@@ -1,0 +1,49 @@
+{
+  "networkCallRecords" : [ {
+    "Method" : "POST",
+    "Uri" : "https://slack.botframework.com/v3/conversations",
+    "Body" : "{\"bot\":{\"id\":\"B21S8SG7J:T03CWQ0QB\"},\"members\":[{\"id\":\"U3Z9ZUDK5:T03CWQ0QB\"}],\"activity\":{\"type\":\"message\",\"from\":{\"id\":\"B21S8SG7J:T03CWQ0QB\"},\"recipient\":{\"id\":\"U3Z9ZUDK5:T03CWQ0QB\"},\"text\":\"TEST Get Activity Members\"}}",
+    "Headers" : {
+      "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+    },
+    "Response" : {
+      "date" : "Fri, 29 Dec 2017 18:29:36 GMT",
+      "server" : "Microsoft-IIS/10.0",
+      "expires" : "-1",
+      "vary" : "Accept-Encoding",
+      "retry-after" : "0",
+      "StatusCode" : "200",
+      "pragma" : "no-cache",
+      "strict-transport-security" : "max-age=31536000",
+      "request-context" : "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+      "x-powered-by" : "ASP.NET",
+      "content-type" : "application/json; charset=utf-8",
+      "cache-control" : "no-cache",
+      "Body" : "{\r\n  \"activityId\": \"1514572176.000088\",\r\n  \"id\": \"B21S8SG7J:T03CWQ0QB:D8K7XGZU3\"\r\n}"
+    }
+  }, {
+    "Method" : "GET",
+    "Uri" : "https://slack.botframework.com/v3/conversations/B21S8SG7J:T03CWQ0QB:D8K7XGZU3/activities/1514572176.000088/members",
+    "Body" : "",
+    "Headers" : {
+      "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)",
+      "Content-Type" : "application/json; charset=utf-8"
+    },
+    "Response" : {
+      "date" : "Fri, 29 Dec 2017 18:29:37 GMT",
+      "server" : "Microsoft-IIS/10.0",
+      "expires" : "-1",
+      "vary" : "Accept-Encoding",
+      "retry-after" : "0",
+      "StatusCode" : "200",
+      "pragma" : "no-cache",
+      "strict-transport-security" : "max-age=31536000",
+      "request-context" : "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+      "x-powered-by" : "ASP.NET",
+      "content-type" : "application/json; charset=utf-8",
+      "cache-control" : "no-cache",
+      "Body" : "[\r\n  {\r\n    \"id\": \"B21S8SG7J:T03CWQ0QB\",\r\n    \"name\": \"manxbot\"\r\n  },\r\n  {\r\n    \"id\": \"U3Z9ZUDK5:T03CWQ0QB\",\r\n    \"name\": \"enz\"\r\n  }\r\n]"
+    }
+  } ],
+  "variables" : [ ]
+}
