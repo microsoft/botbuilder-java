@@ -1,39 +1,37 @@
 package com.microsoft.bot.connector.customizations;
 
-import com.auth0.jwk.Jwk;
-import com.auth0.jwk.JwkException;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.UrlJwkProvider;
+import com.auth0.jwk.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import sun.security.rsa.RSAPublicKeyImpl;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class OpenIdMetadata {
+class OpenIdMetadata {
+    private static final Logger LOGGER = Logger.getLogger( OpenIdMetadata.class.getName() );
+
     private String url;
     private long lastUpdated;
     private JwkProvider cacheKeys;
     private ObjectMapper mapper;
 
-    public OpenIdMetadata(String url) {
+    OpenIdMetadata(String url) {
         this.url = url;
         this.mapper = new ObjectMapper().findAndRegisterModules();
     }
-
 
     public OpenIdMetadataKey getKey(String keyId) {
         // If keys are more than 5 days old, refresh them
         long now = System.currentTimeMillis();
         if (lastUpdated < (now - (1000 * 60 * 60 * 24 * 5))) {
-            String newCache = refreshCache();
-            // TODO: log cache
+            refreshCache();
         }
         // Search the cache even if we failed to refresh
         return findKey(keyId);
@@ -47,10 +45,9 @@ public class OpenIdMetadata {
             this.lastUpdated = System.currentTimeMillis();
             this.cacheKeys = new UrlJwkProvider(keysUrl);
             return IOUtils.toString(keysUrl);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            String errorDescription = String.format("Failed to load openID config: %s", e.getMessage());
+            LOGGER.log(Level.SEVERE, errorDescription);
         }
         return null;
     }
@@ -64,9 +61,11 @@ public class OpenIdMetadata {
             key.endorsements = (List<String>) jwk.getAdditionalAttributes().get("endorsements");
             return key;
         } catch (JwkException e) {
-            e.printStackTrace();
+            String errorDescription = String.format("Failed to load keys: %s", e.getMessage());
+            LOGGER.log(Level.SEVERE, errorDescription);
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            String errorDescription = String.format("Failed to load keys (key not compatible): %s", e.getMessage());
+            LOGGER.log(Level.WARNING, errorDescription);
         }
         return null;
     }

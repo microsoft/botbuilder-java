@@ -8,34 +8,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class BotAuthenticator {
-    private class BotConnectorEndpoint {
-        private String refreshEndpoint;
-        private String refreshScope;
-        private String botConnectorOpenIdMetadata;
-        private String botConnectorIssuer;
-        private String botConnectorAudience;
-        private String emulatorOpenIdMetadata;
-        private String emulatorAuthV31IssuerV1;
-        private String emulatorAuthV31IssuerV2;
-        private String emulatorAuthV32IssuerV1;
-        private String emulatorAuthV32IssuerV2;
-        private String emulatorAudience;
-    }
-
-    private class BotAuthenticatorSettings {
-        private String appId;
-        private String appPassword;
-        private BotConnectorEndpoint endpoint;
-        private String openIdMetadata;
-    }
-
-    private class JwtVerifyOptions {
-        Algorithm algorithm;
-        String issuer;
-        String audience;
-        int clockTolerance;
-    }
+    private static final Logger LOGGER = Logger.getLogger( BotAuthenticator.class.getName() );
 
     private BotAuthenticatorSettings settings;
     private OpenIdMetadata botConnectorOpenIdMetadata;
@@ -45,6 +22,15 @@ public class BotAuthenticator {
         this.settings = new BotAuthenticatorSettings();
         this.settings.appId = credentials.appId();
         this.settings.appPassword = credentials.appPassword();
+        validateSettings();
+    }
+
+    public BotAuthenticator(BotAuthenticatorSettings credentials) {
+        this.settings = credentials;
+        validateSettings();
+    }
+
+    private void validateSettings() {
         if (this.settings.endpoint == null) {
             BotConnectorEndpoint endpoint = new BotConnectorEndpoint();
             endpoint.refreshEndpoint = AuthSettings.REFRESH_ENDPOINT;
@@ -105,7 +91,7 @@ public class BotAuthenticator {
                 // validate the claims from the emulator
                 if ((ver.equalsIgnoreCase("2.0") && !azp.equalsIgnoreCase(this.settings.appId)) ||
                         (!ver.equalsIgnoreCase("2.0") && !appid.equalsIgnoreCase(this.settings.appId))) {
-                    // TODO: record error : ChatConnector: receive - invalid token. Requested by unexpected app ID.
+                    LOGGER.log(Level.SEVERE, "ChatConnector: receive - invalid token. Requested by unexpected app ID.");
                     return false;
                 }
 
@@ -128,7 +114,6 @@ public class BotAuthenticator {
                 if (!issuer.isEmpty()) {
                     openIdMetadata = this.emulatorOpenIdMetadata;
                     verifyOptions = new JwtVerifyOptions();
-                    verifyOptions.algorithm = null; // TODO: Add algorithm
                     verifyOptions.issuer = issuer;
                     verifyOptions.audience = this.settings.endpoint.emulatorAudience;
                     verifyOptions.clockTolerance = 300;
@@ -157,18 +142,18 @@ public class BotAuthenticator {
                         // enforce endorsements in openIdMetadadata if there is any endorsements associated with the key
                         if (!channelId.isEmpty() && key.endorsements != null && !key.endorsements.contains(channelId)) {
                             String errorDescription = String.format("channelId in req.body: %s didn't match the endorsements: %s}.", channelId, StringUtils.join(key.endorsements));
-                            // TODO: record error : BotAuthenticator: receive - endorsements validation failure.
+                            LOGGER.log(Level.SEVERE, errorDescription);
                             return false;
                         }
 
                         if (!decodedServiceUrl.isEmpty() && !serviceUrl.isEmpty() && !serviceUrl.equalsIgnoreCase(decodedServiceUrl)) {
                             String errorDescription = String.format("ServiceUrl in payload of token: %s didn't match the request's serviceurl: %s.", decodedServiceUrl, serviceUrl);
-                            // TODO: record error : BotAuthenticator: receive - serviceurl mismatch.
+                            LOGGER.log(Level.SEVERE, errorDescription);
                             return false;
                         }
                     } catch (JWTVerificationException ex) {
                         String errorDescription = ex.getMessage();
-                        // TODO: record error : BotAuthenticator: receive - invalid token. Check bot's app ID & Password.
+                        LOGGER.log(Level.SEVERE, errorDescription);
                         return false;
                     }
 
@@ -177,13 +162,41 @@ public class BotAuthenticator {
             }
         } else if (isEmulator && !this.settings.appId.isEmpty() && !this.settings.appPassword.isEmpty()) {
             // Emulator running without auth enabled
-            // TODO: record warning
+            LOGGER.log(Level.WARNING, "BotAuthenticator: receive - emulator running without security enabled.");
             return true;
         } else {
             // Token not provided so
-            String errorDescription = "BotAuthenticator: receive - no security token sent.";
+            LOGGER.log(Level.SEVERE, "BotAuthenticator: receive - no security token sent.");
             return  false;
         }
         return true;
+    }
+
+    private class BotConnectorEndpoint {
+        private String refreshEndpoint;
+        private String refreshScope;
+        private String botConnectorOpenIdMetadata;
+        private String botConnectorIssuer;
+        private String botConnectorAudience;
+        private String emulatorOpenIdMetadata;
+        private String emulatorAuthV31IssuerV1;
+        private String emulatorAuthV31IssuerV2;
+        private String emulatorAuthV32IssuerV1;
+        private String emulatorAuthV32IssuerV2;
+        private String emulatorAudience;
+    }
+
+    private class BotAuthenticatorSettings {
+        String appId;
+        String appPassword;
+        BotConnectorEndpoint endpoint;
+        String openIdMetadata;
+    }
+
+    private class JwtVerifyOptions {
+        Algorithm algorithm;
+        String issuer;
+        String audience;
+        int clockTolerance;
     }
 }
