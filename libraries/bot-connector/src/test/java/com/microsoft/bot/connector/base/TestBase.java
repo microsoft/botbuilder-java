@@ -1,6 +1,6 @@
 package com.microsoft.bot.connector.base;
 
-import com.microsoft.bot.connector.customizations.ConnectorCredentials;
+import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.ServiceResponseBuilder;
@@ -169,7 +169,7 @@ public abstract class TestBase {
             }));
         }
         else { // Record mode
-            credentials = new ConnectorCredentials(clientId, clientSecret);
+            credentials = new MicrosoftAppCredentials(clientId, clientSecret);
             restClient = buildRestClient(new RestClient.Builder()
                             .withBaseUrl(hostUri + "/")
                             .withSerializerAdapter(new JacksonAdapter())
