@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 
 public class App {
     private static final Logger LOGGER = Logger.getLogger( App.class.getName() );
-    private static String appId = "be5a8c67-75dd-424a-b7da-746141e11f7f";
-    private static String appPassword = "poR3ZiMgA3JSUkFOcSjtUGp";
+    private static String appId = "<--app-id-->";
+    private static String appPassword = "<--app-password-->";
 
     public static void main( String[] args ) throws Exception
     {
