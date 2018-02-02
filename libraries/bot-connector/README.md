@@ -47,7 +47,7 @@ Client creation (with authentication), conversation initialization and activity 
         .withType(ActivityTypes.MESSAGE)
         .withFrom(bot)
         .withRecipient(user)
-        .withText("this a message from Bot Connector SDK");
+        .withText("this a message from Bot Connector Client (Java)");
 
   ResourceResponse response = client.conversations().sendToConversation(result.id(), activity);
  ```
