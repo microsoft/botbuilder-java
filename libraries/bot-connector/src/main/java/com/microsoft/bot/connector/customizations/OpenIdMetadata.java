@@ -47,7 +47,7 @@ class OpenIdMetadata {
             return IOUtils.toString(keysUrl);
         } catch (IOException e) {
             String errorDescription = String.format("Failed to load openID config: %s", e.getMessage());
-            LOGGER.log(Level.SEVERE, errorDescription);
+            LOGGER.log(Level.WARNING, errorDescription);
         }
         return null;
     }
@@ -62,7 +62,7 @@ class OpenIdMetadata {
             return key;
         } catch (JwkException e) {
             String errorDescription = String.format("Failed to load keys: %s", e.getMessage());
-            LOGGER.log(Level.SEVERE, errorDescription);
+            LOGGER.log(Level.WARNING, errorDescription);
         } catch (InvalidKeyException e) {
             String errorDescription = String.format("Failed to load keys (key not compatible): %s", e.getMessage());
             LOGGER.log(Level.WARNING, errorDescription);

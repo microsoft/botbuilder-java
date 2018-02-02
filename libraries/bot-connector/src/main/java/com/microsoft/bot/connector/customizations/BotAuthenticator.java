@@ -91,7 +91,7 @@ public class BotAuthenticator {
                 // validate the claims from the emulator
                 if ((ver.equalsIgnoreCase("2.0") && !azp.equalsIgnoreCase(this.settings.appId)) ||
                         (!ver.equalsIgnoreCase("2.0") && !appid.equalsIgnoreCase(this.settings.appId))) {
-                    LOGGER.log(Level.SEVERE, "ChatConnector: receive - invalid token. Requested by unexpected app ID.");
+                    LOGGER.log(Level.WARNING, "ChatConnector: receive - invalid token. Requested by unexpected app ID.");
                     return false;
                 }
 
@@ -142,18 +142,18 @@ public class BotAuthenticator {
                         // enforce endorsements in openIdMetadadata if there is any endorsements associated with the key
                         if (!channelId.isEmpty() && key.endorsements != null && !key.endorsements.contains(channelId)) {
                             String errorDescription = String.format("channelId in req.body: %s didn't match the endorsements: %s}.", channelId, StringUtils.join(key.endorsements));
-                            LOGGER.log(Level.SEVERE, errorDescription);
+                            LOGGER.log(Level.WARNING, errorDescription);
                             return false;
                         }
 
                         if (!decodedServiceUrl.isEmpty() && !serviceUrl.isEmpty() && !serviceUrl.equalsIgnoreCase(decodedServiceUrl)) {
                             String errorDescription = String.format("ServiceUrl in payload of token: %s didn't match the request's serviceurl: %s.", decodedServiceUrl, serviceUrl);
-                            LOGGER.log(Level.SEVERE, errorDescription);
+                            LOGGER.log(Level.WARNING, errorDescription);
                             return false;
                         }
                     } catch (JWTVerificationException ex) {
                         String errorDescription = ex.getMessage();
-                        LOGGER.log(Level.SEVERE, errorDescription);
+                        LOGGER.log(Level.WARNING, errorDescription);
                         return false;
                     }
 
@@ -162,11 +162,11 @@ public class BotAuthenticator {
             }
         } else if (isEmulator && !this.settings.appId.isEmpty() && !this.settings.appPassword.isEmpty()) {
             // Emulator running without auth enabled
-            LOGGER.log(Level.WARNING, "BotAuthenticator: receive - emulator running without security enabled.");
+            LOGGER.log(Level.INFO, "BotAuthenticator: receive - emulator running without security enabled.");
             return true;
         } else {
             // Token not provided so
-            LOGGER.log(Level.SEVERE, "BotAuthenticator: receive - no security token sent.");
+            LOGGER.log(Level.WARNING, "BotAuthenticator: receive - no security token sent.");
             return  false;
         }
         return true;

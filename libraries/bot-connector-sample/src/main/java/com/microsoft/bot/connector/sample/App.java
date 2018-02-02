@@ -52,8 +52,10 @@ public class App {
                     if (authenticator.authenticate(httpExchange.getRequestHeaders(), activity.channelId(), activity.serviceUrl())) {
                         ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), new MicrosoftAppCredentials(appId, appPassword));
                         try {
+                            // send ack to user activity
                             httpExchange.sendResponseHeaders(202, 0);
                             httpExchange.getResponseBody().close();
+                            // reply activity with the same text
                             ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
                                     new Activity()
                                             .withType(ActivityTypes.MESSAGE)
@@ -66,7 +68,7 @@ public class App {
                             LOGGER.log(Level.INFO, ex.getMessage());
                         }
                     } else {
-                        LOGGER.log(Level.SEVERE, "auth failed!");
+                        LOGGER.log(Level.WARNING, "auth failed!");
                     }
                 }
             }
