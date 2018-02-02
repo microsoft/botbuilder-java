@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
@@ -40,7 +41,7 @@ public class AttachmentsImpl implements Attachments {
     private ConnectorClientImpl client;
 
     /**
-     * Initializes an instance of Attachments.
+     * Initializes an instance of AttachmentsImpl.
      *
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
@@ -57,12 +58,12 @@ public class AttachmentsImpl implements Attachments {
     interface AttachmentsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
         @GET("v3/attachments/{attachmentId}")
-        Observable<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId);
+        Observable<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachment" })
         @GET("v3/attachments/{attachmentId}/views/{viewId}")
         @Streaming
-        Observable<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId, @Path("viewId") String viewId);
+        Observable<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId, @Path("viewId") String viewId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
     }
 
@@ -122,7 +123,7 @@ public class AttachmentsImpl implements Attachments {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
-        return service.getAttachmentInfo(attachmentId)
+        return service.getAttachmentInfo(attachmentId, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AttachmentInfo>>>() {
                 @Override
                 public Observable<ServiceResponse<AttachmentInfo>> call(Response<ResponseBody> response) {
@@ -206,7 +207,7 @@ public class AttachmentsImpl implements Attachments {
         if (viewId == null) {
             throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
         }
-        return service.getAttachment(attachmentId, viewId)
+        return service.getAttachment(attachmentId, viewId, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<InputStream>>>() {
                 @Override
                 public Observable<ServiceResponse<InputStream>> call(Response<ResponseBody> response) {

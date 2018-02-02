@@ -29,6 +29,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.HTTP;
 import retrofit2.http.Path;
@@ -49,7 +50,7 @@ public class ConversationsImpl implements Conversations {
     private ConnectorClientImpl client;
 
     /**
-     * Initializes an instance of Conversations.
+     * Initializes an instance of ConversationsImpl.
      *
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
@@ -66,35 +67,35 @@ public class ConversationsImpl implements Conversations {
     interface ConversationsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations createConversation" })
         @POST("v3/conversations")
-        Observable<Response<ResponseBody>> createConversation(@Body ConversationParameters parameters);
+        Observable<Response<ResponseBody>> createConversation(@Body ConversationParameters parameters, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendToConversation" })
         @POST("v3/conversations/{conversationId}/activities")
-        Observable<Response<ResponseBody>> sendToConversation(@Path("conversationId") String conversationId, @Body Activity activity);
+        Observable<Response<ResponseBody>> sendToConversation(@Path("conversationId") String conversationId, @Body Activity activity, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations updateActivity" })
         @PUT("v3/conversations/{conversationId}/activities/{activityId}")
-        Observable<Response<ResponseBody>> updateActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Body Activity activity);
+        Observable<Response<ResponseBody>> updateActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Body Activity activity, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity" })
         @POST("v3/conversations/{conversationId}/activities/{activityId}")
-        Observable<Response<ResponseBody>> replyToActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Body Activity activity);
+        Observable<Response<ResponseBody>> replyToActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Body Activity activity, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteActivity" })
         @HTTP(path = "v3/conversations/{conversationId}/activities/{activityId}", method = "DELETE", hasBody = true)
-        Observable<Response<ResponseBody>> deleteActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId);
+        Observable<Response<ResponseBody>> deleteActivity(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers" })
         @GET("v3/conversations/{conversationId}/members")
-        Observable<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId);
+        Observable<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getActivityMembers" })
         @GET("v3/conversations/{conversationId}/activities/{activityId}/members")
-        Observable<Response<ResponseBody>> getActivityMembers(@Path("conversationId") String conversationId, @Path("activityId") String activityId);
+        Observable<Response<ResponseBody>> getActivityMembers(@Path("conversationId") String conversationId, @Path("activityId") String activityId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment" })
         @POST("v3/conversations/{conversationId}/attachments")
-        Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload);
+        Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
     }
 
@@ -199,7 +200,7 @@ public class ConversationsImpl implements Conversations {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
         Validator.validate(parameters);
-        return service.createConversation(parameters)
+        return service.createConversation(parameters, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ConversationResourceResponse>> call(Response<ResponseBody> response) {
@@ -306,7 +307,7 @@ public class ConversationsImpl implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.sendToConversation(conversationId, activity)
+        return service.sendToConversation(conversationId, activity, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -408,7 +409,7 @@ public class ConversationsImpl implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.updateActivity(conversationId, activityId, activity)
+        return service.updateActivity(conversationId, activityId, activity, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -522,7 +523,7 @@ public class ConversationsImpl implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.replyToActivity(conversationId, activityId, activity)
+        return service.replyToActivity(conversationId, activityId, activity, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -611,7 +612,7 @@ public class ConversationsImpl implements Conversations {
         if (activityId == null) {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
-        return service.deleteActivity(conversationId, activityId)
+        return service.deleteActivity(conversationId, activityId, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
                 @Override
                 public Observable<ServiceResponse<Void>> call(Response<ResponseBody> response) {
@@ -693,7 +694,7 @@ public class ConversationsImpl implements Conversations {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
-        return service.getConversationMembers(conversationId)
+        return service.getConversationMembers(conversationId, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ChannelAccount>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<ChannelAccount>>> call(Response<ResponseBody> response) {
@@ -781,7 +782,7 @@ public class ConversationsImpl implements Conversations {
         if (activityId == null) {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
-        return service.getActivityMembers(conversationId, activityId)
+        return service.getActivityMembers(conversationId, activityId, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ChannelAccount>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<ChannelAccount>>> call(Response<ResponseBody> response) {
@@ -874,7 +875,7 @@ public class ConversationsImpl implements Conversations {
             throw new IllegalArgumentException("Parameter attachmentUpload is required and cannot be null.");
         }
         Validator.validate(attachmentUpload);
-        return service.uploadAttachment(conversationId, attachmentUpload)
+        return service.uploadAttachment(conversationId, attachmentUpload, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {

@@ -10,8 +10,7 @@
 
 package com.microsoft.bot.connector.models;
 
-import com.microsoft.bot.schema.models.ErrorResponse;
-import com.microsoft.rest.RestException;
+import com.microsoft.rest.RestException;import com.microsoft.bot.schema.models.ErrorResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
