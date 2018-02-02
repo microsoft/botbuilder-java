@@ -1,6 +1,7 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.implementation.*;
+import com.microsoft.bot.connector.models.ErrorResponseException;
+import com.microsoft.bot.schema.models.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,18 +16,18 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversation() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Create Conversation");
 
-        ConversationParametersInner params = new ConversationParametersInner()
+        ConversationParameters params = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot)
                 .withActivity(activity);
 
-        ConversationResourceResponseInner result = connector.conversations().createConversation(params);
+        ConversationResourceResponse result = connector.conversations().createConversation(params);
 
         Assert.assertNotNull(result.activityId());
     }
@@ -34,19 +35,19 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithInvalidBot() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Create Conversation");
 
-        ConversationParametersInner params = new ConversationParametersInner()
+        ConversationParameters params = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot.withId("invalid-id"))
                 .withActivity(activity);
 
         try {
-            ConversationResourceResponseInner result = connector.conversations().createConversation(params);
+            ConversationResourceResponse result = connector.conversations().createConversation(params);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -57,19 +58,19 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithoutMembers() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Create Conversation");
 
-        ConversationParametersInner params = new ConversationParametersInner()
-                .withMembers(Collections.<ChannelAccountInner>emptyList())
+        ConversationParameters params = new ConversationParameters()
+                .withMembers(Collections.<ChannelAccount>emptyList())
                 .withBot(bot)
                 .withActivity(activity);
 
         try {
-            ConversationResourceResponseInner result = connector.conversations().createConversation(params);
+            ConversationResourceResponse result = connector.conversations().createConversation(params);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("BadArgument", e.body().error().code().toString());
@@ -80,19 +81,19 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithBotMember() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Create Conversation");
 
-        ConversationParametersInner params = new ConversationParametersInner()
+        ConversationParameters params = new ConversationParameters()
                 .withMembers(Collections.singletonList(bot))
                 .withBot(bot)
                 .withActivity(activity);
 
         try {
-            ConversationResourceResponseInner result = connector.conversations().createConversation(params);
+            ConversationResourceResponse result = connector.conversations().createConversation(params);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("BadArgument", e.body().error().code().toString());
@@ -102,17 +103,17 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetConversationMembers() {
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        List<ChannelAccountInner> members = connector.conversations().getConversationMembers(conversation.id());
+        List<ChannelAccount> members = connector.conversations().getConversationMembers(conversation.id());
 
         boolean hasUser = false;
 
-        for (ChannelAccountInner member : members) {
+        for (ChannelAccount member : members) {
             hasUser = member.id().equals(user.id());
             if (hasUser) break;
         }
@@ -123,14 +124,14 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetConversationMembersWithInvalidConversationId() {
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
         try {
-            List<ChannelAccountInner> members = connector.conversations().getConversationMembers(conversation.id().concat("M"));
+            List<ChannelAccount> members = connector.conversations().getConversationMembers(conversation.id().concat("M"));
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -141,20 +142,20 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversation() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withName("activity")
                 .withText("TEST Send to Conversation");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
         Assert.assertNotNull(response.id());
     }
@@ -162,21 +163,21 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversationWithInvalidConversationId() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withName("activity")
                 .withText("TEST Send to Conversation");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
         try {
-            ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id().concat("M"), activity);
+            ResourceResponse response = connector.conversations().sendToConversation(conversation.id().concat("M"), activity);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -187,13 +188,13 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversationWithInvalidBotId() {
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot.withId("B21S8SG7K:T03CWQ0QB"))
@@ -201,7 +202,7 @@ public class ConversationsTest extends BotConnectorTestBase {
                 .withText("TEST Send to Conversation");
 
         try {
-            ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+            ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("MissingProperty", e.body().error().code().toString());
@@ -212,7 +213,7 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendCardToConversation() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
@@ -236,13 +237,13 @@ public class ConversationsTest extends BotConnectorTestBase {
 
                 ));
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
         Assert.assertNotNull(response.id());
     }
@@ -250,24 +251,24 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetActivityMembers() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Get Activity Members");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot)
                 .withActivity(activity);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        List<ChannelAccountInner> members = connector.conversations().getActivityMembers(conversation.id(), conversation.activityId());
+        List<ChannelAccount> members = connector.conversations().getActivityMembers(conversation.id(), conversation.activityId());
 
         boolean hasUser = false;
 
-        for (ChannelAccountInner member : members) {
+        for (ChannelAccount member : members) {
             hasUser = member.id().equals(user.id());
             if (hasUser) break;
         }
@@ -278,21 +279,21 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetActivityMembersWithInvalidConversationId() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Get Activity Members");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot)
                 .withActivity(activity);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
         try {
-            List<ChannelAccountInner> members = connector.conversations().getActivityMembers(conversation.id().concat("M"), conversation.activityId());
+            List<ChannelAccount> members = connector.conversations().getActivityMembers(conversation.id().concat("M"), conversation.activityId());
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -303,27 +304,27 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void ReplyToActivity() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Send to Conversation");
 
-        ActivityInner reply = new ActivityInner()
+        Activity reply = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Reply to Activity");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
-        ResourceResponseInner replyResponse = connector.conversations().replyToActivity(conversation.id(), response.id(), reply);
+        ResourceResponse replyResponse = connector.conversations().replyToActivity(conversation.id(), response.id(), reply);
 
         Assert.assertNotNull(replyResponse.id());
     }
@@ -331,28 +332,28 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void ReplyToActivityWithInvalidConversationId() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Send to Conversation");
 
-        ActivityInner reply = new ActivityInner()
+        Activity reply = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Reply to Activity");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
         try {
-            ResourceResponseInner replyResponse = connector.conversations().replyToActivity(conversation.id().concat("M"), response.id(), reply);
+            ResourceResponse replyResponse = connector.conversations().replyToActivity(conversation.id().concat("M"), response.id(), reply);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -363,18 +364,18 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivity() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Delete Activity");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot)
                 .withActivity(activity);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
         connector.conversations().deleteActivity(conversation.id(), conversation.activityId());
 
@@ -384,18 +385,18 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivityWithInvalidConversationId() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Delete Activity");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot)
                 .withActivity(activity);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
         try {
             connector.conversations().deleteActivity("B21S8SG7K:T03CWQ0QB", conversation.activityId());
@@ -409,24 +410,24 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UpdateActivity() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Send to Conversation");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
-        ActivityInner update = activity.withId(response.id())
+        Activity update = activity.withId(response.id())
                 .withText("TEST Update Activity");
 
-        ResourceResponseInner updateResponse = connector.conversations().updateActivity(conversation.id(), response.id(), update);
+        ResourceResponse updateResponse = connector.conversations().updateActivity(conversation.id(), response.id(), update);
 
         Assert.assertNotNull(updateResponse.id());
     }
@@ -434,25 +435,25 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UpdateActivityWithInvalidConversationId() {
 
-        ActivityInner activity = new ActivityInner()
+        Activity activity = new Activity()
                 .withType(ActivityTypes.MESSAGE)
                 .withRecipient(user)
                 .withFrom(bot)
                 .withText("TEST Send to Conversation");
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().sendToConversation(conversation.id(), activity);
+        ResourceResponse response = connector.conversations().sendToConversation(conversation.id(), activity);
 
-        ActivityInner update = activity.withId(response.id())
+        Activity update = activity.withId(response.id())
                 .withText("TEST Update Activity");
 
         try {
-            ResourceResponseInner updateResponse = connector.conversations().updateActivity("B21S8SG7K:T03CWQ0QB", response.id(), update);
+            ResourceResponse updateResponse = connector.conversations().updateActivity("B21S8SG7K:T03CWQ0QB", response.id(), update);
             Assert.fail("expected exception was not occurred.");
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().error().code().toString());
@@ -463,18 +464,18 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UploadAttachment() {
 
-        AttachmentDataInner attachment = new AttachmentDataInner()
+        AttachmentData attachment = new AttachmentData()
                 .withName("bot-framework.png")
                 .withType("image/png")
                 .withOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner response = connector.conversations().uploadAttachment(conversation.id(), attachment);
+        ResourceResponse response = connector.conversations().uploadAttachment(conversation.id(), attachment);
 
         Assert.assertNotNull(response.id());
     }

@@ -1,13 +1,13 @@
 package com.microsoft.bot.connector.sample;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.connector.ActivityTypes;
 import com.microsoft.bot.connector.customizations.BotAuthenticator;
 import com.microsoft.bot.connector.customizations.BotCredentials;
 import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.implementation.ActivityInner;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
-import com.microsoft.bot.connector.implementation.ResourceResponseInner;
+import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.models.ActivityTypes;
+import com.microsoft.bot.schema.models.ResourceResponse;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 
 public class App {
     private static final Logger LOGGER = Logger.getLogger( App.class.getName() );
-    private static String appId = "<--app-id-->";
-    private static String appPassword = "<--app-password-->";
+    private static String appId = "be5a8c67-75dd-424a-b7da-746141e11f7f";
+    private static String appPassword = "poR3ZiMgA3JSUkFOcSjtUGp";
 
     public static void main( String[] args ) throws Exception
     {
@@ -47,15 +47,15 @@ public class App {
 
         public void handle(HttpExchange httpExchange) throws IOException {
             if (httpExchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                ActivityInner activity = getActivity(httpExchange);
+                Activity activity = getActivity(httpExchange);
                 if (activity != null && activity.type() == ActivityTypes.MESSAGE) {
                     if (authenticator.authenticate(httpExchange.getRequestHeaders(), activity.channelId(), activity.serviceUrl())) {
                         ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), new MicrosoftAppCredentials(appId, appPassword));
                         try {
                             httpExchange.sendResponseHeaders(202, 0);
                             httpExchange.getResponseBody().close();
-                            ResourceResponseInner response = connector.conversations().sendToConversation(activity.conversation().id(),
-                                    new ActivityInner()
+                            ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
+                                    new Activity()
                                             .withType(ActivityTypes.MESSAGE)
                                             .withText("Echo: " + activity.text())
                                             .withRecipient(activity.from())
@@ -86,10 +86,10 @@ public class App {
             return "";
         }
 
-        private ActivityInner getActivity(HttpExchange httpExchange) throws IOException {
+        private Activity getActivity(HttpExchange httpExchange) throws IOException {
             String body = getRequestBody(httpExchange);
             try {
-                return objectMapper.readValue(body, ActivityInner.class);
+                return objectMapper.readValue(body, Activity.class);
             } catch (Exception ex) {
                 return null;
             }

@@ -1,6 +1,6 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.implementation.*;
+import com.microsoft.bot.schema.models.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,20 +13,20 @@ public class AttachmentsTest extends BotConnectorTestBase {
     @Test
     public void GetAttachmentInfo() {
 
-        AttachmentDataInner attachment = new AttachmentDataInner()
+        AttachmentData attachment = new AttachmentData()
                 .withName("bot-framework.png")
                 .withType("image/png")
                 .withOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
+        ResourceResponse attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
 
-        AttachmentInfoInner response = connector.attachments().getAttachmentInfo(attachmentResponse.id());
+        AttachmentInfo response = connector.attachments().getAttachmentInfo(attachmentResponse.id());
 
         Assert.assertEquals(attachment.name(), response.name());
     }
@@ -44,20 +44,20 @@ public class AttachmentsTest extends BotConnectorTestBase {
             e.printStackTrace();
         }
 
-        AttachmentDataInner attachment = new AttachmentDataInner()
+        AttachmentData attachment = new AttachmentData()
                 .withName("bot_icon.png")
                 .withType("image/png")
                 .withOriginalBase64(attachmentPayload);
 
-        ConversationParametersInner createMessage = new ConversationParametersInner()
+        ConversationParameters createMessage = new ConversationParameters()
                 .withMembers(Collections.singletonList(user))
                 .withBot(bot);
 
-        ConversationResourceResponseInner conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
 
-        ResourceResponseInner attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
+        ResourceResponse attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
 
-        AttachmentInfoInner attachmentInfo = connector.attachments().getAttachmentInfo(attachmentResponse.id());
+        AttachmentInfo attachmentInfo = connector.attachments().getAttachmentInfo(attachmentResponse.id());
 
         for (AttachmentView attView : attachmentInfo.views()) {
             InputStream retrievedAttachment = connector.attachments().getAttachment(attachmentResponse.id(), attView.viewId());

@@ -12,13 +12,16 @@ package com.microsoft.bot.connector.implementation;
 
 import com.microsoft.azure.AzureClient;
 import com.microsoft.azure.AzureServiceClient;
+import com.microsoft.bot.connector.Attachments;
+import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.Conversations;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 
 /**
  * Initializes a new instance of the ConnectorClientImpl class.
  */
-public class ConnectorClientImpl extends AzureServiceClient {
+public class ConnectorClientImpl extends AzureServiceClient implements ConnectorClient {
     /** the {@link AzureClient} used for long running operations. */
     private AzureClient azureClient;
 
@@ -100,28 +103,28 @@ public class ConnectorClientImpl extends AzureServiceClient {
     }
 
     /**
-     * The AttachmentsInner object to access its operations.
+     * The Attachments object to access its operations.
      */
-    private AttachmentsInner attachments;
+    private Attachments attachments;
 
     /**
-     * Gets the AttachmentsInner object to access its operations.
-     * @return the AttachmentsInner object.
+     * Gets the Attachments object to access its operations.
+     * @return the Attachments object.
      */
-    public AttachmentsInner attachments() {
+    public Attachments attachments() {
         return this.attachments;
     }
 
     /**
-     * The ConversationsInner object to access its operations.
+     * The Conversations object to access its operations.
      */
-    private ConversationsInner conversations;
+    private Conversations conversations;
 
     /**
-     * Gets the ConversationsInner object to access its operations.
-     * @return the ConversationsInner object.
+     * Gets the Conversations object to access its operations.
+     * @return the Conversations object.
      */
-    public ConversationsInner conversations() {
+    public Conversations conversations() {
         return this.conversations;
     }
 
@@ -159,8 +162,8 @@ public class ConnectorClientImpl extends AzureServiceClient {
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
-        this.attachments = new AttachmentsInner(restClient().retrofit(), this);
-        this.conversations = new ConversationsInner(restClient().retrofit(), this);
+        this.attachments = new AttachmentsImpl(restClient().retrofit(), this);
+        this.conversations = new ConversationsImpl(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
     }
 
