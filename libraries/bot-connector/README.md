@@ -3,9 +3,14 @@
 Within the Bot Framework, the Bot Connector service enables your bot to exchange messages with users on channels that are configured in the Bot Framework Portal.
 
 ## How to Install
+Add to maven dependencies
 
 ````
-Complete here
+  <dependency>
+      <groupId>com.microsoft.bot.connector</groupId>
+      <artifactId>bot-connector</artifactId>
+      <version>VERSION</version>
+  </dependency>
 ````
 
 ## How to Use
@@ -19,9 +24,32 @@ More information: https://docs.microsoft.com/en-us/bot-framework/rest-api/bot-fr
 
 ### Client creation (with authentication), conversation initialization and activity send to user as an example
 
-````Java
-//complete Here
-````
+ ```java
+  String appId = "<your-app-id>";
+  String appPassword = "<your-app-password>";
+  
+  MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
+  
+  ConnectorClientImpl client = new ConnectorClientImpl("https://slack.botframework.com", credentials);
+  
+  ChannelAccount bot = new ChannelAccount().withId("<bot-id>");
+  ChannelAccount user = new ChannelAccount().withId("<user-id>");
+
+  ConversationParameters conversation = new ConversationParameters()
+        .withBot(bot)
+        .withMembers(Collections.singletonList(user))
+        .withIsGroup(false);
+
+  ConversationResourceResponse result = client.conversations().createConversation(conversation);
+        
+  Activity activity = new Activity()
+        .withType(ActivityTypes.MESSAGE)
+        .withFrom(bot)
+        .withRecipient(user)
+        .withText("this a message from Bot Connector SDK");
+
+  ResourceResponse response = client.conversations().sendToConversation(result.id(), activity);
+ ```
 
 ## Rest API Documentation
 
