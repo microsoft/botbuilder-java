@@ -51,6 +51,10 @@ Client creation (with authentication), conversation initialization and activity 
 
   ResourceResponse response = client.conversations().sendToConversation(result.id(), activity);
  ```
+ 
+ ### Simple EchoBot Example ([source code](../../samples/bot-connector-sample))
+EchoBot is a minimal bot that recieves message activities and replies with the same content.
+The sample shows how to use HTTPServer for listening to activities and the ConnectorClient for sending activities.
 
 ## Rest API Documentation
 
