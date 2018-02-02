@@ -4,7 +4,7 @@
 
     <groupId>com.microsoft.bot.connector</groupId>
     <artifactId>bot-connector</artifactId>
-    <version>0.0.1</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>bot-connector</name>
@@ -60,6 +60,11 @@
             <groupId>com.auth0</groupId>
             <artifactId>jwks-rsa</artifactId>
             <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.bot.schema</groupId>
+            <artifactId>botbuilder-schema</artifactId>
+            <version>4.0.0</version>
         </dependency>
     </dependencies>
 

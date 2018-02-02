@@ -57,6 +57,7 @@ public class BotAuthenticator {
         this.emulatorOpenIdMetadata = new OpenIdMetadata(this.settings.endpoint.emulatorOpenIdMetadata);
     }
 
+    @SuppressWarnings("unchecked")
     public boolean authenticate(Headers headers, String channelId, String serviceUrl) {
         boolean isEmulator = channelId.equalsIgnoreCase("emulator");
 

@@ -24,8 +24,7 @@ public class App {
     private static String appId = "<--app-id-->";
     private static String appPassword = "<--app-password-->";
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main( String[] args ) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(3978), 0);
         server.createContext("/api/messages", new MessageHandle());
         server.setExecutor(null);
