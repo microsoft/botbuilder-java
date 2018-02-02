@@ -22,7 +22,8 @@ To authenticate the requests, you'll need configure the Connector with the App I
 
 More information: https://docs.microsoft.com/en-us/bot-framework/rest-api/bot-framework-rest-connector-authentication
 
-### Client creation (with authentication), conversation initialization and activity send to user as an example
+### Example
+Client creation (with authentication), conversation initialization and activity send to user.
 
  ```java
   String appId = "<your-app-id>";
