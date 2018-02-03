@@ -1,0 +1,26 @@
+{
+  "networkCallRecords" : [ {
+    "Method" : "POST",
+    "Uri" : "https://slack.botframework.com/v3/conversations",
+    "Body" : "{\"bot\":{\"id\":\"invalid-id\"},\"members\":[{\"id\":\"U3Z9ZUDK5:T03CWQ0QB\"}],\"activity\":{\"type\":\"message\",\"from\":{\"id\":\"invalid-id\"},\"recipient\":{\"id\":\"U3Z9ZUDK5:T03CWQ0QB\"},\"text\":\"TEST Create Conversation\"}}",
+    "Headers" : {
+      "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+    },
+    "Response" : {
+      "date" : "Fri, 29 Dec 2017 18:29:50 GMT",
+      "content-length" : "97",
+      "server" : "Microsoft-IIS/10.0",
+      "expires" : "-1",
+      "retry-after" : "0",
+      "StatusCode" : "400",
+      "pragma" : "no-cache",
+      "strict-transport-security" : "max-age=31536000",
+      "request-context" : "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+      "x-powered-by" : "ASP.NET",
+      "content-type" : "application/json; charset=utf-8",
+      "cache-control" : "no-cache",
+      "Body" : "{\r\n  \"error\": {\r\n    \"code\": \"ServiceError\",\r\n    \"message\": \"Invalid userId: invalid-id\"\r\n  }\r\n}"
+    }
+  } ],
+  "variables" : [ ]
+}
