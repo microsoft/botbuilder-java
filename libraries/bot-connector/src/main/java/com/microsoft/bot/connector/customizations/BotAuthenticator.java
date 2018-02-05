@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.Verification;
 import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,16 +18,27 @@ public class BotAuthenticator {
     private BotAuthenticatorSettings settings;
     private OpenIdMetadata botConnectorOpenIdMetadata;
     private OpenIdMetadata emulatorOpenIdMetadata;
+    private boolean verifyExpiration;
 
-    public BotAuthenticator(BotCredentials credentials) {
+    public BotAuthenticator(BotCredentials credentials, boolean verifyExpiration) {
         this.settings = new BotAuthenticatorSettings();
         this.settings.appId = credentials.appId();
         this.settings.appPassword = credentials.appPassword();
+        this.verifyExpiration = verifyExpiration;
         validateSettings();
     }
 
+    public BotAuthenticator(BotCredentials credentials) {
+        this(credentials, true);
+    }
+
     public BotAuthenticator(BotAuthenticatorSettings credentials) {
+        this(credentials, true);
+    }
+
+    public BotAuthenticator(BotAuthenticatorSettings credentials, boolean verifyExpiration) {
         this.settings = credentials;
+        this.verifyExpiration = verifyExpiration;
         validateSettings();
     }
 
@@ -133,12 +145,16 @@ public class BotAuthenticator {
             if (openIdMetadata != null) {
                 OpenIdMetadataKey key = openIdMetadata.getKey(decodedJWT.getKeyId());
                 if (key != null) {
-                    JWTVerifier verifier = JWT.require(Algorithm.RSA256(key.key, null))
+                    Verification verification = JWT.require(Algorithm.RSA256(key.key, null))
                             .withIssuer(verifyOptions.issuer)
-                            .withAudience(verifyOptions.audience)
-                            .build();
+                            .withAudience(verifyOptions.audience);
+                    if (!verifyExpiration) {
+                        verification = verification
+                                .acceptExpiresAt(System.currentTimeMillis() + 500)
+                                .acceptNotBefore(0);
+                    }
                     try {
-                        verifier.verify(token);
+                        verification.build().verify(token);
 
                         // enforce endorsements in openIdMetadadata if there is any endorsements associated with the key
                         if (!channelId.isEmpty() && key.endorsements != null && !key.endorsements.contains(channelId)) {
@@ -161,7 +177,7 @@ public class BotAuthenticator {
                     return true;
                 }
             }
-        } else if (isEmulator && !this.settings.appId.isEmpty() && !this.settings.appPassword.isEmpty()) {
+        } else if (isEmulator && this.settings.appId.isEmpty() && this.settings.appPassword.isEmpty()) {
             // Emulator running without auth enabled
             LOGGER.log(Level.INFO, "BotAuthenticator: receive - emulator running without security enabled.");
             return true;
