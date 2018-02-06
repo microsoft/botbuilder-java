@@ -28,7 +28,9 @@
         "summary": "GetAttachmentInfo",
         "description": "Get AttachmentInfo structure describing the attachment views",
         "operationId": "Attachments_GetAttachmentInfo",
-        "consumes": [],
+        "consumes": [
+
+        ],
         "produces": [
           "application/json",
           "text/json",
@@ -68,7 +70,9 @@
         "summary": "GetAttachment",
         "description": "Get the named view as binary content",
         "operationId": "Attachments_GetAttachment",
-        "consumes": [],
+        "consumes": [
+
+        ],
         "produces": [
           "application/json",
           "text/json",
@@ -387,7 +391,9 @@
         "summary": "DeleteActivity",
         "description": "Delete an existing activity.\r\n\r\nSome channels allow you to delete an existing activity, and if successful this method will remove the specified activity.",
         "operationId": "Conversations_DeleteActivity",
-        "consumes": [],
+        "consumes": [
+
+        ],
         "produces": [
           "application/json",
           "text/json",
@@ -434,7 +440,9 @@
         "summary": "GetConversationMembers",
         "description": "Enumerate the members of a converstion. \r\n\r\nThis REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.",
         "operationId": "Conversations_GetConversationMembers",
-        "consumes": [],
+        "consumes": [
+
+        ],
         "produces": [
           "application/json",
           "text/json",
@@ -477,7 +485,9 @@
         "summary": "GetActivityMembers",
         "description": "Enumerate the members of an activity. \r\n\r\nThis REST API takes a ConversationId and a ActivityId, returning an array of ChannelAccount objects representing the members of the particular activity in the conversation.",
         "operationId": "Conversations_GetActivityMembers",
-        "consumes": [],
+        "consumes": [
+
+        ],
         "produces": [
           "application/json",
           "text/json",
@@ -1190,9 +1200,6 @@
     },
     "ThumbnailUrl": {
       "description": "Thumbnail URL",
-      "required": [
-        "url"
-      ],
       "type": "object",
       "properties": {
         "url": {
@@ -1207,9 +1214,6 @@
     },
     "MediaUrl": {
       "description": "Media URL",
-      "required": [
-        "url"
-      ],
       "type": "object",
       "properties": {
         "url": {
@@ -1690,7 +1694,9 @@
         "suggestion"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "ActivityTypes",
         "modelAsString": true
@@ -1703,7 +1709,9 @@
         "carousel"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "AttachmentLayoutTypes",
         "modelAsString": true
@@ -1725,7 +1733,9 @@
         "messageBack"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "ActionTypes",
         "modelAsString": true
@@ -1738,7 +1748,9 @@
         "remove"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "ContactRelationUpdateActionTypes",
         "modelAsString": true
@@ -1751,7 +1763,9 @@
         "remove"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "InstallationUpdateActionTypes",
         "modelAsString": true
@@ -1764,7 +1778,9 @@
         "plusOne"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "MessageReactionTypes",
         "modelAsString": true
@@ -1778,7 +1794,9 @@
         "xml"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "TextFormatTypes",
         "modelAsString": true
@@ -1792,7 +1810,9 @@
         "expectingInput"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "InputHints",
         "modelAsString": true
@@ -1809,7 +1829,9 @@
         "channelFailed"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "EndOfConversationCodes",
         "modelAsString": true
@@ -1823,7 +1845,9 @@
         "high"
       ],
       "type": "string",
-      "properties": {},
+      "properties": {
+
+      },
       "x-ms-enum": {
         "name": "ActivityImportance",
         "modelAsString": true
