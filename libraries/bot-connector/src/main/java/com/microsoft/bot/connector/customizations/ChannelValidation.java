@@ -6,9 +6,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class ChannelValidation {
-    public static final TokenValidationParameters ToBotFromChannelTokenValidationParameters = TokenValidationParameters.toBotFromChannelTokenValidationParameters();
     private static final String ServiceUrlClaim = "serviceurl";
 
+    /**
+     * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
+     */
+    public static final TokenValidationParameters ToBotFromChannelTokenValidationParameters = TokenValidationParameters.toBotFromChannelTokenValidationParameters();
+
+    /**
+     * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+     * @param authHeader The raw HTTP header in the format: "Bearer [longString]"
+     * @param credentials The user defined set of valid credentials, such as the AppId.
+     * @return A valid ClaimsIdentity.
+     * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
+     */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromChannelTokenValidationParameters,
@@ -51,6 +62,14 @@ public class ChannelValidation {
         return CompletableFuture.completedFuture(identity);
     }
 
+    /**
+     * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+     * @param authHeader The raw HTTP header in the format: "Bearer [longString]"
+     * @param credentials The user defined set of valid credentials, such as the AppId.
+     * @param serviceUrl service url
+     * @return A valid ClaimsIdentity.
+     * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
+     */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,CredentialProvider credentials, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
         ClaimsIdentity identity = ChannelValidation.authenticateToken(authHeader, credentials).get();
 

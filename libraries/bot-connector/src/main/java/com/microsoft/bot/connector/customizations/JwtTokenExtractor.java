@@ -27,7 +27,6 @@ public class JwtTokenExtractor {
     private List<String> allowedSigningAlgorithms;
     private Function<List<String>, Boolean> validator;
     private OpenIdMetadata openIdMetadata;
-    private Object endorsementsData;
 
     public JwtTokenExtractor(TokenValidationParameters tokenValidationParameters, String metadataUrl, List<String> allowedSigningAlgorithms, Function<List<String>, Boolean> validator) {
         this.tokenValidationParameters = new TokenValidationParameters(tokenValidationParameters);
@@ -38,7 +37,7 @@ public class JwtTokenExtractor {
         } else {
             this.validator = (endorsements) -> true;
         }
-        this.openIdMetadata = this.openIdMetadataCache.computeIfAbsent(metadataUrl, key -> new OpenIdMetadata(metadataUrl));
+        this.openIdMetadata = openIdMetadataCache.computeIfAbsent(metadataUrl, key -> new OpenIdMetadata(metadataUrl));
     }
 
     public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader) {
@@ -73,6 +72,7 @@ public class JwtTokenExtractor {
         return this.tokenValidationParameters.validIssuers != null && this.tokenValidationParameters.validIssuers.contains(decodedJWT.getIssuer());
     }
 
+    @SuppressWarnings("unchecked")
     private CompletableFuture<ClaimsIdentity> validateTokenAsync(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         OpenIdMetadataKey key = openIdMetadata.getKey(decodedJWT.getKeyId());
@@ -87,6 +87,9 @@ public class JwtTokenExtractor {
                 verification.build().verify(token);
                 if (!validator.apply(key.endorsements)) {
                     throw new AuthenticationException(String.format("Could not validate endorsement for key: %s with endorsements: %s", decodedJWT.getKeyId(), StringUtils.join(key.endorsements)));
+                }
+                if(!allowedSigningAlgorithms.contains(decodedJWT.getAlgorithm())) {
+                    throw new AuthenticationException(String.format("Could not validate algorithm for key: %s with algorithms: %s", decodedJWT.getAlgorithm(), StringUtils.join(allowedSigningAlgorithms)));
                 }
                 Map<String, String> claims = new HashMap<>();
                 if (decodedJWT.getClaims() != null) {

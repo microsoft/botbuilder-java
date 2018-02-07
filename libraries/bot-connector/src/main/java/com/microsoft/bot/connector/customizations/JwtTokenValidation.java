@@ -14,8 +14,7 @@ public class JwtTokenValidation {
      * @param authHeader The Bearer token included as part of the request
      * @param credentials The set of valid credentials, such as the Bot Application ID
      * @return Nothing
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws AuthenticationException Throws on auth failed.
      */
     public static CompletableFuture assertValidActivity(Activity activity, String authHeader, CredentialProvider credentials) throws AuthenticationException, InterruptedException, ExecutionException {
         if (authHeader == null || authHeader.isEmpty()) {

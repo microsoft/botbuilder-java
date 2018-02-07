@@ -7,11 +7,23 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Validates and Examines JWT tokens from the Bot Framework Emulator
+ */
 public class EmulatorValidation {
-    public static final TokenValidationParameters ToBotFromEmulatorTokenValidationParameters = TokenValidationParameters.toBotFromEmulatorTokenValidationParameters();
     private static final String VersionClaim = "ver";
     private static final String AppIdClaim = "appid";
 
+    /**
+     * TO BOT FROM EMULATOR: Token validation parameters when connecting to a channel.
+     */
+    public static final TokenValidationParameters ToBotFromEmulatorTokenValidationParameters = TokenValidationParameters.toBotFromEmulatorTokenValidationParameters();
+
+    /**
+     * Determines if a given Auth header is from the Bot Framework Emulator
+     * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
+     * @return True, if the token was issued by the Emulator. Otherwise, false.
+     */
     public static CompletableFuture<Boolean> isTokenFromEmulator(String authHeader) {
         // The Auth Header generally looks like this:
         // "Bearer eyJ0e[...Big Long String...]XAiO"
@@ -53,7 +65,14 @@ public class EmulatorValidation {
         return CompletableFuture.completedFuture(true);
     }
 
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException {
+    /**
+     * Validate the incoming Auth Header as a token sent from the Bot Framework Emulator.
+     * @param authHeader The raw HTTP header in the format: "Bearer [longString]"
+     * @param credentials The user defined set of valid credentials, such as the AppId.
+     * @return A valid ClaimsIdentity.
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
+     */
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromEmulatorTokenValidationParameters,
                 AuthenticationConstants.ToBotFromEmulatorOpenIdMetadataUrl,
