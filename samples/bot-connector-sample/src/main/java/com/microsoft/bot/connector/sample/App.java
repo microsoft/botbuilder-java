@@ -1,8 +1,11 @@
 package com.microsoft.bot.connector.sample;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.connector.customizations.BotAuthenticator;
-import com.microsoft.bot.connector.customizations.BotCredentials;
+import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.customizations.CredentialProvider;
+import com.microsoft.bot.connector.customizations.CredentialProviderImpl;
+import com.microsoft.bot.connector.customizations.JwtTokenValidation;
 import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.Activity;
@@ -21,54 +24,58 @@ import java.util.logging.Logger;
 
 public class App {
     private static final Logger LOGGER = Logger.getLogger( App.class.getName() );
-    private static String appId = "<--app-id-->";
-    private static String appPassword = "<--app-password-->";
+    private static String appId = "<-- app id -->";
+    private static String appPassword = "<-- app password -->";
 
     public static void main( String[] args ) throws IOException {
+        CredentialProvider credentialProvider = new CredentialProviderImpl(appId, appPassword);
         HttpServer server = HttpServer.create(new InetSocketAddress(3978), 0);
-        server.createContext("/api/messages", new MessageHandle());
+        server.createContext("/api/messages", new MessageHandle(credentialProvider));
         server.setExecutor(null);
         server.start();
     }
 
     static class MessageHandle implements HttpHandler {
         private ObjectMapper objectMapper;
-        private BotAuthenticator authenticator;
+        private CredentialProvider credentialProvider;
+        private MicrosoftAppCredentials credentials;
 
-        MessageHandle() {
-            objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            BotCredentials credentials = new BotCredentials()
-                    .withAppId(appId)
-                    .withAppPassword(appPassword);
-            authenticator = new BotAuthenticator(credentials);
+        MessageHandle(CredentialProvider credentialProvider) {
+            this.objectMapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .findAndRegisterModules();
+            this.credentialProvider = credentialProvider;
+            this.credentials = new MicrosoftAppCredentials(appId, appPassword);
         }
 
         public void handle(HttpExchange httpExchange) throws IOException {
             if (httpExchange.getRequestMethod().equalsIgnoreCase("POST")) {
                 Activity activity = getActivity(httpExchange);
-                if (activity != null && activity.type() == ActivityTypes.MESSAGE) {
-                    if (authenticator.authenticate(httpExchange.getRequestHeaders(), activity.channelId(), activity.serviceUrl())) {
-                        ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), new MicrosoftAppCredentials(appId, appPassword));
-                        try {
-                            // send ack to user activity
-                            httpExchange.sendResponseHeaders(202, 0);
-                            httpExchange.getResponseBody().close();
-                            // reply activity with the same text
-                            ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
-                                    new Activity()
-                                            .withType(ActivityTypes.MESSAGE)
-                                            .withText("Echo: " + activity.text())
-                                            .withRecipient(activity.from())
-                                            .withFrom(activity.recipient())
-                            );
-                        } catch (Exception ex) {
-                            httpExchange.sendResponseHeaders(401, 0);
-                            LOGGER.log(Level.INFO, ex.getMessage());
-                        }
-                    } else {
-                        LOGGER.log(Level.WARNING, "auth failed!");
+                String authHeader = httpExchange.getRequestHeaders().getFirst("Authorization");
+                try {
+                    JwtTokenValidation.assertValidActivity(activity, authHeader, credentialProvider);
+
+                    // send ack to user activity
+                    httpExchange.sendResponseHeaders(202, 0);
+                    httpExchange.getResponseBody().close();
+
+                    if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                        // reply activity with the same text
+                        ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), this.credentials);
+                        ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
+                                new Activity()
+                                        .withType(ActivityTypes.MESSAGE)
+                                        .withText("Echo: " + activity.text())
+                                        .withRecipient(activity.from())
+                                        .withFrom(activity.recipient())
+                        );
                     }
+                } catch (AuthenticationException ex) {
+                    httpExchange.sendResponseHeaders(401, 0);
+                    httpExchange.getResponseBody().close();
+                    LOGGER.log(Level.WARNING, "Auth failed!", ex);
+                } catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, "Execution failed", ex);
                 }
             }
         }
@@ -87,11 +94,13 @@ public class App {
             return "";
         }
 
-        private Activity getActivity(HttpExchange httpExchange) throws IOException {
-            String body = getRequestBody(httpExchange);
+        private Activity getActivity(HttpExchange httpExchange) {
             try {
+                String body = getRequestBody(httpExchange);
+                LOGGER.log(Level.INFO, body);
                 return objectMapper.readValue(body, Activity.class);
             } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, "Failed to get activity", ex);
                 return null;
             }
 

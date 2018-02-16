@@ -19,7 +19,7 @@ public class MediaUrl {
     /**
      * Url for the media.
      */
-    @JsonProperty(value = "url", required = true)
+    @JsonProperty(value = "url")
     private String url;
 
     /**

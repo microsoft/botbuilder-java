@@ -1,8 +1,8 @@
 package com.microsoft.bot.connector.customizations;
 
 public class BotCredentials {
-    private String appId;
-    private String appPassword;
+    protected String appId;
+    protected String appPassword;
 
     public String appId() { return this.appId; }
 

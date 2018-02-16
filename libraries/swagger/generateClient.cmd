@@ -6,7 +6,7 @@ del /q ..\bot-connector\src\main\java\com\microsoft\bot\connector\implementation
 
 del /q ..\botbuilder-schema\src\main\java\com\microsoft\bot\schema\models\
 
-call autorest .\ConnectorAPI.md --java
+call autorest .\README.md --java
 
 robocopy .\generated\models ..\botbuilder-schema\src\main\java\com\microsoft\bot\schema\models *.* /move /xf *Exception.java
 

@@ -19,7 +19,7 @@ public class ThumbnailUrl {
     /**
      * URL pointing to the thumbnail to use for media content.
      */
-    @JsonProperty(value = "url", required = true)
+    @JsonProperty(value = "url")
     private String url;
 
     /**
