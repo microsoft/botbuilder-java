@@ -5,9 +5,9 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class ChannelValidation {
-    private static final String ServiceUrlClaim = "serviceurl";
+import static com.microsoft.bot.connector.customizations.AuthenticationConstants.*;
 
+public class ChannelValidation {
     /**
      * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
      */
@@ -23,8 +23,8 @@ public class ChannelValidation {
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromChannelTokenValidationParameters,
-                AuthenticationConstants.ToBotFromChannelOpenIdMetadataUrl,
-                AuthenticationConstants.AllowedSigningAlgorithms, null);
+                ToBotFromChannelOpenIdMetadataUrl,
+                AllowedSigningAlgorithms, null);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader).get();
         if (identity == null) {
@@ -37,19 +37,19 @@ public class ChannelValidation {
             throw new AuthenticationException("Token Not Authenticated");
         }
 
-        // Now check that the AppID in the claimset matches
+        // Now check that the AppID in the claims set matches
         // what we're looking for. Note that in a multi-tenant bot, this value
         // comes from developer code that may be reaching out to a service, hence the
         // Async validation.
 
         // Look for the "aud" claim, but only if issued from the Bot Framework
-        if (!identity.getIssuer().equalsIgnoreCase(AuthenticationConstants.BotFrameworkTokenIssuer)) {
+        if (!identity.getIssuer().equalsIgnoreCase(ToBotFromChannelTokenIssuer)) {
             throw new AuthenticationException("Token Not Authenticated");
         }
 
         // The AppId from the claim in the token must match the AppId specified by the developer. Note that
-        // the Bot Framwork uses the Audiance claim ("aud") to pass the AppID.
-        String appIdFromClaim = identity.claims().get(AuthenticationConstants.AudienceClaim);
+        // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
+        String appIdFromClaim = identity.claims().get(AudienceClaim);
         if (appIdFromClaim == null || appIdFromClaim.isEmpty()) {
             // Claim is present, but doesn't have a value. Not Authorized.
             throw new AuthenticationException("Token Not Authenticated");
