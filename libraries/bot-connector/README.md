@@ -53,7 +53,7 @@ Client creation (with authentication), conversation initialization and activity 
  ```
  
  ### Simple EchoBot Example ([source code](../../samples/bot-connector-sample))
-EchoBot is a minimal bot that recieves message activities and replies with the same content.
+EchoBot is a minimal bot that receives message activities and replies with the same content.
 The sample shows how to use HTTPServer for listening to activities and the ConnectorClient for sending activities.
 
 ## Rest API Documentation

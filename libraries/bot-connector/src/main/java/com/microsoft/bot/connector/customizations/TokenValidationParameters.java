@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.microsoft.bot.connector.customizations.AuthenticationConstants.ToBotFromChannelTokenIssuer;
+
 public class TokenValidationParameters {
     public boolean validateIssuer;
     public List<String> validIssuers;
@@ -48,7 +50,7 @@ public class TokenValidationParameters {
         return new TokenValidationParameters() {{
             this.validateIssuer = true;
             this.validIssuers = new ArrayList<String>() {{
-                add(AuthenticationConstants.BotFrameworkTokenIssuer);
+                add(ToBotFromChannelTokenIssuer);
             }};
             this.validateAudience = false;
             this.validateLifetime = true;

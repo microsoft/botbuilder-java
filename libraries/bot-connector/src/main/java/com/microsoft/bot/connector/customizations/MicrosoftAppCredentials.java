@@ -7,18 +7,16 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.joda.time.DateTime;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.microsoft.bot.connector.customizations.AuthenticationConstants.ToChannelFromBotLoginUrl;
+import static com.microsoft.bot.connector.customizations.AuthenticationConstants.ToChannelFromBotOAuthScope;
 
 public class MicrosoftAppCredentials extends TokenCredentials {
     private String appId;
@@ -44,12 +42,12 @@ public class MicrosoftAppCredentials extends TokenCredentials {
             return currentToken;
         }
         Request reqToken = request.newBuilder()
-                .url(AuthenticationConstants.ToChannelFromBotLoginUrl)
+                .url(ToChannelFromBotLoginUrl)
                 .post(new FormBody.Builder()
                         .add("grant_type", "client_credentials")
                         .add("client_id", this.appId)
                         .add("client_secret", this.appPassword)
-                        .add("scope", AuthenticationConstants.ToChannelFromBotOAuthScope)
+                        .add("scope", ToChannelFromBotOAuthScope)
                         .build()).build();
         Response response = client.newCall(reqToken).execute();
         if (response.isSuccessful()) {

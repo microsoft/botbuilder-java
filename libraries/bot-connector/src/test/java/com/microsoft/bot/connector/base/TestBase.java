@@ -78,8 +78,8 @@ public abstract class TestBase {
                 throw new IOException("Unknown AZURE_TEST_MODE: " + azureTestMode);
             }
         } else {
-            //System.out.print("Environment variable 'AZURE_TEST_MODE' has not been set yet. Using 'Record' mode.");
-            testMode = TestMode.RECORD;
+            System.out.print("Environment variable 'AZURE_TEST_MODE' has not been set yet. Using 'PLAYBACK' mode.");
+            testMode = TestMode.PLAYBACK;
         }
     }
 

@@ -217,9 +217,9 @@ public class InterceptorManager {
             responseBuilder.addHeader("Content-Length", String.valueOf(rawBody.getBytes("UTF-8").length));
         }
 
-        Response newResponce = responseBuilder.build();
+        Response newResponse = responseBuilder.build();
 
-        return newResponce;
+        return newResponse;
     }
 
     private void extractResponseData(Map<String, String> responseData, Response response) throws IOException {

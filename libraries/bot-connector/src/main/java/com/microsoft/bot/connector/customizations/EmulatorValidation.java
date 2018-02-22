@@ -7,13 +7,12 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static com.microsoft.bot.connector.customizations.AuthenticationConstants.*;
+
 /**
  * Validates and Examines JWT tokens from the Bot Framework Emulator
  */
 public class EmulatorValidation {
-    private static final String VersionClaim = "ver";
-    private static final String AppIdClaim = "appid";
-
     /**
      * TO BOT FROM EMULATOR: Token validation parameters when connecting to a channel.
      */
@@ -75,8 +74,8 @@ public class EmulatorValidation {
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromEmulatorTokenValidationParameters,
-                AuthenticationConstants.ToBotFromEmulatorOpenIdMetadataUrl,
-                AuthenticationConstants.AllowedSigningAlgorithms, null);
+                ToBotFromEmulatorOpenIdMetadataUrl,
+                AllowedSigningAlgorithms, null);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader).get();
         if (identity == null) {
@@ -89,7 +88,7 @@ public class EmulatorValidation {
             throw new AuthenticationException("Token Not Authenticated");
         }
 
-        // Now check that the AppID in the claimset matches
+        // Now check that the AppID in the claims set matches
         // what we're looking for. Note that in a multi-tenant bot, this value
         // comes from developer code that may be reaching out to a service, hence the
         // Async validation.
@@ -113,23 +112,12 @@ public class EmulatorValidation {
             appId = identity.claims().get(AppIdClaim);
         } else if (tokenVersion.equalsIgnoreCase("2.0")) {
             // Emulator, "2.0" puts the AppId in the "azp" claim.
-            if (!identity.claims().containsKey(AuthenticationConstants.AuthorizedParty)) {
+            if (!identity.claims().containsKey(AuthorizedParty)) {
                 // No claim around AppID. Not Authorized.
-                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '2.0'.", AuthenticationConstants.AuthorizedParty));
+                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '2.0'.", AuthorizedParty));
             }
 
-            appId = identity.claims().get(AuthenticationConstants.AuthorizedParty);
-        } else if (tokenVersion.equalsIgnoreCase("3.0")) {
-            // The v3.0 Token types have been disallowed. Not Authorized.
-            throw new AuthenticationException("Emulator token version '3.0' is depricated.");
-        } else if (tokenVersion.equalsIgnoreCase("3.1") || tokenVersion.equalsIgnoreCase("3.2")) {
-            // The emulator for token versions "3.1" & "3.2" puts the AppId in the "Audiance" claim.
-            if (!identity.claims().containsKey(AuthenticationConstants.AudienceClaim)) {
-                // No claim around AppID. Not Authorized.
-                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '%s'.", AuthenticationConstants.AudienceClaim, tokenVersion));
-            }
-
-            appId = identity.claims().get(AuthenticationConstants.AudienceClaim);
+            appId = identity.claims().get(AuthorizedParty);
         } else {
             // Unknown Version. Not Authorized.
             throw new AuthenticationException(String.format("Unknown Emulator Token version '%s'.", tokenVersion));
