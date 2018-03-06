@@ -8,11 +8,10 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import sun.security.rsa.RSAPublicKeyImpl;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.InvalidKeyException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,14 +60,11 @@ class OpenIdMetadata {
         try {
             Jwk jwk = cacheKeys.get(keyId);
             OpenIdMetadataKey key = new OpenIdMetadataKey();
-            key.key = new RSAPublicKeyImpl(jwk.getPublicKey().getEncoded());
+            key.key = (RSAPublicKey) jwk.getPublicKey();
             key.endorsements = (List<String>) jwk.getAdditionalAttributes().get("endorsements");
             return key;
         } catch (JwkException e) {
             String errorDescription = String.format("Failed to load keys: %s", e.getMessage());
-            LOGGER.log(Level.WARNING, errorDescription);
-        } catch (InvalidKeyException e) {
-            String errorDescription = String.format("Failed to load keys (key not compatible): %s", e.getMessage());
             LOGGER.log(Level.WARNING, errorDescription);
         }
         return null;
