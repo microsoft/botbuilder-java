@@ -5,6 +5,8 @@
   <artifactId>bot-parent</artifactId>
   <version>4.0.0</version>
   
+  <packaging>pom</packaging>
+  
   <name>Microsoft BotBuilder SDK Parent</name>
   <description>This package contains the parent module of Microsoft BotBuilder SDK.</description>
   <url>https://github.com/Microsoft/botbuilder-java</url>
