@@ -16,10 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.logging.Level;
-
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
+import java.util.logging.Logger;
 
 public class JwtTokenExtractor {
+    private static final Logger LOGGER = Logger.getLogger( OpenIdMetadata.class.getName() );
+    
     private static final ConcurrentMap<String, OpenIdMetadata> openIdMetadataCache = new ConcurrentHashMap<>();
 
     private TokenValidationParameters tokenValidationParameters;
