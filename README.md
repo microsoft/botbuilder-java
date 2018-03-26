@@ -1,5 +1,15 @@
 
-# Contributing
+# Bot Builder SDK v4 (Java)
+
+[![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java)
+[![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-java/wiki/Roadmap)
+
+This repository contains code for the Java version of the [Microsoft Bot Builder SDK](https://github.com/Microsoft/BotBuilder). The 4.x version of the SDK is being actively developed and should therefore be used for **EXPERIMENTATION PURPOSES ONLY**.
+In addition to the Java SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Python](https://github.com/Microsoft/botbuilder-python).
+
+To get started see the [wiki](https://github.com/Microsoft/botbuilder-java/wiki) for the v4 SDK.
+
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -12,3 +22,18 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Reporting Security Issues
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security
+Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
+receive a response within 24 hours. If for some reason you do not, please follow up via
+email to ensure we received your original message. Further information, including the
+[MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
+the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+
+## License
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+Licensed under the [MIT](https://github.com/Microsoft/vscode/blob/master/LICENSE.txt) License.
