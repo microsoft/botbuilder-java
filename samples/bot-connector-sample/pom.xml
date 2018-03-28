@@ -4,8 +4,15 @@
 
   <groupId>com.microsoft.bot.connector.sample</groupId>
   <artifactId>bot-connector-sample</artifactId>
-  <version>1.0.0</version>
   <packaging>jar</packaging>
+  <version>1.0.0</version>
+
+  <parent>
+    <groupId>com.microsoft.bot</groupId>
+    <artifactId>bot-parent</artifactId>
+    <version>4.0.0</version>
+    <relativePath>../../</relativePath>
+  </parent>
 
   <name>bot-connector-sample</name>
   <url>http://maven.apache.org</url>
@@ -37,6 +44,16 @@
       <version>2.9.2</version>
     </dependency>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>LATEST</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>LATEST</version>
+    </dependency>
+    <dependency>
       <groupId>com.microsoft.bot.schema</groupId>
       <artifactId>botbuilder-schema</artifactId>
       <version>4.0.0</version>
@@ -57,6 +74,14 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <mainClass>com.microsoft.bot.connector.sample.App</mainClass>
         </configuration>
       </plugin>
     </plugins>
