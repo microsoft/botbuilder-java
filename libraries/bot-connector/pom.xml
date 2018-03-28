@@ -4,8 +4,15 @@
 
     <groupId>com.microsoft.bot.connector</groupId>
     <artifactId>bot-connector</artifactId>
-    <version>4.0.0</version>
     <packaging>jar</packaging>
+    <version>4.0.0</version>
+
+    <parent>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-parent</artifactId>
+        <version>4.0.0</version>
+        <relativePath>../../</relativePath>
+    </parent>
 
     <name>bot-connector</name>
     <url>http://maven.apache.org</url>

@@ -4,8 +4,15 @@
 
   <groupId>com.microsoft.bot.schema</groupId>
   <artifactId>botbuilder-schema</artifactId>
-  <version>4.0.0</version>
   <packaging>jar</packaging>
+  <version>4.0.0</version>
+
+  <parent>
+    <groupId>com.microsoft.bot</groupId>
+    <artifactId>bot-parent</artifactId>
+    <version>4.0.0</version>
+    <relativePath>../../</relativePath>
+  </parent>
 
   <name>botbuilder-schema</name>
   <url>http://maven.apache.org</url>
