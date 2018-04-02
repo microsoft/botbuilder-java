@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector.sample;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,8 +27,8 @@ import java.util.logging.Logger;
 
 public class App {
     private static final Logger LOGGER = Logger.getLogger( App.class.getName() );
-    private static String appId = "39619a59-5a0c-4f9b-87c5-816c648ff357";       // <-- app id -->
-    private static String appPassword = "b90er1BC2xp9Y5Exqwj8qwf"; // <-- app password -->
+    private static String appId = "";       // <-- app id -->
+    private static String appPassword = ""; // <-- app password -->
 
     public static void main( String[] args ) throws IOException {
         CredentialProvider credentialProvider = new CredentialProviderImpl(appId, appPassword);

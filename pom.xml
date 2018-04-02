@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-parent</artifactId>
-  <version>4.0.0</version>
+  <version>4.0.0-a0</version>
   
   <packaging>pom</packaging>
   

@@ -4,6 +4,7 @@ import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.ServiceResponseBuilder;
+import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.credentials.TokenCredentials;
 import com.microsoft.rest.interceptors.LoggingInterceptor;
 import com.microsoft.rest.serializer.JacksonAdapter;
@@ -146,7 +147,7 @@ public abstract class TestBase {
 
         interceptorManager = InterceptorManager.create(testName.getMethodName(), testMode);
 
-        TokenCredentials credentials;
+        ServiceClientCredentials credentials;
         RestClient restClient;
 
         if (isPlaybackMode()) {
