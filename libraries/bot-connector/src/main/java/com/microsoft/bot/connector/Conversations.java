@@ -15,6 +15,7 @@ import com.microsoft.bot.schema.models.AttachmentData;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
+import com.microsoft.bot.schema.models.ConversationsResult;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.rest.ServiceCallback;
@@ -29,6 +30,119 @@ import rx.Observable;
  * in Conversations.
  */
 public interface Conversations {
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ConversationsResult object if successful.
+     */
+    ConversationsResult getConversations();
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<ConversationsResult> getConversationsAsync(final ServiceCallback<ConversationsResult> serviceCallback);
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ConversationsResult object
+     */
+    Observable<ConversationsResult> getConversationsAsync();
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ConversationsResult object
+     */
+    Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync();
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @param continuationToken skip or continuation token
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ConversationsResult object if successful.
+     */
+    ConversationsResult getConversations(String continuationToken);
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @param continuationToken skip or continuation token
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<ConversationsResult> getConversationsAsync(String continuationToken, final ServiceCallback<ConversationsResult> serviceCallback);
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @param continuationToken skip or continuation token
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ConversationsResult object
+     */
+    Observable<ConversationsResult> getConversationsAsync(String continuationToken);
+
+    /**
+     * GetConversations.
+     * List the Conversations in which this bot has participated.
+     GET from this method with a skip token
+     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
+     there are further values to be returned. Call this method again with the returned token to get more values.
+     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     *
+     * @param continuationToken skip or continuation token
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ConversationsResult object
+     */
+    Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync(String continuationToken);
+
     /**
      * CreateConversation.
      * Create a new Conversation.
@@ -409,6 +523,60 @@ public interface Conversations {
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
     Observable<ServiceResponse<List<ChannelAccount>>> getConversationMembersWithServiceResponseAsync(String conversationId);
+
+    /**
+     * DeleteConversationMember.
+     * Deletes a member from a converstion.
+     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
+     of the conversation, the conversation will also be deleted.
+     *
+     * @param conversationId Conversation ID
+     * @param memberId ID of the member to delete from this conversation
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     */
+    void deleteConversationMember(String conversationId, String memberId);
+
+    /**
+     * DeleteConversationMember.
+     * Deletes a member from a converstion.
+     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
+     of the conversation, the conversation will also be deleted.
+     *
+     * @param conversationId Conversation ID
+     * @param memberId ID of the member to delete from this conversation
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<Void> deleteConversationMemberAsync(String conversationId, String memberId, final ServiceCallback<Void> serviceCallback);
+
+    /**
+     * DeleteConversationMember.
+     * Deletes a member from a converstion.
+     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
+     of the conversation, the conversation will also be deleted.
+     *
+     * @param conversationId Conversation ID
+     * @param memberId ID of the member to delete from this conversation
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<Void> deleteConversationMemberAsync(String conversationId, String memberId);
+
+    /**
+     * DeleteConversationMember.
+     * Deletes a member from a converstion.
+     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
+     of the conversation, the conversation will also be deleted.
+     *
+     * @param conversationId Conversation ID
+     * @param memberId ID of the member to delete from this conversation
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<ServiceResponse<Void>> deleteConversationMemberWithServiceResponseAsync(String conversationId, String memberId);
 
     /**
      * GetActivityMembers.

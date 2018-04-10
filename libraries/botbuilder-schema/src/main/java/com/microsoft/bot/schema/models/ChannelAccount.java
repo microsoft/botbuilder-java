@@ -30,6 +30,13 @@ public class ChannelAccount {
     private String name;
 
     /**
+     * Role of the entity behind the account (Example: User, Bot, etc.).
+     * Possible values include: 'user', 'bot'.
+     */
+    @JsonProperty(value = "role")
+    private RoleTypes role;
+
+    /**
      * Get the id value.
      *
      * @return the id value
@@ -66,6 +73,26 @@ public class ChannelAccount {
      */
     public ChannelAccount withName(String name) {
         this.name = name;
+        return this;
+    }
+
+    /**
+     * Get the role value.
+     *
+     * @return the role value
+     */
+    public RoleTypes role() {
+        return this.role;
+    }
+
+    /**
+     * Set the role value.
+     *
+     * @param role the role value to set
+     * @return the ChannelAccount object itself.
+     */
+    public ChannelAccount withRole(RoleTypes role) {
+        this.role = role;
         return this;
     }
 

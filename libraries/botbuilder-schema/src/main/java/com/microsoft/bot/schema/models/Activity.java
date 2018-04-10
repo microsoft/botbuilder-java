@@ -24,7 +24,7 @@ public class Activity {
      * 'contactRelationUpdate', 'conversationUpdate', 'typing', 'ping',
      * 'endOfConversation', 'event', 'invoke', 'deleteUserData',
      * 'messageUpdate', 'messageDelete', 'installationUpdate',
-     * 'messageReaction', 'suggestion'.
+     * 'messageReaction', 'suggestion', 'trace'.
      */
     @JsonProperty(value = "type")
     private ActivityTypes type;
@@ -197,6 +197,18 @@ public class Activity {
      */
     @JsonProperty(value = "replyToId")
     private String replyToId;
+
+    /**
+     * Descriptive label.
+     */
+    @JsonProperty(value = "label")
+    private String label;
+
+    /**
+     * Unique string which identifies the shape of the value object.
+     */
+    @JsonProperty(value = "valueType")
+    private String valueType;
 
     /**
      * Open-ended value.
@@ -809,6 +821,46 @@ public class Activity {
      */
     public Activity withReplyToId(String replyToId) {
         this.replyToId = replyToId;
+        return this;
+    }
+
+    /**
+     * Get the label value.
+     *
+     * @return the label value
+     */
+    public String label() {
+        return this.label;
+    }
+
+    /**
+     * Set the label value.
+     *
+     * @param label the label value to set
+     * @return the Activity object itself.
+     */
+    public Activity withLabel(String label) {
+        this.label = label;
+        return this;
+    }
+
+    /**
+     * Get the valueType value.
+     *
+     * @return the valueType value
+     */
+    public String valueType() {
+        return this.valueType;
+    }
+
+    /**
+     * Set the valueType value.
+     *
+     * @param valueType the valueType value to set
+     * @return the Activity object itself.
+     */
+    public Activity withValueType(String valueType) {
+        this.valueType = valueType;
         return this;
     }
 

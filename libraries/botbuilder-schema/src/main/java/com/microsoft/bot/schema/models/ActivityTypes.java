@@ -57,7 +57,10 @@ public enum ActivityTypes {
     MESSAGE_REACTION("messageReaction"),
 
     /** Enum value suggestion. */
-    SUGGESTION("suggestion");
+    SUGGESTION("suggestion"),
+
+    /** Enum value trace. */
+    TRACE("trace");
 
     /** The actual serialized value for a ActivityTypes instance. */
     private String value;
