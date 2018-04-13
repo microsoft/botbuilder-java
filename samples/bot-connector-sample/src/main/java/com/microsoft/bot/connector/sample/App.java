@@ -21,7 +21,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,7 +91,7 @@ public class App {
             }
             stream.close();
             if (buffer.length() > 0) {
-                return URLDecoder.decode(buffer.toString(), "UTF-8");
+                return buffer.toString();
             }
             return "";
         }
