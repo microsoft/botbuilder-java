@@ -17,10 +17,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ConversationAccount {
     /**
-     * Is this a reference to a group.
+     * Indicates whether the conversation contains more than two participants
+     * at the time the activity was generated.
      */
     @JsonProperty(value = "isGroup")
     private Boolean isGroup;
+
+    /**
+     * Indicates the type of the conversation in channels that distinguish
+     * between conversation types.
+     */
+    @JsonProperty(value = "conversationType")
+    private String conversationType;
 
     /**
      * Channel id for the user or bot on this channel (Example: joe@smith.com,
@@ -34,6 +42,13 @@ public class ConversationAccount {
      */
     @JsonProperty(value = "name")
     private String name;
+
+    /**
+     * Role of the entity behind the account (Example: User, Bot, etc.).
+     * Possible values include: 'user', 'bot'.
+     */
+    @JsonProperty(value = "role")
+    private RoleTypes role;
 
     /**
      * Get the isGroup value.
@@ -52,6 +67,26 @@ public class ConversationAccount {
      */
     public ConversationAccount withIsGroup(Boolean isGroup) {
         this.isGroup = isGroup;
+        return this;
+    }
+
+    /**
+     * Get the conversationType value.
+     *
+     * @return the conversationType value
+     */
+    public String conversationType() {
+        return this.conversationType;
+    }
+
+    /**
+     * Set the conversationType value.
+     *
+     * @param conversationType the conversationType value to set
+     * @return the ConversationAccount object itself.
+     */
+    public ConversationAccount withConversationType(String conversationType) {
+        this.conversationType = conversationType;
         return this;
     }
 
@@ -92,6 +127,26 @@ public class ConversationAccount {
      */
     public ConversationAccount withName(String name) {
         this.name = name;
+        return this;
+    }
+
+    /**
+     * Get the role value.
+     *
+     * @return the role value
+     */
+    public RoleTypes role() {
+        return this.role;
+    }
+
+    /**
+     * Set the role value.
+     *
+     * @param role the role value to set
+     * @return the ConversationAccount object itself.
+     */
+    public ConversationAccount withRole(RoleTypes role) {
+        this.role = role;
         return this;
     }
 

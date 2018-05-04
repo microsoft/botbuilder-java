@@ -24,16 +24,16 @@ public class ReceiptCard {
     private String title;
 
     /**
+     * Array of Fact objects.
+     */
+    @JsonProperty(value = "facts")
+    private List<Fact> facts;
+
+    /**
      * Array of Receipt Items.
      */
     @JsonProperty(value = "items")
     private List<ReceiptItem> items;
-
-    /**
-     * Array of Fact Objects   Array of key-value pairs.
-     */
-    @JsonProperty(value = "facts")
-    private List<Fact> facts;
 
     /**
      * This action will be activated when user taps on the card.
@@ -42,19 +42,19 @@ public class ReceiptCard {
     private CardAction tap;
 
     /**
-     * Total amount of money paid (or should be paid).
+     * Total amount of money paid (or to be paid).
      */
     @JsonProperty(value = "total")
     private String total;
 
     /**
-     * Total amount of TAX paid(or should be paid).
+     * Total amount of tax paid (or to be paid).
      */
     @JsonProperty(value = "tax")
     private String tax;
 
     /**
-     * Total amount of VAT paid(or should be paid).
+     * Total amount of VAT paid (or to be paid).
      */
     @JsonProperty(value = "vat")
     private String vat;
@@ -86,26 +86,6 @@ public class ReceiptCard {
     }
 
     /**
-     * Get the items value.
-     *
-     * @return the items value
-     */
-    public List<ReceiptItem> items() {
-        return this.items;
-    }
-
-    /**
-     * Set the items value.
-     *
-     * @param items the items value to set
-     * @return the ReceiptCard object itself.
-     */
-    public ReceiptCard withItems(List<ReceiptItem> items) {
-        this.items = items;
-        return this;
-    }
-
-    /**
      * Get the facts value.
      *
      * @return the facts value
@@ -122,6 +102,26 @@ public class ReceiptCard {
      */
     public ReceiptCard withFacts(List<Fact> facts) {
         this.facts = facts;
+        return this;
+    }
+
+    /**
+     * Get the items value.
+     *
+     * @return the items value
+     */
+    public List<ReceiptItem> items() {
+        return this.items;
+    }
+
+    /**
+     * Set the items value.
+     *
+     * @param items the items value to set
+     * @return the ReceiptCard object itself.
+     */
+    public ReceiptCard withItems(List<ReceiptItem> items) {
+        this.items = items;
         return this;
     }
 
