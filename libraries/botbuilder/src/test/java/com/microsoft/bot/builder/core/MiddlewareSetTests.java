@@ -64,7 +64,7 @@ public class MiddlewareSetTests extends TestBase
 /*
     public async Task NestedSet_OnReceive()
     {
-        bool innerOnReceiveCalled = false;
+        boolean innerOnReceiveCalled = false;
 
         MiddlewareSet inner = new MiddlewareSet();
         inner.Use(new AnonymousReceiveMiddleware(async (context, next) =>
@@ -294,286 +294,307 @@ public class MiddlewareSetTests extends TestBase
         Assert.assertTrue(didAllRun[0]);
 
     }
-/*
+
     @Test
-    public void Status_TwoItemsOneDoesNotCallNext()
+    public void Status_TwoItemsOneDoesNotCallNext() throws ExecutionException, InterruptedException
     {
-        bool called1 = false;
-        bool called2 = false;
+        final boolean called1[] = {false};
+        final boolean called2[] = {false};
 
-        CallMeMiddlware one = new CallMeMiddlware(() =>
-        {
-            Assert.IsFalse(called2, "Second Middleware was called");
-            called1 = true;
+        CallMeMiddlware one = new CallMeMiddlware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertFalse("Second Middleware was called", called2[0]);
+                called1[0] = true;
+            }
         });
 
-        DoNotCallNextMiddleware two = new DoNotCallNextMiddleware(() =>
-        {
-            Assert.IsTrue(called1, "First Middleware was not called");
-            called2 = true;
-        });
+        DoNotCallNextMiddleware two = new DoNotCallNextMiddleware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertTrue("First Middleware was not called", called1[0]);
+                called2[0] = true;
+        }});
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
         m.Use(two);
 
-        bool didAllRun = false;
-        await m.ReceiveActivityWithStatus(null, async (ctx) => didAllRun = true);
-        Assert.IsTrue(called1);
-        Assert.IsTrue(called2);
+        boolean didAllRun[] = {false};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                didAllRun[0] = true;
+                return completedFuture(null);
+            }
+        };
+        await(m.ReceiveActivityWithStatus(null, tt));
+        Assert.assertTrue(called1[0]);
+        Assert.assertTrue(called2[0]);
 
         // The 2nd middleware did not call next, so the "final" action should not have run.
-        Assert.IsFalse(didAllRun);
+        Assert.assertFalse(didAllRun[0]);
     }
 
     @Test
-    public CompletableFuture Status_OneEntryThatDoesNotCallNext()
+    public void Status_OneEntryThatDoesNotCallNext() throws ExecutionException, InterruptedException
     {
-        bool called1 = false;
+        final boolean called1[] = {false};
 
-        DoNotCallNextMiddleware one = new DoNotCallNextMiddleware(() => { called1 = true; });
+        DoNotCallNextMiddleware one = new DoNotCallNextMiddleware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                called1[0] = true;
+            }
+        });
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
 
         // The middlware in this pipeline DOES NOT call next(), so this must not be called
-        bool didAllRun = false;
-        await m.ReceiveActivityWithStatus(null, async (ctx) => didAllRun = true);
+        boolean didAllRun[] = {false};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                didAllRun[0] = true;
+                return completedFuture(null);
+            }
+        };
+        await(m.ReceiveActivityWithStatus(null, tt));
 
-        Assert.IsTrue(called1);
+        Assert.assertTrue(called1[0]);
 
         // Our "Final" action MUST NOT have been called, as the Middlware Pipeline
         // didn't complete.
-        Assert.IsFalse(didAllRun);
+        Assert.assertFalse(didAllRun[0]);
     }
 
     @Test
-    public CompletableFuture AnonymousMiddleware()
+    public void AnonymousMiddleware() throws ExecutionException, InterruptedException
     {
-        bool didRun = false;
+        final boolean didRun[] = {false};
 
         MiddlewareSet m = new MiddlewareSet();
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            didRun = true;
-            await next();
-        }));
-
-        Assert.IsFalse(didRun);
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun);
-    }
-
-    @Test
-    public CompletableFuture TwoAnonymousMiddleware()
-    {
-        bool didRun1 = false;
-        bool didRun2 = false;
-
-        MiddlewareSet m = new MiddlewareSet();
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            didRun1 = true;
-            await next();
-        }));
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            didRun2 = true;
-            await next();
-        }));
-
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun1);
-        Assert.IsTrue(didRun2);
-    }
-
-    @Test
-    public CompletableFuture TwoAnonymousMiddlewareInOrder()
-    {
-        bool didRun1 = false;
-        bool didRun2 = false;
-
-        MiddlewareSet m = new MiddlewareSet();
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsFalse(didRun2, "Looks like the 2nd one has already run");
-            didRun1 = true;
-            await next();
-        }));
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsTrue(didRun1, "Looks like the 1nd one has not yet run");
-            didRun2 = true;
-            await next();
-        }));
-
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun1);
-        Assert.IsTrue(didRun2);
-    }
-
-    @Test
-    public CompletableFuture MixedMiddlewareInOrderAnonymousFirst()
-    {
-        bool didRun1 = false;
-        bool didRun2 = false;
-
-        MiddlewareSet m = new MiddlewareSet();
-
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsFalse(didRun1, "First middleware already ran");
-            Assert.IsFalse(didRun2, "Looks like the second middleware was already run");
-            didRun1 = true;
-            await next();
-            Assert.IsTrue(didRun2, "Second middleware should have completed running");
-        }));
-
-        m.Use(
-            new CallMeMiddlware(() =>
-            {
-                Assert.IsTrue(didRun1, "First middleware should have already been called");
-                Assert.IsFalse(didRun2, "Second middleware should not have been invoked yet");
-                didRun2 = true;
-            }));
-
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun1);
-        Assert.IsTrue(didRun2);
-    }
-
-    @Test
-    public CompletableFuture MixedMiddlewareInOrderAnonymousLast()
-    {
-        bool didRun1 = false;
-        bool didRun2 = false;
-
-        MiddlewareSet m = new MiddlewareSet();
-
-        m.Use(
-            new CallMeMiddlware(() =>
-            {
-                Assert.IsFalse(didRun1, "First middleware should not have been called yet");
-                Assert.IsFalse(didRun2, "Second Middleware should not have been called yet");
-                didRun1 = true;
-            }));
-
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsTrue(didRun1, "First middleware has not been run yet");
-            didRun2 = true;
-            await next();
-
-        }));
-
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun1);
-        Assert.IsTrue(didRun2);
-    }
-
-    @Test
-    public CompletableFuture RunCodeBeforeAndAfter()
-    {
-        bool didRun1 = false;
-        bool codeafter2run = false;
-        bool didRun2 = false;
-
-        MiddlewareSet m = new MiddlewareSet();
-
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsFalse(didRun1, "Looks like the 1st middleware has already run");
-            didRun1 = true;
-            await next();
-            Assert.IsTrue(didRun1, "The 2nd middleware should have run now.");
-            codeafter2run = true;
-        }));
-
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            Assert.IsTrue(didRun1, "Looks like the 1st middleware has not been run");
-            Assert.IsFalse(codeafter2run, "The code that runs after middleware 2 is complete has already run.");
-            didRun2 = true;
-            await next();
-        }));
-
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(didRun1);
-        Assert.IsTrue(didRun2);
-        Assert.IsTrue(codeafter2run);
-    }
-
-    @Test
-    public CompletableFuture CatchAnExceptionViaMiddlware()
-    {
-        MiddlewareSet m = new MiddlewareSet();
-        bool caughtException = false;
-
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            try
-            {
-                await next();
-                Assert.Fail("Should not get here");
+        MiddlewareCall mwc = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                didRun[0] = true;
+                await(nd.next());
+                return completedFuture(true);
             }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex.Message == "test");
-                caughtException = true;
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc));
+
+        Assert.assertFalse(didRun[0]);
+        await( m.ReceiveActivity(null));
+        Assert.assertTrue(didRun[0]);
+    }
+
+    @Test
+    public void TwoAnonymousMiddleware() throws ExecutionException, InterruptedException
+    {
+        final boolean didRun1[] = {false};
+        final boolean didRun2[] = {false};
+
+        MiddlewareSet m = new MiddlewareSet();
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                didRun1[0] = true;
+                await(nd.next());
+                return completedFuture(true);
             }
-        }));
+        };
 
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            throw new Exception("test");
-        }));
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
+        MiddlewareCall mwc2 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                didRun2[0] = true;
+                await(nd.next());
+                return completedFuture(true);
+            }
+        };
 
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(caughtException);
+        m.Use(new AnonymousReceiveMiddleware(mwc2));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(didRun1[0]);
+        Assert.assertTrue(didRun2[0]);
     }
 
-    public class WasCalledMiddlware : IMiddleware
+    @Test
+    public void TwoAnonymousMiddlewareInOrder() throws ExecutionException, InterruptedException
     {
-        public bool Called { get; set; } = false;
+        final boolean didRun1[] = {false};
+        final boolean didRun2[] = {false};
 
-        public Task OnTurn(ITurnContext context, MiddlewareSet.NextDelegate next)
-        {
-            Called = true;
-            return next();
-        }
+        MiddlewareSet m = new MiddlewareSet();
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertFalse("Looks like the 2nd one has already run", didRun2[0]);
+                didRun1[0] = true;
+                await(nd.next());
+                return completedFuture(true);
+            }
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
 
+        MiddlewareCall mwc2 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertTrue("Looks like the 1nd one has not yet run", didRun1[0]);
+                didRun2[0] = true;
+                await(nd.next());
+                return completedFuture(true);
+            }
+        };
 
+        m.Use(new AnonymousReceiveMiddleware(mwc2));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(didRun1[0]);
+        Assert.assertTrue(didRun2[0]);
     }
 
-    public class DoNotCallNextMiddleware : IMiddleware
+    @Test
+    public void MixedMiddlewareInOrderAnonymousFirst() throws ExecutionException, InterruptedException
     {
-        private readonly Action _callMe;
-        public DoNotCallNextMiddleware(Action callMe)
-        {
-            _callMe = callMe;
-        }
-        public Task OnTurn(ITurnContext context, MiddlewareSet.NextDelegate next)
-        {
-            _callMe();
-            // DO NOT call NEXT
-            return Task.CompletedTask;
-        }
+        final boolean didRun1[] = {false};
+        final boolean didRun2[] = {false};
 
+        MiddlewareSet m = new MiddlewareSet();
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertFalse("First middleware already ran", didRun1[0]);
+                Assert.assertFalse("Looks like the second middleware was already run", didRun2[0]);
+                didRun1[0] = true;
+                await(nd.next());
+                Assert.assertTrue("Second middleware should have completed running", didRun2[0]);
+                return completedFuture(true);
+            }
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
 
+        ActionDel act = new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertTrue("First middleware should have already been called", didRun1[0]);
+                Assert.assertFalse("Second middleware should not have been invoked yet", didRun2[0]);
+                didRun2[0] = true;
+            }
+        };
+        m.Use(new CallMeMiddlware(act));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(didRun1[0]);
+        Assert.assertTrue(didRun2[0]);
     }
 
-    public class CallMeMiddlware : IMiddleware
+    @Test
+    public void MixedMiddlewareInOrderAnonymousLast() throws ExecutionException, InterruptedException
     {
-        private readonly Action _callMe;
-        public CallMeMiddlware(Action callMe)
-        {
-            _callMe = callMe;
-        }
-        public Task OnTurn(ITurnContext context, MiddlewareSet.NextDelegate next)
-        {
-            _callMe();
-            return next();
-        }
+        final boolean didRun1[] = {false};
+        final boolean didRun2[] = {false};
 
-    } */
+        MiddlewareSet m = new MiddlewareSet();
+
+        ActionDel act = new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertFalse("First middleware should not have already been called", didRun1[0]);
+                Assert.assertFalse("Second middleware should not have been invoked yet", didRun2[0]);
+                didRun1[0] = true;
+            }
+        };
+        m.Use(new CallMeMiddlware(act));
+
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertTrue("First middleware has not been run yet", didRun1[0]);
+                didRun2[0] = true;
+                await(nd.next());
+                return completedFuture(true);
+            }
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(didRun1[0]);
+        Assert.assertTrue(didRun2[0]);
+    }
+
+    @Test
+    public void RunCodeBeforeAndAfter() throws ExecutionException, InterruptedException
+    {
+        final boolean didRun1[] = {false};
+        final boolean codeafter2run[] = {false};
+        final boolean didRun2[] = {false};
+
+        MiddlewareSet m = new MiddlewareSet();
+
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertFalse("Looks like the 1st middleware has already run", didRun1[0]);
+                didRun1[0] = true;
+                await(nd.next());
+                Assert.assertTrue("The 2nd middleware should have run now.", didRun1[0]);
+                codeafter2run[0] = true;
+                return completedFuture(true);
+            }
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
+
+        MiddlewareCall mwc2 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                Assert.assertTrue("Looks like the 1st middleware has not been run", didRun1[0]);
+                Assert.assertFalse("The code that runs after middleware 2 is complete has already run.", codeafter2run[0]);
+                didRun2[0] = true;
+                await(nd.next());
+                return completedFuture(true);
+            }
+        };
+        m.Use(new AnonymousReceiveMiddleware(mwc2));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(didRun1[0]);
+        Assert.assertTrue(didRun2[0]);
+        Assert.assertTrue(codeafter2run[0]);
+    }
+
+    @Test
+    public void CatchAnExceptionViaMiddlware() throws ExecutionException, InterruptedException
+    {
+        MiddlewareSet m = new MiddlewareSet();
+        final boolean caughtException[] = {false};
+
+        MiddlewareCall mwc1 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+                try {
+                    await(nd.next());
+                    Assert.assertTrue("Should not get here", false);
+
+                }
+                catch (InterruptedException ex) {
+                    System.out.println("Here isi the exception message" + ex.getMessage());
+                    System.out.flush();
+                    Assert.assertTrue(ex.getMessage() == "test");
+
+                    caughtException[0] = true;
+                }
+                return completedFuture(true);
+        }};
+
+        m.Use(new AnonymousReceiveMiddleware(mwc1));
+
+        MiddlewareCall mwc2 = new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws InterruptedException {
+                throw new InterruptedException("test");
+            }
+            };
+
+        m.Use(new AnonymousReceiveMiddleware(mwc2));
+
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(caughtException[0]);
+    }
+
+
+
 }
