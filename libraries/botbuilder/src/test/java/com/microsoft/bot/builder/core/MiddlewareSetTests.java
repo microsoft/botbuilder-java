@@ -148,36 +148,35 @@ public class MiddlewareSetTests extends TestBase
         Assert.assertTrue(simple.getCalled());
         Assert.assertTrue( "Delegate was not called", wasCalled[0]);
     }
-/*
+
     @Test
-    public CompletableFuture OneMiddlewareItemWithDelegate()
-    {
+    public void OneMiddlewareItemWithDelegate() throws ExecutionException, InterruptedException {
         WasCalledMiddlware simple = new WasCalledMiddlware();
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(simple);
 
-        Assert.IsFalse(simple.Called);
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(simple.Called);
+        Assert.assertFalse(simple.getCalled());
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(simple.getCalled());
     }
 
-    @Test
-    [ExpectedException(typeof(InvalidOperationException))]
-    public CompletableFuture BubbleUncaughtException()
-    {
+    @Test(expected = IllegalStateException.class)
+    //[ExpectedException(typeof(InvalidOperationException))]
+    public void BubbleUncaughtException() throws ExecutionException, InterruptedException {
         MiddlewareSet m = new MiddlewareSet();
-        m.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            throw new InvalidOperationException("test");
-        }));
+        m.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
+            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws IllegalStateException {
+                throw new IllegalStateException("test");
+            }}
+            ));
 
-        await m.ReceiveActivity(null);
-        Assert.Fail("Should never have gotten here");
+        await(m.ReceiveActivity(null));
+        Assert.assertFalse("Should never have gotten here", true);
     }
 
     @Test
-    public CompletableFuture TwoMiddlewareItems()
+    public void TwoMiddlewareItems() throws ExecutionException, InterruptedException
     {
         WasCalledMiddlware one = new WasCalledMiddlware();
         WasCalledMiddlware two = new WasCalledMiddlware();
@@ -186,93 +185,118 @@ public class MiddlewareSetTests extends TestBase
         m.Use(one);
         m.Use(two);
 
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(one.Called);
-        Assert.IsTrue(two.Called);
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(one.getCalled());
+        Assert.assertTrue(two.getCalled());
     }
 
     @Test
-    public CompletableFuture TwoMiddlewareItemsWithDelegate()
+    public void TwoMiddlewareItemsWithDelegate() throws ExecutionException, InterruptedException
     {
         WasCalledMiddlware one = new WasCalledMiddlware();
         WasCalledMiddlware two = new WasCalledMiddlware();
 
-        int called = 0;
-        CompletableFuture CallMe(ITurnContext context)
-        {
-            called++;
-        }
+        final int called[] = {0};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                called[0]++;
+                return completedFuture(null);
+            }
+        };
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
         m.Use(two);
 
-        await m.ReceiveActivityWithStatus(null, CallMe);
-        Assert.IsTrue(one.Called);
-        Assert.IsTrue(two.Called);
-        Assert.IsTrue(called == 1, "Incorrect number of calls to Delegate");
+        await(m.ReceiveActivityWithStatus(null, tt));
+        Assert.assertTrue(one.getCalled());
+        Assert.assertTrue(two.getCalled());
+        Assert.assertTrue("Incorrect number of calls to Delegate", called[0] == 1 );
     }
 
     @Test
-    public CompletableFuture TwoMiddlewareItemsInOrder()
+    public void TwoMiddlewareItemsInOrder() throws ExecutionException, InterruptedException
     {
-        bool called1 = false;
-        bool called2 = false;
+        final boolean called1[] = {false};
+        final boolean called2[] = {false};
 
-        CallMeMiddlware one = new CallMeMiddlware(() =>
-        {
-            Assert.IsFalse(called2, "Second Middleware was called");
-            called1 = true;
+        CallMeMiddlware one = new CallMeMiddlware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertFalse( "Second Middleware was called", called2[0]);
+                called1[0] = true;
+            }
         });
 
-        CallMeMiddlware two = new CallMeMiddlware(() =>
-        {
-            Assert.IsTrue(called1, "First Middleware was not called");
-            called2 = true;
+        CallMeMiddlware two = new CallMeMiddlware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                Assert.assertTrue("First Middleware was not called", called1[0]);
+                called2[0] = true;
+            }
         });
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
         m.Use(two);
 
-        await m.ReceiveActivity(null);
-        Assert.IsTrue(called1);
-        Assert.IsTrue(called2);
+        await(m.ReceiveActivity(null));
+        Assert.assertTrue(called1[0]);
+        Assert.assertTrue(called2[0]);
     }
 
     @Test
-    public CompletableFuture Status_OneMiddlewareRan()
-    {
-        bool called1 = false;
+    public void Status_OneMiddlewareRan() throws ExecutionException, InterruptedException {
+        final boolean called1[] = {false};
 
-        CallMeMiddlware one = new CallMeMiddlware(() => { called1 = true; });
+        CallMeMiddlware one = new CallMeMiddlware(new ActionDel() {
+            @Override
+            public void CallMe() {
+                called1[0] = true;
+            }
+        });
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
 
         // The middlware in this pipeline calls next(), so the delegate should be called
-        bool didAllRun = false;
-        await m.ReceiveActivityWithStatus(null, async (ctx) => didAllRun = true);
+        final boolean didAllRun[] = {false};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                didAllRun[0] = true;
+                return completedFuture(null);
+            }
+        };
+        await(m.ReceiveActivityWithStatus(null, tt));
 
-        Assert.IsTrue(called1);
-        Assert.IsTrue(didAllRun);
+        Assert.assertTrue(called1[0]);
+        Assert.assertTrue(didAllRun[0]);
     }
 
     @Test
-    public CompletableFuture Status_RunAtEndEmptyPipeline()
+    public void Status_RunAtEndEmptyPipeline() throws ExecutionException, InterruptedException
     {
         MiddlewareSet m = new MiddlewareSet();
-        bool didAllRun = false;
+        final boolean didAllRun[] = {false};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                didAllRun[0] = true;
+                return completedFuture(null);
+            }
+        };
 
         // This middlware pipeline has no entries. This should result in
         // the status being TRUE.
-        await m.ReceiveActivityWithStatus(null, async (ctx) => didAllRun = true);
-        Assert.IsTrue(didAllRun);
+        await(m.ReceiveActivityWithStatus(null, tt));
+        Assert.assertTrue(didAllRun[0]);
 
     }
-
+/*
     @Test
-    public CompletableFuture Status_TwoItemsOneDoesNotCallNext()
+    public void Status_TwoItemsOneDoesNotCallNext()
     {
         bool called1 = false;
         bool called2 = false;
