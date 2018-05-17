@@ -5,5 +5,5 @@ import java.util.concurrent.ExecutionException;
 
 @FunctionalInterface
 public interface MiddlewareCall {
-    CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException;
+    CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException;
 }
