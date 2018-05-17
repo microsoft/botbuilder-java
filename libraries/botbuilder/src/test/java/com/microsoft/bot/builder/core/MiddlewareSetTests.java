@@ -126,27 +126,29 @@ public class MiddlewareSetTests extends TestBase
         await(m.ReceiveActivityWithStatus(null, tt));
         Assert.assertTrue("Delegate was not called", wasCalled[0]);
     }
-/*
+
     @Test
-    public CompletableFuture OneMiddlewareItem()
-    {
+    public void OneMiddlewareItem() throws ExecutionException, InterruptedException {
         WasCalledMiddlware simple = new WasCalledMiddlware();
 
-        bool wasCalled = false;
-        CompletableFuture CallMe(ITurnContext context)
-        {
-            wasCalled = true;
-        }
+        final boolean wasCalled[] = {false};
+        TurnTask tt = new TurnTask() {
+            @Override
+            public CompletableFuture invoke(TurnContext context) {
+                wasCalled[0] = true;
+                return CompletableFuture.completedFuture(null);
+            }
+        };
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(simple);
 
-        Assert.IsFalse(simple.Called);
-        await m.ReceiveActivityWithStatus(null, CallMe);
-        Assert.IsTrue(simple.Called);
-        Assert.IsTrue(wasCalled, "Delegate was not called");
+        Assert.assertFalse(simple.getCalled());
+        await(m.ReceiveActivityWithStatus(null, tt));
+        Assert.assertTrue(simple.getCalled());
+        Assert.assertTrue( "Delegate was not called", wasCalled[0]);
     }
-
+/*
     @Test
     public CompletableFuture OneMiddlewareItemWithDelegate()
     {
