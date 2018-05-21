@@ -61,27 +61,6 @@ public class MiddlewareSetTests extends TestBase
         }
     }
 
-/*
-    public async Task NestedSet_OnReceive()
-    {
-        boolean innerOnReceiveCalled = false;
-
-        MiddlewareSet inner = new MiddlewareSet();
-        inner.Use(new AnonymousReceiveMiddleware(async (context, next) =>
-        {
-            innerOnReceiveCalled = true;
-            await next();
-        }));
-
-        MiddlewareSet outer = new MiddlewareSet();
-        outer.Use(inner);
-
-        await outer.ReceiveActivity(null);
-
-        Assert.IsTrue(innerOnReceiveCalled, "Inner Middleware Receive was not called.");
-    }
-
-*/
 
     @Test
     public void NestedSet_OnReceive()
@@ -89,7 +68,7 @@ public class MiddlewareSetTests extends TestBase
         final boolean[] wasCalled = {false};
         MiddlewareSet inner = new MiddlewareSet();
         inner.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 wasCalled[0] = true;
                 await(nd.next());
                 return completedFuture(true);
@@ -379,7 +358,7 @@ public class MiddlewareSetTests extends TestBase
             public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 didRun[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc));
@@ -397,19 +376,19 @@ public class MiddlewareSetTests extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 didRun1[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
 
         m.Use(new AnonymousReceiveMiddleware(mwc1));
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 didRun2[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
 
@@ -428,21 +407,21 @@ public class MiddlewareSetTests extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertFalse("Looks like the 2nd one has already run", didRun2[0]);
                 didRun1[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertTrue("Looks like the 1nd one has not yet run", didRun1[0]);
                 didRun2[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
 
@@ -461,13 +440,13 @@ public class MiddlewareSetTests extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertFalse("First middleware already ran", didRun1[0]);
                 Assert.assertFalse("Looks like the second middleware was already run", didRun2[0]);
                 didRun1[0] = true;
                 await(nd.next());
                 Assert.assertTrue("Second middleware should have completed running", didRun2[0]);
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
@@ -506,11 +485,11 @@ public class MiddlewareSetTests extends TestBase
         m.Use(new CallMeMiddlware(act));
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertTrue("First middleware has not been run yet", didRun1[0]);
                 didRun2[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
@@ -530,24 +509,24 @@ public class MiddlewareSetTests extends TestBase
         MiddlewareSet m = new MiddlewareSet();
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertFalse("Looks like the 1st middleware has already run", didRun1[0]);
                 didRun1[0] = true;
                 await(nd.next());
                 Assert.assertTrue("The 2nd middleware should have run now.", didRun1[0]);
                 codeafter2run[0] = true;
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 Assert.assertTrue("Looks like the 1st middleware has not been run", didRun1[0]);
                 Assert.assertFalse("The code that runs after middleware 2 is complete has already run.", codeafter2run[0]);
                 didRun2[0] = true;
                 await(nd.next());
-                return completedFuture(true);
+                return completedFuture(null);
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc2));
@@ -565,7 +544,7 @@ public class MiddlewareSetTests extends TestBase
         final boolean caughtException[] = {false};
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 try {
                     await(nd.next());
                     Assert.assertTrue("Should not get here", false);
@@ -578,13 +557,13 @@ public class MiddlewareSetTests extends TestBase
 
                     caughtException[0] = true;
                 }
-                return completedFuture(true);
+                return completedFuture(null);
         }};
 
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws InterruptedException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws InterruptedException {
                 throw new InterruptedException("test");
             }
             };

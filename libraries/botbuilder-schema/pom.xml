@@ -5,14 +5,8 @@
   <groupId>com.microsoft.bot.schema</groupId>
   <artifactId>botbuilder-schema</artifactId>
   <packaging>jar</packaging>
-  <version>4.0.0-a0</version>
+  <version>4.0.0-b0</version>
 
-  <parent>
-    <groupId>com.microsoft.bot</groupId>
-    <artifactId>bot-parent</artifactId>
-    <version>4.0.0-a0</version>
-    <relativePath>../../</relativePath>
-  </parent>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Bot Framework Schema</description>
