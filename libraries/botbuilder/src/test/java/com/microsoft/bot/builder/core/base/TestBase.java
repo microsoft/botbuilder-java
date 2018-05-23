@@ -83,7 +83,7 @@ public abstract class TestBase {
             }
         } else {
             System.out.print("Environment variable 'AZURE_TEST_MODE' has not been set yet. Using 'PLAYBACK' mode.");
-            testMode = TestMode.PLAYBACK;
+            testMode = TestMode.RECORD;
         }
     }
 

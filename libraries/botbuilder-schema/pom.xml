@@ -5,14 +5,8 @@
   <groupId>com.microsoft.bot.schema</groupId>
   <artifactId>botbuilder-schema</artifactId>
   <packaging>jar</packaging>
-  <version>4.0.0-a0</version>
+  <version>4.0.0-a1</version>
 
-  <parent>
-    <groupId>com.microsoft.bot</groupId>
-    <artifactId>bot-parent</artifactId>
-    <version>4.0.0-a0</version>
-    <relativePath>../../</relativePath>
-  </parent>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Bot Framework Schema</description>
@@ -54,17 +48,17 @@
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-parameter-names</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.5</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jdk8</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.5</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.5</version>
     </dependency>
       <dependency>
           <groupId>joda-time</groupId>
