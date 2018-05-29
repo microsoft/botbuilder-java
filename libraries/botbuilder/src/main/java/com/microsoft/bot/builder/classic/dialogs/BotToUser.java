@@ -32,7 +32,7 @@
 //
 package com.microsoft.bot.builder.classic.dialogs;
 
-import com.microsoft.bot.schema.models.MessageActivity;
+import com.microsoft.bot.schema.models.BotActivity;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -49,14 +49,14 @@ public interface BotToUser
     /// <returns>A task that represents the post operation.</returns>
     // TODO: daveta Cancellation Token
     //CompletableFuture PostAsync(IMessageActivity message, CancellationToken cancellationToken = default(CancellationToken));
-    CompletableFuture PostAsync(MessageActivity message);
+    CompletableFuture PostAsync(BotActivity message);
     
 
     /// <summary>
     /// Make a message.
     /// </summary>
     /// <returns>The new message.</returns>
-    MessageActivity MakeMessage();
+    BotActivity MakeMessage();
 }
 /*
 public final class NullBotToUser implements BotToUser

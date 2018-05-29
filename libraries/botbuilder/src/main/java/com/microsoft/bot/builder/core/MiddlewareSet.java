@@ -3,11 +3,15 @@
 
 package com.microsoft.bot.builder.core;
 
+
+
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import static com.ea.async.Async.await;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 public class MiddlewareSet implements Middleware
@@ -24,16 +28,16 @@ public class MiddlewareSet implements Middleware
     }
 
     public CompletableFuture ReceiveActivity(TurnContext context)
-            throws ExecutionException, InterruptedException {
+            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
         // await ReceiveActivityInternal(context, null).ConfigureAwait(false);
         return ReceiveActivityInternal(context, null);
     }
 
-    public  CompletableFuture OnTurn(TurnContext context, NextDelegate next)
-            throws ExecutionException, InterruptedException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next)
+            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
         await(ReceiveActivityInternal(context, null));
         await(next.next());
-        return CompletableFuture.completedFuture(null);
+        return completedFuture(null);
     }
 
     public CompletableFuture OnTurn(TurnContext context, CompletableFuture next)
@@ -46,17 +50,17 @@ public class MiddlewareSet implements Middleware
     /// standard ReceiveActivity, except that it runs a user-defined delegate returns 
     /// if all Middlware in the receive pipeline was run.
     /// </summary>
-    public CompletableFuture ReceiveActivityWithStatus(TurnContext context, TurnTask callback)
-            throws ExecutionException, InterruptedException {
+    public CompletableFuture ReceiveActivityWithStatus(TurnContext context, Function<TurnContext, CompletableFuture> callback)
+            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
         return ReceiveActivityInternal(context, callback);
     }
 
-    private CompletableFuture ReceiveActivityInternal(TurnContext context, TurnTask callback)
-            throws ExecutionException, InterruptedException {
+    private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback)
+            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
         return ReceiveActivityInternal(context, callback, 0);
     }
-    private CompletableFuture ReceiveActivityInternal(TurnContext context, TurnTask callback, int nextMiddlewareIndex )
-            throws ExecutionException, InterruptedException {
+    private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback, int nextMiddlewareIndex )
+            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
         // Check if we're at the end of the middleware list yet
         if(nextMiddlewareIndex == _middleware.size())
         {
@@ -71,15 +75,15 @@ public class MiddlewareSet implements Middleware
 
             // If a callback was provided invoke it now and return its task, otherwise just return the completed task
             if (callback == null)
-                return CompletableFuture.completedFuture(null);
+                return completedFuture(null);
             else
-                return callback.invoke(context);
+                return callback.apply(context);
         }
 
         // Get the next piece of middleware 
         Middleware nextMiddleware = _middleware.get(nextMiddlewareIndex);
         NextDelegate next = new NextDelegate() {
-            public CompletableFuture next() throws ExecutionException, InterruptedException {
+            public CompletableFuture next() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
                 return ReceiveActivityInternal(context, callback, nextMiddlewareIndex + 1);
             }
         };

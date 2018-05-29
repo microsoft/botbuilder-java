@@ -40,13 +40,13 @@ public interface TurnContext
     /// Gets the bot adapter that created this context object.
     /// </summary>
     // TODO: daveta
-    //BotAdapter getAdapter();
+    BotAdapter getAdapter();
 
     /// <summary>
     /// Gets the services registered on this context object.
     /// </summary>
     // TODO: daveta
-    //ITurnContextServiceCollection getServices();
+    TurnContextServiceCollection getServices();
 
     /// <summary>
     /// Incoming request
@@ -80,10 +80,10 @@ public interface TurnContext
     /// rate, volume, pronunciation, and pitch, specify <paramref name="speak"/> in 
     /// Speech Synthesis Markup Language (SSML) format.</para>
     /// </remarks>
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend);
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak);
+    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend) throws Exception;
+    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak) throws Exception;
     //CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak = null, String inputHint = InputHints.AcceptingInput);
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak, String inputHint);
+    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception;
     
     /// <summary>
     /// Sends an activity to the sender of the incoming activity.
@@ -93,7 +93,7 @@ public interface TurnContext
     /// <remarks>If the activity is successfully sent, the task result contains
     /// a <see cref="ResourceResponse"/> object containing the ID that the receiving 
     /// channel assigned to the activity.</remarks>
-    CompletableFuture<ResourceResponse> SendActivity(Activity activity);
+    CompletableFuture<ResourceResponse> SendActivity(Activity activity) throws Exception;
 
     /// <summary>
     /// Sends a set of activities to the sender of the incoming activity.
@@ -103,7 +103,7 @@ public interface TurnContext
     /// <remarks>If the activities are successfully sent, the task result contains
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that 
     /// the receiving channel assigned to the activities.</remarks>
-    CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities);
+    CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities) throws Exception;
 
     /// <summary>
     /// Replaces an existing activity. 
@@ -115,14 +115,14 @@ public interface TurnContext
     /// channel assigned to the activity.
     /// <para>Before calling this, set the ID of the replacement activity to the ID
     /// of the activity to replace.</para></remarks>
-    CompletableFuture<ResourceResponse> UpdateActivity(Activity activity);
+    ResourceResponse UpdateActivity(Activity activity) throws Exception;
 
     /// <summary>
     /// Deletes an existing activity.
     /// </summary>
     /// <param name="activityId">The ID of the activity to delete.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    CompletableFuture DeleteActivity(String activityId);
+    CompletableFuture DeleteActivity(String activityId) throws Exception;
 
     /// <summary>
     /// Deletes an existing activity.
@@ -131,7 +131,7 @@ public interface TurnContext
     /// <returns>A task that represents the work queued to execute.</returns>
     /// <remarks>The conversation reference's <see cref="ConversationReference.ActivityId"/> 
     /// indicates the activity in the conversation to delete.</remarks>
-    CompletableFuture DeleteActivity(ConversationReference conversationReference);
+    CompletableFuture DeleteActivity(ConversationReference conversationReference) throws Exception;
 
     /// <summary>
     /// Adds a response handler for send activity operations.

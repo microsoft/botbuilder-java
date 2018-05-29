@@ -37,7 +37,7 @@ import com.microsoft.bot.builder.classic.dialogs.BotDataBag;
 import com.microsoft.bot.builder.classic.dialogs.BotToUser;
 import com.microsoft.bot.builder.classic.dialogs.DialogStack;
 import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.MessageActivity;
+import com.microsoft.bot.schema.models.BotActivity;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -78,13 +78,13 @@ public final class DialogContextImpl implements DialogContext
     }
 
     //CompletableFuture IBotToUser.PostAsync(MessageActivity message, CancellationToken cancellationToken)
-    CompletableFuture PostAsync(MessageActivity message)
+    CompletableFuture PostAsync(BotActivity message)
     {
         //this.botToUser.PostAsync(message, cancellationToken).join();
         return this.botToUser.PostAsync(message);
     }
 
-    MessageActivity MakeMessage()
+    BotActivity MakeMessage()
     {
         return this.botToUser.MakeMessage();
     }
