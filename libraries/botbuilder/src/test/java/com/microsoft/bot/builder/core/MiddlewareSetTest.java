@@ -17,14 +17,14 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 // [TestCategory("Russian Doll Middleware, Nested Middleware sets")]
-public class MiddlewareSetTests extends TestBase
+public class MiddlewareSetTest extends TestBase
 {
     protected ConnectorClientImpl connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
     private boolean innerOnreceiveCalled;
 
-    public MiddlewareSetTests() {
+    public MiddlewareSetTest() {
         super(RunCondition.BOTH);
     }
 
