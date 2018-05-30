@@ -6,9 +6,17 @@ package com.microsoft.bot.builder.core.extensions;
 
 
 import com.ea.async.Async;
+import com.microsoft.bot.builder.core.adapters.TestAdapter;
+import com.microsoft.bot.builder.core.adapters.TestFlow;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.schema.models.BotActivity;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static com.ea.async.Async.await;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 //    [TestClass]
 //            [TestCategory("State Management")]
@@ -32,21 +40,21 @@ public class BotStateTest {
     protected void cleanUpResources() {
     }
 
-/*    @Test
+    @Test
     public void State_DoNOTRememberContextState() {
 
         TestAdapter adapter = new TestAdapter();
 
-        await(new TestFlow(adapter, async(context) = >
-                {
-                        var obj = context.GetConversationState < TestPocoState > ();
-        Assert.assertNull(obj, "context.state should not exist");
-                   }
+        await(new TestFlow(adapter, (context) -> {
+                TestPocoState obj = StateTurnContextExtensions.<TestPocoState>GetConversationState(context);
+                Assert.assertNull("context.state should not exist", obj);
+                return completedFuture(null);
+                }
                 )
                 .Send("set value")
                 .StartTest());
     }
-
+/*
     @Test
     public void State_RememberIStoreItemUserState() {
         var adapter = new TestAdapter()

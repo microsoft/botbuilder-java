@@ -1,31 +1,40 @@
 package com.microsoft.bot.builder.core.adapters;
 
 import com.microsoft.bot.builder.core.BotTurnContext;
+import com.microsoft.bot.builder.core.ServiceKeyAlreadyRegisteredException;
+import com.microsoft.bot.builder.core.TurnContext;
+import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.models.BotActivity;
+import org.joda.time.DateTime;
 
+import java.lang.management.ManagementFactory;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-public class TestFlow
-{
+public class TestFlow {
     final TestAdapter adapter;
     final CompletableFuture testTask;
-    Function<BotTurnContext, CompletableFuture> callback;
+    Function<TurnContext, CompletableFuture> callback;
 
     public TestFlow(TestAdapter adapter) {
         this(adapter, null);
     }
 
-    public TestFlow(TestAdapter adapter, Function<BotTurnContext, CompletableFuture> callback) {
+    public TestFlow(TestAdapter adapter, Function<TurnContext, CompletableFuture> callback) {
         this.adapter = adapter;
         this.callback = callback;
         this.testTask = completedFuture(null);
     }
 
 
-    public TestFlow(CompletableFuture testTask, TestFlow flow)
-    {
+    public TestFlow(CompletableFuture testTask, TestFlow flow) {
         if (testTask == null)
             this.testTask = completedFuture(null);
         else
@@ -41,7 +50,7 @@ public class TestFlow
     public CompletableFuture StartTest() {
         return this.testTask;
     }
-/*
+
     /// <summary>
     /// Send a message from the user to the bot
     /// </summary>
@@ -51,23 +60,19 @@ public class TestFlow
         if (userSays == null)
             throw new IllegalArgumentException("You have to pass a userSays parameter");
 
-        return new TestFlow(this.testTask.ContinueWith((task) =>
-                {
-                        // NOTE: we need to .Wait() on the original Task to properly observe any exceptions that might have occurred
-                        // and to have them propagate correctly up through the chain to whomever is waiting on the parent task
-                        // The following StackOverflow answer provides some more details on why you want to do this:
-                        // https://stackoverflow.com/questions/11904821/proper-way-to-use-continuewith-for-tasks/11906865#11906865
-                        //
-                        // From the Docs:
-                        //  https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library
-                        //  Exceptions are propagated when you use one of the static or instance Task.Wait or Wait
-                        //  methods, and you handle them by enclosing the call in a try/catch statement. If a task is the
-                        //  parent of attached child tasks, or if you are waiting on multiple tasks, multiple exceptions
-                        //  could be thrown.
-                        task.Wait();
+        //  Function<BotTurnContext, CompletableFuture>
+        return new TestFlow(this.testTask.thenAccept((task) -> {
+            // task.Wait();
 
-        return this.adapter.SendTextToBot(userSays, this.callback);
-            }).Unwrap(), this);
+            try {
+                this.adapter.SendTextToBot(userSays, this.callback);
+                return;
+            } catch (Exception e) {
+                return;
+            } catch (ServiceKeyAlreadyRegisteredException e) {
+                return;
+            }
+        }), this);
     }
 
     /// <summary>
@@ -75,18 +80,23 @@ public class TestFlow
     /// </summary>
     /// <param name="userActivity"></param>
     /// <returns></returns>
-    public TestFlow Send(IActivity userActivity)
-    {
+    public TestFlow Send(Activity userActivity) {
         if (userActivity == null)
-            throw new ArgumentNullException("You have to pass an Activity");
+            throw new IllegalArgumentException("You have to pass an Activity");
 
-        return new TestFlow(this.testTask.ContinueWith((task) =>
-                {
-                        // NOTE: See details code in above method.
-                        task.Wait();
+        return new TestFlow(this.testTask.thenAccept((task) -> {
+            // NOTE: See details code in above method.
+            //task.Wait();
 
-        return this.adapter.ProcessActivity((Activity)userActivity, this.callback);
-            }).Unwrap(), this);
+            try {
+                this.adapter.ProcessActivity((Activity) userActivity, this.callback);
+            } catch (Exception e) {
+                return;
+            } catch (ServiceKeyAlreadyRegisteredException e) {
+                return;
+            }
+            return;
+        }), this);
     }
 
     /// <summary>
@@ -94,15 +104,20 @@ public class TestFlow
     /// </summary>
     /// <param name="ms"></param>
     /// <returns></returns>
-    public TestFlow Delay(UInt32 ms)
-    {
-        return new TestFlow(this.testTask.ContinueWith((task) =>
-                {
-                        // NOTE: See details code in above method.
-                        task.Wait();
+    public TestFlow Delay(int ms) {
+        return new TestFlow(this.testTask.thenAccept((task) ->
+        {
+            // NOTE: See details code in above method.
+            //task.Wait();
 
-        return Task.Delay((int)ms);
-            }), this);
+
+            try {
+                Thread.sleep((int) ms);
+            } catch (InterruptedException e) {
+                return;
+            }
+            return;
+        }), this);
     }
 
     /// <summary>
@@ -112,8 +127,15 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow AssertReply(string expected, string description = null, UInt32 timeout = 3000)
-    {
+    public TestFlow AssertReply(String expected) {
+        return this.AssertReply(expected, null, 3000);
+    }
+
+    public TestFlow AssertReply(String expected, String description) {
+        return this.AssertReply(expected, description, 3000);
+    }
+
+    public TestFlow AssertReply(String expected, String description, int timeout) {
         return this.AssertReply(this.adapter.MakeActivity(expected), description, timeout);
     }
 
@@ -124,21 +146,27 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow AssertReply(IActivity expected, [CallerMemberName] string description = null, UInt32 timeout = 3000)
-    {
-        return this.AssertReply((reply) =>
-                {
-        if (expected.Type != reply.Type)
-            throw new Exception($"{description}: Type should match");
-        if (expected.AsMessageActivity().Text != reply.AsMessageActivity().Text)
-        {
-            if (description == null)
-                throw new Exception($"Expected:{expected.AsMessageActivity().Text}\nReceived:{reply.AsMessageActivity().Text}");
-            else
-                throw new Exception($"{description}: Text should match");
-        }
-        // TODO, expand this to do all properties set on expected
-            }, description, timeout);
+    public TestFlow AssertReply(Activity expected) {
+        String description = Thread.currentThread().getStackTrace()[1].getMethodName();
+        return AssertReply(expected, description, 3000);
+    }
+
+    public TestFlow AssertReply(Activity expected, String description, int timeout) {
+        if (description == null)
+            description = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String finalDescription = description;
+        return this.AssertReply((reply) -> {
+            if (expected.type() != reply.type())
+                return String.format("%s: Type should match", finalDescription);
+            if (expected.text().equals(reply.text())) {
+                if (finalDescription == null)
+                    return String.format("Expected:%s\nReceived:{reply.AsMessageActivity().Text}", expected.text());
+                else
+                    return String.format("%s: Text should match", finalDescription);
+            }
+            // TODO, expand this to do all properties set on expected
+            return null;
+        }, description, timeout);
     }
 
     /// <summary>
@@ -148,35 +176,48 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow AssertReply(Action<IActivity> validateActivity, [CallerMemberName] string description = null, UInt32 timeout = 3000)
-    {
-        return new TestFlow(this.testTask.ContinueWith((task) =>
-                {
-                        // NOTE: See details code in above method.
-                        task.Wait();
+    public TestFlow AssertReply(Function<Activity, String> validateActivity) {
+        String description = Thread.currentThread().getStackTrace()[1].getMethodName();
+        return AssertReply(validateActivity, description, 3000);
+    }
 
-        if (System.Diagnostics.Debugger.IsAttached)
-            timeout = UInt32.MaxValue;
+    public TestFlow AssertReply(Function<Activity, String> validateActivity, String description) {
+        return AssertReply(validateActivity, description, 3000);
+    }
 
-        var start = DateTime.UtcNow;
-        while (true)
-        {
-            var current = DateTime.UtcNow;
+    public TestFlow AssertReply(Function<Activity, String> validateActivity, String description, int timeout) {
+        return new TestFlow(this.testTask.thenCompose((task) -> {
+            // NOTE: See details code in above method.
+            //task.Wait();
+            int finalTimeout = Integer.MAX_VALUE;
+            if (isDebug())
+                finalTimeout = Integer.MAX_VALUE;
 
-            if ((current - start).TotalMilliseconds > timeout)
-            {
-                throw new TimeoutException($"{timeout}ms Timed out waiting for:'{description}'");
+            DateTime start = DateTime.now();
+            while (true) {
+                DateTime current = DateTime.now();
+
+                if ((current.getMillis() - start.getMillis()) > (long) finalTimeout)
+                    return String.format("%d ms Timed out waiting for:'%s'", finalTimeout, description);
+
+
+                Activity replyActivity = this.adapter.GetNextReply();
+                if (replyActivity != null) {
+                    // if we have a reply
+                    return validateActivity.apply(replyActivity);
+                }
             }
+        }), this);
+    }
 
-            IActivity replyActivity = this.adapter.GetNextReply();
-            if (replyActivity != null)
-            {
-                // if we have a reply
-                validateActivity(replyActivity);
-                return;
+    // Hack to determine if debugger attached..
+    public boolean isDebug() {
+        for (String arg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+            if (arg.contains("jdwp=")) {
+                return true;
             }
         }
-            }), this);
+        return false;
     }
 
 
@@ -188,10 +229,15 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow Test(string userSays, string expected, string description = null, UInt32 timeout = 3000)
-    {
+    public TestFlow Test(String userSays, String expected) {
+        return Test(userSays, expected, null, 3000);
+    }
+    public TestFlow Test(String userSays, String expected, String description) {
+        return Test(userSays, expected, description, 3000);
+    }
+    public TestFlow Test(String userSays, String expected, String description, int timeout) {
         if (expected == null)
-            throw new ArgumentNullException(nameof(expected));
+            throw new IllegalArgumentException("expected");
 
         return this.Send(userSays)
                 .AssertReply(expected, description, timeout);
@@ -205,10 +251,15 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow Test(string userSays, Activity expected, string description = null, UInt32 timeout = 3000)
-    {
+    public TestFlow Test(String userSays, Activity expected) {
+        return Test(userSays, expected, null, 3000);
+    }
+    public TestFlow Test(String userSays, Activity expected, String description) {
+        return Test(userSays, expected, description, 3000);
+    }
+    public TestFlow Test(String userSays, Activity expected, String description, int timeout) {
         if (expected == null)
-            throw new ArgumentNullException(nameof(expected));
+            throw new IllegalArgumentException("expected");
 
         return this.Send(userSays)
                 .AssertReply(expected, description, timeout);
@@ -222,10 +273,15 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow Test(string userSays, Action<IActivity> expected, string description = null, UInt32 timeout = 3000)
-    {
+    public TestFlow Test(String userSays,  Function<Activity, String> expected) {
+        return Test(userSays, expected, null, 3000);
+    }
+    public TestFlow Test(String userSays,  Function<Activity, String> expected, String description) {
+        return Test(userSays, expected, description, 3000);
+    }
+    public TestFlow Test(String userSays, Function<Activity, String> expected, String description, int timeout) {
         if (expected == null)
-            throw new ArgumentNullException(nameof(expected));
+            throw new IllegalArgumentException("expected");
 
         return this.Send(userSays)
                 .AssertReply(expected, description, timeout);
@@ -238,20 +294,23 @@ public class TestFlow
     /// <param name="description"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public TestFlow AssertReplyOneOf(string[] candidates, string description = null, UInt32 timeout = 3000)
-    {
-        if (candidates == null)
-            throw new ArgumentNullException(nameof(candidates));
-
-        return this.AssertReply((reply) =>
-                {
-                        foreach (var candidate in candidates)
-                        {
-        if (reply.AsMessageActivity().Text == candidate)
-            return;
-                }
-        throw new Exception(description ?? $"Not one of candidates: {String.Join("\n", candidates)}");
-            }, description, timeout);
+    public TestFlow AssertReplyOneOf(String[] candidates) {
+        return AssertReplyOneOf(candidates, null, 3000);
     }
-    */
+    public TestFlow AssertReplyOneOf(String[] candidates, String description) {
+        return AssertReplyOneOf(candidates, description, 3000);
+    }
+    public TestFlow AssertReplyOneOf(String[] candidates, String description, int timeout) {
+        if (candidates == null)
+            throw new IllegalArgumentException("candidates");
+
+        return this.AssertReply((reply) -> {
+                        for(String candidate : candidates) {
+                            if (reply.text() == candidate)
+                                return null;
+                        }
+                        return String.format("%s: Not one of candidates: %s", description, String.join("\n ", candidates));
+                        },description, timeout);
+    }
+
 }

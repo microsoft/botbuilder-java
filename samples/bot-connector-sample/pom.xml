@@ -56,12 +56,12 @@
     <dependency>
       <groupId>com.microsoft.bot.schema</groupId>
       <artifactId>botbuilder-schema</artifactId>
-      <version>4.0.0-a0</version>
+      <version>4.0.0-a1</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.bot.connector</groupId>
       <artifactId>bot-connector</artifactId>
-      <version>4.0.0-a0</version>
+      <version>4.0.0-a1</version>
     </dependency>
   </dependencies>
 
@@ -84,6 +84,19 @@
           <mainClass>com.microsoft.bot.connector.sample.App</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.microsoft.bot.connector.sample.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 </project>
