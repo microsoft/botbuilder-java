@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 /// length of the turn.</remarks>
 /// <seealso cref="IBot"/>
 /// <seealso cref="IMiddleware"/>
-public class BotTurnContext implements TurnContext, AutoCloseable {
+public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final BotAdapter _adapter;
     private final Activity _activity;
     private Boolean _responded = false;
@@ -47,7 +47,7 @@ public class BotTurnContext implements TurnContext, AutoCloseable {
     /// <exception cref="IllegalArgumentException"><paramref name="activity"/> or
     /// <paramref name="adapter"/> is <c>null</c>.</exception>
     /// <remarks>For use by bot adapter implementations only.</remarks>
-    public BotTurnContext(BotAdapter adapter, Activity activity) {
+    public TurnContextImpl(BotAdapter adapter, Activity activity) {
         if (adapter == null)
             throw new IllegalArgumentException("adapter");
         _adapter = adapter;
@@ -55,7 +55,7 @@ public class BotTurnContext implements TurnContext, AutoCloseable {
              throw new IllegalArgumentException("activity");
         _activity = activity;
 
-        _turnServices = new BotTurnContextServiceCollection();
+        _turnServices = new TurnContextServiceCollectionImpl();
         }
 
 

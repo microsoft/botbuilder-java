@@ -9,7 +9,6 @@ import com.microsoft.bot.schema.models.ConversationReferenceHelper;
 import com.microsoft.bot.schema.models.ResourceResponse;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import static com.ea.async.Async.await;
@@ -173,7 +172,7 @@ public abstract class BotAdapter {
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
         Activity activity = conv.GetPostToBotMessage();
 
-        try (BotTurnContext context = new BotTurnContext(this, activity))
+        try (TurnContextImpl context = new TurnContextImpl(this, activity))
         {
             return RunPipeline(context, callback);
         }

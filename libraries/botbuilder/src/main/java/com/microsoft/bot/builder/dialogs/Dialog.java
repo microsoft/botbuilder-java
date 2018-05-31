@@ -34,7 +34,7 @@ public abstract class Dialog
             throw new NullPointerException("HashMap<String, Object> state");
 
         // Create empty dialog set and ourselves to it
-        // TODO: daveta
+        // TODO: Complete
         //DialogSet dialogs = new DialogSet();
         //dialogs.Add("dialog", (IDialog)this);
 
@@ -42,7 +42,7 @@ public abstract class Dialog
         //HashMap<String, Object> result = null;
 
         /*
-        // TODO daveta
+        // TODO Complete
 
         await dc.Begin("dialog", options);
         */

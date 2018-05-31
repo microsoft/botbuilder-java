@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public final class BotTurnContextServiceCollection implements TurnContextServiceCollection, AutoCloseable
+public final class TurnContextServiceCollectionImpl implements TurnContextServiceCollection, AutoCloseable
 {
     private final HashMap<String, Object> _services = new HashMap<String, Object>();
 
-    public BotTurnContextServiceCollection() throws IllegalArgumentException {
+    public TurnContextServiceCollectionImpl() throws IllegalArgumentException {
     }
 
 

@@ -74,7 +74,7 @@ public class TestAdapter extends BotAdapter {
         if(activity.timestamp() == null ||activity.timestamp()== new DateTime(0))
             activity.withTimestamp(DateTime.now());
 
-        try (BotTurnContext context=new BotTurnContext(this, activity)) {
+        try (TurnContextImpl context=new TurnContextImpl(this, activity)) {
             await(super.RunPipeline(context, callback));
         }
         return completedFuture(null);
@@ -174,7 +174,7 @@ public class TestAdapter extends BotAdapter {
         ConversationUpdateActivity update=MessageActivity.CreateConversationUpdateActivity();
 
         update.withConversation(new ConversationAccount().withId(UUID.randomUUID().toString()));
-        BotTurnContext context=new BotTurnContext(this,(Activity)update);
+        TurnContextImpl context=new TurnContextImpl(this,(Activity)update);
         return callback.apply(context);
     }
 

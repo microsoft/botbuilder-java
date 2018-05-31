@@ -53,7 +53,7 @@ public class TestFlow {
         if (userSays == null)
             throw new IllegalArgumentException("You have to pass a userSays parameter");
 
-        //  Function<BotTurnContext, CompletableFuture>
+        //  Function<TurnContextImpl, CompletableFuture>
         return new TestFlow(this.testTask.thenAccept((task) -> {
             // task.Wait();
 
