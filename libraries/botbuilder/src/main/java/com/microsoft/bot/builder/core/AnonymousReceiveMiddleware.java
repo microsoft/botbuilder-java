@@ -31,7 +31,7 @@ public class AnonymousReceiveMiddleware implements Middleware
     /// <param name="context">The context object for this turn.</param>
     /// <param name="next">The delegate to call to continue the bot middleware pipeline.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         return _toCall.requestHandler(context, next);
     }
 

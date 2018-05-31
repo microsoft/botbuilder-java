@@ -1,21 +1,14 @@
 package com.microsoft.bot.builder.core.adapters;
 
-import com.microsoft.bot.builder.core.BotTurnContext;
 import com.microsoft.bot.builder.core.ServiceKeyAlreadyRegisteredException;
 import com.microsoft.bot.builder.core.TurnContext;
 import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.BotActivity;
 import org.joda.time.DateTime;
 
 import java.lang.management.ManagementFactory;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class TestFlow {

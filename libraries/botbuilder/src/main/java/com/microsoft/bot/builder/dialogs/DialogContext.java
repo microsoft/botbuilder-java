@@ -74,7 +74,7 @@ public delegate Task StartAsync(IDialogContext context);
 /// The context for the execution of a dialog's conversational process.
 /// </summary>
 // DAVETA: TODO
-// public interface DialogContext extends DialogStack, BotContext
+// public interface DialogContext extends
 public interface DialogContext extends BotContext
         {
         }

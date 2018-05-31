@@ -5,5 +5,5 @@ import java.util.concurrent.ExecutionException;
 
 @FunctionalInterface
 public interface NextDelegate {
-     CompletableFuture next() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException;
+     CompletableFuture next() throws Exception, ServiceKeyAlreadyRegisteredException;
 }

@@ -10,7 +10,7 @@ import java.util.List;
     /// <summary>
     /// A message in a conversation
     /// </summary>
-public class BotActivity extends Activity
+public class MessageActivity extends Activity
 {
     /// <summary>
     /// The language code of the Text field
@@ -145,7 +145,7 @@ public class BotActivity extends Activity
     /// </summary>
     public static ConversationUpdateActivity CreateConversationUpdateActivity()
     {
-        return (ConversationUpdateActivity) new BotActivity()
+        return (ConversationUpdateActivity) new MessageActivity()
                 .withType(ActivityTypes.CONVERSATION_UPDATE)
                 .withMembersAdded(new ArrayList<ChannelAccount>())
                 .withMembersRemoved(new ArrayList<ChannelAccount>());

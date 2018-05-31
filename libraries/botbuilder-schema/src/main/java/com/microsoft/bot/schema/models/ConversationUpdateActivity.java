@@ -2,7 +2,7 @@ package com.microsoft.bot.schema.models;
 
 // Note: In C# implementation, main Activity interface does not contain complete wire format.
 
-public class ConversationUpdateActivity extends BotActivity {
+public class ConversationUpdateActivity extends MessageActivity {
     /// <summary>
     /// Members added to the conversation
     /// </summary>

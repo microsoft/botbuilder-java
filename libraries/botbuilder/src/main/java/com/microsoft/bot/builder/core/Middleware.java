@@ -55,7 +55,7 @@ public interface Middleware
     /// <seealso cref="Bot.Schema.IActivity"/>
     // TODO: daveta review this (NextDelegate
     //CompletableFuture OnTurn(TurnContext context, NextDelegate next);
-    CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException;
+    CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException;
 }
 
 

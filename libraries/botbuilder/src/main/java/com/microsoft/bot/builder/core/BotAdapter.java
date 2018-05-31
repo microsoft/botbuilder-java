@@ -125,7 +125,7 @@ public abstract class BotAdapter {
     /// </remarks>
     // TODO: daveta CancellationToken
     //    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback = null, AtomicReference<CompletableFuture> cancelToken = null)
-    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
         BotAssert.ContextNotNull(context);
 
         // Call any registered Middleware Components looking for ReceiveActivity()

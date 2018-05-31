@@ -5,5 +5,5 @@ import java.util.concurrent.ExecutionException;
 
 @FunctionalInterface
 public interface MiddlewareCall {
-    CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException;
+    CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException;
 }

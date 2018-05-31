@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder.core.extensions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.bot.builder.core.Middleware;
 import com.microsoft.bot.builder.core.NextDelegate;
 import com.microsoft.bot.builder.core.ServiceKeyAlreadyRegisteredException;
@@ -74,14 +75,14 @@ public class BotState<TState> implements Middleware
     /// <remarks>This middleware loads the state object on the leading edge of the middleware pipeline
     /// and persists the state object on the trailing edge.
     /// </remarks>
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         await(ReadToContextService(context));
         await(next.next());
         await(WriteFromContextService(context));
         return completedFuture(null);
     }
 
-    protected CompletableFuture ReadToContextService(TurnContext context) throws ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+    protected CompletableFuture ReadToContextService(TurnContext context) throws ServiceKeyAlreadyRegisteredException, IllegalArgumentException, JsonProcessingException {
         String key = this._keyDelegate.apply(context);
         Map<String, ?> items = await(_storage.Read(new String[] { key }));
         TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
@@ -100,7 +101,7 @@ public class BotState<TState> implements Middleware
         return completedFuture(null);
     }
 
-    protected CompletableFuture WriteFromContextService(TurnContext context) throws IllegalArgumentException {
+    protected CompletableFuture WriteFromContextService(TurnContext context) throws Exception {
         TState state = context.getServices().Get(this._propertyName);
         return completedFuture(await(Write(context, state)));
     }
@@ -110,7 +111,7 @@ public class BotState<TState> implements Middleware
     /// </summary>
     /// <typeparam name="TState">The type of the bot state object.</typeparam>
     /// <param name="context">The context object for this turn.</param>
-    public CompletableFuture<TState> Read(TurnContext context) {
+    public CompletableFuture<TState> Read(TurnContext context) throws JsonProcessingException {
         String key = this._keyDelegate.apply(context);
         Map<String, ?> items = await( _storage.Read(new String[] { key }));
         TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
@@ -130,7 +131,7 @@ public class BotState<TState> implements Middleware
     /// </summary>
     /// <param name="context">The context object for this turn.</param>
     /// <param name="state">The state object.</param>
-    public CompletableFuture Write(TurnContext context, TState state) {
+    public CompletableFuture Write(TurnContext context, TState state) throws Exception {
         HashMap<String, TState> changes = new HashMap<String, TState>();
         //List<Map.Entry<String, ?>> changes = new ArrayList<Map.Entry<String, ?>>();
 

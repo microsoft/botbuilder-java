@@ -28,13 +28,13 @@ public class MiddlewareSet implements Middleware
     }
 
     public CompletableFuture ReceiveActivity(TurnContext context)
-            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            throws Exception, ServiceKeyAlreadyRegisteredException {
         // await ReceiveActivityInternal(context, null).ConfigureAwait(false);
         return ReceiveActivityInternal(context, null);
     }
 
     public CompletableFuture OnTurn(TurnContext context, NextDelegate next)
-            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            throws Exception, ServiceKeyAlreadyRegisteredException {
         await(ReceiveActivityInternal(context, null));
         await(next.next());
         return completedFuture(null);
@@ -51,16 +51,16 @@ public class MiddlewareSet implements Middleware
     /// if all Middlware in the receive pipeline was run.
     /// </summary>
     public CompletableFuture ReceiveActivityWithStatus(TurnContext context, Function<TurnContext, CompletableFuture> callback)
-            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            throws Exception, ServiceKeyAlreadyRegisteredException {
         return ReceiveActivityInternal(context, callback);
     }
 
     private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback)
-            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            throws Exception, ServiceKeyAlreadyRegisteredException {
         return ReceiveActivityInternal(context, callback, 0);
     }
     private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback, int nextMiddlewareIndex )
-            throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            throws Exception, ServiceKeyAlreadyRegisteredException {
         // Check if we're at the end of the middleware list yet
         if(nextMiddlewareIndex == _middleware.size())
         {
@@ -83,7 +83,7 @@ public class MiddlewareSet implements Middleware
         // Get the next piece of middleware 
         Middleware nextMiddleware = _middleware.get(nextMiddlewareIndex);
         NextDelegate next = new NextDelegate() {
-            public CompletableFuture next() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+            public CompletableFuture next() throws Exception, ServiceKeyAlreadyRegisteredException {
                 return ReceiveActivityInternal(context, callback, nextMiddlewareIndex + 1);
             }
         };

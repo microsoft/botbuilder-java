@@ -245,11 +245,11 @@ public class BotTurnContext implements TurnContext, AutoCloseable {
 
         // Convert the IActivities to Activies.
         // Activity[] activityArray = Array.ConvertAll(activities, (input) => (Activity)input);
-        List<BotActivity> activityArray = Arrays.stream(activities).map(input -> (BotActivity) input).collect(toList());
+        List<MessageActivity> activityArray = Arrays.stream(activities).map(input -> (MessageActivity) input).collect(toList());
 
 
         // Create the list used by the recursive methods.
-        List<BotActivity> activityList = new ArrayList<BotActivity>(activityArray);
+        List<MessageActivity> activityList = new ArrayList<MessageActivity>(activityArray);
 
         Callable<CompletableFuture<ResourceResponse[]>> ActuallySendStuff = () ->  {
             // Are the any non-trace activities to send?

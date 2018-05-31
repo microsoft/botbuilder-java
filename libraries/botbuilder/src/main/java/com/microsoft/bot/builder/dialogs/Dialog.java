@@ -43,8 +43,6 @@ public abstract class Dialog
 
         /*
         // TODO daveta
-        // DialogContext dc = new DialogContextImpl(dialogs, context, state, (r) => { result = r; });
-        DialogContext dc = new DialogContextImpl(dialogs, context, state);
 
         await dc.Begin("dialog", options);
         */

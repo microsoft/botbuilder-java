@@ -47,7 +47,7 @@ public class MiddlewareSetTest extends TestBase
 
 
     @Test
-    public void NoMiddleware() throws ServiceKeyAlreadyRegisteredException {
+    public void NoMiddleware() throws ServiceKeyAlreadyRegisteredException, Exception {
         MiddlewareSet m = new MiddlewareSet();
         // No middleware. Should not explode.
         try {
@@ -64,11 +64,11 @@ public class MiddlewareSetTest extends TestBase
 
 
     @Test
-    public void NestedSet_OnReceive() throws ServiceKeyAlreadyRegisteredException {
+    public void NestedSet_OnReceive() throws ServiceKeyAlreadyRegisteredException, Exception {
         final boolean[] wasCalled = {false};
         MiddlewareSet inner = new MiddlewareSet();
         inner.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 wasCalled[0] = true;
                 return nd.next();
             }
@@ -90,7 +90,7 @@ public class MiddlewareSetTest extends TestBase
 
 
     @Test
-    public void NoMiddlewareWithDelegate() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void NoMiddlewareWithDelegate() throws Exception, ServiceKeyAlreadyRegisteredException {
         MiddlewareSet m = new MiddlewareSet();
         final boolean wasCalled[] = {false};
         Function<TurnContext, CompletableFuture> cb = context -> {
@@ -103,7 +103,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void OneMiddlewareItem() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void OneMiddlewareItem() throws Exception, ServiceKeyAlreadyRegisteredException {
         WasCalledMiddlware simple = new WasCalledMiddlware();
 
         final boolean wasCalled[] = {false};
@@ -122,7 +122,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void OneMiddlewareItemWithDelegate() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void OneMiddlewareItemWithDelegate() throws Exception, ServiceKeyAlreadyRegisteredException {
         WasCalledMiddlware simple = new WasCalledMiddlware();
 
         MiddlewareSet m = new MiddlewareSet();
@@ -135,7 +135,7 @@ public class MiddlewareSetTest extends TestBase
 
     @Test(expected = IllegalStateException.class)
     //[ExpectedException(typeof(InvalidOperationException))]
-    public void BubbleUncaughtException() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void BubbleUncaughtException() throws Exception, ServiceKeyAlreadyRegisteredException {
         MiddlewareSet m = new MiddlewareSet();
         m.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
             public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws IllegalStateException {
@@ -148,7 +148,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void TwoMiddlewareItems() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void TwoMiddlewareItems() throws Exception, ServiceKeyAlreadyRegisteredException {
         WasCalledMiddlware one = new WasCalledMiddlware();
         WasCalledMiddlware two = new WasCalledMiddlware();
 
@@ -162,7 +162,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void TwoMiddlewareItemsWithDelegate() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void TwoMiddlewareItemsWithDelegate() throws Exception, ServiceKeyAlreadyRegisteredException {
         WasCalledMiddlware one = new WasCalledMiddlware();
         WasCalledMiddlware two = new WasCalledMiddlware();
 
@@ -183,7 +183,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void TwoMiddlewareItemsInOrder() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void TwoMiddlewareItemsInOrder() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean called1[] = {false};
         final boolean called2[] = {false};
 
@@ -213,7 +213,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void Status_OneMiddlewareRan() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void Status_OneMiddlewareRan() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean called1[] = {false};
 
         CallMeMiddlware one = new CallMeMiddlware(new ActionDel() {
@@ -239,7 +239,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void Status_RunAtEndEmptyPipeline() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void Status_RunAtEndEmptyPipeline() throws Exception, ServiceKeyAlreadyRegisteredException {
         MiddlewareSet m = new MiddlewareSet();
         final boolean didAllRun[] = {false};
         Function<TurnContext, CompletableFuture> cb = (context)-> {
@@ -255,7 +255,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void Status_TwoItemsOneDoesNotCallNext() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void Status_TwoItemsOneDoesNotCallNext() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean called1[] = {false};
         final boolean called2[] = {false};
 
@@ -292,7 +292,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void Status_OneEntryThatDoesNotCallNext() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void Status_OneEntryThatDoesNotCallNext() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean called1[] = {false};
 
         DoNotCallNextMiddleware one = new DoNotCallNextMiddleware(new ActionDel() {
@@ -321,12 +321,12 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void AnonymousMiddleware() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void AnonymousMiddleware() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun[] = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 didRun[0] = true;
                 await(nd.next());
                 return completedFuture(null);
@@ -340,13 +340,13 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void TwoAnonymousMiddleware() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void TwoAnonymousMiddleware() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun1[] = {false};
         final boolean didRun2[] = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 didRun1[0] = true;
                 await(nd.next());
                 return completedFuture(null);
@@ -355,7 +355,7 @@ public class MiddlewareSetTest extends TestBase
 
         m.Use(new AnonymousReceiveMiddleware(mwc1));
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 didRun2[0] = true;
                 await(nd.next());
                 return completedFuture(null);
@@ -370,13 +370,13 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void TwoAnonymousMiddlewareInOrder() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void TwoAnonymousMiddlewareInOrder() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun1[] = {false};
         final boolean didRun2[] = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertFalse("Looks like the 2nd one has already run", didRun2[0]);
                 didRun1[0] = true;
                 await(nd.next());
@@ -386,7 +386,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertTrue("Looks like the 1nd one has not yet run", didRun1[0]);
                 didRun2[0] = true;
                 await(nd.next());
@@ -402,13 +402,13 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void MixedMiddlewareInOrderAnonymousFirst() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void MixedMiddlewareInOrderAnonymousFirst() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun1[] = {false};
         final boolean didRun2[] = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertFalse("First middleware already ran", didRun1[0]);
                 Assert.assertFalse("Looks like the second middleware was already run", didRun2[0]);
                 didRun1[0] = true;
@@ -435,7 +435,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void MixedMiddlewareInOrderAnonymousLast() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void MixedMiddlewareInOrderAnonymousLast() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun1[] = {false};
         final boolean didRun2[] = {false};
 
@@ -452,7 +452,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(new CallMeMiddlware(act));
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertTrue("First middleware has not been run yet", didRun1[0]);
                 didRun2[0] = true;
                 await(nd.next());
@@ -467,7 +467,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void RunCodeBeforeAndAfter() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void RunCodeBeforeAndAfter() throws Exception, ServiceKeyAlreadyRegisteredException {
         final boolean didRun1[] = {false};
         final boolean codeafter2run[] = {false};
         final boolean didRun2[] = {false};
@@ -475,7 +475,7 @@ public class MiddlewareSetTest extends TestBase
         MiddlewareSet m = new MiddlewareSet();
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertFalse("Looks like the 1st middleware has already run", didRun1[0]);
                 didRun1[0] = true;
                 await(nd.next());
@@ -487,7 +487,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception, ServiceKeyAlreadyRegisteredException {
                 Assert.assertTrue("Looks like the 1st middleware has not been run", didRun1[0]);
                 Assert.assertFalse("The code that runs after middleware 2 is complete has already run.", codeafter2run[0]);
                 didRun2[0] = true;
@@ -504,7 +504,7 @@ public class MiddlewareSetTest extends TestBase
     }
 
     @Test
-    public void CatchAnExceptionViaMiddlware() throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public void CatchAnExceptionViaMiddlware() throws Exception, ServiceKeyAlreadyRegisteredException {
         MiddlewareSet m = new MiddlewareSet();
         final boolean caughtException[] = {false};
 
@@ -521,6 +521,8 @@ public class MiddlewareSetTest extends TestBase
                     Assert.assertTrue(ex.getMessage() == "test");
 
                     caughtException[0] = true;
+                } catch (Exception e) {
+                    Assert.assertTrue("Should not get here" + e.getMessage(), false);
                 }
                 return completedFuture(null);
         }};

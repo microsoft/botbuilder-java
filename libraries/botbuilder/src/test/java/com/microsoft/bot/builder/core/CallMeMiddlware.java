@@ -13,7 +13,7 @@ public class CallMeMiddlware implements Middleware
     }
 
     @Override
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         _callMe.CallMe();
         return next.next();
     }

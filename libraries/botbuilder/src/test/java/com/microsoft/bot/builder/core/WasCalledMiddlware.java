@@ -12,7 +12,7 @@ public class WasCalledMiddlware implements Middleware {
         this.called = called;
     }
 
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws ExecutionException, InterruptedException, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         setCalled(true);
         return next.next();
     }

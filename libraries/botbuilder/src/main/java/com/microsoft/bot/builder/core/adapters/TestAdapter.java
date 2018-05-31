@@ -171,7 +171,7 @@ public class TestAdapter extends BotAdapter {
     //@Override
     public CompletableFuture CreateConversation(String channelId,Function<TurnContext, CompletableFuture> callback) {
         this.activeQueue().clear();
-        ConversationUpdateActivity update=BotActivity.CreateConversationUpdateActivity();
+        ConversationUpdateActivity update=MessageActivity.CreateConversationUpdateActivity();
 
         update.withConversation(new ConversationAccount().withId(UUID.randomUUID().toString()));
         BotTurnContext context=new BotTurnContext(this,(Activity)update);
@@ -202,7 +202,7 @@ public class TestAdapter extends BotAdapter {
     public Activity MakeActivity(String text)
     {
         Integer next = _nextId++;
-        Activity activity=new BotActivity()
+        Activity activity=new MessageActivity()
                 .withType(ActivityTypes.MESSAGE)
                 .withFrom(conversationReference().user())
                 .withRecipient(conversationReference().bot())

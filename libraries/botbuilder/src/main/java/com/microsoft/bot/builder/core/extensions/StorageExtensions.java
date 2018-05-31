@@ -1,5 +1,7 @@
 package com.microsoft.bot.builder.core.extensions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +20,7 @@ public class StorageExtensions {
     /// <param name="keys"></param>
     /// <returns></returns>
     //public static <StoreItemT extends Object> CompletableFuture<Iterable<Map.Entry<String, T>>> Read(this Storage storage, String... keys)
-    public static <StoreItemT extends Object> CompletableFuture<Map<String, StoreItemT>> Read(Storage storage, String... keys) {
+    public static <StoreItemT extends Object> CompletableFuture<Map<String, StoreItemT>> Read(Storage storage, String... keys) throws JsonProcessingException {
         Map<String, ?> storeItems = await(storage.Read(keys));
         HashMap<String, StoreItemT> result = new HashMap<String, StoreItemT>();
         for (Map.Entry entry : storeItems.entrySet()) {
