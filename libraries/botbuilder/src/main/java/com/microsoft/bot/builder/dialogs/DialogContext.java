@@ -44,14 +44,6 @@ package com.microsoft.bot.builder.dialogs;
 /// <param name="result">The result.</param>
 /// <returns>A task that represents the code that will resume after the result is available.</returns>
 
-import com.microsoft.bot.schema.models.Attachment;
-import com.microsoft.bot.schema.models.AttachmentLayoutTypes;
-import com.microsoft.bot.schema.models.Entity;
-import com.microsoft.bot.schema.models.TextFormatTypes;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /*
 public interface ResumeAfter
 {
@@ -74,9 +66,8 @@ public delegate Task StartAsync(IDialogContext context);
 /// The context for the execution of a dialog's conversational process.
 /// </summary>
 // DAVETA: TODO
-// public interface DialogContext extends DialogStack, BotContext
-public interface DialogContext extends BotContext
-        {
+// public interface DialogContext extends
+public interface DialogContext {
         }
 
 

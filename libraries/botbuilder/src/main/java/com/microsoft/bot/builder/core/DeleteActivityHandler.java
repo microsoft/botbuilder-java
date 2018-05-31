@@ -1,8 +1,8 @@
 package com.microsoft.bot.builder.core;
 
-import com.microsoft.bot.builder.core.TurnContext;
 import com.microsoft.bot.schema.models.ConversationReference;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 /// <summary>
@@ -24,5 +24,5 @@ import java.util.concurrent.CompletableFuture;
 /// <seealso cref="UpdateActivityHandler"/>
 @FunctionalInterface
 public interface DeleteActivityHandler {
-    CompletableFuture handle(TurnContext context, ConversationReference reference, Func<CompletableFuture> next);
+    CompletableFuture handle(TurnContext context, ConversationReference reference, Callable<CompletableFuture> next);
 }

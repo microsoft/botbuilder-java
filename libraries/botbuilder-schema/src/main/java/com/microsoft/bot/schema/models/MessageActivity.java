@@ -3,9 +3,9 @@
 
 
 package com.microsoft.bot.schema.models;
-import org.joda.time.DateTime;
+
+import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
     /// <summary>
     /// A message in a conversation
@@ -140,4 +140,15 @@ public class MessageActivity extends Activity
     /// </summary>
     bool HasContent();
     */
+    /// <summary>
+    /// Create an instance of the Activity class with IConversationUpdateActivity masking
+    /// </summary>
+    public static ConversationUpdateActivity CreateConversationUpdateActivity()
+    {
+        return (ConversationUpdateActivity) new MessageActivity()
+                .withType(ActivityTypes.CONVERSATION_UPDATE)
+                .withMembersAdded(new ArrayList<ChannelAccount>())
+                .withMembersRemoved(new ArrayList<ChannelAccount>());
+    }
+
 }

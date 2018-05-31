@@ -1,9 +1,9 @@
 package com.microsoft.bot.builder.core;
-import com.microsoft.bot.builder.core.Func;
-import com.microsoft.bot.builder.core.TurnContext;
+
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ResourceResponse;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 /// <summary>
@@ -29,5 +29,5 @@ import java.util.concurrent.CompletableFuture;
 // public delegate Task<ResourceResponse> UpdateActivityHandler(ITurnContext context, Activity activity, Func<Task<ResourceResponse>> next);
 @FunctionalInterface
 public interface UpdateActivityHandler {
-    CompletableFuture<ResourceResponse> handle(TurnContext context, Activity activity, Func<CompletableFuture<ResourceResponse[]>> next);
+    CompletableFuture<ResourceResponse> handle(TurnContext context, Activity activity, Callable<CompletableFuture<ResourceResponse[]>> next);
 }
