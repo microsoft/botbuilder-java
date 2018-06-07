@@ -6,13 +6,20 @@ package com.microsoft.bot.builder.core.extensions;
 
 
 import com.ea.async.Async;
+import com.microsoft.bot.builder.core.TurnContext;
+import com.microsoft.bot.builder.core.TurnContextImpl;
 import com.microsoft.bot.builder.core.adapters.TestAdapter;
 import com.microsoft.bot.builder.core.adapters.TestFlow;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.models.MessageActivity;
 import com.microsoft.rest.RestClient;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -24,7 +31,7 @@ public class BotStateTest {
     protected ChannelAccount bot;
     protected ChannelAccount user;
 
-    //@Override
+
     protected void initializeClients(RestClient restClient, String botId, String userId) {
         // Initialize async/await(support
         Async.init();
@@ -35,77 +42,110 @@ public class BotStateTest {
 
     }
 
-    //@Override
+
     protected void cleanUpResources() {
     }
 
     @Test
-    public void State_DoNOTRememberContextState() {
+    public void State_DoNOTRememberContextState() throws ExecutionException, InterruptedException {
 
         TestAdapter adapter = new TestAdapter();
 
         await(new TestFlow(adapter, (context) -> {
-//                TestPocoState obj = StateTurnContextExtensions.<TestPocoState>GetConversationState(context);
-//                Assert.assertNull("context.state should not exist", obj);
-                return completedFuture(null);
-                }
-                )
+            TestPocoState obj = StateTurnContextExtensions.<TestPocoState>GetConversationState(context);
+            Assert.assertNull("context.state should not exist", obj);
+            return completedFuture(null);
+        }
+        )
                 .Send("set value")
                 .StartTest());
+
     }
-/*
+
     @Test
-    public void State_RememberIStoreItemUserState() {
+    public void State_RememberIStoreItemUserState() throws ExecutionException, InterruptedException {
         TestAdapter adapter = new TestAdapter()
-                .Use(new UserState<TestState>(new MemoryStorage()));
+                .Use(new UserState<TestState>(new MemoryStorage(), TestState::new));
 
-//        await(new TestFlow(adapter,
-//                async(context) = >
-//                {
-//                        var userState = context.GetUserState < TestState > ();
-//        Assert.assertNotNull(userState, "user state should exist");
-//        switch (context.Activity.Text) {
-//            case "set value":
-//                userState.Value = "test";
-//                await(context.SendActivity("value saved");
-//                break;
-//            case "get value":
-//                await(context.SendActivity(userState.Value);
-//                break;
-//        }
-//                    }
-//                )
-//                .Test("set value", "value saved")
-//                .Test("get value", "test")
-//                .StartTest();
+
+        Function<TurnContext, CompletableFuture> callback = (context) -> {
+            CompletableFuture<Void> doit =  CompletableFuture.runAsync( () -> {
+                        System.out.print(String.format("State_RememberIStoreItemUserState CALLBACK called.."));
+                        System.out.flush();
+                        TestState userState = StateTurnContextExtensions.<TestState>GetUserState(context);
+                        Assert.assertNotNull("user state should exist", userState);
+                        switch (context.getActivity().text()) {
+                            case "set value":
+                                userState.withValue("test");
+                                try {
+                                    await(context.SendActivity("value saved"));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Assert.fail(String.format("Error sending activity! - set value"));
+                                }
+                                break;
+                            case "get value":
+                                try {
+                                    await(context.SendActivity(userState.value()));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Assert.fail(String.format("Error sending activity! - get value"));
+                                }
+                                break;
+                        }
+
+                    });
+            return doit;
+        };
+
+        TestFlow myTest = new TestFlow(adapter, callback)
+                .Test("set value", "value saved")
+                .Test("get value", "test");
+        await(myTest.StartTest());
 
     }
 
-/*    @Test
-    public void State_RememberPocoUserState() {
-        var adapter = new TestAdapter()
-                .Use(new UserState<TestPocoState>(new MemoryStorage()));
+    @Test
+    public void State_RememberPocoUserState() throws ExecutionException, InterruptedException {
+        TestAdapter adapter = new TestAdapter()
+                .Use(new UserState<TestPocoState>(new MemoryStorage(), TestPocoState::new));
         await(new TestFlow(adapter,
-                async(context) = >
+                (context) ->
                 {
-                        var userState = context.GetUserState < TestPocoState > ();
-        Assert.assertNotNull(userState, "user state should exist");
-        switch (context.Activity.AsMessageActivity().Text) {
-            case "set value":
-                userState.Value = "test";
-                await(context.SendActivity("value saved");
-                break;
-            case "get value":
-                await(context.SendActivity(userState.Value);
-                break;
-        }
-                    }
-                )
+                    CompletableFuture<Void> doit =  CompletableFuture.runAsync( () -> {
+                        {
+                            TestPocoState userState = StateTurnContextExtensions.<TestPocoState>GetUserState(context);
+
+                            Assert.assertNotNull("user state should exist", userState);
+                            switch (context.getActivity().text()) {
+                                case "set value":
+                                    userState.setValue("test");
+                                    try {
+                                        await(context.SendActivity("value saved"));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        Assert.fail(String.format("Error sending activity! - set value"));
+                                    }
+                                    break;
+                                case "get value":
+                                    try {
+                                        await(context.SendActivity(userState.getValue()));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        Assert.fail(String.format("Error sending activity! - get value"));
+                                    }
+                                    break;
+                            }
+                        }
+
+                    });
+                    return doit;
+                })
                 .Test("set value", "value saved")
                 .Test("get value", "test")
                 .StartTest());
     }
-
+/*
     @Test
     public void State_RememberIStoreItemConversationState() {
         TestAdapter adapter = new TestAdapter()

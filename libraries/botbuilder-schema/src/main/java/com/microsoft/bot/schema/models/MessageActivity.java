@@ -143,9 +143,9 @@ public class MessageActivity extends Activity
     /// <summary>
     /// Create an instance of the Activity class with IConversationUpdateActivity masking
     /// </summary>
-    public static ConversationUpdateActivity CreateConversationUpdateActivity()
+    public static MessageActivity CreateConversationUpdateActivity()
     {
-        return (ConversationUpdateActivity) new MessageActivity()
+        return (MessageActivity) new MessageActivity()
                 .withType(ActivityTypes.CONVERSATION_UPDATE)
                 .withMembersAdded(new ArrayList<ChannelAccount>())
                 .withMembersRemoved(new ArrayList<ChannelAccount>());

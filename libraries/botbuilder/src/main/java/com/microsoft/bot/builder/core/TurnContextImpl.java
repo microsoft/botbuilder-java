@@ -185,7 +185,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
     @Override
     public CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception {
-        if (StringUtils.isNotEmpty(textReplyToSend))
+        if (StringUtils.isEmpty(textReplyToSend))
             throw new IllegalArgumentException("textReplyToSend");
 
         Activity activityToSend = new Activity()
@@ -245,11 +245,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
         // Convert the IActivities to Activies.
         // Activity[] activityArray = Array.ConvertAll(activities, (input) => (Activity)input);
-        List<MessageActivity> activityArray = Arrays.stream(activities).map(input -> (MessageActivity) input).collect(toList());
+        List<Activity> activityArray = Arrays.stream(activities).map(input -> (Activity) input).collect(toList());
 
 
         // Create the list used by the recursive methods.
-        List<MessageActivity> activityList = new ArrayList<MessageActivity>(activityArray);
+        List<Activity> activityList = new ArrayList<Activity>(activityArray);
 
         Callable<CompletableFuture<ResourceResponse[]>> ActuallySendStuff = () ->  {
             // Are the any non-trace activities to send?
@@ -263,7 +263,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             // Send from the list, which may have been manipulated via the event handlers.
             // Note that 'responses' was captured from the root of the call, and will be
             // returned to the original caller.
-            ResourceResponse[] responses = await(this.getAdapter().SendActivities(this, (Activity[]) activityList.toArray()));
+            ResourceResponse[] responses = new ResourceResponse[0];
+            try {
+                responses = await(this.getAdapter().SendActivities(this,  activityList.toArray(new Activity[activityList.size()])));
+            } catch (ServiceKeyAlreadyRegisteredException e) {
+                // TODO: Log error
+                return completedFuture(null);
+            }
             if (responses != null && responses.length == activityList.size())  {
                 // stitch up activity ids
                 for (int i = 0; i < responses.length; i++) {

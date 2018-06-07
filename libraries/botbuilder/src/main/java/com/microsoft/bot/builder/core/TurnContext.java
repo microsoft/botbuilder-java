@@ -39,13 +39,11 @@ public interface TurnContext
     /// <summary>
     /// Gets the bot adapter that created this context object.
     /// </summary>
-    // TODO: daveta
     BotAdapter getAdapter();
 
     /// <summary>
     /// Gets the services registered on this context object.
     /// </summary>
-    // TODO: daveta
     TurnContextServiceCollection getServices();
 
     /// <summary>

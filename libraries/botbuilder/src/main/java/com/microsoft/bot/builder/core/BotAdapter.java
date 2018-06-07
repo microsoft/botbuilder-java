@@ -69,7 +69,7 @@ public abstract class BotAdapter {
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that
     /// the receiving channel assigned to the activities.</remarks>
     /// <seealso cref="ITurnContext.OnSendActivities(SendActivitiesHandler)"/>
-    public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException;
+    public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException, ServiceKeyAlreadyRegisteredException;
 
     /// <summary>
     /// When overridden in a derived class, replaces an existing activity in the

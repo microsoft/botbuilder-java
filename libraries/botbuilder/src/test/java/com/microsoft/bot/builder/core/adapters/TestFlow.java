@@ -2,18 +2,21 @@ package com.microsoft.bot.builder.core.adapters;
 
 import com.microsoft.bot.builder.core.ServiceKeyAlreadyRegisteredException;
 import com.microsoft.bot.builder.core.TurnContext;
+import com.microsoft.bot.builder.core.TurnContextImpl;
 import com.microsoft.bot.schema.models.Activity;
 import org.joda.time.DateTime;
 
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class TestFlow {
     final TestAdapter adapter;
-    final CompletableFuture testTask;
+    CompletableFuture testTask;
     Function<TurnContext, CompletableFuture> callback;
 
     public TestFlow(TestAdapter adapter) {
@@ -40,8 +43,8 @@ public class TestFlow {
     /// Start the execution of the test flow
     /// </summary>
     /// <returns></returns>
-    public CompletableFuture StartTest() {
-        return this.testTask;
+    public CompletableFuture StartTest() throws ExecutionException, InterruptedException {
+        return (CompletableFuture) this.testTask;
     }
 
     /// <summary>
@@ -53,19 +56,22 @@ public class TestFlow {
         if (userSays == null)
             throw new IllegalArgumentException("You have to pass a userSays parameter");
 
+        System.out.print(String.format("USER SAYS: %s", userSays));
+        System.out.flush();
+
         //  Function<TurnContextImpl, CompletableFuture>
-        return new TestFlow(this.testTask.thenAccept((task) -> {
+        return new TestFlow(this.testTask.thenApply(task -> supplyAsync(() ->{
             // task.Wait();
 
             try {
                 this.adapter.SendTextToBot(userSays, this.callback);
-                return;
+                return null;
             } catch (Exception e) {
-                return;
+                return e.getMessage();
             } catch (ServiceKeyAlreadyRegisteredException e) {
-                return;
+                return e.getMessage();
             }
-        }), this);
+        })), this);
     }
 
     /// <summary>
@@ -77,19 +83,19 @@ public class TestFlow {
         if (userActivity == null)
             throw new IllegalArgumentException("You have to pass an Activity");
 
-        return new TestFlow(this.testTask.thenAccept((task) -> {
+        return new TestFlow(this.testTask.thenCompose(task -> supplyAsync(() ->{
             // NOTE: See details code in above method.
             //task.Wait();
 
             try {
                 this.adapter.ProcessActivity((Activity) userActivity, this.callback);
             } catch (Exception e) {
-                return;
+                return e.getMessage();
             } catch (ServiceKeyAlreadyRegisteredException e) {
-                return;
+                return e.getMessage();
             }
-            return;
-        }), this);
+            return null;
+        })), this);
     }
 
     /// <summary>
@@ -98,8 +104,8 @@ public class TestFlow {
     /// <param name="ms"></param>
     /// <returns></returns>
     public TestFlow Delay(int ms) {
-        return new TestFlow(this.testTask.thenAccept((task) ->
-        {
+        return new TestFlow(this.testTask.thenCompose(task -> supplyAsync(() ->{
+
             // NOTE: See details code in above method.
             //task.Wait();
 
@@ -107,10 +113,10 @@ public class TestFlow {
             try {
                 Thread.sleep((int) ms);
             } catch (InterruptedException e) {
-                return;
+                return e.getMessage();
             }
-            return;
-        }), this);
+            return null;
+        })), this);
     }
 
     /// <summary>
@@ -179,7 +185,7 @@ public class TestFlow {
     }
 
     public TestFlow AssertReply(Function<Activity, String> validateActivity, String description, int timeout) {
-        return new TestFlow(this.testTask.thenCompose((task) -> {
+        return new TestFlow(this.testTask.thenApply(task -> supplyAsync(() ->{
             // NOTE: See details code in above method.
             //task.Wait();
             int finalTimeout = Integer.MAX_VALUE;
@@ -200,7 +206,7 @@ public class TestFlow {
                     return validateActivity.apply(replyActivity);
                 }
             }
-        }), this);
+        })), this);
     }
 
     // Hack to determine if debugger attached..

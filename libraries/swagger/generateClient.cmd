@@ -1,12 +1,9 @@
 call npm install replace@0.3.0
 
-del /q ..\bot-connector\src\main\java\com\microsoft\bot\connector\
-del /q ..\bot-connector\src\main\java\com\microsoft\bot\connector\models\
-del /q ..\bot-connector\src\main\java\com\microsoft\bot\connector\implementation\
 
 del /q ..\botbuilder-schema\src\main\java\com\microsoft\bot\schema\models\
 
-call autorest .\README.md --java
+call autorest .\README.md --java --add-credentials true
 
 robocopy .\generated\models ..\botbuilder-schema\src\main\java\com\microsoft\bot\schema\models *.* /move /xf *Exception.java
 

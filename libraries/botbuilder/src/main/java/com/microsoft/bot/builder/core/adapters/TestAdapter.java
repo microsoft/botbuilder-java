@@ -101,7 +101,8 @@ public class TestAdapter extends BotAdapter {
             responses.add(new ResourceResponse().withId(activity.id()));
             // This is simulating DELAY
 
-            if(activity.type() == ActivityTypes.MESSAGE && activity.label().equalsIgnoreCase("Delay"))
+
+            if(activity.type().toString().equals("delay"))
             {
                 // The BotFrameworkAdapter and Console adapter implement this
                 // hack directly in the POST method. Replicating that here
@@ -171,7 +172,7 @@ public class TestAdapter extends BotAdapter {
     //@Override
     public CompletableFuture CreateConversation(String channelId,Function<TurnContext, CompletableFuture> callback) {
         this.activeQueue().clear();
-        ConversationUpdateActivity update=MessageActivity.CreateConversationUpdateActivity();
+        MessageActivity update=MessageActivity.CreateConversationUpdateActivity();
 
         update.withConversation(new ConversationAccount().withId(UUID.randomUUID().toString()));
         TurnContextImpl context=new TurnContextImpl(this,(Activity)update);

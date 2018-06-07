@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.customizations;
+package com.microsoft.bot.connector.authentication;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.authentication.JwtTokenExtractor;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.microsoft.bot.connector.customizations.AuthenticationConstants.*;
+import static com.microsoft.bot.connector.authentication.AuthenticationConstants.*;
 
 /**
  * Validates and Examines JWT tokens from the Bot Framework Emulator

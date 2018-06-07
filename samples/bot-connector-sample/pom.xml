@@ -7,12 +7,6 @@
   <packaging>jar</packaging>
   <version>1.0.0</version>
 
-  <parent>
-    <groupId>com.microsoft.bot</groupId>
-    <artifactId>bot-parent</artifactId>
-    <version>4.0.0-a0</version>
-    <relativePath>../../</relativePath>
-  </parent>
 
   <name>bot-connector-sample</name>
   <url>http://maven.apache.org</url>
@@ -56,12 +50,12 @@
     <dependency>
       <groupId>com.microsoft.bot.schema</groupId>
       <artifactId>botbuilder-schema</artifactId>
-      <version>4.0.0-a1</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.bot.connector</groupId>
       <artifactId>bot-connector</artifactId>
-      <version>4.0.0-a1</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

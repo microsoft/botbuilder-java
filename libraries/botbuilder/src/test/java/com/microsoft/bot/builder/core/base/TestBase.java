@@ -1,6 +1,6 @@
 package com.microsoft.bot.builder.core.base;
 
-import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
+import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.ServiceResponseBuilder;
