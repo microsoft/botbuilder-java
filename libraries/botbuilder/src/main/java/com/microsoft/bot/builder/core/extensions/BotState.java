@@ -65,6 +65,7 @@ public class BotState<TState> implements Middleware
             _settings = settings;
     }
 
+
     /// <summary>
     /// Processess an incoming activity.
     /// </summary>
