@@ -9,7 +9,8 @@ import com.microsoft.bot.schema.ContactRelationUpdateActivity;
 import com.microsoft.bot.schema.TraceActivity;
 import com.microsoft.bot.schema.models.*;
 
-import javafx.util.Pair;
+
+import jdk.internal.util.xml.impl.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
@@ -395,16 +396,16 @@ public class ActivityImpl extends Activity {
     /// <c>true</c> if value of <seealso cref="IActivity.ChannelData"/> was coerceable to <typeparamref name="TypeT"/>, <c>false</c> otherwise.
     /// </returns>
 
-    public <TypeT> Pair<Boolean, TypeT> TryGetChannelData(Class<TypeT> clsType) {
+    public <TypeT> ResultPair<Boolean, TypeT> TryGetChannelData(Class<TypeT> clsType) {
         TypeT instance = null;
         if (this.channelData() == null)
-            return new Pair<Boolean, TypeT>(false, instance);
+            return new ResultPair<>(false, instance);
 
         try {
             instance = this.<TypeT>GetChannelData(clsType);
         } catch (JsonProcessingException e) {
-            return new Pair<Boolean, TypeT>(false, instance);
+            return new ResultPair<Boolean, TypeT>(false, instance);
         }
-        return new Pair<Boolean, TypeT>(true, instance);
+        return new ResultPair<Boolean, TypeT>(true, instance);
     }
 }
