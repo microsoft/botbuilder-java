@@ -15,11 +15,11 @@ public class TestState implements StoreItem {
 
     private String value;
 
-    public String getValue() {
+    public String value() {
         return this.value;
     }
 
-    public void setValue(String value) {
+    public void withValue(String value) {
         this.value = value;
     }
 }

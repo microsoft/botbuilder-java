@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.customizations;
+package com.microsoft.bot.connector.authentication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,12 @@ public final class AuthenticationConstants {
     public static final String ServiceUrlClaim = "serviceurl";
     public static final String VersionClaim = "ver";
     public static final String AppIdClaim = "appid";
+    /// <summary>
+    /// OAuth Url used to get a token from OAuthApiClient
+    /// </summary>
+    public static final String OAuthUrl = "https://api.botframework.com";
+
+
 
     static {
         AllowedSigningAlgorithms.add("RS256");

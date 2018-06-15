@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.customizations;
+package com.microsoft.bot.connector.authentication;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -9,6 +9,9 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.Verification;
 import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.authentication.ClaimsIdentity;
+import com.microsoft.bot.connector.authentication.ClaimsIdentityImpl;
+import com.microsoft.bot.connector.authentication.TokenValidationParameters;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -78,20 +81,20 @@ public class JwtTokenExtractor {
     @SuppressWarnings("unchecked")
     private CompletableFuture<ClaimsIdentity> validateTokenAsync(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
-        OpenIdMetadataKey key = openIdMetadata.getKey(decodedJWT.getKeyId());
+        OpenIdMetadataKey key = this.openIdMetadata.getKey(decodedJWT.getKeyId());
         if (key != null) {
             Verification verification = JWT.require(Algorithm.RSA256(key.key, null));
-            if (!tokenValidationParameters.validateLifetime) {
+            if (!this.tokenValidationParameters.validateLifetime) {
                 verification = verification
                         .acceptExpiresAt(System.currentTimeMillis() + 500)
                         .acceptNotBefore(0);
             }
             try {
                 verification.build().verify(token);
-                if (!validator.apply(key.endorsements)) {
+                if (!this.validator.apply(key.endorsements)) {
                     throw new AuthenticationException(String.format("Could not validate endorsement for key: %s with endorsements: %s", decodedJWT.getKeyId(), StringUtils.join(key.endorsements)));
                 }
-                if(!allowedSigningAlgorithms.contains(decodedJWT.getAlgorithm())) {
+                if(!this.allowedSigningAlgorithms.contains(decodedJWT.getAlgorithm())) {
                     throw new AuthenticationException(String.format("Could not validate algorithm for key: %s with algorithms: %s", decodedJWT.getAlgorithm(), StringUtils.join(allowedSigningAlgorithms)));
                 }
                 Map<String, String> claims = new HashMap<>();

@@ -4,111 +4,131 @@
 
 package com.microsoft.bot.schema.models;
 
+import com.microsoft.bot.schema.ActivityImpl;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
     /// <summary>
     /// A message in a conversation
     /// </summary>
-public class MessageActivity extends Activity
+public class MessageActivity extends ActivityImpl
 {
     /// <summary>
     /// The language code of the Text field
     /// </summary>
-    /// <remarks>
-    /// See https://msdn.microsoft.com/en-us/library/hh456380.aspx for a list of valid language codes
-    /// </remarks>
-    String _locale;
-    String getLocale() {
-        return this._locale;
+    private String locale;
+    public String getLocale() {
+        return this.locale;
     }
-    void setLocale(String locale) {
-        this._locale = locale;
+    public void setLocale(String locale) {
+        this.locale = locale;
 
     }
 
     /// <summary>
     /// Content for the message
     /// </summary>
-    void setText(String text){
-
+    private String text;
+    public void setText(String text){
+        this.text = text;
     }
-    String getText() {
-        return "";
+    public String getText() {
+
+        return this.text;
     }
 
     /// <summary>
     /// Speak tag (SSML markup for text to speech)
     /// </summary>
-    void setSpeak(String speak){
-
+    private String speak;
+    public void setSpeak(String speak){
+        this.speak = speak;
     }
-    String getSpeak(){
-        return "";
+    public String getSpeak(){
+        return this.speak;
     }
 
     /// <summary>
     /// Indicates whether the bot is accepting, expecting, or ignoring input
     /// </summary>
-    String getInputHint(){
-        return "";
+    private String inputHint;
+    public String getInputHint(){
+        return this.inputHint;
     }
-    void setInputHint(String inputhint){
-
+    public void setInputHint(String inputHint){
+        this.inputHint = inputHint;
     }
 
     /// <summary>
     /// Text to display if the channel cannot render cards
     /// </summary>
-    String getSummary(){
-        return "";
+    private String summary;
+    public String getSummary(){
+        return this.summary;
     }
-    void setSummary(String summary) {
-
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     /// <summary>
     /// Format of text fields [plain|markdown] Default:markdown
     /// </summary>
-    String getTextFormat() {
-        return "";
-    }
-    void setTextFormat(String textformat) {
+    private String textFormat;
+    public String getTextFormat() {
 
+        return this.textFormat;
+    }
+    public void setTextFormat(String textFormat) {
+        this.textFormat = textFormat;
     }
 
     /// <summary>
     /// Hint for how to deal with multiple attachments: [list|carousel] Default:list
     /// </summary>
-    String getAttachmentLayout() {
-        return "";
+    private String attachmentLayout;
+    public String getAttachmentLayout() {
+        return this.attachmentLayout;
     }
-    void setAttachmentLayout(String layout) {
-
+    public void setAttachmentLayout(String attachmentLayout) {
+        this.attachmentLayout = attachmentLayout;
     }
 
     /// <summary>
     /// Attachments
     /// </summary>
-    List<Attachment> getAttachments() {
-        return null;
+    private List<Attachment> attachments;
+    public List<Attachment> getAttachments() {
+        return this.attachments;
     }
-    void setAttachments(List<Attachment> attachments) {
-
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 
     /// <summary>
     /// SuggestedActions are used to express actions for interacting with a card like keyboards/quickReplies
     /// </summary>
-        // TODO: daveta
-    // SuggestedActions SuggestedActions { get; set; }
+    private SuggestedActions suggestedActions;
+    public SuggestedActions getSuggestedActions() {
+        return this.suggestedActions;
+    }
+    public void setSuggestedActions(SuggestedActions suggestedActions) {
+        this.suggestedActions = suggestedActions;
+    }
+
 
     /// <summary>
     /// Importance of the activity
     /// Valid values are "low", "normal", and "high". Default value is "normal."
     /// </summary>
-        // TODO: daveta
-    //String Importance { get; set; }
+    private String importance;
+    public String getImportance() {
+        return this.importance;
+    }
+    public void setImportance(String importance) {
+        this.importance = importance;
+    }
 
     /// <summary>
     /// Hint to describe how this activity should be delivered.
@@ -116,39 +136,55 @@ public class MessageActivity extends Activity
     /// "notification" = notification semantics
     /// See DeliveryModes for current constants
     /// </summary>
-        // TODO: daveta
-/*
-    String DeliveryMode { get; set; }
+    private String deliveryMode;
+    public String getDeliveryMode() {
+        return this.deliveryMode;
+    }
+    public void setDeliveryMode(String deliveryMode) {
+        this.deliveryMode = deliveryMode;
+    }
 
     /// <summary>
     /// DateTime to expire the activity as ISO 8601 encoded datetime
     /// </summary>
-    DateTimeOffset? Expiration { get; set; }
+    private OffsetDateTime expiration;
+    public OffsetDateTime getExpiration() {
+        return this.expiration;
+    }
+    public void setExpiration(OffsetDateTime expiration) {
+        this.expiration = expiration;
+    }
 
     /// <summary>
     /// Get mentions
     /// </summary>
-    Mention[] GetMentions();
+    private ArrayList<Mention> mentions;
+    public ArrayList<Mention> GetMentions() {
+        return this.mentions;
+    }
 
     /// <summary>
     /// Value provided with CardAction
     /// </summary>
-    object Value { get; set; }
+    private Object value;
+    public Object getValue() {
+        return this.value;
+    }
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
-    /// <summary>
-    /// True if this activity has text, attachments, or channelData
-    /// </summary>
-    bool HasContent();
-    */
+
     /// <summary>
     /// Create an instance of the Activity class with IConversationUpdateActivity masking
     /// </summary>
     public static ConversationUpdateActivity CreateConversationUpdateActivity()
     {
-        return (ConversationUpdateActivity) new MessageActivity()
-                .withType(ActivityTypes.CONVERSATION_UPDATE)
-                .withMembersAdded(new ArrayList<ChannelAccount>())
-                .withMembersRemoved(new ArrayList<ChannelAccount>());
+        ConversationUpdateActivity conversationActivity =  new ConversationUpdateActivity();
+        conversationActivity.withType(ActivityTypes.CONVERSATION_UPDATE);
+        conversationActivity.withMembersAdded(new ArrayList<ChannelAccount>());
+        conversationActivity.withMembersRemoved(new ArrayList<ChannelAccount>());
+        return conversationActivity;
     }
 
 }

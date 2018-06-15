@@ -1,7 +1,7 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.customizations.*;
+import com.microsoft.bot.connector.authentication.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

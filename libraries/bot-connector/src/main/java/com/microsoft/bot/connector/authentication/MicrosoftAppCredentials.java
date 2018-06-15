@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.customizations;
+package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.microsoft.bot.connector.customizations.AuthenticationConstants.ToChannelFromBotLoginUrl;
-import static com.microsoft.bot.connector.customizations.AuthenticationConstants.ToChannelFromBotOAuthScope;
+import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotLoginUrl;
+import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotOAuthScope;
 
 public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private String appId;
@@ -34,9 +34,10 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     public MicrosoftAppCredentials(String appId, String appPassword) {
         this.appId = appId;
         this.appPassword = appPassword;
-        client = new OkHttpClient.Builder().build();
-        mapper = new ObjectMapper().findAndRegisterModules();
+        this.client = new OkHttpClient.Builder().build();
+        this.mapper = new ObjectMapper().findAndRegisterModules();
     }
+    public static final MicrosoftAppCredentials Empty = new MicrosoftAppCredentials(null, null);
 
     public String getToken(Request request) throws IOException {
         if (System.currentTimeMillis() < expiredTime) {
@@ -50,14 +51,14 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
                         .add("client_secret", this.appPassword)
                         .add("scope", ToChannelFromBotOAuthScope)
                         .build()).build();
-        Response response = client.newCall(reqToken).execute();
+        Response response = this.client.newCall(reqToken).execute();
         if (response.isSuccessful()) {
             String payload = response.body().string();
-            AuthenticationResponse authResponse = mapper.readValue(payload, AuthenticationResponse.class);
-            expiredTime = System.currentTimeMillis() + (authResponse.expiresIn * 1000);
-            currentToken = authResponse.accessToken;
+            AuthenticationResponse authResponse = this.mapper.readValue(payload, AuthenticationResponse.class);
+            this.expiredTime = System.currentTimeMillis() + (authResponse.expiresIn * 1000);
+            this.currentToken = authResponse.accessToken;
         }
-        return currentToken;
+        return this.currentToken;
     }
 
     @Override

@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.customizations;
+package com.microsoft.bot.connector.authentication;
 
+import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -32,7 +33,7 @@ class MicrosoftAppCredentialsInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         if (MicrosoftAppCredentials.isTrustedServiceUrl(chain.request().url().url().toString())) {
             Request newRequest = chain.request().newBuilder()
-                .header("Authorization", "Bearer " + credentials.getToken(chain.request()))
+                .header("Authorization", "Bearer " + this.credentials.getToken(chain.request()))
                 .build();
             return chain.proceed(newRequest);
         }
