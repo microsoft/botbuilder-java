@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.schema.ContactRelationUpdateActivity;
 import com.microsoft.bot.schema.TraceActivity;
 import com.microsoft.bot.schema.models.*;
-import com.sun.deploy.trace.Trace;
+
 import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
