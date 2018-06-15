@@ -34,8 +34,8 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     public MicrosoftAppCredentials(String appId, String appPassword) {
         this.appId = appId;
         this.appPassword = appPassword;
-        client = new OkHttpClient.Builder().build();
-        mapper = new ObjectMapper().findAndRegisterModules();
+        this.client = new OkHttpClient.Builder().build();
+        this.mapper = new ObjectMapper().findAndRegisterModules();
     }
     public static final MicrosoftAppCredentials Empty = new MicrosoftAppCredentials(null, null);
 
@@ -51,14 +51,14 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
                         .add("client_secret", this.appPassword)
                         .add("scope", ToChannelFromBotOAuthScope)
                         .build()).build();
-        Response response = client.newCall(reqToken).execute();
+        Response response = this.client.newCall(reqToken).execute();
         if (response.isSuccessful()) {
             String payload = response.body().string();
-            AuthenticationResponse authResponse = mapper.readValue(payload, AuthenticationResponse.class);
-            expiredTime = System.currentTimeMillis() + (authResponse.expiresIn * 1000);
-            currentToken = authResponse.accessToken;
+            AuthenticationResponse authResponse = this.mapper.readValue(payload, AuthenticationResponse.class);
+            this.expiredTime = System.currentTimeMillis() + (authResponse.expiresIn * 1000);
+            this.currentToken = authResponse.accessToken;
         }
-        return currentToken;
+        return this.currentToken;
     }
 
     @Override

@@ -80,7 +80,7 @@ public class BotStateTest {
                     case "set value":
                         userState.withValue("test");
                         try {
-                            await(context.SendActivity("value saved"));
+                            await(((TurnContextImpl)context).SendActivity("value saved"));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Assert.fail(String.format("Error sending activity! - set value"));
@@ -88,7 +88,7 @@ public class BotStateTest {
                         break;
                     case "get value":
                         try {
-                            await(context.SendActivity(userState.value()));
+                            await(((TurnContextImpl)context).SendActivity(userState.value()));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Assert.fail(String.format("Error sending activity! - get value"));

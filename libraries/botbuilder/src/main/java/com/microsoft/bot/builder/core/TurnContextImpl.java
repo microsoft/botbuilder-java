@@ -3,6 +3,7 @@ package com.microsoft.bot.builder.core;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 /// <seealso cref="IMiddleware"/>
 public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final BotAdapter _adapter;
-    private final Activity _activity;
+    private final ActivityImpl _activity;
     private Boolean _responded = false;
 
     private final List<SendActivitiesHandler> _onSendActivities = new ArrayList<SendActivitiesHandler>();
@@ -47,7 +48,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <exception cref="IllegalArgumentException"><paramref name="activity"/> or
     /// <paramref name="adapter"/> is <c>null</c>.</exception>
     /// <remarks>For use by bot adapter implementations only.</remarks>
-    public TurnContextImpl(BotAdapter adapter, Activity activity) {
+    public TurnContextImpl(BotAdapter adapter, ActivityImpl activity) {
         if (adapter == null)
             throw new IllegalArgumentException("adapter");
         _adapter = adapter;
@@ -133,7 +134,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// Gets the activity associated with this turn; or <c>null</c> when processing
     /// a proactive message.
     /// </summary>
-    public Activity getActivity() {
+    public ActivityImpl getActivity() {
         return this._activity;
     }
 
@@ -188,7 +189,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         if (StringUtils.isEmpty(textReplyToSend))
             throw new IllegalArgumentException("textReplyToSend");
 
-        Activity activityToSend = new Activity()
+        ActivityImpl activityToSend = (ActivityImpl) new ActivityImpl()
                                         .withType(MESSAGE)
                                         .withText(textReplyToSend);
         if (speak != null)
@@ -210,11 +211,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// a <see cref="ResourceResponse"/> object containing the ID that the receiving
     /// channel assigned to the activity.</remarks>
     @Override
-    public CompletableFuture<ResourceResponse> SendActivity(Activity activity) throws Exception {
+    public CompletableFuture<ResourceResponse> SendActivity(ActivityImpl activity) throws Exception {
         if (activity == null)
             throw new IllegalArgumentException("activity");
 
-        Activity[] activities = {activity };
+        ActivityImpl[] activities = {activity };
         ResourceResponse[] responses = await(SendActivities(activities));
         if (responses == null || responses.length == 0)  {
             // It's possible an interceptor prevented the activity from having been sent.
@@ -235,7 +236,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that
     /// the receiving channel assigned to the activities.</remarks>
     @Override
-    public CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities) throws Exception {
+    public CompletableFuture<ResourceResponse[]> SendActivities(ActivityImpl[] activities) throws Exception {
         // Bind the relevant Conversation Reference properties, such as URLs and
         // ChannelId's, to the activities we're about to send.
         ConversationReference cr = GetConversationReference(this._activity);
@@ -305,8 +306,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <para>Before calling this, set the ID of the replacement activity to the ID
     /// of the activity to replace.</para></remarks>
     @Override
-    public ResourceResponse UpdateActivity(Activity activity) throws Exception {
-        Activity a = (Activity)activity;
+    public ResourceResponse UpdateActivity(ActivityImpl activity) throws Exception {
+        ActivityImpl a = (ActivityImpl) activity;
 
         Callable<CompletableFuture<ResourceResponse>> ActuallyUpdateStuff = () -> {
             return completedFuture(await(this.getAdapter().UpdateActivity(this, a)));
@@ -423,7 +424,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     //            UpdateActivityHandler toCall = updateHandlers.First();
     //            return await toCall(this, activity, next);
     //        }
-    private CompletableFuture<ResourceResponse> UpdateActivityInternal(Activity activity,
+    private CompletableFuture<ResourceResponse> UpdateActivityInternal(ActivityImpl activity,
             Iterator<UpdateActivityHandler> updateHandlers,
             Callable<CompletableFuture<ResourceResponse>> callAtBottom) throws Exception {
         BotAssert.ActivityNotNull(activity);
@@ -494,7 +495,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <returns>A conversation reference for the conversation that contains the activity.</returns>
     /// <exception cref="IllegalArgumentException">
     /// <paramref name="activity"/> is <c>null</c>.</exception>
-    public static ConversationReference GetConversationReference(Activity activity) {
+    public static ConversationReference GetConversationReference(ActivityImpl activity) {
         BotAssert.ActivityNotNull(activity);
 
         ConversationReference r = new ConversationReference()

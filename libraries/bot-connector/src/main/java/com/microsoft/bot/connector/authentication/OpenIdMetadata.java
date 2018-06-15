@@ -35,7 +35,7 @@ class OpenIdMetadata {
     public OpenIdMetadataKey getKey(String keyId) {
         // If keys are more than 5 days old, refresh them
         long now = System.currentTimeMillis();
-        if (lastUpdated < (now - (1000 * 60 * 60 * 24 * 5))) {
+        if (this.lastUpdated < (now - (1000 * 60 * 60 * 24 * 5))) {
             refreshCache();
         }
         // Search the cache even if we failed to refresh
@@ -45,7 +45,7 @@ class OpenIdMetadata {
     private String refreshCache() {
         try {
             URL openIdUrl = new URL(this.url);
-            HashMap<String, String> openIdConf = mapper.readValue(openIdUrl, new TypeReference<HashMap<String, Object>>(){});
+            HashMap<String, String> openIdConf = this.mapper.readValue(openIdUrl, new TypeReference<HashMap<String, Object>>(){});
             URL keysUrl = new URL(openIdConf.get("jwks_uri"));
             this.lastUpdated = System.currentTimeMillis();
             this.cacheKeys = new UrlJwkProvider(keysUrl);
@@ -60,7 +60,7 @@ class OpenIdMetadata {
     @SuppressWarnings("unchecked")
     private OpenIdMetadataKey findKey(String keyId) {
         try {
-            Jwk jwk = cacheKeys.get(keyId);
+            Jwk jwk = this.cacheKeys.get(keyId);
             OpenIdMetadataKey key = new OpenIdMetadataKey();
             key.key = (RSAPublicKey) jwk.getPublicKey();
             key.endorsements = (List<String>) jwk.getAdditionalAttributes().get("endorsements");

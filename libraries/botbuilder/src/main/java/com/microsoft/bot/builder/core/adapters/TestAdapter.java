@@ -4,6 +4,7 @@ package com.microsoft.bot.builder.core.adapters;
 // Licensed under the MIT License.
 
 import com.microsoft.bot.builder.core.*;
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -55,7 +56,7 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-    public CompletableFuture ProcessActivity(Activity activity,
+    public CompletableFuture ProcessActivity(ActivityImpl activity,
                                              Function<TurnContext, CompletableFuture> callback
                                              ) throws Exception, ServiceKeyAlreadyRegisteredException {
         synchronized (this.conversationReference()) {
@@ -175,7 +176,7 @@ public class TestAdapter extends BotAdapter {
         MessageActivity update=MessageActivity.CreateConversationUpdateActivity();
 
         update.withConversation(new ConversationAccount().withId(UUID.randomUUID().toString()));
-        TurnContextImpl context=new TurnContextImpl(this,(Activity)update);
+        TurnContextImpl context=new TurnContextImpl(this,(ActivityImpl)update);
         return callback.apply(context);
     }
 
@@ -200,10 +201,10 @@ public class TestAdapter extends BotAdapter {
     public Activity MakeActivity() {
         return MakeActivity(null);
     }
-    public Activity MakeActivity(String text)
+    public ActivityImpl MakeActivity(String text)
     {
         Integer next = _nextId++;
-        Activity activity=new MessageActivity()
+        ActivityImpl activity= (ActivityImpl) new MessageActivity()
                 .withType(ActivityTypes.MESSAGE)
                 .withFrom(conversationReference().user())
                 .withRecipient(conversationReference().bot())

@@ -3,6 +3,7 @@ package com.microsoft.bot.builder.core;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 import com.microsoft.bot.schema.models.ConversationReferenceHelper;
@@ -170,7 +171,7 @@ public abstract class BotAdapter {
     public CompletableFuture ContinueConversation(String botId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
 
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
-        Activity activity = conv.GetPostToBotMessage();
+        ActivityImpl activity = conv.GetPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity))
         {

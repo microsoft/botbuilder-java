@@ -1,5 +1,7 @@
 package com.microsoft.bot.schema.models;
 
+import com.microsoft.bot.schema.ActivityImpl;
+
 import java.util.UUID;
 
 public class ConversationReferenceHelper {
@@ -10,9 +12,9 @@ public class ConversationReferenceHelper {
     /// <summary>
     /// Creates <see cref="Activity"/> from conversation reference as it is posted to bot.
     /// </summary>
-    public Activity GetPostToBotMessage()
+    public ActivityImpl GetPostToBotMessage()
     {
-        return new Activity()
+        return (ActivityImpl) new ActivityImpl()
                 .withType(ActivityTypes.MESSAGE)
                 .withId(UUID.randomUUID().toString())
                 .withRecipient(new ChannelAccount()
@@ -32,7 +34,7 @@ public class ConversationReferenceHelper {
     /// <summary>
     /// Creates <see cref="Activity"/> from conversation reference that can be posted to user as reply.
     /// </summary>
-    public Activity GetPostToUserMessage()
+    public ActivityImpl GetPostToUserMessage()
     {
         Activity msg = this.GetPostToBotMessage();
 
@@ -41,7 +43,7 @@ public class ConversationReferenceHelper {
         ChannelAccount user = msg.from();
         msg.withFrom(bot);
         msg.withRecipient(user);
-        return msg;
+        return (ActivityImpl) msg;
     }
 }
 

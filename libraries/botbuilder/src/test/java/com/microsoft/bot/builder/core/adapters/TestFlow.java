@@ -3,6 +3,7 @@ package com.microsoft.bot.builder.core.adapters;
 import com.microsoft.bot.builder.core.ServiceKeyAlreadyRegisteredException;
 import com.microsoft.bot.builder.core.TurnContext;
 import com.microsoft.bot.builder.core.TurnContextImpl;
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import org.joda.time.DateTime;
 
@@ -88,7 +89,7 @@ public class TestFlow {
             //task.Wait();
 
             try {
-                this.adapter.ProcessActivity((Activity) userActivity, this.callback);
+                this.adapter.ProcessActivity((ActivityImpl) userActivity, this.callback);
             } catch (Exception e) {
                 return e.getMessage();
             } catch (ServiceKeyAlreadyRegisteredException e) {

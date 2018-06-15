@@ -18,6 +18,7 @@ package com.microsoft.bot.builder.core;
 /// <seealso cref="UpdateActivityHandler"/>
 /// <seealso cref="DeleteActivityHandler"/>
 
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 import com.microsoft.bot.schema.models.ResourceResponse;
@@ -49,7 +50,9 @@ public interface TurnContext
     /// <summary>
     /// Incoming request
     /// </summary>
-    Activity getActivity();
+    ActivityImpl getActivity();
+
+
 
     /// <summary>
     /// Indicates whether at least one response was sent for the current turn.
@@ -91,7 +94,7 @@ public interface TurnContext
     /// <remarks>If the activity is successfully sent, the task result contains
     /// a <see cref="ResourceResponse"/> object containing the ID that the receiving 
     /// channel assigned to the activity.</remarks>
-    CompletableFuture<ResourceResponse> SendActivity(Activity activity) throws Exception;
+    CompletableFuture<ResourceResponse> SendActivity(ActivityImpl activity) throws Exception;
 
     /// <summary>
     /// Sends a set of activities to the sender of the incoming activity.
@@ -101,7 +104,7 @@ public interface TurnContext
     /// <remarks>If the activities are successfully sent, the task result contains
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that 
     /// the receiving channel assigned to the activities.</remarks>
-    CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities) throws Exception;
+    CompletableFuture<ResourceResponse[]> SendActivities(ActivityImpl[] activities) throws Exception;
 
     /// <summary>
     /// Replaces an existing activity. 
@@ -113,7 +116,7 @@ public interface TurnContext
     /// channel assigned to the activity.
     /// <para>Before calling this, set the ID of the replacement activity to the ID
     /// of the activity to replace.</para></remarks>
-    ResourceResponse UpdateActivity(Activity activity) throws Exception;
+    ResourceResponse UpdateActivity(ActivityImpl activity) throws Exception;
 
     /// <summary>
     /// Deletes an existing activity.

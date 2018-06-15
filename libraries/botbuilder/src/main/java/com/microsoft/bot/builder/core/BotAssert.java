@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder.core;
 
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 
@@ -18,7 +19,7 @@ public class BotAssert
     /// <param name="activity">The activity object.</param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="activity"/> is <c>null</c>.</exception>
-    public static void ActivityNotNull(Activity activity)
+    public static void ActivityNotNull(ActivityImpl activity)
     {
         if (activity == null)
             throw new IllegalArgumentException ("Activity");

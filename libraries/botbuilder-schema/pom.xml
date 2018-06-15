@@ -65,6 +65,12 @@
           <artifactId>joda-time</artifactId>
           <version>RELEASE</version>
       </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>RELEASE</version>
+          <scope>compile</scope>
+      </dependency>
   </dependencies>
 
   <profiles>

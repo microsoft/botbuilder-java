@@ -22,8 +22,8 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 /// Service client to handle requests to the botframework api service.
 /// </summary>
 public class OAuthClient extends ServiceClient {
-    private final ConnectorClient _client;
-    private final String _uri;
+    private final ConnectorClient client;
+    private final String uri;
 
 
     public OAuthClient(ConnectorClient client, String uri) throws URISyntaxException, MalformedURLException {
@@ -37,8 +37,8 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("Please supply a valid https uri");
         if (client == null)
             throw new IllegalArgumentException("client");
-        this._client = client;
-        this._uri = uri;
+        this.client = client;
+        this.uri = uri;
     }
 
     /// <summary>

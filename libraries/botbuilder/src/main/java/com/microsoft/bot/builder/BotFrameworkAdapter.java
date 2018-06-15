@@ -13,6 +13,7 @@ import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.authentication.*;
 
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import com.microsoft.rest.retry.RetryStrategy;
 import com.sun.jndi.toolkit.url.Uri;
@@ -210,7 +211,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     /// </remarks>
     /// <seealso cref="ContinueConversation(String, ConversationReference, Func{TurnContext, Task})"/>
     /// <seealso cref="BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task}, System.Threading.CancellationTokenSource)"/>
-    public CompletableFuture<InvokeResponse> ProcessActivity(String authHeader, Activity activity, Function<TurnContext, CompletableFuture> callback) throws ServiceKeyAlreadyRegisteredException, Exception {
+    public CompletableFuture<InvokeResponse> ProcessActivity(String authHeader, ActivityImpl activity, Function<TurnContext, CompletableFuture> callback) throws ServiceKeyAlreadyRegisteredException, Exception {
         BotAssert.ActivityNotNull(activity);
 
         //ClaimsIdentity claimsIdentity = await(JwtTokenValidation.validateAuthHeader(activity, authHeader, _credentialProvider));
@@ -219,7 +220,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         return completedFuture(null);
     }
 
-    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, Activity activity, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, ActivityImpl activity, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
         BotAssert.ActivityNotNull(activity);
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {

@@ -10,6 +10,7 @@
 
 package com.microsoft.bot.schema.models;
 
+import com.microsoft.bot.schema.EntityImpl;
 import org.joda.time.DateTime;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -178,7 +179,7 @@ public class Activity {
      * activity. Each Entity object is typed.
      */
     @JsonProperty(value = "entities")
-    private List<Entity> entities;
+    private List<EntityImpl> entities;
 
     /**
      * Channel-specific payload.
@@ -749,7 +750,7 @@ public class Activity {
      *
      * @return the entities value
      */
-    public List<Entity> entities() {
+    public List<EntityImpl> entities() {
         return this.entities;
     }
 
@@ -759,7 +760,7 @@ public class Activity {
      * @param entities the entities value to set
      * @return the Activity object itself.
      */
-    public Activity withEntities(List<Entity> entities) {
+    public Activity withEntities(List<EntityImpl> entities) {
         this.entities = entities;
         return this;
     }
