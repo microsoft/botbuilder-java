@@ -1,32 +1,47 @@
 package com.microsoft.bot.connector.authentication;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.models.ConversationReference;
 import com.microsoft.bot.schema.models.TokenResponse;
 import com.microsoft.rest.ServiceClient;
 
+import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 
 import java.util.concurrent.CompletableFuture;
 
+import static com.ea.async.Async.await;
+import static com.microsoft.bot.connector.authentication.MicrosoftAppCredentials.JSON;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.stream.Collectors.joining;
 
 /// <summary>
 /// Service client to handle requests to the botframework api service.
 /// </summary>
 public class OAuthClient extends ServiceClient {
-    private final ConnectorClient client;
+    private final ConnectorClientImpl client;
     private final String uri;
 
+    private ObjectMapper mapper;
 
-    public OAuthClient(ConnectorClient client, String uri) throws URISyntaxException, MalformedURLException {
+
+    public OAuthClient(ConnectorClientImpl client, String uri) throws URISyntaxException, MalformedURLException {
         super(client.restClient());
         URI uriResult = new URI(uri);
 
@@ -38,7 +53,8 @@ public class OAuthClient extends ServiceClient {
         if (client == null)
             throw new IllegalArgumentException("client");
         this.client = client;
-        this.uri = uri;
+        this.uri = uri + (uri.endsWith("/")? "" : "/");
+        this.mapper = new ObjectMapper();
     }
 
     /// <summary>
@@ -50,109 +66,68 @@ public class OAuthClient extends ServiceClient {
 /// <param name="customHeaders"></param>
 /// <param name="cancellationToken"></param>
 /// <returns></returns>
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) {
+    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
     }
 
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, HashMap<String, ArrayList<String>> customHeaders) {
+    public URI MakeUri(String uri, HashMap<String, String> queryStrings) throws URISyntaxException {
+        String newUri = queryStrings.keySet().stream()
+                .map(key -> {
+                    try {
+                        return key + "=" + URLEncoder.encode(queryStrings.get(key), StandardCharsets.UTF_8.toString());
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(joining("&", (uri.endsWith("?") ? uri : uri + "?"), ""));
+        return new URI(newUri);
+
+
+    }
+
+    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, HashMap<String, ArrayList<String>> customHeaders) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
-
-        // Tracing
-//        boolean shouldTrace = ServiceClientTracing.IsEnabled;
-//         String invocationId = null;
-//        if (shouldTrace)
-//        {
-//        invocationId =  ServiceClientTracing.NextInvocationId.ToString();
-//        HashMap<String, Object> tracingParameters = new HashMap<String, Object>();
-//        tracingParameters.put("userId", userId);
-//        tracingParameters.put("connectionName", connectionName);
-//        tracingParameters.put("magicCode", magicCode);
-//        //tracingParameters.put("cancellationToken", cancellationToken);
-//        // ServiceClientTracing.Enter(invocationId, this, "GetUserTokenAsync", tracingParameters);
-//        }
         // Construct URL
-//        var tokenUrl = new Uri(new Uri(_uri + (_uri.EndsWith("/") ? "" : "/")), "api/usertoken/GetToken?userId={userId}&connectionName={connectionName}{magicCodeParam}").ToString();
-//        tokenUrl = tokenUrl.Replace("{connectionName}", Uri.EscapeDataString(connectionName));
-//        tokenUrl = tokenUrl.Replace("{userId}", Uri.EscapeDataString(userId));
-//        if (!StringUtils.isEmpty(magicCode))
-//        {
-//        tokenUrl = tokenUrl.Replace("{magicCodeParam}", $"&code={Uri.EscapeDataString(magicCode)}");
-//        }
-//        else
-//        {
-//        tokenUrl = tokenUrl.Replace("{magicCodeParam}", String.Empty);
-//        }
-
-        // Create HTTP transport objects
-//        var httpRequest = new HttpRequestMessage();
-//        HttpResponseMessage httpResponse = null;
-//        httpRequest.Method = new HttpMethod("GET");
-//        httpRequest.RequestUri = new Uri(tokenUrl);
+        HashMap <String, String> qstrings = new HashMap<>();
+        qstrings.put("userId", userId);
+        qstrings.put("connectionName", connectionName);
+        if (!StringUtils.isBlank(magicCode))
+            qstrings.put("code", magicCode);
+        String strUri = String.format("%sapi/usertoken/GetToken", this.uri);
+        URI tokenUrl = MakeUri(strUri, qstrings);
 
         // add botframework api service url to the list of trusted service url's for these app credentials.
-//        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+        MicrosoftAppCredentials.trustServiceUrl(tokenUrl.toString());
 
-        // Set Credentials
-//        if (_client.Credentials != null)
-//        {
-//        cancellationToken.ThrowIfCancellationRequested();
-//        await(_client.Credentials.ProcessHttpRequestAsync(httpRequest));
-//        }
-//        cancellationToken.ThrowIfCancellationRequested();
+        // Set Credentials and make call
+        MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
+        Response httpResponse = await(appCredentials.ProcessHttpRequestAsync(true, "GET", tokenUrl.toString()));
 
-//        if (shouldTrace)
-//        {
-//         ServiceClientTracing.SendRequest(invocationId, httpRequest);
-//        }
-//        httpResponse = await(_client.HttpClient.SendAsync(httpRequest, cancellationToken));
-//        if (shouldTrace)
-//        {
-//         ServiceClientTracing.ReceiveResponse(invocationId, httpResponse);
-//        }
-//        HttpStatusCode statusCode = httpResponse.StatusCode;
-//        cancellationToken.ThrowIfCancellationRequested();
-//        if (statusCode == HttpStatusCode.OK)
-//        {
-//         String responseContent = await(httpResponse.Content.ReadAsStringAsync());
-//        try
-//        {
-//        var tokenResponse = Rest.Serialization.SafeJsonConvert.DeserializeObject<TokenResponse>(responseContent);
-//        return tokenResponse;
-//        }
-//        catch (JsonException)
-//        {
-//        // ignore json exception and return null
-//        httpRequest.Dispose();
-//        if (httpResponse != null)
-//        {
-//        httpResponse.Dispose();
-//        }
-        return null;
+        int statusCode = httpResponse.code();
+        if (statusCode == HTTP_OK) {
+            return completedFuture(this.mapper.readValue(httpResponse.body().string(), TokenResponse.class));
+        }
+        else if (statusCode == HTTP_NOT_FOUND) {
+            return null;
+        }
+        else {
+            return null;
+        }
     }
-    //}
-//        else if (statusCode == HttpStatusCode.NotFound)
-//        {
-//        return null;
-//        }
-//        else
-//        {
-//        return null;
-//        }
-//        }
 
     /// <summary>
-/// Signs Out the User for the given ConnectionName.
-/// </summary>
-/// <param name="userId"></param>
-/// <param name="connectionName"></param>
-/// <param name="cancellationToken"></param>
-/// <returns></returns>
-    public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) {
+    /// Signs Out the User for the given ConnectionName.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="connectionName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) throws URISyntaxException, IOException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
@@ -160,71 +135,38 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("connectionName");
         }
 
-        //boolean shouldTrace = // ServiceClientTracing.IsEnabled;
         String invocationId = null;
-//        if (shouldTrace)
-//        {
-//        invocationId = // ServiceClientTracing.NextInvocationId.ToString();
-//        HashMap<String, Object> tracingParameters = new HashMap<String, Object>();
-//        tracingParameters.put("userId", userId);
-//        tracingParameters.put("connectionName", connectionName);
-//        
-//        // ServiceClientTracing.Enter(invocationId, this, "SignOutUserAsync", tracingParameters);
-//        }
 
         // Construct URL
-//        var tokenUrl = new Uri(new Uri(_uri + (_uri.EndsWith("/") ? "" : "/")), "api/usertoken/SignOut?&userId={userId}&connectionName={connectionName}").ToString();
-//        tokenUrl = tokenUrl.Replace("{connectionName}", Uri.EscapeDataString(connectionName));
-//        tokenUrl = tokenUrl.Replace("{userId}", Uri.EscapeDataString(userId));
-//
-//        // add botframework api service url to the list of trusted service url's for these app credentials.
-//        MicrosoftAppCredentials.TrustServiceUrl(tokenUrl);
-//
-//        // Create HTTP transport objects
-//        var httpRequest = new HttpRequestMessage();
-//        HttpResponseMessage httpResponse = null;
-//        httpRequest.Method = new HttpMethod("DELETE");
-//        httpRequest.RequestUri = new Uri(tokenUrl);
-//
-//        // Set Credentials
-//        if (_client.Credentials != null)
-//        {
-//        cancellationToken.ThrowIfCancellationRequested();
-//        await(_client.Credentials.ProcessHttpRequestAsync(httpRequest, cancellationToken));
-//        }
-//        cancellationToken.ThrowIfCancellationRequested();
-//
-//        if (shouldTrace)
-//        {
-//        // ServiceClientTracing.SendRequest(invocationId, httpRequest);
-//        }
-//        httpResponse = await(_client.HttpClient.SendAsync(httpRequest, cancellationToken));
-//        if (shouldTrace)
-//        {
-//        // ServiceClientTracing.ReceiveResponse(invocationId, httpResponse);
-//        }
-//
-//        HttpStatusCode _statusCode = httpResponse.StatusCode;
-//        cancellationToken.ThrowIfCancellationRequested();
-//        if (_statusCode == HttpStatusCode.OK)
-//        {
-//        return true;
-//        }
-//        else
-//        {
-//        return false;
-//        }
+        HashMap <String, String> qstrings = new HashMap<>();
+        qstrings.put("userId", userId);
+        qstrings.put("connectionName", connectionName);
+        String strUri = String.format("%sapi/usertoken/SignOut", this.uri);
+        URI tokenUrl = MakeUri(strUri, qstrings);
+
+        // add botframework api service url to the list of trusted service url's for these app credentials.
+        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+
+        // Set Credentials and make call
+        MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
+        Response httpResponse = await(appCredentials.ProcessHttpRequestAsync(true, "DELETE", tokenUrl.toString()));
+
+        int statusCode = httpResponse.code();
+        if (statusCode == HTTP_OK) {
+            return completedFuture(true);
+        }
         return completedFuture(false);
     }
 
+
     /// <summary>
-/// Gets the Link to be sent to the user for signin into the given ConnectionName
-/// </summary>
-/// <param name="activity"></param>
-/// <param name="connectionName"></param>
-/// <param name="cancellationToken"></param>
-/// <returns></returns>
-    public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) {
+    /// Gets the Link to be sent to the user for signin into the given ConnectionName
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="connectionName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
@@ -232,113 +174,67 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("activity");
         }
 
-        //boolean shouldTrace = // ServiceClientTracing.IsEnabled;
-        String invocationId = null;
-//        if (shouldTrace)
-//        {
-//        invocationId = // ServiceClientTracing.NextInvocationId.ToString();
-//        HashMap<String, object> tracingParameters = new HashMap<String, object>();
-//        tracingParameters.put("activity", activity);
-//        tracingParameters.put("connectionName", connectionName);
-//        tracingParameters.put("cancellationToken", cancellationToken);
-//        // ServiceClientTracing.Enter(invocationId, this, "GetSignInLinkAsync", tracingParameters);
-//        }
+        MicrosoftAppCredentials creds = (MicrosoftAppCredentials) this.client.restClient().credentials();
+        TokenExchangeState tokenExchangeState = new TokenExchangeState()
+            .withConnectionName(connectionName)
+            .withConversation(new ConversationReference()
+                    .withActivityId(activity.id())
+                    .withBot(activity.recipient())
+                    .withChannelId(activity.channelId())
+                    .withConversation(activity.conversation())
+                    .withServiceUrl(activity.serviceUrl())
+                    .withUser(activity.from()))
+            .withMsAppId((creds == null) ? null : creds.microsoftAppId());
 
-//        TokenExchangeState tokenExchangeState = new TokenExchangeState()
-//        {
-//        ConnectionName = connectionName,
-//        Conversation = new ConversationReference()
-//        {
-//        ActivityId = activity.Id,
-//        Bot = activity.Recipient,       // Activity is from the user to the bot
-//        ChannelId = activity.ChannelId,
-//        Conversation = activity.Conversation,
-//        ServiceUrl = activity.ServiceUrl,
-//        User = activity.From
-//        },
-//        MsAppId = (_client.Credentials as MicrosoftAppCredentials)?.MicrosoftAppId
-//        };
 
-//        var serializedState = JsonConvert.SerializeObject(tokenExchangeState);
-//        var encodedState = Encoding.UTF8.GetBytes(serializedState);
-//        var finalState = Convert.ToBase64String(encodedState);
-//
-//        // Construct URL
-//        var tokenUrl = new Uri(new Uri(_uri + (_uri.EndsWith("/") ? "" : "/")), "api/botsignin/getsigninurl?&state={state}").ToString();
-//        tokenUrl = tokenUrl.Replace("{state}", finalState);
-//
-//        // add botframework api service url to the list of trusted service url's for these app credentials.
-//        MicrosoftAppCredentials.TrustServiceUrl(tokenUrl);
-//
-//        // Create HTTP transport objects
-//        var httpRequest = new HttpRequestMessage();
-//        HttpResponseMessage httpResponse = null;
-//        httpRequest.Method = new HttpMethod("GET");
-//        httpRequest.RequestUri = new Uri(tokenUrl);
-//
-//        // Set Credentials
-//        if (_client.Credentials != null)
-//        {
-//        cancellationToken.ThrowIfCancellationRequested();
-//        await(_client.Credentials.ProcessHttpRequestAsync(httpRequest, cancellationToken));
-//        }
-//        cancellationToken.ThrowIfCancellationRequested();
-//
-//        if (shouldTrace)
-//        {
-//        // ServiceClientTracing.SendRequest(invocationId, httpRequest);
-//        }
-//        httpResponse = await(_client.HttpClient.SendAsync(httpRequest, cancellationToken));
-//        if (shouldTrace)
-//        {
-//        // ServiceClientTracing.ReceiveResponse(invocationId, httpResponse);
-//        }
-//
-//        HttpStatusCode statusCode = httpResponse.StatusCode;
-//        cancellationToken.ThrowIfCancellationRequested();
-//        if (statusCode == HttpStatusCode.OK)
-//        {
-//        var link = await(httpResponse.Content.ReadAsStringAsync());
-//        return link;
-//        }
-        return null;
+        String serializedState = this.mapper.writeValueAsString(tokenExchangeState);
+        String encoded = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
+
+        // Construct URL
+
+        HashMap <String, String> qstrings = new HashMap<>();
+        qstrings.put("state", encoded);
+        String strUri = String.format("%sapi/botsignin/getsigninurl", this.uri);
+        URI tokenUrl = MakeUri(strUri, qstrings);
+
+        // add botframework api service url to the list of trusted service url's for these app credentials.
+        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+
+        // Set Credentials and make call
+        MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
+        Response httpResponse = await(appCredentials.ProcessHttpRequestAsync(true, "GET", tokenUrl.toString()));
+
+        int statusCode = httpResponse.code();
+        if (statusCode == HTTP_OK) {
+            return completedFuture(httpResponse.body().string());
+        }
+        return completedFuture(null);
     }
 
     /// <summary>
-/// Send a dummy OAuth card when the bot is being used on the emulator for testing without fetching a real token.
-/// </summary>
-/// <param name="emulateOAuthCards"></param>
-/// <returns></returns>
-    public CompletableFuture SendEmulateOAuthCardsAsync(boolean emulateOAuthCards) {
-        //boolean shouldTrace = // ServiceClientTracing.IsEnabled;
-        String invocationId = null;
-//        if (shouldTrace)
-//        {
-//        invocationId = // ServiceClientTracing.NextInvocationId.ToString();
-//        HashMap<String, Object> tracingParameters = new HashMap<String, Object>();
-//        tracingParameters.put("emulateOAuthCards", emulateOAuthCards);
-//        // ServiceClientTracing.Enter(invocationId, this, "SendEmulateOAuthCards", tracingParameters);
-//        }
-
+    /// Send a dummy OAuth card when the bot is being used on the emulator for testing without fetching a real token.
+    /// </summary>
+    /// <param name="emulateOAuthCards"></param>
+    /// <returns></returns>
+    public CompletableFuture SendEmulateOAuthCardsAsync(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
 
         // Construct URL
-//        URL tokenUrl = new Uri(new Uri(_uri + (_uri.EndsWith("/") ? "" : "/")), "api/usertoken/emulateOAuthCards?emulate={emulate}").ToString();
-//        tokenUrl = tokenUrl.Replace("{emulate}", emulateOAuthCards.toString());
-//
-//        // Create HTTP transport objects
-//        var httpRequest = new HttpRequestMessage();
-//        HttpResponseMessage httpResponse = null;
-//        httpRequest.Method = new HttpMethod("POST");
-//        httpRequest.RequestUri = new Uri(tokenUrl);
-//
-//        // add botframework api service url to the list of trusted service url's for these app credentials.
-//        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+        HashMap <String, String> qstrings = new HashMap<>();
+        qstrings.put("emulate", emulateOAuthCards.toString());
+        String strUri = String.format("%sapi/usertoken/emulateOAuthCards", this.uri);
+        URI tokenUrl = MakeUri(strUri, qstrings);
 
-        // Set Credentials
-//        if (_client.Credentials != null)
-//        {
-//        await(_client.Credentials.ProcessHttpRequestAsync(httpRequest, cancellationToken));
-//        }
+        // add botframework api service url to the list of trusted service url's for these app credentials.
+        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+
+        // Construct dummy body
+        RequestBody body = RequestBody.create(JSON, "{}" );
+
+        // Set Credentials and make call
+        MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
+        Response httpResponse = await(appCredentials.ProcessHttpRequestAsync(true, "POST", tokenUrl.toString(), body));
+
+        // Apparently swallow any results
         return completedFuture(null);
     }
 }

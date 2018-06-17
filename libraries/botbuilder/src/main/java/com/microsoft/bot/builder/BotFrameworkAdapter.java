@@ -601,7 +601,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     protected OAuthClient CreateOAuthApiClient(TurnContext context) throws MalformedURLException, URISyntaxException {
-        ConnectorClient client = context.getServices().Get("ConnectorClient");
+        ConnectorClientImpl client = context.getServices().Get("ConnectorClient");
         if (client == null) {
             throw new IllegalArgumentException("CreateOAuthApiClient: OAuth requires a valid ConnectorClient instance");
         }
