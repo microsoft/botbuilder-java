@@ -24,13 +24,13 @@ public class ChannelValidation {
      * @return A valid ClaimsIdentity.
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromChannelTokenValidationParameters,
                 ToBotFromChannelOpenIdMetadataUrl,
                 AllowedSigningAlgorithms, null);
 
-        ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader).get();
+        ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {
             // No valid identity. Not Authorized.
             throw new AuthenticationException("Invalid Identity");
@@ -74,8 +74,8 @@ public class ChannelValidation {
      * @return A valid ClaimsIdentity.
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,CredentialProvider credentials, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
-        ClaimsIdentity identity = ChannelValidation.authenticateToken(authHeader, credentials).get();
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,CredentialProvider credentials, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
+        ClaimsIdentity identity = ChannelValidation.authenticateToken(authHeader, credentials, channelId).get();
 
         if (!identity.claims().containsKey(ServiceUrlClaim)) {
             // Claim must be present. Not Authorized.

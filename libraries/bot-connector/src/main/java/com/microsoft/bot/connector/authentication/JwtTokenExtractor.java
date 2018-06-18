@@ -46,7 +46,7 @@ public class JwtTokenExtractor {
         this.openIdMetadata = openIdMetadataCache.computeIfAbsent(metadataUrl, key -> new OpenIdMetadata(metadataUrl));
     }
 
-    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader) {
+    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader, String channelId) {
         if (authorizationHeader == null) {
             return CompletableFuture.completedFuture(null);
         }
@@ -56,10 +56,10 @@ public class JwtTokenExtractor {
             return CompletableFuture.completedFuture(null);
         }
 
-        return getIdentityAsync(parts[0], parts[1]);
+        return getIdentityAsync(parts[0], parts[1], channelId);
     }
 
-    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String schema, String token) {
+    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String schema, String token, String channelId) {
         // No header in correct scheme or no token
         if (!schema.equalsIgnoreCase("bearer") || token == null) {
             return CompletableFuture.completedFuture(null);
@@ -70,7 +70,7 @@ public class JwtTokenExtractor {
             return CompletableFuture.completedFuture(null);
         }
 
-        return this.validateTokenAsync(token);
+        return this.validateTokenAsync(token, channelId);
     }
 
     private boolean hasAllowedIssuer(String token) {
@@ -79,7 +79,8 @@ public class JwtTokenExtractor {
     }
 
     @SuppressWarnings("unchecked")
-    private CompletableFuture<ClaimsIdentity> validateTokenAsync(String token) {
+    private CompletableFuture<ClaimsIdentity> validateTokenAsync(String token, String channelId) {
+        // TODO: Validate channelId with Endorsement validator
         DecodedJWT decodedJWT = JWT.decode(token);
         OpenIdMetadataKey key = this.openIdMetadata.getKey(decodedJWT.getKeyId());
         if (key != null) {
