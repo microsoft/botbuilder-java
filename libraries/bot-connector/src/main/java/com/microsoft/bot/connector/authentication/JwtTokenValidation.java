@@ -24,7 +24,7 @@ public class JwtTokenValidation {
      * @return Nothing
      * @throws AuthenticationException Throws on auth failed.
      */
-    public static CompletableFuture<ClaimsIdentity> assertValidActivity(Activity activity, String authHeader, CredentialProvider credentials) throws AuthenticationException, InterruptedException, ExecutionException {
+    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials) throws AuthenticationException, InterruptedException, ExecutionException {
         if (authHeader == null || authHeader.isEmpty()) {
             // No auth header was sent. We might be on the anonymous code path.
             boolean isAuthDisable = credentials.isAuthenticationDisabledAsync().get();

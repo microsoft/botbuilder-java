@@ -88,7 +88,7 @@ public class BotAuthenticatorTest {
     public void ChannelMsaHeaderValidServiceUrlShouldBeTrusted() throws IOException, ExecutionException, InterruptedException {
         String header = getHeaderToken();
         CredentialProvider credentials = new CredentialProviderImpl(AppId, "");
-        JwtTokenValidation.assertValidActivity(
+        JwtTokenValidation.authenticateRequest(
                 new Activity().withServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"),
                 header,
                 credentials);
@@ -105,7 +105,7 @@ public class BotAuthenticatorTest {
         CredentialProvider credentials = new CredentialProviderImpl("7f74513e-6f96-4dbc-be9d-9a81fea22b88", "");
 
         try {
-            JwtTokenValidation.assertValidActivity(
+            JwtTokenValidation.authenticateRequest(
                     new Activity().withServiceUrl("https://webchat.botframework.com/"),
                     header,
                     credentials);
@@ -124,7 +124,7 @@ public class BotAuthenticatorTest {
         String header = "";
         CredentialProvider credentials = new CredentialProviderImpl("", "");
 
-        ClaimsIdentity identity = JwtTokenValidation.assertValidActivity(new Activity().withServiceUrl("https://webchat.botframework.com/"), header, credentials).get();
+        ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(new Activity().withServiceUrl("https://webchat.botframework.com/"), header, credentials).get();
         Assert.assertEquals("anonymous", identity.getIssuer());
     }
 
@@ -136,7 +136,7 @@ public class BotAuthenticatorTest {
         String header = "";
         CredentialProvider credentials = new CredentialProviderImpl("", "");
 
-        ClaimsIdentity identity = JwtTokenValidation.assertValidActivity(new Activity().withServiceUrl("https://webchat.botframework.com/"), header, credentials).get();
+        ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(new Activity().withServiceUrl("https://webchat.botframework.com/"), header, credentials).get();
         Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://webchat.botframework.com/"));
     }
 

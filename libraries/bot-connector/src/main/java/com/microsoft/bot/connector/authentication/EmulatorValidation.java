@@ -79,7 +79,7 @@ public class EmulatorValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromEmulatorTokenValidationParameters,
                 ToBotFromEmulatorOpenIdMetadataUrl,
-                AllowedSigningAlgorithms, null);
+                AllowedSigningAlgorithms);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {

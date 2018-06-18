@@ -28,7 +28,7 @@ public class ChannelValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromChannelTokenValidationParameters,
                 ToBotFromChannelOpenIdMetadataUrl,
-                AllowedSigningAlgorithms, null);
+                AllowedSigningAlgorithms);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {
