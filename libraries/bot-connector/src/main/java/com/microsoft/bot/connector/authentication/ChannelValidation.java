@@ -21,6 +21,7 @@ public class ChannelValidation {
      * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
      * @param authHeader The raw HTTP header in the format: "Bearer [longString]"
      * @param credentials The user defined set of valid credentials, such as the AppId.
+     * @param channelId ChannelId for endorsements validation.
      * @return A valid ClaimsIdentity.
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
@@ -70,7 +71,8 @@ public class ChannelValidation {
      * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
      * @param authHeader The raw HTTP header in the format: "Bearer [longString]"
      * @param credentials The user defined set of valid credentials, such as the AppId.
-     * @param serviceUrl service url
+     * @param channelId ChannelId for endorsements validation.
+     * @param serviceUrl Service url.
      * @return A valid ClaimsIdentity.
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
