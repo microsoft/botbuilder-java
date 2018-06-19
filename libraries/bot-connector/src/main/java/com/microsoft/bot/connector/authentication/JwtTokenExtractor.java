@@ -82,12 +82,15 @@ public class JwtTokenExtractor {
             try {
                 verification.build().verify(token);
 
-                // Validate Channel / Token Endorsements. For this, the channelID present on the Activity
-                // needs to be matched by an endorsement.
-                boolean isEndorsed = EndorsementsValidator.validate(channelId, key.endorsements);
-                if (!isEndorsed)
-                {
-                    throw new AuthenticationException(String.format("Could not validate endorsement for key: %s with endorsements: %s", key.key.toString(), StringUtils.join(key.endorsements)));
+                // Note: On the Emulator Code Path, the endorsements collection is null so the validation code
+                // below won't run. This is normal.
+                if (key.endorsements != null) {
+                    // Validate Channel / Token Endorsements. For this, the channelID present on the Activity
+                    // needs to be matched by an endorsement.
+                    boolean isEndorsed = EndorsementsValidator.validate(channelId, key.endorsements);
+                    if (!isEndorsed) {
+                        throw new AuthenticationException(String.format("Could not validate endorsement for key: %s with endorsements: %s", key.key.toString(), StringUtils.join(key.endorsements)));
+                    }
                 }
 
                 if (!this.allowedSigningAlgorithms.contains(decodedJWT.getAlgorithm())) {
