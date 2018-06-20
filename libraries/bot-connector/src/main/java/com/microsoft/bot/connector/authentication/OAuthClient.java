@@ -23,6 +23,7 @@ import java.util.Base64;
 import java.util.HashMap;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static com.ea.async.Async.await;
 import static com.microsoft.bot.connector.authentication.MicrosoftAppCredentials.JSON;
@@ -66,7 +67,7 @@ public class OAuthClient extends ServiceClient {
 /// <param name="customHeaders"></param>
 /// <param name="cancellationToken"></param>
 /// <returns></returns>
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException {
+    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
     }
 
@@ -85,13 +86,14 @@ public class OAuthClient extends ServiceClient {
 
     }
 
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, HashMap<String, ArrayList<String>> customHeaders) throws IOException, URISyntaxException {
+    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, HashMap<String, ArrayList<String>> customHeaders) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
+
         // Construct URL
         HashMap <String, String> qstrings = new HashMap<>();
         qstrings.put("userId", userId);
@@ -106,17 +108,24 @@ public class OAuthClient extends ServiceClient {
 
         // Set Credentials and make call
         MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
-        Response httpResponse = await(appCredentials.ProcessHttpRequestAsync(true, "GET", tokenUrl.toString()));
+        CompletableFuture<Response> result = appCredentials.ProcessHttpRequestAsync(true, "GET", tokenUrl.toString(), null);
+        result.exceptionally(ex -> {
+                    throw new RuntimeException("GET " + tokenUrl.toString() + " failed. " + ex.getMessage());
+                    });
 
+        Response httpResponse = result.get();
+        if (null == httpResponse) {
+            return completedFuture(null);
+        }
         int statusCode = httpResponse.code();
         if (statusCode == HTTP_OK) {
             return completedFuture(this.mapper.readValue(httpResponse.body().string(), TokenResponse.class));
         }
         else if (statusCode == HTTP_NOT_FOUND) {
-            return null;
+            return completedFuture(null);
         }
         else {
-            return null;
+            return completedFuture(null);
         }
     }
 

@@ -15,9 +15,9 @@ import rx.Completable;
 
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import static com.ea.async.Async.await;
 import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotLoginUrl;
 import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotOAuthScope;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.stream.Collectors.joining;
 
 public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private String appId;
@@ -38,6 +39,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private OkHttpClient client;
     private ObjectMapper mapper;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static final MediaType FORM_ENCODE = MediaType.parse("application/x-www-form-urlencoded");
 
     private String currentToken = null;
     private long expiredTime = 0;
@@ -89,7 +91,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         }
         return this.currentToken;
     }
-    public CompletableFuture<String> GetTokenAsync() throws IOException {
+    public CompletableFuture<String> GetTokenAsync() throws IOException, URISyntaxException {
         return this.GetTokenAsync(false);
     }
 
@@ -97,10 +99,10 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     /// Apply the credentials to the HTTP request.
     /// </summary>
     /// <param name="request">The HTTP request.</param><param name="cancellationToken">Cancellation token.</param>
-    public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url) throws InvalidParameterException, IOException {
+    public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url) throws InvalidParameterException, IOException, URISyntaxException {
         return ProcessHttpRequestAsync(applyCredentials, httpVerb, url, null);
     }
-    public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url, RequestBody body) throws InvalidParameterException, IOException {
+    public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url, RequestBody body) throws InvalidParameterException, IOException, URISyntaxException {
         Request.Builder httpRequestBuilder = new Request.Builder();
         switch (httpVerb.toLowerCase()) {
             case "get":
@@ -155,17 +157,19 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
 
 
 
-    public CompletableFuture<String> GetTokenAsync(boolean forceRefresh) throws IOException {
+    public CompletableFuture<String> GetTokenAsync(boolean forceRefresh) throws IOException, URISyntaxException {
         if (forceRefresh == false) {
             // check the global cache for the token. If we have it, and it's valid, we're done.
             OAuthResponse oAuthToken = null;
+            boolean found = false;
             synchronized (this.cacheSync) {
                 if (this.cache.containsKey(this.getTokenCacheKey())) {
                     oAuthToken = this.cache.get(this.getTokenCacheKey());
+                    found = true;
                 }
             }
             // we have the token. Is it valid?
-            if (oAuthToken.getExpirationTime().getMillis() > DateTime.now(DateTimeZone.UTC).getMillis())
+            if (found && oAuthToken.getExpirationTime().getMillis() > DateTime.now(DateTimeZone.UTC).getMillis())
             {
                 return completedFuture(oAuthToken.getAccessToken());
             }
@@ -184,8 +188,10 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         return completedFuture(token.getAccessToken());
     }
 
-    private CompletableFuture<Response> PostAsync(String endpoint, Map<String, String> content) throws JsonProcessingException {
-        RequestBody body = RequestBody.create(this.JSON, this.mapper.writeValueAsString(content));
+    private CompletableFuture<Response> PostAsync(String endpoint, HashMap<String, String> content) throws JsonProcessingException, URISyntaxException {
+        String bodyText = this.mapper.writeValueAsString(content);
+
+        RequestBody body = RequestBody.create(this.FORM_ENCODE, this.MakeFormBody(content));
         Request request = new Request.Builder()
                 .url(endpoint)
                 .post(body)
@@ -195,8 +201,22 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         call.enqueue(result);
         return result.future;
     }
+    private String MakeFormBody(HashMap<String, String> values) throws URISyntaxException, JsonProcessingException {
+        String formBody = values.keySet().stream()
+                .map(key -> {
+                    try {
+                        return key + "=" + URLEncoder.encode(values.get(key), StandardCharsets.UTF_8.toString());
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(joining("&", "", ""));
+        return formBody;
+    }
 
-    private CompletableFuture<OAuthResponse> RefreshTokenAsync() throws IOException {
+    // Corresponds to https://docs.microsoft.com/en-us/azure/bot-service/rest-api/bot-framework-rest-connector-authentication?view=azure-bot-service-4.0
+    // Step 1: Request an access token from the MSA/AAD v2 login service
+    private CompletableFuture<OAuthResponse> RefreshTokenAsync() throws IOException, URISyntaxException {
         HashMap content = new HashMap<String, String>();
         content.put("grant_type", "client_credentials");
         content.put("client_id", this.appId);

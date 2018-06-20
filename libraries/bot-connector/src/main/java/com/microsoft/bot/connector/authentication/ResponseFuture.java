@@ -7,7 +7,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class ResponseFuture implements Callback {
-    public final CompletableFuture<Response> future = new CompletableFuture<>();
+    public final CompletableFuture<Response> future = new CompletableFuture<Response>();
     public Call call;
 
     public ResponseFuture(Call call) {

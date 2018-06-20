@@ -1,11 +1,16 @@
 package com.microsoft.bot.connector.authentication;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
+import java.util.HashMap;
+
 /// <remarks>
-/// Member variables to this class follow the RFC Naming conventions, rather than C# naming conventions.
+/// Member variables to this class follow the RFC Naming conventions
+/// "properties" house any "extra" properties that aren't used at the moment.
 /// </remarks>
 
 public class OAuthResponse
@@ -35,5 +40,7 @@ public class OAuthResponse
         return this;
     }
 
+    @JsonAnySetter
+    private HashMap<String, String> properties;
 
 }
