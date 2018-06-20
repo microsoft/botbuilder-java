@@ -75,13 +75,13 @@ public class EmulatorValidation {
      * @return A valid ClaimsIdentity.
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromEmulatorTokenValidationParameters,
                 ToBotFromEmulatorOpenIdMetadataUrl,
-                AllowedSigningAlgorithms, null);
+                AllowedSigningAlgorithms);
 
-        ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader).get();
+        ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {
             // No valid identity. Not Authorized.
             throw new AuthenticationException("Invalid Identity");

@@ -55,7 +55,7 @@ public class App {
                 Activity activity = getActivity(httpExchange);
                 String authHeader = httpExchange.getRequestHeaders().getFirst("Authorization");
                 try {
-                    JwtTokenValidation.assertValidActivity(activity, authHeader, credentialProvider);
+                    JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider);
 
                     // send ack to user activity
                     httpExchange.sendResponseHeaders(202, 0);
