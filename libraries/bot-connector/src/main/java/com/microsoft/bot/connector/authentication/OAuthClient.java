@@ -48,8 +48,8 @@ public class OAuthClient extends ServiceClient {
 
         // Sanity check our url
         uriResult.toURL();
-
-        if (new URI(uri).getScheme() == "https")
+        String scheme = uriResult.getScheme();
+        if (!scheme.toLowerCase().equals("https"))
             throw new IllegalArgumentException("Please supply a valid https uri");
         if (client == null)
             throw new IllegalArgumentException("client");

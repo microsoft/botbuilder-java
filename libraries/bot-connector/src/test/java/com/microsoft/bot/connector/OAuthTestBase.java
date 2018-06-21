@@ -25,8 +25,6 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class OAuthTestBase extends TestBase
 {
-    //private final HttpRecorderMode mode = HttpRecorderMode.Playback;
-
     protected final String clientId = "adcdf0c4-5ba0-4f46-9823-61ff9c40ca9e";
     protected final String clientSecret = "6}a4o5D]yhL!jmzI";
     protected final String userId = "U19KH8EHJ:T03CWQ0QB";
@@ -35,6 +33,7 @@ public class OAuthTestBase extends TestBase
 
 
     private String token;
+    protected ConnectorClientImpl connector;
 
     private ChannelAccount bot;
     public ChannelAccount getBot() {
@@ -47,49 +46,27 @@ public class OAuthTestBase extends TestBase
     }
 
 
-    public OAuthTestBase() throws IOException, ExecutionException, InterruptedException, URISyntaxException {
-        super(RunCondition.BOTH);
-
-        if (true) //mode == HttpRecorderMode.Record)
-        {
-            MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(clientId, clientSecret);
-            CompletableFuture<String> task = credentials.GetTokenAsync();
-            this.token = task.get();
-        }
-        else
-        {
-            this.token = "STUB_TOKEN";
-        }
-
-        this.bot = new ChannelAccount()
-                    .withId(botId);
-        this.user = new ChannelAccount()
-                    .withId(userId);
+    public OAuthTestBase()  {
+        super(RunCondition.MOCK_ONLY);
     }
 
-    public OAuthTestBase(RunCondition runCondition) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
+    public OAuthTestBase(RunCondition runCondition) {
         super(runCondition);
-        if (true) //mode == HttpRecorderMode.Record)
-        {
-            MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(clientId, clientSecret);
-            CompletableFuture<String> task = credentials.GetTokenAsync();
-            this.token = task.get();
-        }
-        else
-        {
-            this.token = "STUB_TOKEN";
-        }
+    }
+
+
+    @Override
+    protected void initializeClients(RestClient restClient, String botId, String userId) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
+        this.connector = new ConnectorClientImpl(restClient);
+        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(clientId, clientSecret);
+        CompletableFuture<String> task = credentials.GetTokenAsync();
+        this.token = task.get();
 
         this.bot = new ChannelAccount()
                 .withId(botId);
         this.user = new ChannelAccount()
                 .withId(userId);
 
-    }
-
-
-    @Override
-    protected void initializeClients(RestClient restClient, String botId, String userId) throws IOException {
     }
 
     @Override
@@ -103,9 +80,7 @@ public class OAuthTestBase extends TestBase
         this.UseClientFor(doTest, className, "");
     }
     public void UseClientFor(Function<ConnectorClient, CompletableFuture<Void>> doTest, String className, String methodName) {
-
-        ConnectorClientImpl client = new ConnectorClientImpl(OAuthTestBase.hostUri.toString(), new BotAccessTokenStub(this.token, this.clientId, this.clientSecret));
-        await(doTest.apply(client));
+        await(doTest.apply(this.connector));
     }
 
 
@@ -119,11 +94,9 @@ public class OAuthTestBase extends TestBase
 
     public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
         return CompletableFuture.runAsync(()->{
-
-            ConnectorClientImpl client = new ConnectorClientImpl(OAuthTestBase.hostUri.toString(), new BotAccessTokenStub(this.token, this.clientId, this.clientSecret));
             OAuthClient oauthClient = null;
             try {
-                oauthClient = new OAuthClient(client, AuthenticationConstants.OAuthUrl);
+                oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAuthUrl);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {

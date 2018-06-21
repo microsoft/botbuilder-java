@@ -36,27 +36,25 @@ public class OAuthConnectorTest extends OAuthTestBase  {
         super(RunCondition.BOTH);
 
         this.credentials = new MicrosoftAppCredentials(clientId, clientSecret);
-        this.mockConnectorClient = new ConnectorClientImpl("https://localhost", credentials);
-
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void OAuthClient_ShouldThrowOnInvalidUrl() throws MalformedURLException, URISyntaxException {
 
-        OAuthClient test = new OAuthClient(null, "http://localhost");
+        OAuthClient test = new OAuthClient(this.connector, "http://localhost");
         Assert.assertTrue( "Exception not thrown", false);
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void GetUserToken_ShouldThrowOnEmptyUserId() throws URISyntaxException, IOException, ExecutionException, InterruptedException {
-        OAuthClient client = new OAuthClient(this.mockConnectorClient, "https://localhost");
+        OAuthClient client = new OAuthClient(this.connector, "https://localhost");
         client.GetUserTokenAsync("", "mockConnection", "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void GetUserToken_ShouldThrowOnEmptyConnectionName() throws URISyntaxException, IOException, ExecutionException, InterruptedException {
-        OAuthClient client = new OAuthClient(this.mockConnectorClient, "https://localhost");
+        OAuthClient client = new OAuthClient(this.connector, "https://localhost");
         client.GetUserTokenAsync("userid", "", "");
     }
 /*
