@@ -12,7 +12,9 @@ import org.junit.*;
 import org.junit.rules.TestName;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public abstract class TestBase {
@@ -83,6 +85,9 @@ public abstract class TestBase {
             testMode = TestMode.PLAYBACK;
         }
     }
+    public RunCondition getRunCondition() {
+        return this.runCondition;
+    }
 
     private static void initParams() {
         try {
@@ -140,7 +145,7 @@ public abstract class TestBase {
     }
 
     @Before
-    public void beforeTest() throws IOException {
+    public void beforeTest() throws IOException, InterruptedException, ExecutionException, URISyntaxException {
         printThreadInfo(String.format("%s: %s", "beforeTest", testName.getMethodName()));
         final String skipMessage = shouldCancelTest(isPlaybackMode());
         Assume.assumeTrue(skipMessage, skipMessage == null);
@@ -204,6 +209,6 @@ public abstract class TestBase {
         return builder.build();
     }
 
-    protected abstract void initializeClients(RestClient restClient, String botId, String userId) throws IOException;
+    protected abstract void initializeClients(RestClient restClient, String botId, String userId) throws IOException, URISyntaxException, ExecutionException, InterruptedException;
     protected abstract void cleanUpResources();
 }

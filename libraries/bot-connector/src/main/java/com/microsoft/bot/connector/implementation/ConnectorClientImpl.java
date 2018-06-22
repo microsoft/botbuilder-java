@@ -15,12 +15,18 @@ import com.microsoft.bot.connector.Conversations;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.stream.Stream;
+
 /**
  * Initializes a new instance of the ConnectorClientImpl class.
  */
 public class ConnectorClientImpl extends AzureServiceClient implements ConnectorClient {
     /** the {@link AzureClient} used for long running operations. */
     private AzureClient azureClient;
+
 
     /**
      * Gets the {@link AzureClient} used for long running operations.
@@ -32,6 +38,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
 
     /** Gets or sets the preferred language for the response. */
     private String acceptLanguage;
+    private String user_agent_string;
 
     /**
      * Gets Gets or sets the preferred language for the response.
@@ -150,7 +157,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      *
      * @param restClient the REST client to connect to Azure.
      */
-    public ConnectorClientImpl(RestClient restClient) {
+    public ConnectorClientImpl(RestClient restClient){
         super(restClient);
         initialize();
     }
@@ -162,6 +169,23 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
         this.attachments = new AttachmentsImpl(restClient().retrofit(), this);
         this.conversations = new ConversationsImpl(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
+
+
+        // Format according to https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
+        String build_version;
+        final Properties properties = new Properties();
+        try {
+            InputStream propStream = ConnectorClientImpl.class.getClassLoader().getResourceAsStream("project.properties");
+            properties.load(propStream);
+            build_version = properties.getProperty("version");
+        } catch (IOException e) {
+            e.printStackTrace();
+            build_version = "4.0.0";
+        }
+
+        String os_version = System.getProperty("os.name");
+        String java_version = System.getProperty("java.version");
+        this.user_agent_string = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
     }
 
     /**
@@ -169,8 +193,9 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      *
      * @return the user agent string.
      */
+
     @Override
     public String userAgent() {
-        return String.format("%s (%s, %s)", super.userAgent(), "ConnectorClient", "v3");
+        return this.user_agent_string;
     }
 }
