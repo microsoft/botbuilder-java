@@ -219,8 +219,8 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private CompletableFuture<OAuthResponse> RefreshTokenAsync() throws IOException, URISyntaxException {
         HashMap content = new HashMap<String, String>();
         content.put("grant_type", "client_credentials");
-        content.put("client_id", this.appId);
-        content.put("client_secret", this.appPassword );
+        content.put("client_id", (this.appId==null) ? "" : this.appId);
+        content.put("client_secret", (this.appPassword==null) ? "" : this.appPassword );
         content.put("scope", this.OAuthScope);
 
         try (Response response = await(this.PostAsync(this.OAuthEndpoint, content)))

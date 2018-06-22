@@ -72,9 +72,14 @@ public class OAuthTestBase extends TestBase
         }
 
         this.connector = new ConnectorClientImpl(restClient);
-        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
-        CompletableFuture<String> task = credentials.GetTokenAsync();
-        this.token = task.get();
+        if (this.clientId != null && this.clientSecret != null) {
+            MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
+            CompletableFuture<String> task = credentials.GetTokenAsync();
+            this.token = task.get();
+        }
+        else {
+            this.token = null;
+        }
 
         this.bot = new ChannelAccount()
                 .withId(botId);
