@@ -85,6 +85,9 @@ public abstract class TestBase {
             testMode = TestMode.PLAYBACK;
         }
     }
+    public RunCondition getRunCondition() {
+        return this.runCondition;
+    }
 
     private static void initParams() {
         try {

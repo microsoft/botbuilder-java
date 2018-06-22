@@ -26,8 +26,6 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class OAuthConnectorTest extends OAuthTestBase  {
 
-    private final String clientId = "adcdf0c4-5ba0-4f46-9823-61ff9c40ca9e";
-    private final String clientSecret = "6}a4o5D]yhL!jmzI";
 
     private ConnectorClientImpl mockConnectorClient;
     private MicrosoftAppCredentials credentials;

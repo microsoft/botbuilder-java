@@ -25,8 +25,8 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class OAuthTestBase extends TestBase
 {
-    protected final String clientId = "adcdf0c4-5ba0-4f46-9823-61ff9c40ca9e";
-    protected final String clientSecret = "6}a4o5D]yhL!jmzI";
+    protected String clientId;
+    protected String clientSecret ;
     protected final String userId = "U19KH8EHJ:T03CWQ0QB";
     protected final String botId = "B21UTEF8S:T03CWQ0QB";
     protected final static String hostUri = "https://slack.botframework.com";
@@ -47,7 +47,7 @@ public class OAuthTestBase extends TestBase
 
 
     public OAuthTestBase()  {
-        super(RunCondition.MOCK_ONLY);
+        super(RunCondition.BOTH);
     }
 
     public OAuthTestBase(RunCondition runCondition) {
@@ -57,8 +57,22 @@ public class OAuthTestBase extends TestBase
 
     @Override
     protected void initializeClients(RestClient restClient, String botId, String userId) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
+        this.clientId = System.getenv("AppID");
+        this.clientSecret = System.getenv("AppSecret");
+
+        if (this.getRunCondition() == RunCondition.LIVE_ONLY) {
+            if (this.clientId == null) {
+                System.out.print("CANNOT RUN - NO AppID set in environment!!");
+                throw new IOException("Set AppID in environment to proper clientid");
+            }
+            if (this.clientSecret == null) {
+                System.out.print("CANNOT RUN - NO AppSecret set in environment!!");
+                throw new IOException("Set AppSecret in environment to proper clientid");
+            }
+        }
+
         this.connector = new ConnectorClientImpl(restClient);
-        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(clientId, clientSecret);
+        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
         CompletableFuture<String> task = credentials.GetTokenAsync();
         this.token = task.get();
 
@@ -66,6 +80,8 @@ public class OAuthTestBase extends TestBase
                 .withId(botId);
         this.user = new ChannelAccount()
                 .withId(userId);
+
+
 
     }
 
