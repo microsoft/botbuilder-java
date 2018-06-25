@@ -3,8 +3,8 @@
 package com.microsoft.bot.builder.dialogs;
 
 
-import com.microsoft.bot.builder.core.BotAssert;
-import com.microsoft.bot.builder.core.TurnContext;
+import com.microsoft.bot.builder.BotAssert;
+import com.microsoft.bot.builder.TurnContext;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
