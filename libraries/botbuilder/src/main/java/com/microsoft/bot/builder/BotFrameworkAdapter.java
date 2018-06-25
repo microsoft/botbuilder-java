@@ -3,27 +3,21 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.auth0.jwt.impl.ClaimsHolder;
-import com.auth0.jwt.interfaces.Claim;
-
-import com.ea.async.Async;
-import com.microsoft.bot.builder.core.*;
 import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.authentication.*;
-
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import com.microsoft.rest.retry.RetryStrategy;
-import com.sun.jndi.toolkit.url.Uri;
 import org.apache.commons.lang3.StringUtils;
 import sun.net.www.http.HttpClient;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
