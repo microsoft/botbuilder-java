@@ -51,15 +51,16 @@ public interface ResumeAfter
 }
 
 public delegate Task ResumeAfter<in T>(IDialogContext context, IAwaitable<T> result);
-
+*/
 
 /**
  * Encapsulate a method that represents the code to start a dialog.
  * @param context The dialog context.
  * @return A task that represents the start code for a dialog.
  */
-public delegate Task StartAsync(IDialogContext context);
-*/
+
+//public delegate Task StartAsync(IDialogContext context);
+
 
 
 /**
@@ -77,6 +78,7 @@ public interface DialogContext {
 /*
 public static partial class Extensions
 {
+*/
     /**
      * Post a message to be sent to the user, using previous messages to establish a conversation context.
      * <remarks>
@@ -88,6 +90,7 @@ public static partial class Extensions
      * @param cancellationToken The cancellation token.
      * @return A task that represents the post operation.
      */
+/*
     public static async Task PostAsync(this IBotToUser botToUser, string text, string locale = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var message = botToUser.MakeMessage();
@@ -101,7 +104,7 @@ public static partial class Extensions
         await botToUser.PostAsync(message, cancellationToken);
     }
 
-
+*/
     /**
      * Post a message and optional SSML to be sent to the user, using previous messages to establish a conversation context.
      * <remarks>
@@ -115,6 +118,7 @@ public static partial class Extensions
      * @param cancellationToken The cancellation token.
      * @return A task that represents the post operation.
      */
+    /*
     public static async Task SayAsync(this IBotToUser botToUser, string text, string speak = null, MessageOptions options = null, string locale = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var message = botToUser.MakeMessage();
@@ -138,17 +142,18 @@ public static partial class Extensions
 
         await botToUser.PostAsync(message, cancellationToken);
     }
-
+*/
     /**
      * Suspend the current dialog until the user has sent a message to the bot.
      * @param stack The dialog stack.
      * @param resume The method to resume when the message has been received.
      */
+    /*
     public static void Wait(this IDialogStack stack, ResumeAfter<IMessageActivity> resume)
     {
         stack.Wait<IMessageActivity>(resume);
     }
-
+*/
     /**
      * Call a child dialog, add it to the top of the stack and post the message to the child dialog.
      * @param R The type of result expected from the child dialog.
@@ -159,6 +164,7 @@ public static partial class Extensions
      * @param token A cancellation token.
      * @return A task representing the Forward operation.
      */
+    /*
     public static async Task Forward<R>(this IDialogStack stack, IDialog<R> child, ResumeAfter<R> resume, IMessageActivity message, CancellationToken token = default(CancellationToken))
     {
         await stack.Forward<R, IMessageActivity>(child, resume, message, token);
