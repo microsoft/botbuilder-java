@@ -4,15 +4,15 @@ import com.microsoft.bot.builder.TurnContext;
 
 import java.util.function.Supplier;
 
-/// <summary>
-/// Handles persistence of a conversation state object using the conversation ID as part of the key.
-/// </summary>
-/// <typeparam name="TState">The type of the conversation state object.</typeparam>
+/**
+ * Handles persistence of a conversation state object using the conversation ID as part of the key.
+ * @param TState The type of the conversation state object.
+ */
 public class ConversationState<TState> extends BotState<TState>
 {
-    /// <summary>
-    /// The key to use to read and write this conversation state object to storage.
-    /// </summary>
+    /**
+     * The key to use to read and write this conversation state object to storage.
+     */
     //
     // Note: Hard coded to maintain compatibility with C#
     // "ConversationState:{typeof(ConversationState<TState>).Namespace}.{typeof(ConversationState<TState>).Name}"
@@ -20,11 +20,11 @@ public class ConversationState<TState> extends BotState<TState>
       return String.format("ConversationState:Microsoft.Bot.Builder.Core.Extensions.ConversationState`1");
     }
 
-    /// <summary>
-    /// Creates a new <see cref="ConversationState{TState}"/> object.
-    /// </summary>
-    /// <param name="storage">The storage provider to use.</param>
-    /// <param name="settings">The state persistance options to use.</param>
+    /**
+     * Creates a new {@link ConversationState{TState}} object.
+     * @param storage The storage provider to use.
+     * @param settings The state persistance options to use.
+     */
     public ConversationState(Storage storage, Supplier<? extends TState> ctor) {
         this(storage, null, ctor);
     }
@@ -38,11 +38,11 @@ public class ConversationState<TState> extends BotState<TState>
                 settings);
     }
 
-    /// <summary>
-    /// Gets the conversation state object from turn context.
-    /// </summary>
-    /// <param name="context">The context object for this turn.</param>
-    /// <returns>The coversation state object.</returns>
+    /**
+     * Gets the conversation state object from turn context.
+     * @param context The context object for this turn.
+     * @return The coversation state object.
+     */
     public static <TState> TState Get(TurnContext context) throws IllegalArgumentException {
         return context.getServices().Get(PropertyName());
     }

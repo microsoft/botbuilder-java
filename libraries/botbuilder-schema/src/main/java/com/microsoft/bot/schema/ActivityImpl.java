@@ -18,30 +18,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/// <summary>
-/// An Activity is the basic communication type for the Bot Framework 3.0 protocol
-/// </summary>
-/// <remarks>
-/// The Activity class contains all properties that individual, more specific activities
-/// could contain. It is a superset type.
-/// </remarks>
+/**
+ * An Activity is the basic communication type for the Bot Framework 3.0 protocol
+ * <remarks>
+ * The Activity class contains all properties that individual, more specific activities
+ * could contain. It is a superset type.
+ * </remarks>
+ */
 public class ActivityImpl extends Activity {
-    /// <summary>
-    /// Content-type for an Activity
-    /// </summary>
+    /**
+     * Content-type for an Activity
+     */
     public final String ContentType = "application/vnd.microsoft.activity";
     private static final ObjectMapper mapper = new ObjectMapper();
 
     void CustomInit() {
     }
 
-    /// <summary>
-    /// Take a message and create a reply message for it with the routing information
-    /// set up to correctly route a reply to the source message
-    /// </summary>
-    /// <param name="text">text you want to reply with</param>
-    /// <param name="locale">language of your reply</param>
-    /// <returns>message set up to route back to the sender</returns>
+    /**
+     * Take a message and create a reply message for it with the routing information
+     * set up to correctly route a reply to the source message
+     * @param text text you want to reply with
+     * @param locale language of your reply
+     * @return message set up to route back to the sender
+     */
     public ActivityImpl CreateReply() {
         return CreateReply(null, null);
     }
@@ -74,14 +74,14 @@ public class ActivityImpl extends Activity {
         return reply;
     }
 
-    /// <summary>
-/// Create a trace activity based of this activity
-/// </summary>
-/// <param name="name">Name of the operation</param>
-/// <param name="value">value of the operation</param>
-/// <param name="valueType">valueType if helpful to identify the value schema (default is value.GetType().Name)</param>
-/// <param name="label">descritive label of context. (Default is calling function name)</param>
-/// <returns></returns>
+    /**
+     * Create a trace activity based of this activity
+     * @param name Name of the operation
+     * @param value value of the operation
+     * @param valueType valueType if helpful to identify the value schema (default is value.GetType().Name)
+     * @param label descritive label of context. (Default is calling function name)
+     * @return 
+     */
     public TraceActivity CreateTrace(String name) {
         return CreateTrace(name, null, null, null);
     }
@@ -120,13 +120,13 @@ public class ActivityImpl extends Activity {
         return reply;
     }
 
-    /// <summary>
-    /// Create an instance of the TraceActivity
-    /// </summary>
-    /// <param name="name">Name of the operation</param>
-    /// <param name="value">value of the operation</param>
-    /// <param name="valueType">valueType if helpful to identify the value schema (default is value.GetType().Name)</param>
-    /// <param name="label">descritive label of context. (Default is calling function name)</param>
+    /**
+     * Create an instance of the TraceActivity
+     * @param name Name of the operation
+     * @param value value of the operation
+     * @param valueType valueType if helpful to identify the value schema (default is value.GetType().Name)
+     * @param label descritive label of context. (Default is calling function name)
+     */
     public static TraceActivity CreateTraceActivity(String name, String valueType) {
         return CreateTraceActivity(name, valueType, null, null);
     }
@@ -147,15 +147,15 @@ public class ActivityImpl extends Activity {
 
     }
 
-    /// <summary>
-    /// Extension data for overflow of properties
-    /// </summary>
+    /**
+     * Extension data for overflow of properties
+     */
     //        [JsonExtensionData(ReadData = true, WriteData = true)]
     //public JObject Properties { get; set; } = new JObject();
 
-    /// <summary>
-    /// Create an instance of the Activity class with IMessageActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IMessageActivity masking
+     */
     public static MessageActivity CreateMessageActivity() {
         MessageActivity reply = new MessageActivity();
         reply.withType(ActivityTypes.TRACE);
@@ -165,18 +165,18 @@ public class ActivityImpl extends Activity {
         return reply;
     }
 
-    /// <summary>
-    /// Create an instance of the Activity class with IContactRelationUpdateActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IContactRelationUpdateActivity masking
+     */
     public static ContactRelationUpdateActivity CreateContactRelationUpdateActivity() {
         ContactRelationUpdateActivity reply =  new ContactRelationUpdateActivity();
         reply.withType(ActivityTypes.CONTACT_RELATION_UPDATE);
         return reply;
     }
 
-    /// <summary>
-    /// Create an instance of the Activity class with IConversationUpdateActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IConversationUpdateActivity masking
+     */
     public static ConversationUpdateActivity CreateConversationUpdateActivity() {
         ConversationUpdateActivity reply = new ConversationUpdateActivity();
         reply.withType(ActivityTypes.CONVERSATION_UPDATE);
@@ -185,37 +185,37 @@ public class ActivityImpl extends Activity {
         return reply;
     }
 
-    /// <summary>
-    /// Create an instance of the Activity class with ITypingActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with ITypingActivity masking
+     */
     //public static TypingActivity CreateTypingActivity() { return new Activity(ActivityTypes.Typing); }
 
-    /// <summary>
-    /// Create an instance of the Activity class with IActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IActivity masking
+     */
     public static Activity CreatePingActivity() {
         return new Activity().withType(ActivityTypes.PING);
     }
 
-    /// <summary>
-    /// Create an instance of the Activity class with IEndOfConversationActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IEndOfConversationActivity masking
+     */
     //public static IEndOfConversationActivity CreateEndOfConversationActivity() { return new Activity(ActivityTypes.EndOfConversation); }
 
-    /// <summary>
-    /// Create an instance of the Activity class with an IEventActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with an IEventActivity masking
+     */
     //public static IEventActivity CreateEventActivity() { return new Activity(ActivityTypes.Event); }
 
-    /// <summary>
-    /// Create an instance of the Activity class with IInvokeActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IInvokeActivity masking
+     */
     //public static IInvokeActivity CreateInvokeActivity() { return new Activity(ActivityTypes.Invoke); }
 
 
-    /// <summary>
-    /// True if the Activity is of the specified activity type
-    /// </summary>
+    /**
+     * True if the Activity is of the specified activity type
+     */
     protected boolean IsActivity(String activityType) {
         /*
          * NOTE: While it is possible to come up with a fancy looking "one-liner" to solve
@@ -254,84 +254,84 @@ public class ActivityImpl extends Activity {
         return result;
     }
 
-    /// <summary>
-    /// Return an IMessageActivity mask if this is a message activity
-    /// </summary>
+    /**
+     * Return an IMessageActivity mask if this is a message activity
+     */
     public MessageActivity AsMessageActivity() {
         return IsActivity(ActivityTypes.MESSAGE.toString()) ? (MessageActivity) (Activity) this : null;
     }
 
-    /// <summary>
-    /// Return an IContactRelationUpdateActivity mask if this is a contact relation update activity
-    /// </summary>
+    /**
+     * Return an IContactRelationUpdateActivity mask if this is a contact relation update activity
+     */
     public ContactRelationUpdateActivity AsContactRelationUpdateActivity() {
         return IsActivity(ActivityTypes.CONTACT_RELATION_UPDATE.toString()) ? (ContactRelationUpdateActivity) (Activity) this : null;
     }
 
-    /// <summary>
-    /// Return an IInstallationUpdateActivity mask if this is a installation update activity
-    /// </summary>
+    /**
+     * Return an IInstallationUpdateActivity mask if this is a installation update activity
+     */
     //public InstallationUpdateActivity AsInstallationUpdateActivity() { return IsActivity(ActivityTypes.INSTALLATION_UPDATE.toString()) ? this : null; }
 
-    /// <summary>
-    /// Return an IConversationUpdateActivity mask if this is a conversation update activity
-    /// </summary>
+    /**
+     * Return an IConversationUpdateActivity mask if this is a conversation update activity
+     */
     //public ConversationUpdateActivity AsConversationUpdateActivity() { return IsActivity(ActivityTypes.ConversationUpdate) ? this : null; }
 
-    /// <summary>
-    /// Return an ITypingActivity mask if this is a typing activity
-    /// </summary>
+    /**
+     * Return an ITypingActivity mask if this is a typing activity
+     */
     // public TypingActivity AsTypingActivity() { return IsActivity(ActivityTypes.TYPING.toString()) ? (TypingActivity)(Activity)this : null; }
 
-    /// <summary>
-    /// Return an IEndOfConversationActivity mask if this is an end of conversation activity
-    /// </summary>
+    /**
+     * Return an IEndOfConversationActivity mask if this is an end of conversation activity
+     */
     //public IEndOfConversationActivity AsEndOfConversationActivity() { return IsActivity(ActivityTypes.EndOfConversation) ? this : null; }
 
-    /// <summary>
-    /// Return an IEventActivity mask if this is an event activity
-    /// </summary>
+    /**
+     * Return an IEventActivity mask if this is an event activity
+     */
     //public IEventActivity AsEventActivity() { return IsActivity(ActivityTypes.Event) ? this : null; }
 
-    /// <summary>
-    /// Return an IInvokeActivity mask if this is an invoke activity
-    /// </summary>
+    /**
+     * Return an IInvokeActivity mask if this is an invoke activity
+     */
     //public IInvokeActivity AsInvokeActivity() { return IsActivity(ActivityTypes.Invoke) ? this : null; }
 
-    /// <summary>
-    /// Return an IMessageUpdateAcitvity if this is a MessageUpdate activity
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Return an IMessageUpdateAcitvity if this is a MessageUpdate activity
+     * @return 
+     */
     //public IMessageUpdateActivity AsMessageUpdateActivity() { return IsActivity(ActivityTypes.MessageUpdate) ? this : null; }
 
-    /// <summary>
-    /// Return an IMessageDeleteActivity if this is a MessageDelete activity
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Return an IMessageDeleteActivity if this is a MessageDelete activity
+     * @return 
+     */
     //public IMessageDeleteActivity AsMessageDeleteActivity() { return IsActivity(ActivityTypes.MessageDelete) ? this : null; }
 
-    /// <summary>
-    /// Return an IMessageReactionActivity if this is a MessageReaction activity
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Return an IMessageReactionActivity if this is a MessageReaction activity
+     * @return 
+     */
     //public IMessageReactionActivity AsMessageReactionActivity() { return IsActivity(ActivityTypes.MessageReaction) ? this : null; }
 
-    /// <summary>
-    /// Return an ISuggestionActivity if this is a Suggestion activity
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Return an ISuggestionActivity if this is a Suggestion activity
+     * @return 
+     */
     //public ISuggestionActivity AsSuggestionActivity() { return IsActivity(ActivityTypes.Suggestion) ? this : null; }
 
-    /// <summary>
-    /// Return an ITraceActivity if this is a Trace activity
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Return an ITraceActivity if this is a Trace activity
+     * @return 
+     */
     //public ITraceActivity AsTraceActivity() { return IsActivity(ActivityTypes.Trace) ? this : null; }
 
-    /// <summary>
-    /// Checks if this (message) activity has content.
-    /// </summary>
-    /// <returns>Returns true, if this message has any content to send. False otherwise.</returns>
+    /**
+     * Checks if this (message) activity has content.
+     * @return Returns true, if this message has any content to send. False otherwise.
+     */
     public boolean HasContent() {
         if (!StringUtils.isBlank(this.text()))
             return true;
@@ -357,10 +357,10 @@ public class ActivityImpl extends Activity {
         return null;
 
     }
-    /// <summary>
-    /// Resolves the mentions from the entities of this (message) activity.
-    /// </summary>
-    /// <returns>The array of mentions or an empty array, if none found.</returns>
+    /**
+     * Resolves the mentions from the entities of this (message) activity.
+     * @return The array of mentions or an empty array, if none found.
+     */
     public ArrayList<Mention> GetMentions() {
         ArrayList<Mention> list = (ArrayList) this.entities().stream()
                 .filter(entity -> entity.type().equalsIgnoreCase("mention"))
@@ -369,12 +369,12 @@ public class ActivityImpl extends Activity {
         return list;
     }
 
-    /// <summary>
-    /// Get channeldata as typed structure
-    /// </summary>
-    /// <param name="activity"></param>
-    /// <typeparam name="TypeT">type to use</typeparam>
-    /// <returns>typed Object or default(TypeT)</returns>
+    /**
+     * Get channeldata as typed structure
+     * @param activity 
+     * @param TypeT type to use
+     * @return typed Object or default(TypeT)
+     */
     public <TypeT> TypeT GetChannelData(Class<TypeT> classType) throws JsonProcessingException {
         if (this.channelData() == null)
             return null;
@@ -386,15 +386,14 @@ public class ActivityImpl extends Activity {
         return mapper.treeToValue((TreeNode) node, classType);
     }
 
-    /// <summary>
-    /// Get channeldata as typed structure
-    /// </summary>
-    /// <param name="activity"></param>
-    /// <typeparam name="TypeT">type to use</typeparam>
-    /// <param name="instance">The resulting instance, if possible</param>
-    /// <returns>
-    /// <c>true</c> if value of <seealso cref="IActivity.ChannelData"/> was coerceable to <typeparamref name="TypeT"/>, <c>false</c> otherwise.
-    /// </returns>
+    /**
+     * Get channeldata as typed structure
+     * @param activity 
+     * @param TypeT type to use
+     * @param instance The resulting instance, if possible
+     * @return 
+     * {@code true} if value of {@linkalso IActivity.ChannelData} was coerceable to {@code TypeT}, {@code false} otherwise.
+     */
 
     public <TypeT> ResultPair<Boolean, TypeT> TryGetChannelData(Class<TypeT> clsType) {
         TypeT instance = null;

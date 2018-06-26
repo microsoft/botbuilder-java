@@ -51,11 +51,11 @@ public class MiddlewareSet implements Middleware
         return null;
     }
 
-    /// <summary>
-    /// Intended to be called from Bot, this method performs exactly the same as the
-    /// standard ReceiveActivity, except that it runs a user-defined delegate returns 
-    /// if all Middlware in the receive pipeline was run.
-    /// </summary>
+    /**
+     * Intended to be called from Bot, this method performs exactly the same as the
+     * standard ReceiveActivity, except that it runs a user-defined delegate returns 
+     * if all Middlware in the receive pipeline was run.
+     */
     public CompletableFuture ReceiveActivityWithStatus(TurnContext context, Function<TurnContext, CompletableFuture> callback)
             throws Exception, ServiceKeyAlreadyRegisteredException {
         return ReceiveActivityInternal(context, callback);

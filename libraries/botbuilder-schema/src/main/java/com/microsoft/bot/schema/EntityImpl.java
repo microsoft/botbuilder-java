@@ -13,9 +13,9 @@ import java.io.IOException;
 public class EntityImpl extends Entity
 {
     private static final ObjectMapper mapper = new ObjectMapper();
-    /// <summary>
-    /// Extension data for overflow of properties
-    /// </summary>
+    /**
+     * Extension data for overflow of properties
+     */
     private ObjectNode _properties = JsonNodeFactory.instance.objectNode();
     public ObjectNode getProperties() {
             return _properties;
@@ -25,11 +25,11 @@ public class EntityImpl extends Entity
     }
 
 
-    /// <summary>
-    /// Set internal payload.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
+    /**
+     * Set internal payload.
+     * @param T 
+     * @param obj 
+     */
     private String objectData;
 
     public <T> void SetAs(T obj) throws JsonProcessingException {
@@ -38,11 +38,11 @@ public class EntityImpl extends Entity
 
     }
 
-    /// <summary>
-    /// Retrieve internal payload.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /**
+     * Retrieve internal payload.
+     * @param T 
+     * @return 
+     */
     public <T> T GetAs(Class<T> classType) throws IOException {
         String classTypeName= classType.getName();
 

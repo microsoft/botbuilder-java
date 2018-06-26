@@ -9,9 +9,9 @@ public class ConversationReferenceHelper {
     public ConversationReferenceHelper(ConversationReference reference) {
         this.reference = reference;
     }
-    /// <summary>
-    /// Creates <see cref="Activity"/> from conversation reference as it is posted to bot.
-    /// </summary>
+    /**
+     * Creates {@link Activity} from conversation reference as it is posted to bot.
+     */
     public ActivityImpl GetPostToBotMessage()
     {
         return (ActivityImpl) new ActivityImpl()
@@ -31,9 +31,9 @@ public class ConversationReferenceHelper {
                     .withName(reference.user().name()));
     }
 
-    /// <summary>
-    /// Creates <see cref="Activity"/> from conversation reference that can be posted to user as reply.
-    /// </summary>
+    /**
+     * Creates {@link Activity} from conversation reference that can be posted to user as reply.
+     */
     public ActivityImpl GetPostToUserMessage()
     {
         Activity msg = this.GetPostToBotMessage();
