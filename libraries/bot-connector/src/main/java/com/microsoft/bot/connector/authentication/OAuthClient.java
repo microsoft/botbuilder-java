@@ -32,9 +32,9 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.joining;
 
-/// <summary>
-/// Service client to handle requests to the botframework api service.
-/// </summary>
+/**
+ * Service client to handle requests to the botframework api service.
+ */
 public class OAuthClient extends ServiceClient {
     private final ConnectorClientImpl client;
     private final String uri;
@@ -58,15 +58,14 @@ public class OAuthClient extends ServiceClient {
         this.mapper = new ObjectMapper();
     }
 
-    /// <summary>
-/// Get User Token for given user and connection.
-/// </summary>
-/// <param name="userId"></param>
-/// <param name="connectionName"></param>
-/// <param name="magicCode"></param>
-/// <param name="customHeaders"></param>
-/// <param name="cancellationToken"></param>
-/// <returns></returns>
+    /**
+     * Get User Token for given user and connection.
+     * @param userId 
+     * @param connectionName 
+     * @param magicCode 
+     * @param customHeaders
+     * @return 
+     */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
     }
@@ -129,13 +128,12 @@ public class OAuthClient extends ServiceClient {
         }
     }
 
-    /// <summary>
-    /// Signs Out the User for the given ConnectionName.
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="connectionName"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /**
+     * Signs Out the User for the given ConnectionName.
+     * @param userId 
+     * @param connectionName
+     * @return 
+     */
     public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) throws URISyntaxException, IOException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
@@ -168,13 +166,12 @@ public class OAuthClient extends ServiceClient {
     }
 
 
-    /// <summary>
-    /// Gets the Link to be sent to the user for signin into the given ConnectionName
-    /// </summary>
-    /// <param name="activity"></param>
-    /// <param name="connectionName"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /**
+     * Gets the Link to be sent to the user for signin into the given ConnectionName
+     * @param activity 
+     * @param connectionName
+     * @return 
+     */
     public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) throws IOException, URISyntaxException {
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
@@ -220,11 +217,11 @@ public class OAuthClient extends ServiceClient {
         return completedFuture(null);
     }
 
-    /// <summary>
-    /// Send a dummy OAuth card when the bot is being used on the emulator for testing without fetching a real token.
-    /// </summary>
-    /// <param name="emulateOAuthCards"></param>
-    /// <returns></returns>
+    /**
+     * Send a dummy OAuth card when the bot is being used on the emulator for testing without fetching a real token.
+     * @param emulateOAuthCards 
+     * @return 
+     */
     public CompletableFuture SendEmulateOAuthCardsAsync(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
 
         // Construct URL

@@ -95,10 +95,10 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         return this.GetTokenAsync(false);
     }
 
-    /// <summary>
-    /// Apply the credentials to the HTTP request.
-    /// </summary>
-    /// <param name="request">The HTTP request.</param><param name="cancellationToken">Cancellation token.</param>
+    /**
+     * Apply the credentials to the HTTP request.
+     * @param request The HTTP request.
+     */
     public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url) throws InvalidParameterException, IOException, URISyntaxException {
         return ProcessHttpRequestAsync(applyCredentials, httpVerb, url, null);
     }

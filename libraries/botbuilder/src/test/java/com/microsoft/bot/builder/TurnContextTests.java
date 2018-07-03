@@ -138,13 +138,13 @@ public class TurnContextTests {
     }
 
     [TestMethod]
-    public async Task SendAndSetRespondedUsingIMessageActivity()
+    public async Task SendAndSetRespondedUsing MessageActivity()
     {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContext(a, new Activity());
         Assert.IsFalse(c.Responded);
 
-        IMessageActivity msg = TestMessage.Message().AsMessageActivity();
+         MessageActivity msg = TestMessage.Message().AsMessageActivity();
         await c.SendActivity(msg);
         Assert.IsTrue(c.Responded);
     }
@@ -163,7 +163,7 @@ public class TurnContextTests {
 
         // Just to sanity check everything, send a Message and verify the 
         // responded flag IS set. 
-        IMessageActivity msg = TestMessage.Message().AsMessageActivity();
+         MessageActivity msg = TestMessage.Message().AsMessageActivity();
         await c.SendActivity(msg);
         Assert.IsTrue(c.Responded);
     }

@@ -12,13 +12,13 @@ import static com.ea.async.Async.await;
 public class StorageExtensions {
 
 
-    /// <summary>
-    /// Storage extension to Read as strong typed StoreItem objects
-    /// </summary>
-    /// <typeparam name="StoreItemT"></typeparam>
-    /// <param name="storage"></param>
-    /// <param name="keys"></param>
-    /// <returns></returns>
+    /**
+     * Storage extension to Read as strong typed StoreItem objects
+     * @param StoreItemT 
+     * @param storage 
+     * @param keys 
+     * @return 
+     */
     //public static <StoreItemT extends Object> CompletableFuture<Iterable<Map.Entry<String, T>>> Read(this Storage storage, String... keys)
     public static <StoreItemT extends Object> CompletableFuture<Map<String, StoreItemT>> Read(Storage storage, String... keys) throws JsonProcessingException {
         Map<String, ?> storeItems = await(storage.Read(keys));

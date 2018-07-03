@@ -2,19 +2,19 @@ package com.microsoft.bot.builder;
 
 import java.util.concurrent.CompletableFuture;
 
-/// <summary>
-/// Helper class for defining middleware by using a delegate or anonymous method.
-/// </summary>
+/**
+ * Helper class for defining middleware by using a delegate or anonymous method.
+ */
 public class AnonymousReceiveMiddleware implements Middleware
 {
     private MiddlewareCall _toCall;
 
-    /// <summary>
-    /// Creates a middleware object that uses the provided method as its
-    /// process request handler.
-    /// </summary>
-    /// <param name="anonymousMethod">The method to use as the middleware's process
-    /// request handler.</param>
+    /**
+     * Creates a middleware object that uses the provided method as its
+     * process request handler.
+     * @param anonymousMethod The method to use as the middleware's process
+     * request handler.
+     */
     public AnonymousReceiveMiddleware(MiddlewareCall anonymousMethod)
     {
         if (anonymousMethod == null)
@@ -23,13 +23,13 @@ public class AnonymousReceiveMiddleware implements Middleware
             _toCall = anonymousMethod;
     }
 
-    /// <summary>
-    /// Uses the method provided in the <see cref="AnonymousReceiveMiddleware"/> to
-    /// process an incoming activity.
-    /// </summary>
-    /// <param name="context">The context object for this turn.</param>
-    /// <param name="next">The delegate to call to continue the bot middleware pipeline.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /**
+     * Uses the method provided in the {@link AnonymousReceiveMiddleware} to
+     * process an incoming activity.
+     * @param context The context object for this turn.
+     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @return A task that represents the work queued to execute.
+     */
     public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         return _toCall.requestHandler(context, next);
     }

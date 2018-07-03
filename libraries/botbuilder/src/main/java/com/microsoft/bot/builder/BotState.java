@@ -21,10 +21,10 @@ import java.util.stream.StreamSupport;
 import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-/// <summary>
-/// Abstract Base class which manages details of automatic loading and saving of bot state.
-/// </summary>
-/// <typeparam name="TState">The type of the bot state object.</typeparam>
+/**
+ * Abstract Base class which manages details of automatic loading and saving of bot state.
+ * @param TState The type of the bot state object.
+ */
 //public class BotState<TState> : IMiddleware
 //    where TState : class, new()
 public class BotState<TState> implements Middleware
@@ -36,12 +36,12 @@ public class BotState<TState> implements Middleware
     private final String _propertyName;
     private final Supplier<? extends TState> _ctor;
 
-    /// <summary>
-    /// Creates a new <see cref="BotState{TState}"/> middleware object.
-    /// </summary>
-    /// <param name="name">The name to use to load or save the state object.</param>
-    /// <param name="storage">The storage provider to use.</param>
-    /// <param name="settings">The state persistance options to use.</param>
+    /**
+     * Creates a new {@link BotState{TState}} middleware object.
+     * @param name The name to use to load or save the state object.
+     * @param storage The storage provider to use.
+     * @param settings The state persistance options to use.
+     */
     public BotState(Storage storage, String propertyName, Function<TurnContext, String> keyDelegate, Supplier<? extends TState> ctor) {
         this(storage, propertyName, keyDelegate, ctor, null);
     }
@@ -69,15 +69,15 @@ public class BotState<TState> implements Middleware
     }
 
 
-    /// <summary>
-    /// Processess an incoming activity.
-    /// </summary>
-    /// <param name="context">The context object for this turn.</param>
-    /// <param name="next">The delegate to call to continue the bot middleware pipeline.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    /// <remarks>This middleware loads the state object on the leading edge of the middleware pipeline
-    /// and persists the state object on the trailing edge.
-    /// </remarks>
+    /**
+     * Processess an incoming activity.
+     * @param context The context object for this turn.
+     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @return A task that represents the work queued to execute.
+     *  This middleware loads the state object on the leading edge of the middleware pipeline
+     * and persists the state object on the trailing edge.
+     *
+     */
     public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         await(ReadToContextService(context));
         await(next.next());
@@ -109,11 +109,11 @@ public class BotState<TState> implements Middleware
         return completedFuture(await(Write(context, state)));
     }
 
-    /// <summary>
-    /// Reads state from storage.
-    /// </summary>
-    /// <typeparam name="TState">The type of the bot state object.</typeparam>
-    /// <param name="context">The context object for this turn.</param>
+    /**
+     * Reads state from storage.
+     * @param TState The type of the bot state object.
+     * @param context The context object for this turn.
+     */
     public CompletableFuture<TState> Read(TurnContext context) throws JsonProcessingException {
         String key = this._keyDelegate.apply(context);
         Map<String, ?> items = await( _storage.Read(new String[] { key }));
@@ -129,11 +129,11 @@ public class BotState<TState> implements Middleware
         return completedFuture(state);
     }
 
-    /// <summary>
-    /// Writes state to storage.
-    /// </summary>
-    /// <param name="context">The context object for this turn.</param>
-    /// <param name="state">The state object.</param>
+    /**
+     * Writes state to storage.
+     * @param context The context object for this turn.
+     * @param state The state object.
+     */
     public CompletableFuture Write(TurnContext context, TState state) throws Exception {
         HashMap<String, TState> changes = new HashMap<String, TState>();
         //List<Map.Entry<String, ?>> changes = new ArrayList<Map.Entry<String, ?>>();
