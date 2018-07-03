@@ -4,7 +4,7 @@ import com.microsoft.bot.schema.models.AttachmentLayoutTypes;
 import com.microsoft.bot.schema.models.TextFormatTypes;
 
 /**
- * Optional message properties that can be sent {@link Extensions.SayAsync(IBotToUser, string, string, MessageOptions, string, CancellationToken)}
+ * Optional message properties that can be sent {@link Extensions.SayAsync(IBotToUser, string, string, MessageOptions, string)}
  */
 public class MessageOptions
 {

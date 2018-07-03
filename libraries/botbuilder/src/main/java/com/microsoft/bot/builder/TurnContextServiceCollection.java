@@ -6,9 +6,9 @@ import java.util.Map;
 
 /**
  * Represents a set of collection of services associated with the {@link ITurnContext}.
- * <remarks>
+ *
  * TODO: add more details on what kind of services can/should be stored here, by whom and what the lifetime semantics are, etc.
- * </remarks>
+ *
  */
 public interface TurnContextServiceCollection extends Iterable<Map.Entry<String, Object>>, AutoCloseable {
     /**

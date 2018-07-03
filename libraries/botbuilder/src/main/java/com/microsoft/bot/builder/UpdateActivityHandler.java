@@ -13,13 +13,13 @@ import java.util.concurrent.CompletableFuture;
  * @param activity The replacement activity.
  * @param next The delegate to call to continue event processing.
  * @return A task that represents the work queued to execute.
- * <remarks>A handler calls the {@code next} delegate to pass control to
+ *  A handler calls the {@code next} delegate to pass control to
  * the next registered handler. If a handler doesn’t call the next delegate,
  * the adapter does not call any of the subsequent handlers and does not update the
  * activity.
  * <p>The activity's {@link IActivity.Id} indicates the activity in the
  * conversation to replace.</p>
- * </remarks>
+ *
  * {@linkalso BotAdapter}
  * {@linkalso SendActivitiesHandler}
  * {@linkalso DeleteActivityHandler}

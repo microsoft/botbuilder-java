@@ -63,8 +63,7 @@ public class OAuthClient extends ServiceClient {
      * @param userId 
      * @param connectionName 
      * @param magicCode 
-     * @param customHeaders 
-     * @param cancellationToken 
+     * @param customHeaders
      * @return 
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
@@ -132,8 +131,7 @@ public class OAuthClient extends ServiceClient {
     /**
      * Signs Out the User for the given ConnectionName.
      * @param userId 
-     * @param connectionName 
-     * @param cancellationToken 
+     * @param connectionName
      * @return 
      */
     public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) throws URISyntaxException, IOException {
@@ -171,8 +169,7 @@ public class OAuthClient extends ServiceClient {
     /**
      * Gets the Link to be sent to the user for signin into the given ConnectionName
      * @param activity 
-     * @param connectionName 
-     * @param cancellationToken 
+     * @param connectionName
      * @return 
      */
     public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) throws IOException, URISyntaxException {

@@ -35,9 +35,9 @@ package com.microsoft.bot.builder.dialogs;
 
 /**
  * Encapsulates a method that represents the code to execute after a result is available.
- * <remarks>
+ *
  * The result is often a message from the user.
- * </remarks>
+ *
  * @param T The type of the result.
  * @param context The dialog context.
  * @param result The result.
@@ -81,13 +81,12 @@ public static partial class Extensions
 */
     /**
      * Post a message to be sent to the user, using previous messages to establish a conversation context.
-     * <remarks>
+     *
      * If the locale parameter is not set, locale of the incoming message will be used for reply.
-     * </remarks>
+     *
      * @param botToUser Communication channel to use.
      * @param text The message text.
      * @param locale The locale of the text.
-     * @param cancellationToken The cancellation token.
      * @return A task that represents the post operation.
      */
 /*
@@ -107,15 +106,14 @@ public static partial class Extensions
 */
     /**
      * Post a message and optional SSML to be sent to the user, using previous messages to establish a conversation context.
-     * <remarks>
+     *
      * If the locale parameter is not set, locale of the incoming message will be used for reply.
-     * </remarks>
+     *
      * @param botToUser Communication channel to use.
      * @param text The message text.
      * @param speak The SSML markup for text to speech.
      * @param options The options for the message.
      * @param locale The locale of the text.
-     * @param cancellationToken The cancellation token.
      * @return A task that represents the post operation.
      */
     /*
@@ -149,9 +147,9 @@ public static partial class Extensions
      * @param resume The method to resume when the message has been received.
      */
     /*
-    public static void Wait(this IDialogStack stack, ResumeAfter<IMessageActivity> resume)
+    public static void Wait(this IDialogStack stack, ResumeAfter< MessageActivity> resume)
     {
-        stack.Wait<IMessageActivity>(resume);
+        stack.Wait< MessageActivity>(resume);
     }
 */
     /**
@@ -161,13 +159,12 @@ public static partial class Extensions
      * @param child The child dialog.
      * @param resume The method to resume when the child dialog has completed.
      * @param message The message that will be posted to child dialog.
-     * @param token A cancellation token.
      * @return A task representing the Forward operation.
      */
     /*
-    public static async Task Forward<R>(this IDialogStack stack, IDialog<R> child, ResumeAfter<R> resume, IMessageActivity message, CancellationToken token = default(CancellationToken))
+    public static async Task Forward<R>(this IDialogStack stack, IDialog<R> child, ResumeAfter<R> resume,  MessageActivity message, CancellationToken token = default(CancellationToken))
     {
-        await stack.Forward<R, IMessageActivity>(child, resume, message, token);
+        await stack.Forward<R,  MessageActivity>(child, resume, message, token);
     }
 }
 */

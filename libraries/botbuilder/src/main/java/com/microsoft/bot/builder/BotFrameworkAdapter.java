@@ -26,7 +26,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
  * A bot adapter that can connect a bot to a service endpoint.
- * <remarks>The bot adapter encapsulates authentication processes and sends
+ *  The bot adapter encapsulates authentication processes and sends
  * activities to and receives activities from the Bot Connector Service. When your
  * bot receives an activity, the adapter creates a context object, passes it to your
  * bot's application logic, and sends responses back to the user's channel.
@@ -36,7 +36,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  * and then back out again. As each activity flows in and out of the bot, each piece
  * of middleware can inspect or act upon the activity, both before and after the bot
  * logic runs.</p>
- * </remarks>
+ *
  * {@linkalso TurnContext}
  * {@linkalso IActivity}
  * {@linkalso IBot}
@@ -60,10 +60,10 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param middleware The middleware to initially add to the adapter.
      * @throws IllegalArgumentException 
      * {@code credentialProvider} is {@code null}.
-     * <remarks>Use a {@link MiddlewareSet} object to add multiple middleware
+     *  Use a {@link MiddlewareSet} object to add multiple middleware
      * components in the conustructor. Use the {@link Use(IMiddleware)} method to
      * add additional middleware to the adapter after construction.
-     * </remarks>
+     *
      */
     public BotFrameworkAdapter(CredentialProvider credentialProvider) {
         this(credentialProvider, null, null, null);
@@ -99,7 +99,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @throws IllegalArgumentException 
      * {@code botAppId}, {@code reference}, or
      * {@code callback} is {@code null}.
-     * <remarks>Call this method to proactively send a message to a conversation.
+     *  Call this method to proactively send a message to a conversation.
      * Most channels require a user to initaiate a conversation with a bot
      * before the bot can send activities to the user.
      * <p>This method registers the following.services().for the turn.<list type="bullet 
@@ -111,9 +111,9 @@ public class BotFrameworkAdapter extends BotAdapter {
      * passed in. The .Net code allows multiple bots to be hosted in a single adapter which
      * isn't something supported by Node.
      * </p>
-     * </remarks>
+     *
      * {@linkalso ProcessActivity(String, Activity, Func{TurnContext, Task})}
-     * {@linkalso BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task}, System.Threading.CancellationTokenSource)}
+     * {@linkalso BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task}}
      */
     @Override
     public CompletableFuture ContinueConversation(String botAppId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
@@ -148,10 +148,10 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param connectorClientRetryStrategy Retry policy for retrying HTTP operations.
      * @param httpClient The HTTP client.
      * @param middleware The middleware to initially add to the adapter.
-     * <remarks>Use a {@link MiddlewareSet} object to add multiple middleware
+     *  Use a {@link MiddlewareSet} object to add multiple middleware
      * components in the conustructor. Use the {@link Use(IMiddleware)} method to
      * add additional middleware to the adapter after construction.
-     * </remarks>
+     *
      */
     public BotFrameworkAdapter(String appId, String appPassword) {
         this(appId, appPassword, null, null, null);
@@ -173,9 +173,9 @@ public class BotFrameworkAdapter extends BotAdapter {
      * Adds middleware to the adapter's pipeline.
      * @param middleware The middleware to add.
      * @return The updated adapter object.
-     * <remarks>Middleware is added to the adapter at initialization time.
+     *  Middleware is added to the adapter at initialization time.
      * For each turn, the adapter calls middleware in the order in which you added it.
-     * </remarks>
+     *
      */
 
     public BotFrameworkAdapter Use(Middleware middleware) {
@@ -196,14 +196,14 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@code activity} is {@code null}.
      * @throws UnauthorizedAccessException 
      * authentication failed.
-     * <remarks>Call this method to reactively send a message to a conversation.
+     *  Call this method to reactively send a message to a conversation.
      * <p>This method registers the following.services().for the turn.<list type="bullet 
      * <item>{@link IIdentity} (key = "BotIdentity"), a claims identity for the bot.</item>
      * <item>{@link ConnectorClient}, the channel connector client to use this turn.</item>
      * </list></p>
-     * </remarks>
+     *
      * {@linkalso ContinueConversation(String, ConversationReference, Func{TurnContext, Task})}
-     * {@linkalso BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task}, System.Threading.CancellationTokenSource)}
+     * {@linkalso BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task})}
      */
     public CompletableFuture<InvokeResponse> ProcessActivity(String authHeader, ActivityImpl activity, Function<TurnContext, CompletableFuture> callback) throws ServiceKeyAlreadyRegisteredException, Exception {
         BotAssert.ActivityNotNull(activity);
@@ -249,9 +249,9 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param context The context object for the turn.
      * @param activities The activities to send.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activities are successfully sent, the task result contains
+     *  If the activities are successfully sent, the task result contains
      * an array of {@link ResourceResponse} objects containing the IDs that
-     * the receiving channel assigned to the activities.</remarks>
+     * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
     public CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws ServiceKeyAlreadyRegisteredException, InterruptedException {
@@ -325,11 +325,11 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param context The context object for the turn.
      * @param activity New replacement activity.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
      * <p>Before calling this, set the ID of the replacement activity to the ID
-     * of the activity to replace.</p></remarks>
+     * of the activity to replace.</p>
      * {@linkalso TurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
     @Override
@@ -345,8 +345,8 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param context The context object for the turn.
      * @param reference Conversation reference for the activity to delete.
      * @return A task that represents the work queued to execute.
-     * <remarks>The {@link ConversationReference.ActivityId} of the conversation
-     * reference identifies the activity to delete.</remarks>
+     *  The {@link ConversationReference.ActivityId} of the conversation
+     * reference identifies the activity to delete.
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
     public CompletableFuture DeleteActivity(TurnContext context, ConversationReference reference) {
@@ -439,10 +439,10 @@ public class BotFrameworkAdapter extends BotAdapter {
      * from the channel server. This should be left as `null` to retrieve the first page
      * of results.
      * @return List of Members of the current conversation
-     * <remarks>
+     *
      * This overload may be called from outside the context of a conversation, as only the
      * Bot's ServiceUrl and credentials are required.
-     * </remarks>
+     *
      */
     public CompletableFuture<ConversationsResult> GetConversations(String serviceUrl, MicrosoftAppCredentials credentials) throws MalformedURLException, URISyntaxException {
         return GetConversations(serviceUrl, credentials, null);
@@ -470,11 +470,11 @@ public class BotFrameworkAdapter extends BotAdapter {
      * from the channel server. This should be left as `null` to retrieve the first page
      * of results.
      * @return List of Members of the current conversation
-     * <remarks>
+     *
      * This overload may be called during standard Activity processing, at which point the Bot's
      * service URL and credentials that are part of the current activity processing pipeline
      * will be used.
-     * </remarks>
+     *
      */
     public CompletableFuture<ConversationsResult> GetConversations(TurnContext context) {
         return GetConversations(context, null);
@@ -549,7 +549,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * create the conversation.
      * @param callback The method to call for the resulting bot turn.
      * @return A task that represents the work queued to execute.
-     * <remarks>To start a conversation, your bot must know its account information
+     *  To start a conversation, your bot must know its account information
      * and the user's account information on that channel.
      * Most channels only support initiating a direct message (non-group) conversation.
      * <p>The adapter attempts to create a new conversation on the channel, and
@@ -558,7 +558,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * <p>If the conversation is established with the
      * specified users, the ID of the activity's {@link IActivity.Conversation}
      * will contain the ID of the new conversation.</p>
-     * </remarks>
+     *
      */
     public CompletableFuture CreateConversation(String channelId, String serviceUrl, MicrosoftAppCredentials
             credentials, ConversationParameters conversationParameters, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {

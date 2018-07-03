@@ -74,9 +74,9 @@ public class BotState<TState> implements Middleware
      * @param context The context object for this turn.
      * @param next The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
-     * <remarks>This middleware loads the state object on the leading edge of the middleware pipeline
+     *  This middleware loads the state object on the leading edge of the middleware pipeline
      * and persists the state object on the trailing edge.
-     * </remarks>
+     *
      */
     public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
         await(ReadToContextService(context));

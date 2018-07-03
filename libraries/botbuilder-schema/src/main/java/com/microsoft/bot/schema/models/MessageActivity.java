@@ -176,7 +176,7 @@ public class MessageActivity extends ActivityImpl
 
 
     /**
-     * Create an instance of the Activity class with IConversationUpdateActivity masking
+     * Create an instance of the Activity class with ConversationUpdateActivity masking
      */
     public static ConversationUpdateActivity CreateConversationUpdateActivity()
     {

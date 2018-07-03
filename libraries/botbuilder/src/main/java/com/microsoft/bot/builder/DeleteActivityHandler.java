@@ -11,13 +11,13 @@ import java.util.concurrent.CompletableFuture;
  * @param reference The conversation containing the activity.
  * @param next The delegate to call to continue event processing.
  * @return A task that represents the work queued to execute.
- * <remarks>A handler calls the {@code next} delegate to pass control to
+ *  A handler calls the {@code next} delegate to pass control to
  * the next registered handler. If a handler doesn’t call the next delegate,
  * the adapter does not call any of the subsequent handlers and does not delete the
  *activity.
  * <p>The conversation reference's {@link ConversationReference.ActivityId}
  * indicates the activity in the conversation to replace.</p>
- * </remarks>
+ *
  * {@linkalso BotAdapter}
  * {@linkalso SendActivitiesHandler}
  * {@linkalso UpdateActivityHandler}

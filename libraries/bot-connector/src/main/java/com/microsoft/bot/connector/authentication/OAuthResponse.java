@@ -9,10 +9,8 @@ import org.joda.time.DateTime;
 import java.util.HashMap;
 
 /**
- * <remarks>
  * Member variables to this class follow the RFC Naming conventions
  * "properties" house any "extra" properties that aren't used at the moment.
- * </remarks>
  */
 
 public class OAuthResponse

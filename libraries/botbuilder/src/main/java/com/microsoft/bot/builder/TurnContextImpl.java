@@ -31,9 +31,9 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * Provides context for a turn of a bot.
- * <remarks>Context provides information needed to process an incoming activity.
+ *  Context provides information needed to process an incoming activity.
  * The context object is created by a {@link BotAdapter} and persists for the
- * length of the turn.</remarks>
+ * length of the turn.
  * {@linkalso IBot}
  * {@linkalso IMiddleware}
  */
@@ -55,7 +55,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * or {@code null} for a turn for a proactive message.
      * @throws IllegalArgumentException {@code activity} or
      * {@code adapter} is {@code null}.
-     * <remarks>For use by bot adapter implementations only.</remarks>
+     *  For use by bot adapter implementations only.
      */
     public TurnContextImpl(BotAdapter adapter, ActivityImpl activity) {
         if (adapter == null)
@@ -75,11 +75,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     * <remarks>When the context's {@link SendActivity(IActivity)}
+     *  When the context's {@link SendActivity(IActivity)}
      * or {@link SendActivities(IActivity[])} methods are called,
      * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
-     * </remarks>
+     *
      */
     public TurnContext OnSendActivities(SendActivitiesHandler handler) {
         if (handler == null)
@@ -94,10 +94,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     * <remarks>When the context's {@link UpdateActivity(IActivity)} is called,
+     *  When the context's {@link UpdateActivity(IActivity)} is called,
      * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
-     * </remarks>
+     *
      */
     public TurnContext OnUpdateActivity(UpdateActivityHandler handler) {
         if (handler == null)
@@ -112,10 +112,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     * <remarks>When the context's {@link DeleteActivity(string)} is called,
+     *  When the context's {@link DeleteActivity(string)} is called,
      * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
-     * </remarks>
+     *
      */
     public TurnContext OnDeleteActivity(DeleteActivityHandler handler) {
         if (handler == null)
@@ -175,7 +175,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
  * @return A task that represents the work queued to execute.
  * @throws IllegalArgumentException 
  * {@code textReplyToSend} is {@code null} or whitespace.
- * <remarks>If the activity is successfully sent, the task result contains
+ *  If the activity is successfully sent, the task result contains
  * a {@link ResourceResponse} object containing the ID that the receiving
  * channel assigned to the activity.
  * <p>See the channel's documentation for limits imposed upon the contents of
@@ -183,7 +183,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
  * <p>To control various characteristics of your bot's speech such as voice,
  * rate, volume, pronunciation, and pitch, specify {@code speak} in
  * Speech Synthesis Markup Language (SSML) format.</p>
- * </remarks>
+ *
  */
     @Override
     public CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend) throws Exception {
@@ -215,9 +215,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param activity The activity to send.
      * @return A task that represents the work queued to execute.
      * @throws IllegalArgumentException {@code activity} is {@code null}.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving
-     * channel assigned to the activity.</remarks>
+     * channel assigned to the activity.
      */
     @Override
     public CompletableFuture<ResourceResponse> SendActivity(ActivityImpl activity) throws Exception {
@@ -240,9 +240,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Sends a set of activities to the sender of the incoming activity.
      * @param activities The activities to send.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activities are successfully sent, the task result contains
+     *  If the activities are successfully sent, the task result contains
      * an array of {@link ResourceResponse} objects containing the IDs that
-     * the receiving channel assigned to the activities.</remarks>
+     * the receiving channel assigned to the activities.
      */
     @Override
     public CompletableFuture<ResourceResponse[]> SendActivities(ActivityImpl[] activities) throws Exception {
@@ -308,11 +308,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * The HTTP operation failed and the response contained additional information.
      * @throws System.AggregateException 
      * One or more exceptions occurred during the operation.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
      * <p>Before calling this, set the ID of the replacement activity to the ID
-     * of the activity to replace.</p></remarks>
+     * of the activity to replace.</p>
      */
     @Override
     public ResourceResponse UpdateActivity(ActivityImpl activity) throws Exception {
@@ -354,8 +354,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return A task that represents the work queued to execute.
      * @throws Microsoft.Bot.Schema.ErrorResponseException 
      * The HTTP operation failed and the response contained additional information.
-     * <remarks>The conversation reference's {@link ConversationReference.ActivityId}
-     * indicates the activity in the conversation to delete.</remarks>
+     *  The conversation reference's {@link ConversationReference.ActivityId}
+     * indicates the activity in the conversation to delete.
      */
     public CompletableFuture DeleteActivity(ConversationReference conversationReference) throws Exception {
         if (conversationReference == null)
@@ -532,12 +532,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param isIncoming (Optional) {@code true} to treat the activity as an
      * incoming activity, where the bot is the recipient; otherwaire {@code false}.
      * Default is {@code false}, and the activity will show the bot as the sender.
-     * <remarks>Call {@link GetConversationReference(Activity)} on an incoming
+     *  Call {@link GetConversationReference(Activity)} on an incoming
      * activity to get a conversation reference that you can then use to update an
      * outgoing activity with the correct delivery information.
      * <p>The {@link SendActivity(IActivity)} and {@link SendActivities(IActivity[])}
      * methods do this for you.</p>
-     * </remarks>
+     *
      */
     public static Activity ApplyConversationReference(Activity activity, ConversationReference reference) {
         return ApplyConversationReference(activity, reference, false);

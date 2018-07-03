@@ -20,10 +20,9 @@ import java.util.stream.Collectors;
 
 /**
  * An Activity is the basic communication type for the Bot Framework 3.0 protocol
- * <remarks>
+ *
  * The Activity class contains all properties that individual, more specific activities
  * could contain. It is a superset type.
- * </remarks>
  */
 public class ActivityImpl extends Activity {
     /**
@@ -154,7 +153,7 @@ public class ActivityImpl extends Activity {
     //public JObject Properties { get; set; } = new JObject();
 
     /**
-     * Create an instance of the Activity class with IMessageActivity masking
+     * Create an instance of the Activity class with  MessageActivity masking
      */
     public static MessageActivity CreateMessageActivity() {
         MessageActivity reply = new MessageActivity();
@@ -166,7 +165,7 @@ public class ActivityImpl extends Activity {
     }
 
     /**
-     * Create an instance of the Activity class with IContactRelationUpdateActivity masking
+     * Create an instance of the Activity class with  ContactRelationUpdateActivity masking
      */
     public static ContactRelationUpdateActivity CreateContactRelationUpdateActivity() {
         ContactRelationUpdateActivity reply =  new ContactRelationUpdateActivity();
@@ -175,7 +174,7 @@ public class ActivityImpl extends Activity {
     }
 
     /**
-     * Create an instance of the Activity class with IConversationUpdateActivity masking
+     * Create an instance of the Activity class with ConversationUpdateActivity masking
      */
     public static ConversationUpdateActivity CreateConversationUpdateActivity() {
         ConversationUpdateActivity reply = new ConversationUpdateActivity();
@@ -255,14 +254,14 @@ public class ActivityImpl extends Activity {
     }
 
     /**
-     * Return an IMessageActivity mask if this is a message activity
+     * Return an  MessageActivity mask if this is a message activity
      */
     public MessageActivity AsMessageActivity() {
         return IsActivity(ActivityTypes.MESSAGE.toString()) ? (MessageActivity) (Activity) this : null;
     }
 
     /**
-     * Return an IContactRelationUpdateActivity mask if this is a contact relation update activity
+     * Return an  ContactRelationUpdateActivity mask if this is a contact relation update activity
      */
     public ContactRelationUpdateActivity AsContactRelationUpdateActivity() {
         return IsActivity(ActivityTypes.CONTACT_RELATION_UPDATE.toString()) ? (ContactRelationUpdateActivity) (Activity) this : null;
@@ -274,7 +273,7 @@ public class ActivityImpl extends Activity {
     //public InstallationUpdateActivity AsInstallationUpdateActivity() { return IsActivity(ActivityTypes.INSTALLATION_UPDATE.toString()) ? this : null; }
 
     /**
-     * Return an IConversationUpdateActivity mask if this is a conversation update activity
+     * Return an ConversationUpdateActivity mask if this is a conversation update activity
      */
     //public ConversationUpdateActivity AsConversationUpdateActivity() { return IsActivity(ActivityTypes.ConversationUpdate) ? this : null; }
 

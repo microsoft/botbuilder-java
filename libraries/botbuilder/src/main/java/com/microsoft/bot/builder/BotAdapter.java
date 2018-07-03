@@ -18,7 +18,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 /**
  * Represents a bot adapter that can connect a bot to a service endpoint.
  * This class is abstract.
- * <remarks>The bot adapter encapsulates authentication processes and sends
+ *  The bot adapter encapsulates authentication processes and sends
  * activities to and receives activities from the Bot Connector Service. When your
  * bot receives an activity, the adapter creates a context object, passes it to your
  * bot's application logic, and sends responses back to the user's channel.
@@ -28,7 +28,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  * and then back out again. As each activity flows in and out of the bot, each piece
  * of middleware can inspect or act upon the activity, both before and after the bot
  * logic runs.</p>
- * </remarks>
+ *
  * {@linkalso ITurnContext}
  * {@linkalso IActivity}
  * {@linkalso IBot}
@@ -51,9 +51,9 @@ public abstract class BotAdapter {
      * Adds middleware to the adapter's pipeline.
      * @param middleware The middleware to add.
      * @return The updated adapter object.
-     * <remarks>Middleware is added to the adapter at initialization time.
+     *  Middleware is added to the adapter at initialization time.
      * For each turn, the adapter calls middleware in the order in which you added it.
-     * </remarks>
+     *
      */
     public BotAdapter Use(Middleware middleware) {
         _middlewareSet.Use(middleware);
@@ -65,9 +65,9 @@ public abstract class BotAdapter {
      * @param context The context object for the turn.
      * @param activities The activities to send.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activities are successfully sent, the task result contains
+     *  If the activities are successfully sent, the task result contains
      * an array of {@link ResourceResponse} objects containing the IDs that
-     * the receiving channel assigned to the activities.</remarks>
+     * the receiving channel assigned to the activities.
      * {@linkalso ITurnContext.OnSendActivities(SendActivitiesHandler)}
      */
     public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException, ServiceKeyAlreadyRegisteredException;
@@ -78,11 +78,11 @@ public abstract class BotAdapter {
      * @param context The context object for the turn.
      * @param activity New replacement activity.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
      * <p>Before calling this, set the ID of the replacement activity to the ID
-     * of the activity to replace.</p></remarks>
+     * of the activity to replace.</p>
      * {@linkalso ITurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
     public abstract CompletableFuture<ResourceResponse> UpdateActivity(TurnContext context, Activity activity);
@@ -93,8 +93,8 @@ public abstract class BotAdapter {
      * @param context The context object for the turn.
      * @param reference Conversation reference for the activity to delete.
      * @return A task that represents the work queued to execute.
-     * <remarks>The {@link ConversationReference.ActivityId} of the conversation
-     * reference identifies the activity to delete.</remarks>
+     *  The {@link ConversationReference.ActivityId} of the conversation
+     * reference identifies the activity to delete.
      * {@linkalso ITurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
     public abstract CompletableFuture DeleteActivity(TurnContext context, ConversationReference reference);
@@ -108,7 +108,7 @@ public abstract class BotAdapter {
      * @return A task that represents the work queued to execute.
      * @throws NullPointerException 
      * {@code context} is null.
-     * <remarks>The adapter calls middleware in the order in which you added it.
+     *  The adapter calls middleware in the order in which you added it.
      * The adapter passes in the context object for the turn and a next delegate,
      * and the middleware calls the delegate to pass control to the next middleware
      * in the pipeline. Once control reaches the end of the pipeline, the adapter calls
@@ -121,9 +121,9 @@ public abstract class BotAdapter {
      * {@link IBot.OnTurn(ITurnContext)} method. When the turn is
      * initiated by a call to {@link ContinueConversation(ConversationReference, Func{ITurnContext, Task})}
      * (proactive messaging), the callback method is the callback method that was provided in the call.</p>
-     * </remarks>
+     *
      */
-    // TODO: daveta CancellationToken
+
     //    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback = null, AtomicReference<CompletableFuture> cancelToken = null)
     protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
         BotAssert.ContextNotNull(context);
@@ -148,7 +148,7 @@ public abstract class BotAdapter {
      * @param callback A method to call when the new conversation is available.
      * @return A task that represents the work queued to execute.
      * @throws UnsupportedOperationException 
-     * <remarks>No base implementation is provided.</remarks>
+     *  No base implementation is provided.
      */
     public CompletableFuture CreateConversation(String channelId, Function<TurnContext, CompletableFuture> callback)
     {
@@ -163,10 +163,10 @@ public abstract class BotAdapter {
      * @param reference A reference to the conversation to continue.
      * @param callback The method to call for the resulting bot turn.
      * @return A task that represents the work queued to execute.
-     * <remarks>Call this method to proactively send a message to a conversation.
+     *  Call this method to proactively send a message to a conversation.
      * Most channels require a user to initaiate a conversation with a bot
-     * before the bot can send activities to the user.</remarks>
-     * {@linkalso RunPipeline(ITurnContext, Func{ITurnContext, Task}, CancellationTokenSource)}
+     * before the bot can send activities to the user.
+     * {@linkalso RunPipeline(ITurnContext, Func{ITurnContext, Task}}
      */
     public CompletableFuture ContinueConversation(String botId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
 

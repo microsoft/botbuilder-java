@@ -8,11 +8,11 @@ package com.microsoft.bot.builder;
  * @param activities The activities to send.
  * @param next The delegate to call to continue event processing.
  * @return A task that represents the work queued to execute.
- * <remarks>A handler calls the {@code next} delegate to pass control to 
+ *  A handler calls the {@code next} delegate to pass control to
  * the next registered handler. If a handler doesn’t call the next delegate,
  * the adapter does not call any of the subsequent handlers and does not send the
  * {@code activities}.
- * </remarks>
+ *
  * {@linkalso BotAdapter}
  * {@linkalso UpdateActivityHandler}
  * {@linkalso DeleteActivityHandler}
@@ -30,9 +30,9 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Provides context for a turn of a bot.
- * <remarks>Context provides information needed to process an incoming activity.
+ *  Context provides information needed to process an incoming activity.
  * The context object is created by a {@link BotAdapter} and persists for the 
- * length of the turn.</remarks>
+ * length of the turn.
  * {@linkalso IBot}
  * {@linkalso IMiddleware}
  */
@@ -72,7 +72,7 @@ public interface TurnContext
      * One of: "acceptingInput", "ignoringInput", or "expectingInput".
      * Default is "acceptingInput".
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving 
      * channel assigned to the activity.
      * <p>See the channel's documentation for limits imposed upon the contents of 
@@ -80,7 +80,7 @@ public interface TurnContext
      * <p>To control various characteristics of your bot's speech such as voice, 
      * rate, volume, pronunciation, and pitch, specify {@code speak} in 
      * Speech Synthesis Markup Language (SSML) format.</p>
-     * </remarks>
+     *
      */
     CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend) throws Exception;
     CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak) throws Exception;
@@ -91,9 +91,9 @@ public interface TurnContext
      * Sends an activity to the sender of the incoming activity.
      * @param activity The activity to send.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving 
-     * channel assigned to the activity.</remarks>
+     * channel assigned to the activity.
      */
     CompletableFuture<ResourceResponse> SendActivity(ActivityImpl activity) throws Exception;
 
@@ -101,9 +101,9 @@ public interface TurnContext
      * Sends a set of activities to the sender of the incoming activity.
      * @param activities The activities to send.
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activities are successfully sent, the task result contains
+     *  If the activities are successfully sent, the task result contains
      * an array of {@link ResourceResponse} objects containing the IDs that 
-     * the receiving channel assigned to the activities.</remarks>
+     * the receiving channel assigned to the activities.
      */
     CompletableFuture<ResourceResponse[]> SendActivities(ActivityImpl[] activities) throws Exception;
 
@@ -111,11 +111,11 @@ public interface TurnContext
      * Replaces an existing activity. 
      * @param activity New replacement activity.        
      * @return A task that represents the work queued to execute.
-     * <remarks>If the activity is successfully sent, the task result contains
+     *  If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving 
      * channel assigned to the activity.
      * <p>Before calling this, set the ID of the replacement activity to the ID
-     * of the activity to replace.</p></remarks>
+     * of the activity to replace.</p>
      */
     ResourceResponse UpdateActivity(ActivityImpl activity) throws Exception;
 
@@ -130,8 +130,8 @@ public interface TurnContext
      * Deletes an existing activity.
      * @param conversationReference The conversation containing the activity to delete.
      * @return A task that represents the work queued to execute.
-     * <remarks>The conversation reference's {@link ConversationReference.ActivityId} 
-     * indicates the activity in the conversation to delete.</remarks>
+     *  The conversation reference's {@link ConversationReference.ActivityId}
+     * indicates the activity in the conversation to delete.
      */
     CompletableFuture DeleteActivity(ConversationReference conversationReference) throws Exception;
 
@@ -139,11 +139,11 @@ public interface TurnContext
      * Adds a response handler for send activity operations.
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * <remarks>When the context's {@link SendActivity(IActivity)} 
+     *  When the context's {@link SendActivity(IActivity)}
      * or {@link SendActivities(IActivity[])} methods are called, 
      * the adapter calls the registered handlers in the order in which they were 
      * added to the context object.
-     * </remarks>
+     *
      */
     TurnContext OnSendActivities(SendActivitiesHandler handler);
 
@@ -151,10 +151,10 @@ public interface TurnContext
      * Adds a response handler for update activity operations.
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * <remarks>When the context's {@link UpdateActivity(IActivity)} is called, 
+     *  When the context's {@link UpdateActivity(IActivity)} is called,
      * the adapter calls the registered handlers in the order in which they were 
      * added to the context object.
-     * </remarks>
+     *
      */
     TurnContext OnUpdateActivity(UpdateActivityHandler handler);
 
@@ -163,10 +163,10 @@ public interface TurnContext
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws NullPointerException {@code handler} is {@code null}.
-     * <remarks>When the context's {@link DeleteActivity(String)} is called, 
+     *  When the context's {@link DeleteActivity(String)} is called,
      * the adapter calls the registered handlers in the order in which they were 
      * added to the context object.
-     * </remarks>
+     *
      */
     TurnContext OnDeleteActivity(DeleteActivityHandler handler);
 }

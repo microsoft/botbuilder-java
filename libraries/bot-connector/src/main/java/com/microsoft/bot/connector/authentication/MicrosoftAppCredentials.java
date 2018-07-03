@@ -97,7 +97,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
 
     /**
      * Apply the credentials to the HTTP request.
-     * @param request The HTTP request.@param cancellationToken Cancellation token.
+     * @param request The HTTP request.
      */
     public CompletableFuture<Response> ProcessHttpRequestAsync(boolean applyCredentials, String httpVerb, String url) throws InvalidParameterException, IOException, URISyntaxException {
         return ProcessHttpRequestAsync(applyCredentials, httpVerb, url, null);
