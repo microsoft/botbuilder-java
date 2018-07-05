@@ -5,17 +5,17 @@ package com.microsoft.bot.builder.dialogs;
 
 import java.util.HashMap;
 
-/// <summary>
-/// Result returned to the caller of one of the various stack manipulation methods and used to
-/// return the result from a final call to `DialogContext.end()` to the bots logic.
-/// </summary>
+/**
+ * Result returned to the caller of one of the various stack manipulation methods and used to
+ * return the result from a final call to `DialogContext.end()` to the bots logic.
+ */
 public class DialogCompletion
 {
 
 
-    /// <summary>
-    /// If 'true' the dialog is still active.
-    /// </summary>
+    /**
+     * If 'true' the dialog is still active.
+     */
     boolean _isActive;
     public void setIsActive(boolean isActive) {
         this._isActive =  isActive;
@@ -24,9 +24,9 @@ public class DialogCompletion
         return this._isActive;
     }
 
-    /// <summary>
-    /// If 'true' the dialog just completed and the final [result](#result) can be retrieved.
-    /// </summary>
+    /**
+     * If 'true' the dialog just completed and the final [result](#result) can be retrieved.
+     */
     boolean _isCompleted;
     public void setIsCompleted(boolean isCompleted)
     {
@@ -37,15 +37,13 @@ public class DialogCompletion
         return this._isCompleted;
     }
 
-    /// <summary>
-    /// Result returned by a dialog that was just ended.This will only be populated in certain
-    /// cases:
-    /// 
-    /// - The bot calls `dc.begin()` to start a new dialog and the dialog ends immediately.
-    /// - The bot calls `dc.continue()` and a dialog that was active ends.
-    ///
-    /// In all cases where it's populated, [active](#active) will be `false`.        
-    /// </summary>
+    /**
+     * Result returned by a dialog that was just ended.This will only be populated in certain
+     * cases:
+     * - The bot calls `dc.begin()` to start a new dialog and the dialog ends immediately.
+     * - The bot calls `dc.continue()` and a dialog that was active ends.
+     * In all cases where it's populated, [active](#active) will be `false`.        
+     */
     HashMap<String, Object> _result;
     public HashMap<String, Object> getResult() {
         return _result;

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class Choice
 {
-    ///<summary>
-    /// Value to return when selected.
-    ///</summary>
+    /**
+     * Value to return when selected.
+     */
     String _value;
     public void setValue(String value) {
         this._value = value;
@@ -15,9 +15,9 @@ public class Choice
         return this._value;
     }
 
-    ///<summary>
-    /// (Optional) action to use when rendering the choice as a suggested action.
-    ///</summary>
+    /**
+     * (Optional) action to use when rendering the choice as a suggested action.
+     */
     CardAction _action;
     public CardAction getAction() {
         return this._action;
@@ -26,9 +26,9 @@ public class Choice
         this._action = action;
     }
 
-    ///<summary>
-    /// (Optional) list of synonyms to recognize in addition to the value.
-    ///</summary>
+    /**
+     * (Optional) list of synonyms to recognize in addition to the value.
+     */
     ArrayList<String> _synonyms;
     public ArrayList<String> getSynonyms() {
         return _synonyms;

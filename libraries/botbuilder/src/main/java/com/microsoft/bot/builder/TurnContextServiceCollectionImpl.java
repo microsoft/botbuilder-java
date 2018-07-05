@@ -22,11 +22,11 @@ public final class TurnContextServiceCollectionImpl implements TurnContextServic
         // TODO: log that we didn't find the requested service
         return (TService) service;
     }
-    /// <summary>
-    /// Get a service by type using its full type name as the key.
-    /// </summary>
-    /// <typeparam name="TService">The type of service to be retrieved.</typeparam>
-    /// <returns>The service stored under the specified key.</returns>
+    /**
+     * Get a service by type using its full type name as the key.
+     * @param TService The type of service to be retrieved.
+     * @return The service stored under the specified key.
+     */
     public <TService> TService Get(Class<TService> type) throws IllegalArgumentException {
         return this.Get(type.getName());
     }
@@ -40,11 +40,11 @@ public final class TurnContextServiceCollectionImpl implements TurnContextServic
             throw new IllegalArgumentException (String.format("Key %s already exists", key));
         _services.put(key, service);
     }
-    /// <summary>
-    /// Add a service using its full type name as the key.
-    /// </summary>
-    /// <typeparam name="TService">The type of service to be added.</typeparam>
-    /// <param name="service">The service to add.</param>
+    /**
+     * Add a service using its full type name as the key.
+     * @param TService The type of service to be added.
+     * @param service The service to add.
+     */
 
     public <TService> void Add(TService service, Class<TService> type) throws IllegalArgumentException {
         Add(type.getName(), service);

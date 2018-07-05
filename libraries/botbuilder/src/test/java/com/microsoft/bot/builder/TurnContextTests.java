@@ -129,7 +129,7 @@ public class TurnContextTests {
         var message1 = TestMessage.Message("message1");
         var message2 = TestMessage.Message("message2");
 
-        var response = await c.SendActivities(new IActivity[] { message1, message2 } );
+        var response = await c.SendActivities(new Activity[] { message1, message2 } );
 
         Assert.IsTrue(c.Responded);
         Assert.IsTrue(response.Length == 2);
@@ -138,13 +138,13 @@ public class TurnContextTests {
     }
 
     [TestMethod]
-    public async Task SendAndSetRespondedUsingIMessageActivity()
+    public async Task SendAndSetRespondedUsingMessageActivity()
     {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContext(a, new Activity());
         Assert.IsFalse(c.Responded);
 
-        IMessageActivity msg = TestMessage.Message().AsMessageActivity();
+        MessageActivity msg = TestMessage.Message().AsMessageActivity();
         await c.SendActivity(msg);
         Assert.IsTrue(c.Responded);
     }
@@ -163,7 +163,7 @@ public class TurnContextTests {
 
         // Just to sanity check everything, send a Message and verify the 
         // responded flag IS set. 
-        IMessageActivity msg = TestMessage.Message().AsMessageActivity();
+        MessageActivity msg = TestMessage.Message().AsMessageActivity();
         await c.SendActivity(msg);
         Assert.IsTrue(c.Responded);
     }
@@ -478,7 +478,7 @@ public class TurnContextTests {
         }            
     }        
 
-    public async Task MyBotLogic(ITurnContext context)
+    public async Task MyBotLogic(TurnContext context)
     {
         switch (context.Activity.AsMessageActivity().Text)
         {

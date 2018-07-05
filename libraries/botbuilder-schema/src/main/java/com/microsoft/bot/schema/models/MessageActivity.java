@@ -10,14 +10,14 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-    /// <summary>
-    /// A message in a conversation
-    /// </summary>
+    /**
+     * A message in a conversation
+     */
 public class MessageActivity extends ActivityImpl
 {
-    /// <summary>
-    /// The language code of the Text field
-    /// </summary>
+    /**
+     * The language code of the Text field
+     */
     private String locale;
     public String getLocale() {
         return this.locale;
@@ -27,9 +27,9 @@ public class MessageActivity extends ActivityImpl
 
     }
 
-    /// <summary>
-    /// Content for the message
-    /// </summary>
+    /**
+     * Content for the message
+     */
     private String text;
     public void setText(String text){
         this.text = text;
@@ -39,9 +39,9 @@ public class MessageActivity extends ActivityImpl
         return this.text;
     }
 
-    /// <summary>
-    /// Speak tag (SSML markup for text to speech)
-    /// </summary>
+    /**
+     * Speak tag (SSML markup for text to speech)
+     */
     private String speak;
     public void setSpeak(String speak){
         this.speak = speak;
@@ -50,9 +50,9 @@ public class MessageActivity extends ActivityImpl
         return this.speak;
     }
 
-    /// <summary>
-    /// Indicates whether the bot is accepting, expecting, or ignoring input
-    /// </summary>
+    /**
+     * Indicates whether the bot is accepting, expecting, or ignoring input
+     */
     private String inputHint;
     public String getInputHint(){
         return this.inputHint;
@@ -61,9 +61,9 @@ public class MessageActivity extends ActivityImpl
         this.inputHint = inputHint;
     }
 
-    /// <summary>
-    /// Text to display if the channel cannot render cards
-    /// </summary>
+    /**
+     * Text to display if the channel cannot render cards
+     */
     private String summary;
     public String getSummary(){
         return this.summary;
@@ -72,9 +72,9 @@ public class MessageActivity extends ActivityImpl
         this.summary = summary;
     }
 
-    /// <summary>
-    /// Format of text fields [plain|markdown] Default:markdown
-    /// </summary>
+    /**
+     * Format of text fields [plain|markdown] Default:markdown
+     */
     private String textFormat;
     public String getTextFormat() {
 
@@ -84,9 +84,9 @@ public class MessageActivity extends ActivityImpl
         this.textFormat = textFormat;
     }
 
-    /// <summary>
-    /// Hint for how to deal with multiple attachments: [list|carousel] Default:list
-    /// </summary>
+    /**
+     * Hint for how to deal with multiple attachments: [list|carousel] Default:list
+     */
     private String attachmentLayout;
     public String getAttachmentLayout() {
         return this.attachmentLayout;
@@ -95,9 +95,9 @@ public class MessageActivity extends ActivityImpl
         this.attachmentLayout = attachmentLayout;
     }
 
-    /// <summary>
-    /// Attachments
-    /// </summary>
+    /**
+     * Attachments
+     */
     private List<Attachment> attachments;
     public List<Attachment> getAttachments() {
         return this.attachments;
@@ -106,9 +106,9 @@ public class MessageActivity extends ActivityImpl
         this.attachments = attachments;
     }
 
-    /// <summary>
-    /// SuggestedActions are used to express actions for interacting with a card like keyboards/quickReplies
-    /// </summary>
+    /**
+     * SuggestedActions are used to express actions for interacting with a card like keyboards/quickReplies
+     */
     private SuggestedActions suggestedActions;
     public SuggestedActions getSuggestedActions() {
         return this.suggestedActions;
@@ -118,10 +118,10 @@ public class MessageActivity extends ActivityImpl
     }
 
 
-    /// <summary>
-    /// Importance of the activity
-    /// Valid values are "low", "normal", and "high". Default value is "normal."
-    /// </summary>
+    /**
+     * Importance of the activity
+     * Valid values are "low", "normal", and "high". Default value is "normal."
+     */
     private String importance;
     public String getImportance() {
         return this.importance;
@@ -130,12 +130,12 @@ public class MessageActivity extends ActivityImpl
         this.importance = importance;
     }
 
-    /// <summary>
-    /// Hint to describe how this activity should be delivered.
-    /// null or "default" = default delivery
-    /// "notification" = notification semantics
-    /// See DeliveryModes for current constants
-    /// </summary>
+    /**
+     * Hint to describe how this activity should be delivered.
+     * null or "default" = default delivery
+     * "notification" = notification semantics
+     * See DeliveryModes for current constants
+     */
     private String deliveryMode;
     public String getDeliveryMode() {
         return this.deliveryMode;
@@ -144,9 +144,9 @@ public class MessageActivity extends ActivityImpl
         this.deliveryMode = deliveryMode;
     }
 
-    /// <summary>
-    /// DateTime to expire the activity as ISO 8601 encoded datetime
-    /// </summary>
+    /**
+     * DateTime to expire the activity as ISO 8601 encoded datetime
+     */
     private OffsetDateTime expiration;
     public OffsetDateTime getExpiration() {
         return this.expiration;
@@ -155,17 +155,17 @@ public class MessageActivity extends ActivityImpl
         this.expiration = expiration;
     }
 
-    /// <summary>
-    /// Get mentions
-    /// </summary>
+    /**
+     * Get mentions
+     */
     private ArrayList<Mention> mentions;
     public ArrayList<Mention> GetMentions() {
         return this.mentions;
     }
 
-    /// <summary>
-    /// Value provided with CardAction
-    /// </summary>
+    /**
+     * Value provided with CardAction
+     */
     private Object value;
     public Object getValue() {
         return this.value;
@@ -175,9 +175,9 @@ public class MessageActivity extends ActivityImpl
     }
 
 
-    /// <summary>
-    /// Create an instance of the Activity class with IConversationUpdateActivity masking
-    /// </summary>
+    /**
+     * Create an instance of the Activity class with IConversationUpdateActivity masking
+     */
     public static ConversationUpdateActivity CreateConversationUpdateActivity()
     {
         ConversationUpdateActivity conversationActivity =  new ConversationUpdateActivity();

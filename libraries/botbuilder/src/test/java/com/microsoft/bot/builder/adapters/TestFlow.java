@@ -40,19 +40,19 @@ public class TestFlow {
         this.adapter = flow.adapter;
     }
 
-    /// <summary>
-    /// Start the execution of the test flow
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Start the execution of the test flow
+     * @return 
+     */
     public CompletableFuture<String> StartTest() throws ExecutionException, InterruptedException {
         return (CompletableFuture<String>) this.testTask;
     }
 
-    /// <summary>
-    /// Send a message from the user to the bot
-    /// </summary>
-    /// <param name="userSays"></param>
-    /// <returns></returns>
+    /**
+     * Send a message from the user to the bot
+     * @param userSays 
+     * @return 
+     */
 //    public TestFlow Send(String userSays) throws IllegalArgumentException {
 //        if (userSays == null)
 //            throw new IllegalArgumentException("You have to pass a userSays parameter");
@@ -60,9 +60,13 @@ public class TestFlow {
 //        System.out.print(String.format("USER SAYS: %s", userSays));
 //        System.out.flush();
 //
-//        //  Function<TurnContextImpl, CompletableFuture>
+//      /**
+//       */  Function<TurnContextImpl, CompletableFuture>
+//       */
 //        return new TestFlow(this.testTask.thenCompose(task -> supplyAsync(() ->{
-//            // task.Wait();
+//          /**
+//           */ task.Wait();
+//           */
 //
 //            try {
 //                this.adapter.SendTextToBot(userSays, this.callback);
@@ -92,11 +96,11 @@ public class TestFlow {
         })), this);
     }
 
-    /// <summary>
-    /// Send an activity from the user to the bot
-    /// </summary>
-    /// <param name="userActivity"></param>
-    /// <returns></returns>
+    /**
+     * Send an activity from the user to the bot
+     * @param userActivity 
+     * @return 
+     */
     public TestFlow Send(Activity userActivity) {
         if (userActivity == null)
             throw new IllegalArgumentException("You have to pass an Activity");
@@ -114,11 +118,11 @@ public class TestFlow {
         })), this);
     }
 
-    /// <summary>
-    /// Delay for time period
-    /// </summary>
-    /// <param name="ms"></param>
-    /// <returns></returns>
+    /**
+     * Delay for time period
+     * @param ms 
+     * @return 
+     */
     public TestFlow Delay(int ms) {
         return new TestFlow(this.testTask.thenCompose(task -> supplyAsync(() ->{
 
@@ -135,13 +139,13 @@ public class TestFlow {
         })), this);
     }
 
-    /// <summary>
-    /// Assert that reply is expected text
-    /// </summary>
-    /// <param name="expected"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Assert that reply is expected text
+     * @param expected 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow AssertReply(String expected) {
         return this.AssertReply(expected, null, 3000);
     }
@@ -154,13 +158,13 @@ public class TestFlow {
         return this.AssertReply(this.adapter.MakeActivity(expected), description, timeout);
     }
 
-    /// <summary>
-    /// Assert that the reply is expected activity
-    /// </summary>
-    /// <param name="expected"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Assert that the reply is expected activity
+     * @param expected 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow AssertReply(Activity expected) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
         return AssertReply(expected, description, 3000);
@@ -184,13 +188,13 @@ public class TestFlow {
         }, description, timeout);
     }
 
-    /// <summary>
-    /// Assert that the reply matches a custom validation routine
-    /// </summary>
-    /// <param name="validateActivity"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Assert that the reply matches a custom validation routine
+     * @param validateActivity 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow AssertReply(Function<Activity, String> validateActivity) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
         return AssertReply(validateActivity, description, 3000);
@@ -330,14 +334,14 @@ public class TestFlow {
         return this;
 
     }
-    /// <summary>
-    /// Say() -> shortcut for .Send(user).AssertReply(Expected)
-    /// </summary>
-    /// <param name="userSays"></param>
-    /// <param name="expected"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Say() -> shortcut for .Send(user).AssertReply(Expected)
+     * @param userSays 
+     * @param expected 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow Test(String userSays, String expected) {
         return Test(userSays, expected, null, 3000);
     }
@@ -352,14 +356,14 @@ public class TestFlow {
                 .AssertReply(expected, description, timeout);
     }
 
-    /// <summary>
-    /// Test() -> shortcut for .Send(user).AssertReply(Expected)
-    /// </summary>
-    /// <param name="userSays"></param>
-    /// <param name="expected"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Test() -> shortcut for .Send(user).AssertReply(Expected)
+     * @param userSays 
+     * @param expected 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow Test(String userSays, Activity expected) {
         return Test(userSays, expected, null, 3000);
     }
@@ -374,14 +378,14 @@ public class TestFlow {
                 .AssertReply(expected, description, timeout);
     }
 
-    /// <summary>
-    /// Say() -> shortcut for .Send(user).AssertReply(Expected)
-    /// </summary>
-    /// <param name="userSays"></param>
-    /// <param name="expected"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Say() -> shortcut for .Send(user).AssertReply(Expected)
+     * @param userSays 
+     * @param expected 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow Test(String userSays,  Function<Activity, String> expected) {
         return Test(userSays, expected, null, 3000);
     }
@@ -396,13 +400,13 @@ public class TestFlow {
                 .AssertReply(expected, description, timeout);
     }
 
-    /// <summary>
-    /// Assert that reply is one of the candidate responses
-    /// </summary>
-    /// <param name="candidates"></param>
-    /// <param name="description"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
+    /**
+     * Assert that reply is one of the candidate responses
+     * @param candidates 
+     * @param description 
+     * @param timeout 
+     * @return 
+     */
     public TestFlow AssertReplyOneOf(String[] candidates) {
         return AssertReplyOneOf(candidates, null, 3000);
     }

@@ -3,9 +3,9 @@ package com.microsoft.bot.builder.dialogs;
 import com.microsoft.bot.schema.models.AttachmentLayoutTypes;
 import com.microsoft.bot.schema.models.TextFormatTypes;
 
-/// <summary>
-/// Optional message properties that can be sent <see cref="Extensions.SayAsync(IBotToUser, string, string, MessageOptions, string, CancellationToken)"/>
-/// </summary>
+/**
+ * Optional message properties that can be sent {@link Extensions.SayAsync(BotToUser, String MessageOptions,)}
+ */
 public class MessageOptions
 {
     public MessageOptions()
@@ -16,14 +16,14 @@ public class MessageOptions
         // this.Entities = new ArrayList<Entity>();
     }
 
-    /// <summary>
-    /// Indicates whether the bot is accepting, expecting, or ignoring input
-    /// </summary>
+    /**
+     * Indicates whether the bot is accepting, expecting, or ignoring input
+     */
     //public string InputHint { get; set; }
 
-    /// <summary>
-    /// Format of text fields [plain|markdown] Default:markdown
-    /// </summary>
+    /**
+     * Format of text fields [plain|markdown] Default:markdown
+     */
     String textFormat;
     public String getTextFormat() {
         return this.textFormat;
@@ -34,9 +34,9 @@ public class MessageOptions
 
 
 
-    /// <summary>
-    /// Hint for how to deal with multiple attachments: [list|carousel] Default:list
-    /// </summary>
+    /**
+     * Hint for how to deal with multiple attachments: [list|carousel] Default:list
+     */
     String attachmentLayout;
     public String getAttachmentLayout() {
         return this.attachmentLayout;
@@ -45,13 +45,13 @@ public class MessageOptions
         this.attachmentLayout = attachmentLayout;
     }
 
-    /// <summary>
-    /// Attachments
-    /// </summary>
+    /**
+     * Attachments
+     */
     //public IList<Attachment> Attachments { get; set; }
 
-    /// <summary>
-    /// Collection of Entity objects, each of which contains metadata about this activity. Each Entity object is typed.
-    /// </summary>
+    /**
+     * Collection of Entity objects, each of which contains metadata about this activity. Each Entity object is typed.
+     */
     //public IList<Microsoft.Bot.Schema.Entity> Entities { get; set; }
 }

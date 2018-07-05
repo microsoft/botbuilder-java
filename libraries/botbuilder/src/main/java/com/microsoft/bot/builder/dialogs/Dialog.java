@@ -9,20 +9,20 @@ import com.microsoft.bot.builder.TurnContext;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-/// <summary>
-/// Base class for controls
-/// </summary>
+/**
+ * Base class for controls
+ */
 public abstract class Dialog
 {
-    /// <summary>
-    /// Starts the dialog. Depending on the dialog, its possible for the dialog to finish 
-    /// immediately so it's advised to check the completion Object returned by `begin()` and ensure 
-    /// that the dialog is still active before continuing.
-    /// </summary>
-    /// <param name="context">Context for the current turn of the conversation with the user.</param>
-    /// <param name="state">A state Object that the dialog will use to persist its current state. This should be an empty Object which the dialog will populate. The bot should persist this with its other conversation state for as long as the dialog is still active.</param>
-    /// <param name="options">(Optional) additional options supported by the dialog.</param>
-    /// <returns>DialogCompletion result</returns>
+    /**
+     * Starts the dialog. Depending on the dialog, its possible for the dialog to finish 
+     * immediately so it's advised to check the completion Object returned by `begin()` and ensure 
+     * that the dialog is still active before continuing.
+     * @param context Context for the current turn of the conversation with the user.
+     * @param state A state Object that the dialog will use to persist its current state. This should be an empty Object which the dialog will populate. The bot should persist this with its other conversation state for as long as the dialog is still active.
+     * @param options (Optional) additional options supported by the dialog.
+     * @return DialogCompletion result
+     */
     public CompletableFuture<DialogCompletion> Begin(TurnContext context, HashMap<String, Object> state)
     {
         return Begin(context, state, null);
@@ -63,15 +63,15 @@ public abstract class Dialog
         return result;
     }
 
-    /// <summary>
-    /// Passes a users reply to the dialog for further processing.The bot should keep calling 
-    /// 'continue()' for future turns until the dialog returns a completion Object with 
-    /// 'isCompleted == true'. To cancel or interrupt the prompt simply delete the `state` Object
-    /// being persisted.     
-    /// </summary>
-    /// <param name="context">Context for the current turn of the conversation with the user.</param>
-    /// <param name="state">A state Object that was previously initialized by a call to [begin()](#begin).</param>
-    /// <returns>DialogCompletion result</returns>
+    /**
+     * Passes a users reply to the dialog for further processing.The bot should keep calling 
+     * 'continue()' for future turns until the dialog returns a completion Object with 
+     * 'isCompleted == true'. To cancel or interrupt the prompt simply delete the `state` Object
+     * being persisted.     
+     * @param context Context for the current turn of the conversation with the user.
+     * @param state A state Object that was previously initialized by a call to [begin()](#begin).
+     * @return DialogCompletion result
+     */
     public CompletableFuture<DialogCompletion> Continue(TurnContext context, HashMap<String, Object> state)
     {
         BotAssert.ContextNotNull(context);

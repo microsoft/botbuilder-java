@@ -18,9 +18,9 @@ public final class AuthenticationConstants {
     public static final String ServiceUrlClaim = "serviceurl";
     public static final String VersionClaim = "ver";
     public static final String AppIdClaim = "appid";
-    /// <summary>
-    /// OAuth Url used to get a token from OAuthApiClient
-    /// </summary>
+    /**
+     * OAuth Url used to get a token from OAuthApiClient
+     */
     public static final String OAuthUrl = "https://api.botframework.com";
 
 

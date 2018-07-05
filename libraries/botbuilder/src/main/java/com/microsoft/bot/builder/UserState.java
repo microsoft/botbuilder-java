@@ -7,26 +7,26 @@ import com.microsoft.bot.builder.TurnContext;
 
 import java.util.function.Supplier;
 
-/// <summary>
-/// Handles persistence of a user state object using the user ID as part of the key.
-/// </summary>
-/// <typeparam name="TState">The type of the user state object.</typeparam>
+/**
+ * Handles persistence of a user state object using the user ID as part of the key.
+ * @param TState The type of the user state object.
+ */
 public class UserState<TState> extends BotState<TState>
 {
-    /// <summary>
-    /// The key to use to read and write this conversation state object to storage.
-    /// </summary>
+    /**
+     * The key to use to read and write this conversation state object to storage.
+     */
     // Note: Hard coded to maintain compatibility with C#
     // "UserState:{typeof(UserState<TState>).Namespace}.{typeof(UserState<TState>).Name}"
     public static String PropertyName() {
         return String.format("UserState:Microsoft.Bot.Builder.Core.Extensions.UserState`1");
     }
 
-    /// <summary>
-    /// Creates a new <see cref="UserState{TState}"/> object.
-    /// </summary>
-    /// <param name="storage">The storage provider to use.</param>
-    /// <param name="settings">The state persistance options to use.</param>
+    /**
+     * Creates a new {@link UserState{TState}} object.
+     * @param storage The storage provider to use.
+     * @param settings The state persistance options to use.
+     */
     public UserState(Storage storage, Supplier<? extends TState> ctor) {
         this(storage, ctor, null);
     }
@@ -39,11 +39,11 @@ public class UserState<TState> extends BotState<TState>
                 settings);
     }
 
-    /// <summary>
-    /// Gets the user state object from turn context.
-    /// </summary>
-    /// <param name="context">The context object for this turn.</param>
-    /// <returns>The user state object.</returns>
+    /**
+     * Gets the user state object from turn context.
+     * @param context The context object for this turn.
+     * @return The user state object.
+     */
     public static <TState> TState Get(TurnContext context) throws IllegalArgumentException {
         return context.getServices().<TState>Get(PropertyName());
     }

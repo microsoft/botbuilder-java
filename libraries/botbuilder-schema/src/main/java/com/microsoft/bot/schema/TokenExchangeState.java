@@ -3,14 +3,14 @@ package com.microsoft.bot.schema;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.schema.models.ConversationReference;
 
-/// <summary>
-/// State object passed to the bot token service.
-/// </summary>
+/**
+ * State object passed to the bot token service.
+ */
 public class TokenExchangeState
 {
-    /// <summary>
-    /// The connection name that was used
-    /// </summary>
+    /**
+     * The connection name that was used
+     */
     @JsonProperty(value = "connectionName")
     private String connectionName;
     public String connectionName() {
@@ -21,9 +21,9 @@ public class TokenExchangeState
         return this;
     }
 
-    /// <summary>
-    /// A reference to the conversation
-    /// </summary>
+    /**
+     * A reference to the conversation
+     */
     @JsonProperty(value = "conversation")
     private ConversationReference conversation;
     public ConversationReference conversation() {
@@ -34,9 +34,9 @@ public class TokenExchangeState
         return this;
     }
 
-    /// <summary>
-    /// The URL of the bot messaging endpoint
-    /// </summary>
+    /**
+     * The URL of the bot messaging endpoint
+     */
     @JsonProperty("botUrl")
     private String botUrl;
     public String botUrl() {
@@ -47,9 +47,9 @@ public class TokenExchangeState
         return this;
     }
 
-    /// <summary>
-    /// The bot's registered application ID
-    /// </summary>
+    /**
+     * The bot's registered application ID
+     */
     @JsonProperty("msAppId")
     String msAppId;
     public String msAppId() {
