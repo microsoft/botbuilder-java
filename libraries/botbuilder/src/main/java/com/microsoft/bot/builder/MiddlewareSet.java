@@ -5,18 +5,11 @@ package com.microsoft.bot.builder;
 
 
 
-import com.microsoft.bot.builder.BotAssert;
-import com.microsoft.bot.builder.Middleware;
-import com.microsoft.bot.builder.NextDelegate;
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
-import com.microsoft.bot.builder.TurnContext;
-
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
@@ -33,20 +26,28 @@ public class MiddlewareSet implements Middleware
         return this;
     }
 
-    public CompletableFuture ReceiveActivity(TurnContext context)
-            throws Exception, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture ReceiveActivity(TurnContextImpl context)
+            throws Exception {
         // await ReceiveActivityInternal(context, null).ConfigureAwait(false);
         return ReceiveActivityInternal(context, null);
     }
 
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next)
-            throws Exception, ServiceKeyAlreadyRegisteredException {
-        await(ReceiveActivityInternal(context, null));
-        await(next.next());
-        return completedFuture(null);
+    @Override
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
+        return completedFuture(ReceiveActivityInternal((TurnContextImpl)context, null)
+                .thenRun(() -> {
+                    try {
+                        next.next();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(String.format("MiddlewareSet::OnTurn next delegate: %s", e.toString()));
+                    }
+                })
+                .get());
     }
 
-    public CompletableFuture OnTurn(TurnContext context, CompletableFuture next)
+
+    public CompletableFuture OnTurn(TurnContextImpl context, CompletableFuture next)
             throws ExecutionException, InterruptedException {
         return null;
     }
@@ -54,19 +55,19 @@ public class MiddlewareSet implements Middleware
     /// <summary>
     /// Intended to be called from Bot, this method performs exactly the same as the
     /// standard ReceiveActivity, except that it runs a user-defined delegate returns 
-    /// if all Middlware in the receive pipeline was run.
+    /// if all Middleware in the receive pipeline was run.
     /// </summary>
     public CompletableFuture ReceiveActivityWithStatus(TurnContext context, Function<TurnContext, CompletableFuture> callback)
-            throws Exception, ServiceKeyAlreadyRegisteredException {
+            throws Exception {
         return ReceiveActivityInternal(context, callback);
     }
 
     private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback)
-            throws Exception, ServiceKeyAlreadyRegisteredException {
+            throws Exception {
         return ReceiveActivityInternal(context, callback, 0);
     }
     private CompletableFuture ReceiveActivityInternal(TurnContext context, Function<TurnContext, CompletableFuture> callback, int nextMiddlewareIndex )
-            throws Exception, ServiceKeyAlreadyRegisteredException {
+            throws Exception {
         // Check if we're at the end of the middleware list yet
         if(nextMiddlewareIndex == _middleware.size())
         {
@@ -89,7 +90,7 @@ public class MiddlewareSet implements Middleware
         // Get the next piece of middleware 
         Middleware nextMiddleware = _middleware.get(nextMiddlewareIndex);
         NextDelegate next = new NextDelegate() {
-            public CompletableFuture next() throws Exception, ServiceKeyAlreadyRegisteredException {
+            public CompletableFuture next() throws Exception {
                 return ReceiveActivityInternal(context, callback, nextMiddlewareIndex + 1);
             }
         };

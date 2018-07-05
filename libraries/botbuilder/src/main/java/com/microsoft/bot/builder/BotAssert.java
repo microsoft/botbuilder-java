@@ -26,6 +26,18 @@ public class BotAssert
     }
 
     /// <summary>
+    /// Checks that an activity object is not <c>null</c>.
+    /// </summary>
+    /// <param name="activity">The activity object.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="activity"/> is <c>null</c>.</exception>
+    public static void ActivityNotNull(Activity activity)
+    {
+        if (activity == null)
+            throw new IllegalArgumentException ("Activity");
+    }
+
+    /// <summary>
     /// Checks that a context object is not <c>null</c>.
     /// </summary>
     /// <param name="context">The context object.</param>

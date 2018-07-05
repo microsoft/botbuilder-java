@@ -5,10 +5,8 @@ package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.Middleware;
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextImpl;
-import com.microsoft.bot.builder.*;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +61,7 @@ public class TestAdapter extends BotAdapter {
 
     public CompletableFuture ProcessActivity(ActivityImpl activity,
                                              Function<TurnContext, CompletableFuture> callback
-                                             ) throws Exception, ServiceKeyAlreadyRegisteredException {
+                                             ) throws Exception {
         synchronized (this.conversationReference()) {
             // ready for next reply
             if(activity.type()==null)
@@ -94,7 +92,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]>SendActivities(TurnContext context, Activity[]activities) throws InterruptedException {
+    public CompletableFuture<ResourceResponse[]>SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
         List<ResourceResponse> responses=new LinkedList<ResourceResponse>();
 
         for(Activity activity : activities) {
@@ -107,7 +105,10 @@ public class TestAdapter extends BotAdapter {
             responses.add(new ResourceResponse().withId(activity.id()));
             // This is simulating DELAY
 
-
+            System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.length));
+            for(Activity act : activities)
+                System.out.println(String.format(":--------\n: To:%s\n: From:%s\n> Text:%s\n:---------", act.recipient().name(), act.from().name(),
+                        act.text()));
             if(activity.type().toString().equals("delay"))
             {
                 // The BotFrameworkAdapter and Console adapter implement this
@@ -227,7 +228,7 @@ public class TestAdapter extends BotAdapter {
     /// </summary>
     /// <param name="userSays"></param>
     /// <returns></returns>
-    public CompletableFuture SendTextToBot(String userSays,Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture SendTextToBot(String userSays,Function<TurnContext, CompletableFuture> callback) throws Exception {
         return this.ProcessActivity(this.MakeActivity(userSays),callback);
     }
 }

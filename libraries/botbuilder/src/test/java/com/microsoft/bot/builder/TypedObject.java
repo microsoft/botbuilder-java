@@ -1,13 +1,14 @@
 package com.microsoft.bot.builder;
 
 public class TypedObject {
-    private String _name;
+    private String name;
 
-    public String getName() {
-        return _name;
+    public String name() {
+        return this.name;
     }
 
-    public void setName(String name) {
-        this._name = name;
+    public TypedObject withName(String name) {
+        this.name = name;
+        return this;
     }
 }

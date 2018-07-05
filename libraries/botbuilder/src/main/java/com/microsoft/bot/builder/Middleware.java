@@ -52,9 +52,7 @@ public interface Middleware
     /// </remarks>
     /// <seealso cref="ITurnContext"/>
     /// <seealso cref="Bot.Schema.IActivity"/>
-    // TODO: daveta review this (NextDelegate
-    //CompletableFuture OnTurn(TurnContext context, NextDelegate next);
-    CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException;
+    CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception;
 }
 
 

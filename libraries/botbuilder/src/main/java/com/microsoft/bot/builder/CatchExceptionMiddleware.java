@@ -2,12 +2,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.builder.Middleware;
-import com.microsoft.bot.builder.NextDelegate;
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
-import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.builder.*;
-
 import java.util.concurrent.CompletableFuture;
 
 import static com.ea.async.Async.await;
@@ -35,7 +29,7 @@ public class CatchExceptionMiddleware<T extends Exception> implements Middleware
 
 
     @Override
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
 
         Class c = _exceptionType.getDeclaringClass();
 

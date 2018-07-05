@@ -1,8 +1,6 @@
 package com.microsoft.bot.builder;
 
 
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,12 +32,12 @@ public final class TurnContextServiceCollectionImpl implements TurnContextServic
     }
 
     @Override
-    public <TService extends Object> void Add(String key, TService service) throws IllegalArgumentException, ServiceKeyAlreadyRegisteredException {
+    public <TService extends Object> void Add(String key, TService service) throws IllegalArgumentException  {
         if (key == null) throw new IllegalArgumentException("key");
         if (service == null) throw new IllegalArgumentException("service");
 
         if (_services.containsKey(key))
-            throw new ServiceKeyAlreadyRegisteredException(key);
+            throw new IllegalArgumentException (String.format("Key %s already exists", key));
         _services.put(key, service);
     }
     /// <summary>
@@ -48,7 +46,7 @@ public final class TurnContextServiceCollectionImpl implements TurnContextServic
     /// <typeparam name="TService">The type of service to be added.</typeparam>
     /// <param name="service">The service to add.</param>
 
-    public <TService> void Add(TService service, Class<TService> type) throws ServiceKeyAlreadyRegisteredException, IllegalArgumentException {
+    public <TService> void Add(TService service, Class<TService> type) throws IllegalArgumentException {
         Add(type.getName(), service);
     }
 

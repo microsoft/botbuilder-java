@@ -1,7 +1,5 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
-
 import java.util.Map;
 
 /// <summary>
@@ -17,8 +15,8 @@ public interface TurnContextServiceCollection extends Iterable<Map.Entry<String,
     /// <typeparam name="TService">The type of service to be added.</typeparam>
     /// <param name="key">The key to store the service under.</param>
     /// <param name="service">The service to add.</param>
-    /// <exception cref="ServiceKeyAlreadyRegisteredException">Thrown when a service is already registered with the specified <paramref name="key"/></exception>
-     <TService extends Object> void Add(String key, TService service) throws IllegalArgumentException, ServiceKeyAlreadyRegisteredException;
+    /// <exception cref="IllegalArgumentException">Thrown when a service is already registered with the specified <paramref name="key"/></exception>
+     <TService extends Object> void Add(String key, TService service) throws IllegalArgumentException;
 
     /// <summary>
     /// Get a service by its key.

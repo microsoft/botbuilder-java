@@ -217,7 +217,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     // Corresponds to https://docs.microsoft.com/en-us/azure/bot-service/rest-api/bot-framework-rest-connector-authentication?view=azure-bot-service-4.0
     // Step 1: Request an access token from the MSA/AAD v2 login service
     private CompletableFuture<OAuthResponse> RefreshTokenAsync() throws IOException, URISyntaxException {
-        HashMap content = new HashMap<String, String>();
+        HashMap<String, String> content = new HashMap<String, String>();
         content.put("grant_type", "client_credentials");
         content.put("client_id", (this.appId==null) ? "" : this.appId);
         content.put("client_secret", (this.appPassword==null) ? "" : this.appPassword );

@@ -26,6 +26,9 @@ import com.microsoft.rest.ServiceResponse;
 import com.microsoft.rest.Validator;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -106,6 +109,15 @@ public class ConversationsImpl implements Conversations {
         @POST("v3/conversations/{conversationId}/attachments")
         Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
+    }
+
+    public static <T> CompletableFuture<List<T>> completableFutureFromObservable(Observable<T> observable) {
+        final CompletableFuture<List<T>> future = new CompletableFuture<>();
+        observable
+                .doOnError(future::completeExceptionally)
+                .toList()
+                .forEach(future::complete);
+        return future;
     }
 
     /**
@@ -354,6 +366,12 @@ public class ConversationsImpl implements Conversations {
             }
         });
     }
+
+    public CompletableFuture<List<ConversationResourceResponse>> CreateConversationAsync(ConversationParameters parameters) {
+        CompletableFuture<List<ConversationResourceResponse>> future_result = completableFutureFromObservable(createConversationAsync(parameters));
+        return future_result;
+    }
+
 
     /**
      * CreateConversation.
@@ -945,7 +963,21 @@ public class ConversationsImpl implements Conversations {
             }
         });
     }
-
+    /**
+     * DeleteConversationMemberFuture
+     * Deletes a member from a converstion.
+     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
+     of the conversation, the conversation will also be deleted.
+     *
+     * @param conversationId Conversation ID
+     * @param memberId ID of the member to delete from this conversation
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return CompletableFuture of List < Void ></>
+     */
+    public CompletableFuture<List<Void>> deleteConversationMemberFuture(String conversationId, String memberId) throws ExecutionException, InterruptedException {
+        CompletableFuture<List<Void>> future_result = completableFutureFromObservable(deleteConversationMemberAsync(conversationId, memberId));
+        return future_result;
+    }
     /**
      * DeleteConversationMember.
      * Deletes a member from a converstion.
@@ -977,6 +1009,7 @@ public class ConversationsImpl implements Conversations {
                 }
             });
     }
+
 
     private ServiceResponse<Void> deleteConversationMemberDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
         return this.client.restClient().responseBuilderFactory().<Void, ErrorResponseException>newInstance(this.client.serializerAdapter())
