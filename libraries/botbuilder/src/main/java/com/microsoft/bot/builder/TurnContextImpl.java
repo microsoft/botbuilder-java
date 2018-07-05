@@ -3,15 +3,6 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.microsoft.bot.builder.BotAdapter;
-import com.microsoft.bot.builder.BotAssert;
-import com.microsoft.bot.builder.DeleteActivityHandler;
-import com.microsoft.bot.builder.SendActivitiesHandler;
-import com.microsoft.bot.builder.ServiceKeyAlreadyRegisteredException;
-import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.builder.TurnContextServiceCollection;
-import com.microsoft.bot.builder.TurnContextServiceCollectionImpl;
-import com.microsoft.bot.builder.UpdateActivityHandler;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import org.apache.commons.lang3.StringUtils;
@@ -38,15 +29,15 @@ import static java.util.stream.Collectors.toList;
 /// <seealso cref="IBot"/>
 /// <seealso cref="IMiddleware"/>
 public class TurnContextImpl implements TurnContext, AutoCloseable {
-    private final BotAdapter _adapter;
-    private final ActivityImpl _activity;
-    private Boolean _responded = false;
+    private final BotAdapter adapter;
+    private final ActivityImpl activity;
+    private Boolean responded = false;
 
-    private final List<SendActivitiesHandler> _onSendActivities = new ArrayList<SendActivitiesHandler>();
-    private final List<UpdateActivityHandler> _onUpdateActivity = new ArrayList<UpdateActivityHandler>();
-    private final List<DeleteActivityHandler> _onDeleteActivity = new ArrayList<DeleteActivityHandler>();
+    private final List<SendActivitiesHandler> onSendActivities = new ArrayList<SendActivitiesHandler>();
+    private final List<UpdateActivityHandler> onUpdateActivity = new ArrayList<UpdateActivityHandler>();
+    private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<DeleteActivityHandler>();
 
-    private final TurnContextServiceCollection _turnServices;
+    private final TurnContextServiceCollection turnServices;
 
     /// <summary>
     /// Creates a context object.
@@ -60,12 +51,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     public TurnContextImpl(BotAdapter adapter, ActivityImpl activity) {
         if (adapter == null)
             throw new IllegalArgumentException("adapter");
-        _adapter = adapter;
+        this.adapter = adapter;
         if (activity == null)
              throw new IllegalArgumentException("activity");
-        _activity = activity;
+        this.activity = activity;
 
-        _turnServices = new TurnContextServiceCollectionImpl();
+        turnServices = new TurnContextServiceCollectionImpl();
         }
 
 
@@ -81,11 +72,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// the adapter calls the registered handlers in the order in which they were
     /// added to the context object.
     /// </remarks>
-    public TurnContext OnSendActivities(SendActivitiesHandler handler) {
+    public TurnContextImpl OnSendActivities(SendActivitiesHandler handler) {
         if (handler == null)
             throw new IllegalArgumentException("handler");
 
-        _onSendActivities.add(handler);
+        this.onSendActivities.add(handler);
         return this;
         }
 
@@ -99,11 +90,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// the adapter calls the registered handlers in the order in which they were
     /// added to the context object.
     /// </remarks>
-    public TurnContext OnUpdateActivity(UpdateActivityHandler handler) {
+    public TurnContextImpl OnUpdateActivity(UpdateActivityHandler handler) {
         if (handler == null)
         throw new IllegalArgumentException("handler");
 
-        _onUpdateActivity.add(handler);
+        this.onUpdateActivity.add(handler);
         return this;
         }
 
@@ -117,11 +108,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// the adapter calls the registered handlers in the order in which they were
     /// added to the context object.
     /// </remarks>
-    public TurnContext OnDeleteActivity(DeleteActivityHandler handler) {
+    public TurnContextImpl OnDeleteActivity(DeleteActivityHandler handler) {
         if (handler == null)
             throw new IllegalArgumentException("handler");
 
-        _onDeleteActivity.add(handler);
+        this.onDeleteActivity.add(handler);
         return this;
     }
 
@@ -129,22 +120,23 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// Gets the bot adapter that created this context object.
     /// </summary>
     public BotAdapter getAdapter() {
-        return this._adapter;
+        return this.adapter;
     }
 
     /// <summary>
     /// Gets the services registered on this context object.
     /// </summary>
     public TurnContextServiceCollection getServices() {
-        return this._turnServices;
+        return this.turnServices;
     }
 
     /// <summary>
     /// Gets the activity associated with this turn; or <c>null</c> when processing
     /// a proactive message.
     /// </summary>
-    public ActivityImpl getActivity() {
-        return this._activity;
+    @Override
+    public Activity getActivity() {
+        return this.activity;
     }
 
     /// <summary>
@@ -153,14 +145,14 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <value><c>true</c> if at least one response was sent for the current turn.</value>
     /// <exception cref="ArgumentException">You attempted to set the value to <c>false</c>.</exception>
     public boolean getResponded() {
-        return this._responded;
+        return this.responded;
     }
     public void setResponded(boolean responded) {
         if (responded == false)
         {
             throw new IllegalArgumentException("TurnContext: cannot set 'responded' to a value of 'false'.");
         }
-        this._responded = true;
+        this.responded = true;
     }
 
 /// <summary>
@@ -220,20 +212,29 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// a <see cref="ResourceResponse"/> object containing the ID that the receiving
     /// channel assigned to the activity.</remarks>
     @Override
-    public CompletableFuture<ResourceResponse> SendActivity(ActivityImpl activity) throws Exception {
+    public CompletableFuture<ResourceResponse> SendActivity(Activity activity) throws Exception {
         if (activity == null)
             throw new IllegalArgumentException("activity");
+        return CompletableFuture.supplyAsync(() -> {
+            Activity[] activities = { activity };
+            ResourceResponse[] responses = new ResourceResponse[0];
+            try {
+                responses = await(SendActivities(activities));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(String.format("TurnContext:SendActivity fail %s", e.toString()));
+            }
+            if (responses == null || responses.length == 0)  {
+                // It's possible an interceptor prevented the activity from having been sent.
+                // Just return an empty response in that case.
+                return null;
+            }
+            else {
+                return responses[0];
+            }
 
-        ActivityImpl[] activities = {activity };
-        ResourceResponse[] responses = await(SendActivities(activities));
-        if (responses == null || responses.length == 0)  {
-            // It's possible an interceptor prevented the activity from having been sent.
-            // Just return an empty response in that case.
-            return completedFuture(null);
-        }
-        else {
-            return completedFuture(responses[0]);
-        }
+        });
+
     }
 
     /// <summary>
@@ -245,10 +246,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that
     /// the receiving channel assigned to the activities.</remarks>
     @Override
-    public CompletableFuture<ResourceResponse[]> SendActivities(ActivityImpl[] activities) throws Exception {
+    public CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities) throws Exception {
         // Bind the relevant Conversation Reference properties, such as URLs and
         // ChannelId's, to the activities we're about to send.
-        ConversationReference cr = GetConversationReference(this._activity);
+        ConversationReference cr = GetConversationReference(this.activity);
         for (Activity a : activities) {
             ApplyConversationReference(a, cr);
         }
@@ -274,12 +275,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             // Note that 'responses' was captured from the root of the call, and will be
             // returned to the original caller.
             ResourceResponse[] responses = new ResourceResponse[0];
-            try {
-                responses = await(this.getAdapter().SendActivities(this,  activityList.toArray(new Activity[activityList.size()])));
-            } catch (ServiceKeyAlreadyRegisteredException e) {
-                // TODO: Log error
-                return completedFuture(null);
-            }
+            responses = await(this.getAdapter().SendActivities(this,  activityList.toArray(new ActivityImpl[activityList.size()])));
             if (responses != null && responses.length == activityList.size())  {
                 // stitch up activity ids
                 for (int i = 0; i < responses.length; i++) {
@@ -297,7 +293,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         };
 
         List<Activity> act_list = new ArrayList<>(activityList);
-        return completedFuture(await(SendActivitiesInternal(act_list, _onSendActivities.iterator(), ActuallySendStuff)));
+        return completedFuture(await(SendActivitiesInternal(act_list, onSendActivities.iterator(), ActuallySendStuff)));
     }
 
     /// <summary>
@@ -315,14 +311,15 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <para>Before calling this, set the ID of the replacement activity to the ID
     /// of the activity to replace.</para></remarks>
     @Override
-    public ResourceResponse UpdateActivity(ActivityImpl activity) throws Exception {
-        ActivityImpl a = (ActivityImpl) activity;
+    public ResourceResponse UpdateActivity(Activity activity) throws Exception {
+
+
 
         Callable<CompletableFuture<ResourceResponse>> ActuallyUpdateStuff = () -> {
-            return completedFuture(await(this.getAdapter().UpdateActivity(this, a)));
+            return completedFuture(await(this.getAdapter().UpdateActivity(this, activity)));
         };
 
-        return await(UpdateActivityInternal(a, _onUpdateActivity.iterator(), ActuallyUpdateStuff));
+        return await(UpdateActivityInternal(activity, onUpdateActivity.iterator(), ActuallyUpdateStuff));
     }
 
     /// <summary>
@@ -336,7 +333,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         if (StringUtils.isWhitespace(activityId) || activityId == null)
             throw new IllegalArgumentException("activityId");
 
-        ConversationReference cr = GetConversationReference(this.getActivity());
+        ConversationReference cr = this.GetConversationReference(this.getActivity());
         cr.withActivityId(activityId);
 
         Callable<CompletableFuture> ActuallyDeleteStuff = () -> {
@@ -344,7 +341,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             return completedFuture(null);
         };
 
-        await(DeleteActivityInternal(cr, _onDeleteActivity.iterator(), ActuallyDeleteStuff));
+        await(DeleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff));
         return completedFuture(null);
     }
 
@@ -365,7 +362,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             return completedFuture(await(this.getAdapter().DeleteActivity(this, conversationReference)));
         };
 
-        await(DeleteActivityInternal(conversationReference, _onDeleteActivity.iterator(), ActuallyDeleteStuff));
+        await(DeleteActivityInternal(conversationReference, onDeleteActivity.iterator(), ActuallyDeleteStuff));
         return completedFuture(null);
     }
 
@@ -433,7 +430,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     //            UpdateActivityHandler toCall = updateHandlers.First();
     //            return await toCall(this, activity, next);
     //        }
-    private CompletableFuture<ResourceResponse> UpdateActivityInternal(ActivityImpl activity,
+    private CompletableFuture<ResourceResponse> UpdateActivityInternal(Activity activity,
             Iterator<UpdateActivityHandler> updateHandlers,
             Callable<CompletableFuture<ResourceResponse>> callAtBottom) throws Exception {
         BotAssert.ActivityNotNull(activity);
@@ -466,7 +463,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
 
 
-    private CompletableFuture DeleteActivityInternal(ConversationReference cr,
+    private CompletableFuture<Void> DeleteActivityInternal(ConversationReference cr,
             Iterator<DeleteActivityHandler> updateHandlers,
             Callable<CompletableFuture> callAtBottom) throws Exception {
         BotAssert.ConversationReferenceNotNull(cr);
@@ -504,7 +501,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /// <returns>A conversation reference for the conversation that contains the activity.</returns>
     /// <exception cref="IllegalArgumentException">
     /// <paramref name="activity"/> is <c>null</c>.</exception>
-    public static ConversationReference GetConversationReference(ActivityImpl activity) {
+    public static ConversationReference GetConversationReference(Activity activity) {
         BotAssert.ActivityNotNull(activity);
 
         ConversationReference r = new ConversationReference()
@@ -557,6 +554,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
 
     public void close() throws Exception {
-        _turnServices.close();
+        turnServices.close();
     }
 }

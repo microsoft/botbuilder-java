@@ -14,6 +14,7 @@ import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
+import com.microsoft.rest.retry.RetryStrategy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +59,19 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
     public ConnectorClientImpl withAcceptLanguage(String acceptLanguage) {
         this.acceptLanguage = acceptLanguage;
         return this;
+    }
+
+    /**
+     * RetryStrategy as defined in Microsoft Rest Retry
+     * TODO: Use this.
+     */
+    private RetryStrategy retryStrategy = null;
+    public ConnectorClientImpl withRestRetryStrategy(RetryStrategy retryStrategy) {
+        this.retryStrategy = retryStrategy;
+        return this;
+    }
+    public RetryStrategy restRetryStrategy() {
+        return this.retryStrategy;
     }
 
     /** Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30. */
@@ -122,13 +136,14 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
     /**
      * The Conversations object to access its operations.
      */
-    private Conversations conversations;
+    private ConversationsImpl conversations;
 
     /**
      * Gets the Conversations object to access its operations.
      * @return the Conversations object.
      */
-    public Conversations conversations() {
+    @Override
+    public ConversationsImpl conversations() {
         return this.conversations;
     }
 
@@ -187,6 +202,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
         String java_version = System.getProperty("java.version");
         this.user_agent_string = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
     }
+
 
     /**
      * Gets the User-Agent header for the client.

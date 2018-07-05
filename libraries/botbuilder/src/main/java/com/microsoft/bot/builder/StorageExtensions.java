@@ -19,7 +19,7 @@ public class StorageExtensions {
     /// <param name="storage"></param>
     /// <param name="keys"></param>
     /// <returns></returns>
-    //public static <StoreItemT extends Object> CompletableFuture<Iterable<Map.Entry<String, T>>> Read(this Storage storage, String... keys)
+    @SuppressWarnings("unchecked")
     public static <StoreItemT extends Object> CompletableFuture<Map<String, StoreItemT>> Read(Storage storage, String... keys) throws JsonProcessingException {
         Map<String, ?> storeItems = await(storage.Read(keys));
         HashMap<String, StoreItemT> result = new HashMap<String, StoreItemT>();

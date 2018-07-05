@@ -254,6 +254,112 @@ public class ActivityImpl extends Activity {
         return result;
     }
 
+    /**
+     * Set the type value.
+     *
+     * @param type the type value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withType(ActivityTypes type) {
+        super.withType(type);
+        return this;
+    }
+
+    /**
+     * Set the id value.
+     *
+     * @param id the id value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withId(String id) {
+        super.withId(id);
+        return this;
+    }
+
+    /**
+     * Set the timestamp value.
+     *
+     * @param timestamp the timestamp value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withTimestamp(DateTime timestamp) {
+        super.withTimestamp(timestamp);
+        return this;
+    }
+    /**
+     * Set the localTimestamp value.
+     *
+     * @param localTimestamp the localTimestamp value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withLocalTimestamp(DateTime localTimestamp) {
+        super.withLocalTimestamp(localTimestamp);
+        return this;
+    }
+
+    /**
+     * Set the serviceUrl value.
+     *
+     * @param serviceUrl the serviceUrl value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withServiceUrl(String serviceUrl) {
+        super.withServiceUrl(serviceUrl);
+        return this;
+    }
+
+    /**
+     * Set the channelId value.
+     *
+     * @param channelId the channelId value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withChannelId(String channelId) {
+        super.withChannelId(channelId);
+        return this;
+    }
+    /**
+     * Set the from value.
+     *
+     * @param from the from value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withFrom(ChannelAccount from) {
+        super.withFrom(from);
+        return this;
+    }
+    /**
+     * Set the conversation value.
+     *
+     * @param conversation the conversation value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withConversation(ConversationAccount conversation) {
+        super.withConversation(conversation);
+        return this;
+    }
+    /**
+     * Set the recipient value.
+     *
+     * @param recipient the recipient value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withRecipient(ChannelAccount recipient) {
+        super.withRecipient(recipient);
+        return this;
+    }
+
+    /**
+     * Set the text value.
+     *
+     * @param text the text value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withText(String text) {
+        super.withText(text);
+        return this;
+    }
+
     /// <summary>
     /// Return an IMessageActivity mask if this is a message activity
     /// </summary>
@@ -267,6 +373,8 @@ public class ActivityImpl extends Activity {
     public ContactRelationUpdateActivity AsContactRelationUpdateActivity() {
         return IsActivity(ActivityTypes.CONTACT_RELATION_UPDATE.toString()) ? (ContactRelationUpdateActivity) (Activity) this : null;
     }
+
+
 
     /// <summary>
     /// Return an IInstallationUpdateActivity mask if this is a installation update activity
@@ -348,7 +456,7 @@ public class ActivityImpl extends Activity {
         return false;
     }
 
-    private Mention convertToMention(ObjectNode node) {
+    private Mention convertToMention(JsonNode node) {
         try {
             return ActivityImpl.mapper.treeToValue(node, Mention.class);
         } catch (JsonProcessingException e) {
@@ -361,11 +469,13 @@ public class ActivityImpl extends Activity {
     /// Resolves the mentions from the entities of this (message) activity.
     /// </summary>
     /// <returns>The array of mentions or an empty array, if none found.</returns>
+    /// TODO: Need to see how mentions are formated in the message
     public ArrayList<Mention> GetMentions() {
-        ArrayList<Mention> list = (ArrayList) this.entities().stream()
-                .filter(entity -> entity.type().equalsIgnoreCase("mention"))
-                .map(entity -> convertToMention(entity.getProperties()))
-                .collect(Collectors.toCollection(ArrayList::new)); // create mutable list
+        ArrayList<Mention> list = null;
+//        (ArrayList) this.entities().stream()
+//                .filter(entity -> entity.type().equalsIgnoreCase("mention"))
+//                .map(entity -> convertToMention(entity.getProperties()))
+//                .collect(Collectors.toCollection(ArrayList::new)); // create mutable list
         return list;
     }
 

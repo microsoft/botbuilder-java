@@ -2,7 +2,10 @@ package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.schema.models.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +20,10 @@ public class DictionaryStorage implements Storage {
     private static ObjectMapper objectMapper;
 
     // TODO: Object needs to be defined
-    private final Map<String, Object> _memory;
-    private final Object _syncroot = new Object();
+    private final Map<String, Object> memory;
+    private final Object syncroot = new Object();
     private int _eTag = 0;
+    private final String typeNameForNonEntity = "__type_name_";
 
     public DictionaryStorage() {
             this(null);
@@ -28,13 +32,14 @@ public class DictionaryStorage implements Storage {
         DictionaryStorage.objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .findAndRegisterModules();
-        _memory = (dictionary != null) ? dictionary : new HashMap<String, Object>();
+        this.memory = (dictionary != null) ? dictionary : new HashMap<String, Object>();
     }
 
     public CompletableFuture Delete(String[] keys) {
-        synchronized (_syncroot) {
+        synchronized (this.syncroot) {
                 for (String key : keys)  {
-                        _memory.get(key);
+                        Object o = this.memory.get(key);
+                        this.memory.remove(o);
                 }
         }
         return completedFuture(null);
@@ -42,40 +47,66 @@ public class DictionaryStorage implements Storage {
 
     @Override
     public CompletableFuture<Map<String, ?>> Read(String[] keys) throws JsonProcessingException {
-        HashMap storeItems = new HashMap<String, Object>(keys.length);
-        synchronized (_syncroot) {
-            for (String key : keys) {
-                if (_memory.containsKey(key)) {
-                    Object state = _memory.get(key);
-                    if (state != null) {
-                        storeItems.put(key, DictionaryStorage.objectMapper.writeValueAsString(state));
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, Object> storeItems = new HashMap<String, Object>(keys.length);
+            synchronized (this.syncroot) {
+                for (String key : keys) {
+                    if (this.memory.containsKey(key)) {
+                        Object state = this.memory.get(key);
+                        if (state != null) {
+                            try {
+                                if (!(state instanceof JsonNode))
+                                    throw new RuntimeException("DictionaryRead failed: entry not JsonNode");
+                                JsonNode stateNode = (JsonNode) state;
+                                // Check if type info is set for the class
+                                if (!(stateNode.hasNonNull(this.typeNameForNonEntity))) {
+                                    throw new RuntimeException(String.format("DictionaryRead failed: Type info not present"));
+                                }
+                                String clsName = stateNode.get(this.typeNameForNonEntity).textValue();
+
+                                // Load the class info
+                                Class<?> cls;
+                                try {
+                                    cls = Class.forName(clsName);
+                                } catch (ClassNotFoundException e) {
+                                    e.printStackTrace();
+                                    throw new RuntimeException(String.format("DictionaryRead failed: Could not load class %s", clsName));
+                                }
+
+                                // Populate dictionary
+                                storeItems.put(key,DictionaryStorage.objectMapper.treeToValue(stateNode, cls ));
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException(String.format("DictionaryRead failed: %s", e.toString()));
+                            }
+                        }
                     }
+
                 }
-
             }
-        }
 
-        return completedFuture(storeItems);
+            return storeItems;
+        });
     }
 
     @Override
     public CompletableFuture Write(Map<String, ?> changes) throws Exception {
-        synchronized (_syncroot) {
+        synchronized (this.syncroot) {
             for (Map.Entry change : changes.entrySet()) {
                 Object newValue = change.getValue();
 
                 String oldStateETag = null; // default(string);
-                if (_memory.containsValue(change.getKey())) {
-                    Map oldState = (Map) _memory.get(change.getKey());
+                if (this.memory.containsValue(change.getKey())) {
+                    Map oldState = (Map) this.memory.get(change.getKey());
                     if (oldState.containsValue("eTag")) {
                         Map.Entry eTagToken = (Map.Entry) oldState.get("eTag");
                         oldStateETag = (String) eTagToken.getValue();
                     }
 
                 }
-
-
-                Map<String, Object> newState = DictionaryStorage.objectMapper.convertValue(newValue, HashMap.class);
+                // Dictionary stores Key:JsonNode (with type information held within the JsonNode)
+                JsonNode newState = DictionaryStorage.objectMapper.valueToTree(newValue);
+                ((ObjectNode)newState).put(this.typeNameForNonEntity, newValue.getClass().getTypeName());
 
                 // Set ETag if applicable
                 if (newValue instanceof StoreItem) {
@@ -86,10 +117,10 @@ public class DictionaryStorage implements Storage {
                                 newStoreItem.geteTag(), oldStateETag));
                     }
                     Integer newTag = _eTag++;
-                    newState.put("eTag", newTag.toString());
+                    ((ObjectNode)newState).put("eTag", newTag.toString());
                 }
 
-                _memory.put((String)change.getKey(), newState);
+                this.memory.put((String)change.getKey(), newState);
             }
         }
         return completedFuture(null);

@@ -10,6 +10,8 @@ import com.microsoft.bot.schema.models.ConversationReferenceHelper;
 import com.microsoft.bot.schema.models.ResourceResponse;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 
 import static com.ea.async.Async.await;
@@ -70,7 +72,7 @@ public abstract class BotAdapter {
     /// an array of <see cref="ResourceResponse"/> objects containing the IDs that
     /// the receiving channel assigned to the activities.</remarks>
     /// <seealso cref="ITurnContext.OnSendActivities(SendActivitiesHandler)"/>
-    public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException, ServiceKeyAlreadyRegisteredException;
+    public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException ;
 
     /// <summary>
     /// When overridden in a derived class, replaces an existing activity in the
@@ -97,7 +99,7 @@ public abstract class BotAdapter {
     /// <remarks>The <see cref="ConversationReference.ActivityId"/> of the conversation
     /// reference identifies the activity to delete.</remarks>
     /// <seealso cref="ITurnContext.OnDeleteActivity(DeleteActivityHandler)"/>
-    public abstract CompletableFuture DeleteActivity(TurnContext context, ConversationReference reference);
+    public abstract CompletableFuture<Void> DeleteActivity(TurnContext context, ConversationReference reference) throws ExecutionException, InterruptedException;
 
 
     /// <summary>
@@ -123,9 +125,7 @@ public abstract class BotAdapter {
     /// initiated by a call to <see cref="ContinueConversation(ConversationReference, Func{ITurnContext, Task})"/>
     /// (proactive messaging), the callback method is the callback method that was provided in the call.</para>
     /// </remarks>
-    // TODO: daveta CancellationToken
-    //    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback = null, AtomicReference<CompletableFuture> cancelToken = null)
-    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
+    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws Exception  {
         BotAssert.ContextNotNull(context);
 
         // Call any registered Middleware Components looking for ReceiveActivity()
@@ -168,14 +168,14 @@ public abstract class BotAdapter {
     /// Most channels require a user to initaiate a conversation with a bot
     /// before the bot can send activities to the user.</remarks>
     /// <seealso cref="RunPipeline(ITurnContext, Func{ITurnContext, Task}, CancellationTokenSource)"/>
-    public CompletableFuture ContinueConversation(String botId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception, ServiceKeyAlreadyRegisteredException {
+    public CompletableFuture ContinueConversation(String botId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception  {
 
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
         ActivityImpl activity = conv.GetPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity))
         {
-            return RunPipeline(context, callback);
+            return this.RunPipeline(context, callback);
         }
     }
 }

@@ -3,6 +3,8 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.schema.ActivityImpl;
+import com.microsoft.bot.schema.models.Activity;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,9 +24,22 @@ public class CatchException_MiddlewareTest {
                 .Use(new CatchExceptionMiddleware<Exception>(new CallOnException() {
                     @Override
                     public <T> CompletableFuture apply(TurnContext context, T t) throws Exception {
-                        ActivityImpl activity = context.getActivity();
-                        context.SendActivity(activity.CreateReply(t.toString()));
-                        return completedFuture(null);
+                        return CompletableFuture.runAsync(() -> {
+                            Activity activity = context.getActivity();
+                            if (activity instanceof  ActivityImpl)
+                            {
+                                try {
+                                    context.SendActivity(((ActivityImpl)activity).CreateReply(t.toString()));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
+                                }
+                            }
+                            else
+                                Assert.assertTrue("Test was built for ActivityImpl", false);
+
+                        });
+
                     }
                 }, Exception.class))
                 // Add middleware to catch NullReferenceExceptions before throwing up to the general exception instance

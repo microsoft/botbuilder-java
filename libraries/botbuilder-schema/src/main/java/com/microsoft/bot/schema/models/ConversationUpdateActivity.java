@@ -48,6 +48,7 @@ public class ConversationUpdateActivity extends MessageActivity {
         return this;
     }
 
+
     /// <summary>
     /// True if prior history of the channel is disclosed
     /// Note: Boolean (class) is used, may be null

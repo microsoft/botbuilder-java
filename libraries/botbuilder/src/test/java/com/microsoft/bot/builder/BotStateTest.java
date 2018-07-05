@@ -11,7 +11,9 @@ import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.rest.RestClient;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,6 +87,7 @@ public class BotStateTest {
                         break;
                     case "get value":
                         try {
+                            Assert.assertFalse(StringUtils.isBlank(userState.value()));
                             await(((TurnContextImpl)context).SendActivity(userState.value()));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -128,6 +131,7 @@ public class BotStateTest {
                                     break;
                                 case "get value":
                                     try {
+                                        Assert.assertFalse(StringUtils.isBlank(userState.getValue()));
                                         await(context.SendActivity(userState.getValue()));
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -167,6 +171,7 @@ public class BotStateTest {
                                 break;
                             case "get value":
                                 try {
+                                    Assert.assertFalse(StringUtils.isBlank(conversationState.value()));
                                     await(context.SendActivity(conversationState.value()));
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -204,6 +209,7 @@ public class BotStateTest {
                                 break;
                             case "get value":
                                 try {
+                                    Assert.assertFalse(StringUtils.isBlank(conversationState.getValue()));
                                     await(context.SendActivity(conversationState.getValue()));
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -244,6 +250,7 @@ public class BotStateTest {
                                 break;
                             case "get value":
                                 try {
+                                    Assert.assertFalse(StringUtils.isBlank(customState.getCustomString()));
                                     await(context.SendActivity(customState.getCustomString()));
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -257,6 +264,58 @@ public class BotStateTest {
                 .Test("set value", "value saved")
                 .Test("get value", testGuid.toString())
                 .StartTest());
+    }
+    @Test
+    public void State_RoundTripTypedObjectwTrace() throws ExecutionException, InterruptedException {
+        TestAdapter adapter = new TestAdapter()
+                .Use(new ConversationState<TypedObject>(new MemoryStorage(), TypedObject::new));
+        String result = await(new TestFlow(adapter,
+                (context) ->
+                {
+                    CompletableFuture<Void> doit = CompletableFuture.runAsync(() -> {
+                        System.out.println(String.format(">>Test Callback(tid:%s): STARTING : %s", Thread.currentThread().getId(), context.getActivity().text()));
+                        System.out.flush();
+                        TypedObject conversation = StateTurnContextExtensions.<TypedObject>GetConversationState(context);
+                        Assert.assertNotNull("conversationstate should exist", conversation);
+                        System.out.println(String.format(">>Test Callback(tid:%s): Text is : %s", Thread.currentThread().getId(), context.getActivity().text()));
+                        System.out.flush();
+                        switch (context.getActivity().text()) {
+                            case "set value":
+                                conversation.withName("test");
+                                try {
+                                    System.out.println(String.format(">>Test Callback(tid:%s): Send activity : %s", Thread.currentThread().getId(),
+                                            "value saved"));
+                                    System.out.flush();
+                                    ResourceResponse response = await(context.SendActivity("value saved"));
+                                    System.out.println(String.format(">>Test Callback(tid:%s): Response Id: %s", Thread.currentThread().getId(),
+                                            response.id()));
+                                    System.out.flush();
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Assert.fail(String.format("Error sending activity! - set value"));
+                                }
+                                break;
+                            case "get value":
+                                try {
+                                    System.out.println(String.format(">>Test Callback(tid:%s): Send activity : %s", Thread.currentThread().getId(),
+                                            "TypedObject"));
+                                    System.out.flush();
+                                    await(context.SendActivity("TypedObject"));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Assert.fail(String.format("Error sending activity! - get value"));
+                                }
+                                break;
+                        }
+                    });
+                    return doit;
+                })
+                .Turn("set value", "value saved", "Description", 50000)
+                .Turn("get value", "TypedObject", "Description", 50000)
+                .StartTest());
+        System.out.print(String.format("Done with test : %s\n", result));
+
     }
 
 
@@ -273,7 +332,7 @@ public class BotStateTest {
                         Assert.assertNotNull("conversationstate should exist", conversation);
                         switch (context.getActivity().text()) {
                             case "set value":
-                                conversation.setName("test");
+                                conversation.withName("test");
                                 try {
                                     await(context.SendActivity("value saved"));
                                 } catch (Exception e) {
