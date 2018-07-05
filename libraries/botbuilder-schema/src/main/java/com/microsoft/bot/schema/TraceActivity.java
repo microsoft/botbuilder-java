@@ -3,13 +3,13 @@ package com.microsoft.bot.schema;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 
-/// <summary>
-/// An activity by which a bot can log internal information into a logged conversation transcript
-/// </summary>
+/**
+ * An activity by which a bot can log internal information into a logged conversation transcript
+ */
 public class TraceActivity extends ActivityImpl {
-    /// <summary>
-    /// Name of the trace activity
-    /// </summary>
+    /**
+     * Name of the trace activity
+     */
     private String _name;
 
     public String getName() {
@@ -20,9 +20,9 @@ public class TraceActivity extends ActivityImpl {
         _name = name;
     }
 
-    /// <summary>
-    /// Descriptive label for the trace
-    /// </summary>
+    /**
+     * Descriptive label for the trace
+     */
     private String _label;
 
     public String getLabel() {
@@ -33,9 +33,9 @@ public class TraceActivity extends ActivityImpl {
         this._label = label;
     }
 
-    /// <summary>
-    /// Unique string which identifies the format of the value object
-    /// </summary>
+    /**
+     * Unique string which identifies the format of the value object
+     */
     private String _value_type;
 
     public String getValueType() {
@@ -46,9 +46,9 @@ public class TraceActivity extends ActivityImpl {
         _value_type = value_type;
     }
 
-    /// <summary>
-    /// Open-ended value
-    /// </summary>
+    /**
+     * Open-ended value
+     */
     private Object _value;
 
     Object getValue() {
@@ -59,9 +59,9 @@ public class TraceActivity extends ActivityImpl {
         _value = value;
     }
 
-    /// <summary>
-    /// Reference to another conversation or activity
-    /// </summary>
+    /**
+     * Reference to another conversation or activity
+     */
     private ConversationReference _relates_to;
 
     ConversationReference getRelatesTo() {

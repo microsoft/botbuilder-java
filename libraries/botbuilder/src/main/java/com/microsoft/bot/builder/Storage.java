@@ -11,23 +11,23 @@ import java.util.concurrent.CompletableFuture;
 
 public interface Storage
 {
-    /// <summary>
-    /// Read StoreItems from storage
-    /// </summary>
-    /// <param name="keys">keys of the storeItems to read</param>
-    /// <returns>StoreItem dictionary</returns>
+    /**
+     * Read StoreItems from storage
+     * @param keys keys of the storeItems to read
+     * @return StoreItem dictionary
+     */
     CompletableFuture<Map<String, ? extends Object>> Read(String... keys) throws JsonProcessingException;
 
-    /// <summary>
-    /// Write StoreItems to storage
-    /// </summary>
-    /// <param name="changes"></param>
+    /**
+     * Write StoreItems to storage
+     * @param changes 
+     */
     CompletableFuture Write(Map<String, ? extends Object> changes) throws Exception;
 
-    /// <summary>
-    /// Delete StoreItems from storage
-    /// </summary>
-    /// <param name="keys">keys of the storeItems to delete</param>
+    /**
+     * Delete StoreItems from storage
+     * @param keys keys of the storeItems to delete
+     */
     CompletableFuture Delete(String... keys);
 }
 

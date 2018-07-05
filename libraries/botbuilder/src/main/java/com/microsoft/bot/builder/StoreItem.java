@@ -2,9 +2,9 @@ package com.microsoft.bot.builder;
 
 public interface StoreItem
 {
-    /// <summary>
-    /// eTag for concurrency
-    /// </summary>
+    /**
+     * eTag for concurrency
+     */
 
     String geteTag();
     void seteTag(String eTag);

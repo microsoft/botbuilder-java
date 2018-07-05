@@ -5,9 +5,9 @@ package com.microsoft.bot.schema.models;
 import java.util.List;
 
 public class ConversationUpdateActivity extends MessageActivity {
-    /// <summary>
-    /// Members added to the conversation
-    /// </summary>
+    /**
+     * Members added to the conversation
+     */
     private List<ChannelAccount> membersAdded;
 
     @Override
@@ -20,9 +20,9 @@ public class ConversationUpdateActivity extends MessageActivity {
         return this;
     }
 
-    /// <summary>
-    /// Members removed from the conversation
-    /// </summary>
+    /**
+     * Members removed from the conversation
+     */
     private List<ChannelAccount> membersRemoved;
     public List<ChannelAccount> membersRemoved() {
         return this.membersRemoved;
@@ -34,9 +34,9 @@ public class ConversationUpdateActivity extends MessageActivity {
         return this;
     }
 
-    /// <summary>
-    /// The conversation's updated topic name
-    /// </summary>
+    /**
+     * The conversation's updated topic name
+     */
     private String topicName;
     @Override
     public String topicName() {
@@ -49,10 +49,10 @@ public class ConversationUpdateActivity extends MessageActivity {
     }
 
 
-    /// <summary>
-    /// True if prior history of the channel is disclosed
-    /// Note: Boolean (class) is used, may be null
-    /// </summary>
+    /**
+     * True if prior history of the channel is disclosed
+     * Note: Boolean (class) is used, may be null
+     */
     private Boolean historyDisclosed;
     public Boolean historyDisclosed() {
         return this.historyDisclosed;

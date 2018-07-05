@@ -12,4 +12,4 @@ import java.util.concurrent.CompletableFuture;
 public interface SendActivitiesHandler {
     CompletableFuture<ResourceResponse[]> handle(TurnContext context, List<Activity> activities, Callable<CompletableFuture<ResourceResponse[]>> next);
 }
-// public delegate CompletableFuture<ResourceResponse[]> SendActivitiesHandler(ITurnContext context, List<Activity> activities, Func<Task<ResourceResponse[]>> next);
+// public delegate CompletableFuture<ResourceResponse[]> SendActivitiesHandler(TurnContext context, List<Activity> activities, Func<Task<ResourceResponse[]>> next);

@@ -18,32 +18,32 @@ import java.util.Map;
 public class EntityImpl extends Entity {
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    /// <summary>
-    /// Initializes a new instance of the Entity class.
-    /// </summary>
+    /**
+     * Initializes a new instance of the Entity class.
+     */
     public EntityImpl() {
         CustomInit();
     }
 
 
-    /// <summary>
-    /// Initializes a new instance of the Entity class.
-    /// </summary>
-    /// <param name="type">Entity Type (typically from schema.org
-    /// types)</param>
+    /**
+     * Initializes a new instance of the Entity class.
+     * @param type Entity Type (typically from schema.org
+     * types)
+     */
     public EntityImpl(String type) {
         this.type = type;
         CustomInit();
     }
 
-    /// <summary>
-    /// An initialization method that performs custom operations like setting defaults
-    /// </summary>
+    /**
+     * An initialization method that performs custom operations like setting defaults
+     */
     void CustomInit() {
     }
-    /// <summary>
-    /// Gets or sets entity Type (typically from schema.org types)
-    /// </summary>
+    /**
+     * Gets or sets entity Type (typically from schema.org types)
+     */
     public String type;
 
 
@@ -66,15 +66,23 @@ public class EntityImpl extends Entity {
     }
 
 
-    /// <summary>
+    /**
+     */
 
-    /// Retrieve internal payload.
+    /**
+     * Retrieve internal payload.
+     */
 
-    /// </summary>
+    /**
+     */
 
-    /// <typeparam name="T"></typeparam>
+    /**
+     * @param T 
+     */
 
-    /// <returns></returns>
+    /**
+     * @return 
+     */
 
     public <T> T GetAs(Class<T> type)  {
 
@@ -102,11 +110,11 @@ public class EntityImpl extends Entity {
     }
 
 
-    /// <summary>
-    /// Set internal payload.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
+    /**
+     * Set internal payload.
+     * @param T 
+     * @param obj 
+     */
 
     public <T> boolean SetAs(T obj) {
         // Serialize

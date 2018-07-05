@@ -170,12 +170,12 @@ public class TestAdapter extends BotAdapter {
         return completedFuture(null);
     }
 
-    /// <summary>
-    /// NOTE: this resets the queue, it doesn't actually maintain multiple converstion queues
-    /// </summary>
-    /// <param name="channelId"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
+    /**
+     * NOTE: this resets the queue, it doesn't actually maintain multiple converstion queues
+     * @param channelId 
+     * @param callback 
+     * @return 
+     */
     //@Override
     public CompletableFuture CreateConversation(String channelId,Function<TurnContext, CompletableFuture> callback) {
         this.activeQueue().clear();
@@ -186,10 +186,10 @@ public class TestAdapter extends BotAdapter {
         return callback.apply(context);
     }
 
-    /// <summary>
-    /// Called by TestFlow to check next reply
-    /// </summary>
-    /// <returns></returns>
+    /**
+     * Called by TestFlow to check next reply
+     * @return 
+     */
     public Activity GetNextReply() {
         synchronized (this.botReplies) {
             if(this.botReplies.size()>0) {
@@ -199,11 +199,11 @@ public class TestAdapter extends BotAdapter {
         return null;
     }
 
-    /// <summary>
-    /// Called by TestFlow to get appropriate activity for conversationReference of testbot
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
+    /**
+     * Called by TestFlow to get appropriate activity for conversationReference of testbot
+     * @param text 
+     * @return 
+     */
     public Activity MakeActivity() {
         return MakeActivity(null);
     }
@@ -223,11 +223,11 @@ public class TestAdapter extends BotAdapter {
     }
 
 
-    /// <summary>
-    /// Called by TestFlow to send text to the bot
-    /// </summary>
-    /// <param name="userSays"></param>
-    /// <returns></returns>
+    /**
+     * Called by TestFlow to send text to the bot
+     * @param userSays 
+     * @return 
+     */
     public CompletableFuture SendTextToBot(String userSays,Function<TurnContext, CompletableFuture> callback) throws Exception {
         return this.ProcessActivity(this.MakeActivity(userSays),callback);
     }

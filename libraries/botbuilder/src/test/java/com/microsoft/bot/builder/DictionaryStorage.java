@@ -13,9 +13,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-/// <summary>
-/// Models IStorage around a dictionary
-/// </summary>
+/**
+ * Models IStorage around a dictionary
+ */
 public class DictionaryStorage implements Storage {
     private static ObjectMapper objectMapper;
 

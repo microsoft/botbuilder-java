@@ -3,9 +3,9 @@ package com.microsoft.bot.schema;
 import com.microsoft.bot.schema.models.Activity;
 
 public class ContactRelationUpdateActivity extends Activity {
-    /// <summary>
-    /// add|remove
-    /// </summary>
+    /**
+     * add|remove
+     */
     private String _action;
 
     public String getAction() {
