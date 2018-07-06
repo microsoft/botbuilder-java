@@ -56,7 +56,7 @@ public class OAuthConnectorTest extends OAuthTestBase  {
         client.GetUserTokenAsync("userid", "", "");
     }
 /*
-   TODO: Need to figure out how they are setting up this test.
+   TODO: Need to set up a bot and login with AADv2 to perform new recording (or convert the C# recordings)
     @Test
     public void GetUserToken_ShouldReturnTokenWithNoMagicCode() throws URISyntaxException, MalformedURLException {
 
