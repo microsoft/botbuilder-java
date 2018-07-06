@@ -68,7 +68,7 @@ public class OAuthClient extends ServiceClient {
      * @param userId 
      * @param connectionName 
      * @param magicCode
-     * @return 
+     * @return CompletableFuture< TokenResponse > on success; otherwise null.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
@@ -97,7 +97,7 @@ public class OAuthClient extends ServiceClient {
      @param magicCode
      @param customHeaders
 
-     @return
+     @return CompletableFuture< TokenResponse > on success; null otherwise.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
         if (StringUtils.isEmpty(userId)) {
@@ -112,8 +112,9 @@ public class OAuthClient extends ServiceClient {
             HashMap <String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
             qstrings.put("connectionName", connectionName);
-            if (!StringUtils.isBlank(magicCode))
+            if (!StringUtils.isBlank(magicCode)) {
                 qstrings.put("code", magicCode);
+            }
             String strUri = String.format("%sapi/usertoken/GetToken", this.uri);
             URI tokenUrl = null;
             try {
@@ -167,7 +168,7 @@ public class OAuthClient extends ServiceClient {
      * Signs Out the User for the given ConnectionName.
      * @param userId 
      * @param connectionName
-     * @return True on successful sign-out.  False otherwise.
+     * @return True on successful sign-out; False otherwise.
      */
     public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) throws URISyntaxException, IOException {
         if (StringUtils.isEmpty(userId)) {
@@ -230,7 +231,7 @@ public class OAuthClient extends ServiceClient {
      * Gets the Link to be sent to the user for signin into the given ConnectionName
      * @param activity 
      * @param connectionName
-     * @return Sign in link string.
+     * @return Sign in link on success; null otherwise.
      */
     public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) throws IllegalArgumentException, URISyntaxException, JsonProcessingException {
         if (StringUtils.isEmpty(connectionName)) {
