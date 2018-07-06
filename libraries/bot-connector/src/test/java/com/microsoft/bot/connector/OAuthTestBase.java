@@ -9,6 +9,7 @@ import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
 import com.sun.jndi.toolkit.url.Uri;
+import okhttp3.Request;
 import org.apache.commons.io.FileSystemUtils;
 
 import java.io.IOException;
@@ -74,8 +75,8 @@ public class OAuthTestBase extends TestBase
         this.connector = new ConnectorClientImpl(restClient);
         if (this.clientId != null && this.clientSecret != null) {
             MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
-            CompletableFuture<String> task = credentials.GetTokenAsync();
-            this.token = task.get();
+
+            this.token = credentials.getToken(new Request.Builder().build());
         }
         else {
             this.token = null;
