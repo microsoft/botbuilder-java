@@ -24,5 +24,5 @@ import java.util.concurrent.CompletableFuture;
  */
 @FunctionalInterface
 public interface DeleteActivityHandler {
-    CompletableFuture handle(TurnContext context, ConversationReference reference, Callable<CompletableFuture> next);
+    CompletableFuture handle(TurnContext context, ConversationReference reference, Callable<CompletableFuture> next) throws Exception;
 }

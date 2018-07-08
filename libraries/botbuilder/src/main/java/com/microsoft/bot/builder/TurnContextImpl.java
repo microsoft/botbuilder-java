@@ -451,20 +451,27 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         }
 
         // Default to "No more Middleware after this".
-        Callable<CompletableFuture<ResourceResponse[]>> next = () -> {
-            // Remove the first item from the list of middleware to call,
-            // so that the next call just has the remaining items to worry about.
-            if (updateHandlers.hasNext())
-                updateHandlers.next();
-            ResourceResponse result = null;
-            result = await(UpdateActivityInternal(activity, updateHandlers, callAtBottom));
-            activity.withId(result.id());
-            return completedFuture(new ResourceResponse[] { result });
+        Callable<CompletableFuture<ResourceResponse>> next = () -> {
+            return CompletableFuture.supplyAsync(() -> {
+                // Remove the first item from the list of middleware to call,
+                // so that the next call just has the remaining items to worry about.
+                if (updateHandlers.hasNext())
+                    updateHandlers.next();
+                ResourceResponse result = null;
+                try {
+                    result = await(UpdateActivityInternal(activity, updateHandlers, callAtBottom));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(String.format("Error updating activity: %s", e.toString()));
+                }
+                activity.withId(result.id());
+                return result;
+            });
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it
         UpdateActivityHandler toCall = updateHandlers.next();
-        return completedFuture(await(toCall.handle(this, activity, next)));
+        return toCall.handle(this, activity, next);
     }
 
 

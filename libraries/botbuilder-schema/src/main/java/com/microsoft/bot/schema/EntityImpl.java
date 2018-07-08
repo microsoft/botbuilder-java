@@ -53,7 +53,7 @@ public class EntityImpl extends Entity {
     private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
 
     @JsonAnyGetter
-    public Map<String, JsonNode> getProperties() {
+    public Map<String, JsonNode> properties() {
 
         return this.properties;
 

@@ -25,10 +25,7 @@ import java.util.concurrent.CompletableFuture;
  * {@linkalso DeleteActivityHandler}
  */
 
-
-
-// public delegate Task<ResourceResponse> UpdateActivityHandler(TurnContext context, Activity activity, Func<Task<ResourceResponse>> next);
 @FunctionalInterface
 public interface UpdateActivityHandler {
-    CompletableFuture<ResourceResponse> handle(TurnContext context, Activity activity, Callable<CompletableFuture<ResourceResponse[]>> next);
+    CompletableFuture<ResourceResponse> handle(TurnContext context, Activity activity, Callable<CompletableFuture<ResourceResponse>> next);
 }
