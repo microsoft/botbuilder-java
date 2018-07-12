@@ -3,6 +3,8 @@
 > see https://aka.ms/autorest
 
 Configuration for generating BotFramework Connector SDK.
+NOTE: 
+The generated files have been modified by hand to overcome limitations.
 
 ``` yaml
 add-credentials: true
