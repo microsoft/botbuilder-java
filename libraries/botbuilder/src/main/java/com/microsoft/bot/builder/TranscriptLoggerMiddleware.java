@@ -19,8 +19,6 @@ import org.joda.time.DateTimeZone;
 
 import java.util.LinkedList;
 
-import static com.ea.async.Async.await;
-
 
 /**
  * When added, this middleware will log incoming and outgoing activitites to a ITranscriptStore.

@@ -5,7 +5,7 @@
 package com.microsoft.bot.builder;
 
 
-import com.ea.async.Async;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
+
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 //    [TestClass]
@@ -35,8 +35,6 @@ public class BotStateTest {
 
 
     protected void initializeClients(RestClient restClient, String botId, String userId) {
-        // Initialize async/await(support
-        Async.init();
 
         connector = new ConnectorClientImpl(restClient);
         bot = new ChannelAccount().withId(botId);
@@ -346,7 +344,7 @@ public class BotStateTest {
                         // read initial state object
                         CustomState customState = null;
                         try {
-                            customState = await(botStateManager.<CustomState>Read(context));
+                            customState = (CustomState) botStateManager.<CustomState>Read(context).join();
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                             Assert.fail("Error reading custom state");
@@ -358,7 +356,7 @@ public class BotStateTest {
                         // amend property and write to storage
                         customState.setCustomString("test");
                         try {
-                            await(botStateManager.Write(context, customState));
+                            botStateManager.Write(context, customState).join();
                         } catch (Exception e) {
                             e.printStackTrace();
                             Assert.fail("Could not write customstate");
@@ -367,7 +365,7 @@ public class BotStateTest {
                         // set customState to null before reading from storage
                         customState = null;
                         try {
-                            customState = await(botStateManager.Read(context));
+                            customState = (CustomState) botStateManager.<CustomState>Read(context).join();
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                             Assert.fail("Could not read customstate back");

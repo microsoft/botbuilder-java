@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static com.ea.async.Async.await;
+
 
 public class BotFrameworkAdapterTest {
     @Test

@@ -1,25 +1,24 @@
 {
   "configuration": {
-    "status": "error",
-    "name": "Bot Framework",
-    "packages": "com.microsoft.bot.builder",
-    "ThresholdFilter": {
-      "level": "debug"
-    },
+    "name": "Default",
     "appenders": {
       "Console": {
-        "name": "STDOUT",
-        "PatternLayout": {
-          "pattern": "%d [%t] %-5p %c - %m%n"
-        }
+        "name": "Console-Appender",
+        "target": "SYSTEM_OUT",
+        "PatternLayout": {"pattern": "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"}
       }
     },
     "loggers": {
-      "root": {
-        "level": "debug",
-        "AppenderRef": {
-          "ref": "STDOUT"
+      "logger": [
+        {
+          "name": "com.microsoft.bot.builder",
+          "level": "debug",
+          "appender-ref": [{"ref": "Console-Appender", "level": "debug"}]
         }
+      ],
+      "root": {
+        "level": "warn",
+        "appender-ref": {"ref": "Console-Appender","level": "warn"}
       }
     }
   }

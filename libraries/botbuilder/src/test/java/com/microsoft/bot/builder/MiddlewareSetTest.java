@@ -1,6 +1,6 @@
 package com.microsoft.bot.builder;
 
-import com.ea.async.Async;
+
 import com.microsoft.bot.builder.ActionDel;
 import com.microsoft.bot.builder.base.TestBase;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
+
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
@@ -32,8 +32,6 @@ public class MiddlewareSetTest extends TestBase
 
     @Override
     protected void initializeClients(RestClient restClient, String botId, String userId) {
-        // Initialize async/await support
-        Async.init();
 
         connector = new ConnectorClientImpl(restClient);
         bot = new ChannelAccount().withId(botId);

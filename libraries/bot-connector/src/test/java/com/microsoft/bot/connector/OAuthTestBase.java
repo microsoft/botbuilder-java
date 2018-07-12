@@ -20,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
@@ -102,7 +101,7 @@ public class OAuthTestBase extends TestBase
         this.UseClientFor(doTest, className, "");
     }
     public void UseClientFor(Function<ConnectorClient, CompletableFuture<Void>> doTest, String className, String methodName) {
-        await(doTest.apply(this.connector));
+        doTest.apply(this.connector).join();
     }
 
 

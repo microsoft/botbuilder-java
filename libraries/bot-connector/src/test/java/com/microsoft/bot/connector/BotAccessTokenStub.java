@@ -6,7 +6,7 @@ import com.microsoft.rest.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-import static com.ea.async.Async.await;
+
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class BotAccessTokenStub extends MicrosoftAppCredentials {
