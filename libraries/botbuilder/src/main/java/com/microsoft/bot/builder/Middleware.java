@@ -52,7 +52,7 @@ public interface Middleware
      * {@linkalso TurnContext}
      * {@linkalso Bot.Schema.Activity}
      */
-    CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception;
+    void OnTurn(TurnContext context, NextDelegate next) throws Exception;
 }
 
 

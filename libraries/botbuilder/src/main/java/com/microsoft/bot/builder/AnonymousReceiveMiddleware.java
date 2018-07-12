@@ -30,8 +30,8 @@ public class AnonymousReceiveMiddleware implements Middleware
      * @param next The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        return _toCall.requestHandler(context, next);
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
+        _toCall.requestHandler(context, next);
     }
 
 }

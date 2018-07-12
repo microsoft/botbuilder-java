@@ -10,6 +10,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface SendActivitiesHandler {
-    CompletableFuture<ResourceResponse[]> handle(TurnContext context, List<Activity> activities, Callable<CompletableFuture<ResourceResponse[]>> next) throws Exception;
+    ResourceResponse[] handle(TurnContext context, List<Activity> activities, Callable<ResourceResponse[]> next) throws Exception;
 }
-// public delegate CompletableFuture<ResourceResponse[]> SendActivitiesHandler(TurnContext context, List<Activity> activities, Func<Task<ResourceResponse[]>> next);

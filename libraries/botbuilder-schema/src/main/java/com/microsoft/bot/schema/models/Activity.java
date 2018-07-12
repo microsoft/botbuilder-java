@@ -1061,5 +1061,51 @@ public class Activity {
         this.properties.put(key, value);
     }
 
+    /**
+     Updates this activity with the delivery information from an existing
+     conversation reference.
+
+     @param reference The conversation reference.
+     @param isIncoming (Optional) <c>true</c> to treat the activity as an
+     incoming activity, where the bot is the recipient; otherwaire <c>false</c>.
+     Default is <c>false</c>, and the activity will show the bot as the sender.
+     Call <see cref="GetConversationReference()"/> on an incoming
+     activity to get a conversation reference that you can then use to update an
+     outgoing activity with the correct delivery information.
+
+     */
+
+
+    public final Activity applyConversationReference(ConversationReference reference)
+    {
+        return applyConversationReference(reference, false);
+    }
+
+    public final Activity applyConversationReference(ConversationReference reference, boolean isIncoming)
+    {
+        this.withChannelId(reference.channelId());
+        this.withServiceUrl(reference.serviceUrl());
+        this.withConversation(reference.conversation());
+
+        if (isIncoming)
+        {
+            this.withFrom(reference.user());
+            this.withRecipient(reference.bot());
+            if (reference.activityId() != null)
+            {
+                this.withId(reference.activityId());
+            }
+        }
+        else // Outgoing
+        {
+            this.withFrom(reference.bot());
+            this.withRecipient(reference.user());
+            if (reference.activityId() != null)
+            {
+                this.withReplyToId(reference.activityId());
+            }
+        }
+        return this;
+    }
 
 }

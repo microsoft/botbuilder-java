@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.ea.async.Async.await;
@@ -117,7 +118,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@linkalso BotAdapter.RunPipeline(TurnContext, Func{TurnContext, Task}}
      */
     @Override
-    public CompletableFuture ContinueConversation(String botAppId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception {
+    public void ContinueConversation(String botAppId, ConversationReference reference, Consumer<TurnContext> callback) throws Exception {
         if (StringUtils.isEmpty(botAppId))
             throw new IllegalArgumentException("botAppId");
 
@@ -138,9 +139,9 @@ public class BotFrameworkAdapter extends BotAdapter {
 
             ConnectorClient connectorClient = await(this.CreateConnectorClientAsync(reference.serviceUrl(), claimsIdentity));
             context.getServices().Add("ConnectorClient", connectorClient);
-            await(RunPipeline(context, callback));
+            RunPipeline(context, callback);
         }
-        return completedFuture(null);
+        return;
     }
 
     /**
@@ -217,7 +218,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         return completedFuture(null);
     }
 
-    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, ActivityImpl activity, Function<TurnContext, CompletableFuture> callback) throws Exception {
+    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, ActivityImpl activity, Consumer<TurnContext> callback) throws Exception {
         BotAssert.ActivityNotNull(activity);
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
@@ -227,7 +228,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             // TODO: Verify key that C# uses
             context.getServices().Add("ConnectorClient", connectorClient);
 
-            await(super.RunPipeline(context, callback));
+            super.RunPipeline(context, callback);
 
             // Handle Invoke scenarios, which deviate from the request/response model in that
             // the Bot will return a specific body and return code.
@@ -257,7 +258,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
-    public CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
+    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
@@ -296,12 +297,10 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // if it is a Trace activity we only send to the channel if it's the emulator.
             } else if (!StringUtils.isEmpty(activity.replyToId())) {
                 ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
-                // TODO
-                //response = await(connectorClient.conversations().ReplyToActivityAsync(activity.conversation().id(), activity.id(), activity));
+                response = connectorClient.conversations().replyToActivity(activity.conversation().id(), activity.id(), activity);
             } else {
                 ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
-                // TODO
-                //response = Async.await(connectorClient.conversations().SendToConversationAsync(activity.conversation().id(), activity));
+                response = connectorClient.conversations().sendToConversation(activity.conversation().id(), activity);
             }
 
             // If No response is set, then defult to a "simple" response. This can't really be done
@@ -320,7 +319,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             responses[index] = response;
         }
 
-        return completedFuture(responses);
+        return responses;
     }
 
     /**
@@ -336,11 +335,10 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@linkalso TurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
     @Override
-    public CompletableFuture<ResourceResponse> UpdateActivity(TurnContext context, Activity activity) {
+    public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
         ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
-        // TODO
-        //return await(connectorClient.conversations().updateActivityAsync(activity));
-        return completedFuture(null);
+        // TODO String conversationId, String activityId, Activity activity)
+        return connectorClient.conversations().updateActivity(activity.conversation().id(), activity.id(), activity);
     }
 
     /**
@@ -352,8 +350,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * reference identifies the activity to delete.
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
-    public CompletableFuture<Void> DeleteActivity(TurnContext context, ConversationReference reference) {
-        return CompletableFuture.supplyAsync(() -> {
+    public void DeleteActivity(TurnContext context, ConversationReference reference) {
             ConnectorClientImpl connectorClient = context.getServices().Get("ConnectorClient");
             try {
                 await(connectorClient.conversations().deleteConversationMemberFuture(reference.conversation().id(), reference.activityId()));
@@ -364,8 +361,7 @@ public class BotFrameworkAdapter extends BotAdapter {
                 e.printStackTrace();
                 throw new RuntimeException(String.format("Failed deleting activity (%s)", e.toString()));
             }
-            return null;
-        });
+            return ;
     }
 
     /**
@@ -374,7 +370,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param memberId ID of the member to delete from the conversation
      * @return 
      */
-    public CompletableFuture<Void> DeleteConversationMember(TurnContextImpl context, String memberId) {
+    public void DeleteConversationMember(TurnContextImpl context, String memberId) {
         if (context.getActivity().conversation() == null)
             throw new IllegalArgumentException("BotFrameworkAdapter.deleteConversationMember(): missing conversation");
 
@@ -387,7 +383,7 @@ public class BotFrameworkAdapter extends BotAdapter {
 
         // TODO:
         //await (connectorClient.conversations().DeleteConversationMemberAsync(conversationId, memberId));
-        return completedFuture(null);
+        return ;
     }
 
     /**
@@ -573,7 +569,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      *
      */
     public CompletableFuture CreateConversation(String channelId, String serviceUrl, MicrosoftAppCredentials
-            credentials, ConversationParameters conversationParameters, Function<TurnContext, CompletableFuture> callback) throws Exception {
+            credentials, ConversationParameters conversationParameters, Consumer<TurnContext> callback) throws Exception {
         // Validate serviceUrl - can throw
         URI uri = new URI(serviceUrl);
         return CompletableFuture.runAsync(() -> {
@@ -614,7 +610,7 @@ public class BotFrameworkAdapter extends BotAdapter {
 
                 try (TurnContextImpl context = new TurnContextImpl(this, conversationUpdate)) {
                     try {
-                        await(this.RunPipeline(context, callback));
+                        this.RunPipeline(context, callback);
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new RuntimeException(String.format("Running pipeline failed : %s", e));

@@ -11,8 +11,8 @@ public class WasCalledMiddlware implements Middleware {
         this.called = called;
     }
 
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
         setCalled(true);
-        return next.next();
+        next.next();
     }
 }

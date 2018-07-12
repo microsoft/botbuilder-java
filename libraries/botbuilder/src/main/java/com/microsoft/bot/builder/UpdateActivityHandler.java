@@ -27,5 +27,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface UpdateActivityHandler {
-    CompletableFuture<ResourceResponse> handle(TurnContext context, Activity activity, Callable<CompletableFuture<ResourceResponse>> next);
+    ResourceResponse handle(TurnContext context, Activity activity, Callable<ResourceResponse> next);
 }

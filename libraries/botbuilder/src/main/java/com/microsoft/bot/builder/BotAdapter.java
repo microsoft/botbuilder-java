@@ -12,7 +12,9 @@ import com.microsoft.bot.schema.models.ResourceResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -72,7 +74,7 @@ public abstract class BotAdapter {
      * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
-    public abstract CompletableFuture<ResourceResponse[]> SendActivities(TurnContext context, Activity[] activities) throws InterruptedException ;
+    public abstract ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException ;
 
     /**
      * When overridden in a derived class, replaces an existing activity in the
@@ -87,7 +89,7 @@ public abstract class BotAdapter {
      * of the activity to replace.</p>
      * {@linkalso TurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
-    public abstract CompletableFuture<ResourceResponse> UpdateActivity(TurnContext context, Activity activity);
+    public abstract ResourceResponse UpdateActivity(TurnContext context, Activity activity);
 
     /**
      * When overridden in a derived class, deletes an existing activity in the
@@ -99,7 +101,7 @@ public abstract class BotAdapter {
      * reference identifies the activity to delete.
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
-    public abstract CompletableFuture<Void> DeleteActivity(TurnContext context, ConversationReference reference) throws ExecutionException, InterruptedException;
+    public abstract void DeleteActivity(TurnContext context, ConversationReference reference) throws ExecutionException, InterruptedException;
 
 
     /**
@@ -124,20 +126,20 @@ public abstract class BotAdapter {
      * (proactive messaging), the callback method is the callback method that was provided in the call.</p>
      *
      */
-    protected CompletableFuture RunPipeline(TurnContext context, Function<TurnContext, CompletableFuture> callback) throws Exception  {
+    protected void RunPipeline(TurnContext context, Consumer<TurnContext> callback) throws Exception  {
         BotAssert.ContextNotNull(context);
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
-            await(_middlewareSet.ReceiveActivityWithStatus(context, callback));
+            _middlewareSet.ReceiveActivityWithStatus(context, callback);
         }
         else {
             // call back to caller on proactive case
             if (callback != null) {
-                await(callback.apply(context));
+                callback.accept(context);
             }
         }
-        return completedFuture(null);
+        return;
     }
 
 
@@ -167,14 +169,14 @@ public abstract class BotAdapter {
      * before the bot can send activities to the user.
      * {@linkalso RunPipeline(TurnContext, Func{TurnContext, Task})}
      */
-    public CompletableFuture ContinueConversation(String botId, ConversationReference reference, Function<TurnContext, CompletableFuture> callback) throws Exception  {
+    public void ContinueConversation(String botId, ConversationReference reference, Consumer<TurnContext> callback) throws Exception  {
 
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
         ActivityImpl activity = conv.GetPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity))
         {
-            return this.RunPipeline(context, callback);
+            this.RunPipeline(context, callback);
         }
     }
 }

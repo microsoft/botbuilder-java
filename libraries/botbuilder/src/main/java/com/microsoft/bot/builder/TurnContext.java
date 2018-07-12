@@ -18,7 +18,6 @@ package com.microsoft.bot.builder;
  * {@linkalso DeleteActivityHandler}
  */
 
-import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 import com.microsoft.bot.schema.models.ResourceResponse;
@@ -81,10 +80,10 @@ public interface TurnContext
      * Speech Synthesis Markup Language (SSML) format.</p>
      *
      */
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend) throws Exception;
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak) throws Exception;
+    ResourceResponse SendActivity(String textReplyToSend) throws Exception;
+    ResourceResponse SendActivity(String textReplyToSend, String speak) throws Exception;
     //CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak = null, String inputHint = InputHints.AcceptingInput);
-    CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception;
+    ResourceResponse SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception;
     
     /**
      * Sends an activity to the sender of the incoming activity.
@@ -94,7 +93,7 @@ public interface TurnContext
      * a {@link ResourceResponse} object containing the ID that the receiving 
      * channel assigned to the activity.
      */
-    CompletableFuture<ResourceResponse> SendActivity(Activity activity) throws Exception;
+    ResourceResponse SendActivity(Activity activity) throws Exception;
 
     /**
      * Sends a set of activities to the sender of the incoming activity.
@@ -104,7 +103,7 @@ public interface TurnContext
      * an array of {@link ResourceResponse} objects containing the IDs that 
      * the receiving channel assigned to the activities.
      */
-    CompletableFuture<ResourceResponse[]> SendActivities(Activity[] activities) throws Exception;
+    ResourceResponse[] SendActivities(Activity[] activities) throws Exception;
 
     /**
      * Replaces an existing activity. 
@@ -119,11 +118,23 @@ public interface TurnContext
     ResourceResponse UpdateActivity(Activity activity) throws Exception;
 
     /**
+     * Replaces an existing activity.
+     * @param activity New replacement activity.
+     * @return A task that represents the work queued to execute.
+     * If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.
+     * <p>Before calling this, set the ID of the replacement activity to the ID
+     * of the activity to replace.</p>
+     */
+    //CompletableFuture<ResourceResponse> UpdateActivityAsync(Activity activity) throws Exception;
+
+    /**
      * Deletes an existing activity.
      * @param activityId The ID of the activity to delete.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture DeleteActivity(String activityId) throws Exception;
+    CompletableFuture<Void> DeleteActivity(String activityId) throws Exception;
 
     /**
      * Deletes an existing activity.
@@ -132,7 +143,7 @@ public interface TurnContext
      * The conversation reference's {@link ConversationReference.ActivityId}
      * indicates the activity in the conversation to delete.
      */
-    CompletableFuture DeleteActivity(ConversationReference conversationReference) throws Exception;
+    void DeleteActivity(ConversationReference conversationReference) throws Exception;
 
     /**
      * Adds a response handler for send activity operations.

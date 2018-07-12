@@ -13,6 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 
 /**
  * Represents a transcript logger that writes activites to a <see cref="Trace"/> object.
@@ -23,6 +26,18 @@ public class TraceTranscriptLogger implements TranscriptLogger {
             .enable(SerializationFeature.INDENT_OUTPUT);
     private static final Logger logger = LogManager.getLogger("HelloWorld");
 
+    ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
+    {
+        @Override
+        public ForkJoinWorkerThread newThread(ForkJoinPool pool)
+        {
+            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            worker.setName("BotTrace-" + worker.getPoolIndex());
+            return worker;
+        }
+    };
+
+    ExecutorService executor = new ForkJoinPool(Runtime.getRuntime().availableProcessors(), factory, null, true);
 
     /**
      * Log an activity to the transcript.
@@ -30,8 +45,8 @@ public class TraceTranscriptLogger implements TranscriptLogger {
      * @param activity The activity to transcribe.
      * @return A task that represents the work queued to execute.
      */
-    public final CompletableFuture LogActivityAsync(Activity activity) {
-        return CompletableFuture.runAsync(() -> {
+    @Override
+    public void LogActivityAsync(Activity activity) {
             BotAssert.ActivityNotNull(activity);
             String event = null;
             try {
@@ -40,6 +55,5 @@ public class TraceTranscriptLogger implements TranscriptLogger {
                 e.printStackTrace();
             }
             this.logger.info(event);
-        });
     }
 }

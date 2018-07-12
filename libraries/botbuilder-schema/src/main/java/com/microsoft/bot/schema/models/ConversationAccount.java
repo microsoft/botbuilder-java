@@ -167,10 +167,10 @@ public class ConversationAccount {
      *
      * @return A Key-Value map of the properties
      */
-    @JsonAnyGetter
-    public Map<String, JsonNode> properties() {
-        return this.properties;
-    }
+//    @JsonAnyGetter
+//    public Map<String, JsonNode> properties() {
+//        return this.properties;
+//    }
 
     /**
      * Set overflow properties.
@@ -180,10 +180,10 @@ public class ConversationAccount {
      *
      */
 
-    @JsonAnySetter
-    public void setProperties(String key, JsonNode value) {
-        this.properties.put(key, value);
-    }
+//    @JsonAnySetter
+//    public void setProperties(String key, JsonNode value) {
+//        this.properties.put(key, value);
+//    }
 
 
 }

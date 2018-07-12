@@ -72,15 +72,14 @@ public class BotState<TState> implements Middleware
      * and persists the state object on the trailing edge.
      *
      */
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        await(ReadToContextService(context));
-        await(next.next());
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
+        ReadToContextService(context);
+        next.next();
         await(WriteFromContextService(context));
-        return completedFuture(null);
+        return;
     }
 
-    protected CompletableFuture ReadToContextService(TurnContext context) throws  IllegalArgumentException, JsonProcessingException {
-        return CompletableFuture.runAsync(() -> {
+    protected void ReadToContextService(TurnContext context) throws  IllegalArgumentException, JsonProcessingException {
             String key = this.keyDelegate.apply(context);
             Map<String, ?> items = null;
             try {
@@ -108,12 +107,11 @@ public class BotState<TState> implements Middleware
             if (state == null)
                 state = ctor.get();
             context.getServices().Add(this.propertyName, state);
-        });
     }
 
     protected CompletableFuture WriteFromContextService(TurnContext context) throws Exception {
         TState state = context.getServices().Get(this.propertyName);
-        return completedFuture(await(Write(context, state)));
+        return Write(context, state);
     }
 
     /**

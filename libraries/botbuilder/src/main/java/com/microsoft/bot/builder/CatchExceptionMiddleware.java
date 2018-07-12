@@ -28,7 +28,7 @@ public class CatchExceptionMiddleware<T extends Exception> implements Middleware
 
 
     @Override
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
 
         Class c = _exceptionType.getDeclaringClass();
 
@@ -36,16 +36,16 @@ public class CatchExceptionMiddleware<T extends Exception> implements Middleware
             // Continue to route the activity through the pipeline
             // any errors further down the pipeline will be caught by
             // this try / catch
-            await(next.next());
+            next.next();
         } catch (Exception ex) {
 
             if (_exceptionType.isInstance(ex))
                 // If an error is thrown and the exception is of type T then invoke the handler
-                await(_handler.<T>apply(context, (T)ex));
+                _handler.<T>apply(context, (T)ex);
             else
                 throw ex;
         }
-        return completedFuture(null);
+        return ;
     }
 
 }

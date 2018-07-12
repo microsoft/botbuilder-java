@@ -19,5 +19,5 @@ public interface TranscriptLogger {
      * @param activity The activity to transcribe.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture LogActivityAsync(Activity activity);
+    void LogActivityAsync(Activity activity);
 }

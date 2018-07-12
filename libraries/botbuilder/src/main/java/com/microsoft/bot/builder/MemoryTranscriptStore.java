@@ -17,6 +17,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,6 +32,17 @@ import java.util.stream.Collectors;
  */
 public class MemoryTranscriptStore implements TranscriptStore {
     private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<String, HashMap<String, ArrayList<Activity>>>();
+    final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+        @Override
+        public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            worker.setName("TestFlow-" + worker.getPoolIndex());
+            return worker;
+        }
+    };
+
+    final ExecutorService executor = new ForkJoinPool(Runtime.getRuntime().availableProcessors(), factory, null, false);
+
 
     /**
      * Logs an activity to the transcript.
@@ -36,31 +50,33 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @param activity The activity to log.
      * @return A CompletableFuture that represents the work queued to execute.
      */
-    public final CompletableFuture LogActivityAsync(Activity activity) {
-        return CompletableFuture.runAsync(() -> {
-            if (activity == null) {
-                throw new NullPointerException("activity cannot be null for LogActivity()");
+    public final void LogActivityAsync(Activity activity) {
+        if (activity == null) {
+            throw new NullPointerException("activity cannot be null for LogActivity()");
+        }
+
+        synchronized (this.channels) {
+            HashMap<String, ArrayList<Activity>> channel;
+            if (!this.channels.containsKey(activity.channelId())) {
+                channel = new HashMap<String, ArrayList<Activity>>();
+                this.channels.put(activity.channelId(), channel);
+            } else {
+                channel = this.channels.get(activity.channelId());
             }
 
-            synchronized (this.channels) {
-                HashMap<String, ArrayList<Activity>> channel;
-                if (!this.channels.containsKey(activity.channelId())) {
-                    channel = new HashMap<String, ArrayList<Activity>>();
-                    this.channels.put(activity.channelId(), channel);
-                } else {
-                    channel = this.channels.get(activity.channelId());
-                }
+            ArrayList<Activity> transcript = null;
 
-                ArrayList<Activity> transcript = null;
-                if (!(channel.containsKey(activity.conversation().id()) ? (transcript = channel.get(activity.conversation().id())) == transcript : false)) {
-                    transcript = new ArrayList<Activity>();
-                    channel.put(activity.conversation().id(), transcript);
-                }
 
-                transcript.add(activity);
+            if (!channel.containsKey(activity.conversation().id())) {
+                transcript = new ArrayList<Activity>();
+                channel.put(activity.conversation().id(), transcript);
+            } else {
+                transcript = channel.get(activity.conversation().id());
             }
 
-        });
+            transcript.add(activity);
+        }
+
     }
 
     /**
@@ -140,7 +156,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 } else {
                     List<Activity> items = transcript.stream()
                             .sorted(Comparator.comparing(Activity::timestamp))
-                            .filter(a -> a.timestamp().compareTo(startDate) >= 0)
+                            .filter(a -> a.timestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
                             .limit(20)
                             .collect(Collectors.toList());
                     pagedResult.items(items.toArray(new Activity[items.size()]));
@@ -152,7 +168,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
             return pagedResult;
 
-        });
+        }, this.executor);
     }
 
     /**
@@ -181,7 +197,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                     channel.remove(conversationId);
                 }
             }
-        });
+        }, this.executor);
     }
 
     /**
@@ -275,7 +291,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 }
             }
             return pagedResult;
-        });
+        }, this.executor);
     }
 
     /**
