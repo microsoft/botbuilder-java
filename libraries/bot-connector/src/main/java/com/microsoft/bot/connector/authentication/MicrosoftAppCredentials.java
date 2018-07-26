@@ -4,33 +4,21 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
-
 import okhttp3.*;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import rx.Completable;
-
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.ea.async.Async.await;
 import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotLoginUrl;
 import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotOAuthScope;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.stream.Collectors.joining;
 
 public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private String appId;
@@ -50,7 +38,6 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     public final String OAuthScope = AuthenticationConstants.ToChannelFromBotOAuthScope;
 
 
-
     public String getTokenCacheKey() {
         return String.format("%s-cache", this.appId);
     }
@@ -61,15 +48,18 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         this.client = new OkHttpClient.Builder().build();
         this.mapper = new ObjectMapper().findAndRegisterModules();
     }
+
     public static final MicrosoftAppCredentials Empty = new MicrosoftAppCredentials(null, null);
 
     public String microsoftAppId() {
         return this.appId;
     }
+
     public MicrosoftAppCredentials withMicrosoftAppId(String appId) {
         this.appId = appId;
         return this;
     }
+
     public String getToken(Request request) throws IOException {
         if (System.currentTimeMillis() < expiredTime) {
             return currentToken;
@@ -93,16 +83,12 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     }
 
 
-
-    private boolean ShouldSetToken(String url)
-    {
-        if (isTrustedServiceUrl(url))
-        {
+    private boolean ShouldSetToken(String url) {
+        if (isTrustedServiceUrl(url)) {
             return true;
         }
         return false;
     }
-
 
 
     @Override
@@ -134,7 +120,8 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         try {
             URL url = new URL(serviceUrl);
             trustServiceUrl(url, expirationTime);
-        } catch (MalformedURLException e) { }
+        } catch (MalformedURLException e) {
+        }
     }
 
     public static void trustServiceUrl(URL serviceUrl, LocalDateTime expirationTime) {
@@ -153,6 +140,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     public static boolean isTrustedServiceUrl(URL url) {
         return !trustHostNames.getOrDefault(url.getHost(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
     }
+
     public static boolean isTrustedServiceUrl(HttpUrl url) {
         return !trustHostNames.getOrDefault(url.host(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
     }

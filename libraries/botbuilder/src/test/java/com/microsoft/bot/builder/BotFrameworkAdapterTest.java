@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static com.ea.async.Async.await;
+
 
 public class BotFrameworkAdapterTest {
     @Test
@@ -41,7 +41,7 @@ public class BotFrameworkAdapterTest {
                 .withId(activityId);
 
 
-        ResourceResponse resourceResponse = await(c.SendActivity(activity));
+        ResourceResponse resourceResponse = c.SendActivity(activity);
         Assert.assertTrue("Incorrect response Id returned", resourceResponse.id() == activityId);
     }
     

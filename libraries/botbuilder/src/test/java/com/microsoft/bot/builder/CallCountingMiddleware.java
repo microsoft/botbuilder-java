@@ -1,9 +1,5 @@
 package com.microsoft.bot.builder;
 
-import java.util.concurrent.CompletableFuture;
-
-import static com.ea.async.Async.await;
-
 public class CallCountingMiddleware implements Middleware {
     private int calls = 0;
 
@@ -18,17 +14,15 @@ public class CallCountingMiddleware implements Middleware {
 
 
     @Override
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        return CompletableFuture.runAsync(() -> {
-            this.calls++;
-            try {
-                await(next.next());
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(String.format("CallCountingMiddleWare: %s", e.toString()));
-            }
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
+        this.calls++;
+        try {
+            next.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(String.format("CallCountingMiddleWare: %s", e.toString()));
+        }
 
 
-        });
     }
 }

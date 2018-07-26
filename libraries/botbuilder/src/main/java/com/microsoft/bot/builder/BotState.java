@@ -4,25 +4,24 @@ package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-import static com.ea.async.Async.await;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
  * Abstract Base class which manages details of automatic loading and saving of bot state.
+ *
  * @param TState The type of the bot state object.
  */
 //public class BotState<TState> : Middleware
 //    where TState : class, new()
-public class BotState<TState> implements Middleware
-{
+public class BotState<TState> implements Middleware {
 
     private final StateSettings settings;
     private final Storage storage;
@@ -32,13 +31,15 @@ public class BotState<TState> implements Middleware
 
     /**
      * Creates a new {@link BotState{TState}} middleware object.
-     * @param name The name to use to load or save the state object.
-     * @param storage The storage provider to use.
+     *
+     * @param name     The name to use to load or save the state object.
+     * @param storage  The storage provider to use.
      * @param settings The state persistance options to use.
      */
     public BotState(Storage storage, String propertyName, Function<TurnContext, String> keyDelegate, Supplier<? extends TState> ctor) {
         this(storage, propertyName, keyDelegate, ctor, null);
     }
+
     public BotState(Storage storage, String propertyName, Function<TurnContext, String> keyDelegate, Supplier<? extends TState> ctor, StateSettings settings) {
         if (null == storage) {
             throw new IllegalArgumentException("Storage");
@@ -65,65 +66,63 @@ public class BotState<TState> implements Middleware
 
     /**
      * Processess an incoming activity.
+     *
      * @param context The context object for this turn.
-     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @param next    The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
      * This middleware loads the state object on the leading edge of the middleware pipeline
      * and persists the state object on the trailing edge.
-     *
      */
-    public CompletableFuture OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        await(ReadToContextService(context));
-        await(next.next());
-        await(WriteFromContextService(context));
-        return completedFuture(null);
+    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
+        ReadToContextService(context);
+        next.next();
+        WriteFromContextService(context).join();
+        return;
     }
 
-    protected CompletableFuture ReadToContextService(TurnContext context) throws  IllegalArgumentException, JsonProcessingException {
-        return CompletableFuture.runAsync(() -> {
-            String key = this.keyDelegate.apply(context);
-            Map<String, ?> items = null;
-            try {
-                CompletableFuture<Map<String, ?>> result = storage.Read(new String[] { key });
-                items = result.get();
-                System.out.println(String.format("BotState:OnTurn(tid:%s) ReadToContextService: Found %s items", Thread.currentThread().getId(), items.size()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                throw new RuntimeException(String.format("Error waiting context storage read: %s", e.toString()));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
-                    .filter(entry -> entry.getKey() == key)
-                    .map(Map.Entry::getValue)
-                    .map(entry -> (TState) entry)
-                    .findFirst()
-                    .orElse(null);
+    protected void ReadToContextService(TurnContext context) throws IllegalArgumentException, JsonProcessingException {
+        String key = this.keyDelegate.apply(context);
+        Map<String, ?> items = null;
+        try {
+            CompletableFuture<Map<String, ?>> result = storage.Read(new String[]{key});
+            items = result.get();
+            System.out.println(String.format("BotState:OnTurn(tid:%s) ReadToContextService: Found %s items", Thread.currentThread().getId(), items.size()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException(String.format("Error waiting context storage read: %s", e.toString()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
+                .filter(entry -> entry.getKey() == key)
+                .map(Map.Entry::getValue)
+                .map(entry -> (TState) entry)
+                .findFirst()
+                .orElse(null);
 
 
-
-            //var state = items.Where(entry => entry.Key == key).Select(entry => entry.Value).OfType<TState>().FirstOrDefault();
-            if (state == null)
-                state = ctor.get();
-            context.getServices().Add(this.propertyName, state);
-        });
+        //var state = items.Where(entry => entry.Key == key).Select(entry => entry.Value).OfType<TState>().FirstOrDefault();
+        if (state == null)
+            state = ctor.get();
+        context.getServices().Add(this.propertyName, state);
     }
 
     protected CompletableFuture WriteFromContextService(TurnContext context) throws Exception {
         TState state = context.getServices().Get(this.propertyName);
-        return completedFuture(await(Write(context, state)));
+        return Write(context, state);
     }
 
     /**
      * Reads state from storage.
-     * @param TState The type of the bot state object.
+     *
+     * @param TState  The type of the bot state object.
      * @param context The context object for this turn.
      */
     public CompletableFuture<TState> Read(TurnContext context) throws JsonProcessingException {
         String key = this.keyDelegate.apply(context);
-        Map<String, ?> items = await( storage.Read(new String[] { key }));
+        Map<String, ?> items = storage.Read(new String[]{key}).join();
         TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
                 .filter(item -> item.getKey() == key)
                 .map(Map.Entry::getValue)
@@ -138,8 +137,9 @@ public class BotState<TState> implements Middleware
 
     /**
      * Writes state to storage.
+     *
      * @param context The context object for this turn.
-     * @param state The state object.
+     * @param state   The state object.
      */
     public CompletableFuture Write(TurnContext context, TState state) throws Exception {
         HashMap<String, TState> changes = new HashMap<String, TState>();
@@ -150,14 +150,14 @@ public class BotState<TState> implements Middleware
         changes.put(key, state);
 
         if (this.settings.getLastWriterWins()) {
-            for (Map.Entry<String, ?> item  : changes.entrySet()) {
+            for (Map.Entry<String, ?> item : changes.entrySet()) {
                 if (item.getValue() instanceof StoreItem) {
                     StoreItem valueStoreItem = (StoreItem) item.getValue();
                     valueStoreItem.seteTag("*");
                 }
             }
         }
-        return completedFuture(await(storage.Write(changes)));
+        return completedFuture(storage.Write(changes).join());
     }
 }
 

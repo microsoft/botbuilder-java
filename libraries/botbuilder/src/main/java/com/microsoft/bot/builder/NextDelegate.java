@@ -4,5 +4,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface NextDelegate {
-     CompletableFuture next() throws Exception;
+     void next() throws Exception;
 }

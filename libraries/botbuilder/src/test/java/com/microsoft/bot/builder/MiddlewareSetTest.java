@@ -1,6 +1,6 @@
 package com.microsoft.bot.builder;
 
-import com.ea.async.Async;
+
 import com.microsoft.bot.builder.ActionDel;
 import com.microsoft.bot.builder.base.TestBase;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
@@ -11,9 +11,10 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.ea.async.Async.await;
+
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
@@ -31,8 +32,6 @@ public class MiddlewareSetTest extends TestBase
 
     @Override
     protected void initializeClients(RestClient restClient, String botId, String userId) {
-        // Initialize async/await support
-        Async.init();
 
         connector = new ConnectorClientImpl(restClient);
         bot = new ChannelAccount().withId(botId);
@@ -69,9 +68,9 @@ public class MiddlewareSetTest extends TestBase
         final boolean[] wasCalled = {false};
         MiddlewareSet inner = new MiddlewareSet();
         inner.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 wasCalled[0] = true;
-                return nd.next();
+                nd.next();
             }
         }));
         MiddlewareSet outer = new MiddlewareSet();
@@ -94,12 +93,11 @@ public class MiddlewareSetTest extends TestBase
     public void NoMiddlewareWithDelegate() throws Exception {
         MiddlewareSet m = new MiddlewareSet();
         final boolean wasCalled[] = {false};
-        Function<TurnContext, CompletableFuture> cb = context -> {
+        Consumer<TurnContext> cb = context -> {
                 wasCalled[0] = true;
-                return completedFuture(null);
         };
         // No middleware. Should not explode.
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
         Assert.assertTrue("Delegate was not called", wasCalled[0]);
     }
 
@@ -108,16 +106,15 @@ public class MiddlewareSetTest extends TestBase
         WasCalledMiddlware simple = new WasCalledMiddlware();
 
         final boolean wasCalled[] = {false};
-        Function<TurnContext, CompletableFuture> cb = context -> {
+        Consumer<TurnContext> cb = context -> {
                 wasCalled[0] = true;
-                return completedFuture(null);
         };
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(simple);
 
         Assert.assertFalse(simple.getCalled());
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
         Assert.assertTrue(simple.getCalled());
         Assert.assertTrue( "Delegate was not called", wasCalled[0]);
     }
@@ -130,7 +127,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(simple);
 
         Assert.assertFalse(simple.getCalled());
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(simple.getCalled());
     }
 
@@ -139,12 +136,12 @@ public class MiddlewareSetTest extends TestBase
     public void BubbleUncaughtException() throws Exception {
         MiddlewareSet m = new MiddlewareSet();
         m.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
-            public CompletableFuture<Boolean> requestHandler(TurnContext tc, NextDelegate nd) throws IllegalStateException {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws IllegalStateException {
                 throw new IllegalStateException("test");
             }}
             ));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertFalse("Should never have gotten here", true);
     }
 
@@ -157,7 +154,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(one);
         m.Use(two);
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(one.getCalled());
         Assert.assertTrue(two.getCalled());
     }
@@ -168,16 +165,15 @@ public class MiddlewareSetTest extends TestBase
         WasCalledMiddlware two = new WasCalledMiddlware();
 
         final int called[] = {0};
-        Function<TurnContext, CompletableFuture> cb = (context) -> {
+        Consumer<TurnContext> cb = (context) -> {
                 called[0]++;
-                return completedFuture(null);
         };
 
         MiddlewareSet m = new MiddlewareSet();
         m.Use(one);
         m.Use(two);
 
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
         Assert.assertTrue(one.getCalled());
         Assert.assertTrue(two.getCalled());
         Assert.assertTrue("Incorrect number of calls to Delegate", called[0] == 1 );
@@ -208,7 +204,7 @@ public class MiddlewareSetTest extends TestBase
         m.Use(one);
         m.Use(two);
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(called1[0]);
         Assert.assertTrue(called2[0]);
     }
@@ -229,11 +225,10 @@ public class MiddlewareSetTest extends TestBase
 
         // The middlware in this pipeline calls next(), so the delegate should be called
         final boolean didAllRun[] = {false};
-        Function<TurnContext, CompletableFuture> cb  = (context) -> {
+        Consumer<TurnContext> cb  = (context) -> {
                 didAllRun[0] = true;
-                return completedFuture(null);
         };
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
 
         Assert.assertTrue(called1[0]);
         Assert.assertTrue(didAllRun[0]);
@@ -243,14 +238,13 @@ public class MiddlewareSetTest extends TestBase
     public void Status_RunAtEndEmptyPipeline() throws Exception {
         MiddlewareSet m = new MiddlewareSet();
         final boolean didAllRun[] = {false};
-        Function<TurnContext, CompletableFuture> cb = (context)-> {
+        Consumer<TurnContext> cb = (context)-> {
                 didAllRun[0] = true;
-                return completedFuture(null);
         };
 
         // This middlware pipeline has no entries. This should result in
         // the status being TRUE.
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
         Assert.assertTrue(didAllRun[0]);
 
     }
@@ -280,11 +274,10 @@ public class MiddlewareSetTest extends TestBase
         m.Use(two);
 
         boolean didAllRun[] = {false};
-        Function<TurnContext, CompletableFuture> cb= (context) -> {
+        Consumer<TurnContext> cb= (context) -> {
                 didAllRun[0] = true;
-                return completedFuture(null);
         };
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
         Assert.assertTrue(called1[0]);
         Assert.assertTrue(called2[0]);
 
@@ -308,12 +301,10 @@ public class MiddlewareSetTest extends TestBase
 
         // The middleware in this pipeline DOES NOT call next(), so this must not be called
         boolean didAllRun[] = {false};
-        Function<TurnContext, CompletableFuture> cb = (context) -> {
-            return CompletableFuture.runAsync(() -> {
+        Consumer<TurnContext> cb = (context) -> {
                 didAllRun[0] = true;
-            });
         };
-        await(m.ReceiveActivityWithStatus(null, cb));
+        m.ReceiveActivityWithStatus(null, cb);
 
         Assert.assertTrue(called1[0]);
 
@@ -328,16 +319,16 @@ public class MiddlewareSetTest extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 didRun[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc));
 
         Assert.assertFalse(didRun[0]);
-        await( m.ReceiveActivity(null));
+         m.ReceiveActivity(null);
         Assert.assertTrue(didRun[0]);
     }
 
@@ -348,25 +339,25 @@ public class MiddlewareSetTest extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 didRun1[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return;
             }
         };
 
         m.Use(new AnonymousReceiveMiddleware(mwc1));
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 didRun2[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return;
             }
         };
 
         m.Use(new AnonymousReceiveMiddleware(mwc2));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(didRun1[0]);
         Assert.assertTrue(didRun2[0]);
     }
@@ -378,27 +369,27 @@ public class MiddlewareSetTest extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertFalse("Looks like the 2nd one has already run", didRun2[0]);
                 didRun1[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertTrue("Looks like the 1nd one has not yet run", didRun1[0]);
                 didRun2[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return ;
             }
         };
 
         m.Use(new AnonymousReceiveMiddleware(mwc2));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(didRun1[0]);
         Assert.assertTrue(didRun2[0]);
     }
@@ -410,13 +401,13 @@ public class MiddlewareSetTest extends TestBase
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertFalse("First middleware already ran", didRun1[0]);
                 Assert.assertFalse("Looks like the second middleware was already run", didRun2[0]);
                 didRun1[0] = true;
-                await(nd.next());
+                nd.next();
                 Assert.assertTrue("Second middleware should have completed running", didRun2[0]);
-                return completedFuture(null);
+                return ;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
@@ -431,7 +422,7 @@ public class MiddlewareSetTest extends TestBase
         };
         m.Use(new CallMeMiddlware(act));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(didRun1[0]);
         Assert.assertTrue(didRun2[0]);
     }
@@ -454,16 +445,16 @@ public class MiddlewareSetTest extends TestBase
         m.Use(new CallMeMiddlware(act));
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertTrue("First middleware has not been run yet", didRun1[0]);
                 didRun2[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(didRun1[0]);
         Assert.assertTrue(didRun2[0]);
     }
@@ -477,29 +468,29 @@ public class MiddlewareSetTest extends TestBase
         MiddlewareSet m = new MiddlewareSet();
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertFalse("Looks like the 1st middleware has already run", didRun1[0]);
                 didRun1[0] = true;
-                await(nd.next());
+                nd.next();
                 Assert.assertTrue("The 2nd middleware should have run now.", didRun1[0]);
                 codeafter2run[0] = true;
-                return completedFuture(null);
+                return ;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
                 Assert.assertTrue("Looks like the 1st middleware has not been run", didRun1[0]);
                 Assert.assertFalse("The code that runs after middleware 2 is complete has already run.", codeafter2run[0]);
                 didRun2[0] = true;
-                await(nd.next());
-                return completedFuture(null);
+                nd.next();
+                return ;
             }
         };
         m.Use(new AnonymousReceiveMiddleware(mwc2));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(didRun1[0]);
         Assert.assertTrue(didRun2[0]);
         Assert.assertTrue(codeafter2run[0]);
@@ -511,9 +502,9 @@ public class MiddlewareSetTest extends TestBase
         final boolean caughtException[] = {false};
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws ExecutionException, InterruptedException {
                 try {
-                    await(nd.next());
+                    nd.next();
                     Assert.assertTrue("Should not get here", false);
 
                 }
@@ -526,20 +517,20 @@ public class MiddlewareSetTest extends TestBase
                 } catch (Exception e) {
                     Assert.assertTrue("Should not get here" + e.getMessage(), false);
                 }
-                return completedFuture(null);
+                return ;
         }};
 
         m.Use(new AnonymousReceiveMiddleware(mwc1));
 
         MiddlewareCall mwc2 = new MiddlewareCall() {
-            public CompletableFuture requestHandler(TurnContext tc, NextDelegate nd) throws InterruptedException {
+            public void requestHandler(TurnContext tc, NextDelegate nd) throws InterruptedException {
                 throw new InterruptedException("test");
             }
             };
 
         m.Use(new AnonymousReceiveMiddleware(mwc2));
 
-        await(m.ReceiveActivity(null));
+        m.ReceiveActivity(null);
         Assert.assertTrue(caughtException[0]);
     }
 

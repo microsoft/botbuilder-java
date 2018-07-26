@@ -10,32 +10,25 @@ import org.junit.Test;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ea.async.Async.await;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-
 public class CatchException_MiddlewareTest {
 
     @Test
     public void CatchException_TestMiddleware_TestStackedErrorMiddleware() throws ExecutionException, InterruptedException {
 
         TestAdapter adapter = new TestAdapter()
-                // Add middleware to catch general exceptions
-
                 .Use(new CatchExceptionMiddleware<Exception>(new CallOnException() {
                     @Override
                     public <T> CompletableFuture apply(TurnContext context, T t) throws Exception {
                         return CompletableFuture.runAsync(() -> {
                             Activity activity = context.getActivity();
-                            if (activity instanceof  ActivityImpl)
-                            {
+                            if (activity instanceof ActivityImpl) {
                                 try {
-                                    context.SendActivity(((ActivityImpl)activity).CreateReply(t.toString()));
+                                    context.SendActivity(((ActivityImpl) activity).CreateReply(t.toString()));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
                                 }
-                            }
-                            else
+                            } else
                                 Assert.assertTrue("Test was built for ActivityImpl", false);
 
                         });
@@ -52,29 +45,27 @@ public class CatchException_MiddlewareTest {
                 }, NullPointerException.class));
 
 
-        await(new TestFlow(adapter, (context) ->
-        {
-            CompletableFuture doit = CompletableFuture.runAsync(() -> {
-                if (context.getActivity().text() == "foo") {
-                    try {
-                        context.SendActivity(context.getActivity().text());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (context.getActivity().text() == "UnsupportedOperationException") {
-                    throw new UnsupportedOperationException("Test");
-                }
-            });
+        new TestFlow(adapter, (context) ->
+                {
 
-            return doit;
-        }
+                    if (context.getActivity().text() == "foo") {
+                        try {
+                            context.SendActivity(context.getActivity().text());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (context.getActivity().text() == "UnsupportedOperationException") {
+                        throw new UnsupportedOperationException("Test");
+                    }
+
+                }
         )
                 .Send("foo")
                 .AssertReply("foo", "passthrough")
                 .Send("UnsupportedOperationException")
                 .AssertReply("Test")
-                .StartTest());
+                .StartTest();
 
     }
 

@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -361,6 +362,223 @@ public class ActivityImpl extends Activity {
     }
 
     /**
+     * Set the speak value.
+     *
+     * @param speak the speak value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withSpeak(String speak) {
+        super.withSpeak(speak);
+        return this;
+    }
+
+
+    /**
+     * Set the inputHint value.
+     *
+     * @param inputHint the inputHint value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withInputHint(InputHints inputHint) {
+        super.withInputHint(inputHint);
+        return this;
+    }
+
+    /**
+     * Set the summary value.
+     *
+     * @param summary the summary value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withSummary(String summary) {
+        super.withSummary(summary);
+        return this;
+    }
+
+
+    /**
+     * Set the suggestedActions value.
+     *
+     * @param suggestedActions the suggestedActions value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withSuggestedActions(SuggestedActions suggestedActions) {
+        super.withSuggestedActions(suggestedActions);
+        return this;
+    }
+
+
+    /**
+     * Set the attachments value.
+     *
+     * @param attachments the attachments value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withAttachments(List<Attachment> attachments) {
+        super.withAttachments(attachments);
+        return this;
+    }
+
+
+    /**
+     * Set the entities value.
+     *
+     * @param entities the entities value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withEntities(List<EntityImpl> entities) {
+        super.withEntities(entities);
+        return this;
+    }
+
+
+    /**
+     * Set the channelData value.
+     *
+     * @param channelData the channelData value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withChannelData(Object channelData) {
+        super.withChannelData(channelData);
+        return this;
+    }
+
+
+    /**
+     * Set the action value.
+     *
+     * @param action the action value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withAction(String action) {
+        super.withAction(action);
+        return this;
+    }
+
+    /**
+     * Set the replyToId value.
+     *
+     * @param replyToId the replyToId value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withReplyToId(String replyToId) {
+        super.withReplyToId(replyToId);
+        return this;
+    }
+
+    /**
+     * Set the label value.
+     *
+     * @param label the label value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withLabel(String label) {
+        super.withLabel(label);
+        return this;
+    }
+
+    /**
+     * Set the valueType value.
+     *
+     * @param valueType the valueType value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withValueType(String valueType) {
+        super.withValueType(valueType);
+        return this;
+    }
+
+    /**
+     * Set the value value.
+     *
+     * @param value the value value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withValue(Object value) {
+        super.withValue(value);
+        return this;
+    }
+
+
+    /**
+     * Set the name value.
+     *
+     * @param name the name value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withName(String name) {
+        super.withName(name);
+        return this;
+    }
+
+
+    /**
+     * Set the relatesTo value.
+     *
+     * @param relatesTo the relatesTo value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withRelatesTo(ConversationReference relatesTo) {
+        super.withRelatesTo(relatesTo);
+        return this;
+    }
+
+    /**
+     * Set the code value.
+     *
+     * @param code the code value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withCode(EndOfConversationCodes code) {
+        super.withCode(code);
+        return this;
+    }
+
+    /**
+     * Set the expiration value.
+     *
+     * @param expiration the expiration value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withExpiration(DateTime expiration) {
+        super.withExpiration(expiration);
+        return this;
+    }
+
+    /**
+     * Set the importance value.
+     *
+     * @param importance the importance value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withImportance(String importance) {
+        super.withImportance(importance);
+        return this;
+    }
+
+    /**
+     * Set the deliveryMode value.
+     *
+     * @param deliveryMode the deliveryMode value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withDeliveryMode(String deliveryMode) {
+        super.withDeliveryMode(deliveryMode);
+        return this;
+    }
+
+    /**
+     * Set the textHighlights value.
+     *
+     * @param textHighlights the textHighlights value to set
+     * @return the Activity object itself.
+     */
+    public ActivityImpl withTextHighlights(List<TextHighlight> textHighlights) {
+        super.withTextHighlights(textHighlights);
+        return this;
+    }
+
+    /**
      * Return an MessageActivity mask if this is a message activity
      */
     public MessageActivity AsMessageActivity() {
@@ -517,4 +735,44 @@ public class ActivityImpl extends Activity {
         }
         return new ResultPair<Boolean, TypeT>(true, instance);
     }
+    public static Activity CloneActity(Activity activity) {
+        Activity clone = new Activity()
+                .withType(activity.type())
+                .withId(activity.id())
+                .withTimestamp(activity.timestamp())
+                .withLocalTimestamp(activity.localTimestamp())
+                .withText(activity.text())
+                .withFrom(activity.from())
+                .withRecipient(activity.recipient())
+                .withConversation(activity.conversation())
+                .withChannelId(activity.channelId())
+                .withServiceUrl(activity.serviceUrl())
+                .withChannelId(activity.channelId())
+                .withText(activity.text())
+                .withSpeak(activity.speak())
+                .withInputHint(activity.inputHint())
+                .withSummary(activity.summary())
+                .withSuggestedActions(activity.suggestedActions())
+                .withAttachments(activity.attachments())
+                .withEntities(activity.entities())
+                .withChannelData(activity.channelData())
+                .withAction(activity.action())
+                .withReplyToId(activity.replyToId())
+                .withLabel(activity.label())
+                .withValueType(activity.valueType())
+                .withValue(activity.value())
+                .withName(activity.name())
+                .withRelatesTo(activity.relatesTo())
+                .withCode(activity.code())
+                .withExpiration(activity.expiration())
+                .withImportance(activity.importance())
+                .withDeliveryMode(activity.deliveryMode())
+                .withTextHighlights(activity.textHighlights());
+        for (Map.Entry<String, JsonNode> entry : activity.properties().entrySet()) {
+            clone.setProperties(entry.getKey(), entry.getValue());
+        }
+        return clone;
+
+    }
+
 }

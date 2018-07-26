@@ -2,7 +2,6 @@ package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.TokenExchangeState;
@@ -10,35 +9,36 @@ import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 import com.microsoft.bot.schema.models.TokenResponse;
 import com.microsoft.rest.ServiceClient;
-
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
-
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ea.async.Async.await;
 import static com.microsoft.bot.connector.authentication.MicrosoftAppCredentials.JSON;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.joining;
+
 
 /**
  * Service client to handle requests to the botframework api service.
- *
+ * <p>
  * Uses the MicrosoftInterceptor class to add Authorization header from idp.
- *
  */
 public class OAuthClient extends ServiceClient {
     private final ConnectorClientImpl client;
@@ -59,16 +59,17 @@ public class OAuthClient extends ServiceClient {
         if (client == null)
             throw new IllegalArgumentException("client");
         this.client = client;
-        this.uri = uri + (uri.endsWith("/")? "" : "/");
+        this.uri = uri + (uri.endsWith("/") ? "" : "/");
         this.mapper = new ObjectMapper();
     }
 
     /**
      * Get User Token for given user and connection.
-     * @param userId 
-     * @param connectionName 
+     *
+     * @param userId
+     * @param connectionName
      * @param magicCode
-     * @return CompletableFuture< TokenResponse > on success; otherwise null.
+     * @return CompletableFuture<        TokenResponse        > on success; otherwise null.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
@@ -90,14 +91,13 @@ public class OAuthClient extends ServiceClient {
     }
 
     /**
-     Get User Token for given user and connection.
-
-     @param userId
-     @param connectionName
-     @param magicCode
-     @param customHeaders
-
-     @return CompletableFuture< TokenResponse > on success; null otherwise.
+     * Get User Token for given user and connection.
+     *
+     * @param userId
+     * @param connectionName
+     * @param magicCode
+     * @param customHeaders
+     * @return CompletableFuture<        TokenResponse        > on success; null otherwise.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
         if (StringUtils.isEmpty(userId)) {
@@ -109,7 +109,7 @@ public class OAuthClient extends ServiceClient {
 
         return CompletableFuture.supplyAsync(() -> {
             // Construct URL
-            HashMap <String, String> qstrings = new HashMap<>();
+            HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
             qstrings.put("connectionName", connectionName);
             if (!StringUtils.isBlank(magicCode)) {
@@ -146,17 +146,14 @@ public class OAuthClient extends ServiceClient {
                 int statusCode = response.code();
                 if (statusCode == HTTP_OK) {
                     return this.mapper.readValue(response.body().string(), TokenResponse.class);
-                }
-                else if (statusCode == HTTP_NOT_FOUND) {
+                } else if (statusCode == HTTP_NOT_FOUND) {
                     return null;
-                }
-                else {
+                } else {
                     return null;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 if (response != null)
                     response.body().close();
             }
@@ -166,7 +163,8 @@ public class OAuthClient extends ServiceClient {
 
     /**
      * Signs Out the User for the given ConnectionName.
-     * @param userId 
+     *
+     * @param userId
      * @param connectionName
      * @return True on successful sign-out; False otherwise.
      */
@@ -182,7 +180,7 @@ public class OAuthClient extends ServiceClient {
             String invocationId = null;
 
             // Construct URL
-            HashMap <String, String> qstrings = new HashMap<>();
+            HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
             qstrings.put("connectionName", connectionName);
             String strUri = String.format("%sapi/usertoken/SignOut", this.uri);
@@ -226,10 +224,10 @@ public class OAuthClient extends ServiceClient {
     }
 
 
-
     /**
      * Gets the Link to be sent to the user for signin into the given ConnectionName
-     * @param activity 
+     *
+     * @param activity
      * @param connectionName
      * @return Sign in link on success; null otherwise.
      */
@@ -294,13 +292,13 @@ public class OAuthClient extends ServiceClient {
     /**
      * Send a dummy OAuth card when the bot is being used on the emulator for testing without fetching a real token.
      *
-     * @param emulateOAuthCards 
+     * @param emulateOAuthCards
      * @return CompletableFuture with no result code
      */
     public CompletableFuture SendEmulateOAuthCardsAsync(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
 
         // Construct URL
-        HashMap <String, String> qstrings = new HashMap<>();
+        HashMap<String, String> qstrings = new HashMap<>();
         qstrings.put("emulate", emulateOAuthCards.toString());
         String strUri = String.format("%sapi/usertoken/emulateOAuthCards", this.uri);
         URI tokenUrl = MakeUri(strUri, qstrings);
@@ -310,7 +308,7 @@ public class OAuthClient extends ServiceClient {
 
         return CompletableFuture.runAsync(() -> {
             // Construct dummy body
-            RequestBody body = RequestBody.create(JSON, "{}" );
+            RequestBody body = RequestBody.create(JSON, "{}");
 
             // Set Credentials and make call
             MicrosoftAppCredentials appCredentials = (MicrosoftAppCredentials) client.restClient().credentials();
