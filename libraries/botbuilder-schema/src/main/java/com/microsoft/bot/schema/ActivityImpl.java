@@ -55,12 +55,12 @@ public class ActivityImpl extends Activity {
         ActivityImpl reply = new ActivityImpl();
         reply.withType(ActivityTypes.MESSAGE);
         reply.withTimestamp(DateTime.now());
-        reply.withFrom(new ChannelAccount());
-        reply.withId(recipient().id());
-        reply.withName(recipient().name());
-        reply.withRecipient(new ChannelAccount());
-        reply.withId(from().id());
-        reply.withName(from().name());
+        reply.withFrom(new ChannelAccount()
+                        .withId(recipient().id())
+                        .withName(recipient().name()));
+        reply.withRecipient(new ChannelAccount()
+                        .withId(from().id())
+                        .withName(from().name()));
         reply.withReplyToId(this.id());
         reply.withServiceUrl(this.serviceUrl());
         reply.withChannelId(channelId());
