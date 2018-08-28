@@ -125,7 +125,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     }
 
     public static void trustServiceUrl(URL serviceUrl, LocalDateTime expirationTime) {
-        trustHostNames.putIfAbsent(serviceUrl.getHost(), expirationTime);
+        trustHostNames.put(serviceUrl.getHost(), expirationTime);
     }
 
     public static boolean isTrustedServiceUrl(String serviceUrl) {
@@ -148,6 +148,6 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private static ConcurrentMap<String, LocalDateTime> trustHostNames = new ConcurrentHashMap<>();
 
     static {
-        trustHostNames.putIfAbsent("state.botframework.com", LocalDateTime.MAX);
+        trustHostNames.put("state.botframework.com", LocalDateTime.MAX);
     }
 }
