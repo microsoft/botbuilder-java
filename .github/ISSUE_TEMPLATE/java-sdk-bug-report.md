@@ -1,5 +1,5 @@
 ---
-name: Java SDK Bug report
+name: Java SDK Bug Report
 about: Create a bug report for a bug you found in the Bot Builder Java SDK
 
 ---

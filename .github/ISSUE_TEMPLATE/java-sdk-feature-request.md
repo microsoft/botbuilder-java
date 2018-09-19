@@ -1,5 +1,5 @@
 ---
-name: Java SDK feature request
+name: Java SDK Feature Request
 about: 'Suggest a feature for the Bot Builder Java SDK '
 
 ---
