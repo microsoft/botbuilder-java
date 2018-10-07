@@ -16,6 +16,7 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
+import com.microsoft.bot.schema.models.TeammateAccount;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.rest.ServiceCallback;
@@ -491,6 +492,19 @@ public interface Conversations {
     List<ChannelAccount> getConversationMembers(String conversationId);
 
     /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a TeamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the List&lt;TeammateAccount&gt; object if successful.
+     */
+    List<TeammateAccount> getTeamsConversationMembers(String teamId);
+
+    /**
      * GetConversationMembers.
      * Enumerate the members of a converstion.
      This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
@@ -514,6 +528,17 @@ public interface Conversations {
     Observable<List<ChannelAccount>> getConversationMembersAsync(String conversationId);
 
     /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a TeamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the List&lt;TeammateAccount&gt; object
+     */
+    Observable<List<TeammateAccount>> getTeamsConversationMembersAsync(String teamId);
+
+    /**
      * GetConversationMembers.
      * Enumerate the members of a converstion.
      This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
@@ -523,6 +548,17 @@ public interface Conversations {
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
     Observable<ServiceResponse<List<ChannelAccount>>> getConversationMembersWithServiceResponseAsync(String conversationId);
+
+    /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a teamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the List&lt;TeammateAccount&gt; object
+     */
+    Observable<ServiceResponse<List<TeammateAccount>>> getTeamsConversationMembersWithServiceResponseAsync(String teamId);
 
     /**
      * DeleteConversationMember.

@@ -18,6 +18,7 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
+import com.microsoft.bot.schema.models.TeammateAccount;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.rest.ServiceCallback;
@@ -97,6 +98,10 @@ public class ConversationsImpl implements Conversations {
         @GET("v3/conversations/{conversationId}/members")
         Observable<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getTeamConversationMembers" })
+        @GET("v3/conversations/{teamId}/members")
+        Observable<Response<ResponseBody>> getTeamConversationMembers(@Path("teamId") String teamId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteConversationMember" })
         @HTTP(path = "v3/conversations/{conversationId}/members/{memberId}", method = "DELETE", hasBody = true)
         Observable<Response<ResponseBody>> deleteConversationMember(@Path("conversationId") String conversationId, @Path("memberId") String memberId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
@@ -108,7 +113,6 @@ public class ConversationsImpl implements Conversations {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment" })
         @POST("v3/conversations/{conversationId}/attachments")
         Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
-
     }
 
     public static <T> CompletableFuture<List<T>> completableFutureFromObservable(Observable<T> observable) {
@@ -847,6 +851,21 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a TeamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the List&lt;TeammateAccount&gt; object if successful.
+     */
+    public List<TeammateAccount> getTeamsConversationMembers(String teamId) {
+        return getTeamsConversationMembersWithServiceResponseAsync(teamId).toBlocking().single().body();
+    }
+
+    /**
      * GetConversationMembers.
      * Enumerate the members of a converstion.
      This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
@@ -879,6 +898,24 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a TeamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the List&lt;TeammateAccount&gt; object
+     */
+    public Observable<List<TeammateAccount>> getTeamsConversationMembersAsync(String teamId) {
+        return getTeamsConversationMembersWithServiceResponseAsync(teamId).map(new Func1<ServiceResponse<List<TeammateAccount>>, List<TeammateAccount>>() {
+            @Override
+            public List<TeammateAccount> call(ServiceResponse<List<TeammateAccount>> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
      * GetConversationMembers.
      * Enumerate the members of a converstion.
      This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
@@ -905,9 +942,43 @@ public class ConversationsImpl implements Conversations {
             });
     }
 
+    /**
+     * GetTeamsConversationMembers.
+     * Enumerate the members of a team.
+     This REST API takes a TeamId and returns an array of TeammateAccount objects representing the members of the team.
+     *
+     * @param teamId Team ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the List&lt;TeammateAccount&gt; object
+     */
+    public Observable<ServiceResponse<List<TeammateAccount>>> getTeamsConversationMembersWithServiceResponseAsync(String teamId) {
+        if (teamId == null) {
+            throw new IllegalArgumentException("Parameter teamId is required and cannot be null.");
+        }
+        return service.getTeamConversationMembers(teamId, this.client.acceptLanguage(), this.client.userAgent())
+                .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<TeammateAccount>>>>() {
+                    @Override
+                    public Observable<ServiceResponse<List<TeammateAccount>>> call(Response<ResponseBody> response) {
+                        try {
+                            ServiceResponse<List<TeammateAccount>> clientResponse = getTeamsConversationMembersDelegate(response);
+                            return Observable.just(clientResponse);
+                        } catch (Throwable t) {
+                            return Observable.error(t);
+                        }
+                    }
+                });
+    }
+
     private ServiceResponse<List<ChannelAccount>> getConversationMembersDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
         return this.client.restClient().responseBuilderFactory().<List<ChannelAccount>, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<List<ChannelAccount>>() { }.getType())
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+    private ServiceResponse<List<TeammateAccount>> getTeamsConversationMembersDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<List<TeammateAccount>, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<List<TeammateAccount>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
