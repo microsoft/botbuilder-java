@@ -101,10 +101,6 @@
     </repositories>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
           <id>MyGet</id>
           <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
