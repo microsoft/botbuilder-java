@@ -93,6 +93,13 @@
 
     </dependencies>
 
+    <repositories>
+      <repository>
+        <id>MyGet</id>
+        <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
+      </repository>
+    </repositories>
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -101,6 +108,10 @@
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <repository>
+          <id>MyGet</id>
+          <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
         </repository>
     </distributionManagement>
 
