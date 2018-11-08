@@ -73,6 +73,13 @@
       </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>MyGet</id>
+      <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
+    </repository>
+  </repositories>
+
   <distributionManagement>
     <repository>
       <id>MyGet</id>
