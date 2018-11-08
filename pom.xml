@@ -11,6 +11,10 @@
   <description>This package contains the parent module of Microsoft BotBuilder SDK.</description>
   <url>https://github.com/Microsoft/botbuilder-java</url>
   
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <modules>
     <module>libraries/botbuilder-schema</module>
     <module>libraries/botbuilder</module>
