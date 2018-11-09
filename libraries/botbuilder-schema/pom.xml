@@ -36,6 +36,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.deploy.skip>false</maven.deploy.skip>
   </properties>
 
   <dependencies>
@@ -72,6 +73,20 @@
           <scope>compile</scope>
       </dependency>
   </dependencies>
+
+  <repositories>
+    <repository>
+      <id>MyGet</id>
+      <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>MyGet</id>
+      <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
+    </repository>
+  </distributionManagement>
 
   <profiles>
     <profile>

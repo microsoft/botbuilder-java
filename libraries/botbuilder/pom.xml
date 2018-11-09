@@ -36,6 +36,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
     <dependencies>
@@ -117,14 +118,17 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+      <repository>
+        <id>MyGet</id>
+        <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
+      </repository>
+    </repositories>
+
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          <id>MyGet</id>
+          <url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</url>
         </repository>
     </distributionManagement>
 
