@@ -209,6 +209,18 @@ public class TranscriptMiddlewareTest {
                 .StartTest();
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
+		if (Debugger.isEnabled()) 
+		{
+		    Debugger.log("pagedResult items:");
+		    Debugger.log(((Activity)pagedResult.getItems()[0]).text());
+		    Debugger.log(((Activity)pagedResult.getItems()[1]).text());
+		    Debugger.log(((Activity)pagedResult.getItems()[2]).text());
+		    Debugger.log(((Activity)pagedResult.getItems()[3]).text());
+		    Debugger.log(((Activity)pagedResult.getItems()[0]).id());
+		    Debugger.log(((Activity)pagedResult.getItems()[1]).id());
+		    Debugger.log(((Activity)pagedResult.getItems()[2]).id());
+		    Debugger.log(((Activity)pagedResult.getItems()[3]).id());
+		}
         Assert.assertEquals(4, pagedResult.getItems().length);
         Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
         Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).text());
