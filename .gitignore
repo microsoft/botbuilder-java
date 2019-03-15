@@ -54,3 +54,5 @@ Thumbs.db
 
 # reduced pom files should not be included
 dependency-reduced-pom.xml
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
