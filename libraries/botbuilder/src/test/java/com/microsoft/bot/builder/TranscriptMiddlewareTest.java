@@ -213,7 +213,7 @@ public class TranscriptMiddlewareTest {
         Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
         Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).text());
         // TODO: Fix the following 3 asserts so they work correctly. They work differently in travis builds than in the 
-		// BotBuilder-Java 4.0 master build.
+        // BotBuilder-Java 4.0 master build.
         //Assert.assertEquals( "new response", ((Activity)pagedResult.getItems()[2]).text());
         //Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).text());
         //Assert.assertEquals( ((Activity)pagedResult.getItems()[1]).id(),  ((Activity) pagedResult.getItems()[2]).id());
