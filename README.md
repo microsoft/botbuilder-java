@@ -1,4 +1,6 @@
 
+### [Click here to find out what's new for //build2019!](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
+
 # Bot Builder SDK v4 (Java) (Preview)
 
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java)
