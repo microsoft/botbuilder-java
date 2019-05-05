@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-java/wiki/Roadmap)
 
+### [Click here to find out what's new for //build2019!](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
+
 This repository contains code for the Java version of the [Microsoft Bot Builder V4 SDK](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0). The Bot Builder SDK v4 is the latest SDK for building bot applications. This Java version is in **Preview** state and is being actively developed.
 
 In addition to the Java Bot Builder V4 SDK, Bot Builder supports creating bots in other popular programming languages like [.Net SDK](https://github.com/Microsoft/botbuilder-dotnet), [JavaScript](https://github.com/Microsoft/botbuilder-js), and [Python](https://github.com/Microsoft/botbuilder-python). Production bots should be developed using the JavaScript or .Net SDKs.
