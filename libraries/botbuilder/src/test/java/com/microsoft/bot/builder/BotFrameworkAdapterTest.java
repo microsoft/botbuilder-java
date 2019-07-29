@@ -1,4 +1,4 @@
-package com.microsoft.bot.connector;
+package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.*;
 import com.microsoft.bot.schema.ActivityImpl;
