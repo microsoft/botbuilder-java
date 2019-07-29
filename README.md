@@ -1,6 +1,6 @@
 # ![Bot Framework for Java](./docs/media/BotFrameworkJava_header.png)
 
-### [Click here to find out what's new with Bot Framework](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
+### [Click here to find out what's new](https://github.com/Microsoft/botframework/blob/master/whats-new.md#whats-new)
 
 # Bot Framework SDK for Java (Preview)
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java)
