@@ -735,6 +735,11 @@ public class ActivityImpl extends Activity {
         }
         return new ResultPair<Boolean, TypeT>(true, instance);
     }
+    /**
+     * Clone a activity 
+     * @param activity 
+     * @return new cloned activity
+     */
     public static Activity CloneActity(Activity activity) {
         Activity clone = new Activity()
                 .withType(activity.type())
