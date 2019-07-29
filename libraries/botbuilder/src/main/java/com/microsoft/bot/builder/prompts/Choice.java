@@ -1,3 +1,7 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+package com.microsoft.bot.builder.prompts;
+
 import com.microsoft.bot.schema.models.CardAction;
 
 import java.util.ArrayList;
