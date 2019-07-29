@@ -17,7 +17,8 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**
@@ -36,7 +37,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
     private TranscriptLogger logger;
     private static final Logger log4j = LogManager.getLogger("BotFx");
 
-    private LinkedList<Activity> transcript = new LinkedList<Activity>();
+    private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
     /**
      * Initializes a new instance of the <see cref="TranscriptLoggerMiddleware"/> class.
@@ -178,12 +179,10 @@ public class TranscriptLoggerMiddleware implements Middleware {
 
 
     private void LogActivity(Activity activity) {
-        synchronized (transcript) {
-            if (activity.timestamp() == null) {
-                activity.withTimestamp(DateTime.now(DateTimeZone.UTC));
-            }
-            transcript.offer(activity);
+        if (activity.timestamp() == null) {
+            activity.withTimestamp(DateTime.now(DateTimeZone.UTC));
         }
+        transcript.offer(activity);
     }
 
 }
