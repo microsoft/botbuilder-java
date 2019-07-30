@@ -207,7 +207,7 @@ public class TranscriptMiddlewareTest {
                 .Send("update")
                 .AssertReply("new response")
                 .StartTest();
-        Thread.sleep(5000);
+        Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().length);
         Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
