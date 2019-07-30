@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.schema.ContactRelationUpdateActivity;
 import com.microsoft.bot.schema.TraceActivity;
 import com.microsoft.bot.schema.models.*;
@@ -17,7 +16,6 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * An Activity is the basic communication type for the Bot Framework 3.0 protocol

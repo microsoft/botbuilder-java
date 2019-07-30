@@ -6,7 +6,6 @@ import com.microsoft.bot.schema.models.ResourceResponse;
 
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface SendActivitiesHandler {

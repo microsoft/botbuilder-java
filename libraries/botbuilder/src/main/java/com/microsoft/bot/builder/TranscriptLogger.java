@@ -7,8 +7,6 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.models.Activity;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * Transcript logger stores activities for conversations for recall.
  */

@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.microsoft.bot.builder.adapters.TestAdapter;
@@ -17,12 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 public class TranscriptMiddlewareTest {

@@ -9,9 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-
-
 public class MiddlewareSet implements Middleware {
     public NextDelegate Next;
 
