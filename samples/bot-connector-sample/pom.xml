@@ -41,12 +41,12 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>LATEST</version>
+      <version>1.7.26</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>LATEST</version>
+      <version>1.7.26</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.bot.schema</groupId>
