@@ -134,8 +134,8 @@ under the License.
     <server>
       <id>MyGet</id>
       <!-- only needed for private feeds or when deploying artifacts to the feed -->
-      <username>${internal.repo.username}</username>
-      <password>${internal.repo.password}</password>
+      <username>${repo.username}</username>
+      <password>${repo.password}</password>
     </server>
   </servers>
 
