@@ -20,8 +20,8 @@ public class MicrosoftPayMethodData {
     /**
      * Microsoft Pay Merchant ID.
      */
-    @JsonProperty(value = "mechantId")
-    private String mechantId;
+    @JsonProperty(value = "merchantId")
+    private String merchantId;
 
     /**
      * Supported payment networks (e.g., "visa" and "mastercard").
@@ -36,22 +36,22 @@ public class MicrosoftPayMethodData {
     private List<String> supportedTypes;
 
     /**
-     * Get the mechantId value.
+     * Get the merchantId value.
      *
-     * @return the mechantId value
+     * @return the merchantId value
      */
-    public String mechantId() {
-        return this.mechantId;
+    public String merchantId() {
+        return this.merchantId;
     }
 
     /**
-     * Set the mechantId value.
+     * Set the merchantId value.
      *
-     * @param mechantId the mechantId value to set
+     * @param merchantId the merchantId value to set
      * @return the MicrosoftPayMethodData object itself.
      */
-    public MicrosoftPayMethodData withMechantId(String mechantId) {
-        this.mechantId = mechantId;
+    public MicrosoftPayMethodData withMerchantId(String merchantId) {
+        this.merchantId = merchantId;
         return this;
     }
 

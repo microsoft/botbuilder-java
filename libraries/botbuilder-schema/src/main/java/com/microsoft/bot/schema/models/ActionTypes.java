@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Defines values for ActionTypes.
+ * Defines action types for clickable buttons.
  */
 public enum ActionTypes {
     /** Enum value openUrl. */

@@ -29,6 +29,12 @@ public class Error {
     private String message;
 
     /**
+     * Error from inner http call
+     */
+    @JsonProperty(value = "innerHttpError")
+    private InnerHttpError innerHttpError;
+
+    /**
      * Get the code value.
      *
      * @return the code value
@@ -68,4 +74,18 @@ public class Error {
         return this;
     }
 
+    /**
+     * Gets error from inner http call.
+     */
+    public InnerHttpError innerHttpError(){
+        return this.innerHttpError;
+    }
+
+    /**
+     * Sets error from inner http call.
+     */
+    public Error withInnerHttpError(InnerHttpError innerHttpError){
+        this.innerHttpError = innerHttpError;
+        return this;
+    }
 }

@@ -18,8 +18,10 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
+import com.microsoft.bot.schema.models.PagedMembersResult;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.models.Transcript;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
@@ -109,6 +111,13 @@ public class ConversationsImpl implements Conversations {
         @POST("v3/conversations/{conversationId}/attachments")
         Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory" })
+        @POST("v3/conversations/{conversationId}/activities/history")
+        Observable<Response<ResponseBody>> sendConversationHistory(@Path("conversationId") String conversationId, @Body Transcript history, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers" })
+        @GET("v3/conversations/{conversationId}/pagedmembers")
+        Observable<Response<ResponseBody>> getConversationPagedMembers(@Path("conversationId") String conversationId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
     }
 
     public static <T> CompletableFuture<List<T>> completableFutureFromObservable(Observable<T> observable) {
@@ -133,6 +142,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ConversationsResult object if successful.
      */
+    @Override
     public ConversationsResult getConversations() {
         return getConversationsWithServiceResponseAsync().toBlocking().single().body();
     }
@@ -149,6 +159,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ConversationsResult> getConversationsAsync(final ServiceCallback<ConversationsResult> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationsWithServiceResponseAsync(), serviceCallback);
     }
@@ -164,6 +175,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
+    @Override
     public Observable<ConversationsResult> getConversationsAsync() {
         return getConversationsWithServiceResponseAsync().map(new Func1<ServiceResponse<ConversationsResult>, ConversationsResult>() {
             @Override
@@ -184,6 +196,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
+    @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync() {
         final String continuationToken = null;
         return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
@@ -214,6 +227,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ConversationsResult object if successful.
      */
+    @Override
     public ConversationsResult getConversations(String continuationToken) {
         return getConversationsWithServiceResponseAsync(continuationToken).toBlocking().single().body();
     }
@@ -231,6 +245,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ConversationsResult> getConversationsAsync(String continuationToken, final ServiceCallback<ConversationsResult> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationsWithServiceResponseAsync(continuationToken), serviceCallback);
     }
@@ -247,6 +262,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
+    @Override
     public Observable<ConversationsResult> getConversationsAsync(String continuationToken) {
         return getConversationsWithServiceResponseAsync(continuationToken).map(new Func1<ServiceResponse<ConversationsResult>, ConversationsResult>() {
             @Override
@@ -268,6 +284,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
+    @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync(String continuationToken) {
         return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationsResult>>>() {
@@ -311,6 +328,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ConversationResourceResponse object if successful.
      */
+    @Override
     public ConversationResourceResponse createConversation(ConversationParameters parameters) {
         return createConversationWithServiceResponseAsync(parameters).toBlocking().single().body();
     }
@@ -335,6 +353,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters, final ServiceCallback<ConversationResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(createConversationWithServiceResponseAsync(parameters), serviceCallback);
     }
@@ -358,6 +377,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationResourceResponse object
      */
+    @Override
     public Observable<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters) {
         return createConversationWithServiceResponseAsync(parameters).map(new Func1<ServiceResponse<ConversationResourceResponse>, ConversationResourceResponse>() {
             @Override
@@ -392,6 +412,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationResourceResponse object
      */
+    @Override
     public Observable<ServiceResponse<ConversationResourceResponse>> createConversationWithServiceResponseAsync(ConversationParameters parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
@@ -436,6 +457,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ResourceResponse object if successful.
      */
+    @Override
     public ResourceResponse sendToConversation(String conversationId, Activity activity) {
         return sendToConversationWithServiceResponseAsync(conversationId, activity).toBlocking().single().body();
     }
@@ -455,6 +477,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(sendToConversationWithServiceResponseAsync(conversationId, activity), serviceCallback);
     }
@@ -473,6 +496,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity) {
         return sendToConversationWithServiceResponseAsync(conversationId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -496,6 +520,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> sendToConversationWithServiceResponseAsync(String conversationId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -541,6 +566,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ResourceResponse object if successful.
      */
+    @Override
     public ResourceResponse updateActivity(String conversationId, String activityId, Activity activity) {
         return updateActivityWithServiceResponseAsync(conversationId, activityId, activity).toBlocking().single().body();
     }
@@ -558,6 +584,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(updateActivityWithServiceResponseAsync(conversationId, activityId, activity), serviceCallback);
     }
@@ -574,6 +601,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity) {
         return updateActivityWithServiceResponseAsync(conversationId, activityId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -595,6 +623,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> updateActivityWithServiceResponseAsync(String conversationId, String activityId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -646,6 +675,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ResourceResponse object if successful.
      */
+    @Override
     public ResourceResponse replyToActivity(String conversationId, String activityId, Activity activity) {
         return replyToActivityWithServiceResponseAsync(conversationId, activityId, activity).toBlocking().single().body();
     }
@@ -666,6 +696,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ResourceResponse> replyToActivityAsync(String conversationId, String activityId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(replyToActivityWithServiceResponseAsync(conversationId, activityId, activity), serviceCallback);
     }
@@ -685,6 +716,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ResourceResponse> replyToActivityAsync(String conversationId, String activityId, Activity activity) {
         return replyToActivityWithServiceResponseAsync(conversationId, activityId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -709,6 +741,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> replyToActivityWithServiceResponseAsync(String conversationId, String activityId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -754,6 +787,7 @@ public class ConversationsImpl implements Conversations {
      * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      */
+    @Override
     public void deleteActivity(String conversationId, String activityId) {
         deleteActivityWithServiceResponseAsync(conversationId, activityId).toBlocking().single().body();
     }
@@ -769,6 +803,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<Void> deleteActivityAsync(String conversationId, String activityId, final ServiceCallback<Void> serviceCallback) {
         return ServiceFuture.fromResponse(deleteActivityWithServiceResponseAsync(conversationId, activityId), serviceCallback);
     }
@@ -783,6 +818,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
+    @Override
     public Observable<Void> deleteActivityAsync(String conversationId, String activityId) {
         return deleteActivityWithServiceResponseAsync(conversationId, activityId).map(new Func1<ServiceResponse<Void>, Void>() {
             @Override
@@ -802,6 +838,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
+    @Override
     public Observable<ServiceResponse<Void>> deleteActivityWithServiceResponseAsync(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -842,6 +879,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the List&lt;ChannelAccount&gt; object if successful.
      */
+    @Override
     public List<ChannelAccount> getConversationMembers(String conversationId) {
         return getConversationMembersWithServiceResponseAsync(conversationId).toBlocking().single().body();
     }
@@ -856,6 +894,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<List<ChannelAccount>> getConversationMembersAsync(String conversationId, final ServiceCallback<List<ChannelAccount>> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationMembersWithServiceResponseAsync(conversationId), serviceCallback);
     }
@@ -869,6 +908,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
+    @Override
     public Observable<List<ChannelAccount>> getConversationMembersAsync(String conversationId) {
         return getConversationMembersWithServiceResponseAsync(conversationId).map(new Func1<ServiceResponse<List<ChannelAccount>>, List<ChannelAccount>>() {
             @Override
@@ -887,6 +927,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
+    @Override
     public Observable<ServiceResponse<List<ChannelAccount>>> getConversationMembersWithServiceResponseAsync(String conversationId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -924,6 +965,7 @@ public class ConversationsImpl implements Conversations {
      * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      */
+    @Override
     public void deleteConversationMember(String conversationId, String memberId) {
         deleteConversationMemberWithServiceResponseAsync(conversationId, memberId).toBlocking().single().body();
     }
@@ -940,6 +982,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<Void> deleteConversationMemberAsync(String conversationId, String memberId, final ServiceCallback<Void> serviceCallback) {
         return ServiceFuture.fromResponse(deleteConversationMemberWithServiceResponseAsync(conversationId, memberId), serviceCallback);
     }
@@ -955,6 +998,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
+    @Override
     public Observable<Void> deleteConversationMemberAsync(String conversationId, String memberId) {
         return deleteConversationMemberWithServiceResponseAsync(conversationId, memberId).map(new Func1<ServiceResponse<Void>, Void>() {
             @Override
@@ -978,6 +1022,7 @@ public class ConversationsImpl implements Conversations {
         CompletableFuture<List<Void>> future_result = completableFutureFromObservable(deleteConversationMemberAsync(conversationId, memberId));
         return future_result;
     }
+
     /**
      * DeleteConversationMember.
      * Deletes a member from a converstion.
@@ -989,6 +1034,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
+    @Override
     public Observable<ServiceResponse<Void>> deleteConversationMemberWithServiceResponseAsync(String conversationId, String memberId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1031,6 +1077,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the List&lt;ChannelAccount&gt; object if successful.
      */
+    @Override
     public List<ChannelAccount> getActivityMembers(String conversationId, String activityId) {
         return getActivityMembersWithServiceResponseAsync(conversationId, activityId).toBlocking().single().body();
     }
@@ -1046,6 +1093,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId, final ServiceCallback<List<ChannelAccount>> serviceCallback) {
         return ServiceFuture.fromResponse(getActivityMembersWithServiceResponseAsync(conversationId, activityId), serviceCallback);
     }
@@ -1060,6 +1108,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
+    @Override
     public Observable<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId) {
         return getActivityMembersWithServiceResponseAsync(conversationId, activityId).map(new Func1<ServiceResponse<List<ChannelAccount>>, List<ChannelAccount>>() {
             @Override
@@ -1079,6 +1128,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
+    @Override
     public Observable<ServiceResponse<List<ChannelAccount>>> getActivityMembersWithServiceResponseAsync(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1120,6 +1170,7 @@ public class ConversationsImpl implements Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ResourceResponse object if successful.
      */
+    @Override
     public ResourceResponse uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
         return uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload).toBlocking().single().body();
     }
@@ -1136,6 +1187,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
+    @Override
     public ServiceFuture<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload), serviceCallback);
     }
@@ -1151,6 +1203,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload) {
         return uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -1171,6 +1224,7 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> uploadAttachmentWithServiceResponseAsync(String conversationId, AttachmentData attachmentUpload) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1198,6 +1252,248 @@ public class ConversationsImpl implements Conversations {
                 .register(200, new TypeToken<ResourceResponse>() { }.getType())
                 .register(201, new TypeToken<ResourceResponse>() { }.getType())
                 .register(202, new TypeToken<ResourceResponse>() { }.getType())
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    @Override
+    public ResourceResponse sendConversationHistory(String conversationId, Transcript history) {
+        return sendConversationHistoryWithServiceResponseAsync(conversationId, history).toBlocking().single().body();
+    }
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    @Override
+    public ServiceFuture<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history, final ServiceCallback<ResourceResponse> serviceCallback) {
+        return ServiceFuture.fromResponse(sendConversationHistoryWithServiceResponseAsync(conversationId, history), serviceCallback);
+    }
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    @Override
+    public Observable<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history) {
+        return sendConversationHistoryWithServiceResponseAsync(conversationId, history).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
+            @Override
+            public ResourceResponse call(ServiceResponse<ResourceResponse> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    @Override
+     public Observable<ServiceResponse<ResourceResponse>> sendConversationHistoryWithServiceResponseAsync(String conversationId, Transcript history) {
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+        if (history == null) {
+            throw new IllegalArgumentException("Parameter history is required and cannot be null.");
+        }
+        Validator.validate(history);
+        return service.sendConversationHistory(conversationId, history, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
+                @Override
+                public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<ResourceResponse> clientResponse = sendConversationHistoryDelegate(response);
+                        return Observable.just(clientResponse);
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    private ServiceResponse<ResourceResponse> sendConversationHistoryDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<ResourceResponse>() { }.getType())
+                .register(201, new TypeToken<ResourceResponse>() { }.getType())
+                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    @Override
+    public PagedMembersResult getConversationPagedMembers(String conversationId){
+        return getConversationPagedMembersWithServiceResponseAsync(conversationId).toBlocking().single().body();
+    }
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    @Override
+    public ServiceFuture<PagedMembersResult> getConversationPagedMembersAsync(String conversationId, final ServiceCallback<PagedMembersResult> serviceCallback){
+        return ServiceFuture.fromResponse(getConversationPagedMembersWithServiceResponseAsync(conversationId), serviceCallback);
+    }
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    @Override
+    public Observable<PagedMembersResult> getConversationPagedMembersAsync(String conversationId){
+        return getConversationPagedMembersWithServiceResponseAsync(conversationId).map(new Func1<ServiceResponse<PagedMembersResult>, PagedMembersResult>() {
+            @Override
+            public PagedMembersResult call(ServiceResponse<PagedMembersResult> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the observable to the ResourceResponse object
+     */
+    @Override
+    public Observable<ServiceResponse<PagedMembersResult>> getConversationPagedMembersWithServiceResponseAsync(String conversationId){
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+        return service.getConversationPagedMembers(conversationId, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<PagedMembersResult>>>() {
+                @Override
+                public Observable<ServiceResponse<PagedMembersResult>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<PagedMembersResult> clientResponse = getConversationPagedMembersDelegate(response);
+                        return Observable.just(clientResponse);
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    private ServiceResponse<PagedMembersResult> getConversationPagedMembersDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<PagedMembersResult, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<PagedMembersResult>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

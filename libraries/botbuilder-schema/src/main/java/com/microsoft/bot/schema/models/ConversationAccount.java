@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 
 /**
- * Channel account information for a conversation.
+ * Conversation account represents the identity of the conversation within a channel.
  */
 public class ConversationAccount {
     /**
@@ -31,6 +31,12 @@ public class ConversationAccount {
     private String conversationType;
 
     /**
+     * This conversation's tenant ID.
+     */
+    @JsonProperty(value = "tenantId")
+    private String tenantId;
+
+    /**
      * Channel id for the user or bot on this channel (Example: joe@smith.com,
      * or @joesmith or 123456).
      */
@@ -42,6 +48,12 @@ public class ConversationAccount {
      */
     @JsonProperty(value = "name")
     private String name;
+
+    /**
+     * This account's object ID within Azure Active Directory (AAD).
+     */
+    @JsonProperty(value = "aadObjectId")
+    private String aadObjectId;
 
     /**
      * Role of the entity behind the account (Example: User, Bot, etc.).
@@ -91,6 +103,24 @@ public class ConversationAccount {
     }
 
     /**
+     * Gets this conversation's tenant ID.
+     */
+    public String tenantId(){
+        return this.tenantId;
+    }
+
+    /**
+     * Sets this conversation's tenant ID.
+     * 
+     * @param tenantId this conversation's tenant ID
+     * @return the ConversationAccount object itself.
+     */
+    public ConversationAccount withTenantId(String tenantId){
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    /**
      * Get the id value.
      *
      * @return the id value
@@ -127,6 +157,24 @@ public class ConversationAccount {
      */
     public ConversationAccount withName(String name) {
         this.name = name;
+        return this;
+    }
+
+    /**
+     * Gets this account's object ID within Azure Active Directory (AAD).
+     */
+    public String aadObjectId(){
+        return this.aadObjectId;
+    }
+
+    /**
+     * Sets this account's object ID within Azure Active Directory (AAD).
+
+     * @param name the AAD ID to set
+     * @return the ConversationAccount object itself.
+     */
+    public ConversationAccount withAadObjectId(String aadObjectId){
+        this.aadObjectId = aadObjectId;
         return this;
     }
 

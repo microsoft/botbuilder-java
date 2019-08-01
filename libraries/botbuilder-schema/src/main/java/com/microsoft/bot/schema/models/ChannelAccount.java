@@ -33,6 +33,12 @@ public class ChannelAccount {
     private String name;
 
     /**
+     * This account's object ID within Azure Active Directory (AAD)
+     */
+    @JsonProperty(value = "aadObjectId")
+    private String aadObjectId;
+
+    /**
      * Role of the entity behind the account (Example: User, Bot, etc.).
      * Possible values include: 'user', 'bot'.
      */
@@ -133,5 +139,18 @@ public class ChannelAccount {
         this.properties.put(key, value);
     }
 
+    /**
+     * Gets aadObjectId
+     */
+    public String aadObjectId(){
+        return this.aadObjectId;
+    }
 
+    /**
+     * Sets aadObjectId
+     */
+    public ChannelAccount withAadObjectId(String aadObjectId){
+        this.aadObjectId = aadObjectId;
+        return this;
+    }
 }

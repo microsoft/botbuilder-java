@@ -14,32 +14,33 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Role of the entity behind the account (Example: User, Bot, etc.).
+ * Values for deliveryMode field.
  */
-public enum RoleTypes {
-    /** Enum value user. */
-    USER("user"),
+public enum DeliveryModes {
+    /** Enum value normal. */
+    NORMAL("normal"),
 
-    /** Enum value bot. */
-    BOT("bot");
+    /** Enum value notification. */
+    NOTIFICATION("notification");
 
-    /** The actual serialized value for a RoleTypes instance. */
+
+    /** The actual serialized value for a DeliveryModes instance. */
     private String value;
 
-    RoleTypes(String value) {
+    DeliveryModes(String value) {
         this.value = value;
     }
 
     /**
-     * Parses a serialized value to a RoleTypes instance.
+     * Parses a serialized value to a ActivityTypes instance.
      *
      * @param value the serialized value to parse.
-     * @return the parsed RoleTypes object, or null if unable to parse.
+     * @return the parsed ActivityTypes object, or null if unable to parse.
      */
     @JsonCreator
-    public static RoleTypes fromString(String value) {
-        RoleTypes[] items = RoleTypes.values();
-        for (RoleTypes item : items) {
+    public static DeliveryModes fromString(String value) {
+        DeliveryModes[] items = DeliveryModes.values();
+        for (DeliveryModes item : items) {
             if (item.toString().equalsIgnoreCase(value)) {
                 return item;
             }

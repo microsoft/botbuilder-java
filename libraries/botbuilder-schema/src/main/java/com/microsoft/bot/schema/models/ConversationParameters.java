@@ -42,6 +42,12 @@ public class ConversationParameters {
     private String topicName;
 
     /**
+     * (Optional) The tenant ID in which the conversation should be created.
+     */
+    @JsonProperty(value = "tenantId")
+    private String tenantId;
+
+    /**
      * (Optional) When creating a new conversation, use this activity as the
      * intial message to the conversation.
      */
@@ -174,4 +180,18 @@ public class ConversationParameters {
         return this;
     }
 
+    /**
+     * Gets tenantId
+     */
+    public String tenantId(){
+        return this.tenantId;
+    }
+
+    /**
+     * Sets tenantId
+     */
+    public ConversationParameters withTenantId(String tenantId){
+        this.tenantId = tenantId;
+        return this;
+    }
 }

@@ -29,9 +29,6 @@ public enum ActivityTypes {
     /** Enum value typing. */
     TYPING("typing"),
 
-    /** Enum value ping. */
-    PING("ping"),
-
     /** Enum value endOfConversation. */
     END_OF_CONVERSATION("endOfConversation"),
 
@@ -60,7 +57,10 @@ public enum ActivityTypes {
     SUGGESTION("suggestion"),
 
     /** Enum value trace. */
-    TRACE("trace");
+    TRACE("trace"),
+
+    /** Enum value handoff. */
+    HANDOFF("handoff");
 
     /** The actual serialized value for a ActivityTypes instance. */
     private String value;

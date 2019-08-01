@@ -13,11 +13,11 @@ package com.microsoft.bot.schema.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Object of schema.org types.
+ * Metadata object pertaining to an activity
  */
 public class Entity {
     /**
-     * Entity Type (typically from schema.org types).
+     * Type of this entity (RFC 3987 IRI).
      */
     @JsonProperty(value = "type")
     private String type;

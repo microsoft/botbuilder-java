@@ -16,8 +16,10 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
+import com.microsoft.bot.schema.models.PagedMembersResult;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.models.Transcript;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
@@ -515,7 +517,7 @@ public interface Conversations {
 
     /**
      * GetConversationMembers.
-     * Enumerate the members of a converstion.
+     * Enumerate the members of a conversation.
      This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
      *
      * @param conversationId Conversation ID
@@ -526,7 +528,7 @@ public interface Conversations {
 
     /**
      * DeleteConversationMember.
-     * Deletes a member from a converstion.
+     * Deletes a member from a conversation.
      This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
      of the conversation, the conversation will also be deleted.
      *
@@ -540,7 +542,7 @@ public interface Conversations {
 
     /**
      * DeleteConversationMember.
-     * Deletes a member from a converstion.
+     * Deletes a member from a conversation.
      This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
      of the conversation, the conversation will also be deleted.
      *
@@ -554,7 +556,7 @@ public interface Conversations {
 
     /**
      * DeleteConversationMember.
-     * Deletes a member from a converstion.
+     * Deletes a member from a conversation.
      This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
      of the conversation, the conversation will also be deleted.
      *
@@ -567,7 +569,7 @@ public interface Conversations {
 
     /**
      * DeleteConversationMember.
-     * Deletes a member from a converstion.
+     * Deletes a member from a conversation.
      This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
      of the conversation, the conversation will also be deleted.
      *
@@ -684,4 +686,163 @@ public interface Conversations {
      */
     Observable<ServiceResponse<ResourceResponse>> uploadAttachmentWithServiceResponseAsync(String conversationId, AttachmentData attachmentUpload);
 
-}
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    ResourceResponse sendConversationHistory(String conversationId, Transcript history);
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    ServiceFuture<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history, final ServiceCallback<ResourceResponse> serviceCallback);
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+    Observable<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history);
+
+    /**
+     * This method allows you to upload the historic activities to the conversation.
+     * 
+     * Sender must ensure that the historic activities have unique ids and appropriate timestamps. 
+     * The ids are used by the client to deal with duplicate activities and the timestamps are used by 
+     * the client to render the activities in the right order.
+     *
+     * @param conversationId Conversation ID
+     * @param history Historic activities
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ResourceResponse object if successful.
+     */
+     Observable<ServiceResponse<ResourceResponse>> sendConversationHistoryWithServiceResponseAsync(String conversationId, Transcript history);
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    PagedMembersResult getConversationPagedMembers(String conversationId);
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    ServiceFuture<PagedMembersResult> getConversationPagedMembersAsync(String conversationId, final ServiceCallback<PagedMembersResult> serviceCallback);
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    Observable<PagedMembersResult> getConversationPagedMembersAsync(String conversationId);
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     * 
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided. 
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members 
+     * of the conversation and a continuation token that can be used to get more values.
+     * 
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may 
+     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no 
+     * additional results the response will not contain a continuation token. If there are no members in the 
+     * conversation the Members will be empty or not present in the response.
+     * 
+     * A response to a request that has a continuation token from a prior request may rarely return members 
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the observable to the ResourceResponse object
+     */
+    Observable<ServiceResponse<PagedMembersResult>> getConversationPagedMembersWithServiceResponseAsync(String conversationId);
+
+  }

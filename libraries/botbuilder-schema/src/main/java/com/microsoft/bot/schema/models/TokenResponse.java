@@ -17,6 +17,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TokenResponse {
     /**
+     * The channelId of the TokenResponse.
+     */
+    @JsonProperty(value = "channelId")
+    private String channelId;
+
+    /**
      * The connection name.
      */
     @JsonProperty(value = "connectionName")
@@ -33,6 +39,24 @@ public class TokenResponse {
      */
     @JsonProperty(value = "expiration")
     private String expiration;
+
+    /**
+     * Gets the channelId value.
+     */
+    public String channelId(){
+        return this.channelId;
+    }
+
+    /**
+     * Sets the channelId value.
+     * 
+     * @param channelId The channel id to set.
+     * @return the TokenResponse object itself.
+     */
+    public TokenResponse withChannelId(String channelId){
+        this.channelId = channelId;
+        return this;
+    }
 
     /**
      * Get the connectionName value.

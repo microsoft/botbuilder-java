@@ -14,32 +14,36 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Role of the entity behind the account (Example: User, Bot, etc.).
+ * Indicates whether the semantic action is starting, continuing, or done.
  */
-public enum RoleTypes {
-    /** Enum value user. */
-    USER("user"),
+public enum SemanticActionStates {
+    /** Enum value start. */
+    START("start"),
 
-    /** Enum value bot. */
-    BOT("bot");
+    /** Enum value continue. */
+    CONTINUE("continue"),
 
-    /** The actual serialized value for a RoleTypes instance. */
+    /** Enum value done. */
+    DONE("done");
+
+
+    /** The actual serialized value for a SemanticActionStates instance. */
     private String value;
 
-    RoleTypes(String value) {
+    SemanticActionStates(String value) {
         this.value = value;
     }
 
     /**
-     * Parses a serialized value to a RoleTypes instance.
+     * Parses a serialized value to a ActivityTypes instance.
      *
      * @param value the serialized value to parse.
-     * @return the parsed RoleTypes object, or null if unable to parse.
+     * @return the parsed ActivityTypes object, or null if unable to parse.
      */
     @JsonCreator
-    public static RoleTypes fromString(String value) {
-        RoleTypes[] items = RoleTypes.values();
-        for (RoleTypes item : items) {
+    public static SemanticActionStates fromString(String value) {
+        SemanticActionStates[] items = SemanticActionStates.values();
+        for (SemanticActionStates item : items) {
             if (item.toString().equalsIgnoreCase(value)) {
                 return item;
             }

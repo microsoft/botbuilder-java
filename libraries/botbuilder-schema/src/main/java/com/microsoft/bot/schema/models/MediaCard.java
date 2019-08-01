@@ -42,7 +42,7 @@ public class MediaCard {
     private ThumbnailUrl image;
 
     /**
-     * Media URLs for this card.
+     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative format of the same content.
      */
     @JsonProperty(value = "media")
     private List<MediaUrl> media;
@@ -78,6 +78,12 @@ public class MediaCard {
      */
     @JsonProperty(value = "aspect")
     private String aspect;
+
+    /**
+     * Describes the length of the media content without requiring a receiver to open the content. Formatted as an ISO 8601 Duration field.
+     */
+    @JsonProperty(value = "duration")
+    private String duration;
 
     /**
      * Supplementary parameter for this card.
@@ -284,6 +290,24 @@ public class MediaCard {
         this.aspect = aspect;
         return this;
     }
+
+    /**
+     * Gets the duration value.
+     */
+    public String duration(){
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration value.
+     *
+     * @param duration the duration value to set
+     * @return the MediaCard object itself.
+     */
+    public MediaCard withDuration(String duration){
+        this.duration = duration;
+        return this;
+    }    
 
     /**
      * Get the value value.
