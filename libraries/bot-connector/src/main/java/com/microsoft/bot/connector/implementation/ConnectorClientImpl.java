@@ -8,13 +8,16 @@
 package com.microsoft.bot.connector.implementation;
 
 import com.microsoft.azure.AzureClient;
+import com.microsoft.azure.AzureResponseBuilder;
 import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.Conversations;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.retry.RetryStrategy;
+import com.microsoft.azure.serializer.AzureJacksonAdapter;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -213,5 +216,24 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
     @Override
     public String userAgent() {
         return this.user_agent_string;
+    }
+
+    /**
+     * This is a copy of what the Azure Client does to create a RestClient.  This returns
+     * a RestClient.Builder so that the app can create a custom RestClient, and supply
+     * it to ConnectorClient during construction.
+     * 
+     * One use case of this is for supplying a Proxy to the RestClient.
+     * 
+     * @param baseUrl
+     * @param credentials
+     * @return
+     */
+    public static RestClient.Builder getDefaultRestClientBuilder(String baseUrl, ServiceClientCredentials credentials){
+        return new RestClient.Builder(new OkHttpClient.Builder(), new Retrofit.Builder())
+                .withBaseUrl(baseUrl)
+                .withCredentials(credentials)
+                .withSerializerAdapter(new AzureJacksonAdapter())
+                .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
     }
 }
