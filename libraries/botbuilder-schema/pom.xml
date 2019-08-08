@@ -118,7 +118,6 @@
             <artifactId>cobertura-maven-plugin</artifactId>
             <version>2.7</version>
             <configuration>
-              <outputDirectory>../../cobertura-report/botbuilder-schema</outputDirectory>
               <format>xml</format>
               <maxmem>256m</maxmem>
               <!-- aggregated reports for multi-module projects -->
