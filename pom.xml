@@ -46,8 +46,11 @@
           </coberturaReports>
 
           <sourceEncoding>UTF-8</sourceEncoding>
-          <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
+          <pullRequest>${env.COVERALLS_PULL_REQUEST}</pullRequest>
+          <serviceBuildNumber>${env.COVERALLS_SERVICE_BUILD_NUMBER}</serviceBuildNumber>
+          <serviceBuildUrl>${env.COVERALLS_SERVICE_BUILD_URL}</serviceBuildUrl>
           <serviceJobId>${env.COVERALLS_SERVICE_JOB_ID}</serviceJobId>
+          <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
         </configuration>
       </plugin>
 
