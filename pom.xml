@@ -30,15 +30,6 @@
         <artifactId>coveralls-maven-plugin</artifactId>
         <version>4.3.0</version>
         <configuration>
-          <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
           <coberturaReports>
             <coberturaReport>
               ./cobertura-report/botbuilder/coverage.xml
@@ -53,7 +44,16 @@
               ./cobertura-report/bot-connector-sample/coverage.xml
             </coberturaReport>
           </coberturaReports>
-          
+
+          <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
           <formats>
             <format>xml</format>
           </formats>
