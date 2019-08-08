@@ -39,6 +39,21 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
+          <coberturaReports>
+            <coberturaReport>
+              ./cobertura-report/botbuilder/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/botbuilder-schema/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/bot-connector/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/bot-connector-sample/coverage.xml
+            </coberturaReport>
+          </coberturaReports>
+          
           <formats>
             <format>xml</format>
           </formats>
