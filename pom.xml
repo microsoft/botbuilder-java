@@ -46,8 +46,8 @@
           </coberturaReports>
 
           <sourceEncoding>UTF-8</sourceEncoding>
-          <serviceName>azure-ci</serviceName>
-          <serviceJobId>${env.TRAVIS_JOB_ID} </serviceJobId>
+          <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
+          <serviceJobId>${env.COVERALLS_SERVICE_JOB_ID}</serviceJobId>
           <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
         </configuration>
       </plugin>
