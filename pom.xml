@@ -56,6 +56,7 @@
         <artifactId>coveralls-maven-plugin</artifactId>
         <version>4.3.0</version>
         <configuration>
+          <outputDirectory>./cobertura-report</outputDirectory>
           <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
         </configuration>
       </plugin>
@@ -65,7 +66,7 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <outputDirectory>./target/tmpCobertura</outputDirectory>
+          <outputDirectory>./cobertura-report</outputDirectory>
           <formats>
             <format>xml</format>
           </formats>
