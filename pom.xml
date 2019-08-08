@@ -21,4 +21,22 @@
     <module>libraries/bot-connector</module>
     <module>samples/bot-connector-sample</module>
   </modules>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <outputDirectory>./target/tmpCobertura</outputDirectory>
+          <formats>
+            <format>xml</format>
+          </formats>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+  
 </project>
