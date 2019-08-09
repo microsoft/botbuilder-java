@@ -46,6 +46,7 @@
           </coberturaReports>
 
           <sourceEncoding>UTF-8</sourceEncoding>
+          <branch>${env.COVERALLS_GIT_BRANCH}</branch>
           <pullRequest>${env.COVERALLS_PULL_REQUEST}</pullRequest>
           <serviceBuildNumber>${env.COVERALLS_SERVICE_BUILD_NUMBER}</serviceBuildNumber>
           <serviceBuildUrl>${env.COVERALLS_SERVICE_BUILD_URL}</serviceBuildUrl>
