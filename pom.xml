@@ -12,6 +12,7 @@
   <url>https://github.com/Microsoft/botbuilder-java</url>
   
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
@@ -21,4 +22,51 @@
     <module>libraries/bot-connector</module>
     <module>samples/bot-connector-sample</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>4.3.0</version>
+        <configuration>
+          <coberturaReports>
+            <coberturaReport>
+              ./cobertura-report/botbuilder/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/botbuilder-schema/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/bot-connector/coverage.xml
+            </coberturaReport>
+            <coberturaReport>
+              ./cobertura-report/bot-connector-sample/coverage.xml
+            </coberturaReport>
+          </coberturaReports>
+
+          <sourceEncoding>UTF-8</sourceEncoding>
+          <branch>${env.COVERALLS_GIT_BRANCH}</branch>
+          <pullRequest>${env.COVERALLS_PULL_REQUEST}</pullRequest>
+          <serviceBuildNumber>${env.COVERALLS_SERVICE_BUILD_NUMBER}</serviceBuildNumber>
+          <serviceBuildUrl>${env.COVERALLS_SERVICE_BUILD_URL}</serviceBuildUrl>
+          <serviceJobId>${env.COVERALLS_SERVICE_JOB_ID}</serviceJobId>
+          <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <formats>
+            <format>xml</format>
+          </formats>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
 </project>
