@@ -8,7 +8,6 @@ import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
-import com.sun.jndi.toolkit.url.Uri;
 import okhttp3.Request;
 import org.apache.commons.io.FileSystemUtils;
 
