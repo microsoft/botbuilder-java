@@ -11,7 +11,6 @@ import com.microsoft.azure.AzureClient;
 import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.Conversations;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.retry.RetryStrategy;
@@ -19,7 +18,6 @@ import com.microsoft.rest.retry.RetryStrategy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.stream.Stream;
 
 /**
  * Initializes a new instance of the ConnectorClientImpl class.

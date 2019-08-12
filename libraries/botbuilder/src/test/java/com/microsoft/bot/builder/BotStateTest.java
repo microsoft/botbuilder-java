@@ -18,13 +18,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 //    [TestClass]
 //            [TestCategory("State Management")]

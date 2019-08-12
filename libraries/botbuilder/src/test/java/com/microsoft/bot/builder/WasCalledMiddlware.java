@@ -1,7 +1,5 @@
 package com.microsoft.bot.builder;
 
-import java.util.concurrent.CompletableFuture;
-
 public class WasCalledMiddlware implements Middleware {
     boolean called = false;
     public boolean getCalled() {

@@ -7,13 +7,7 @@
 
 package com.microsoft.bot.schema.models;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Channel account information for a conversation.
@@ -158,7 +152,7 @@ public class ConversationAccount {
      * while maintaining the object.
      *
      */
-    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+//    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
 
     /**
      * Overflow properties.

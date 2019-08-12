@@ -5,7 +5,6 @@ import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ResourceResponse;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A method that can participate in update activity events for the current turn.

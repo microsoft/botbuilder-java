@@ -9,13 +9,8 @@ import com.microsoft.rest.RestClient;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 // [TestCategory("Russian Doll Middleware, Nested Middleware sets")]

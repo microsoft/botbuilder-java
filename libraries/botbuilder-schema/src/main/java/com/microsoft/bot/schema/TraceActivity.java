@@ -1,6 +1,5 @@
 package com.microsoft.bot.schema;
 
-import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
 
 /**

@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * Represents middleware that can operate on incoming activities.
  * A {@link BotAdapter} passes incoming activities from the user's

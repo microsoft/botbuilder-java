@@ -84,7 +84,7 @@ public class OAuthClient extends ServiceClient {
                         throw new RuntimeException(e);
                     }
                 })
-                .collect(joining("&", (uri.endsWith("?") ? uri : uri + "?"), ""));
+                .collect(joining("&", uri.endsWith("?") ? uri : uri + "?", ""));
         return new URI(newUri);
 
 
@@ -177,8 +177,6 @@ public class OAuthClient extends ServiceClient {
         }
 
         return CompletableFuture.supplyAsync(() -> {
-            String invocationId = null;
-
             // Construct URL
             HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);

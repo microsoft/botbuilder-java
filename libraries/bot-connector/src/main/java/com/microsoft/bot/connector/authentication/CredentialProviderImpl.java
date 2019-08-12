@@ -33,7 +33,7 @@ public class CredentialProviderImpl extends BotCredentials implements Credential
 
     @Override
     public CompletableFuture<String> getAppPasswordAsync(String appId) {
-        return CompletableFuture.completedFuture((this.appId.equals(appId) ? this.appPassword : null));
+        return CompletableFuture.completedFuture(this.appId.equals(appId) ? this.appPassword : null);
     }
 
     @Override

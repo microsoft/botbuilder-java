@@ -4,8 +4,6 @@ package com.microsoft.bot.builder;
 // Licensed under the MIT License.
 
 
-import org.joda.time.DateTime;
-
 import java.time.OffsetDateTime;
 
 /**
