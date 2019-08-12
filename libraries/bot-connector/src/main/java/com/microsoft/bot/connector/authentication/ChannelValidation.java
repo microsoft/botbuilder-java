@@ -8,8 +8,6 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.microsoft.bot.connector.authentication.AuthenticationConstants.*;
-
 public class ChannelValidation {
     /**
      * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
@@ -26,9 +24,9 @@ public class ChannelValidation {
      */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-                ToBotFromChannelTokenValidationParameters,
-                ToBotFromChannelOpenIdMetadataUrl,
-                AllowedSigningAlgorithms);
+            ToBotFromChannelTokenValidationParameters,
+            AuthenticationConstants.ToBotFromChannelOpenIdMetadataUrl,
+            AuthenticationConstants.AllowedSigningAlgorithms);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {
@@ -47,13 +45,13 @@ public class ChannelValidation {
         // Async validation.
 
         // Look for the "aud" claim, but only if issued from the Bot Framework
-        if (!identity.getIssuer().equalsIgnoreCase(ToBotFromChannelTokenIssuer)) {
+        if (!identity.getIssuer().equalsIgnoreCase(AuthenticationConstants.ToBotFromChannelTokenIssuer)) {
             throw new AuthenticationException("Token Not Authenticated");
         }
 
         // The AppId from the claim in the token must match the AppId specified by the developer. Note that
         // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-        String appIdFromClaim = identity.claims().get(AudienceClaim);
+        String appIdFromClaim = identity.claims().get(AuthenticationConstants.AudienceClaim);
         if (appIdFromClaim == null || appIdFromClaim.isEmpty()) {
             // Claim is present, but doesn't have a value. Not Authorized.
             throw new AuthenticationException("Token Not Authenticated");
@@ -78,14 +76,14 @@ public class ChannelValidation {
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,CredentialProvider credentials, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
         ClaimsIdentity identity = ChannelValidation.authenticateToken(authHeader, credentials, channelId).get();
 
-        if (!identity.claims().containsKey(ServiceUrlClaim)) {
+        if (!identity.claims().containsKey(AuthenticationConstants.ServiceUrlClaim)) {
             // Claim must be present. Not Authorized.
-            throw new AuthenticationException(String.format("'%s' claim is required on Channel Token.", ServiceUrlClaim));
+            throw new AuthenticationException(String.format("'%s' claim is required on Channel Token.", AuthenticationConstants.ServiceUrlClaim));
         }
 
-        if (!serviceUrl.equalsIgnoreCase(identity.claims().get(ServiceUrlClaim))) {
+        if (!serviceUrl.equalsIgnoreCase(identity.claims().get(AuthenticationConstants.ServiceUrlClaim))) {
             // Claim must match. Not Authorized.
-            throw new AuthenticationException(String.format("'%s' claim does not match service url provided (%s).", ServiceUrlClaim, serviceUrl));
+            throw new AuthenticationException(String.format("'%s' claim does not match service url provided (%s).", AuthenticationConstants.ServiceUrlClaim, serviceUrl));
         }
 
         return CompletableFuture.completedFuture(identity);

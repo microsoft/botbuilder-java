@@ -85,10 +85,12 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.12.0</version>
         <configuration>
+          <failOnViolation>true</failOnViolation>
           <printFailingErrors>true</printFailingErrors>
         </configuration>
         <executions>
           <execution>
+            <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>

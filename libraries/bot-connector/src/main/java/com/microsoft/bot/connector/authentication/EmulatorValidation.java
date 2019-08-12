@@ -10,8 +10,6 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.microsoft.bot.connector.authentication.AuthenticationConstants.*;
-
 /**
  * Validates and Examines JWT tokens from the Bot Framework Emulator
  */
@@ -77,8 +75,8 @@ public class EmulatorValidation {
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                 ToBotFromEmulatorTokenValidationParameters,
-                ToBotFromEmulatorOpenIdMetadataUrl,
-                AllowedSigningAlgorithms);
+                AuthenticationConstants.ToBotFromEmulatorOpenIdMetadataUrl,
+                AuthenticationConstants.AllowedSigningAlgorithms);
 
         ClaimsIdentity identity = tokenExtractor.getIdentityAsync(authHeader, channelId).get();
         if (identity == null) {
@@ -95,11 +93,11 @@ public class EmulatorValidation {
         // what we're looking for. Note that in a multi-tenant bot, this value
         // comes from developer code that may be reaching out to a service, hence the
         // Async validation.
-        if (!identity.claims().containsKey(VersionClaim)) {
-            throw new AuthenticationException(String.format("'%s' claim is required on Emulator Tokens.", VersionClaim));
+        if (!identity.claims().containsKey(AuthenticationConstants.VersionClaim)) {
+            throw new AuthenticationException(String.format("'%s' claim is required on Emulator Tokens.", AuthenticationConstants.VersionClaim));
         }
 
-        String tokenVersion = identity.claims().get(VersionClaim);
+        String tokenVersion = identity.claims().get(AuthenticationConstants.VersionClaim);
         String appId = "";
 
         // The Emulator, depending on Version, sends the AppId via either the
@@ -107,20 +105,20 @@ public class EmulatorValidation {
         if (tokenVersion.isEmpty() || tokenVersion.equalsIgnoreCase("1.0")) {
             // either no Version or a version of "1.0" means we should look for
             // the claim in the "appid" claim.
-            if (!identity.claims().containsKey(AppIdClaim)) {
+            if (!identity.claims().containsKey(AuthenticationConstants.AppIdClaim)) {
                 // No claim around AppID. Not Authorized.
-                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '1.0'.", AppIdClaim));
+                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '1.0'.", AuthenticationConstants.AppIdClaim));
             }
 
-            appId = identity.claims().get(AppIdClaim);
+            appId = identity.claims().get(AuthenticationConstants.AppIdClaim);
         } else if (tokenVersion.equalsIgnoreCase("2.0")) {
             // Emulator, "2.0" puts the AppId in the "azp" claim.
-            if (!identity.claims().containsKey(AuthorizedParty)) {
+            if (!identity.claims().containsKey(AuthenticationConstants.AuthorizedParty)) {
                 // No claim around AppID. Not Authorized.
-                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '2.0'.", AuthorizedParty));
+                throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '2.0'.", AuthenticationConstants.AuthorizedParty));
             }
 
-            appId = identity.claims().get(AuthorizedParty);
+            appId = identity.claims().get(AuthenticationConstants.AuthorizedParty);
         } else {
             // Unknown Version. Not Authorized.
             throw new AuthenticationException(String.format("Unknown Emulator Token version '%s'.", tokenVersion));
