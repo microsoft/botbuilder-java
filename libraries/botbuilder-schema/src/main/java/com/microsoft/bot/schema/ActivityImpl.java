@@ -4,9 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.schema.models.*;
-
-
+import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.models.ActivityTypes;
+import com.microsoft.bot.schema.models.Attachment;
+import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.models.ConversationAccount;
+import com.microsoft.bot.schema.models.ConversationReference;
+import com.microsoft.bot.schema.models.ConversationUpdateActivity;
+import com.microsoft.bot.schema.models.EndOfConversationCodes;
+import com.microsoft.bot.schema.models.InputHints;
+import com.microsoft.bot.schema.models.Mention;
+import com.microsoft.bot.schema.models.MessageActivity;
+import com.microsoft.bot.schema.models.SuggestedActions;
+import com.microsoft.bot.schema.models.TextHighlight;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
