@@ -18,8 +18,10 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
+import com.microsoft.bot.schema.models.PagedMembersResult;
 import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.models.Transcript;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
@@ -109,6 +111,13 @@ public class ConversationsImpl implements Conversations {
         @POST("v3/conversations/{conversationId}/attachments")
         Observable<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId, @Body AttachmentData attachmentUpload, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory" })
+        @POST("v3/conversations/{conversationId}/activities/history")
+        Observable<Response<ResponseBody>> sendConversationHistory(@Path("conversationId") String conversationId, @Body Transcript history, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers" })
+        @GET("v3/conversations/{conversationId}/pagedmembers")
+        Observable<Response<ResponseBody>> getConversationPagedMembers(@Path("conversationId") String conversationId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
     }
 
     public static <T> CompletableFuture<List<T>> completableFutureFromObservable(Observable<T> observable) {
@@ -121,49 +130,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversations.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ConversationsResult object if successful.
+     * @see Conversations#getConversations
      */
+    @Override
     public ConversationsResult getConversations() {
         return getConversationsWithServiceResponseAsync().toBlocking().single().body();
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsAsync.
      *
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#getConversationsAsync
      */
+    @Override
     public ServiceFuture<ConversationsResult> getConversationsAsync(final ServiceCallback<ConversationsResult> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationsWithServiceResponseAsync(), serviceCallback);
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsAsync.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationsResult object
+     * @see Conversations#getConversationsAsync
      */
+    @Override
     public Observable<ConversationsResult> getConversationsAsync() {
         return getConversationsWithServiceResponseAsync().map(new Func1<ServiceResponse<ConversationsResult>, ConversationsResult>() {
             @Override
@@ -174,16 +165,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsWithServiceResponseAsync.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationsResult object
+     * @see Conversations#getConversationsWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync() {
         final String continuationToken = null;
         return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
@@ -201,52 +187,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversations.
      *
-     * @param continuationToken skip or continuation token
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ConversationsResult object if successful.
+     * @see Conversations#getConversations
      */
+    @Override
     public ConversationsResult getConversations(String continuationToken) {
         return getConversationsWithServiceResponseAsync(continuationToken).toBlocking().single().body();
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsAsync.
      *
-     * @param continuationToken skip or continuation token
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#getConversationsAsync
      */
+    @Override
     public ServiceFuture<ConversationsResult> getConversationsAsync(String continuationToken, final ServiceCallback<ConversationsResult> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationsWithServiceResponseAsync(continuationToken), serviceCallback);
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsAsync.
      *
-     * @param continuationToken skip or continuation token
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationsResult object
+     * @see Conversations#getConversationsAsync
      */
+    @Override
     public Observable<ConversationsResult> getConversationsAsync(String continuationToken) {
         return getConversationsWithServiceResponseAsync(continuationToken).map(new Func1<ServiceResponse<ConversationsResult>, ConversationsResult>() {
             @Override
@@ -257,17 +222,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversations.
-     * List the Conversations in which this bot has participated.
-     GET from this method with a skip token
-     The return value is a ConversationsResult, which contains an array of ConversationMembers and a skip token.  If the skip token is not empty, then
-     there are further values to be returned. Call this method again with the returned token to get more values.
-     Each ConversationMembers object contains the ID of the conversation and an array of ChannelAccounts that describe the members of the conversation.
+     * Implementation of getConversationsWithServiceResponseAsync.
      *
-     * @param continuationToken skip or continuation token
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationsResult object
+     * @see Conversations#getConversationsWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync(String continuationToken) {
         return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationsResult>>>() {
@@ -291,73 +250,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * CreateConversation.
-     * Create a new Conversation.
-     POST to this method with a
-     * Bot being the bot creating the conversation
-     * IsGroup set to true if this is not a direct message (default is false)
-     * Members array contining the members you want to have be in the conversation.
-     The return value is a ResourceResponse which contains a conversation id which is suitable for use
-     in the message payload and REST API uris.
-     Most channels only support the semantics of bots initiating a direct message conversation.  An example of how to do that would be:
-     ```
-     var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot, members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
-     ```.
+     * Implementation of CreateConversation.
      *
-     * @param parameters Parameters to create the conversation from
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ConversationResourceResponse object if successful.
+     * @see Conversations#createConversation
      */
+    @Override
     public ConversationResourceResponse createConversation(ConversationParameters parameters) {
         return createConversationWithServiceResponseAsync(parameters).toBlocking().single().body();
     }
 
     /**
-     * CreateConversation.
-     * Create a new Conversation.
-     POST to this method with a
-     * Bot being the bot creating the conversation
-     * IsGroup set to true if this is not a direct message (default is false)
-     * Members array contining the members you want to have be in the conversation.
-     The return value is a ResourceResponse which contains a conversation id which is suitable for use
-     in the message payload and REST API uris.
-     Most channels only support the semantics of bots initiating a direct message conversation.  An example of how to do that would be:
-     ```
-     var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot, members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
-     ```.
+     * Implementation of CreateConversation.
      *
-     * @param parameters Parameters to create the conversation from
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#createConversationAsync
      */
+    @Override
     public ServiceFuture<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters, final ServiceCallback<ConversationResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(createConversationWithServiceResponseAsync(parameters), serviceCallback);
     }
 
     /**
-     * CreateConversation.
-     * Create a new Conversation.
-     POST to this method with a
-     * Bot being the bot creating the conversation
-     * IsGroup set to true if this is not a direct message (default is false)
-     * Members array contining the members you want to have be in the conversation.
-     The return value is a ResourceResponse which contains a conversation id which is suitable for use
-     in the message payload and REST API uris.
-     Most channels only support the semantics of bots initiating a direct message conversation.  An example of how to do that would be:
-     ```
-     var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot, members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
-     ```.
+     * Implementation of CreateConversation.
      *
-     * @param parameters Parameters to create the conversation from
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationResourceResponse object
+     * @see Conversations#createConversationAsync
      */
+    @Override
     public Observable<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters) {
         return createConversationWithServiceResponseAsync(parameters).map(new Func1<ServiceResponse<ConversationResourceResponse>, ConversationResourceResponse>() {
             @Override
@@ -367,6 +284,9 @@ public class ConversationsImpl implements Conversations {
         });
     }
 
+    // FIXME: This isn't really a reasonable return value in this case.  
+    // I know what it said about converting Observable to CompletableFuture, but this particular 
+    // conversion returns a result that changes the meaning.  The response is not, and is never, a list.
     public CompletableFuture<List<ConversationResourceResponse>> CreateConversationAsync(ConversationParameters parameters) {
         CompletableFuture<List<ConversationResourceResponse>> future_result = completableFutureFromObservable(createConversationAsync(parameters));
         return future_result;
@@ -374,24 +294,11 @@ public class ConversationsImpl implements Conversations {
 
 
     /**
-     * CreateConversation.
-     * Create a new Conversation.
-     POST to this method with a
-     * Bot being the bot creating the conversation
-     * IsGroup set to true if this is not a direct message (default is false)
-     * Members array contining the members you want to have be in the conversation.
-     The return value is a ResourceResponse which contains a conversation id which is suitable for use
-     in the message payload and REST API uris.
-     Most channels only support the semantics of bots initiating a direct message conversation.  An example of how to do that would be:
-     ```
-     var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot, members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
-     ```.
+     * Implementation of createConversationWithServiceResponseAsync.
      *
-     * @param parameters Parameters to create the conversation from
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ConversationResourceResponse object
+     * @see Conversations#createConversationWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ConversationResourceResponse>> createConversationWithServiceResponseAsync(ConversationParameters parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
@@ -421,58 +328,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * SendToConversation.
-     * This method allows you to send an activity to the end of a conversation.
-     This is slightly different from ReplyToActivity().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of sendToConversation.
      *
-     * @param conversationId Conversation ID
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ResourceResponse object if successful.
+     * @see Conversations#sendToConversation
      */
+    @Override
     public ResourceResponse sendToConversation(String conversationId, Activity activity) {
         return sendToConversationWithServiceResponseAsync(conversationId, activity).toBlocking().single().body();
     }
 
     /**
-     * SendToConversation.
-     * This method allows you to send an activity to the end of a conversation.
-     This is slightly different from ReplyToActivity().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of sendToConversationAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activity Activity to send
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#sendToConversationAsync
      */
+    @Override
     public ServiceFuture<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(sendToConversationWithServiceResponseAsync(conversationId, activity), serviceCallback);
     }
 
     /**
-     * SendToConversation.
-     * This method allows you to send an activity to the end of a conversation.
-     This is slightly different from ReplyToActivity().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of sendToConversationAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#sendToConversationAsync
      */
+    @Override
     public Observable<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity) {
         return sendToConversationWithServiceResponseAsync(conversationId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -483,19 +363,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * SendToConversation.
-     * This method allows you to send an activity to the end of a conversation.
-     This is slightly different from ReplyToActivity().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of sendToConversationWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#sendToConversationWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> sendToConversationWithServiceResponseAsync(String conversationId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -528,52 +400,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * UpdateActivity.
-     * Edit an existing activity.
-     Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.
-     For example, you can remove buttons after someone has clicked "Approve" button.
+     * Implementation of updateActivity.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to update
-     * @param activity replacement Activity
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ResourceResponse object if successful.
+     * @see Conversations#updateActivity
      */
+    @Override
     public ResourceResponse updateActivity(String conversationId, String activityId, Activity activity) {
         return updateActivityWithServiceResponseAsync(conversationId, activityId, activity).toBlocking().single().body();
     }
 
     /**
-     * UpdateActivity.
-     * Edit an existing activity.
-     Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.
-     For example, you can remove buttons after someone has clicked "Approve" button.
+     * Implementation of updateActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to update
-     * @param activity replacement Activity
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#updateActivityAsync
      */
+    @Override
     public ServiceFuture<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(updateActivityWithServiceResponseAsync(conversationId, activityId, activity), serviceCallback);
     }
 
     /**
-     * UpdateActivity.
-     * Edit an existing activity.
-     Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.
-     For example, you can remove buttons after someone has clicked "Approve" button.
+     * Implementation of updateActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to update
-     * @param activity replacement Activity
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#updateActivityAsync
      */
+    @Override
     public Observable<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity) {
         return updateActivityWithServiceResponseAsync(conversationId, activityId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -584,17 +435,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * UpdateActivity.
-     * Edit an existing activity.
-     Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.
-     For example, you can remove buttons after someone has clicked "Approve" button.
+     * Implementation of updateActivityWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to update
-     * @param activity replacement Activity
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#updateActivityWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> updateActivityWithServiceResponseAsync(String conversationId, String activityId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -630,61 +475,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * ReplyToActivity.
-     * This method allows you to reply to an activity.
-     This is slightly different from SendToConversation().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of replyToActivity.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId the reply is to (OPTIONAL)
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ResourceResponse object if successful.
+     * @see Conversations#replyToActivity
      */
+    @Override
     public ResourceResponse replyToActivity(String conversationId, String activityId, Activity activity) {
         return replyToActivityWithServiceResponseAsync(conversationId, activityId, activity).toBlocking().single().body();
     }
 
     /**
-     * ReplyToActivity.
-     * This method allows you to reply to an activity.
-     This is slightly different from SendToConversation().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of replyToActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId the reply is to (OPTIONAL)
-     * @param activity Activity to send
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#replyToActivityAsync
      */
+    @Override
     public ServiceFuture<ResourceResponse> replyToActivityAsync(String conversationId, String activityId, Activity activity, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(replyToActivityWithServiceResponseAsync(conversationId, activityId, activity), serviceCallback);
     }
 
     /**
-     * ReplyToActivity.
-     * This method allows you to reply to an activity.
-     This is slightly different from SendToConversation().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of replyToActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId the reply is to (OPTIONAL)
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#replyToActivityAsync
      */
+    @Override
     public Observable<ResourceResponse> replyToActivityAsync(String conversationId, String activityId, Activity activity) {
         return replyToActivityWithServiceResponseAsync(conversationId, activityId, activity).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -695,20 +510,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * ReplyToActivity.
-     * This method allows you to reply to an activity.
-     This is slightly different from SendToConversation().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the timestamp or semantics of the channel.
-     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
-     Use ReplyToActivity when replying to a specific activity in the conversation.
-     Use SendToConversation in all other cases.
+     * Implementation of replyToActivityWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId the reply is to (OPTIONAL)
-     * @param activity Activity to send
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#replyToActivityWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> replyToActivityWithServiceResponseAsync(String conversationId, String activityId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -744,45 +550,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * DeleteActivity.
-     * Delete an existing activity.
-     Some channels allow you to delete an existing activity, and if successful this method will remove the specified activity.
+     * Implementation of deleteActivity.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to delete
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @see Conversations#deleteActivity
      */
+    @Override
     public void deleteActivity(String conversationId, String activityId) {
         deleteActivityWithServiceResponseAsync(conversationId, activityId).toBlocking().single().body();
     }
 
     /**
-     * DeleteActivity.
-     * Delete an existing activity.
-     Some channels allow you to delete an existing activity, and if successful this method will remove the specified activity.
+     * Implementation of deleteActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to delete
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#deleteActivityAsync
      */
+    @Override
     public ServiceFuture<Void> deleteActivityAsync(String conversationId, String activityId, final ServiceCallback<Void> serviceCallback) {
         return ServiceFuture.fromResponse(deleteActivityWithServiceResponseAsync(conversationId, activityId), serviceCallback);
     }
 
     /**
-     * DeleteActivity.
-     * Delete an existing activity.
-     Some channels allow you to delete an existing activity, and if successful this method will remove the specified activity.
+     * Implementation of deleteActivityAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to delete
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @see Conversations#deleteActivityAsync
      */
+    @Override
     public Observable<Void> deleteActivityAsync(String conversationId, String activityId) {
         return deleteActivityWithServiceResponseAsync(conversationId, activityId).map(new Func1<ServiceResponse<Void>, Void>() {
             @Override
@@ -793,15 +585,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * DeleteActivity.
-     * Delete an existing activity.
-     Some channels allow you to delete an existing activity, and if successful this method will remove the specified activity.
+     * Implementation of deleteActivityWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId activityId to delete
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @see Conversations#deleteActivityWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<Void>> deleteActivityWithServiceResponseAsync(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -832,43 +620,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversationMembers.
-     * Enumerate the members of a converstion.
-     This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
+     * Implementation of getConversationMembers.
      *
-     * @param conversationId Conversation ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the List&lt;ChannelAccount&gt; object if successful.
+     * @see Conversations#getConversationMembers
      */
+    @Override
     public List<ChannelAccount> getConversationMembers(String conversationId) {
         return getConversationMembersWithServiceResponseAsync(conversationId).toBlocking().single().body();
     }
 
     /**
-     * GetConversationMembers.
-     * Enumerate the members of a converstion.
-     This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
+     * Implementation of getConversationMembersAsync.
      *
-     * @param conversationId Conversation ID
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#getConversationMembersAsync
      */
+    @Override
     public ServiceFuture<List<ChannelAccount>> getConversationMembersAsync(String conversationId, final ServiceCallback<List<ChannelAccount>> serviceCallback) {
         return ServiceFuture.fromResponse(getConversationMembersWithServiceResponseAsync(conversationId), serviceCallback);
     }
 
     /**
-     * GetConversationMembers.
-     * Enumerate the members of a converstion.
-     This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
+     * Implementation of getConversationMembersAsync.
      *
-     * @param conversationId Conversation ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the List&lt;ChannelAccount&gt; object
+     * @see Conversations#getConversationMembersAsync
      */
+    @Override
     public Observable<List<ChannelAccount>> getConversationMembersAsync(String conversationId) {
         return getConversationMembersWithServiceResponseAsync(conversationId).map(new Func1<ServiceResponse<List<ChannelAccount>>, List<ChannelAccount>>() {
             @Override
@@ -879,14 +655,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetConversationMembers.
-     * Enumerate the members of a converstion.
-     This REST API takes a ConversationId and returns an array of ChannelAccount objects representing the members of the conversation.
+     * Implementation of getConversationMembersWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the List&lt;ChannelAccount&gt; object
+     * @see Conversations#getConversationMembersWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<List<ChannelAccount>>> getConversationMembersWithServiceResponseAsync(String conversationId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -913,48 +686,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * DeleteConversationMember.
-     * Deletes a member from a converstion.
-     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
-     of the conversation, the conversation will also be deleted.
+     * Implementation of deleteConversationMember.
      *
-     * @param conversationId Conversation ID
-     * @param memberId ID of the member to delete from this conversation
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @see Conversations#deleteConversationMember
      */
+    @Override
     public void deleteConversationMember(String conversationId, String memberId) {
         deleteConversationMemberWithServiceResponseAsync(conversationId, memberId).toBlocking().single().body();
     }
 
     /**
-     * DeleteConversationMember.
-     * Deletes a member from a converstion.
-     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
-     of the conversation, the conversation will also be deleted.
+     * Implementation of deleteConversationMemberAsync.
      *
-     * @param conversationId Conversation ID
-     * @param memberId ID of the member to delete from this conversation
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#deleteConversationMemberAsync
      */
+    @Override
     public ServiceFuture<Void> deleteConversationMemberAsync(String conversationId, String memberId, final ServiceCallback<Void> serviceCallback) {
         return ServiceFuture.fromResponse(deleteConversationMemberWithServiceResponseAsync(conversationId, memberId), serviceCallback);
     }
 
     /**
-     * DeleteConversationMember.
-     * Deletes a member from a converstion.
-     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
-     of the conversation, the conversation will also be deleted.
+     * Implementation of deleteConversationMemberAsync.
      *
-     * @param conversationId Conversation ID
-     * @param memberId ID of the member to delete from this conversation
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @see Conversations#deleteConversationMemberAsync
      */
+    @Override
     public Observable<Void> deleteConversationMemberAsync(String conversationId, String memberId) {
         return deleteConversationMemberWithServiceResponseAsync(conversationId, memberId).map(new Func1<ServiceResponse<Void>, Void>() {
             @Override
@@ -963,6 +719,7 @@ public class ConversationsImpl implements Conversations {
             }
         });
     }
+    
     /**
      * DeleteConversationMemberFuture
      * Deletes a member from a converstion.
@@ -974,21 +731,18 @@ public class ConversationsImpl implements Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return CompletableFuture of List < Void ></>
      */
+    // FIXME: This return result is ridiculous.
     public CompletableFuture<List<Void>> deleteConversationMemberFuture(String conversationId, String memberId) throws ExecutionException, InterruptedException {
         CompletableFuture<List<Void>> future_result = completableFutureFromObservable(deleteConversationMemberAsync(conversationId, memberId));
         return future_result;
     }
+
     /**
-     * DeleteConversationMember.
-     * Deletes a member from a converstion.
-     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
-     of the conversation, the conversation will also be deleted.
+     * Implementation of deleteConversationMemberWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param memberId ID of the member to delete from this conversation
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @see Conversations#deleteConversationMemberWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<Void>> deleteConversationMemberWithServiceResponseAsync(String conversationId, String memberId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1020,46 +774,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetActivityMembers.
-     * Enumerate the members of an activity.
-     This REST API takes a ConversationId and a ActivityId, returning an array of ChannelAccount objects representing the members of the particular activity in the conversation.
+     * Implementation of getActivityMembers.
      *
-     * @param conversationId Conversation ID
-     * @param activityId Activity ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the List&lt;ChannelAccount&gt; object if successful.
+     * @see Conversations#getActivityMembers
      */
+    @Override
     public List<ChannelAccount> getActivityMembers(String conversationId, String activityId) {
         return getActivityMembersWithServiceResponseAsync(conversationId, activityId).toBlocking().single().body();
     }
 
     /**
-     * GetActivityMembers.
-     * Enumerate the members of an activity.
-     This REST API takes a ConversationId and a ActivityId, returning an array of ChannelAccount objects representing the members of the particular activity in the conversation.
+     * Implementation of getActivityMembersAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId Activity ID
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#getActivityMembersAsync
      */
+    @Override
     public ServiceFuture<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId, final ServiceCallback<List<ChannelAccount>> serviceCallback) {
         return ServiceFuture.fromResponse(getActivityMembersWithServiceResponseAsync(conversationId, activityId), serviceCallback);
     }
 
     /**
-     * GetActivityMembers.
-     * Enumerate the members of an activity.
-     This REST API takes a ConversationId and a ActivityId, returning an array of ChannelAccount objects representing the members of the particular activity in the conversation.
+     * Implementation of getActivityMembersAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId Activity ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the List&lt;ChannelAccount&gt; object
+     * @see Conversations#getActivityMembersAsync
      */
+    @Override
     public Observable<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId) {
         return getActivityMembersWithServiceResponseAsync(conversationId, activityId).map(new Func1<ServiceResponse<List<ChannelAccount>>, List<ChannelAccount>>() {
             @Override
@@ -1070,15 +809,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * GetActivityMembers.
-     * Enumerate the members of an activity.
-     This REST API takes a ConversationId and a ActivityId, returning an array of ChannelAccount objects representing the members of the particular activity in the conversation.
+     * Implementation of getActivityMembersWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param activityId Activity ID
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the List&lt;ChannelAccount&gt; object
+     * @see Conversations#getActivityMembersWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<List<ChannelAccount>>> getActivityMembersWithServiceResponseAsync(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1108,49 +843,31 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * UploadAttachment.
-     * Upload an attachment directly into a channel's blob storage.
-     This is useful because it allows you to store data in a compliant store when dealing with enterprises.
-     The response is a ResourceResponse which contains an AttachmentId which is suitable for using with the attachments API.
+     * Implementation of uploadAttachment.
      *
-     * @param conversationId Conversation ID
-     * @param attachmentUpload Attachment data
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the ResourceResponse object if successful.
+     * @see Conversations#uploadAttachment
      */
+    @Override
     public ResourceResponse uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
         return uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload).toBlocking().single().body();
     }
 
     /**
-     * UploadAttachment.
-     * Upload an attachment directly into a channel's blob storage.
-     This is useful because it allows you to store data in a compliant store when dealing with enterprises.
-     The response is a ResourceResponse which contains an AttachmentId which is suitable for using with the attachments API.
+     * Implementation of uploadAttachmentAsync.
      *
-     * @param conversationId Conversation ID
-     * @param attachmentUpload Attachment data
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
+     * @see Conversations#uploadAttachmentAsync
      */
+    @Override
     public ServiceFuture<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload, final ServiceCallback<ResourceResponse> serviceCallback) {
         return ServiceFuture.fromResponse(uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload), serviceCallback);
     }
 
     /**
-     * UploadAttachment.
-     * Upload an attachment directly into a channel's blob storage.
-     This is useful because it allows you to store data in a compliant store when dealing with enterprises.
-     The response is a ResourceResponse which contains an AttachmentId which is suitable for using with the attachments API.
+     * Implementation of uploadAttachmentAsync.
      *
-     * @param conversationId Conversation ID
-     * @param attachmentUpload Attachment data
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#uploadAttachmentAsync
      */
+    @Override
     public Observable<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload) {
         return uploadAttachmentWithServiceResponseAsync(conversationId, attachmentUpload).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
             @Override
@@ -1161,16 +878,11 @@ public class ConversationsImpl implements Conversations {
     }
 
     /**
-     * UploadAttachment.
-     * Upload an attachment directly into a channel's blob storage.
-     This is useful because it allows you to store data in a compliant store when dealing with enterprises.
-     The response is a ResourceResponse which contains an AttachmentId which is suitable for using with the attachments API.
+     * Implementation of uploadAttachmentWithServiceResponseAsync.
      *
-     * @param conversationId Conversation ID
-     * @param attachmentUpload Attachment data
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the ResourceResponse object
+     * @see Conversations#uploadAttachmentWithServiceResponseAsync
      */
+    @Override
     public Observable<ServiceResponse<ResourceResponse>> uploadAttachmentWithServiceResponseAsync(String conversationId, AttachmentData attachmentUpload) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
@@ -1198,6 +910,146 @@ public class ConversationsImpl implements Conversations {
                 .register(200, new TypeToken<ResourceResponse>() { }.getType())
                 .register(201, new TypeToken<ResourceResponse>() { }.getType())
                 .register(202, new TypeToken<ResourceResponse>() { }.getType())
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+
+    /**
+     * Implementation of sendConversationHistory.
+     *
+     * @see Conversations#sendConversationHistory
+     */
+    @Override
+    public ResourceResponse sendConversationHistory(String conversationId, Transcript history) {
+        return sendConversationHistoryWithServiceResponseAsync(conversationId, history).toBlocking().single().body();
+    }
+
+    /**
+     * Implementation of sendConversationHistoryAsync.
+     *
+     * @see Conversations#sendConversationHistoryAsync
+     */
+    @Override
+    public ServiceFuture<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history, final ServiceCallback<ResourceResponse> serviceCallback) {
+        return ServiceFuture.fromResponse(sendConversationHistoryWithServiceResponseAsync(conversationId, history), serviceCallback);
+    }
+
+    /**
+     * Implementation of sendConversationHistoryAsync.
+     *
+     * @see Conversations#sendConversationHistoryAsync
+     */
+    @Override
+    public Observable<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history) {
+        return sendConversationHistoryWithServiceResponseAsync(conversationId, history).map(new Func1<ServiceResponse<ResourceResponse>, ResourceResponse>() {
+            @Override
+            public ResourceResponse call(ServiceResponse<ResourceResponse> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
+     * Implementation of sendConversationHistoryWithServiceResponseAsync.
+     *
+     * @see Conversations#sendConversationHistoryWithServiceResponseAsync
+     */
+    @Override
+     public Observable<ServiceResponse<ResourceResponse>> sendConversationHistoryWithServiceResponseAsync(String conversationId, Transcript history) {
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+        if (history == null) {
+            throw new IllegalArgumentException("Parameter history is required and cannot be null.");
+        }
+        Validator.validate(history);
+        return service.sendConversationHistory(conversationId, history, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
+                @Override
+                public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<ResourceResponse> clientResponse = sendConversationHistoryDelegate(response);
+                        return Observable.just(clientResponse);
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    private ServiceResponse<ResourceResponse> sendConversationHistoryDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<ResourceResponse>() { }.getType())
+                .register(201, new TypeToken<ResourceResponse>() { }.getType())
+                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+
+    /**
+     * Implementation of getConversationPagedMembers.
+     *
+     * @see Conversations#getConversationPagedMembers
+     */
+    @Override
+    public PagedMembersResult getConversationPagedMembers(String conversationId){
+        return getConversationPagedMembersWithServiceResponseAsync(conversationId).toBlocking().single().body();
+    }
+
+    /**
+     * Implementation of getConversationPagedMembersAsync.
+     *
+     * @see Conversations#getConversationPagedMembersAsync
+     */
+    @Override
+    public ServiceFuture<PagedMembersResult> getConversationPagedMembersAsync(String conversationId, final ServiceCallback<PagedMembersResult> serviceCallback){
+        return ServiceFuture.fromResponse(getConversationPagedMembersWithServiceResponseAsync(conversationId), serviceCallback);
+    }
+
+    /**
+     * Implementation of getConversationPagedMembersAsync.
+     *
+     * @see Conversations#getConversationPagedMembersAsync
+     */
+    @Override
+    public Observable<PagedMembersResult> getConversationPagedMembersAsync(String conversationId){
+        return getConversationPagedMembersWithServiceResponseAsync(conversationId).map(new Func1<ServiceResponse<PagedMembersResult>, PagedMembersResult>() {
+            @Override
+            public PagedMembersResult call(ServiceResponse<PagedMembersResult> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
+     * Implementation of getConversationPagedMembersWithServiceResponseAsync.
+     *
+     * @see Conversations#getConversationPagedMembersWithServiceResponseAsync
+     */
+    @Override
+    public Observable<ServiceResponse<PagedMembersResult>> getConversationPagedMembersWithServiceResponseAsync(String conversationId){
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+        return service.getConversationPagedMembers(conversationId, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<PagedMembersResult>>>() {
+                @Override
+                public Observable<ServiceResponse<PagedMembersResult>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<PagedMembersResult> clientResponse = getConversationPagedMembersDelegate(response);
+                        return Observable.just(clientResponse);
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    private ServiceResponse<PagedMembersResult> getConversationPagedMembersDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<PagedMembersResult, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<PagedMembersResult>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

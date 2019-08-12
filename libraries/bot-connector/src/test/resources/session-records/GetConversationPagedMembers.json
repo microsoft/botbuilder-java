@@ -1,0 +1,53 @@
+{
+  "networkCallRecords": [
+    {
+      "Uri": "https://slack.botframework.com/v3/conversations",
+      "Method": "POST",
+      "Body": "{\r\n  \"bot\": {\r\n    \"id\": \"B21UTEF8S:T03CWQ0QB\"\r\n  },\r\n  \"members\": [\r\n    {\r\n      \"id\": \"U19KH8EHJ:T03CWQ0QB\"\r\n    }\r\n  ]\r\n}",
+      "Headers" : {
+        "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+      },
+      "Response":{
+        "date" : "Fri, 29 Dec 2017 18:30:31 GMT",
+        "server" : "Microsoft-IIS/10.0",
+        "expires" : "-1",
+        "vary" : "Accept-Encoding",
+        "retry-after" : "0",
+        "StatusCode" : "200",
+        "pragma" : "no-cache",
+        "strict-transport-security" : "max-age=31536000",
+        "request-context" : "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+        "x-powered-by" : "ASP.NET",
+        "content-type" : "application/json; charset=utf-8",
+        "cache-control" : "no-cache",
+        "Content-Length" : "45",
+        "Body" : "{\r\n  \"id\": \"B21UTEF8S:T03CWQ0QB:DD6UM0YHW\"\r\n}"
+      }
+    },
+    {
+      "Uri": "https://slack.botframework.com/v3/conversations/B21UTEF8S%3AT03CWQ0QB%3ADD6UM0YHW/pagedmembers",
+      "Method": "GET",
+      "Body": "",
+      "Headers" : {
+        "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+      },
+      "Response":{
+        "date" : "Fri, 29 Dec 2017 18:30:31 GMT",
+        "server" : "Microsoft-IIS/10.0",
+        "expires" : "-1",
+        "vary" : "Accept-Encoding",
+        "retry-after" : "0",
+        "StatusCode" : "200",
+        "pragma" : "no-cache",
+        "strict-transport-security" : "max-age=31536000",
+        "request-context" : "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+        "x-powered-by" : "ASP.NET",
+        "content-type" : "application/json; charset=utf-8",
+        "cache-control" : "no-cache",
+        "Content-Length" : "185",
+        "Body" : "{\r\n  \"members\": [\r\n    {\r\n      \"id\": \"B21UTEF8S:T03CWQ0QB\",\r\n      \"name\": \"botframeworktest\"\r\n    },\r\n    {\r\n      \"id\": \"U3Z9ZUDK5:T03CWQ0QB\",\r\n      \"name\": \"juan.ar\"\r\n    }\r\n  ]\r\n}"
+      }
+    }
+  ],
+  "variables" : [ ]
+}

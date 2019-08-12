@@ -27,7 +27,7 @@ public class Mention extends EntityImpl {
     private String text;
 
     /**
-     * Entity Type (typically from schema.org types).
+     * Type of this entity (RFC 3987 IRI).
      */
     @JsonProperty(value = "type")
     private String type;

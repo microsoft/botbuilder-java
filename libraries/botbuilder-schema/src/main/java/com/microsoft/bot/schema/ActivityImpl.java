@@ -198,13 +198,6 @@ public class ActivityImpl extends Activity {
     //public static TypingActivity CreateTypingActivity() { return new Activity(ActivityTypes.Typing); }
 
     /**
-     * Create an instance of the Activity class with Activity masking
-     */
-    public static Activity CreatePingActivity() {
-        return new Activity().withType(ActivityTypes.PING);
-    }
-
-    /**
      * Create an instance of the Activity class with IEndOfConversationActivity masking
      */
     //public static IEndOfConversationActivity CreateEndOfConversationActivity() { return new Activity(ActivityTypes.EndOfConversation); }

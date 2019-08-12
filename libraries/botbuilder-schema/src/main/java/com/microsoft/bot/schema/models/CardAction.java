@@ -56,6 +56,12 @@ public class CardAction {
     private Object value;
 
     /**
+     * Channel-specific data associated with this action.
+     */
+    @JsonProperty(value = "channelData")
+    private Object channelData;
+
+    /**
      * Get the type value.
      *
      * @return the type value
@@ -175,4 +181,21 @@ public class CardAction {
         return this;
     }
 
+    /**
+     * Gets the channelData value.
+     */
+    public Object channelData(){
+        return this.channelData;
+    }
+
+    /**
+     * Sets the channelData value.
+     * 
+     * @param channelData The channelData object to set.
+     * @return the CardAction object itself.
+     */
+    public CardAction withChannelData(Object channelData){
+        this.channelData = channelData;
+        return this;
+    }
 }

@@ -35,51 +35,65 @@ public class Activity {
     private ActivityTypes type;
 
     /**
-     * ID of this activity.
+     * Contains an ID that uniquely identifies the activity on the channel.
      */
     @JsonProperty(value = "id")
     private String id;
 
     /**
-     * UTC Time when message was sent (set by service).
+     * Contains the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
      */
     @JsonProperty(value = "timestamp")
     private DateTime timestamp;
 
     /**
-     * Local time when message was sent (set by client, Ex:
-     * 2016-09-23T13:07:49.4714686-07:00).
+     * Contains the local date and time of the message, expressed in ISO-8601 format.
+     * For example, 2016-09-23T13:07:49.4714686-07:00.
      */
     @JsonProperty(value = "localTimestamp")
     private DateTime localTimestamp;
 
     /**
-     * Service endpoint where operations concerning the activity may be
-     * performed.
+     * Contains the name of the local timezone of the message, expressed in IANA Time Zone database format.
+     * For example, America/Los_Angeles.
+     */
+    @JsonProperty(value = "localTimezone")
+    private String localTimezone;
+
+    /**
+     * A string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted
+     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
+     * that asserts the identity of the callers (e.g. tokens).
+     */
+    @JsonProperty(value = "callerId")
+    private String callerId;
+
+    /**
+     * Contains the URL that specifies the channel's service endpoint. Set by the channel.
      */
     @JsonProperty(value = "serviceUrl")
     private String serviceUrl;
 
     /**
-     * ID of the channel where the activity was sent.
+     * Contains an ID that uniquely identifies the channel. Set by the channel.
      */
     @JsonProperty(value = "channelId")
     private String channelId;
 
     /**
-     * Sender address.
+     * Identifies the sender of the message.
      */
     @JsonProperty(value = "from")
     private ChannelAccount from;
 
     /**
-     * Conversation.
+     * Identifies the conversation to which the activity belongs.
      */
     @JsonProperty(value = "conversation")
     private ConversationAccount conversation;
 
     /**
-     * (Outbound to bot only) Bot's address that received the message.
+     * Identifies the recipient of the message.
      */
     @JsonProperty(value = "recipient")
     private ChannelAccount recipient;
@@ -92,82 +106,84 @@ public class Activity {
     private TextFormatTypes textFormat;
 
     /**
-     * Hint for how to deal with multiple attachments. Default:list. Possible
-     * values include: 'list', 'carousel'.
+     * The layout hint for multiple attachments. Default: list.
      */
     @JsonProperty(value = "attachmentLayout")
     private AttachmentLayoutTypes attachmentLayout;
 
     /**
-     * Members added to the conversation.
+     * The collection of members added to the conversation.
      */
     @JsonProperty(value = "membersAdded")
     private List<ChannelAccount> membersAdded;
 
     /**
-     * Members removed from the conversation.
+     * The collection of members removed from the conversation.
      */
     @JsonProperty(value = "membersRemoved")
     private List<ChannelAccount> membersRemoved;
 
     /**
-     * Reactions added to the activity.
+     * The collection of reactions added to the conversation.
      */
     @JsonProperty(value = "reactionsAdded")
     private List<MessageReaction> reactionsAdded;
 
     /**
-     * Reactions removed from the activity.
+     * The collection of reactions removed from the conversation.
      */
     @JsonProperty(value = "reactionsRemoved")
     private List<MessageReaction> reactionsRemoved;
 
     /**
-     * The conversation's updated topic name.
+     * The updated topic name of the conversation.
      */
     @JsonProperty(value = "topicName")
     private String topicName;
 
     /**
-     * True if prior history of the channel is disclosed.
+     * Indicates whether the prior history of the channel is disclosed.
      */
     @JsonProperty(value = "historyDisclosed")
     private Boolean historyDisclosed;
 
     /**
-     * The language code of the Text field.
+     * A locale name for the contents of the text field.
+     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
+     * and an ISO 3166 two-letter subculture code associated with a country or region.
+     * 
+     * The locale name can also correspond to a valid BCP-47 language tag.
      */
     @JsonProperty(value = "locale")
     private String locale;
 
     /**
-     * Content for the message.
+     * The text content of the message.
      */
     @JsonProperty(value = "text")
     private String text;
 
     /**
-     * SSML Speak for TTS audio response.
+     * The text to speak.
      */
     @JsonProperty(value = "speak")
     private String speak;
 
     /**
-     * Input hint to the channel on what the bot is expecting. Possible values
-     * include: 'acceptingInput', 'ignoringInput', 'expectingInput'.
+     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message 
+     * is delivered to the client.
      */
     @JsonProperty(value = "inputHint")
     private InputHints inputHint;
 
     /**
-     * Text to display if the channel cannot render cards.
+     * The text to display if the channel cannot render cards.
      */
     @JsonProperty(value = "summary")
     private String summary;
 
     /**
-     * SuggestedActions are used to provide keyboard/quickreply like behavior
-     * in many clients.
+     * The suggested actions for the activity.
      */
     @JsonProperty(value = "suggestedActions")
     private SuggestedActions suggestedActions;
@@ -179,92 +195,93 @@ public class Activity {
     private List<Attachment> attachments;
 
     /**
-     * Collection of Entity objects, each of which contains metadata about this
-     * activity. Each Entity object is typed.
+     * Represents the entities that were mentioned in the message.
      */
     @JsonProperty(value = "entities")
     private List<EntityImpl> entities;
 
     /**
-     * Channel-specific payload.
+     * Contains channel-specific content.
      */
     @JsonProperty(value = "channelData")
     private Object channelData;
 
     /**
-     * ContactAdded/Removed action.
+     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
      */
     @JsonProperty(value = "action")
     private String action;
 
     /**
-     * The original ID this message is a response to.
+     * Contains the ID of the message to which this message is a reply.
      */
     @JsonProperty(value = "replyToId")
     private String replyToId;
 
     /**
-     * Descriptive label.
+     * A descriptive label for the activity.
      */
     @JsonProperty(value = "label")
     private String label;
 
     /**
-     * Unique string which identifies the shape of the value object.
+     * The type of the activity's value object.
      */
     @JsonProperty(value = "valueType")
     private String valueType;
 
     /**
-     * Open-ended value.
+     * A value that is associated with the activity.
      */
     @JsonProperty(value = "value")
     private Object value;
 
     /**
-     * Name of the operation to invoke or the name of the event.
+     * The name of the operation associated with an invoke or event activity.
      */
     @JsonProperty(value = "name")
     private String name;
 
     /**
-     * Reference to another conversation or activity.
+     * A reference to another conversation or activity.
      */
     @JsonProperty(value = "relatesTo")
     private ConversationReference relatesTo;
 
     /**
-     * Code indicating why the conversation has ended. Possible values include:
-     * 'unknown', 'completedSuccessfully', 'userCancelled', 'botTimedOut',
-     * 'botIssuedInvalidMessage', 'channelFailed'.
+     * The a code for endOfConversation activities that indicates why the conversation ended.
      */
     @JsonProperty(value = "code")
     private EndOfConversationCodes code;
 
     /**
-     * DateTime to expire the activity as ISO 8601 encoded datetime.
+     * The time at which the activity should be considered to be expired and should not be presented to the recipient.
      */
     @JsonProperty(value = "expiration")
     private DateTime expiration;
 
     /**
-     * Importance of this activity
-     * {Low|Normal|High}, null value indicates Normal importance see
-     * ActivityImportance).
+     * The importance of the activity.
      */
     @JsonProperty(value = "importance")
     private String importance;
 
     /**
-     * Hint to describe how this activity should be delivered.
-     * Currently: null or "Default" = default delivery
-     * "Notification" = notification semantics.
+     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
+     * 
+     * The default delivery mode is \"default\".
      */
     @JsonProperty(value = "deliveryMode")
     private String deliveryMode;
 
     /**
-     * TextHighlight in the activity represented in the ReplyToId property.
+     * List of phrases and references that speech and language priming systems should listen for.
+     */
+    @JsonProperty(value = "listenFor")
+    private List<String> listenFor;
+
+    /**
+     * The collection of text fragments to highlight when the activity contains a ReplyToId value.
      */
     @JsonProperty(value = "textHighlights")
     private List<TextHighlight> textHighlights;
@@ -346,6 +363,41 @@ public class Activity {
      */
     public Activity withLocalTimestamp(DateTime localTimestamp) {
         this.localTimestamp = localTimestamp;
+        return this;
+    }
+
+    /**
+     * Gets the localTimezone.
+     * 
+     * @return The name of the local timezone of the message, expressed in IANA Time Zone database format.
+     */
+    public String localTimezone(){
+        return this.localTimezone;
+    }
+
+    /**
+     * Sets the localTimezone.
+     * @param localTimezone The name of the local timezone of the message, expressed in IANA Time Zone database format.
+     */
+    public Activity withLocalTimeZone(String localTimezone){
+        this.localTimezone = localTimezone;
+        return this;
+    }
+
+    /**
+     * Gets the callerId
+     */
+    public String callerId(){
+        return this.callerId;
+    }
+
+    /**
+     * Sets the callerId
+     * 
+     * @param callerId A string containing an IRI identifying the caller of a bot.
+     */
+    public Activity withCallerId(String callerId){
+        this.callerId = callerId;
         return this;
     }
 
@@ -1006,6 +1058,21 @@ public class Activity {
      */
     public Activity withDeliveryMode(String deliveryMode) {
         this.deliveryMode = deliveryMode;
+        return this;
+    }
+
+    /**
+     * Gets listenFor value.
+     */
+    public List<String> listenFor(){
+        return this.listenFor;
+    }
+
+    /**
+     * Sets listenFor value on this object.
+     */
+    public Activity withListenFor(List<String> listenFor){
+        this.listenFor = listenFor;
         return this;
     }
 

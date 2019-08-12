@@ -140,6 +140,30 @@ public class ConversationsTest extends BotConnectorTestBase {
     }
 
     @Test
+    public void GetConversationPagedMembers(){
+        ConversationParameters createMessage = new ConversationParameters()
+            .withMembers(Collections.singletonList(user))
+            .withBot(bot);
+
+        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
+
+        try {
+            PagedMembersResult pagedMembers = connector.conversations().getConversationPagedMembers(conversation.id());
+
+            boolean hasUser = false;
+            for(ChannelAccount member : pagedMembers.members()){
+                hasUser = member.id().equalsIgnoreCase(user.id());
+                if(hasUser)
+                    break;
+            }
+
+            Assert.assertTrue(hasUser);
+        } catch (ErrorResponseException e) {
+            Assert.assertEquals("ServiceError", e.body().error().code().toString());
+        }
+    }
+
+    @Test
     public void SendToConversation() {
 
         Activity activity = new Activity()

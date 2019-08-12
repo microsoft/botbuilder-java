@@ -57,3 +57,4 @@ dependency-reduced-pom.xml
 *.factorypath
 .vscode/settings.json
 pom.xml.versionsBackup
+libraries/swagger/generated

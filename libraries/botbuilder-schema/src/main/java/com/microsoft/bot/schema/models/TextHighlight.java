@@ -13,17 +13,17 @@ package com.microsoft.bot.schema.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * The TextHighlight model.
+ * Refers to a substring of content within another field.
  */
 public class TextHighlight {
     /**
-     * plain text fragment to highlight.
+     * Defines the snippet of text to highlight.
      */
     @JsonProperty(value = "text")
     private String text;
 
     /**
-     * index of occurence of the Text (Starting at 1).
+     * Occurrence of the text field within the referenced text, if multiple exist.
      */
     @JsonProperty(value = "occurence")
     private Integer occurence;

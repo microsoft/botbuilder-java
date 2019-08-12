@@ -17,13 +17,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class AttachmentView {
     /**
-     * Content type of the attachment.
+     * Id of the attachment.
      */
     @JsonProperty(value = "viewId")
     private String viewId;
 
     /**
-     * Name of the attachment.
+     * Size of the attachment.
      */
     @JsonProperty(value = "size")
     private Integer size;
