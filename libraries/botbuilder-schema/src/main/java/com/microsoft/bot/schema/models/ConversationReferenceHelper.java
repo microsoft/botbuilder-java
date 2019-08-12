@@ -18,7 +18,7 @@ public class ConversationReferenceHelper {
                 .withType(ActivityTypes.MESSAGE)
                 .withId(UUID.randomUUID().toString())
                 .withRecipient(new ChannelAccount()
-                        .withId((reference.bot().id()))
+                        .withId(reference.bot().id())
                         .withName(reference.bot().name()))
                 .withChannelId(reference.channelId())
                 .withServiceUrl(reference.serviceUrl())

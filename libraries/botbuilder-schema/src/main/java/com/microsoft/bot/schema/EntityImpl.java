@@ -77,11 +77,11 @@ public class EntityImpl extends Entity {
      */
 
     /**
-     * @param T 
+     * @param T
      */
 
     /**
-     * @return 
+     * @return
      */
 
     public <T> T GetAs(Class<T> type)  {
@@ -112,8 +112,8 @@ public class EntityImpl extends Entity {
 
     /**
      * Set internal payload.
-     * @param T 
-     * @param obj 
+     * @param T
+     * @param obj
      */
 
     public <T> boolean SetAs(T obj) {
@@ -142,6 +142,5 @@ public class EntityImpl extends Entity {
         return true;
 
     }
-
-};
+}
 

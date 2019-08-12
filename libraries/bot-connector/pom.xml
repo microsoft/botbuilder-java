@@ -249,11 +249,8 @@
                             </archive>
                         </configuration>
                     </plugin>
-
-
                 </plugins>
             </build>
         </profile>
     </profiles>
-
 </project>

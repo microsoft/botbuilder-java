@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.schema.ContactRelationUpdateActivity;
-import com.microsoft.bot.schema.TraceActivity;
 import com.microsoft.bot.schema.models.*;
 
 
@@ -79,7 +77,7 @@ public class ActivityImpl extends Activity {
      * @param value value of the operation
      * @param valueType valueType if helpful to identify the value schema (default is value.GetType().Name)
      * @param label descritive label of context. (Default is calling function name)
-     * @return 
+     * @return
      */
     public TraceActivity CreateTrace(String name) {
         return CreateTrace(name, null, null, null);
@@ -160,7 +158,7 @@ public class ActivityImpl extends Activity {
         reply.withType(ActivityTypes.TRACE);
         reply.withTimestamp(DateTime.now());
         reply.withAttachments(new ArrayList<Attachment>());
-        reply.withEntities(new ArrayList<EntityImpl>());;
+        reply.withEntities(new ArrayList<EntityImpl>());
         return reply;
     }
 
@@ -624,31 +622,31 @@ public class ActivityImpl extends Activity {
 
     /**
      * Return an IMessageUpdateAcitvity if this is a MessageUpdate activity
-     * @return 
+     * @return
      */
     //public IMessageUpdateActivity AsMessageUpdateActivity() { return IsActivity(ActivityTypes.MessageUpdate) ? this : null; }
 
     /**
      * Return an IMessageDeleteActivity if this is a MessageDelete activity
-     * @return 
+     * @return
      */
     //public IMessageDeleteActivity AsMessageDeleteActivity() { return IsActivity(ActivityTypes.MessageDelete) ? this : null; }
 
     /**
      * Return an IMessageReactionActivity if this is a MessageReaction activity
-     * @return 
+     * @return
      */
     //public IMessageReactionActivity AsMessageReactionActivity() { return IsActivity(ActivityTypes.MessageReaction) ? this : null; }
 
     /**
      * Return an ISuggestionActivity if this is a Suggestion activity
-     * @return 
+     * @return
      */
     //public ISuggestionActivity AsSuggestionActivity() { return IsActivity(ActivityTypes.Suggestion) ? this : null; }
 
     /**
      * Return an ITraceActivity if this is a Trace activity
-     * @return 
+     * @return
      */
     //public ITraceActivity AsTraceActivity() { return IsActivity(ActivityTypes.Trace) ? this : null; }
 
@@ -672,7 +670,7 @@ public class ActivityImpl extends Activity {
         return false;
     }
 
-    private Mention convertToMention(JsonNode node) {
+    public Mention convertToMention(JsonNode node) {
         try {
             return ActivityImpl.mapper.treeToValue(node, Mention.class);
         } catch (JsonProcessingException e) {
@@ -697,7 +695,7 @@ public class ActivityImpl extends Activity {
 
     /**
      * Get channeldata as typed structure
-     * @param activity 
+     * @param activity
      * @param TypeT type to use
      * @return typed Object or default(TypeT)
      */
@@ -706,7 +704,7 @@ public class ActivityImpl extends Activity {
             return null;
 
         if (classType.isInstance(this.channelData())) {
-            return ((TypeT) this.channelData());
+            return (TypeT) this.channelData();
         }
         JsonNode node = mapper.valueToTree(this.channelData());
         return mapper.treeToValue((TreeNode) node, classType);
@@ -714,10 +712,10 @@ public class ActivityImpl extends Activity {
 
     /**
      * Get channeldata as typed structure
-     * @param activity 
+     * @param activity
      * @param TypeT type to use
      * @param instance The resulting instance, if possible
-     * @return 
+     * @return
      * {@code true} if value of {@linkalso Activity.ChannelData} was coerceable to {@code TypeT}, {@code false} otherwise.
      */
 
@@ -734,8 +732,8 @@ public class ActivityImpl extends Activity {
         return new ResultPair<Boolean, TypeT>(true, instance);
     }
     /**
-     * Clone a activity 
-     * @param activity 
+     * Clone a activity
+     * @param activity
      * @return new cloned activity
      */
     public static Activity CloneActity(Activity activity) {
