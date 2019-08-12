@@ -8,9 +8,6 @@
 package com.microsoft.bot.schema.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.HashMap;
 
 /**
  * Conversation account represents the identity of the conversation within a channel.
@@ -203,7 +200,7 @@ public class ConversationAccount {
      * while maintaining the object.
      *
      */
-    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+//    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
 
     /**
      * Overflow properties.

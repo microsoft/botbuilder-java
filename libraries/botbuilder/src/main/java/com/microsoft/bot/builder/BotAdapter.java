@@ -135,7 +135,6 @@ public abstract class BotAdapter {
                 callback.accept(context);
             }
         }
-        return;
     }
 
 

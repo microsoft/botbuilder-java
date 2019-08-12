@@ -125,6 +125,16 @@
           <aggregate>true</aggregate>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <configuration>
+          <analysisCache>true</analysisCache>
+          <excludes>
+            <exclude>**/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>

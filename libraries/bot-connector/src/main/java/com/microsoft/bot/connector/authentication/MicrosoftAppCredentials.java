@@ -31,11 +31,11 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
 
     private String currentToken = null;
     private long expiredTime = 0;
-    private static final Object cacheSync = new Object();
+    //private static final Object cacheSync = new Object();
     protected static final HashMap<String, OAuthResponse> cache = new HashMap<String, OAuthResponse>();
 
-    public final String OAuthEndpoint = AuthenticationConstants.ToChannelFromBotLoginUrl;
-    public final String OAuthScope = AuthenticationConstants.ToChannelFromBotOAuthScope;
+    public final String OAuthEndpoint = ToChannelFromBotLoginUrl;
+    public final String OAuthScope = ToChannelFromBotOAuthScope;
 
 
     public String getTokenCacheKey() {
@@ -83,7 +83,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     }
 
 
-    private boolean ShouldSetToken(String url) {
+    protected boolean ShouldSetToken(String url) {
         if (isTrustedServiceUrl(url)) {
             return true;
         }
@@ -121,6 +121,8 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
             URL url = new URL(serviceUrl);
             trustServiceUrl(url, expirationTime);
         } catch (MalformedURLException e) {
+            //TODO: What's missing here?
+            e.printStackTrace();
         }
     }
 

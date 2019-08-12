@@ -22,7 +22,6 @@ import retrofit2.Retrofit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.stream.Stream;
 
 /**
  * Initializes a new instance of the ConnectorClientImpl class.

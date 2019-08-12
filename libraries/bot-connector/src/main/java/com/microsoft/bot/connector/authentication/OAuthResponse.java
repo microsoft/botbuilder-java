@@ -1,7 +1,6 @@
 package com.microsoft.bot.connector.authentication;
 
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
@@ -43,6 +42,6 @@ public class OAuthResponse
     }
 
     @JsonAnySetter
-    private HashMap<String, String> properties;
+    public HashMap<String, String> properties;
 
 }

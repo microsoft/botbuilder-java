@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

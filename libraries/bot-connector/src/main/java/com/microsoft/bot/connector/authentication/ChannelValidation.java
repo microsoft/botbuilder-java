@@ -4,7 +4,6 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.JwtTokenExtractor;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

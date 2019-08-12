@@ -3,11 +3,7 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.auth0.jwt.interfaces.Claim;
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.authentication.ClaimsIdentityImpl;
-import com.microsoft.bot.connector.authentication.EmulatorValidation;
 import com.microsoft.bot.schema.models.Activity;
 
 import java.util.concurrent.CompletableFuture;

@@ -9,9 +9,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.Verification;
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.ClaimsIdentity;
-import com.microsoft.bot.connector.authentication.ClaimsIdentityImpl;
-import com.microsoft.bot.connector.authentication.TokenValidationParameters;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -20,7 +17,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
