@@ -34,6 +34,8 @@
     <module>libraries/bot-builder</module>
     <module>libraries/bot-connector</module>
     <module>samples/bot-connector-sample</module>
+    <module>samples/servlet-echo</module>
+    <module>samples/spring-echo</module>
   </modules>
 
   <build>
