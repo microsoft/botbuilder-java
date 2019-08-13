@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-parent</artifactId>
-  <version>4.0.0-a0</version>
+  <version>4.0.0</version>
 
   <packaging>pom</packaging>
 
@@ -30,8 +30,8 @@
   </profiles>
 
   <modules>
-    <module>libraries/botbuilder-schema</module>
-    <module>libraries/botbuilder</module>
+    <module>libraries/bot-schema</module>
+    <module>libraries/bot-builder</module>
     <module>libraries/bot-connector</module>
     <module>samples/bot-connector-sample</module>
   </modules>
@@ -45,10 +45,10 @@
         <configuration>
           <coberturaReports>
             <coberturaReport>
-              ./cobertura-report/botbuilder/coverage.xml
+              ./cobertura-report/bot-builder/coverage.xml
             </coberturaReport>
             <coberturaReport>
-              ./cobertura-report/botbuilder-schema/coverage.xml
+              ./cobertura-report/bot-schema/coverage.xml
             </coberturaReport>
             <coberturaReport>
               ./cobertura-report/bot-connector/coverage.xml

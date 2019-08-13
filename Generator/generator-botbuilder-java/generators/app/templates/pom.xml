@@ -2,19 +2,19 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.microsoft.bot.connector.sample</groupId>
-  <artifactId>bot-connector-sample</artifactId>
+  <groupId>com.microsoft.bot</groupId>
+  <artifactId>generator-botbuilder-java</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0</version>
 
   <parent>
     <groupId>com.microsoft.bot</groupId>
     <artifactId>bot-parent</artifactId>
-    <version>4.0.0-a0</version>
-    <relativePath>../../</relativePath>
+    <version>4.0.0</version>
+    <relativePath>../../../../../pom.xml</relativePath>
   </parent>
 
-  <name>bot-connector-sample</name>
+  <name>generator-botbuilder-java</name>
   <url>http://maven.apache.org</url>
 
   <properties>
