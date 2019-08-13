@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.bot</groupId>
-    <artifactId>bot-connector</artifactId>
+    <artifactId>bot-builder</artifactId>
     <packaging>jar</packaging>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
 
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -46,6 +46,26 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.microsoft.rest</groupId>
             <artifactId>client-runtime</artifactId>
@@ -91,7 +111,11 @@
             <artifactId>bot-schema</artifactId>
             <version>4.0.0-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.microsoft.bot</groupId>
+            <artifactId>bot-connector</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -115,13 +139,16 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
-                <resources>
-                    <resource>
-                    <directory>src/main/resources</directory>
-                    <filtering>true</filtering>
-                    </resource>
-                </resources>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.7.0</version>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
@@ -130,18 +157,8 @@
                             <archive>
                                 <manifest>
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 </manifest>
                             </archive>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.7.0</version>
-                        <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -157,7 +174,7 @@
                         <artifactId>cobertura-maven-plugin</artifactId>
                         <version>2.7</version>
                         <configuration>
-                            <outputDirectory>../../cobertura-report/bot-connector</outputDirectory>
+                            <outputDirectory>../../cobertura-report/bot-builder</outputDirectory>
                             <format>xml</format>
                             <maxmem>256m</maxmem>
                             <!-- aggregated reports for multi-module projects -->
@@ -167,18 +184,15 @@
                     <plugin>
                       <groupId>org.apache.maven.plugins</groupId>
                       <artifactId>maven-pmd-plugin</artifactId>
-                      <executions>
-                        <execution>
-                          <phase>validate</phase>
-                          <goals>
-                            <goal>check</goal>
-                          </goals>
-                        </execution>
-                      </executions>
+                      <configuration>
+                        <analysisCache>true</analysisCache>
+                        <excludes>
+                          <exclude>**/**</exclude>
+                        </excludes>
+                      </configuration>
                     </plugin>
-                  </plugins>
+                </plugins>
             </build>
-
         </profile>
 
         <profile>
