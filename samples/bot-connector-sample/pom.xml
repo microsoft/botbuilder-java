@@ -50,12 +50,12 @@
     </dependency>
     <dependency>
       <groupId>com.microsoft.bot</groupId>
-      <artifactId>botframework-schema</artifactId>
+      <artifactId>bot-schema</artifactId>
       <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.bot</groupId>
-      <artifactId>botframework-connector</artifactId>
+      <artifactId>bot-connector</artifactId>
       <version>4.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
