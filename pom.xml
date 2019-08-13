@@ -1,9 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-parent</artifactId>
-  <version>4.0.0-a0</version>
+  <version>4.0.0</version>
 
   <packaging>pom</packaging>
 
@@ -30,8 +31,8 @@
   </profiles>
 
   <modules>
-    <module>libraries/botbuilder-schema</module>
-    <module>libraries/botbuilder</module>
+    <module>libraries/bot-schema</module>
+    <module>libraries/bot-builder</module>
     <module>libraries/bot-connector</module>
     <module>samples/bot-connector-sample</module>
   </modules>
@@ -48,10 +49,10 @@
               ./cobertura-report/botbuilder/coverage.xml
             </coberturaReport>
             <coberturaReport>
-              ./cobertura-report/botbuilder-schema/coverage.xml
+              ./cobertura-report/botframework-schema/coverage.xml
             </coberturaReport>
             <coberturaReport>
-              ./cobertura-report/bot-connector/coverage.xml
+              ./cobertura-report/botframework-connector/coverage.xml
             </coberturaReport>
             <coberturaReport>
               ./cobertura-report/bot-connector-sample/coverage.xml

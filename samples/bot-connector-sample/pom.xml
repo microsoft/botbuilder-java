@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.microsoft.bot.connector.sample</groupId>
+  <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-connector-sample</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0</version>
@@ -49,13 +49,13 @@
       <version>1.7.26</version>
     </dependency>
     <dependency>
-      <groupId>com.microsoft.bot.schema</groupId>
-      <artifactId>botbuilder-schema</artifactId>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>botframework-schema</artifactId>
       <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>com.microsoft.bot.connector</groupId>
-      <artifactId>bot-connector</artifactId>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>botframework-connector</artifactId>
       <version>4.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
@@ -128,6 +128,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.12.0</version>
         <configuration>
           <analysisCache>true</analysisCache>
           <excludes>
