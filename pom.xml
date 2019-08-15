@@ -1,33 +1,128 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.microsoft.bot</groupId>
-  <artifactId>bot-parent</artifactId>
-  <version>4.0.0</version>
 
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.microsoft.bot</groupId>
+  <artifactId>bot-java</artifactId>
+  <version>4.0.0</version>
   <packaging>pom</packaging>
 
-  <name>Microsoft BotBuilder SDK Parent</name>
-  <description>This package contains the parent module of Microsoft BotBuilder SDK.</description>
+  <name>Microsoft BotBuilder Java SDK Parent</name>
+  <description>This package contains the parent module of Microsoft BotBuilder Java SDK.</description>
   <url>https://github.com/Microsoft/botbuilder-java</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.deploy.skip>true</maven.deploy.skip>
+    <jdk.version>1.8</jdk.version>
+    <repo.url>https://botbuilder.myget.org/F/scratch/maven/</repo.url>
   </properties>
 
   <profiles>
     <profile>
-        <id>build</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-        <build>
-          <plugins>
-          </plugins>
-        </build>
+      <id>build</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+        </plugins>
+      </build>
     </profile>
   </profiles>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.rest</groupId>
+        <artifactId>client-runtime</artifactId>
+        <version>1.6.12</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-client-runtime</artifactId>
+        <version>1.6.12</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-client-authentication</artifactId>
+        <version>1.6.12</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>adal4j</artifactId>
+        <version>1.6.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-parameter-names</artifactId>
+        <version>2.9.8</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jdk8</artifactId>
+        <version>2.9.8</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>2.9.8</version>
+      </dependency>
+      <dependency>
+        <groupId>com.auth0</groupId>
+        <artifactId>java-jwt</artifactId>
+        <version>3.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.auth0</groupId>
+        <artifactId>jwks-rsa</artifactId>
+        <version>0.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.22</version>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.10.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.11.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.25</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.11.0</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>libraries/bot-schema</module>
@@ -39,67 +134,140 @@
   </modules>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eluder.coveralls</groupId>
-        <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.3.0</version>
-        <configuration>
-          <coberturaReports>
-            <coberturaReport>
-              ./cobertura-report/bot-builder/coverage.xml
-            </coberturaReport>
-            <coberturaReport>
-              ./cobertura-report/bot-schema/coverage.xml
-            </coberturaReport>
-            <coberturaReport>
-              ./cobertura-report/bot-connector/coverage.xml
-            </coberturaReport>
-            <coberturaReport>
-              ./cobertura-report/bot-connector-sample/coverage.xml
-            </coberturaReport>
-          </coberturaReports>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.7.0</version>
+          <configuration>
+            <source>${jdk.version}</source>
+            <target>${jdk.version}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.1</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.12.0</version>
+          <configuration>
+            <failOnViolation>true</failOnViolation>
+            <printFailingErrors>true</printFailingErrors>
+            <linkXRef>false</linkXRef>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
 
-          <sourceEncoding>UTF-8</sourceEncoding>
-          <branch>${env.COVERALLS_GIT_BRANCH}</branch>
-          <pullRequest>${env.COVERALLS_PULL_REQUEST}</pullRequest>
-          <serviceBuildNumber>${env.COVERALLS_SERVICE_BUILD_NUMBER}</serviceBuildNumber>
-          <serviceBuildUrl>${env.COVERALLS_SERVICE_BUILD_URL}</serviceBuildUrl>
-          <serviceJobId>${env.COVERALLS_SERVICE_JOB_ID}</serviceJobId>
-          <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
-        </configuration>
-      </plugin>
+        <plugin>
+          <groupId>org.eluder.coveralls</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>4.3.0</version>
+          <configuration>
+            <coberturaReports>
+              <coberturaReport>
+                ./cobertura-report/bot-builder/coverage.xml
+              </coberturaReport>
+              <coberturaReport>
+                ./cobertura-report/bot-schema/coverage.xml
+              </coberturaReport>
+              <coberturaReport>
+                ./cobertura-report/bot-connector/coverage.xml
+              </coberturaReport>
+              <coberturaReport>
+                ./cobertura-report/bot-connector-sample/coverage.xml
+              </coberturaReport>
+            </coberturaReports>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <formats>
-            <format>xml</format>
-          </formats>
-          <aggregate>true</aggregate>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.12.0</version>
-        <configuration>
-          <failOnViolation>true</failOnViolation>
-          <printFailingErrors>true</printFailingErrors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+            <sourceEncoding>UTF-8</sourceEncoding>
+            <branch>${env.COVERALLS_GIT_BRANCH}</branch>
+            <pullRequest>${env.COVERALLS_PULL_REQUEST}</pullRequest>
+            <serviceBuildNumber>${env.COVERALLS_SERVICE_BUILD_NUMBER}</serviceBuildNumber>
+            <serviceBuildUrl>${env.COVERALLS_SERVICE_BUILD_URL}</serviceBuildUrl>
+            <serviceJobId>${env.COVERALLS_SERVICE_JOB_ID}</serviceJobId>
+            <serviceName>${env.COVERALLS_SERVICE_NAME}</serviceName>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+          <version>2.7</version>
+          <configuration>
+            <formats>
+              <format>xml</format>
+            </formats>
+            <aggregate>true</aggregate>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.8</version>
+          <extensions>true</extensions>
+          <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <reporting>

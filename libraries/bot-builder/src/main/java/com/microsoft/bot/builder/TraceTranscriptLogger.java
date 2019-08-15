@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.microsoft.bot.schema.models.Activity;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -23,7 +23,7 @@ public class TraceTranscriptLogger implements TranscriptLogger {
     // https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features
     private static ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
-    private static final Logger logger = LogManager.getLogger("HelloWorld");
+    private static final Logger logger = LoggerFactory.getLogger(TraceTranscriptLogger.class);
 
     ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
     {
