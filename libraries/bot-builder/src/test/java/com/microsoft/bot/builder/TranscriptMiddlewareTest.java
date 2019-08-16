@@ -7,12 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.builder.dialogs.Dialog;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -99,7 +96,6 @@ public class TranscriptMiddlewareTest {
 
     @Test
     public final void Transcript_LogActivities() throws ExecutionException, InterruptedException {
-        Logger logger = LogManager.getLogger(Dialog.class);
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
         TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
@@ -206,7 +202,7 @@ public class TranscriptMiddlewareTest {
         Assert.assertEquals(4, pagedResult.getItems().length);
         Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
         Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).text());
-        // TODO: Fix the following 3 asserts so they work correctly. They succeed in the travis builds and fail in the 
+        // TODO: Fix the following 3 asserts so they work correctly. They succeed in the travis builds and fail in the
         // BotBuilder-Java 4.0 master build.
         //Assert.assertEquals( "new response", ((Activity)pagedResult.getItems()[2]).text());
         //Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).text());

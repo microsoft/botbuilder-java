@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 
 package com.microsoft.bot.sample.spring;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,8 @@ public class BotController {
     private CredentialProvider _credentialProvider;
     private MicrosoftAppCredentials _credentials;
 
+    private Logger logger = LoggerFactory.getLogger(BotController.class);
+
     /**
      * Performs post construction initialization for this controller.
      * This must be done post construction so that application.properties
@@ -66,6 +69,8 @@ public class BotController {
             CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider);
             authenticateRequest.thenRunAsync(() -> {
                 if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                    logger.info("Received: " + activity.text());
+
                     // reply activity with the same text
                     ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), _credentials);
                     connector.conversations().sendToConversation(activity.conversation().id(),

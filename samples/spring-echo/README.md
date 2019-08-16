@@ -13,7 +13,7 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 ## To try this sample locally
 - From the root of this project folder:
   - Build the sample using `mvn package`
-  - Run it by using `java -jar .\target\springechobot-sample.jar`
+  - Run it by using `java -jar .\target\bot-spring-echo-sample.jar`
 
 - Test the bot using Bot Framework Emulator
 

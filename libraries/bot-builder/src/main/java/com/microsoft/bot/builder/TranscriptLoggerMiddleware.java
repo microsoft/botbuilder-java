@@ -12,8 +12,8 @@ import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -34,8 +34,8 @@ public class TranscriptLoggerMiddleware implements Middleware {
         mapper.findAndRegisterModules();
     }
 
-    private TranscriptLogger logger;
-    private static final Logger log4j = LogManager.getLogger("BotFx");
+    private TranscriptLogger transcriptLogger;
+    private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
 
     private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
@@ -48,7 +48,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
         if (transcriptLogger == null)
             throw new NullPointerException("TranscriptLoggerMiddleware requires a ITranscriptLogger implementation.  ");
 
-        this.logger = transcriptLogger;
+        this.transcriptLogger = transcriptLogger;
 
     }
 
@@ -134,12 +134,12 @@ public class TranscriptLoggerMiddleware implements Middleware {
 
             try {
                 if (nextDel != null) {
-                    log4j.error(String.format("Transcript logActivity next delegate: %s)", nextDel));
+                    logger.error(String.format("Transcript logActivity next delegate: %s)", nextDel));
                     nextDel.run();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                log4j.error(String.format("Transcript logActivity failed with %s (next delegate: %s)", e.toString(), nextDel));
+                logger.error(String.format("Transcript logActivity failed with %s (next delegate: %s)", e.toString(), nextDel));
                 throw new RuntimeException(String.format("Transcript logActivity failed with %s", e.getMessage()));
 
             }
@@ -169,9 +169,9 @@ public class TranscriptLoggerMiddleware implements Middleware {
         while (!transcript.isEmpty()) {
             Activity activity = transcript.poll();
             try {
-                this.logger.LogActivityAsync(activity);
+                this.transcriptLogger.LogActivityAsync(activity);
             } catch (RuntimeException err) {
-                log4j.error(String.format("Transcript poll failed : %1$s", err));
+                logger.error(String.format("Transcript poll failed : %1$s", err));
             }
         }
 

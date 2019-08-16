@@ -221,9 +221,9 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * This is a copy of what the Azure Client does to create a RestClient.  This returns
      * a RestClient.Builder so that the app can create a custom RestClient, and supply
      * it to ConnectorClient during construction.
-     * 
+     *
      * One use case of this is for supplying a Proxy to the RestClient.
-     * 
+     *
      * @param baseUrl
      * @param credentials
      * @return
