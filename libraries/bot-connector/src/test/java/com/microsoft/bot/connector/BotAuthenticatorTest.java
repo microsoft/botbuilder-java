@@ -7,6 +7,7 @@ import okhttp3.Request;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.concurrent.ExecutionException;
 
 public class BotAuthenticatorTest {
@@ -140,8 +141,7 @@ public class BotAuthenticatorTest {
         Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://webchat.botframework.com/"));
     }
 
-    private static String getHeaderToken() throws IOException {
-        Request request = new Request.Builder().url(AuthenticationConstants.ToChannelFromBotLoginUrl).build();
-        return String.format("Bearer %s", new MicrosoftAppCredentials(AppId, AppPassword).getToken(request));
+    private static String getHeaderToken() throws MalformedURLException, ExecutionException, InterruptedException {
+        return String.format("Bearer %s", new MicrosoftAppCredentials(AppId, AppPassword).getToken().get().getAccessToken());
     }
 }

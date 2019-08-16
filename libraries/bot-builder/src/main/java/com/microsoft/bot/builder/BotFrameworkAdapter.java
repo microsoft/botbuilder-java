@@ -763,7 +763,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     private CompletableFuture<MicrosoftAppCredentials> GetAppCredentialsAsync(String appId) {
         CompletableFuture<MicrosoftAppCredentials> result = CompletableFuture.supplyAsync(() -> {
             if (appId == null) {
-                return MicrosoftAppCredentials.Empty;
+                return MicrosoftAppCredentials.empty();
             }
             if (this.appCredentialMap.containsKey(appId))
                 return this.appCredentialMap.get(appId);

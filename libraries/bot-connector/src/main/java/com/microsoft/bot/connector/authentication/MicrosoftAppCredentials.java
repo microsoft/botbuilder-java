@@ -4,109 +4,104 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.aad.adal4j.AuthenticationResult;
+import com.microsoft.aad.adal4j.ClientCredential;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import okhttp3.*;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 
-import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotLoginUrl;
-import static com.microsoft.bot.connector.authentication.AuthenticationConstants.ToChannelFromBotOAuthScope;
-
+/**
+ * MicrosoftAppCredentials auth implementation
+ */
 public class MicrosoftAppCredentials implements ServiceClientCredentials {
-    private String appId;
-    private String appPassword;
-
-    private OkHttpClient client;
-    private ObjectMapper mapper;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType FORM_ENCODE = MediaType.parse("application/x-www-form-urlencoded");
 
-    private String currentToken = null;
-    private long expiredTime = 0;
-    //private static final Object cacheSync = new Object();
-    protected static final HashMap<String, OAuthResponse> cache = new HashMap<String, OAuthResponse>();
-
-    public final String OAuthEndpoint = ToChannelFromBotLoginUrl;
-    public final String OAuthScope = ToChannelFromBotOAuthScope;
-
-
-    public String getTokenCacheKey() {
-        return String.format("%s-cache", this.appId);
-    }
+    private String appId;
+    private String appPassword;
+    private String channelAuthTenant;
+    private AdalAuthenticator authenticator;
 
     public MicrosoftAppCredentials(String appId, String appPassword) {
         this.appId = appId;
         this.appPassword = appPassword;
-        this.client = new OkHttpClient.Builder().build();
-        this.mapper = new ObjectMapper().findAndRegisterModules();
     }
 
-    public static final MicrosoftAppCredentials Empty = new MicrosoftAppCredentials(null, null);
+    public MicrosoftAppCredentials(String appId, String appPassword, String channelAuthTenant) throws MalformedURLException {
+        this.appId = appId;
+        this.appPassword = appPassword;
+        setChannelAuthTenant(channelAuthTenant);
+    }
 
-    public String microsoftAppId() {
+    public static MicrosoftAppCredentials empty() {
+        return new MicrosoftAppCredentials(null, null);
+    }
+
+    public String appId() {
         return this.appId;
     }
+    public String appPassword(){ return this.appPassword; }
 
-    public MicrosoftAppCredentials withMicrosoftAppId(String appId) {
+    public MicrosoftAppCredentials withAppId(String appId) {
         this.appId = appId;
         return this;
     }
 
-    public String getToken(Request request) throws IOException {
-        if (System.currentTimeMillis() < expiredTime) {
-            return currentToken;
-        }
-        Request reqToken = request.newBuilder()
-                .url(ToChannelFromBotLoginUrl)
-                .post(new FormBody.Builder()
-                        .add("grant_type", "client_credentials")
-                        .add("client_id", this.appId)
-                        .add("client_secret", this.appPassword)
-                        .add("scope", ToChannelFromBotOAuthScope)
-                        .build()).build();
-        Response response = this.client.newCall(reqToken).execute();
-        if (response.isSuccessful()) {
-            String payload = response.body().string();
-            AuthenticationResponse authResponse = this.mapper.readValue(payload, AuthenticationResponse.class);
-            this.expiredTime = System.currentTimeMillis() + (authResponse.expiresIn * 1000);
-            this.currentToken = authResponse.accessToken;
-        }
-        return this.currentToken;
+    public MicrosoftAppCredentials withAppPassword(String appPassword){
+        this.appPassword = appPassword;
+        return this;
     }
 
+    public String channelAuthTenant(){
+        return channelAuthTenant == null?AuthenticationConstants.DefaultChannelAuthTenant:channelAuthTenant;
+    }
+
+    public void setChannelAuthTenant(String authTenant) throws MalformedURLException {
+        channelAuthTenant = (new URL(authTenant)).toString();
+    }
+
+    public MicrosoftAppCredentials withChannelAuthTenant(String authTenant) throws MalformedURLException {
+        setChannelAuthTenant(authTenant);
+        return this;
+    }
+
+    public String oAuthEndpoint(){
+        return String.format(AuthenticationConstants.ToChannelFromBotLoginUrlTemplate, channelAuthTenant());
+    }
+
+    public String oAuthScope(){
+        return AuthenticationConstants.ToChannelFromBotOAuthScope;
+    }
+
+    public Future<AuthenticationResult> getToken() throws MalformedURLException {
+        return getAuthenticator().acquireToken();
+    }
 
     protected boolean ShouldSetToken(String url) {
-        if (isTrustedServiceUrl(url)) {
-            return true;
-        }
-        return false;
+       return isTrustedServiceUrl(url);
     }
 
+    private AdalAuthenticator getAuthenticator() throws MalformedURLException {
+        if(this.authenticator == null) {
+            this.authenticator = new AdalAuthenticator(
+                new ClientCredential(this.appId, this.appPassword),
+                new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
+        }
+        return this.authenticator;
+    }
 
     @Override
     public void applyCredentialsFilter(OkHttpClient.Builder clientBuilder) {
         clientBuilder.interceptors().add(new MicrosoftAppCredentialsInterceptor(this));
     }
-
-    private static class AuthenticationResponse {
-        @JsonProperty(value = "token_type")
-        String tokenType;
-        @JsonProperty(value = "expires_in")
-        long expiresIn;
-        @JsonProperty(value = "ext_expires_in")
-        long extExpiresIn;
-        @JsonProperty(value = "access_token")
-        String accessToken;
-    }
-
 
     public static void trustServiceUrl(URI serviceUrl) {
         trustServiceUrl(serviceUrl.toString(), LocalDateTime.now().plusDays(1));
@@ -121,8 +116,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
             URL url = new URL(serviceUrl);
             trustServiceUrl(url, expirationTime);
         } catch (MalformedURLException e) {
-            //TODO: What's missing here?
-            e.printStackTrace();
+            LoggerFactory.getLogger(MicrosoftAppCredentials.class).error("trustServiceUrl", e);
         }
     }
 
@@ -135,6 +129,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
             URL url = new URL(serviceUrl);
             return isTrustedServiceUrl(url);
         } catch (MalformedURLException e) {
+            LoggerFactory.getLogger(MicrosoftAppCredentials.class).error("trustServiceUrl", e);
             return false;
         }
     }
@@ -150,6 +145,9 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     private static ConcurrentMap<String, LocalDateTime> trustHostNames = new ConcurrentHashMap<>();
 
     static {
-        trustHostNames.put("state.botframework.com", LocalDateTime.MAX);
+        trustHostNames.put("api.botframework.com", LocalDateTime.MAX);
+        trustHostNames.put("token.botframework.com", LocalDateTime.MAX);
+        trustHostNames.put("api.botframework.azure.us", LocalDateTime.MAX);
+        trustHostNames.put("token.botframework.azure.us", LocalDateTime.MAX);
     }
 }

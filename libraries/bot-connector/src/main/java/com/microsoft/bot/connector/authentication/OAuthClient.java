@@ -246,7 +246,7 @@ public class OAuthClient extends ServiceClient {
                         .withConversation(activity.conversation())
                         .withServiceUrl(activity.serviceUrl())
                         .withUser(activity.from()))
-                .withMsAppId((creds == null) ? null : creds.microsoftAppId());
+                .withMsAppId((creds == null) ? null : creds.appId());
 
         String serializedState = this.mapper.writeValueAsString(tokenExchangeState);
 
