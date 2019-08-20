@@ -11,44 +11,48 @@ public class OAuthConfiguration {
     private String scope;
     private String authority;
 
-    public OAuthConfiguration(String authority, String scope){
+    public OAuthConfiguration(String authority, String scope) {
         this.authority = authority;
         this.scope = scope;
     }
 
     /**
      * Sets oAuth Authority for authentication.
+     *
      * @param authority
      * @return This OAuthConfiguration object.
      */
-    public OAuthConfiguration withAuthority(String authority){
+    public OAuthConfiguration withAuthority(String authority) {
         this.authority = authority;
         return this;
     }
 
     /**
      * Gets oAuth Authority for authentication.
+     *
      * @return OAuth Authority for authentication.
      */
-    public String authority(){
+    public String authority() {
         return authority;
     }
 
     /**
      * Sets oAuth scope for authentication.
+     *
      * @param scope
      * @return This OAuthConfiguration object.
      */
-    public OAuthConfiguration withScope(String scope){
+    public OAuthConfiguration withScope(String scope) {
         this.scope = scope;
         return this;
     }
 
     /**
      * Gets oAuth scope for authentication.
+     *
      * @return OAuth scope for authentication.
      */
-    public String scope(){
+    public String scope() {
         return scope;
     }
 }

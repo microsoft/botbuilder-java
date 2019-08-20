@@ -20,17 +20,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class OpenIdMetadata {
-    private static final Logger LOGGER = Logger.getLogger( OpenIdMetadata.class.getName() );
+        private static final Logger LOGGER = Logger.getLogger( OpenIdMetadata.class.getName() );
 
-    private String url;
-    private long lastUpdated;
-    private JwkProvider cacheKeys;
-    private ObjectMapper mapper;
+        private String url;
+        private long lastUpdated;
+        private JwkProvider cacheKeys;
+        private ObjectMapper mapper;
 
-    OpenIdMetadata(String url) {
-        this.url = url;
-        this.mapper = new ObjectMapper().findAndRegisterModules();
-    }
+        OpenIdMetadata(String url) {
+            this.url = url;
+            this.mapper = new ObjectMapper().findAndRegisterModules();
+        }
 
     public OpenIdMetadataKey getKey(String keyId) {
         // If keys are more than 5 days old, refresh them

@@ -34,7 +34,7 @@ class MicrosoftAppCredentialsInterceptor implements Interceptor {
             String token;
             try {
                 token = this.credentials.getToken().get().getAccessToken();
-            } catch(Throwable t){
+            } catch (Throwable t) {
                 throw new IOException(t);
             }
 

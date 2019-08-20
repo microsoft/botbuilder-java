@@ -9,7 +9,7 @@ package com.microsoft.bot.builder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.rest.RestClient;
@@ -25,14 +25,14 @@ import java.util.function.Consumer;
 //    [TestClass]
 //            [TestCategory("State Management")]
 public class BotStateTest {
-    protected ConnectorClientImpl connector;
+    protected RestConnectorClient connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
 
 
     protected void initializeClients(RestClient restClient, String botId, String userId) {
 
-        connector = new ConnectorClientImpl(restClient);
+        connector = new RestConnectorClient(restClient);
         bot = new ChannelAccount().withId(botId);
         user = new ChannelAccount().withId(userId);
 

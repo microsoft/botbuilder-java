@@ -1,6 +1,9 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.models.ErrorResponseException;
+import com.microsoft.bot.connector.rest.ErrorResponseException;
 import com.microsoft.bot.schema.models.*;
 import org.junit.Assert;
 import org.junit.Test;

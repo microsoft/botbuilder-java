@@ -1,9 +1,12 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.connector.UserAgent;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
@@ -41,13 +44,13 @@ import static java.util.stream.Collectors.joining;
  * Uses the MicrosoftInterceptor class to add Authorization header from idp.
  */
 public class OAuthClient extends ServiceClient {
-    private final ConnectorClientImpl client;
+    private final RestConnectorClient client;
     private final String uri;
 
     private ObjectMapper mapper;
 
 
-    public OAuthClient(ConnectorClientImpl client, String uri) throws URISyntaxException, MalformedURLException {
+    public OAuthClient(RestConnectorClient client, String uri) throws URISyntaxException, MalformedURLException {
         super(client.restClient());
         URI uriResult = new URI(uri);
 
@@ -69,7 +72,7 @@ public class OAuthClient extends ServiceClient {
      * @param userId
      * @param connectionName
      * @param magicCode
-     * @return CompletableFuture<        TokenResponse        > on success; otherwise null.
+     * @return CompletableFuture<TokenResponse> on success; otherwise null.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         return GetUserTokenAsync(userId, connectionName, magicCode, null);
@@ -77,14 +80,14 @@ public class OAuthClient extends ServiceClient {
 
     protected URI MakeUri(String uri, HashMap<String, String> queryStrings) throws URISyntaxException {
         String newUri = queryStrings.keySet().stream()
-                .map(key -> {
-                    try {
-                        return key + "=" + URLEncoder.encode(queryStrings.get(key), StandardCharsets.UTF_8.toString());
-                    } catch (UnsupportedEncodingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(joining("&", uri.endsWith("?") ? uri : uri + "?", ""));
+            .map(key -> {
+                try {
+                    return key + "=" + URLEncoder.encode(queryStrings.get(key), StandardCharsets.UTF_8.toString());
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .collect(joining("&", uri.endsWith("?") ? uri : uri + "?", ""));
         return new URI(newUri);
 
 
@@ -97,7 +100,7 @@ public class OAuthClient extends ServiceClient {
      * @param connectionName
      * @param magicCode
      * @param customHeaders
-     * @return CompletableFuture<        TokenResponse        > on success; null otherwise.
+     * @return CompletableFuture<TokenResponse> on success; null otherwise.
      */
     public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
         if (StringUtils.isEmpty(userId)) {
@@ -132,13 +135,13 @@ public class OAuthClient extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
-                    .build();
+                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .build();
 
             Request request = new Request.Builder()
-                    .url(tokenUrl.toString())
-                    .header("User-Agent", UserAgent.value())
-                    .build();
+                .url(tokenUrl.toString())
+                .header("User-Agent", UserAgent.value())
+                .build();
 
             Response response = null;
             try {
@@ -198,14 +201,14 @@ public class OAuthClient extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
-                    .build();
+                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .build();
 
             Request request = new Request.Builder()
-                    .delete()
-                    .url(tokenUrl.toString())
-                    .header("User-Agent", UserAgent.value())
-                    .build();
+                .delete()
+                .url(tokenUrl.toString())
+                .header("User-Agent", UserAgent.value())
+                .build();
 
             Response response = null;
             try {
@@ -238,15 +241,15 @@ public class OAuthClient extends ServiceClient {
         }
         final MicrosoftAppCredentials creds = (MicrosoftAppCredentials) this.client.restClient().credentials();
         TokenExchangeState tokenExchangeState = new TokenExchangeState()
-                .withConnectionName(connectionName)
-                .withConversation(new ConversationReference()
-                        .withActivityId(activity.id())
-                        .withBot(activity.recipient())
-                        .withChannelId(activity.channelId())
-                        .withConversation(activity.conversation())
-                        .withServiceUrl(activity.serviceUrl())
-                        .withUser(activity.from()))
-                .withMsAppId((creds == null) ? null : creds.appId());
+            .withConnectionName(connectionName)
+            .withConversation(new ConversationReference()
+                .withActivityId(activity.id())
+                .withBot(activity.recipient())
+                .withChannelId(activity.channelId())
+                .withConversation(activity.conversation())
+                .withServiceUrl(activity.serviceUrl())
+                .withUser(activity.from()))
+            .withMsAppId((creds == null) ? null : creds.appId());
 
         String serializedState = this.mapper.writeValueAsString(tokenExchangeState);
 
@@ -266,13 +269,13 @@ public class OAuthClient extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor(new MicrosoftAppCredentialsInterceptor(creds))
-                    .build();
+                .addInterceptor(new MicrosoftAppCredentialsInterceptor(creds))
+                .build();
 
             Request request = new Request.Builder()
-                    .url(tokenUrl.toString())
-                    .header("User-Agent", UserAgent.value())
-                    .build();
+                .url(tokenUrl.toString())
+                .header("User-Agent", UserAgent.value())
+                .build();
 
             Response response = null;
             try {
@@ -313,14 +316,14 @@ public class OAuthClient extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
-                    .build();
+                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .build();
 
             Request request = new Request.Builder()
-                    .url(tokenUrl.toString())
-                    .header("User-Agent", UserAgent.value())
-                    .post(body)
-                    .build();
+                .url(tokenUrl.toString())
+                .header("User-Agent", UserAgent.value())
+                .post(body)
+                .build();
 
             Response response = null;
             try {

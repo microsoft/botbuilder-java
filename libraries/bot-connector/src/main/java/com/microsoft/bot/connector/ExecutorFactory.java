@@ -4,7 +4,6 @@
 
 package com.microsoft.bot.connector;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinPool.ForkJoinWorkerThreadFactory;
@@ -23,13 +22,13 @@ public class ExecutorFactory {
         }
     };
 
-    private static ExecutorService executor= new ForkJoinPool(
+    private static ExecutorService executor = new ForkJoinPool(
         Runtime.getRuntime().availableProcessors() * 2,
         factory,
         null,
         false);
 
-    public static ExecutorService getExecutor(){
+    public static ExecutorService getExecutor() {
         return executor;
     }
 }

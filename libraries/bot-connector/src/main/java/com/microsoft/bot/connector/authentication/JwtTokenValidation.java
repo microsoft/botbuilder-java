@@ -5,6 +5,7 @@ package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.schema.models.Activity;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -17,48 +18,100 @@ public class JwtTokenValidation {
      * @param activity    The incoming Activity from the Bot Framework or the Emulator
      * @param authHeader  The Bearer token included as part of the request
      * @param credentials The set of valid credentials, such as the Bot Application ID
-     * @return Nothing
+     * @return A task that represents the work queued to execute.
      * @throws AuthenticationException Throws on auth failed.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials) throws AuthenticationException, InterruptedException, ExecutionException {
-        if (authHeader == null || authHeader.isEmpty()) {
+    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials, ChannelProvider channelProvider) throws AuthenticationException, InterruptedException, ExecutionException {
+        return authenticateRequest(activity, authHeader, credentials, channelProvider, new AuthenticationConfiguration());
+    }
+
+    /**
+     * Validates the security tokens required by the Bot Framework Protocol. Throws on any exceptions.
+     *
+     * @param activity    The incoming Activity from the Bot Framework or the Emulator
+     * @param authHeader  The Bearer token included as part of the request
+     * @param credentials The set of valid credentials, such as the Bot Application ID
+     * @param authConfig  The authentication configuration.
+     * @return A task that represents the work queued to execute.
+     * @throws AuthenticationException Throws on auth failed.
+     */
+    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, AuthenticationConfiguration authConfig) throws AuthenticationException, InterruptedException, ExecutionException {
+        if (StringUtils.isEmpty(authHeader)) {
             // No auth header was sent. We might be on the anonymous code path.
             boolean isAuthDisable = credentials.isAuthenticationDisabledAsync().get();
             if (isAuthDisable) {
                 // In the scenario where Auth is disabled, we still want to have the
                 // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
                 // adding in an empty claim.
-                return CompletableFuture.completedFuture(new ClaimsIdentityImpl("anonymous"));
+                return CompletableFuture.completedFuture(new ClaimsIdentity("anonymous"));
             }
 
             // No Auth Header. Auth is required. Request is not authorized.
-            throw new AuthenticationException("No Auth Header. Auth is required.");
+            CompletableFuture<ClaimsIdentity> result = CompletableFuture.completedFuture(null);
+            result.completeExceptionally(new AuthenticationException("No Auth Header. Auth is required."));
+            return result;
         }
 
         // Go through the standard authentication path.
-        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(authHeader, credentials, activity.channelId(), activity.serviceUrl()).get();
+        return JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.channelId(), activity.serviceUrl(), authConfig)
+            .thenApply(identity -> {
+                // On the standard Auth path, we need to trust the URL that was incoming.
+                MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
 
-        // On the standard Auth path, we need to trust the URL that was incoming.
-        MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
-        return CompletableFuture.completedFuture(identity);
+                return identity;
+            });
     }
 
-    // TODO: Recieve httpClient and use ClientID
-    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
-        if (authHeader == null || authHeader.isEmpty()) {
+    /**
+     * Validates the authentication header of an incoming request.
+     *
+     * @param authHeader      The authentication header to validate.
+     * @param credentials     The bot's credential provider.
+     * @param channelProvider The bot's channel service provider.
+     * @param channelId       The ID of the channel that sent the request.
+     * @param serviceUrl      The service URL for the activity.
+     * @return A task that represents the work queued to execute.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws AuthenticationException
+     */
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
+        return validateAuthHeader(authHeader, credentials, channelProvider, channelId, serviceUrl, new AuthenticationConfiguration());
+    }
+
+    /**
+     * Validates the authentication header of an incoming request.
+     *
+     * @param authHeader      The authentication header to validate.
+     * @param credentials     The bot's credential provider.
+     * @param channelProvider The bot's channel service provider.
+     * @param channelId       The ID of the channel that sent the request.
+     * @param serviceUrl      The service URL for the activity.
+     * @param authConfig      The authentication configuration.
+     * @return A task that represents the work queued to execute.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws AuthenticationException
+     */
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+        if (StringUtils.isEmpty(authHeader)) {
             throw new IllegalArgumentException("No authHeader present. Auth is required.");
         }
 
-        boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader).get();
+        boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
         if (usingEmulator) {
-            return EmulatorValidation.authenticateToken(authHeader, credentials, channelId);
-        } else {
+            return EmulatorValidation.authenticateToken(authHeader, credentials, channelProvider, channelId, authConfig);
+        } else if (channelProvider == null || channelProvider.isPublicAzure()) {
             // No empty or null check. Empty can point to issues. Null checks only.
             if (serviceUrl != null) {
-                return ChannelValidation.authenticateToken(authHeader, credentials, channelId, serviceUrl);
+                return ChannelValidation.authenticateToken(authHeader, credentials, channelId, serviceUrl, authConfig);
             } else {
-                return ChannelValidation.authenticateToken(authHeader, credentials, channelId);
+                return ChannelValidation.authenticateToken(authHeader, credentials, channelId, authConfig);
             }
+        } else if (channelProvider.isGovernment()) {
+            return GovernmentChannelValidation.authenticateToken(authHeader, credentials, serviceUrl, channelId, authConfig);
+        } else {
+            return EnterpriseChannelValidation.authenticateToken(authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig);
         }
     }
 }

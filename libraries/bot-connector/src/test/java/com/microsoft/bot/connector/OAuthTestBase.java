@@ -5,21 +5,16 @@ import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.OAuthClient;
 import com.microsoft.bot.connector.base.TestBase;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
-import okhttp3.Request;
-import org.apache.commons.io.FileSystemUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 public class OAuthTestBase extends TestBase
@@ -32,7 +27,7 @@ public class OAuthTestBase extends TestBase
 
 
     private String token;
-    protected ConnectorClientImpl connector;
+    protected RestConnectorClient connector;
 
     private ChannelAccount bot;
     public ChannelAccount getBot() {
@@ -70,7 +65,7 @@ public class OAuthTestBase extends TestBase
             }
         }
 
-        this.connector = new ConnectorClientImpl(restClient);
+        this.connector = new RestConnectorClient(restClient);
         if (this.clientId != null && this.clientSecret != null) {
             MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
 
@@ -116,7 +111,7 @@ public class OAuthTestBase extends TestBase
         return CompletableFuture.runAsync(()->{
             OAuthClient oauthClient = null;
             try {
-                oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAuthUrl);
+                oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAUTH_URL);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {

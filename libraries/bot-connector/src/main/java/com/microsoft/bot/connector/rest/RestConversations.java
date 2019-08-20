@@ -2,12 +2,9 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
- *
- * NOT GENERATED.
- * This uses Java 8 CompletionStage for async processing instead of JavaRX/Guava
  */
 
-package com.microsoft.bot.connector.implementation;
+package com.microsoft.bot.connector.rest;
 
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Conversations;
@@ -19,7 +16,6 @@ import com.microsoft.bot.schema.models.ConversationParameters;
 import com.microsoft.bot.schema.models.ConversationResourceResponse;
 import com.microsoft.bot.schema.models.ConversationsResult;
 import com.microsoft.bot.schema.models.PagedMembersResult;
-import com.microsoft.bot.connector.models.ErrorResponseException;
 import com.microsoft.bot.schema.models.ResourceResponse;
 import com.microsoft.bot.schema.models.Transcript;
 import com.microsoft.rest.ServiceCallback;
@@ -49,11 +45,11 @@ import rx.Observable;
  * An instance of this class provides access to all the operations defined
  * in Conversations.
  */
-public class ConversationsImpl implements Conversations {
+public class RestConversations implements Conversations {
     /** The Retrofit service to perform REST calls. */
     private ConversationsService service;
     /** The service client containing this operation class. */
-    private ConnectorClientImpl client;
+    private RestConnectorClient client;
 
     /**
      * Initializes an instance of ConversationsImpl.
@@ -61,7 +57,7 @@ public class ConversationsImpl implements Conversations {
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
      */
-    public ConversationsImpl(Retrofit retrofit, ConnectorClientImpl client) {
+    RestConversations(Retrofit retrofit, RestConnectorClient client) {
         this.service = retrofit.create(ConversationsService.class);
         this.client = client;
     }
@@ -284,8 +280,8 @@ public class ConversationsImpl implements Conversations {
         });
     }
 
-    // FIXME: This isn't really a reasonable return value in this case.  
-    // I know what it said about converting Observable to CompletableFuture, but this particular 
+    // FIXME: This isn't really a reasonable return value in this case.
+    // I know what it said about converting Observable to CompletableFuture, but this particular
     // conversion returns a result that changes the meaning.  The response is not, and is never, a list.
     public CompletableFuture<List<ConversationResourceResponse>> CreateConversationAsync(ConversationParameters parameters) {
         CompletableFuture<List<ConversationResourceResponse>> future_result = completableFutureFromObservable(createConversationAsync(parameters));
@@ -719,7 +715,7 @@ public class ConversationsImpl implements Conversations {
             }
         });
     }
-    
+
     /**
      * DeleteConversationMemberFuture
      * Deletes a member from a converstion.

@@ -130,6 +130,7 @@
     <module>libraries/bot-schema</module>
     <module>libraries/bot-builder</module>
     <module>libraries/bot-connector</module>
+    <module>libraries/bot-integration-core</module>
     <module>samples/bot-connector-sample</module>
     <module>samples/servlet-echo</module>
     <module>samples/spring-echo</module>

@@ -23,7 +23,7 @@ public class AdalAuthenticator {
         this.context = new AuthenticationContext(configurationOAuth.authority(), false, ExecutorFactory.getExecutor());
     }
 
-    public Future<AuthenticationResult> acquireToken(){
+    public Future<AuthenticationResult> acquireToken() {
         return context.acquireToken(oAuthConfiguration.scope(), clientCredential, null);
     }
 }

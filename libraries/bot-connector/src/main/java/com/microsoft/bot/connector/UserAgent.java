@@ -1,6 +1,6 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public class UserAgent {
         String build_version;
         final Properties properties = new Properties();
         try {
-            InputStream propStream = ConnectorClientImpl.class.getClassLoader().getResourceAsStream("project.properties");
+            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
             properties.load(propStream);
             build_version = properties.getProperty("version");
         } catch (IOException e) {

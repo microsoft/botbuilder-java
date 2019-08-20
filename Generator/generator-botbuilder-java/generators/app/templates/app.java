@@ -10,7 +10,7 @@ import com.microsoft.bot.connector.customizations.CredentialProvider;
 import com.microsoft.bot.connector.customizations.CredentialProviderImpl;
 import com.microsoft.bot.connector.customizations.JwtTokenValidation;
 import com.microsoft.bot.connector.customizations.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.ConnectorClientImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 import com.microsoft.bot.schema.models.ResourceResponse;
