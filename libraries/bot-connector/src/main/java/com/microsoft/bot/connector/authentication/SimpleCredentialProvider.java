@@ -47,16 +47,35 @@ public class SimpleCredentialProvider implements CredentialProvider {
         this.password = password;
     }
 
+    /**
+     * Validates an app ID.
+     *
+     * @param appId The app ID to validate.
+     * @return If the task is successful, the result is true if appId is valid for the controller; otherwise, false.
+     */
     @Override
     public CompletableFuture<Boolean> isValidAppIdAsync(String appId) {
         return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId));
     }
 
+    /**
+     * Gets the app password for a given bot app ID.
+     *
+     * @param appId The ID of the app to get the password for.
+     * @return If the task is successful and the app ID is valid, the result
+     * contains the password; otherwise, null.
+     */
     @Override
     public CompletableFuture<String> getAppPasswordAsync(String appId) {
         return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId) ? this.password : null);
     }
 
+    /**
+     * Checks whether bot authentication is disabled.
+     *
+     * @return A task that represents the work queued to execute If the task is successful and bot authentication
+     * is disabled, the result is true; otherwise, false.
+     */
     @Override
     public CompletableFuture<Boolean> isAuthenticationDisabledAsync() {
         return CompletableFuture.completedFuture(StringUtils.isEmpty(this.appId));

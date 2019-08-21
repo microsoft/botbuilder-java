@@ -119,7 +119,13 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     }
 
     public void setChannelAuthTenant(String authTenant) throws MalformedURLException {
-        channelAuthTenant = new URL(authTenant).toString();
+        String originalAuthTenant = channelAuthTenant;
+        try {
+            channelAuthTenant = authTenant;
+            new URL(oAuthEndpoint()).toString();
+        } catch(MalformedURLException e) {
+            channelAuthTenant = originalAuthTenant;
+        }
     }
 
     public MicrosoftAppCredentials withChannelAuthTenant(String authTenant) throws MalformedURLException {
@@ -135,7 +141,7 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
     }
 
-    public Future<AuthenticationResult> getToken() throws MalformedURLException {
+    public Future<AuthenticationResult> getToken() {
         return getAuthenticator().acquireToken();
     }
 
@@ -143,12 +149,19 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         return isTrustedServiceUrl(url);
     }
 
-    private AdalAuthenticator getAuthenticator() throws MalformedURLException {
-        if (this.authenticator == null) {
-            this.authenticator = new AdalAuthenticator(
-                new ClientCredential(this.appId, this.appPassword),
-                new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
+    private AdalAuthenticator getAuthenticator() {
+        try {
+            if (this.authenticator == null) {
+                this.authenticator = new AdalAuthenticator(
+                    new ClientCredential(this.appId, this.appPassword),
+                    new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
+            }
+        } catch(MalformedURLException e) {
+            // intentional no-op.  This class validates the URL on construction or setChannelAuthTenant.
+            // That is... this will never happen.
+            LoggerFactory.getLogger(MicrosoftAppCredentials.class).error("getAuthenticator", e);
         }
+
         return this.authenticator;
     }
 
