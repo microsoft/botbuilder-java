@@ -202,6 +202,24 @@ public class JwtTokenValidationTests {
         Assert.assertEquals("anonymous", identity.getIssuer());
     }
 
+    @Test
+    public void ChannelNoHeaderAuthenticationEnabledShouldThrow() throws IOException, ExecutionException, InterruptedException {
+        try {
+            String header = "";
+            CredentialProvider credentials = new SimpleCredentialProvider(APPID, APPPASSWORD);
+            JwtTokenValidation.authenticateRequest(
+                new Activity().withServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"),
+                header,
+                credentials,
+                new SimpleChannelProvider()).join();
+            Assert.fail("Should have thrown AuthenticationException");
+        } catch(CompletionException e) {
+            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        }
+
+        Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"));
+    }
+
     /**
      * Tests with no authentication header and makes sure the service URL is not added to the trusted list.
      */
