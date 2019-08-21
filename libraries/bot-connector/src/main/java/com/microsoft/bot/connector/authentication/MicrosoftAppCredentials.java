@@ -28,7 +28,6 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
 
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    public static final MediaType FORM_ENCODE = MediaType.parse("application/x-www-form-urlencoded");
     private static ConcurrentMap<String, LocalDateTime> trustHostNames = new ConcurrentHashMap<>();
 
     static {

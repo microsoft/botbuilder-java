@@ -18,7 +18,7 @@ public class EmulatorValidation {
     /**
      * TO BOT FROM EMULATOR: Token validation parameters when connecting to a channel.
      */
-    private static final TokenValidationParameters ToBotFromEmulatorTokenValidationParameters = TokenValidationParameters.toBotFromEmulatorTokenValidationParameters();
+    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = TokenValidationParameters.toBotFromEmulatorTokenValidationParameters();
 
     /**
      * Determines if a given Auth header is from the Bot Framework Emulator
@@ -59,7 +59,7 @@ public class EmulatorValidation {
 
         // Is the token issues by a source we consider to be the emulator?
         // Not a Valid Issuer. This is NOT a Bot Framework Emulator Token.
-        return ToBotFromEmulatorTokenValidationParameters.validIssuers.contains(decodedJWT.getIssuer());
+        return TOKENVALIDATIONPARAMETERS.validIssuers.contains(decodedJWT.getIssuer());
     }
 
     /**
@@ -71,9 +71,11 @@ public class EmulatorValidation {
      * @param channelProvider The channelService value that distinguishes public Azure from US Government Azure.
      * @param channelId       The ID of the channel to validate.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId) {
         return authenticateToken(authHeader, credentials, channelProvider, channelId, new AuthenticationConfiguration());
     }
 
@@ -87,15 +89,17 @@ public class EmulatorValidation {
      * @param channelId       The ID of the channel to validate.
      * @param authConfig      The authentication configuration.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, AuthenticationConfiguration authConfig)  {
         String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment() ?
             GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL :
             AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
 
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            ToBotFromEmulatorTokenValidationParameters,
+            TOKENVALIDATIONPARAMETERS,
             openIdMetadataUrl,
             AuthenticationConstants.AllowedSigningAlgorithms);
 

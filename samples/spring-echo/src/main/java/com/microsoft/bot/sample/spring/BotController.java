@@ -21,7 +21,7 @@ import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * This is the controller that will receive incoming Channel Activity messages.
@@ -63,20 +63,25 @@ public class BotController {
     public ResponseEntity<Object> incoming(@RequestBody Activity activity,
             @RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
         try {
-            CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider());
-            authenticateRequest.thenRunAsync(() -> {
-                if (activity.type().equals(ActivityTypes.MESSAGE)) {
-                    logger.info("Received: " + activity.text());
+            JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider())
+                .thenRunAsync(() -> {
+                    if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                        logger.info("Received: " + activity.text());
 
-                    // reply activity with the same text
-                    ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), _credentials);
-                    connector.conversations().sendToConversation(activity.conversation().id(),
-                            new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
-                                    .withRecipient(activity.from()).withFrom(activity.recipient()));
-                }
-            });
-        } catch (AuthenticationException ex) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                        // reply activity with the same text
+                        ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), _credentials);
+                        connector.conversations().sendToConversation(activity.conversation().id(),
+                                new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
+                                        .withRecipient(activity.from()).withFrom(activity.recipient()));
+                    }
+                }).join();
+        } catch (CompletionException ex) {
+            if (ex.getCause() instanceof AuthenticationException) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

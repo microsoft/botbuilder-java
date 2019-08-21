@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Contains helper methods for authenticating incoming HTTP requests.
+ */
 public class JwtTokenValidation {
 
     /**
@@ -36,30 +39,31 @@ public class JwtTokenValidation {
      * @throws AuthenticationException Throws on auth failed.
      */
     public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, AuthenticationConfiguration authConfig) throws AuthenticationException, InterruptedException, ExecutionException {
-        if (StringUtils.isEmpty(authHeader)) {
-            // No auth header was sent. We might be on the anonymous code path.
-            boolean isAuthDisable = credentials.isAuthenticationDisabledAsync().get();
-            if (isAuthDisable) {
-                // In the scenario where Auth is disabled, we still want to have the
-                // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
-                // adding in an empty claim.
-                return CompletableFuture.completedFuture(new ClaimsIdentity("anonymous"));
+        return CompletableFuture.supplyAsync(() -> {
+            if (StringUtils.isEmpty(authHeader)) {
+                // No auth header was sent. We might be on the anonymous code path.
+                boolean isAuthDisable = credentials.isAuthenticationDisabledAsync().join();
+                if (isAuthDisable) {
+                    // In the scenario where Auth is disabled, we still want to have the
+                    // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+                    // adding in an empty claim.
+                    return new ClaimsIdentity("anonymous");
+                }
+
+                // No Auth Header. Auth is required. Request is not authorized.
+                CompletableFuture<ClaimsIdentity> result = CompletableFuture.completedFuture(null);
+                throw new AuthenticationException("No Auth Header. Auth is required.");
             }
 
-            // No Auth Header. Auth is required. Request is not authorized.
-            CompletableFuture<ClaimsIdentity> result = CompletableFuture.completedFuture(null);
-            result.completeExceptionally(new AuthenticationException("No Auth Header. Auth is required."));
-            return result;
-        }
+            // Go through the standard authentication path.  This will throw AuthenticationException if
+            // it fails.
+            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.channelId(), activity.serviceUrl(), authConfig).join();
 
-        // Go through the standard authentication path.
-        return JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.channelId(), activity.serviceUrl(), authConfig)
-            .thenApply(identity -> {
-                // On the standard Auth path, we need to trust the URL that was incoming.
-                MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
+            // On the standard Auth path, we need to trust the URL that was incoming.
+            MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
 
-                return identity;
-            });
+            return identity;
+        });
     }
 
     /**
@@ -71,11 +75,14 @@ public class JwtTokenValidation {
      * @param channelId       The ID of the channel that sent the request.
      * @param serviceUrl      The service URL for the activity.
      * @return A task that represents the work queued to execute.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws AuthenticationException
+     *
+     * On Call:
+     * @throws IllegalArgumentException Incorrect arguments supplied
+     *
+     * On join:
+     * @throws AuthenticationException Authentication Error
      */
-    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl) {
         return validateAuthHeader(authHeader, credentials, channelProvider, channelId, serviceUrl, new AuthenticationConfiguration());
     }
 
@@ -89,11 +96,14 @@ public class JwtTokenValidation {
      * @param serviceUrl      The service URL for the activity.
      * @param authConfig      The authentication configuration.
      * @return A task that represents the work queued to execute.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws AuthenticationException
+     *
+     * On Call:
+     * @throws IllegalArgumentException Incorrect arguments supplied
+     *
+     * On Join:
+     * @throws AuthenticationException Authentication Error
      */
-    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) {
         if (StringUtils.isEmpty(authHeader)) {
             throw new IllegalArgumentException("No authHeader present. Auth is required.");
         }

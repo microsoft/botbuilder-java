@@ -13,24 +13,38 @@ public class ChannelValidation {
     /**
      * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
      */
-    public static final TokenValidationParameters ToBotFromChannelTokenValidationParameters = TokenValidationParameters.toBotFromChannelTokenValidationParameters();
+    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = TokenValidationParameters.toBotFromChannelTokenValidationParameters();
 
     /**
      * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
      *
-     * @param authHeader  The raw HTTP header in the format: "Bearer [longString]"
+     * @param authHeader  The raw HTTP header in the format: "Bearer [longString]".
      * @param credentials The user defined set of valid credentials, such as the AppId.
      * @param channelId   ChannelId for endorsements validation.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) {
         return authenticateToken(authHeader, credentials, channelId, new AuthenticationConfiguration());
     }
 
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+    /**
+     * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
+     *
+     * @param authHeader  The raw HTTP header in the format: "Bearer [longString]".
+     * @param credentials The user defined set of valid credentials, such as the AppId.
+     * @param channelId   ChannelId for endorsements validation.
+     * @param authConfig  The AuthenticationConfiguration.
+     * @return A valid ClaimsIdentity.
+     *
+     * On join:
+     * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
+     */
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            ToBotFromChannelTokenValidationParameters,
+            TOKENVALIDATIONPARAMETERS,
             AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
@@ -84,9 +98,11 @@ public class ChannelValidation {
      * @param channelId   ChannelId for endorsements validation.
      * @param serviceUrl  Service url.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl) {
         return authenticateToken(authHeader, credentials, channelId, serviceUrl, new AuthenticationConfiguration());
     }
 
@@ -99,9 +115,11 @@ public class ChannelValidation {
      * @param serviceUrl  Service url.
      * @param authConfig  The authentication configuration.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) {
         return ChannelValidation.authenticateToken(authHeader, credentials, channelId, authConfig)
             .thenApply(identity -> {
                 if (!identity.claims().containsKey(AuthenticationConstants.SERVICE_URL_CLAIM)) {

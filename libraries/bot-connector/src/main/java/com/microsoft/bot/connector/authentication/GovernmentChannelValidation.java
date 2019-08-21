@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting to a bot.
  */
 public class GovernmentChannelValidation {
-    private static final TokenValidationParameters GOVERNMENT_VALIDATION_PARAMETERS = new TokenValidationParameters() {{
+    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
         this.validateIssuer = true;
         this.validIssuers = new ArrayList<String>() {{
             add(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
@@ -34,6 +34,9 @@ public class GovernmentChannelValidation {
      * @param serviceUrl  The service url from the request.
      * @param channelId   The ID of the channel to validate.
      * @return A CompletableFuture representing the asynchronous operation.
+     *
+     * On join:
+     * @throws AuthenticationException Authentication failed.
      */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String serviceUrl, String channelId) {
         return authenticateToken(authHeader, credentials, serviceUrl, channelId, new AuthenticationConfiguration());
@@ -48,10 +51,13 @@ public class GovernmentChannelValidation {
      * @param channelId   The ID of the channel to validate.
      * @param authConfig  The authentication configuration.
      * @return A CompletableFuture representing the asynchronous operation.
+     *
+     * On join:
+     * @throws AuthenticationException Authentication failed.
      */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String serviceUrl, String channelId, AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            GOVERNMENT_VALIDATION_PARAMETERS,
+            TOKENVALIDATIONPARAMETERS,
             GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
@@ -68,6 +74,9 @@ public class GovernmentChannelValidation {
      * @param credentials The user defined set of valid credentials, such as the AppId.
      * @param serviceUrl  The service url from the request.
      * @return A CompletableFuture representing the asynchronous operation.
+     *
+     * On join:
+     * @throws AuthenticationException Validation failed.
      */
     public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity, CredentialProvider credentials, String serviceUrl) {
 

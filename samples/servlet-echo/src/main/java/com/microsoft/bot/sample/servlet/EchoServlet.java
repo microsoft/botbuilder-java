@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.Properties;
+import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,13 +78,21 @@ public class EchoServlet extends HttpServlet {
                                     .withFrom(activity.recipient())
                     );
                 }
-            });
-        } catch (AuthenticationException ex) {
-            response.setStatus(401);
-            LOGGER.log(Level.WARNING, "Auth failed!", ex);
+            }).join();
+
+            response.setStatus(200);
+        } catch (CompletionException ex) {
+            if (ex.getCause() instanceof AuthenticationException) {
+                LOGGER.log(Level.WARNING, "Auth failed!", ex);
+                response.setStatus(401);
+            }
+            else {
+                LOGGER.log(Level.WARNING, "Execution failed", ex);
+                response.setStatus(500);
+            }
         } catch (Exception ex) {
-            response.setStatus(500);
             LOGGER.log(Level.WARNING, "Execution failed", ex);
+            response.setStatus(500);
         }
     }
 

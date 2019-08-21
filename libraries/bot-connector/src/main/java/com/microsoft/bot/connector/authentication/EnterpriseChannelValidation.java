@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class EnterpriseChannelValidation {
-    private static final TokenValidationParameters ENTERPRISE_VALIDATION_PARAMETERS = new TokenValidationParameters() {{
+    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
         this.validateIssuer = true;
         this.validIssuers = new ArrayList<String>() {{
             add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
@@ -32,9 +32,11 @@ public class EnterpriseChannelValidation {
      * @param channelProvider The channelService value that distinguishes public Azure from US Government Azure.
      * @param channelId       The ID of the channel to validate.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId) {
         return authenticateToken(authHeader, credentials, channelProvider, serviceUrl, channelId, new AuthenticationConfiguration());
     }
 
@@ -48,18 +50,20 @@ public class EnterpriseChannelValidation {
      * @param channelId       The ID of the channel to validate.
      * @param authConfig      The authentication configuration.
      * @return A valid ClaimsIdentity.
+     *
+     * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId, AuthenticationConfiguration authConfig) throws ExecutionException, InterruptedException, AuthenticationException {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId, AuthenticationConfiguration authConfig) {
         if (authConfig == null) {
-            throw new AuthenticationException("Missing AuthenticationConfiguration");
+            throw new IllegalArgumentException("Missing AuthenticationConfiguration");
         }
 
         return channelProvider.getChannelService()
 
             .thenCompose(channelService -> {
                 JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-                    ENTERPRISE_VALIDATION_PARAMETERS,
+                    TOKENVALIDATIONPARAMETERS,
                     String.format(AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT, channelService),
                     AuthenticationConstants.AllowedSigningAlgorithms);
 
