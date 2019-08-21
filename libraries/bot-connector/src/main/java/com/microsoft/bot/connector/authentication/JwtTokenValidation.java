@@ -51,7 +51,6 @@ public class JwtTokenValidation {
                 }
 
                 // No Auth Header. Auth is required. Request is not authorized.
-                CompletableFuture<ClaimsIdentity> result = CompletableFuture.completedFuture(null);
                 throw new AuthenticationException("No Auth Header. Auth is required.");
             }
 

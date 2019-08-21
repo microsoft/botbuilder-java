@@ -9,7 +9,6 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Validates and Examines JWT tokens from the Bot Framework Emulator

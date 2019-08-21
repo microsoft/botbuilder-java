@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class EnterpriseChannelValidation {
     private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
