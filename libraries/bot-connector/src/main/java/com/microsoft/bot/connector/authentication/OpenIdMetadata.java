@@ -16,11 +16,11 @@ import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class OpenIdMetadata {
-        private static final Logger LOGGER = Logger.getLogger( OpenIdMetadata.class.getName() );
+        private static final Logger LOGGER = LoggerFactory.getLogger(OpenIdMetadata.class);
 
         private String url;
         private long lastUpdated;
@@ -52,7 +52,7 @@ class OpenIdMetadata {
             return IOUtils.toString(keysUrl);
         } catch (IOException e) {
             String errorDescription = String.format("Failed to load openID config: %s", e.getMessage());
-            LOGGER.log(Level.WARNING, errorDescription);
+            LOGGER.warn(errorDescription);
         }
         return null;
     }
@@ -67,7 +67,7 @@ class OpenIdMetadata {
             return key;
         } catch (JwkException e) {
             String errorDescription = String.format("Failed to load keys: %s", e.getMessage());
-            LOGGER.log(Level.WARNING, errorDescription);
+            LOGGER.warn(errorDescription);
         }
         return null;
     }
