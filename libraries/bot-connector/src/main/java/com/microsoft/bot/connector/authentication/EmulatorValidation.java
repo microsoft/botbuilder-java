@@ -48,17 +48,21 @@ public class EmulatorValidation {
         }
 
         // Parse the Big Long String into an actual token.
-        DecodedJWT decodedJWT = JWT.decode(token);
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
 
-        // Is there an Issuer?
-        if (decodedJWT.getIssuer().isEmpty()) {
-            // No Issuer, means it's not from the Emulator.
+            // Is there an Issuer?
+            if (StringUtils.isEmpty(decodedJWT.getIssuer())) {
+                // No Issuer, means it's not from the Emulator.
+                return false;
+            }
+
+            // Is the token issues by a source we consider to be the emulator?
+            // Not a Valid Issuer. This is NOT a Bot Framework Emulator Token.
+            return TOKENVALIDATIONPARAMETERS.validIssuers.contains(decodedJWT.getIssuer());
+        } catch (Throwable t) {
             return false;
         }
-
-        // Is the token issues by a source we consider to be the emulator?
-        // Not a Valid Issuer. This is NOT a Bot Framework Emulator Token.
-        return TOKENVALIDATIONPARAMETERS.validIssuers.contains(decodedJWT.getIssuer());
     }
 
     /**
@@ -70,7 +74,7 @@ public class EmulatorValidation {
      * @param channelProvider The channelService value that distinguishes public Azure from US Government Azure.
      * @param channelId       The ID of the channel to validate.
      * @return A valid ClaimsIdentity.
-     *
+     * <p>
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
@@ -88,11 +92,11 @@ public class EmulatorValidation {
      * @param channelId       The ID of the channel to validate.
      * @param authConfig      The authentication configuration.
      * @return A valid ClaimsIdentity.
-     *
+     * <p>
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, AuthenticationConfiguration authConfig)  {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, AuthenticationConfiguration authConfig) {
         String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment() ?
             GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL :
             AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
