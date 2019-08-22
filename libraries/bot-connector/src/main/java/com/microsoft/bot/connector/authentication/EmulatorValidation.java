@@ -147,7 +147,7 @@ public class EmulatorValidation {
 
                 // The Emulator, depending on Version, sends the AppId via either the
                 // appid claim (Version 1) or the Authorized Party claim (Version 2).
-                if (tokenVersion.isEmpty() || tokenVersion.equalsIgnoreCase("1.0")) {
+                if (StringUtils.isEmpty(tokenVersion) || tokenVersion.equalsIgnoreCase("1.0")) {
                     // either no Version or a version of "1.0" means we should look for
                     // the claim in the "appid" claim.
                     if (!identity.claims().containsKey(AuthenticationConstants.APPID_CLAIM)) {

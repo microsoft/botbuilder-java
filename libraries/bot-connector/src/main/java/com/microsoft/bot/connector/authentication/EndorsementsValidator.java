@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public abstract class EndorsementsValidator {
@@ -22,7 +24,7 @@ public abstract class EndorsementsValidator {
 
         // If the Activity came in and doesn't have a Channel ID then it's making no
         // assertions as to who endorses it. This means it should pass.
-        if (channelId == null || channelId.isEmpty())
+        if (StringUtils.isEmpty(channelId))
             return true;
 
         if (endorsements == null)

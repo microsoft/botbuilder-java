@@ -6,12 +6,10 @@ package com.microsoft.bot.connector;
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.schema.models.Activity;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
@@ -66,7 +64,7 @@ public class JwtTokenValidationTests {
                 "",
                 null).join();
         } catch (CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -84,7 +82,7 @@ public class JwtTokenValidationTests {
                 "",
                 null).join();
         } catch (CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -133,7 +131,7 @@ public class JwtTokenValidationTests {
                 "",
                 null).join();
         } catch (CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -185,7 +183,7 @@ public class JwtTokenValidationTests {
                 new SimpleChannelProvider()).join();
             Assert.fail("Should have thrown AuthenticationException");
         } catch (CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
             Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://webchat.botframework.com/"));
         }
     }
@@ -217,8 +215,8 @@ public class JwtTokenValidationTests {
                 credentials,
                 new SimpleChannelProvider()).join();
             Assert.fail("Should have thrown AuthenticationException");
-        } catch(CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
 
         Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"));
@@ -246,14 +244,15 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity("anonymous", claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
 
         try {
             EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
-        } catch (Exception e) {
+        } catch (CompletionException e) {
             Assert.fail("Should not have thrown " + e.getCause().getClass().getName());
         }
     }
@@ -264,16 +263,17 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
         ClaimsIdentity identity = new ClaimsIdentity(null, claims);
 
         try {
             EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an AuthenticationException");
-        } catch (Exception e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -283,15 +283,36 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity("anonymous", claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
 
         try {
             EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an AuthenticationException");
-        } catch (Exception e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void EnterpriseChannelValidation_NoAudienceClaimValue_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, "");
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an AuthenticationException");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -301,16 +322,76 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, "abc");
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity("anonymous", claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, "abc");
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
 
         try {
             EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an AuthenticationException");
-        } catch (Exception e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void EnterpriseChannelValidation_NoServiceClaim_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an AuthenticationException");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void EnterpriseChannelValidation_NoServiceClaimValue_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, "");
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an AuthenticationException");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void EnterpriseChannelValidation_WrongServiceClaim_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, null);
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, "other");
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            EnterpriseChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an AuthenticationException");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -320,16 +401,16 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity("anonymous", claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
 
         try {
             GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
-            Assert.assertTrue(true);
-        } catch(Exception e) {
-            Assert.fail("Should not have thrown " + e.getCause().getClass().getName());
+        } catch (Exception e) {
+            Assert.fail("Should not have thrown " + e.getCause().getClass().getName() + ": " + e.getCause().getMessage());
         }
     }
 
@@ -339,16 +420,56 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
         ClaimsIdentity identity = new ClaimsIdentity(null, claims);
 
         try {
             GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an Authorization exception");
-        } catch(CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void GovernmentChannelValidation_NoAudienceClaim_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an Authorization exception");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void GovernmentChannelValidation_NoAudienceClaimValue_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, "");
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an Authorization exception");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
@@ -358,43 +479,102 @@ public class JwtTokenValidationTests {
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, "abc");
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity(null, claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, "abc");
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
 
         try {
             GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an Authorization exception");
-        } catch(CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
 
-    /*
     @Test
     public void GovernmentChannelValidation_WrongAudienceClaimIssuer_Fails() {
         String appId = "1234567890";
         String serviceUrl = "https://webchat.botframework.com/";
         CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
-        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-        ClaimsIdentity identity = new ClaimsIdentity(null, claims);
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity("https://wrongissuer.com", claims);
 
         try {
             GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
             Assert.fail("Should have thrown an Authorization exception");
-        } catch(CompletionException e) {
-            Assert.assertTrue(StringUtils.equals(e.getCause().getClass().getName(), AuthenticationException.class.getName()));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
     }
-    */
+
+    @Test
+    public void GovernmentChannelValidation_NoServiceClaim_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an Authorization exception");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void GovernmentChannelValidation_NoServiceClaimValue_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, "");
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an Authorization exception");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
+
+    @Test
+    public void GovernmentChannelValidation_WrongServiceClaimValue_Fails() {
+        String appId = "1234567890";
+        String serviceUrl = "https://webchat.botframework.com/";
+        CredentialProvider credentials = new SimpleCredentialProvider(appId, "");
+
+        Map<String, String> claims = new HashMap<String, String>() {{
+            put(AuthenticationConstants.AUDIENCE_CLAIM, appId);
+            put(AuthenticationConstants.SERVICE_URL_CLAIM, "other");
+        }};
+        ClaimsIdentity identity = new ClaimsIdentity(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER, claims);
+
+        try {
+            GovernmentChannelValidation.validateIdentity(identity, credentials, serviceUrl).join();
+            Assert.fail("Should have thrown an Authorization exception");
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+        }
+    }
 
     private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String appId, String pwd, String channelService) throws IOException, ExecutionException, InterruptedException {
         ChannelProvider channel = new SimpleChannelProvider(channelService);
-        String header = channel.isGovernment()?getGovHeaderToken():getHeaderToken();
+        String header = channel.isGovernment() ? getGovHeaderToken() : getHeaderToken();
 
         JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(header, appId, pwd, channel);
     }
@@ -411,7 +591,7 @@ public class JwtTokenValidationTests {
                 "https://webchat.botframework.com/").join();
 
             Assert.assertTrue(identity.isAuthenticated());
-        } catch(Exception e) {
+        } catch (Exception e) {
             Assert.fail("Should not have thrown " + e.getClass().getName());
         }
     }

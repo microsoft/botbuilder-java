@@ -42,7 +42,7 @@ public class JwtTokenExtractor {
 
     public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader, String channelId, List<String> requiredEndorsements) {
         if (authorizationHeader == null) {
-            return CompletableFuture.completedFuture(null);
+            throw new IllegalArgumentException("authorizationHeader is required");
         }
 
         String[] parts = authorizationHeader.split(" ");

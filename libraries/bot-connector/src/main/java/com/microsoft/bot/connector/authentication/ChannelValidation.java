@@ -66,23 +66,19 @@ public class ChannelValidation {
 
                 // Look for the "aud" claim, but only if issued from the Bot Framework
                 if (!identity.getIssuer().equalsIgnoreCase(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
-                    throw new AuthenticationException("Token Not Authenticated");
+                    throw new AuthenticationException("Wrong Issuer");
                 }
 
-                return identity;
-            })
-
-            .thenApply(identity -> {
                 // The AppId from the claim in the token must match the AppId specified by the developer. Note that
                 // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-                String appIdFromClaim = identity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
-                if (StringUtils.isEmpty(appIdFromClaim)) {
+                String appIdFromAudienceClaim = identity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
+                if (StringUtils.isEmpty(appIdFromAudienceClaim)) {
                     // Claim is present, but doesn't have a value. Not Authorized.
-                    throw new AuthenticationException("Token Not Authenticated");
+                    throw new AuthenticationException("No Audience Claim");
                 }
 
-                if (!credentials.isValidAppIdAsync(appIdFromClaim).join()) {
-                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromClaim));
+                if (!credentials.isValidAppIdAsync(appIdFromAudienceClaim).join()) {
+                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
                 }
 
                 return identity;

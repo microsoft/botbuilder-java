@@ -85,38 +85,38 @@ public class GovernmentChannelValidation {
                 throw new AuthenticationException("Invalid Identity");
             }
 
+            // Now check that the AppID in the claim set matches
+            // what we're looking for. Note that in a multi-tenant bot, this value
+            // comes from developer code that may be reaching out to a service, hence the
+            // Async validation.
+
+            if (!StringUtils.equalsIgnoreCase(identity.getIssuer(), GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+                throw new AuthenticationException("Wrong Issuer");
+            }
+
+            // The AppId from the claim in the token must match the AppId specified by the developer. Note that
+            // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
+            String appIdFromAudienceClaim = identity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
+            if (StringUtils.isEmpty(appIdFromAudienceClaim)) {
+                // Claim is present, but doesn't have a value. Not Authorized.
+                throw new AuthenticationException("No Audience Claim");
+            }
+
+            boolean isValid = credentials.isValidAppIdAsync(appIdFromAudienceClaim).join();
+            if (!isValid) {
+                throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
+            }
+
+            String serviceUrlClaim = identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
+            if (StringUtils.isEmpty(serviceUrl)) {
+                throw new AuthenticationException(String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
+            }
+
+            if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
+                throw new AuthenticationException(String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
+            }
+
             return identity;
-        }, ExecutorFactory.getExecutor())
-
-            .thenApply(theIdentity -> {
-                // Now check that the AppID in the claim set matches
-                // what we're looking for. Note that in a multi-tenant bot, this value
-                // comes from developer code that may be reaching out to a service, hence the
-                // Async validation.
-
-                // The AppId from the claim in the token must match the AppId specified by the developer. Note that
-                // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-                String appIdFromClaim = theIdentity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
-                if (StringUtils.isEmpty(appIdFromClaim)) {
-                    // Claim is present, but doesn't have a value. Not Authorized.
-                    throw new AuthenticationException("Token Not Authenticated");
-                }
-
-                boolean isValid = credentials.isValidAppIdAsync(appIdFromClaim).join();
-                if (!isValid) {
-                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromClaim));
-                }
-
-                String serviceUrlClaim = theIdentity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
-                if (StringUtils.isEmpty(serviceUrl)) {
-                    throw new AuthenticationException(String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
-                }
-
-                if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
-                    throw new AuthenticationException(String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
-                }
-
-                return theIdentity;
-            });
+        }, ExecutorFactory.getExecutor());
     }
 }
