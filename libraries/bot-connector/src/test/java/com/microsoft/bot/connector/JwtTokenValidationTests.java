@@ -22,8 +22,12 @@ public class JwtTokenValidationTests {
     private static final String APPID = "2cd87869-38a0-4182-9251-d056e8f0ac24";
     private static final String APPPASSWORD = "2.30Vs3VQLKt974F";
 
-    private static String getHeaderToken() throws MalformedURLException, ExecutionException, InterruptedException {
+    private static String getHeaderToken() throws ExecutionException, InterruptedException {
         return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().get().getAccessToken());
+    }
+
+    private static String getGovHeaderToken() throws ExecutionException, InterruptedException {
+        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().get().getAccessToken());
     }
 
     @Test
@@ -389,13 +393,14 @@ public class JwtTokenValidationTests {
     */
 
     private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String appId, String pwd, String channelService) throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(header, appId, pwd, channelService);
+        ChannelProvider channel = new SimpleChannelProvider(channelService);
+        String header = channel.isGovernment()?getGovHeaderToken():getHeaderToken();
+
+        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(header, appId, pwd, channel);
     }
 
-    private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String header, String appId, String pwd, String channelService) {
+    private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String header, String appId, String pwd, ChannelProvider channel) {
         CredentialProvider credentials = new SimpleCredentialProvider(appId, pwd);
-        ChannelProvider channel = new SimpleChannelProvider(channelService);
 
         try {
             ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(

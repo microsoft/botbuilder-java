@@ -6,7 +6,7 @@ import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
 
 public class BotConnectorTestBase extends TestBase {
-    protected RestConnectorClient connector;
+    protected ConnectorClient connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
 
