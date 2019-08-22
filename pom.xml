@@ -189,7 +189,7 @@
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>${checkstyle.version}</version>
           <configuration>
-<!--            <configLocation>checkstyle.xml</configLocation>-->
+            <configLocation>./etc/bot-checkstyle.xml</configLocation>
             <encoding>UTF-8</encoding>
             <consoleOutput>false</consoleOutput>
             <failsOnError>false</failsOnError>
