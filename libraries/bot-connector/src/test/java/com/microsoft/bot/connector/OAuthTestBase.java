@@ -118,7 +118,7 @@ public class OAuthTestBase extends TestBase
                 e.printStackTrace();
             }
             doTest.apply(oauthClient);
-        });
+        }, ExecutorFactory.getExecutor());
     }
 }
 

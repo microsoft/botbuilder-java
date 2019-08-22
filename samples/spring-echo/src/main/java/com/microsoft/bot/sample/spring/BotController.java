@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.sample.spring;
 import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class BotController {
                                 new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
                                         .withRecipient(activity.from()).withFrom(activity.recipient()));
                     }
-                }).join();
+                }, ExecutorFactory.getExecutor()).join();
         } catch (CompletionException ex) {
             if (ex.getCause() instanceof AuthenticationException) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

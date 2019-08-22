@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestConversations;
@@ -628,7 +629,7 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // Should never happen
                 throw new RuntimeException(String.format("Conversations create issue - returned %d conversations", results.size()));
             }
-        });
+        }, ExecutorFactory.getExecutor());
 
     }
 
@@ -719,7 +720,7 @@ public class BotFrameworkAdapter extends BotAdapter {
                     throw new RuntimeException(String.format("Bad Service URL: %s", serviceUrl));
                 }
             }
-        });
+        }, ExecutorFactory.getExecutor());
 
     }
 
@@ -772,7 +773,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             this.appCredentialMap.put(appId, appCredentials);
             return appCredentials;
 
-        });
+        }, ExecutorFactory.getExecutor());
         return result;
     }
 

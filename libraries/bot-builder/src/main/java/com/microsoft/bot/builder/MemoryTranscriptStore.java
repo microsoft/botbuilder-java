@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 // Licensed under the MIT License.
 
 
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.models.Activity;
 import org.joda.time.DateTime;
 
@@ -32,17 +33,6 @@ import java.util.stream.Collectors;
  */
 public class MemoryTranscriptStore implements TranscriptStore {
     private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<String, HashMap<String, ArrayList<Activity>>>();
-    final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
-        @Override
-        public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
-            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
-            worker.setName("TestFlow-" + worker.getPoolIndex());
-            return worker;
-        }
-    };
-
-    final ExecutorService executor = new ForkJoinPool(Runtime.getRuntime().availableProcessors(), factory, null, false);
-
 
     /**
      * Logs an activity to the transcript.
@@ -168,7 +158,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
             return pagedResult;
 
-        }, this.executor);
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
@@ -197,7 +187,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                     channel.remove(conversationId);
                 }
             }
-        }, this.executor);
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
@@ -291,7 +281,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 }
             }
             return pagedResult;
-        }, this.executor);
+        }, ExecutorFactory.getExecutor());
     }
 
     /**

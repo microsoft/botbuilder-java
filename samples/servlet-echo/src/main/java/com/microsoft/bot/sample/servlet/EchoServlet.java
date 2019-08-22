@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.Activity;
@@ -78,7 +79,7 @@ public class EchoServlet extends HttpServlet {
                                     .withFrom(activity.recipient())
                     );
                 }
-            }).join();
+            }, ExecutorFactory.getExecutor()).join();
 
             response.setStatus(200);
         } catch (CompletionException ex) {

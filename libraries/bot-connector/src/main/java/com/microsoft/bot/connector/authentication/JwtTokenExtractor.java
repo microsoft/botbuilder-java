@@ -9,6 +9,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.Verification;
 import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.ExecutorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +114,6 @@ public class JwtTokenExtractor {
                 LOGGER.warn(errorDescription);
                 throw new AuthenticationException(ex);
             }
-        });
+        }, ExecutorFactory.getExecutor());
     }
 }

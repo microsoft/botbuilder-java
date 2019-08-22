@@ -3,6 +3,7 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ConversationReference;
@@ -38,20 +39,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<DeleteActivityHandler>();
 
     private final TurnContextServiceCollection turnServices;
-    ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
-    {
-        @Override
-        public ForkJoinWorkerThread newThread(ForkJoinPool pool)
-        {
-            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
-            worker.setName("TestFlow-" + worker.getPoolIndex());
-            return worker;
-        }
-    };
-
-    ExecutorService executor = new ForkJoinPool(Runtime.getRuntime().availableProcessors(), factory, null, true);
-
-
 
     /**
      * Creates a context object.
@@ -375,7 +362,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             }
             return;
 
-        }, executor);
+        }, ExecutorFactory.getExecutor());
 
     }
 

@@ -4,6 +4,7 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.models.Activity;
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,7 +63,7 @@ public class JwtTokenValidation {
             MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
 
             return identity;
-        });
+        }, ExecutorFactory.getExecutor());
     }
 
     /**

@@ -4,6 +4,7 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
+import com.microsoft.bot.connector.ExecutorFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -113,6 +114,6 @@ public class EnterpriseChannelValidation {
             }
 
             return identity;
-        });
+        }, ExecutorFactory.getExecutor());
     }
 }

@@ -5,6 +5,7 @@ package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.TokenExchangeState;
@@ -161,7 +162,7 @@ public class OAuthClient extends ServiceClient {
                     response.body().close();
             }
             return null;
-        });
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
@@ -221,7 +222,7 @@ public class OAuthClient extends ServiceClient {
             }
             return false;
 
-        });
+        }, ExecutorFactory.getExecutor());
     }
 
 
@@ -287,7 +288,7 @@ public class OAuthClient extends ServiceClient {
                 e.printStackTrace();
             }
             return null;
-        });
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
@@ -339,6 +340,6 @@ public class OAuthClient extends ServiceClient {
             // Apparently swallow any results
             return;
 
-        });
+        }, ExecutorFactory.getExecutor());
     }
 }
