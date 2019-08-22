@@ -6,13 +6,24 @@ package com.microsoft.bot.connector.authentication;
 import com.microsoft.aad.adal4j.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class ChannelValidation {
     /**
      * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
      */
-    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = TokenValidationParameters.toBotFromChannelTokenValidationParameters();
+    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
+            this.validateIssuer = true;
+            this.validIssuers = new ArrayList<String>() {{
+                add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
+            }};
+            this.validateAudience = false;
+            this.validateLifetime = true;
+            this.clockSkew = Duration.ofMinutes(5);
+            this.requireSignedTokens = true;
+        }};
 
     /**
      * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
