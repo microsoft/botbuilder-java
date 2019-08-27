@@ -759,6 +759,24 @@ public class Activity {
     }
 
     /**
+     * Returns payload version of the Entities in an Activity.
+     *
+     * Entities can vary in the number of fields.  The {@link Entity} class holds the additional
+     * fields in {@link Entity#getProperties()}.
+     *
+     * To convert to other entity types, use {@link Entity#getAs(Class)}.
+     * @see Mention
+     * @see Place
+     * @see GeoCoordinates
+     * @see Activity#getMentions()
+     *
+     * {@code
+     * getEntities().stream()
+     *             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
+     *             .map(entity -> entity.getAs(Mention.class))
+     *             .collect(Collectors.toCollection(ArrayList::new));
+     * }
+     *
      * @see #entities
      */
     public List<Entity> getEntities() {
