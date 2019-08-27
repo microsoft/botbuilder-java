@@ -15,9 +15,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
 
 /**
  * MicrosoftAppCredentials auth implementation
@@ -144,11 +144,11 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
     }
 
-    public Future<AuthenticationResult> getToken() {
+    public CompletableFuture<AuthenticationResult> getToken() {
         return getAuthenticator().acquireToken();
     }
 
-    protected boolean ShouldSetToken(String url) {
+    protected boolean shouldSetToken(String url) {
         return isTrustedServiceUrl(url);
     }
 

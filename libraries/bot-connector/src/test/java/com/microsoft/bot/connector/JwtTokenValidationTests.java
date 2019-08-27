@@ -20,12 +20,12 @@ public class JwtTokenValidationTests {
     private static final String APPID = "2cd87869-38a0-4182-9251-d056e8f0ac24";
     private static final String APPPASSWORD = "2.30Vs3VQLKt974F";
 
-    private static String getHeaderToken() throws ExecutionException, InterruptedException {
-        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().get().getAccessToken());
+    private static String getHeaderToken() {
+        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().join().getAccessToken());
     }
 
-    private static String getGovHeaderToken() throws ExecutionException, InterruptedException {
-        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().get().getAccessToken());
+    private static String getGovHeaderToken() {
+        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join().getAccessToken());
     }
 
     @Test
