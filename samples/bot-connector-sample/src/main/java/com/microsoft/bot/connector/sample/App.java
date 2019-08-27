@@ -61,7 +61,7 @@ public class App {
                     if (activity.getType().equals(ActivityTypes.MESSAGE)) {
                         // reply activity with the same text
                         ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), this.credentials);
-                        connector.conversations().sendToConversation(
+                        connector.getConversations().sendToConversation(
                             activity.getConversation().getId(),
                             activity.createReply("Echo: " + activity.getText()));
                     }

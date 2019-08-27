@@ -16,8 +16,6 @@ import com.microsoft.rest.ServiceResponse;
 import com.microsoft.rest.Validator;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -108,15 +106,6 @@ public class RestConversations implements Conversations {
         Observable<Response<ResponseBody>> getConversationPagedMembers(@Path("conversationId") String conversationId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
     }
 
-    public static <T> CompletableFuture<List<T>> completableFutureFromObservable(Observable<T> observable) {
-        final CompletableFuture<List<T>> future = new CompletableFuture<>();
-        observable
-                .doOnError(future::completeExceptionally)
-                .toList()
-                .forEach(future::complete);
-        return future;
-    }
-
     /**
      * Implementation of getConversations.
      *
@@ -160,7 +149,7 @@ public class RestConversations implements Conversations {
     @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync() {
         final String continuationToken = null;
-        return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getConversations(continuationToken, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationsResult>>>() {
                 @Override
                 public Observable<ServiceResponse<ConversationsResult>> call(Response<ResponseBody> response) {
@@ -216,7 +205,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public Observable<ServiceResponse<ConversationsResult>> getConversationsWithServiceResponseAsync(String continuationToken) {
-        return service.getConversations(continuationToken, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getConversations(continuationToken, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationsResult>>>() {
                 @Override
                 public Observable<ServiceResponse<ConversationsResult>> call(Response<ResponseBody> response) {
@@ -272,15 +261,6 @@ public class RestConversations implements Conversations {
         });
     }
 
-    // FIXME: This isn't really a reasonable return value in this case.
-    // I know what it said about converting Observable to CompletableFuture, but this particular
-    // conversion returns a result that changes the meaning.  The response is not, and is never, a list.
-    public CompletableFuture<List<ConversationResourceResponse>> CreateConversationAsync(ConversationParameters parameters) {
-        CompletableFuture<List<ConversationResourceResponse>> future_result = completableFutureFromObservable(createConversationAsync(parameters));
-        return future_result;
-    }
-
-
     /**
      * Implementation of createConversationWithServiceResponseAsync.
      *
@@ -292,7 +272,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
         Validator.validate(parameters);
-        return service.createConversation(parameters, this.client.acceptLanguage(), this.client.userAgent())
+        return service.createConversation(parameters, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ConversationResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ConversationResourceResponse>> call(Response<ResponseBody> response) {
@@ -364,7 +344,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.sendToConversation(conversationId, activity, this.client.acceptLanguage(), this.client.userAgent())
+        return service.sendToConversation(conversationId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -439,7 +419,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.updateActivity(conversationId, activityId, activity, this.client.acceptLanguage(), this.client.userAgent())
+        return service.updateActivity(conversationId, activityId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -514,7 +494,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
         }
         Validator.validate(activity);
-        return service.replyToActivity(conversationId, activityId, activity, this.client.acceptLanguage(), this.client.userAgent())
+        return service.replyToActivity(conversationId, activityId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -585,7 +565,7 @@ public class RestConversations implements Conversations {
         if (activityId == null) {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
-        return service.deleteActivity(conversationId, activityId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.deleteActivity(conversationId, activityId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
                 @Override
                 public Observable<ServiceResponse<Void>> call(Response<ResponseBody> response) {
@@ -652,7 +632,7 @@ public class RestConversations implements Conversations {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
-        return service.getConversationMembers(conversationId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getConversationMembers(conversationId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ChannelAccount>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<ChannelAccount>>> call(Response<ResponseBody> response) {
@@ -709,23 +689,6 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * DeleteConversationMemberFuture
-     * Deletes a member from a converstion.
-     This REST API takes a ConversationId and a memberId (of type string) and removes that member from the conversation. If that member was the last member
-     of the conversation, the conversation will also be deleted.
-     *
-     * @param conversationId Conversation ID
-     * @param memberId ID of the member to delete from this conversation
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return CompletableFuture of List < Void ></>
-     */
-    // FIXME: This return result is ridiculous.
-    public CompletableFuture<List<Void>> deleteConversationMemberFuture(String conversationId, String memberId) throws ExecutionException, InterruptedException {
-        CompletableFuture<List<Void>> future_result = completableFutureFromObservable(deleteConversationMemberAsync(conversationId, memberId));
-        return future_result;
-    }
-
-    /**
      * Implementation of deleteConversationMemberWithServiceResponseAsync.
      *
      * @see Conversations#deleteConversationMemberWithServiceResponseAsync
@@ -738,7 +701,7 @@ public class RestConversations implements Conversations {
         if (memberId == null) {
             throw new IllegalArgumentException("Parameter memberId is required and cannot be null.");
         }
-        return service.deleteConversationMember(conversationId, memberId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.deleteConversationMember(conversationId, memberId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
                 @Override
                 public Observable<ServiceResponse<Void>> call(Response<ResponseBody> response) {
@@ -809,7 +772,7 @@ public class RestConversations implements Conversations {
         if (activityId == null) {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
-        return service.getActivityMembers(conversationId, activityId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getActivityMembers(conversationId, activityId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ChannelAccount>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<ChannelAccount>>> call(Response<ResponseBody> response) {
@@ -879,7 +842,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter attachmentUpload is required and cannot be null.");
         }
         Validator.validate(attachmentUpload);
-        return service.uploadAttachment(conversationId, attachmentUpload, this.client.acceptLanguage(), this.client.userAgent())
+        return service.uploadAttachment(conversationId, attachmentUpload, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -952,7 +915,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter history is required and cannot be null.");
         }
         Validator.validate(history);
-        return service.sendConversationHistory(conversationId, history, this.client.acceptLanguage(), this.client.userAgent())
+        return service.sendConversationHistory(conversationId, history, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ResourceResponse>>>() {
                 @Override
                 public Observable<ServiceResponse<ResourceResponse>> call(Response<ResponseBody> response) {
@@ -1021,7 +984,7 @@ public class RestConversations implements Conversations {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
-        return service.getConversationPagedMembers(conversationId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getConversationPagedMembers(conversationId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<PagedMembersResult>>>() {
                 @Override
                 public Observable<ServiceResponse<PagedMembersResult>> call(Response<ResponseBody> response) {

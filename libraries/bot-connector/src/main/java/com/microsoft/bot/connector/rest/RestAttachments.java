@@ -118,7 +118,7 @@ public class RestAttachments implements Attachments {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
-        return service.getAttachmentInfo(attachmentId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getAttachmentInfo(attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AttachmentInfo>>>() {
                 @Override
                 public Observable<ServiceResponse<AttachmentInfo>> call(Response<ResponseBody> response) {
@@ -202,7 +202,7 @@ public class RestAttachments implements Attachments {
         if (viewId == null) {
             throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
         }
-        return service.getAttachment(attachmentId, viewId, this.client.acceptLanguage(), this.client.userAgent())
+        return service.getAttachment(attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<InputStream>>>() {
                 @Override
                 public Observable<ServiceResponse<InputStream>> call(Response<ResponseBody> response) {

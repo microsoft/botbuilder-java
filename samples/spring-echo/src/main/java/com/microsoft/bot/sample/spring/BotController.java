@@ -71,7 +71,7 @@ public class BotController {
 
                         // reply activity with the same text
                         ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), _credentials);
-                        connector.conversations().sendToConversation(
+                        connector.getConversations().sendToConversation(
                             activity.getConversation().getId(),
                             activity.createReply("Echo: " + activity.getText()));
                     }
