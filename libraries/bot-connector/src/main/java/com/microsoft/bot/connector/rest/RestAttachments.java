@@ -9,7 +9,7 @@ package com.microsoft.bot.connector.rest;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Attachments;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.bot.schema.models.AttachmentInfo;
+import com.microsoft.bot.schema.AttachmentInfo;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;

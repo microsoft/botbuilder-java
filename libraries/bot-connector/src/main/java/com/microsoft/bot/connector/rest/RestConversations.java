@@ -6,18 +6,10 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.schema.*;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Conversations;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.AttachmentData;
-import com.microsoft.bot.schema.models.ChannelAccount;
-import com.microsoft.bot.schema.models.ConversationParameters;
-import com.microsoft.bot.schema.models.ConversationResourceResponse;
-import com.microsoft.bot.schema.models.ConversationsResult;
-import com.microsoft.bot.schema.models.PagedMembersResult;
-import com.microsoft.bot.schema.models.ResourceResponse;
-import com.microsoft.bot.schema.models.Transcript;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;

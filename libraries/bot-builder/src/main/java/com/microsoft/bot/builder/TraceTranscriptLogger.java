@@ -8,7 +8,7 @@ package com.microsoft.bot.builder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +24,6 @@ public class TraceTranscriptLogger implements TranscriptLogger {
     private static ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
     private static final Logger logger = LoggerFactory.getLogger(TraceTranscriptLogger.class);
-
-    ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
-    {
-        @Override
-        public ForkJoinWorkerThread newThread(ForkJoinPool pool)
-        {
-            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
-            worker.setName("BotTrace-" + worker.getPoolIndex());
-            return worker;
-        }
-    };
-
-    ExecutorService executor = new ForkJoinPool(Runtime.getRuntime().availableProcessors(), factory, null, true);
 
     /**
      * Log an activity to the transcript.

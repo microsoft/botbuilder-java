@@ -5,7 +5,7 @@ package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -57,10 +57,10 @@ public class JwtTokenValidation {
 
             // Go through the standard authentication path.  This will throw AuthenticationException if
             // it fails.
-            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.channelId(), activity.serviceUrl(), authConfig).join();
+            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.getChannelId(), activity.getServiceUrl(), authConfig).join();
 
             // On the standard Auth path, we need to trust the URL that was incoming.
-            MicrosoftAppCredentials.trustServiceUrl(activity.serviceUrl());
+            MicrosoftAppCredentials.trustServiceUrl(activity.getServiceUrl());
 
             return identity;
         }, ExecutorFactory.getExecutor());

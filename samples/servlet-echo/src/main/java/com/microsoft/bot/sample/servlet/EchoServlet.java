@@ -12,8 +12,8 @@ import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ActivityTypes;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
@@ -68,16 +68,12 @@ public class EchoServlet extends HttpServlet {
 
             CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider, new SimpleChannelProvider());
             authenticateRequest.thenRunAsync(() -> {
-                if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                if (activity.getType().equals(ActivityTypes.MESSAGE)) {
                     // reply activity with the same text
-                    ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), this.credentials);
-                    connector.conversations().sendToConversation(activity.conversation().id(),
-                            new Activity()
-                                    .withType(ActivityTypes.MESSAGE)
-                                    .withText("Echo: " + activity.text())
-                                    .withRecipient(activity.from())
-                                    .withFrom(activity.recipient())
-                    );
+                    ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), this.credentials);
+                    connector.conversations().sendToConversation(
+                        activity.getConversation().getId(),
+                        activity.createReply("Echo: " + activity.getText()));
                 }
             }, ExecutorFactory.getExecutor()).join();
 

@@ -2,7 +2,7 @@ package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.rest.RestClient;
 
 public class BotConnectorTestBase extends TestBase {
@@ -21,8 +21,8 @@ public class BotConnectorTestBase extends TestBase {
     @Override
     protected void initializeClients(RestClient restClient, String botId, String userId) {
         connector = new RestConnectorClient(restClient);
-        bot = new ChannelAccount().withId(botId);
-        user = new ChannelAccount().withId(userId);
+        bot = new ChannelAccount(botId);
+        user = new ChannelAccount(userId);
     }
 
     @Override

@@ -18,9 +18,9 @@ package com.microsoft.bot.builder;
  * {@linkalso DeleteActivityHandler}
  */
 
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.ResourceResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Provides context for a turn of a bot.
  * Context provides information needed to process an incoming activity.
- * The context object is created by a {@link BotAdapter} and persists for the 
+ * The context object is created by a {@link BotAdapter} and persists for the
  * length of the turn.
  * {@linkalso Bot}
  * {@linkalso Middleware}
@@ -63,34 +63,66 @@ public interface TurnContext
     /**
      * Sends a message activity to the sender of the incoming activity.
      * @param textReplyToSend The text of the message to send.
-     * @param speak Optional, text to be spoken by your bot on a speech-enabled 
+     * @return A task that represents the work queued to execute.
+     * If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.
+     * <p>See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.</p>
+     * <p>To control various characteristics of your bot's speech such as voice,
+     * rate, volume, pronunciation, and pitch, specify {@code speak} in
+     * Speech Synthesis Markup Language (SSML) format.</p>
+     *
+     */
+    ResourceResponse SendActivity(String textReplyToSend) throws Exception;
+
+    /**
+     * Sends a message activity to the sender of the incoming activity.
+     * @param textReplyToSend The text of the message to send.
+     * @param speak Optional, text to be spoken by your bot on a speech-enabled
      * channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, 
+     * @return A task that represents the work queued to execute.
+     * If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.
+     * <p>See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.</p>
+     * <p>To control various characteristics of your bot's speech such as voice,
+     * rate, volume, pronunciation, and pitch, specify {@code speak} in
+     * Speech Synthesis Markup Language (SSML) format.</p>
+     *
+     */
+    ResourceResponse SendActivity(String textReplyToSend, String speak) throws Exception;
+    //CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak = null, String inputHint = InputHints.AcceptingInput);
+
+    /**
+     * Sends a message activity to the sender of the incoming activity.
+     * @param textReplyToSend The text of the message to send.
+     * @param speak Optional, text to be spoken by your bot on a speech-enabled
+     * channel.
+     * @param inputHint Optional, indicates whether your bot is accepting,
      * expecting, or ignoring user input after the message is delivered to the client.
      * One of: "acceptingInput", "ignoringInput", or "expectingInput".
      * Default is "acceptingInput".
      * @return A task that represents the work queued to execute.
      * If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving 
+     * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
-     * <p>See the channel's documentation for limits imposed upon the contents of 
+     * <p>See the channel's documentation for limits imposed upon the contents of
      * {@code textReplyToSend}.</p>
-     * <p>To control various characteristics of your bot's speech such as voice, 
-     * rate, volume, pronunciation, and pitch, specify {@code speak} in 
+     * <p>To control various characteristics of your bot's speech such as voice,
+     * rate, volume, pronunciation, and pitch, specify {@code speak} in
      * Speech Synthesis Markup Language (SSML) format.</p>
      *
      */
-    ResourceResponse SendActivity(String textReplyToSend) throws Exception;
-    ResourceResponse SendActivity(String textReplyToSend, String speak) throws Exception;
-    //CompletableFuture<ResourceResponse> SendActivity(String textReplyToSend, String speak = null, String inputHint = InputHints.AcceptingInput);
     ResourceResponse SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception;
-    
+
     /**
      * Sends an activity to the sender of the incoming activity.
      * @param activity The activity to send.
      * @return A task that represents the work queued to execute.
      * If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving 
+     * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
      */
     ResourceResponse SendActivity(Activity activity) throws Exception;
@@ -100,17 +132,17 @@ public interface TurnContext
      * @param activities The activities to send.
      * @return A task that represents the work queued to execute.
      * If the activities are successfully sent, the task result contains
-     * an array of {@link ResourceResponse} objects containing the IDs that 
+     * an array of {@link ResourceResponse} objects containing the IDs that
      * the receiving channel assigned to the activities.
      */
     ResourceResponse[] SendActivities(Activity[] activities) throws Exception;
 
     /**
-     * Replaces an existing activity. 
-     * @param activity New replacement activity.        
+     * Replaces an existing activity.
+     * @param activity New replacement activity.
      * @return A task that represents the work queued to execute.
      * If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving 
+     * a {@link ResourceResponse} object containing the ID that the receiving
      * channel assigned to the activity.
      * <p>Before calling this, set the ID of the replacement activity to the ID
      * of the activity to replace.</p>
@@ -140,7 +172,7 @@ public interface TurnContext
      * Deletes an existing activity.
      * @param conversationReference The conversation containing the activity to delete.
      * @return A task that represents the work queued to execute.
-     * The conversation reference's {@link ConversationReference.ActivityId}
+     * The conversation reference's {@link ConversationReference#getActivityId}
      * indicates the activity in the conversation to delete.
      */
     void DeleteActivity(ConversationReference conversationReference) throws Exception;
@@ -149,9 +181,9 @@ public interface TurnContext
      * Adds a response handler for send activity operations.
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * When the context's {@link SendActivity(Activity)}
-     * or {@link SendActivities(Activity[])} methods are called,
-     * the adapter calls the registered handlers in the order in which they were 
+     * When the context's {@link #SendActivity( Activity )}
+     * or {@link #SendActivities( Activity[])} methods are called,
+     * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
      *
      */
@@ -161,8 +193,8 @@ public interface TurnContext
      * Adds a response handler for update activity operations.
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * When the context's {@link UpdateActivity(Activity)} is called,
-     * the adapter calls the registered handlers in the order in which they were 
+     * When the context's {@link #UpdateActivity( Activity )} is called,
+     * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
      *
      */
@@ -173,8 +205,8 @@ public interface TurnContext
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws NullPointerException {@code handler} is {@code null}.
-     * When the context's {@link DeleteActivity(String)} is called,
-     * the adapter calls the registered handlers in the order in which they were 
+     * When the context's {@link #DeleteActivity(String)} is called,
+     * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
      *
      */

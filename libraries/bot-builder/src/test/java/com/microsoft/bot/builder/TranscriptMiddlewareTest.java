@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.*;
+import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,10 +28,10 @@ public class TranscriptMiddlewareTest {
         {
 
                 TurnContextImpl context = (TurnContextImpl) ctxt;
-                conversationId[0] = context.getActivity().conversation().id();
-                ActivityImpl typingActivity = new ActivityImpl()
-                        .withType(ActivityTypes.TYPING)
-                        .withRelatesTo(context.getActivity().relatesTo());
+                conversationId[0] = context.getActivity().getConversation().getId();
+                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+                    setRelatesTo(context.getActivity().getRelatesTo());
+                }};
                 try {
                     ResourceResponse response = context.SendActivity(typingActivity);
                     System.out.printf("Here's the response:");
@@ -47,7 +46,7 @@ public class TranscriptMiddlewareTest {
                     Assert.fail();
                 }
                 try {
-                    context.SendActivity("echo:" + context.getActivity().text());
+                    context.SendActivity("echo:" + context.getActivity().getText());
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail();
@@ -55,7 +54,7 @@ public class TranscriptMiddlewareTest {
 
         }).Send("foo")
                 .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.type(), ActivityTypes.TYPING);
+                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
                     return null;
                 }).StartTest();
                 //.AssertReply("echo:foo").StartTest();
@@ -68,8 +67,8 @@ public class TranscriptMiddlewareTest {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
         TranscriptLoggerMiddleware logger = new TranscriptLoggerMiddleware(transcriptStore);
         TestAdapter adapter = new TestAdapter();
-        ActivityImpl activity = ActivityImpl.CreateMessageActivity()
-                .withFrom(new ChannelAccount().withName("MyAccount").withId("acctid").withRole(RoleTypes.USER));
+        Activity activity = Activity.createMessageActivity();
+        activity.setFrom(new ChannelAccount("acctid", "MyAccount", RoleTypes.USER));
         TurnContextImpl context = new TurnContextImpl(adapter, activity);
         NextDelegate nd = new NextDelegate() {
             @Override
@@ -79,9 +78,10 @@ public class TranscriptMiddlewareTest {
                 return ;
             }
         };
-        ActivityImpl typingActivity = new ActivityImpl()
-                .withType(ActivityTypes.TYPING)
-                .withRelatesTo(context.getActivity().relatesTo());
+        Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+            setRelatesTo(context.getActivity().getRelatesTo());
+        }};
+
         try {
             context.SendActivity(typingActivity);
             System.out.printf("HI");
@@ -105,10 +105,10 @@ public class TranscriptMiddlewareTest {
         {
 
                 //TurnContextImpl context = (TurnContextImpl) ctxt;
-                conversationId[0] = context.getActivity().conversation().id();
-                ActivityImpl typingActivity = new ActivityImpl()
-                        .withType(ActivityTypes.TYPING)
-                        .withRelatesTo(context.getActivity().relatesTo());
+                conversationId[0] = context.getActivity().getConversation().getId();
+                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+                    setRelatesTo(context.getActivity().getRelatesTo());
+                }};
                 try {
                     context.SendActivity((Activity)typingActivity);
                 } catch (Exception e) {
@@ -122,20 +122,20 @@ public class TranscriptMiddlewareTest {
                     Assert.fail();
                 }
                 try {
-                    context.SendActivity("echo:" + context.getActivity().text());
+                    context.SendActivity("echo:" + context.getActivity().getText());
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail();
                 }
         }).Send("foo")
                 .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.type(), ActivityTypes.TYPING);
+                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
                     return null;
                 })
                 .AssertReply("echo:foo")
                 .Send("bar")
                 .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.type(), ActivityTypes.TYPING);
+                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
                     return null;
                 })
                 .AssertReply("echo:bar")
@@ -144,17 +144,17 @@ public class TranscriptMiddlewareTest {
 
         PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
         Assert.assertEquals(6, pagedResult.getItems().length);
-        Assert.assertEquals( "foo", ((Activity)pagedResult.getItems()[0]).text());
+        Assert.assertEquals( "foo", ((Activity)pagedResult.getItems()[0]).getText());
         Assert.assertNotEquals(((Activity)pagedResult.getItems()[1]), null);
-        Assert.assertEquals("echo:foo", ((Activity) pagedResult.getItems()[2]).text());
-        Assert.assertEquals("bar", ((Activity)pagedResult.getItems()[3]).text());
+        Assert.assertEquals("echo:foo", ((Activity) pagedResult.getItems()[2]).getText());
+        Assert.assertEquals("bar", ((Activity)pagedResult.getItems()[3]).getText());
 
         Assert.assertTrue(pagedResult.getItems()[4] != null);
-        Assert.assertEquals("echo:bar", ((Activity)pagedResult.getItems()[5]).text());
+        Assert.assertEquals("echo:bar", ((Activity)pagedResult.getItems()[5]).getText());
         for (Object activity : pagedResult.getItems())
         {
-            Assert.assertFalse(StringUtils.isBlank(((Activity) activity).id()));
-            Assert.assertTrue(((Activity)activity).timestamp().isAfter(Long.MIN_VALUE));
+            Assert.assertFalse(StringUtils.isBlank(((Activity) activity).getId()));
+            Assert.assertTrue(((Activity)activity).getTimestamp().isAfter(Long.MIN_VALUE));
         }
         System.out.printf("Complete");
     }
@@ -170,16 +170,16 @@ public class TranscriptMiddlewareTest {
         new TestFlow(adapter, (context) ->
         {
 
-                conversationId[0] = context.getActivity().conversation().id();
-                if (context.getActivity().text().equals("update")) {
-                    activityToUpdate[0].withText("new response");
+                conversationId[0] = context.getActivity().getConversation().getId();
+                if (context.getActivity().getText().equals("update")) {
+                    activityToUpdate[0].setText("new response");
                     try {
                         context.UpdateActivity(activityToUpdate[0]);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    ActivityImpl activity = ((ActivityImpl) context.getActivity()).CreateReply("response");
+                    Activity activity = ((Activity) context.getActivity()).createReply("response");
                     ResourceResponse response = null;
                     try {
                         response = context.SendActivity(activity);
@@ -187,10 +187,10 @@ public class TranscriptMiddlewareTest {
                         e.printStackTrace();
                         Assert.fail();
                     }
-                    activity.withId(response.id());
+                    activity.setId(response.getId());
 
                     // clone the activity, so we can use it to do an update
-                    activityToUpdate[0] = ActivityImpl.CloneActity(activity);
+                    activityToUpdate[0] = Activity.cloneActivity(activity);
                     //JsonConvert.<Activity>DeserializeObject(JsonConvert.SerializeObject(activity));
                 }
         }).Send("foo")
@@ -200,13 +200,13 @@ public class TranscriptMiddlewareTest {
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
-        Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).text());
+        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).getText());
+        Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).getText());
         // TODO: Fix the following 3 asserts so they work correctly. They succeed in the travis builds and fail in the
         // BotBuilder-Java 4.0 master build.
         //Assert.assertEquals( "new response", ((Activity)pagedResult.getItems()[2]).text());
         //Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).text());
-        //Assert.assertEquals( ((Activity)pagedResult.getItems()[1]).id(),  ((Activity) pagedResult.getItems()[2]).id());
+        //Assert.assertEquals( ((Activity)pagedResult.getItems()[1]).getId(),  ((Activity) pagedResult.getItems()[2]).getId());
     }
 
     @Test
@@ -218,8 +218,8 @@ public class TranscriptMiddlewareTest {
         new TestFlow(adapter, (context) ->
         {
 
-                conversationId[0] = context.getActivity().conversation().id();
-                if (context.getActivity().text().equals("deleteIt")) {
+                conversationId[0] = context.getActivity().getConversation().getId();
+                if (context.getActivity().getText().equals("deleteIt")) {
                     try {
                         context.DeleteActivity(activityId[0]).join();
                     } catch (Exception e) {
@@ -227,7 +227,7 @@ public class TranscriptMiddlewareTest {
                         Assert.fail();
                     }
                 } else {
-                    ActivityImpl activity = ((ActivityImpl) context.getActivity()).CreateReply("response");
+                    Activity activity = ((Activity) context.getActivity()).createReply("response");
                     ResourceResponse response = null;
                     try {
                         response = context.SendActivity(activity);
@@ -235,7 +235,7 @@ public class TranscriptMiddlewareTest {
                         e.printStackTrace();
                         Assert.fail();
                     }
-                    activityId[0] = response.id();
+                    activityId[0] = response.getId();
                 }
 
 
@@ -246,18 +246,18 @@ public class TranscriptMiddlewareTest {
         Thread.sleep(1500);
         PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
         for (Object act : pagedResult.getItems()) {
-            System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity)act).type());
+            System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity)act).getType());
         }
 
         for (Object activity : pagedResult.getItems() ) {
-            System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).recipient().name(), ((Activity)activity).text());
+            System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).getRecipient().getName(), ((Activity)activity).getText());
         }
         Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).text());
-        Assert.assertEquals("response", ((Activity)pagedResult.getItems()[1]).text());
-        Assert.assertEquals("deleteIt", ((Activity)pagedResult.getItems()[2]).text());
-        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity)pagedResult.getItems()[3]).type());
-        Assert.assertEquals(((Activity)pagedResult.getItems()[1]).id(), ((Activity) pagedResult.getItems()[3]).id());
+        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).getText());
+        Assert.assertEquals("response", ((Activity)pagedResult.getItems()[1]).getText());
+        Assert.assertEquals("deleteIt", ((Activity)pagedResult.getItems()[2]).getText());
+        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity)pagedResult.getItems()[3]).getType());
+        Assert.assertEquals(((Activity)pagedResult.getItems()[1]).getId(), ((Activity) pagedResult.getItems()[3]).getId());
     }
 }
 

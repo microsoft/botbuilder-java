@@ -10,7 +10,7 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.schema.models.*;
+import com.microsoft.bot.schema.*;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;

@@ -5,7 +5,7 @@ package com.microsoft.bot.connector;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.authentication.*;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -159,7 +159,9 @@ public class JwtTokenValidationTests {
         String header = getHeaderToken();
         CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
         JwtTokenValidation.authenticateRequest(
-            new Activity().withServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"),
+            new Activity() {{
+                setServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/");
+            }},
             header,
             credentials,
             new SimpleChannelProvider()).join();
@@ -177,7 +179,9 @@ public class JwtTokenValidationTests {
 
         try {
             JwtTokenValidation.authenticateRequest(
-                new Activity().withServiceUrl("https://webchat.botframework.com/"),
+                new Activity() {{
+                    setServiceUrl("https://webchat.botframework.com/");
+                }},
                 header,
                 credentials,
                 new SimpleChannelProvider()).join();
@@ -197,7 +201,9 @@ public class JwtTokenValidationTests {
         CredentialProvider credentials = new SimpleCredentialProvider("", "");
 
         ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(
-            new Activity().withServiceUrl("https://webchat.botframework.com/"),
+            new Activity() {{
+                setServiceUrl("https://webchat.botframework.com/");
+            }},
             header,
             credentials,
             new SimpleChannelProvider()).join();
@@ -210,7 +216,9 @@ public class JwtTokenValidationTests {
             String header = "";
             CredentialProvider credentials = new SimpleCredentialProvider(APPID, APPPASSWORD);
             JwtTokenValidation.authenticateRequest(
-                new Activity().withServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"),
+                new Activity() {{
+                    setServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/");
+                }},
                 header,
                 credentials,
                 new SimpleChannelProvider()).join();
@@ -231,7 +239,9 @@ public class JwtTokenValidationTests {
         CredentialProvider credentials = new SimpleCredentialProvider("", "");
 
         ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(
-            new Activity().withServiceUrl("https://webchat.botframework.com/"),
+            new Activity() {{
+                setServiceUrl("https://webchat.botframework.com/");
+            }},
             header,
             credentials,
             new SimpleChannelProvider()).join();

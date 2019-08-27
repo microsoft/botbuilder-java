@@ -7,10 +7,9 @@ package com.microsoft.bot.builder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ActivityTypes;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,19 +63,19 @@ public class TranscriptLoggerMiddleware implements Middleware {
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
             JsonNode role = null;
-            if (context.getActivity().from() == null) {
+            if (context.getActivity().getFrom() == null) {
                 throw new RuntimeException("Activity does not contain From field");
             }
-            if (context.getActivity().from().properties().containsKey("role")) {
-                role = context.getActivity().from().properties().get("role");
+            if (context.getActivity().getFrom().getProperties().containsKey("role")) {
+                role = context.getActivity().getFrom().getProperties().get("role");
             }
 
             if (role == null || StringUtils.isBlank(role.asText())) {
-                context.getActivity().from().properties().put("role", mapper.createObjectNode().with("user"));
+                context.getActivity().getFrom().getProperties().put("role", mapper.createObjectNode().with("user"));
             }
-            Activity activityTemp = ActivityImpl.CloneActity(context.getActivity());
+            Activity activityTemp = Activity.cloneActivity(context.getActivity());
 
-            LogActivity(ActivityImpl.CloneActity(context.getActivity()));
+            LogActivity(Activity.cloneActivity(context.getActivity()));
         }
 
         // hook up onSend pipeline
@@ -94,7 +93,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             for (Activity activity : activities) {
-                LogActivity(ActivityImpl.CloneActity(activity));
+                LogActivity(Activity.cloneActivity(activity));
             }
 
             return responses;
@@ -120,8 +119,8 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             // add Message Update activity
-            Activity updateActivity = ActivityImpl.CloneActity(activity);
-            updateActivity.withType(ActivityTypes.MESSAGE_UPDATE);
+            Activity updateActivity = Activity.cloneActivity(activity);
+            updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
             LogActivity(updateActivity);
             return response;
 
@@ -146,10 +145,10 @@ public class TranscriptLoggerMiddleware implements Middleware {
 
             // add MessageDelete activity
             // log as MessageDelete activity
-            Activity deleteActivity = new Activity()
-                    .withType(ActivityTypes.MESSAGE_DELETE)
-                    .withId(reference.activityId())
-                    .applyConversationReference(reference, false);
+            Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {{
+                setId(reference.getActivityId());
+                applyConversationReference(reference, false);
+            }};
 
             LogActivity(deleteActivity);
             return;
@@ -179,8 +178,8 @@ public class TranscriptLoggerMiddleware implements Middleware {
 
 
     private void LogActivity(Activity activity) {
-        if (activity.timestamp() == null) {
-            activity.withTimestamp(DateTime.now(DateTimeZone.UTC));
+        if (activity.getTimestamp() == null) {
+            activity.setTimestamp(DateTime.now(DateTimeZone.UTC));
         }
         transcript.offer(activity);
     }

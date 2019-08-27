@@ -2,8 +2,8 @@ package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
@@ -112,13 +112,13 @@ public class TestFlow {
             throw new IllegalArgumentException("You have to pass an Activity");
 
         return new TestFlow((() -> {
-            System.out.printf("TestFlow(%s): Send with User Activity! %s", Thread.currentThread().getId(), userActivity.text());
+            System.out.printf("TestFlow(%s): Send with User Activity! %s", Thread.currentThread().getId(), userActivity.getText());
             System.out.flush();
 
 
             try {
-                this.adapter.ProcessActivity((ActivityImpl) userActivity, this.callback);
-                return "TestFlow: Send() -> ProcessActivity: " + userActivity.text();
+                this.adapter.ProcessActivity((Activity) userActivity, this.callback);
+                return "TestFlow: Send() -> ProcessActivity: " + userActivity.getText();
             } catch (Exception e) {
                 return e.getMessage();
 
@@ -151,8 +151,6 @@ public class TestFlow {
      * Assert that reply is expected text
      *
      * @param expected
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow AssertReply(String expected) {
@@ -171,8 +169,6 @@ public class TestFlow {
      * Assert that the reply is expected activity
      *
      * @param expected
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow AssertReply(Activity expected) {
@@ -185,11 +181,11 @@ public class TestFlow {
             description = Thread.currentThread().getStackTrace()[1].getMethodName();
         String finalDescription = description;
         return this.AssertReply((reply) -> {
-            if (expected.type() != reply.type())
+            if (expected.getType() != reply.getType())
                 return String.format("%s: Type should match", finalDescription);
-            if (expected.text().equals(reply.text())) {
+            if (expected.getText().equals(reply.getText())) {
                 if (finalDescription == null)
-                    return String.format("Expected:%s\nReceived:{reply.AsMessageActivity().Text}", expected.text());
+                    return String.format("Expected:%s\nReceived:{reply.AsMessageActivity().Text}", expected.getText());
                 else
                     return String.format("%s: Text should match", finalDescription);
             }
@@ -202,8 +198,6 @@ public class TestFlow {
      * Assert that the reply matches a custom validation routine
      *
      * @param validateActivity
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow AssertReply(Function<Activity, String> validateActivity) {
@@ -242,10 +236,10 @@ public class TestFlow {
 //                System.out.flush();
 
                 if (replyActivity != null) {
-                    System.out.printf("AssertReply(tid:%s): Received Reply: %s ", Thread.currentThread().getId(), (replyActivity.text() == null) ? "No Text set" : replyActivity.text());
+                    System.out.printf("AssertReply(tid:%s): Received Reply: %s ", Thread.currentThread().getId(), (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText());
                     System.out.flush();
-                    System.out.printf("=============\n From: %s\n To:%s\n ==========\n", (replyActivity.from() == null) ? "No from set" : replyActivity.from().name(),
-                            (replyActivity.recipient() == null) ? "No recipient set" : replyActivity.recipient().name());
+                    System.out.printf("=============\n From: %s\n To:%s\n ==========\n", (replyActivity.getFrom() == null) ? "No from set" : replyActivity.getFrom().getName(),
+                            (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName());
                     System.out.flush();
 
                     // if we have a reply
@@ -304,7 +298,7 @@ public class TestFlow {
                         if (isDebug())
                             finalTimeout = Integer.MAX_VALUE;
                         Function<Activity, String> validateActivity = activity -> {
-                            if (activity.text().equals(expected)) {
+                            if (activity.getText().equals(expected)) {
                                 System.out.println(String.format("TestTurn(tid:%s): Validated text is: %s", Thread.currentThread().getId(), expected));
                                 System.out.flush();
 
@@ -313,7 +307,7 @@ public class TestFlow {
                             System.out.println(String.format("TestTurn(tid:%s): Failed validate text is: %s", Thread.currentThread().getId(), expected));
                             System.out.flush();
 
-                            return String.format("FAIL: %s received in Activity.text (%s expected)", activity.text(), expected);
+                            return String.format("FAIL: %s received in Activity.text (%s expected)", activity.getText(), expected);
                         };
 
 
@@ -334,7 +328,7 @@ public class TestFlow {
                                 // if we have a reply
                                 System.out.println(String.format("TestTurn(tid:%s): Received Reply: %s",
                                         Thread.currentThread().getId(),
-                                        String.format("\n========\n To:%s\n From:%s\n Msg:%s\n=======", replyActivity.recipient().name(), replyActivity.from().name(), replyActivity.text())
+                                        String.format("\n========\n To:%s\n From:%s\n Msg:%s\n=======", replyActivity.getRecipient().getName(), replyActivity.getFrom().getName(), replyActivity.getText())
                                 ));
                                 System.out.flush();
                                 return validateActivity.apply(replyActivity);
@@ -367,8 +361,6 @@ public class TestFlow {
      *
      * @param userSays
      * @param expected
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow Test(String userSays, String expected) {
@@ -392,8 +384,6 @@ public class TestFlow {
      *
      * @param userSays
      * @param expected
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow Test(String userSays, Activity expected) {
@@ -417,8 +407,6 @@ public class TestFlow {
      *
      * @param userSays
      * @param expected
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow Test(String userSays, Function<Activity, String> expected) {
@@ -441,8 +429,6 @@ public class TestFlow {
      * Assert that reply is one of the candidate responses
      *
      * @param candidates
-     * @param description
-     * @param timeout
      * @return
      */
     public TestFlow AssertReplyOneOf(String[] candidates) {
@@ -459,7 +445,7 @@ public class TestFlow {
 
         return this.AssertReply((reply) -> {
             for (String candidate : candidates) {
-                if (reply.text() == candidate)
+                if (StringUtils.equals(reply.getText(), candidate))
                     return null;
             }
             return String.format("%s: Not one of candidates: %s", description, String.join("\n ", candidates));

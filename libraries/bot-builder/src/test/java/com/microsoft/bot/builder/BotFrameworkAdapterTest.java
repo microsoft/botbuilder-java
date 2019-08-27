@@ -1,7 +1,9 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.*;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.*;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,13 +32,13 @@ public class BotFrameworkAdapterTest {
         };
 
         SimpleAdapter a = new SimpleAdapter(validateResponse);
-        TurnContextImpl c = new TurnContextImpl(a, new ActivityImpl());
+        TurnContextImpl c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
         String activityId = UUID.randomUUID().toString();
-        ActivityImpl activity = TestMessage.Message()
-                .withId(activityId);
+        Activity activity = TestMessage.Message();
+        activity.setId(activityId);
 
         ResourceResponse resourceResponse = c.SendActivity(activity);
-        Assert.assertTrue("Incorrect response Id returned", resourceResponse.id() == activityId);
+        Assert.assertTrue("Incorrect response Id returned", StringUtils.equals(resourceResponse.getId(), activityId));
     }
 }

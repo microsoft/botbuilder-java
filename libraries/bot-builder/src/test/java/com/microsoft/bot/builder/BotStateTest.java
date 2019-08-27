@@ -10,8 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.ChannelAccount;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.rest.RestClient;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -33,9 +33,8 @@ public class BotStateTest {
     protected void initializeClients(RestClient restClient, String botId, String userId) {
 
         connector = new RestConnectorClient(restClient);
-        bot = new ChannelAccount().withId(botId);
-        user = new ChannelAccount().withId(userId);
-
+        bot = new ChannelAccount(botId);
+        user = new ChannelAccount(userId);
     }
 
 
@@ -67,7 +66,7 @@ public class BotStateTest {
                 System.out.flush();
                 TestState userState = StateTurnContextExtensions.<TestState>GetUserState(context);
                 Assert.assertNotNull("user state should exist", userState);
-                switch (context.getActivity().text()) {
+                switch (context.getActivity().getText()) {
                     case "set value":
                         userState.withValue("test");
                         try {
@@ -107,7 +106,7 @@ public class BotStateTest {
                             TestPocoState userState = StateTurnContextExtensions.<TestPocoState>GetUserState(context);
 
                             Assert.assertNotNull("user state should exist", userState);
-                            switch (context.getActivity().text()) {
+                            switch (context.getActivity().getText()) {
                                 case "set value":
                                     userState.setValue("test");
                                     try {
@@ -142,7 +141,7 @@ public class BotStateTest {
                 {
                         TestState conversationState = StateTurnContextExtensions.<TestState>GetConversationState(context);
                         Assert.assertNotNull("state.conversation should exist", conversationState);
-                        switch (context.getActivity().text()) {
+                        switch (context.getActivity().getText()) {
                             case "set value":
                                 conversationState.withValue("test");
                                 try {
@@ -177,7 +176,7 @@ public class BotStateTest {
                 {
                         TestPocoState conversationState = StateTurnContextExtensions.<TestPocoState>GetConversationState(context);
                         Assert.assertNotNull("state.conversation should exist", conversationState);
-                        switch (context.getActivity().text()) {
+                        switch (context.getActivity().getText()) {
                             case "set value":
                                 conversationState.setValue("test");
                                 try {
@@ -215,7 +214,7 @@ public class BotStateTest {
                 {
                         CustomState customState = CustomKeyState.Get(context);
 
-                        switch (context.getActivity().text()) {
+                        switch (context.getActivity().getText()) {
                             case "set value":
                                 customState.setCustomString(testGuid);
                                 try {
@@ -247,13 +246,13 @@ public class BotStateTest {
         new TestFlow(adapter,
                 (context) ->
                 {
-                        System.out.println(String.format(">>Test Callback(tid:%s): STARTING : %s", Thread.currentThread().getId(), context.getActivity().text()));
+                        System.out.println(String.format(">>Test Callback(tid:%s): STARTING : %s", Thread.currentThread().getId(), context.getActivity().getText()));
                         System.out.flush();
                         TypedObject conversation = StateTurnContextExtensions.<TypedObject>GetConversationState(context);
                         Assert.assertNotNull("conversationstate should exist", conversation);
-                        System.out.println(String.format(">>Test Callback(tid:%s): Text is : %s", Thread.currentThread().getId(), context.getActivity().text()));
+                        System.out.println(String.format(">>Test Callback(tid:%s): Text is : %s", Thread.currentThread().getId(), context.getActivity().getText()));
                         System.out.flush();
-                        switch (context.getActivity().text()) {
+                        switch (context.getActivity().getText()) {
                             case "set value":
                                 conversation.withName("test");
                                 try {
@@ -262,7 +261,7 @@ public class BotStateTest {
                                     System.out.flush();
                                     ResourceResponse response = context.SendActivity("value saved");
                                     System.out.println(String.format(">>Test Callback(tid:%s): Response Id: %s", Thread.currentThread().getId(),
-                                            response.id()));
+                                            response.getId()));
                                     System.out.flush();
 
                                 } catch (Exception e) {
@@ -300,7 +299,7 @@ public class BotStateTest {
                 {
                         TypedObject conversation = StateTurnContextExtensions.<TypedObject>GetConversationState(context);
                         Assert.assertNotNull("conversationstate should exist", conversation);
-                        switch (context.getActivity().text()) {
+                        switch (context.getActivity().getText()) {
                             case "set value":
                                 conversation.withName("test");
                                 try {
@@ -335,7 +334,7 @@ public class BotStateTest {
                 {
                         BotState botStateManager = new BotState<CustomState>(new MemoryStorage(), "BotState:com.microsoft.bot.builder.core.extensions.BotState<CustomState>",
                                 (ctx) -> String.format("botstate/%s/%s/com.microsoft.bot.builder.core.extensions.BotState<CustomState>",
-                                        ctx.getActivity().channelId(), ctx.getActivity().conversation().id()), CustomState::new);
+                                        ctx.getActivity().getChannelId(), ctx.getActivity().getConversation().getId()), CustomState::new);
 
                         // read initial state object
                         CustomState customState = null;

@@ -5,6 +5,7 @@ package com.microsoft.bot.sample.spring;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
+import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,7 @@ import javax.annotation.PostConstruct;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ActivityTypes;
+import com.microsoft.bot.schema.ActivityTypes;
 
 import java.util.concurrent.CompletionException;
 
@@ -66,14 +66,14 @@ public class BotController {
         try {
             JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider())
                 .thenRunAsync(() -> {
-                    if (activity.type().equals(ActivityTypes.MESSAGE)) {
-                        logger.info("Received: " + activity.text());
+                    if (activity.getType().equals(ActivityTypes.MESSAGE)) {
+                        logger.info("Received: " + activity.getText());
 
                         // reply activity with the same text
-                        ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), _credentials);
-                        connector.conversations().sendToConversation(activity.conversation().id(),
-                                new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
-                                        .withRecipient(activity.from()).withFrom(activity.recipient()));
+                        ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), _credentials);
+                        connector.conversations().sendToConversation(
+                            activity.getConversation().getId(),
+                            activity.createReply("Echo: " + activity.getText()));
                     }
                 }, ExecutorFactory.getExecutor()).join();
         } catch (CompletionException ex) {
