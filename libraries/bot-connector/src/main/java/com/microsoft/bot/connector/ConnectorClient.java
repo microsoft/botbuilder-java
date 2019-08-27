@@ -67,14 +67,16 @@ public interface ConnectorClient {
     void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout);
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true..
+     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * is true.
      *
      * @return the generateClientRequestId value.
      */
     boolean getGenerateClientRequestId();
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true..
+     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.
      * @return the service client itself

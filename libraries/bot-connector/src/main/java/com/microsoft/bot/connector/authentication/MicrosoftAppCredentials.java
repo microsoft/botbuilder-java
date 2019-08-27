@@ -47,7 +47,8 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
         this.appPassword = appPassword;
     }
 
-    public MicrosoftAppCredentials(String appId, String appPassword, String channelAuthTenant) throws MalformedURLException {
+    public MicrosoftAppCredentials(String appId, String appPassword, String channelAuthTenant)
+        throws MalformedURLException {
         this.appId = appId;
         this.appPassword = appPassword;
         setChannelAuthTenant(channelAuthTenant);
@@ -89,11 +90,13 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
     }
 
     public static boolean isTrustedServiceUrl(URL url) {
-        return !trustHostNames.getOrDefault(url.getHost(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
+        return !trustHostNames.getOrDefault(
+            url.getHost(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
     }
 
     public static boolean isTrustedServiceUrl(HttpUrl url) {
-        return !trustHostNames.getOrDefault(url.host(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
+        return !trustHostNames.getOrDefault(
+            url.host(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
     }
 
     public String appId() {

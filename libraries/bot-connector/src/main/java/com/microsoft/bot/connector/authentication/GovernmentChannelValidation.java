@@ -38,7 +38,10 @@ public class GovernmentChannelValidation {
      * On join:
      * @throws AuthenticationException Authentication failed.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String serviceUrl, String channelId) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      String serviceUrl,
+                                                                      String channelId) {
         return authenticateToken(authHeader, credentials, serviceUrl, channelId, new AuthenticationConfiguration());
     }
 
@@ -55,7 +58,11 @@ public class GovernmentChannelValidation {
      * On join:
      * @throws AuthenticationException Authentication failed.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String serviceUrl, String channelId, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      String serviceUrl,
+                                                                      String channelId,
+                                                                      AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
@@ -78,7 +85,9 @@ public class GovernmentChannelValidation {
      * On join:
      * @throws AuthenticationException Validation failed.
      */
-    public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity, CredentialProvider credentials, String serviceUrl) {
+    public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity,
+                                                                     CredentialProvider credentials,
+                                                                     String serviceUrl) {
 
         return CompletableFuture.supplyAsync(() -> {
             if (identity == null || !identity.isAuthenticated()) {
@@ -104,16 +113,19 @@ public class GovernmentChannelValidation {
 
             boolean isValid = credentials.isValidAppIdAsync(appIdFromAudienceClaim).join();
             if (!isValid) {
-                throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
+                throw new AuthenticationException(
+                    String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
             }
 
             String serviceUrlClaim = identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
             if (StringUtils.isEmpty(serviceUrl)) {
-                throw new AuthenticationException(String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
+                throw new AuthenticationException(
+                    String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
             }
 
             if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
-                throw new AuthenticationException(String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
+                throw new AuthenticationException(
+                    String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
             }
 
             return identity;

@@ -17,10 +17,12 @@ public class AdalAuthenticator {
     private OAuthConfiguration oAuthConfiguration;
     private ClientCredential clientCredential;
 
-    public AdalAuthenticator(ClientCredential clientCredential, OAuthConfiguration configurationOAuth) throws MalformedURLException {
+    public AdalAuthenticator(ClientCredential clientCredential, OAuthConfiguration configurationOAuth)
+        throws MalformedURLException {
         this.oAuthConfiguration = configurationOAuth;
         this.clientCredential = clientCredential;
-        this.context = new AuthenticationContext(configurationOAuth.authority(), false, ExecutorFactory.getExecutor());
+        this.context = new AuthenticationContext(configurationOAuth.authority(), false,
+            ExecutorFactory.getExecutor());
     }
 
     public Future<AuthenticationResult> acquireToken() {

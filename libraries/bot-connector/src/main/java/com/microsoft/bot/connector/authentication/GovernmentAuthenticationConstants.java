@@ -13,7 +13,8 @@ public class GovernmentAuthenticationConstants {
     /**
      * TO GOVERNMENT CHANNEL FROM BOT: Login URL.
      */
-    public static final String TO_CHANNEL_FROM_BOT_LOGIN_URL = "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e";
+    public static final String TO_CHANNEL_FROM_BOT_LOGIN_URL =
+        "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e";
 
     /**
      * TO GOVERNMENT CHANNEL FROM BOT: OAuth scope to request.
@@ -33,11 +34,13 @@ public class GovernmentAuthenticationConstants {
     /**
      * TO BOT FROM GOVERNMANT CHANNEL: OpenID metadata document for tokens coming from MSA.
      */
-    public static final String TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL = "https://login.botframework.azure.us/v1/.well-known/openidconfiguration";
+    public static final String TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL =
+        "https://login.botframework.azure.us/v1/.well-known/openidconfiguration";
 
     /**
      * TO BOT FROM GOVERNMENT EMULATOR: OpenID metadata document for tokens coming from MSA.
      */
-    public static final String TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL = "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration";
+    public static final String TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL =
+        "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration";
 }
 

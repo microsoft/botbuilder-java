@@ -53,12 +53,17 @@ public class RestAttachments implements Attachments {
     interface AttachmentsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
         @GET("v3/attachments/{attachmentId}")
-        Observable<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        Observable<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId,
+                                                             @Header("accept-language") String acceptLanguage,
+                                                             @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachment" })
         @GET("v3/attachments/{attachmentId}/views/{viewId}")
         @Streaming
-        Observable<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId, @Path("viewId") String viewId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        Observable<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId,
+                                                         @Path("viewId") String viewId,
+                                                         @Header("accept-language") String acceptLanguage,
+                                                         @Header("User-Agent") String userAgent);
 
     }
 
@@ -85,7 +90,8 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
-    public ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId, final ServiceCallback<AttachmentInfo> serviceCallback) {
+    public ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(
+        String attachmentId, final ServiceCallback<AttachmentInfo> serviceCallback) {
         return ServiceFuture.fromResponse(getAttachmentInfoWithServiceResponseAsync(attachmentId), serviceCallback);
     }
 
@@ -98,12 +104,7 @@ public class RestAttachments implements Attachments {
      * @return the observable to the AttachmentInfo object
      */
     public Observable<AttachmentInfo> getAttachmentInfoAsync(String attachmentId) {
-        return getAttachmentInfoWithServiceResponseAsync(attachmentId).map(new Func1<ServiceResponse<AttachmentInfo>, AttachmentInfo>() {
-            @Override
-            public AttachmentInfo call(ServiceResponse<AttachmentInfo> response) {
-                return response.body();
-            }
-        });
+        return getAttachmentInfoWithServiceResponseAsync(attachmentId).map(response -> response.body());
     }
 
     /**
@@ -119,20 +120,19 @@ public class RestAttachments implements Attachments {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
         return service.getAttachmentInfo(attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AttachmentInfo>>>() {
-                @Override
-                public Observable<ServiceResponse<AttachmentInfo>> call(Response<ResponseBody> response) {
-                    try {
-                        ServiceResponse<AttachmentInfo> clientResponse = getAttachmentInfoDelegate(response);
-                        return Observable.just(clientResponse);
-                    } catch (Throwable t) {
-                        return Observable.error(t);
-                    }
+            .flatMap((Func1<Response<ResponseBody>, Observable<ServiceResponse<AttachmentInfo>>>) response -> {
+                try {
+                    ServiceResponse<AttachmentInfo> clientResponse = getAttachmentInfoDelegate(response);
+                    return Observable.just(clientResponse);
+                } catch (Throwable t) {
+                    return Observable.error(t);
                 }
             });
     }
 
-    private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(Response<ResponseBody> response)
+        throws ErrorResponseException, IOException, IllegalArgumentException {
+
         return this.client.restClient().responseBuilderFactory().<AttachmentInfo, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<AttachmentInfo>() { }.getType())
                 .registerError(ErrorResponseException.class)
@@ -164,7 +164,9 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
-    public ServiceFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId, final ServiceCallback<InputStream> serviceCallback) {
+    public ServiceFuture<InputStream> getAttachmentAsync(String attachmentId,
+                                                         String viewId,
+                                                         final ServiceCallback<InputStream> serviceCallback) {
         return ServiceFuture.fromResponse(getAttachmentWithServiceResponseAsync(attachmentId, viewId), serviceCallback);
     }
 
@@ -178,12 +180,7 @@ public class RestAttachments implements Attachments {
      * @return the observable to the InputStream object
      */
     public Observable<InputStream> getAttachmentAsync(String attachmentId, String viewId) {
-        return getAttachmentWithServiceResponseAsync(attachmentId, viewId).map(new Func1<ServiceResponse<InputStream>, InputStream>() {
-            @Override
-            public InputStream call(ServiceResponse<InputStream> response) {
-                return response.body();
-            }
-        });
+        return getAttachmentWithServiceResponseAsync(attachmentId, viewId).map(response -> response.body());
     }
 
     /**
@@ -195,7 +192,8 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the InputStream object
      */
-    public Observable<ServiceResponse<InputStream>> getAttachmentWithServiceResponseAsync(String attachmentId, String viewId) {
+    public Observable<ServiceResponse<InputStream>> getAttachmentWithServiceResponseAsync(String attachmentId,
+                                                                                          String viewId) {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
@@ -203,20 +201,19 @@ public class RestAttachments implements Attachments {
             throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
         }
         return service.getAttachment(attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<InputStream>>>() {
-                @Override
-                public Observable<ServiceResponse<InputStream>> call(Response<ResponseBody> response) {
-                    try {
-                        ServiceResponse<InputStream> clientResponse = getAttachmentDelegate(response);
-                        return Observable.just(clientResponse);
-                    } catch (Throwable t) {
-                        return Observable.error(t);
-                    }
+            .flatMap((Func1<Response<ResponseBody>, Observable<ServiceResponse<InputStream>>>) response -> {
+                try {
+                    ServiceResponse<InputStream> clientResponse = getAttachmentDelegate(response);
+                    return Observable.just(clientResponse);
+                } catch (Throwable t) {
+                    return Observable.error(t);
                 }
             });
     }
 
-    private ServiceResponse<InputStream> getAttachmentDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<InputStream> getAttachmentDelegate(Response<ResponseBody> response)
+        throws ErrorResponseException, IOException, IllegalArgumentException {
+
         return this.client.restClient().responseBuilderFactory().<InputStream, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<InputStream>() { }.getType())
                 .register(301, new TypeToken<Void>() { }.getType())
@@ -224,5 +221,4 @@ public class RestAttachments implements Attachments {
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
-
 }

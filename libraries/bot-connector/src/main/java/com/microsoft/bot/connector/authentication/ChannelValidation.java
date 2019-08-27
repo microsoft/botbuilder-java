@@ -36,7 +36,8 @@ public class ChannelValidation {
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader, CredentialProvider credentials, String channelId) {
         return authenticateToken(authHeader, credentials, channelId, new AuthenticationConfiguration());
     }
 
@@ -52,7 +53,8 @@ public class ChannelValidation {
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader, CredentialProvider credentials, String channelId, AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
@@ -89,7 +91,8 @@ public class ChannelValidation {
                 }
 
                 if (!credentials.isValidAppIdAsync(appIdFromAudienceClaim).join()) {
-                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
+                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.",
+                        appIdFromAudienceClaim));
                 }
 
                 return identity;
@@ -108,7 +111,8 @@ public class ChannelValidation {
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader, CredentialProvider credentials, String channelId, String serviceUrl) {
         return authenticateToken(authHeader, credentials, channelId, serviceUrl, new AuthenticationConfiguration());
     }
 
@@ -125,17 +129,24 @@ public class ChannelValidation {
      * On join:
      * @throws AuthenticationException A token issued by the Bot Framework emulator will FAIL this check.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      String channelId,
+                                                                      String serviceUrl,
+                                                                      AuthenticationConfiguration authConfig) {
         return ChannelValidation.authenticateToken(authHeader, credentials, channelId, authConfig)
             .thenApply(identity -> {
                 if (!identity.claims().containsKey(AuthenticationConstants.SERVICE_URL_CLAIM)) {
                     // Claim must be present. Not Authorized.
-                    throw new AuthenticationException(String.format("'%s' claim is required on Channel Token.", AuthenticationConstants.SERVICE_URL_CLAIM));
+                    throw new AuthenticationException(String.format("'%s' claim is required on Channel Token.",
+                        AuthenticationConstants.SERVICE_URL_CLAIM));
                 }
 
                 if (!serviceUrl.equalsIgnoreCase(identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM))) {
                     // Claim must match. Not Authorized.
-                    throw new AuthenticationException(String.format("'%s' claim does not match service url provided (%s).", AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl));
+                    throw new AuthenticationException(
+                        String.format("'%s' claim does not match service url provided (%s).",
+                            AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl));
                 }
 
                 return identity;

@@ -9,7 +9,6 @@ import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Contains helper methods for authenticating incoming HTTP requests.
@@ -25,8 +24,12 @@ public class JwtTokenValidation {
      * @return A task that represents the work queued to execute.
      * @throws AuthenticationException Throws on auth failed.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials, ChannelProvider channelProvider) throws AuthenticationException, InterruptedException, ExecutionException {
-        return authenticateRequest(activity, authHeader, credentials, channelProvider, new AuthenticationConfiguration());
+    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity,
+                                                                        String authHeader,
+                                                                        CredentialProvider credentials,
+                                                                        ChannelProvider channelProvider) {
+        return authenticateRequest(
+            activity, authHeader, credentials, channelProvider, new AuthenticationConfiguration());
     }
 
     /**
@@ -39,7 +42,11 @@ public class JwtTokenValidation {
      * @return A task that represents the work queued to execute.
      * @throws AuthenticationException Throws on auth failed.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity, String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, AuthenticationConfiguration authConfig) throws AuthenticationException, InterruptedException, ExecutionException {
+    public static CompletableFuture<ClaimsIdentity> authenticateRequest(Activity activity,
+                                                                        String authHeader,
+                                                                        CredentialProvider credentials,
+                                                                        ChannelProvider channelProvider,
+                                                                        AuthenticationConfiguration authConfig) {
         return CompletableFuture.supplyAsync(() -> {
             if (StringUtils.isEmpty(authHeader)) {
                 // No auth header was sent. We might be on the anonymous code path.
@@ -57,7 +64,14 @@ public class JwtTokenValidation {
 
             // Go through the standard authentication path.  This will throw AuthenticationException if
             // it fails.
-            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(authHeader, credentials, channelProvider, activity.getChannelId(), activity.getServiceUrl(), authConfig).join();
+            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
+                authHeader,
+                credentials,
+                channelProvider,
+                activity.getChannelId(),
+                activity.getServiceUrl(),
+                authConfig)
+                .join();
 
             // On the standard Auth path, we need to trust the URL that was incoming.
             MicrosoftAppCredentials.trustServiceUrl(activity.getServiceUrl());
@@ -82,8 +96,13 @@ public class JwtTokenValidation {
      * On join:
      * @throws AuthenticationException Authentication Error
      */
-    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl) {
-        return validateAuthHeader(authHeader, credentials, channelProvider, channelId, serviceUrl, new AuthenticationConfiguration());
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader,
+                                                                       CredentialProvider credentials,
+                                                                       ChannelProvider channelProvider,
+                                                                       String channelId,
+                                                                       String serviceUrl) {
+        return validateAuthHeader(
+            authHeader, credentials, channelProvider, channelId, serviceUrl, new AuthenticationConfiguration());
     }
 
     /**
@@ -103,14 +122,20 @@ public class JwtTokenValidation {
      * On Join:
      * @throws AuthenticationException Authentication Error
      */
-    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, String serviceUrl, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> validateAuthHeader(String authHeader,
+                                                                       CredentialProvider credentials,
+                                                                       ChannelProvider channelProvider,
+                                                                       String channelId,
+                                                                       String serviceUrl,
+                                                                       AuthenticationConfiguration authConfig) {
         if (StringUtils.isEmpty(authHeader)) {
             throw new IllegalArgumentException("No authHeader present. Auth is required.");
         }
 
         boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
         if (usingEmulator) {
-            return EmulatorValidation.authenticateToken(authHeader, credentials, channelProvider, channelId, authConfig);
+            return EmulatorValidation.authenticateToken(
+                authHeader, credentials, channelProvider, channelId, authConfig);
         } else if (channelProvider == null || channelProvider.isPublicAzure()) {
             // No empty or null check. Empty can point to issues. Null checks only.
             if (serviceUrl != null) {
@@ -119,9 +144,11 @@ public class JwtTokenValidation {
                 return ChannelValidation.authenticateToken(authHeader, credentials, channelId, authConfig);
             }
         } else if (channelProvider.isGovernment()) {
-            return GovernmentChannelValidation.authenticateToken(authHeader, credentials, serviceUrl, channelId, authConfig);
+            return GovernmentChannelValidation.authenticateToken(
+                authHeader, credentials, serviceUrl, channelId, authConfig);
         } else {
-            return EnterpriseChannelValidation.authenticateToken(authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig);
+            return EnterpriseChannelValidation.authenticateToken(
+                authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig);
         }
     }
 }

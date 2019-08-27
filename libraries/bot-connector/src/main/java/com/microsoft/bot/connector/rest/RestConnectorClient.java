@@ -114,11 +114,11 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.longRunningOperationRetryTimeout = longRunningOperationRetryTimeout;
     }
 
-    /** When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true. */
+    /** When set to true a unique x-ms-client-request-id value is generated and included in each request. */
     private boolean generateClientRequestId;
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @return the generateClientRequestId value.
      */
@@ -128,7 +128,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @param generateClientRequestId the generateClientRequestId value.
      */
@@ -204,7 +204,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.azureClient = new AzureClient(this);
 
 
-        // Format according to https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
+        // Format according to: https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
         String build_version;
         final Properties properties = new Properties();
         try {

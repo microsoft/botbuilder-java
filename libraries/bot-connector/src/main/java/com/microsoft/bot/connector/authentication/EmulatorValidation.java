@@ -20,20 +20,20 @@ public class EmulatorValidation {
      * TO BOT FROM EMULATOR: Token validation parameters when connecting to a channel.
      */
     private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
-            this.validateIssuer = true;
-            this.validIssuers = new ArrayList<String>() {{
-                add("https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/");               // Auth v3.1, 1.0 token
-                add("https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0"); // Auth v3.1, 2.0 token
-                add("https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/");               // Auth v3.2, 1.0 token
-                add("https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0"); // Auth v3.2, 2.0 token
-                add("https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/");               // Auth for US Gov, 1.0 token
-                add("https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0");  // Auth for US Gov, 2.0 token
-            }};
-            this.validateAudience = false;
-            this.validateLifetime = true;
-            this.clockSkew = Duration.ofMinutes(5);
-            this.requireSignedTokens = true;
+        this.validateIssuer = true;
+        this.validIssuers = new ArrayList<String>() {{
+            add("https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/");               // Auth v3.1, 1.0
+            add("https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0"); // Auth v3.1, 2.0
+            add("https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/");               // Auth v3.2, 1.0
+            add("https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0"); // Auth v3.2, 2.0
+            add("https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/");               // Auth for US Gov, 1.0
+            add("https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0");  // Auth for US Gov, 2.0
         }};
+        this.validateAudience = false;
+        this.validateLifetime = true;
+        this.clockSkew = Duration.ofMinutes(5);
+        this.requireSignedTokens = true;
+    }};
 
     /**
      * Determines if a given Auth header is from the Bot Framework Emulator
@@ -92,9 +92,11 @@ public class EmulatorValidation {
      * @return A valid ClaimsIdentity.
      * <p>
      * On join:
-     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator
+     * tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId) {
         return authenticateToken(authHeader, credentials, channelProvider, channelId, new AuthenticationConfiguration());
     }
 
@@ -110,9 +112,14 @@ public class EmulatorValidation {
      * @return A valid ClaimsIdentity.
      * <p>
      * On join:
-     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator
+     * tokens will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      ChannelProvider channelProvider,
+                                                                      String channelId,
+                                                                      AuthenticationConfiguration authConfig) {
         String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment() ?
             GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL :
             AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
@@ -139,7 +146,8 @@ public class EmulatorValidation {
                 // comes from developer code that may be reaching out to a service, hence the
                 // Async validation.
                 if (!identity.claims().containsKey(AuthenticationConstants.VERSION_CLAIM)) {
-                    throw new AuthenticationException(String.format("'%s' claim is required on Emulator Tokens.", AuthenticationConstants.VERSION_CLAIM));
+                    throw new AuthenticationException(String.format("'%s' claim is required on Emulator Tokens.",
+                        AuthenticationConstants.VERSION_CLAIM));
                 }
 
                 String tokenVersion = identity.claims().get(AuthenticationConstants.VERSION_CLAIM);
@@ -152,7 +160,9 @@ public class EmulatorValidation {
                     // the claim in the "appid" claim.
                     if (!identity.claims().containsKey(AuthenticationConstants.APPID_CLAIM)) {
                         // No claim around AppID. Not Authorized.
-                        throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '1.0'.", AuthenticationConstants.APPID_CLAIM));
+                        throw new AuthenticationException(
+                            String.format("'%s' claim is required on Emulator Token version '1.0'.",
+                                AuthenticationConstants.APPID_CLAIM));
                     }
 
                     appId = identity.claims().get(AuthenticationConstants.APPID_CLAIM);
@@ -160,17 +170,21 @@ public class EmulatorValidation {
                     // Emulator, "2.0" puts the AppId in the "azp" claim.
                     if (!identity.claims().containsKey(AuthenticationConstants.AUTHORIZED_PARTY)) {
                         // No claim around AppID. Not Authorized.
-                        throw new AuthenticationException(String.format("'%s' claim is required on Emulator Token version '2.0'.", AuthenticationConstants.AUTHORIZED_PARTY));
+                        throw new AuthenticationException(
+                            String.format("'%s' claim is required on Emulator Token version '2.0'.",
+                                AuthenticationConstants.AUTHORIZED_PARTY));
                     }
 
                     appId = identity.claims().get(AuthenticationConstants.AUTHORIZED_PARTY);
                 } else {
                     // Unknown Version. Not Authorized.
-                    throw new AuthenticationException(String.format("Unknown Emulator Token version '%s'.", tokenVersion));
+                    throw new AuthenticationException(
+                        String.format("Unknown Emulator Token version '%s'.", tokenVersion));
                 }
 
                 if (!credentials.isValidAppIdAsync(appId).join()) {
-                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appId));
+                    throw new AuthenticationException(
+                        String.format("Invalid AppId passed on token: '%s'.", appId));
                 }
 
                 return identity;

@@ -34,10 +34,16 @@ public class EnterpriseChannelValidation {
      * @return A valid ClaimsIdentity.
      *
      * On join:
-     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens
+     * will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId) {
-        return authenticateToken(authHeader, credentials, channelProvider, serviceUrl, channelId, new AuthenticationConfiguration());
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      ChannelProvider channelProvider,
+                                                                      String serviceUrl,
+                                                                      String channelId) {
+        return authenticateToken(
+            authHeader, credentials, channelProvider, serviceUrl, channelId, new AuthenticationConfiguration());
     }
 
     /**
@@ -52,9 +58,15 @@ public class EnterpriseChannelValidation {
      * @return A valid ClaimsIdentity.
      *
      * On join:
-     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens
+     * will pass.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String serviceUrl, String channelId, AuthenticationConfiguration authConfig) {
+    public static CompletableFuture<ClaimsIdentity> authenticateToken(String authHeader,
+                                                                      CredentialProvider credentials,
+                                                                      ChannelProvider channelProvider,
+                                                                      String serviceUrl,
+                                                                      String channelId,
+                                                                      AuthenticationConfiguration authConfig) {
         if (authConfig == null) {
             throw new IllegalArgumentException("Missing AuthenticationConfiguration");
         }
@@ -64,7 +76,8 @@ public class EnterpriseChannelValidation {
             .thenCompose(channelService -> {
                 JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
                     TOKENVALIDATIONPARAMETERS,
-                    String.format(AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT, channelService),
+                    String.format(AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT,
+                        channelService),
                     AuthenticationConstants.AllowedSigningAlgorithms);
 
                 return tokenExtractor.getIdentityAsync(authHeader, channelId, authConfig.requiredEndorsements());
@@ -80,7 +93,9 @@ public class EnterpriseChannelValidation {
             });
     }
 
-    public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity, CredentialProvider credentials, String serviceUrl) {
+    public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity,
+                                                                     CredentialProvider credentials,
+                                                                     String serviceUrl) {
         return CompletableFuture.supplyAsync(() -> {
             if (identity == null || !identity.isAuthenticated()) {
                 throw new AuthenticationException("Invalid Identity");
@@ -105,16 +120,19 @@ public class EnterpriseChannelValidation {
 
             boolean isValid = credentials.isValidAppIdAsync(appIdFromAudienceClaim).join();
             if (!isValid) {
-                throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
+                throw new AuthenticationException(
+                    String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
             }
 
             String serviceUrlClaim = identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
             if (StringUtils.isEmpty(serviceUrl)) {
-                throw new AuthenticationException(String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
+                throw new AuthenticationException(
+                    String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
             }
 
             if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
-                throw new AuthenticationException(String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
+                throw new AuthenticationException(
+                    String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
             }
 
             return identity;

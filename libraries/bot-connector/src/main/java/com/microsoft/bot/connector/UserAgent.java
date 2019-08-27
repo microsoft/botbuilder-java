@@ -23,7 +23,8 @@ public class UserAgent {
         String build_version;
         final Properties properties = new Properties();
         try {
-            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
+            InputStream propStream = RestConnectorClient.class.getClassLoader()
+                .getResourceAsStream("project.properties");
             properties.load(propStream);
             build_version = properties.getProperty("version");
         } catch (IOException e) {
