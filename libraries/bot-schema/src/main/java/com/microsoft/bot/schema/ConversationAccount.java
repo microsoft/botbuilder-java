@@ -6,7 +6,13 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Conversation account represents the identity of the conversation within a channel.
@@ -80,7 +86,8 @@ public class ConversationAccount {
      * @param withName Display friendly name.
      */
     public ConversationAccount(boolean withIsGroup, String withId, String withName) {
-        this(withIsGroup, null, withId, withName, null, null, null);
+        this(withIsGroup, null, withId, withName,
+            null, null, null);
     }
 
     /**
@@ -97,7 +104,8 @@ public class ConversationAccount {
      *                 include: 'user', 'bot'.
      * @param withTenantId This conversation's tenant ID.
      */
-    public ConversationAccount(boolean withIsGroup, String withConversationType, String withId, String withName, String withAadObjectId, RoleTypes withRole, String withTenantId) {
+    public ConversationAccount(boolean withIsGroup, String withConversationType, String withId, String withName,
+                               String withAadObjectId, RoleTypes withRole, String withTenantId) {
         this.isGroup = withIsGroup;
         this.conversationType = withConversationType;
         this.id = withId;
@@ -223,9 +231,28 @@ public class ConversationAccount {
      * Holds the overflow properties that aren't first class
      * properties in the object.  This allows extensibility
      * while maintaining the object.
-     *
      */
-//    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+
+    public static ConversationAccount clone(ConversationAccount conversationAccount) {
+        if (conversationAccount == null) {
+            return null;
+        }
+
+        return new ConversationAccount() {{
+            setId(conversationAccount.getId());
+            setName(conversationAccount.getName());
+            setIsGroup(conversationAccount.isGroup());
+            setConversationType(conversationAccount.getConversationType());
+            setAadObjectId(conversationAccount.getAadObjectId());
+            setRole(conversationAccount.getRole());
+            setAadObjectId(conversationAccount.getAadObjectId());
+
+            for (String key : conversationAccount.getProperties().keySet()) {
+                this.setProperties(key, conversationAccount.getProperties().get(key));
+            }
+        }};
+    }
 
     /**
      * Overflow properties.
@@ -234,20 +261,20 @@ public class ConversationAccount {
      *
      * @return A Key-Value map of the properties
      */
-//    @JsonAnyGetter
-//    public Map<String, JsonNode> properties() {
-//        return this.properties;
-//    }
+    @JsonAnyGetter
+    public Map<String, JsonNode> getProperties() {
+        return this.properties;
+    }
 
     /**
      * Set overflow properties.
      *
-     * @param key Key for the property
+     * @param key   Key for the property
      * @param value JsonNode of value (can be nested)
-     *
      */
-//    @JsonAnySetter
-//    public void setProperties(String key, JsonNode value) {
-//        this.properties.put(key, value);
-//    }
+    @JsonAnySetter
+    public void setProperties(String key, JsonNode value) {
+
+        this.properties.put(key, value);
+    }
 }

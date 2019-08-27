@@ -8,7 +8,10 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * SuggestedActions that can be performed.
@@ -27,6 +30,35 @@ public class SuggestedActions {
      */
     @JsonProperty(value = "actions")
     private List<CardAction> actions;
+
+    public static SuggestedActions clone(SuggestedActions suggestedActions) {
+        if (suggestedActions == null) {
+            return null;
+        }
+
+        return new SuggestedActions() {{
+            setTo(suggestedActions.getTo());
+
+            setActions(suggestedActions.getActions().stream()
+                .map(card -> CardAction.clone(card))
+                .collect(Collectors.toCollection(ArrayList::new)));
+        }};
+    }
+
+    /**
+     * Default empty SuggestedActions
+     */
+    public SuggestedActions() {
+
+    }
+
+    /**
+     *
+     * @param withCardActions
+     */
+    public SuggestedActions(CardAction[] withCardActions) {
+        this.setActions(Arrays.asList(withCardActions));
+    }
 
     /**
      * Get the to value.

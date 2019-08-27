@@ -57,6 +57,38 @@ public class CardAction {
     @JsonProperty(value = "channelData")
     private Object channelData;
 
+    public static CardAction clone(CardAction cardAction) {
+        if (cardAction == null) {
+            return null;
+        }
+
+        return new CardAction() {{
+           setValue(cardAction.getValue());
+           setTitle(cardAction.getTitle());
+           setDisplayText(cardAction.getDisplayText());
+           setImage(cardAction.getImage());
+           setType(cardAction.getType());
+           setText(cardAction.getText());
+           setChannelData(cardAction.getChannelData());
+        }};
+    }
+
+    /**
+     * Default empty CardAction
+     */
+    public CardAction() {
+
+    }
+
+    /**
+     * Simplify creation of CardActions with string values.
+     * @param input
+     */
+    public CardAction(String input) {
+        setTitle(input);
+        setValue(input);
+    }
+
     /**
      * Get the type value.
      *

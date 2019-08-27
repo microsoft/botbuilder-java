@@ -49,6 +49,21 @@ public class ConversationReference {
     @JsonProperty(value = "serviceUrl")
     private String serviceUrl;
 
+    public static ConversationReference clone(ConversationReference conversationReference) {
+        if (conversationReference == null) {
+            return null;
+        }
+
+        return new ConversationReference() {{
+            setActivityId(conversationReference.getActivityId());
+            setBot(ChannelAccount.clone(conversationReference.getBot()));
+            setUser(ChannelAccount.clone(conversationReference.getUser()));
+            setConversation(ConversationAccount.clone(conversationReference.getConversation()));
+            setServiceUrl(conversationReference.getServiceUrl());
+            setChannelId(conversationReference.getChannelId());
+        }};
+    }
+
     /**
      * Get the activityId value.
      *

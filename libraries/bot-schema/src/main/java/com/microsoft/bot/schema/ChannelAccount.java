@@ -11,8 +11,11 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Channel account information needed to route a message.
@@ -50,6 +53,34 @@ public class ChannelAccount {
      * while maintaining the object.
      */
     private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+
+    public static ChannelAccount clone(ChannelAccount channelAccount) {
+        if (channelAccount == null) {
+            return null;
+        }
+
+        return new ChannelAccount() {{
+            setId(channelAccount.getId());
+            setRole(channelAccount.getRole());
+            setName(channelAccount.getName());
+            setAadObjectId(channelAccount.getAadObjectId());
+
+            for (String key : channelAccount.getProperties().keySet()) {
+                this.setProperties(key, channelAccount.getProperties().get(key));
+            }
+        }};
+    }
+
+    public static List<ChannelAccount> cloneList(List<ChannelAccount> channelAccounts) {
+        if (channelAccounts == null) {
+            return null;
+        }
+
+        return channelAccounts.stream()
+            .map(channelAccount -> ChannelAccount.clone(channelAccount))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
 
     /**
      * Initializes a new instance of the ChannelAccount class.

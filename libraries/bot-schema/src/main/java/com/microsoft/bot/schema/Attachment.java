@@ -11,8 +11,11 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * An attachment within an activity.
@@ -53,6 +56,35 @@ public class Attachment {
      * while maintaining the object.
      */
     private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+
+    public static Attachment clone(Attachment attachment) {
+        if (attachment == null) {
+            return null;
+        }
+
+        return new Attachment() {{
+            setContentType(attachment.getContentType());
+            setContent(attachment.getContent());
+            setContentUrl(attachment.getContentUrl());
+            setName(attachment.getName());
+            setThumbnailUrl(attachment.getThumbnailUrl());
+
+            for (String key : attachment.getProperties().keySet()) {
+                this.setProperties(key, attachment.getProperties().get(key));
+            }
+        }};
+    }
+
+    public static List<Attachment> cloneList(List<Attachment> attachments) {
+        if (attachments == null) {
+            return null;
+        }
+
+        return attachments.stream()
+            .map(attachment -> Attachment.clone(attachment))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
 
     /**
      * Get the contentType value.

@@ -73,9 +73,9 @@ public class TranscriptLoggerMiddleware implements Middleware {
             if (role == null || StringUtils.isBlank(role.asText())) {
                 context.getActivity().getFrom().getProperties().put("role", mapper.createObjectNode().with("user"));
             }
-            Activity activityTemp = Activity.cloneActivity(context.getActivity());
+            Activity activityTemp = Activity.clone(context.getActivity());
 
-            LogActivity(Activity.cloneActivity(context.getActivity()));
+            LogActivity(Activity.clone(context.getActivity()));
         }
 
         // hook up onSend pipeline
@@ -93,7 +93,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             for (Activity activity : activities) {
-                LogActivity(Activity.cloneActivity(activity));
+                LogActivity(Activity.clone(activity));
             }
 
             return responses;
@@ -119,7 +119,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             // add Message Update activity
-            Activity updateActivity = Activity.cloneActivity(activity);
+            Activity updateActivity = Activity.clone(activity);
             updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
             LogActivity(updateActivity);
             return response;

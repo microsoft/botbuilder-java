@@ -190,7 +190,7 @@ public class TranscriptMiddlewareTest {
                     activity.setId(response.getId());
 
                     // clone the activity, so we can use it to do an update
-                    activityToUpdate[0] = Activity.cloneActivity(activity);
+                    activityToUpdate[0] = Activity.clone(activity);
                     //JsonConvert.<Activity>DeserializeObject(JsonConvert.SerializeObject(activity));
                 }
         }).Send("foo")

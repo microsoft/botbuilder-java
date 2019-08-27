@@ -39,7 +39,8 @@ public class AnimationCard {
     private ThumbnailUrl image;
 
     /**
-     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative format of the same content.
+     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative
+     * format of the same content.
      */
     @JsonProperty(value = "media")
     private List<MediaUrl> media;
@@ -77,7 +78,8 @@ public class AnimationCard {
     private String aspect;
 
     /**
-     * Describes the length of the media content without requiring a receiver to open the content. Formatted as an ISO 8601 Duration field.
+     * Describes the length of the media content without requiring a receiver to open the content. Formatted as
+     * an ISO 8601 Duration field.
      */
     @JsonProperty(value = "duration")
     private String duration;

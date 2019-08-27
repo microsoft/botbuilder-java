@@ -77,7 +77,8 @@ public class VideoCard {
     private String aspect;
 
     /**
-     * Describes the length of the media content without requiring a receiver to open the content. Formatted as an ISO 8601 Duration field.
+     * Describes the length of the media content without requiring a receiver to open the content.
+     * Formatted as an ISO 8601 Duration field.
      */
     @JsonProperty(value = "duration")
     private String duration;

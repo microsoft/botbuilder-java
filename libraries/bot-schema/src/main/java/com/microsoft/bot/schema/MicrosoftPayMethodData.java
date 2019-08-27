@@ -44,7 +44,7 @@ public class MicrosoftPayMethodData {
     /**
      * Set the merchantId value.
      *
-     * @param merchantId the merchantId value to set
+     * @param withMerchantId the merchantId value to set
      * @return the MicrosoftPayMethodData object itself.
      */
     public void setMerchantId(String withMerchantId) {

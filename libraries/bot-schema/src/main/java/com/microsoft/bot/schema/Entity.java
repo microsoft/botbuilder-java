@@ -14,8 +14,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Metadata object pertaining to an activity.
@@ -32,6 +35,30 @@ public class Entity {
      */
     @JsonProperty(value = "type")
     private String type;
+
+    public static Entity clone(Entity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        return new Entity() {{
+            setType(entity.getType());
+
+            for (String key : entity.getProperties().keySet()) {
+                setProperties(key, entity.getProperties().get(key));
+            }
+        }};
+    }
+
+    public static List<Entity> cloneList(List<Entity> entities) {
+        if (entities == null) {
+            return null;
+        }
+
+        return entities.stream()
+            .map(entity -> Entity.clone(entity))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
 
     /**
      * Get the {@link #type} value.
@@ -66,10 +93,10 @@ public class Entity {
     }
 
     /**
-     * Retrieve internal payload.
+     * Converts Entity to other Entity types.
      *
-     * @param classType of type T
-     * @return
+     * @param classType Class extended EntitySerialization
+     * @return Entity converted to type T
      */
     public <T extends EntitySerialization> T getAs(Class<T> classType) {
 
@@ -95,9 +122,9 @@ public class Entity {
     }
 
     /**
-     * Set internal payload.
+     * Converts other Entity types to Entity.
      *
-     * This is only intended to be used with other Enitity classes:
+     * This is only intended to be used with other Entity classes:
      * @see Mention
      * @see Place
      * @see GeoCoordinates
