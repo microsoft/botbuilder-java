@@ -12,16 +12,13 @@ import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
+import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.retry.RetryStrategy;
 import com.microsoft.azure.serializer.AzureJacksonAdapter;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * The Bot Connector REST API allows your bot to send and receive messages
@@ -202,25 +199,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
-
-
-        // Format according to: https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
-        String build_version;
-        final Properties properties = new Properties();
-        try {
-            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
-            properties.load(propStream);
-            build_version = properties.getProperty("version");
-        } catch (IOException e) {
-            e.printStackTrace();
-            build_version = "4.0.0";
-        }
-
-        String os_version = System.getProperty("os.name");
-        String java_version = System.getProperty("java.version");
-        this.user_agent_string = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
+        this.user_agent_string = UserAgent.value();
     }
-
 
     /**
      * Gets the User-Agent header for the client.
