@@ -1,0 +1,25 @@
+{
+  "networkCallRecords": [{
+      "Uri": "/v3/conversations",
+      "Method": "POST",
+      "Body": "{\r\n  \"bot\": {\r\n    \"id\": \"B21UTEF8S:T03CWQ0QB\"\r\n  },\r\n  \"members\": [\r\n    {\r\n      \"id\": \"U19KH8EHJ:T03CWQ0QB\"\r\n    }\r\n  ],\r\n  \"activity\": {\r\n    \"type\": \"message\",\r\n    \"from\": {\r\n      \"id\": \"B21UTEF8S:T03CWQ0QB\"\r\n    },\r\n    \"recipient\": {\r\n      \"id\": \"U19KH8EHJ:T03CWQ0QB\"\r\n    },\r\n    \"membersAdded\": [],\r\n    \"membersRemoved\": [],\r\n    \"reactionsAdded\": [],\r\n    \"reactionsRemoved\": [],\r\n    \"text\": \"TEST Get Activity Members with null conversation id\",\r\n    \"attachments\": [],\r\n    \"entities\": []\r\n  }\r\n}",
+      "Headers": {
+        "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+      },
+      "Response" : {
+        "Body": "{\r\n  \"activityId\": \"1516641070.000334\",\r\n  \"id\": \"B21UTEF8S:T03CWQ0QB:D2369CT7C\"\r\n}",
+        "Content-Length": "83",
+        "Content-Type": "application/json; charset=utf-8",
+        "Expires": "-1",
+        "Pragma": "no-cache",
+        "Request-Context": "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+        "Strict-Transport-Security": "max-age=31536000",
+        "Cache-Control": "no-cache",
+        "Date": "Mon, 22 Jan 2018 17:11:10 GMT",
+        "Server": "Microsoft-IIS/10.0",
+        "X-Powered-By": "ASP.NET",
+        "StatusCode": 200
+      }
+  }],
+  "variables": []
+}

@@ -7,12 +7,9 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.schema.AttachmentInfo;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
-import com.microsoft.rest.ServiceResponse;
-import rx.Observable;
 
 import java.io.InputStream;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * An instance of this class provides access to all the operations defined
@@ -34,33 +31,11 @@ public interface Attachments {
      * GetAttachmentInfo.
      * Get AttachmentInfo structure describing the attachment views.
      *
-     * @param attachmentId    attachment id
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @return the {@link ServiceFuture} object
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     */
-    ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId,
-                                                         final ServiceCallback<AttachmentInfo> serviceCallback);
-
-    /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
-     *
      * @param attachmentId attachment id
      * @return the observable to the AttachmentInfo object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    Observable<AttachmentInfo> getAttachmentInfoAsync(String attachmentId);
-
-    /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
-     *
-     * @param attachmentId attachment id
-     * @return the observable to the AttachmentInfo object
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     */
-    Observable<ServiceResponse<AttachmentInfo>> getAttachmentInfoWithServiceResponseAsync(String attachmentId);
+    CompletableFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId);
 
     /**
      * GetAttachment.
@@ -78,35 +53,10 @@ public interface Attachments {
      * GetAttachment.
      * Get the named view as binary content.
      *
-     * @param attachmentId    attachment id
-     * @param viewId          View id from attachmentInfo
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @return the {@link ServiceFuture} object
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     */
-    ServiceFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId,
-                                                  final ServiceCallback<InputStream> serviceCallback);
-
-    /**
-     * GetAttachment.
-     * Get the named view as binary content.
-     *
      * @param attachmentId attachment id
      * @param viewId       View id from attachmentInfo
      * @return the observable to the InputStream object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    Observable<InputStream> getAttachmentAsync(String attachmentId, String viewId);
-
-    /**
-     * GetAttachment.
-     * Get the named view as binary content.
-     *
-     * @param attachmentId attachment id
-     * @param viewId       View id from attachmentInfo
-     * @return the observable to the InputStream object
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     */
-    Observable<ServiceResponse<InputStream>> getAttachmentWithServiceResponseAsync(String attachmentId, String viewId);
-
+    CompletableFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId);
 }

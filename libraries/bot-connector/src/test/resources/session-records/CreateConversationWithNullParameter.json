@@ -1,0 +1,24 @@
+{
+  "networkCallRecords": [ {
+      "Uri": "/v3/conversations",
+      "Method": "POST",
+      "Body": "{\r\n  \"bot\": {\r\n    \"id\": \"B21S8SG7J:T03CWQ0QB\"\r\n  },\r\n  \"members\": [\r\n    {\r\n      \"id\": \"U8H8E2HSB:T03CWQ0QB\"\r\n    }\r\n  ],\r\n  \"activity\": {\r\n    \"type\": \"message\",\r\n    \"from\": {\r\n      \"id\": \"B21S8SG7J:T03CWQ0QB\"\r\n    },\r\n    \"recipient\": {\r\n      \"id\": \"U8H8E2HSB:T03CWQ0QB\"\r\n    },\r\n    \"text\": \"TEST Create Conversation\"\r\n  }\r\n}",
+      "Headers": {
+        "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+      },
+      "Response" : {
+        "body": "{\r\n  \"activityId\": \"1515187112.000022\",\r\n  \"id\": \"B21S8SG7J:T03CWQ0QB:D8PNY7UQ7\"\r\n}",
+        "content-type": "application/json; charset=utf-8",
+        "expires": "-1",
+        "cache-control": "no-cache",
+        "date": "Fri, 05 Jan 2018 21:18:31 GMT",
+        "pragma": "no-cache",
+        "server": "Microsoft-IIS/10.0",
+        "request-context": "appId=cid-v1:6814484e-c0d5-40ea-9dba-74ff29ca4f62",
+        "x-powered-by": "ASP.NET",
+        "strict-transport-security": "max-age=31536000",
+        "StatusCode": 200
+      }
+  }],
+  "variables": []
+}

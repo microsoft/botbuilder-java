@@ -3,7 +3,6 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.microsoft.bot.connector.AsyncHelper;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.ExecutorFactory;
@@ -351,9 +350,8 @@ public class BotFrameworkAdapter extends BotAdapter {
     public void DeleteActivity(TurnContext context, ConversationReference reference) {
         RestConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
         try {
-            AsyncHelper.completableSingleFutureFromObservable(
-                connectorClient.getConversations().deleteConversationMemberAsync(
-                    reference.getConversation().getId(), reference.getActivityId())).join();
+            connectorClient.getConversations().deleteConversationMemberAsync(
+                    reference.getConversation().getId(), reference.getActivityId()).join();
         } catch (CompletionException e) {
             e.printStackTrace();
             throw new RuntimeException(String.format("Failed deleting activity (%s)", e.toString()));
@@ -588,8 +586,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             }
 
             Conversations conversations = connectorClient.getConversations();
-            CompletableFuture<ConversationResourceResponse> result = AsyncHelper.completableSingleFutureFromObservable(
-                conversations.createConversationAsync(conversationParameters));
+            CompletableFuture<ConversationResourceResponse> result = conversations.createConversationAsync(conversationParameters);
 
             ConversationResourceResponse response = result.join();
 

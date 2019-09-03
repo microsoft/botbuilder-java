@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 package com.microsoft.bot.sample.spring;
+
 import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
@@ -22,6 +22,7 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.ActivityTypes;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
@@ -61,33 +62,37 @@ public class BotController {
      * @return
      */
     @PostMapping("/api/messages")
-    public ResponseEntity<Object> incoming(@RequestBody Activity activity,
-            @RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
-        try {
-            JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider())
-                .thenRunAsync(() -> {
-                    if (activity.getType().equals(ActivityTypes.MESSAGE)) {
-                        logger.info("Received: " + activity.getText());
+    public CompletableFuture<ResponseEntity<Object>> incoming(@RequestBody Activity activity,
+                                                              @RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
+        return JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider())
+            .thenAccept((identity) -> {
+                if (activity.getType().equals(ActivityTypes.MESSAGE)) {
+                    logger.info("Received: " + activity.getText());
 
-                        // reply activity with the same text
-                        ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), _credentials);
-                        connector.getConversations().sendToConversation(
-                            activity.getConversation().getId(),
-                            activity.createReply("Echo: " + activity.getText()));
+                    // reply activity with the same text
+                    ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), _credentials);
+                    connector.getConversations().sendToConversation(
+                        activity.getConversation().getId(),
+                        activity.createReply("Echo: " + activity.getText()));
+                }
+            })
+
+            .handle((identity, exception) -> {
+                if (exception == null) {
+                    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                }
+
+                logger.error("Exception handling message", exception);
+
+                if (exception instanceof CompletionException) {
+                    if (exception.getCause() instanceof AuthenticationException) {
+                        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                    } else {
+                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                     }
-                }, ExecutorFactory.getExecutor()).join();
-        } catch (CompletionException ex) {
-            if (ex.getCause() instanceof AuthenticationException) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            else {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        // send ack to user activity
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            });
     }
 }
