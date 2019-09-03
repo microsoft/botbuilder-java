@@ -1,9 +1,8 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.ResourceResponse;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class SimpleAdapter extends BotAdapter {
 
         List<ResourceResponse> responses = new ArrayList<ResourceResponse>();
         for (Activity activity : activities) {
-            responses.add(new ResourceResponse().withId(activity.id()));
+            responses.add(new ResourceResponse(activity.getId()));
         }
         ResourceResponse[] result = new ResourceResponse[responses.size()];
         return responses.toArray(result);
@@ -56,14 +55,10 @@ public class SimpleAdapter extends BotAdapter {
 
     @Override
     public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
-
         Assert.assertNotNull("SimpleAdapter.updateActivity: missing activity", activity);
         if (this.callOnUpdate != null)
             this.callOnUpdate.accept(activity);
-        return new ResourceResponse()
-                .withId(activity.id());
-
-
+        return new ResourceResponse(activity.getId());
     }
 
     @Override
@@ -71,12 +66,10 @@ public class SimpleAdapter extends BotAdapter {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", reference);
         if (callOnDelete != null)
             this.callOnDelete.accept(reference);
-
-
     }
 
 
-    public void ProcessRequest(ActivityImpl activty, Consumer<TurnContext> callback) throws Exception {
+    public void ProcessRequest(Activity activty, Consumer<TurnContext> callback) throws Exception {
 
         try (TurnContextImpl ctx = new TurnContextImpl(this, activty)) {
             this.RunPipeline(ctx, callback);

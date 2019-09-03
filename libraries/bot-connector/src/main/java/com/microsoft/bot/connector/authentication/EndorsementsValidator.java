@@ -17,7 +17,8 @@ public abstract class EndorsementsValidator {
      * @param channelId    The channel name, typically extracted from the activity.ChannelId field, that
      *                     to which the Activity is affinitized.
      * @param endorsements Whoever signed the JWT token is permitted to send activities only for
-     *                     some specific channels. That list is the endorsement list, and is validated here against the channelId.
+     *                     some specific channels. That list is the endorsement list, and is validated here against
+     *                     the channelId.
      * @return True is the channelId is found in the Endorsement set. False if the channelId is not found.
      */
     public static boolean validate(String channelId, List<String> endorsements) {

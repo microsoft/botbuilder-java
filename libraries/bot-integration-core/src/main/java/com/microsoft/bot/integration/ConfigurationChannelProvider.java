@@ -12,6 +12,10 @@ import com.microsoft.bot.connector.authentication.SimpleChannelProvider;
  * the key of "ChannelService".
  */
 public class ConfigurationChannelProvider extends SimpleChannelProvider {
+    /**
+     * Initializes a new instance using {@link Configuration}.
+     * @param configuration The configuration to use.
+     */
     public ConfigurationChannelProvider(Configuration configuration) {
         super(configuration.getProperty("ChannelService"));
     }

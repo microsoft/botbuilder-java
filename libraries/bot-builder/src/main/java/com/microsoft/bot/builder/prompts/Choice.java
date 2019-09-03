@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder.prompts;
 
-import com.microsoft.bot.schema.models.CardAction;
+import com.microsoft.bot.schema.CardAction;
 
 import java.util.ArrayList;
 

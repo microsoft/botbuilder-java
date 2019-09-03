@@ -3,11 +3,7 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
-import com.microsoft.bot.schema.models.ConversationReferenceHelper;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.*;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -167,7 +163,7 @@ public abstract class BotAdapter {
     public void ContinueConversation(String botId, ConversationReference reference, Consumer<TurnContext> callback) throws Exception {
 
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
-        ActivityImpl activity = conv.GetPostToBotMessage();
+        Activity activity = conv.getPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
             this.RunPipeline(context, callback);

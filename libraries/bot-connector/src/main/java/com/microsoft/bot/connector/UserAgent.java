@@ -1,38 +1,33 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.rest.RestConnectorClient;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.slf4j.LoggerFactory;
 
 /**
- * Retrieve the User Agent string that BotBuilder uses
+ * Retrieve the User Agent string that Bot SDK uses
  * <p>
  * Conforms to spec:
  * https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
  * <p>
  */
 public class UserAgent {
-
-
     // os/java and botbuilder will never change - static initialize once
     private static String os_java_botbuilder_cache;
 
     static {
-        String build_version;
-        final Properties properties = new Properties();
-        try {
-            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
-            properties.load(propStream);
-            build_version = properties.getProperty("version");
-        } catch (IOException e) {
-            e.printStackTrace();
-            build_version = "4.0.0";
-        }
-        String os_version = System.getProperty("os.name");
-        String java_version = System.getProperty("java.version");
-        os_java_botbuilder_cache = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
+        new ConnectorConfiguration().process(properties -> {
+            String build_version = properties.getProperty("version");
+            String os_version = System.getProperty("os.name");
+            String java_version = System.getProperty("java.version");
+            os_java_botbuilder_cache = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
+
+            LoggerFactory.getLogger(UserAgent.class).info("UserAgent: {}", os_java_botbuilder_cache);
+        });
     }
 
     /**
@@ -48,5 +43,4 @@ public class UserAgent {
     public static String value() {
         return os_java_botbuilder_cache;
     }
-
 }

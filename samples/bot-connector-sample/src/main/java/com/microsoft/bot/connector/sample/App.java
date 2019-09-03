@@ -9,9 +9,8 @@ import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ActivityTypes;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -59,16 +58,12 @@ public class App {
                     httpExchange.sendResponseHeaders(202, 0);
                     httpExchange.getResponseBody().close();
 
-                    if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                    if (activity.getType().equals(ActivityTypes.MESSAGE)) {
                         // reply activity with the same text
-                        ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), this.credentials);
-                        ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
-                                new Activity()
-                                        .withType(ActivityTypes.MESSAGE)
-                                        .withText("Echo: " + activity.text())
-                                        .withRecipient(activity.from())
-                                        .withFrom(activity.recipient())
-                        );
+                        ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), this.credentials);
+                        connector.getConversations().sendToConversation(
+                            activity.getConversation().getId(),
+                            activity.createReply("Echo: " + activity.getText()));
                     }
                 } catch (AuthenticationException ex) {
                     httpExchange.sendResponseHeaders(401, 0);

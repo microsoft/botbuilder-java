@@ -6,7 +6,7 @@ package com.microsoft.bot.builder;
 
 
 import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.joda.time.DateTime;
 
 import java.time.Instant;
@@ -18,9 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -47,21 +44,21 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
         synchronized (this.channels) {
             HashMap<String, ArrayList<Activity>> channel;
-            if (!this.channels.containsKey(activity.channelId())) {
+            if (!this.channels.containsKey(activity.getChannelId())) {
                 channel = new HashMap<String, ArrayList<Activity>>();
-                this.channels.put(activity.channelId(), channel);
+                this.channels.put(activity.getChannelId(), channel);
             } else {
-                channel = this.channels.get(activity.channelId());
+                channel = this.channels.get(activity.getChannelId());
             }
 
             ArrayList<Activity> transcript = null;
 
 
-            if (!channel.containsKey(activity.conversation().id())) {
+            if (!channel.containsKey(activity.getConversation().getId())) {
                 transcript = new ArrayList<Activity>();
-                channel.put(activity.conversation().id(), transcript);
+                channel.put(activity.getConversation().getId(), transcript);
             } else {
-                transcript = channel.get(activity.conversation().id());
+                transcript = channel.get(activity.getConversation().getId());
             }
 
             transcript.add(activity);
@@ -131,9 +128,9 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 transcript = channel.get(conversationId);
                 if (continuationToken != null) {
                     List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::timestamp))
-                            .filter(a -> a.timestamp().compareTo(startDate) >= 0)
-                            .filter(skipwhile(a -> !a.id().equals(continuationToken)))
+                            .sorted(Comparator.comparing(Activity::getTimestamp))
+                            .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
+                            .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
                             .skip(1)
                             .limit(20)
                             .collect(Collectors.toList());
@@ -141,17 +138,17 @@ public class MemoryTranscriptStore implements TranscriptStore {
                     pagedResult.items(items.toArray(new Activity[items.size()]));
 
                     if (pagedResult.getItems().length == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).id());
+                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
                     }
                 } else {
                     List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::timestamp))
-                            .filter(a -> a.timestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
+                            .sorted(Comparator.comparing(Activity::getTimestamp))
+                            .filter(a -> a.getTimestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
                             .limit(20)
                             .collect(Collectors.toList());
                     pagedResult.items(items.toArray(new Activity[items.size()]));
                     if (items.size() == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).id());
+                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
                     }
                 }
             }
@@ -228,7 +225,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                             .map(c -> {
                                         OffsetDateTime offsetDateTime = null;
                                         if (c.getValue().stream().findFirst().isPresent()) {
-                                            DateTime dt = c.getValue().stream().findFirst().get().timestamp();
+                                            DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
                                             // convert to DateTime to OffsetDateTime
                                             Instant instant = Instant.ofEpochMilli(dt.getMillis());
                                             ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
@@ -257,7 +254,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                             .map(c -> {
                                         OffsetDateTime offsetDateTime = null;
                                         if (c.getValue().stream().findFirst().isPresent()) {
-                                            DateTime dt = c.getValue().stream().findFirst().get().timestamp();
+                                            DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
                                             // convert to DateTime to OffsetDateTime
                                             Instant instant = Instant.ofEpochMilli(dt.getMillis());
                                             ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);

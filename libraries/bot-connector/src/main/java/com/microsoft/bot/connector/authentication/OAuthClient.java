@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
+import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.TokenExchangeState;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
-import com.microsoft.bot.schema.models.TokenResponse;
+import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.rest.ServiceClient;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -241,16 +241,18 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("activity");
         }
         final MicrosoftAppCredentials creds = (MicrosoftAppCredentials) this.client.restClient().credentials();
-        TokenExchangeState tokenExchangeState = new TokenExchangeState()
-            .withConnectionName(connectionName)
-            .withConversation(new ConversationReference()
-                .withActivityId(activity.id())
-                .withBot(activity.recipient())
-                .withChannelId(activity.channelId())
-                .withConversation(activity.conversation())
-                .withServiceUrl(activity.serviceUrl())
-                .withUser(activity.from()))
-            .withMsAppId((creds == null) ? null : creds.appId());
+        TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
+            setConnectionName(connectionName);
+            setConversation(new ConversationReference() {{
+                setActivityId(activity.getId());
+                setBot(activity.getRecipient());
+                setChannelId(activity.getChannelId());
+                setConversation(activity.getConversation());
+                setServiceUrl(activity.getServiceUrl());
+                setUser(activity.getFrom());
+                }});
+            setMsAppId((creds == null) ? null : creds.appId());
+        }};
 
         String serializedState = this.mapper.writeValueAsString(tokenExchangeState);
 

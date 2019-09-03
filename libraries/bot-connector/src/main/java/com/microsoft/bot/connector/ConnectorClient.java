@@ -22,7 +22,7 @@ public interface ConnectorClient {
      *
      * @return the {@link RestClient} object.
      */
-    RestClient restClient();
+    RestClient getRestClient();
 
     /**
      * Gets the {@link AzureClient} used for long running operations.
@@ -35,29 +35,28 @@ public interface ConnectorClient {
      *
      * @return the user agent string.
      */
-    String userAgent();
+    String getUserAgent();
 
     /**
      * Gets Gets or sets the preferred language for the response..
      *
      * @return the acceptLanguage value.
      */
-    String acceptLanguage();
+    String getAcceptLanguage();
 
     /**
      * Sets Gets or sets the preferred language for the response..
      *
      * @param acceptLanguage the acceptLanguage value.
-     * @return the service client itself
      */
-    ConnectorClient withAcceptLanguage(String acceptLanguage);
+    void setAcceptLanguage(String acceptLanguage);
 
     /**
      * Gets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30..
      *
      * @return the longRunningOperationRetryTimeout value.
      */
-    int longRunningOperationRetryTimeout();
+    int getLongRunningOperationRetryTimeout();
 
     /**
      * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30..
@@ -65,33 +64,34 @@ public interface ConnectorClient {
      * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
      * @return the service client itself
      */
-    ConnectorClient withLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout);
+    void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout);
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true..
+     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * is true.
      *
      * @return the generateClientRequestId value.
      */
-    boolean generateClientRequestId();
+    boolean getGenerateClientRequestId();
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true..
+     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.
      * @return the service client itself
      */
-    ConnectorClient withGenerateClientRequestId(boolean generateClientRequestId);
+    void setGenerateClientRequestId(boolean generateClientRequestId);
 
     /**
      * Gets the Attachments object to access its operations.
      * @return the Attachments object.
      */
-    Attachments attachments();
+    Attachments getAttachments();
 
     /**
      * Gets the Conversations object to access its operations.
      * @return the Conversations object.
      */
-    Conversations conversations();
-
+    Conversations getConversations();
 }

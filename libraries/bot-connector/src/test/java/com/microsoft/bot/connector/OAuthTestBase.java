@@ -6,7 +6,7 @@ import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.OAuthClient;
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.rest.RestClient;
 
 import java.io.IOException;
@@ -17,10 +17,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 
-public class OAuthTestBase extends TestBase
-{
+public class OAuthTestBase extends TestBase {
     protected String clientId;
-    protected String clientSecret ;
+    protected String clientSecret;
     protected final String userId = "U19KH8EHJ:T03CWQ0QB";
     protected final String botId = "B21UTEF8S:T03CWQ0QB";
     protected final static String hostUri = "https://slack.botframework.com";
@@ -30,17 +29,19 @@ public class OAuthTestBase extends TestBase
     protected RestConnectorClient connector;
 
     private ChannelAccount bot;
+
     public ChannelAccount getBot() {
         return this.bot;
     }
 
     private ChannelAccount user;
+
     public ChannelAccount getUser() {
         return this.user;
     }
 
 
-    public OAuthTestBase()  {
+    public OAuthTestBase() {
         super(RunCondition.BOTH);
     }
 
@@ -70,30 +71,27 @@ public class OAuthTestBase extends TestBase
             MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
 
             this.token = credentials.getToken().get().getAccessToken();
-        }
-        else {
+        } else {
             this.token = null;
         }
 
-        this.bot = new ChannelAccount()
-                .withId(botId);
-        this.user = new ChannelAccount()
-                .withId(userId);
-
-
-
+        this.bot = new ChannelAccount(botId);
+        this.user = new ChannelAccount(userId);
     }
 
     @Override
     protected void cleanUpResources() {
 
     }
+
     public void UseClientFor(Function<ConnectorClient, CompletableFuture<Void>> doTest) {
         this.UseClientFor(doTest, null, "");
     }
+
     public void UseClientFor(Function<ConnectorClient, CompletableFuture<Void>> doTest, String className) {
         this.UseClientFor(doTest, className, "");
     }
+
     public void UseClientFor(Function<ConnectorClient, CompletableFuture<Void>> doTest, String className, String methodName) {
         doTest.apply(this.connector).join();
     }
@@ -108,7 +106,7 @@ public class OAuthTestBase extends TestBase
     }
 
     public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
-        return CompletableFuture.runAsync(()->{
+        return CompletableFuture.runAsync(() -> {
             OAuthClient oauthClient = null;
             try {
                 oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAUTH_URL);

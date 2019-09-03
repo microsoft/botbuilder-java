@@ -33,17 +33,20 @@ public final class AuthenticationConstants {
     /**
      * TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA.
      */
-    public static final String TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL = "https://login.botframework.com/v1/.well-known/openidconfiguration";
+    public static final String TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL =
+        "https://login.botframework.com/v1/.well-known/openidconfiguration";
 
     /**
      * TO BOT FROM EMULATOR: OpenID metadata document for tokens coming from MSA.
      */
-    public static final String TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration";
+    public static final String TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL =
+        "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration";
 
     /**
      * TO BOT FROM ENTERPRISE CHANNEL: OpenID metadata document for tokens coming from MSA.
      */
-    public static final String TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT = "https://%s.enterprisechannel.botframework.com/v1/.well-known/openidconfiguration";
+    public static final String TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT =
+        "https://%s.enterprisechannel.botframework.com/v1/.well-known/openidconfiguration";
 
     /**
      * Allowed token signing algorithms. Tokens come from channels to the bot. The code

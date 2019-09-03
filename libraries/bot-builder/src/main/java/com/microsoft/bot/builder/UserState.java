@@ -33,7 +33,7 @@ public class UserState<TState> extends BotState<TState>
     public UserState(Storage storage, Supplier<? extends TState> ctor, StateSettings settings) {
         super(storage, PropertyName(),
                 (context) -> {
-                    return String.format("user/%s/%s", context.getActivity().channelId(), context.getActivity().conversation().id());
+                    return String.format("user/%s/%s", context.getActivity().getChannelId(), context.getActivity().getConversation().getId());
                 },
                 ctor,
                 settings);

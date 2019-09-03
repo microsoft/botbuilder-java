@@ -12,7 +12,11 @@ import java.util.concurrent.ForkJoinWorkerThread;
 /**
  * Provides a common Executor for Future operations.
  */
-public class ExecutorFactory {
+public final class ExecutorFactory {
+    private ExecutorFactory() {
+
+    }
+
     private static ForkJoinWorkerThreadFactory factory = new ForkJoinWorkerThreadFactory() {
         @Override
         public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
@@ -28,6 +32,10 @@ public class ExecutorFactory {
         null,
         false);
 
+    /**
+     * Provides an SDK wide ExecutorService for async calls.
+     * @return An ExecutorService.
+     */
     public static ExecutorService getExecutor() {
         return executor;
     }

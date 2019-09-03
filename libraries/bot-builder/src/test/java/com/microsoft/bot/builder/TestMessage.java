@@ -1,31 +1,28 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.ActivityTypes;
-import com.microsoft.bot.schema.models.ChannelAccount;
-import com.microsoft.bot.schema.models.ConversationAccount;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.ConversationAccount;
 
 public class TestMessage {
-    public static ActivityImpl Message() {
+    public static Activity Message() {
         return TestMessage.Message("1234");
     }
 
-    public static ActivityImpl Message(String id) {
-        ActivityImpl a = new ActivityImpl()
-                .withType(ActivityTypes.MESSAGE)
-                .withId(id)
-                .withText("test")
-                .withFrom(new ChannelAccount()
-                        .withId("user")
-                        .withName("User Name"))
-                .withRecipient(new ChannelAccount()
-                        .withId("bot")
-                        .withName("Bot Name"))
-                .withConversation(new ConversationAccount()
-                        .withId("convo")
-                        .withName("Convo Name"))
-                .withChannelId("UnitTest")
-                .withServiceUrl("https://example.org");
+    public static Activity Message(String id) {
+        Activity a = new Activity(ActivityTypes.MESSAGE) {{
+            setId(id);
+            setText("test");
+            setFrom(new ChannelAccount("user", "User Name"));
+            setRecipient(new ChannelAccount("bot", "Bot Name"));
+            setConversation(new ConversationAccount() {{
+                setId("convo");
+                setName("Convo Name");
+            }});
+            setChannelId("UnitTest");
+            setServiceUrl("https://example.org");
+        }};
         return a;
     }
 

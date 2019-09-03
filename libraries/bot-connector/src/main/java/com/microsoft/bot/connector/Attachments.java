@@ -6,7 +6,7 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.schema.models.AttachmentInfo;
+import com.microsoft.bot.schema.AttachmentInfo;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
@@ -39,7 +39,8 @@ public interface Attachments {
      * @return the {@link ServiceFuture} object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId, final ServiceCallback<AttachmentInfo> serviceCallback);
+    ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId,
+                                                         final ServiceCallback<AttachmentInfo> serviceCallback);
 
     /**
      * GetAttachmentInfo.
@@ -83,7 +84,8 @@ public interface Attachments {
      * @return the {@link ServiceFuture} object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    ServiceFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId, final ServiceCallback<InputStream> serviceCallback);
+    ServiceFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId,
+                                                  final ServiceCallback<InputStream> serviceCallback);
 
     /**
      * GetAttachment.

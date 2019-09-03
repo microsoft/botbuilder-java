@@ -4,11 +4,10 @@ package com.microsoft.bot.builder;
 // Licensed under the MIT License.
 
 import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
-import com.microsoft.bot.schema.models.InputHints;
-import com.microsoft.bot.schema.models.ResourceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.InputHints;
+import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -17,8 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static com.microsoft.bot.schema.models.ActivityTypes.MESSAGE;
-import static com.microsoft.bot.schema.models.ActivityTypes.TRACE;
+import static com.microsoft.bot.schema.ActivityTypes.MESSAGE;
+import static com.microsoft.bot.schema.ActivityTypes.TRACE;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -31,7 +30,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final BotAdapter adapter;
-    private final ActivityImpl activity;
+    private final Activity activity;
     private Boolean responded = false;
 
     private final List<SendActivitiesHandler> onSendActivities = new ArrayList<SendActivitiesHandler>();
@@ -50,7 +49,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *                                  {@code adapter} is {@code null}.
      *                                  For use by bot adapter implementations only.
      */
-    public TurnContextImpl(BotAdapter adapter, ActivityImpl activity) {
+    public TurnContextImpl(BotAdapter adapter, Activity activity) {
         if (adapter == null)
             throw new IllegalArgumentException("adapter");
         this.adapter = adapter;
@@ -68,8 +67,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link SendActivity(Activity)}
-     *                                  or {@link SendActivities(Activity[])} methods are called,
+     *                                  When the context's {@link #SendActivity( Activity )}
+     *                                  or {@link #SendActivities( Activity[])} methods are called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
@@ -87,7 +86,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link UpdateActivity(Activity)} is called,
+     *                                  When the context's {@link #UpdateActivity( Activity )} is called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
@@ -105,7 +104,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link DeleteActivity(string)} is called,
+     *                                  When the context's {@link #DeleteActivity(String)} is called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
@@ -161,12 +160,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Sends a message activity to the sender of the incoming activity.
      *
      * @param textReplyToSend The text of the message to send.
-     * @param speak           Optional, text to be spoken by your bot on a speech-enabled
-     *                        channel.
-     * @param inputHint       Optional, indicates whether your bot is accepting,
-     *                        expecting, or ignoring user input after the message is delivered to the client.
-     *                        One of: "acceptingInput", "ignoringInput", or "expectingInput".
-     *                        Default is null.
      * @return A task that represents the work queued to execute.
      * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
      *                                  If the activity is successfully sent, the task result contains
@@ -193,14 +186,14 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         if (StringUtils.isEmpty(textReplyToSend))
             throw new IllegalArgumentException("textReplyToSend");
 
-        ActivityImpl activityToSend = (ActivityImpl) new ActivityImpl()
-                .withType(MESSAGE)
-                .withText(textReplyToSend);
+        Activity activityToSend = (Activity) new Activity(MESSAGE) {{
+            setText(textReplyToSend);
+        }};
         if (speak != null)
-            activityToSend.withSpeak(speak);
+            activityToSend.setSpeak(speak);
 
         if (StringUtils.isNotEmpty(inputHint))
-            activityToSend.withInputHint(InputHints.fromString(inputHint));
+            activityToSend.setInputHint(InputHints.fromString(inputHint));
 
         return SendActivity(activityToSend);
     }
@@ -260,7 +253,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
         // Convert the IActivities to Activies.
         // Activity[] activityArray = Array.ConvertAll(activities, (input) => (Activity)input);
-        List<Activity> activityArray = Arrays.stream(activities).map(input -> (Activity) input).collect(toList());
+        List<Activity> activityArray = Arrays.stream(activities).map(input -> input).collect(toList());
 
 
         // Create the list used by the recursive methods.
@@ -272,20 +265,20 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             // so the "Responded" flag should not be set by Trace messages being
             // sent out.
             boolean sentNonTraceActivities = false;
-            if (!activityList.stream().anyMatch((a) -> a.type() == TRACE)) {
+            if (!activityList.stream().anyMatch((a) -> a.getType() == TRACE)) {
                 sentNonTraceActivities = true;
             }
             // Send from the list, which may have been manipulated via the event handlers.
             // Note that 'responses' was captured from the root of the call, and will be
             // returned to the original caller.
             ResourceResponse[] responses = new ResourceResponse[0];
-            responses = this.getAdapter().SendActivities(this, activityList.toArray(new ActivityImpl[activityList.size()]));
+            responses = this.getAdapter().SendActivities(this, activityList.toArray(new Activity[activityList.size()]));
             if (responses != null && responses.length == activityList.size()) {
                 // stitch up activity ids
                 for (int i = 0; i < responses.length; i++) {
                     ResourceResponse response = responses[i];
                     Activity activity = activityList.get(i);
-                    activity.withId(response.id());
+                    activity.setId(response.getId());
                 }
             }
 
@@ -305,13 +298,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param activity New replacement activity.
      * @return A task that represents the work queued to execute.
-     * @throws Microsoft.Bot.Schema.ErrorResponseException The HTTP operation failed and the response contained additional information.
-     * @throws System.AggregateException                   One or more exceptions occurred during the operation.
-     *                                                     If the activity is successfully sent, the task result contains
-     *                                                     a {@link ResourceResponse} object containing the ID that the receiving
-     *                                                     channel assigned to the activity.
-     *                                                     <p>Before calling this, set the ID of the replacement activity to the ID
-     *                                                     of the activity to replace.</p>
+     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the response contained additional information.
      */
     @Override
     public ResourceResponse UpdateActivity(Activity activity) throws Exception {
@@ -339,7 +326,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
         return CompletableFuture.runAsync(() -> {
             ConversationReference cr = this.GetConversationReference(this.getActivity());
-            cr.withActivityId(activityId);
+            cr.setActivityId(activityId);
 
             Runnable ActuallyDeleteStuff = () -> {
                 try {
@@ -371,8 +358,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param conversationReference The conversation containing the activity to delete.
      * @return A task that represents the work queued to execute.
-     * @throws Microsoft.Bot.Schema.ErrorResponseException The HTTP operation failed and the response contained additional information.
-     *                                                     The conversation reference's {@link ConversationReference.ActivityId}
+     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the response contained additional information.
+     *                                                     The conversation reference's {@link ConversationReference#getActivityId}
      *                                                     indicates the activity in the conversation to delete.
      */
     public void DeleteActivity(ConversationReference conversationReference) throws Exception {
@@ -463,8 +450,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     //            return await toCall(this, activity, next);
     //        }
     private ResourceResponse UpdateActivityInternal(Activity activity,
-                                                                       Iterator<UpdateActivityHandler> updateHandlers,
-                                                                       Callable<ResourceResponse> callAtBottom) throws Exception {
+                                                    Iterator<UpdateActivityHandler> updateHandlers,
+                                                    Callable<ResourceResponse> callAtBottom) throws Exception {
         BotAssert.ActivityNotNull(activity);
         if (updateHandlers == null)
             throw new IllegalArgumentException("updateHandlers");
@@ -489,7 +476,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                     e.printStackTrace();
                     throw new RuntimeException(String.format("Error updating activity: %s", e.toString()));
                 }
-                activity.withId(result.id());
+                activity.setId(result.getId());
                 return result;
         };
 
@@ -547,15 +534,27 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     public static ConversationReference GetConversationReference(Activity activity) {
         BotAssert.ActivityNotNull(activity);
 
-        ConversationReference r = new ConversationReference()
-                .withActivityId(activity.id())
-                .withUser(activity.from())
-                .withBot(activity.recipient())
-                .withConversation(activity.conversation())
-                .withChannelId(activity.channelId())
-                .withServiceUrl(activity.serviceUrl());
+        ConversationReference r = new ConversationReference() {{
+            setActivityId(activity.getId());
+            setUser(activity.getFrom());
+            setBot(activity.getRecipient());
+            setConversation(activity.getConversation());
+            setChannelId(activity.getChannelId());
+            setServiceUrl(activity.getServiceUrl());
+        }};
 
         return r;
+    }
+
+    /**
+     * Updates an activity with the delivery information from an existing
+     * conversation reference.
+     *
+     * @param activity   The activity to update.
+     * @param reference  The conversation reference.
+     */
+    public static Activity ApplyConversationReference(Activity activity, ConversationReference reference) {
+        return ApplyConversationReference(activity, reference, false);
     }
 
     /**
@@ -567,31 +566,27 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param isIncoming (Optional) {@code true} to treat the activity as an
      *                   incoming activity, where the bot is the recipient; otherwaire {@code false}.
      *                   Default is {@code false}, and the activity will show the bot as the sender.
-     *                   Call {@link GetConversationReference(Activity)} on an incoming
+     *                   Call {@link #GetConversationReference( Activity )} on an incoming
      *                   activity to get a conversation reference that you can then use to update an
      *                   outgoing activity with the correct delivery information.
-     *                   <p>The {@link SendActivity(Activity)} and {@link SendActivities(Activity[])}
+     *                   <p>The {@link #SendActivity( Activity )} and {@link #SendActivities( Activity[])}
      *                   methods do this for you.</p>
      */
-    public static Activity ApplyConversationReference(Activity activity, ConversationReference reference) {
-        return ApplyConversationReference(activity, reference, false);
-    }
-
     public static Activity ApplyConversationReference(Activity activity, ConversationReference reference, boolean isIncoming) {
-        activity.withChannelId(reference.channelId());
-        activity.withServiceUrl(reference.serviceUrl());
-        activity.withConversation(reference.conversation());
+        activity.setChannelId(reference.getChannelId());
+        activity.setServiceUrl(reference.getServiceUrl());
+        activity.setConversation(reference.getConversation());
 
         if (isIncoming) {
-            activity.withFrom(reference.user());
-            activity.withRecipient(reference.bot());
-            if (reference.activityId() != null)
-                activity.withId(reference.activityId());
+            activity.setFrom(reference.getUser());
+            activity.setRecipient(reference.getBot());
+            if (reference.getActivityId() != null)
+                activity.setId(reference.getActivityId());
         } else { // Outgoing
-            activity.withFrom(reference.bot());
-            activity.withRecipient(reference.user());
-            if (reference.activityId() != null)
-                activity.withReplyToId(reference.activityId());
+            activity.setFrom(reference.getBot());
+            activity.setRecipient(reference.getUser());
+            if (reference.getActivityId() != null)
+                activity.setReplyToId(reference.getActivityId());
         }
         return activity;
     }

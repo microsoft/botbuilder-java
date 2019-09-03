@@ -11,16 +11,14 @@ import com.microsoft.azure.AzureResponseBuilder;
 import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.Conversations;
+import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.retry.RetryStrategy;
 import com.microsoft.azure.serializer.AzureJacksonAdapter;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * The Bot Connector REST API allows your bot to send and receive messages
@@ -49,8 +47,14 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * Gets the {@link AzureClient} used for long running operations.
      * @return the azure client;
      */
+    @Override
     public AzureClient getAzureClient() {
         return this.azureClient;
+    }
+
+    @Override
+    public RestClient getRestClient() {
+        return super.restClient();
     }
 
     /** Gets or sets the preferred language for the response. */
@@ -58,35 +62,29 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     private String user_agent_string;
 
     /**
-     * Gets Gets or sets the preferred language for the response.
-     *
-     * @return the acceptLanguage value.
+     * @see ConnectorClient#getAcceptLanguage()
      */
-    public String acceptLanguage() {
+    @Override
+    public String getAcceptLanguage() {
         return this.acceptLanguage;
     }
 
     /**
-     * Sets Gets or sets the preferred language for the response.
-     *
-     * @param acceptLanguage the acceptLanguage value.
-     * @return the service client itself
+     * @see ConnectorClient#setAcceptLanguage(String)
      */
-    public RestConnectorClient withAcceptLanguage(String acceptLanguage) {
+    @Override
+    public void setAcceptLanguage(String acceptLanguage) {
         this.acceptLanguage = acceptLanguage;
-        return this;
     }
 
     /**
      * RetryStrategy as defined in Microsoft Rest Retry
-     * TODO: Use this.
      */
     private RetryStrategy retryStrategy = null;
-    public RestConnectorClient withRestRetryStrategy(RetryStrategy retryStrategy) {
+    public void setRestRetryStrategy(RetryStrategy retryStrategy) {
         this.retryStrategy = retryStrategy;
-        return this;
     }
-    public RetryStrategy restRetryStrategy() {
+    public RetryStrategy getRestRetryStrategy() {
         return this.retryStrategy;
     }
 
@@ -98,7 +96,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      *
      * @return the longRunningOperationRetryTimeout value.
      */
-    public int longRunningOperationRetryTimeout() {
+    @Override
+    public int getLongRunningOperationRetryTimeout() {
         return this.longRunningOperationRetryTimeout;
     }
 
@@ -106,34 +105,33 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
      *
      * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
-     * @return the service client itself
      */
-    public RestConnectorClient withLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
+    @Override
+    public void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
         this.longRunningOperationRetryTimeout = longRunningOperationRetryTimeout;
-        return this;
     }
 
-    /** When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true. */
+    /** When set to true a unique x-ms-client-request-id value is generated and included in each request. */
     private boolean generateClientRequestId;
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @return the generateClientRequestId value.
      */
-    public boolean generateClientRequestId() {
+    @Override
+    public boolean getGenerateClientRequestId() {
         return this.generateClientRequestId;
     }
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @param generateClientRequestId the generateClientRequestId value.
-     * @return the service client itself
      */
-    public RestConnectorClient withGenerateClientRequestId(boolean generateClientRequestId) {
+    @Override
+    public void setGenerateClientRequestId(boolean generateClientRequestId) {
         this.generateClientRequestId = generateClientRequestId;
-        return this;
     }
 
     /**
@@ -145,21 +143,22 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * Gets the Attachments object to access its operations.
      * @return the Attachments object.
      */
-    public Attachments attachments() {
+    @Override
+    public Attachments getAttachments() {
         return this.attachments;
     }
 
     /**
      * The Conversations object to access its operations.
      */
-    private RestConversations conversations;
+    private Conversations conversations;
 
     /**
      * Gets the Conversations object to access its operations.
      * @return the Conversations object.
      */
     @Override
-    public RestConversations conversations() {
+    public Conversations getConversations() {
         return this.conversations;
     }
 
@@ -200,25 +199,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
-
-
-        // Format according to https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
-        String build_version;
-        final Properties properties = new Properties();
-        try {
-            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
-            properties.load(propStream);
-            build_version = properties.getProperty("version");
-        } catch (IOException e) {
-            e.printStackTrace();
-            build_version = "4.0.0";
-        }
-
-        String os_version = System.getProperty("os.name");
-        String java_version = System.getProperty("java.version");
-        this.user_agent_string = String.format("BotBuilder/%s (JVM %s; %s)", build_version, java_version, os_version);
+        this.user_agent_string = UserAgent.value();
     }
-
 
     /**
      * Gets the User-Agent header for the client.
@@ -227,8 +209,14 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      */
 
     @Override
-    public String userAgent() {
+    public String getUserAgent() {
         return this.user_agent_string;
+    }
+
+    // this is to override the AzureServiceClient version
+    @Override
+    public String userAgent() {
+        return getUserAgent();
     }
 
     /**
@@ -236,7 +224,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * a RestClient.Builder so that the app can create a custom RestClient, and supply
      * it to ConnectorClient during construction.
      *
-     * One use case of this is for supplying a Proxy to the RestClient.
+     * One use case of this is for supplying a Proxy to the RestClient.  Though it is
+     * recommended to set proxy information via the Java system properties.
      *
      * @param baseUrl
      * @param credentials

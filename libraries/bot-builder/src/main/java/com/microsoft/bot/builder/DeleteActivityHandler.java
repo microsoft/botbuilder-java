@@ -1,6 +1,6 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.models.ConversationReference;
+import com.microsoft.bot.schema.ConversationReference;
 
 /**
  * A method that can participate in delete activity events for the current turn.

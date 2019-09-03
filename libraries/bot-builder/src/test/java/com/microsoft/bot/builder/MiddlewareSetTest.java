@@ -3,7 +3,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
-import com.microsoft.bot.schema.models.ChannelAccount;
+import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.rest.RestClient;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class MiddlewareSetTest extends TestBase
     protected void initializeClients(RestClient restClient, String botId, String userId) {
 
         connector = new RestConnectorClient(restClient);
-        bot = new ChannelAccount().withId(botId);
-        user = new ChannelAccount().withId(userId);
+        bot = new ChannelAccount(botId);
+        user = new ChannelAccount(userId);
 
         // Test-specific stuff
         innerOnreceiveCalled = false;

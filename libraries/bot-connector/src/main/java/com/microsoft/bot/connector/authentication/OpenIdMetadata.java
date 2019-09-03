@@ -45,7 +45,8 @@ class OpenIdMetadata {
     private String refreshCache() {
         try {
             URL openIdUrl = new URL(this.url);
-            HashMap<String, String> openIdConf = this.mapper.readValue(openIdUrl, new TypeReference<HashMap<String, Object>>(){});
+            HashMap<String, String> openIdConf = this.mapper.readValue(
+                openIdUrl, new TypeReference<HashMap<String, Object>>(){});
             URL keysUrl = new URL(openIdConf.get("jwks_uri"));
             this.lastUpdated = System.currentTimeMillis();
             this.cacheKeys = new UrlJwkProvider(keysUrl);

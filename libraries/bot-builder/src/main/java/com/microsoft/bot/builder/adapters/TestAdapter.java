@@ -7,8 +7,8 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.Middleware;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextImpl;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.*;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
@@ -29,22 +29,26 @@ public class TestAdapter extends BotAdapter {
 
     public TestAdapter(ConversationReference reference) {
         if (reference != null) {
-            this.withConversationReference(reference);
+            this.setConversationReference(reference);
         } else {
-            this.withConversationReference(new ConversationReference()
-                    .withChannelId("test")
-                    .withServiceUrl("https://test.com"));
+            this.setConversationReference(new ConversationReference() {{
+                setChannelId("test");
+                setServiceUrl("https://test.com");
+            }});
 
-            this.conversationReference().withUser(new ChannelAccount()
-                    .withId("user1")
-                    .withName("User1"));
-            this.conversationReference().withBot(new ChannelAccount()
-                    .withId("bot")
-                    .withName("Bot"));
-            this.conversationReference().withConversation(new ConversationAccount()
-                    .withIsGroup(Boolean.FALSE)
-                    .withConversationType("convo1")
-                    .withId("Conversation1"));
+            this.conversationReference().setUser(new ChannelAccount() {{
+                setId("user1");
+                setName("User1");
+            }});
+            this.conversationReference().setBot(new ChannelAccount() {{
+                setId("bot");
+                setName("Bot");
+            }});
+            this.conversationReference().setConversation(new ConversationAccount() {{
+                setIsGroup(Boolean.FALSE);
+                setConversationType("convo1");
+                setId("Conversation1");
+            }});
         }
     }
 
@@ -57,24 +61,24 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-    public void ProcessActivity(ActivityImpl activity,
+    public void ProcessActivity(Activity activity,
                                 Consumer<TurnContext> callback
     ) throws Exception {
         synchronized (this.conversationReference()) {
             // ready for next reply
-            if (activity.type() == null)
-                activity.withType(ActivityTypes.MESSAGE);
-            activity.withChannelId(this.conversationReference().channelId());
-            activity.withFrom(this.conversationReference().user());
-            activity.withRecipient(this.conversationReference().bot());
-            activity.withConversation(this.conversationReference().conversation());
-            activity.withServiceUrl(this.conversationReference().serviceUrl());
+            if (activity.getType() == null)
+                activity.setType(ActivityTypes.MESSAGE);
+            activity.setChannelId(this.conversationReference().getChannelId());
+            activity.setFrom(this.conversationReference().getUser());
+            activity.setRecipient(this.conversationReference().getBot());
+            activity.setConversation(this.conversationReference().getConversation());
+            activity.setServiceUrl(this.conversationReference().getServiceUrl());
             Integer next = this.nextId++;
-            activity.withId(next.toString());
+            activity.setId(next.toString());
         }
         // Assume Default DateTime : DateTime(0)
-        if (activity.timestamp() == null || activity.timestamp() == new DateTime(0))
-            activity.withTimestamp(DateTime.now());
+        if (activity.getTimestamp() == null || activity.getTimestamp() == new DateTime(0))
+            activity.setTimestamp(DateTime.now());
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
             super.RunPipeline(context, callback);
@@ -86,7 +90,7 @@ public class TestAdapter extends BotAdapter {
         return conversationReference;
     }
 
-    public void withConversationReference(ConversationReference conversationReference) {
+    public void setConversationReference(ConversationReference conversationReference) {
         this.conversationReference = conversationReference;
     }
 
@@ -95,27 +99,27 @@ public class TestAdapter extends BotAdapter {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
-            if (StringUtils.isEmpty(activity.id()))
-                activity.withId(UUID.randomUUID().toString());
+            if (StringUtils.isEmpty(activity.getId()))
+                activity.setId(UUID.randomUUID().toString());
 
-            if (activity.timestamp() == null)
-                activity.withTimestamp(DateTime.now());
+            if (activity.getTimestamp() == null)
+                activity.setTimestamp(DateTime.now());
 
-            responses.add(new ResourceResponse().withId(activity.id()));
+            responses.add(new ResourceResponse(activity.getId()));
             // This is simulating DELAY
 
             System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.length));
             for (Activity act : activities) {
-                System.out.printf(":--------\n: To:%s\n", act.recipient().name());
-                System.out.printf(": From:%s\n", (act.from() == null) ? "No from set" : act.from().name());
-                System.out.printf(": Text:%s\n:---------", (act.text() == null) ? "No text set" : act.text());
+                System.out.printf(":--------\n: To:%s\n", act.getRecipient().getName());
+                System.out.printf(": From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
+                System.out.printf(": Text:%s\n:---------", (act.getText() == null) ? "No text set" : act.getText());
             }
-            if (activity.type().toString().equals("delay")) {
+            if (activity.getType().toString().equals("delay")) {
                 // The BotFrameworkAdapter and Console adapter implement this
                 // hack directly in the POST method. Replicating that here
                 // to keep the behavior as close as possible to facillitate
                 // more realistic tests.
-                int delayMs = (int) activity.value();
+                int delayMs = (int) activity.getValue();
                 Thread.sleep(delayMs);
             } else {
                 synchronized (this.botReplies) {
@@ -132,14 +136,14 @@ public class TestAdapter extends BotAdapter {
         synchronized (this.botReplies) {
             List<Activity> replies = new ArrayList<>(botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {
-                if (replies.get(i).id().equals(activity.id())) {
+                if (replies.get(i).getId().equals(activity.getId())) {
                     replies.set(i, activity);
                     this.botReplies.clear();
 
                     for (Activity item : replies) {
                         this.botReplies.add(item);
                     }
-                    return new ResourceResponse().withId(activity.id());
+                    return new ResourceResponse(activity.getId());
                 }
             }
         }
@@ -151,7 +155,7 @@ public class TestAdapter extends BotAdapter {
         synchronized (this.botReplies) {
             ArrayList<Activity> replies = new ArrayList<>(this.botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {
-                if (replies.get(i).id().equals(reference.activityId())) {
+                if (replies.get(i).getId().equals(reference.getActivityId())) {
                     replies.remove(i);
                     this.botReplies.clear();
                     for (Activity item : replies) {
@@ -174,10 +178,10 @@ public class TestAdapter extends BotAdapter {
     //@Override
     public CompletableFuture CreateConversation(String channelId, Function<TurnContext, CompletableFuture> callback) {
         this.activeQueue().clear();
-        MessageActivity update = MessageActivity.CreateConversationUpdateActivity();
+        Activity update = Activity.createConversationUpdateActivity();
 
-        update.withConversation(new ConversationAccount().withId(UUID.randomUUID().toString()));
-        TurnContextImpl context = new TurnContextImpl(this, (ActivityImpl) update);
+        update.setConversation(new ConversationAccount(UUID.randomUUID().toString()));
+        TurnContextImpl context = new TurnContextImpl(this, update);
         return callback.apply(context);
     }
 
@@ -198,23 +202,22 @@ public class TestAdapter extends BotAdapter {
     /**
      * Called by TestFlow to get appropriate activity for conversationReference of testbot
      *
-     * @param text
      * @return
      */
     public Activity MakeActivity() {
         return MakeActivity(null);
     }
 
-    public ActivityImpl MakeActivity(String text) {
+    public Activity MakeActivity(String withText) {
         Integer next = nextId++;
-        ActivityImpl activity = (ActivityImpl) new ActivityImpl()
-                .withType(ActivityTypes.MESSAGE)
-                .withFrom(conversationReference().user())
-                .withRecipient(conversationReference().bot())
-                .withConversation(conversationReference().conversation())
-                .withServiceUrl(conversationReference().serviceUrl())
-                .withId(next.toString())
-                .withText(text);
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setFrom(conversationReference().getUser());
+            setRecipient(conversationReference().getBot());
+            setConversation(conversationReference().getConversation());
+            setServiceUrl(conversationReference().getServiceUrl());
+            setId(next.toString());
+            setText(withText);
+        }};
 
         return activity;
     }

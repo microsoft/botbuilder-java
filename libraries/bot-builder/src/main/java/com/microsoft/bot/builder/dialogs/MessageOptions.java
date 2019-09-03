@@ -1,7 +1,7 @@
 package com.microsoft.bot.builder.dialogs;
 
-import com.microsoft.bot.schema.models.AttachmentLayoutTypes;
-import com.microsoft.bot.schema.models.TextFormatTypes;
+import com.microsoft.bot.schema.AttachmentLayoutTypes;
+import com.microsoft.bot.schema.TextFormatTypes;
 
 /**
  * Optional message properties that can be sent {@link Extensions.SayAsync(BotToUser, String MessageOptions,)}

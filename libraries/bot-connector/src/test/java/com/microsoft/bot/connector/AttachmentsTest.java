@@ -1,6 +1,6 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.schema.models.*;
+import com.microsoft.bot.schema.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,22 +13,24 @@ public class AttachmentsTest extends BotConnectorTestBase {
     @Test
     public void GetAttachmentInfo() {
 
-        AttachmentData attachment = new AttachmentData()
-                .withName("bot-framework.png")
-                .withType("image/png")
-                .withOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
+        AttachmentData attachment = new AttachmentData() {{
+            setName("bot-framework.png");
+            setType("image/png");
+            setOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
+        }};
 
-        ConversationParameters createMessage = new ConversationParameters()
-                .withMembers(Collections.singletonList(user))
-                .withBot(bot);
+        ConversationParameters createMessage = new ConversationParameters() {{
+            setMembers(Collections.singletonList(user));
+            setBot(bot);
+        }};
 
-        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
 
-        ResourceResponse attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
+        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment);
 
-        AttachmentInfo response = connector.attachments().getAttachmentInfo(attachmentResponse.id());
+        AttachmentInfo response = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId());
 
-        Assert.assertEquals(attachment.name(), response.name());
+        Assert.assertEquals(attachment.getName(), response.getName());
     }
 
     @Test
@@ -44,23 +46,25 @@ public class AttachmentsTest extends BotConnectorTestBase {
             e.printStackTrace();
         }
 
-        AttachmentData attachment = new AttachmentData()
-                .withName("bot_icon.png")
-                .withType("image/png")
-                .withOriginalBase64(attachmentPayload);
+        AttachmentData attachment = new AttachmentData() {{
+            setName("bot_icon.png");
+            setType("image/png");
+            setOriginalBase64(attachmentPayload);
+        }};
 
-        ConversationParameters createMessage = new ConversationParameters()
-                .withMembers(Collections.singletonList(user))
-                .withBot(bot);
+        ConversationParameters createMessage = new ConversationParameters() {{
+            setMembers(Collections.singletonList(user));
+            setBot(bot);
+        }};
 
-        ConversationResourceResponse conversation = connector.conversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
 
-        ResourceResponse attachmentResponse = connector.conversations().uploadAttachment(conversation.id(), attachment);
+        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment);
 
-        AttachmentInfo attachmentInfo = connector.attachments().getAttachmentInfo(attachmentResponse.id());
+        AttachmentInfo attachmentInfo = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId());
 
-        for (AttachmentView attView : attachmentInfo.views()) {
-            InputStream retrievedAttachment = connector.attachments().getAttachment(attachmentResponse.id(), attView.viewId());
+        for (AttachmentView attView : attachmentInfo.getViews()) {
+            InputStream retrievedAttachment = connector.getAttachments().getAttachment(attachmentResponse.getId(), attView.getViewId());
 
             Assert.assertTrue(isSame(retrievedAttachment, attachmentStream));
         }
@@ -69,7 +73,7 @@ public class AttachmentsTest extends BotConnectorTestBase {
     private byte[] encodeToBase64(File file) {
         try {
             FileInputStream fis = new FileInputStream(file);
-            byte[] result = new byte[(int)file.length()];
+            byte[] result = new byte[(int) file.length()];
             int size = fis.read(result);
             return result;
         } catch (Exception ex) {

@@ -5,7 +5,7 @@ package com.microsoft.bot.builder;
 // Licensed under the MIT License.
 
 
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 
 /**
  * Transcript logger stores activities for conversations for recall.

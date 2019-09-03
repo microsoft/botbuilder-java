@@ -18,10 +18,20 @@ public class TokenValidationParameters {
     }
 
     public TokenValidationParameters(TokenValidationParameters other) {
-        this(other.validateIssuer, other.validIssuers, other.validateAudience, other.validateLifetime, other.clockSkew, other.requireSignedTokens);
+        this(other.validateIssuer,
+            other.validIssuers,
+            other.validateAudience,
+            other.validateLifetime,
+            other.clockSkew,
+            other.requireSignedTokens);
     }
 
-    public TokenValidationParameters(boolean validateIssuer, List<String> validIssuers, boolean validateAudience, boolean validateLifetime, Duration clockSkew, boolean requireSignedTokens) {
+    public TokenValidationParameters(boolean validateIssuer,
+                                     List<String> validIssuers,
+                                     boolean validateAudience,
+                                     boolean validateLifetime,
+                                     Duration clockSkew,
+                                     boolean requireSignedTokens) {
         this.validateIssuer = validateIssuer;
         this.validIssuers = validIssuers;
         this.validateAudience = validateAudience;

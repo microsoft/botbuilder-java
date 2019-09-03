@@ -4,7 +4,7 @@ package com.microsoft.bot.builder;
 // Licensed under the MIT License.
 
 
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.joda.time.DateTime;
 
 import java.util.concurrent.CompletableFuture;

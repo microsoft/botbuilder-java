@@ -1,0 +1,86 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
+package com.microsoft.bot.schema;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * An image on a card.
+ */
+public class CardImage {
+    /**
+     * URL thumbnail image for major content property.
+     */
+    @JsonProperty(value = "url")
+    private String url;
+
+    /**
+     * Image description intended for screen readers.
+     */
+    @JsonProperty(value = "alt")
+    private String alt;
+
+    /**
+     * Action assigned to specific Attachment.
+     */
+    @JsonProperty(value = "tap")
+    private CardAction tap;
+
+    /**
+     * Get the url value.
+     *
+     * @return the url value
+     */
+    public String getUrl() {
+        return this.url;
+    }
+
+    /**
+     * Set the url value.
+     *
+     * @param withUrl the url value to set
+     */
+    public void setUrl(String withUrl) {
+        this.url = withUrl;
+    }
+
+    /**
+     * Get the alt value.
+     *
+     * @return the alt value
+     */
+    public String getAlt() {
+        return this.alt;
+    }
+
+    /**
+     * Set the alt value.
+     *
+     * @param withAlt the alt value to set
+     */
+    public void setAlt(String withAlt) {
+        this.alt = withAlt;
+    }
+
+    /**
+     * Get the tap value.
+     *
+     * @return the tap value
+     */
+    public CardAction getTap() {
+        return this.tap;
+    }
+
+    /**
+     * Set the tap value.
+     *
+     * @param withTap the tap value to set
+     */
+    public void setTap(CardAction withTap) {
+        this.tap = withTap;
+    }
+}

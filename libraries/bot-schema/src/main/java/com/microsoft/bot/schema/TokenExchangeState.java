@@ -1,62 +1,70 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
 package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.bot.schema.models.ConversationReference;
 
 /**
  * State object passed to the bot token service.
  */
-public class TokenExchangeState
-{
+public class TokenExchangeState {
+    /**
+     * The bot's registered application ID
+     */
+    @JsonProperty("msAppId")
+    private String msAppId;
+
     /**
      * The connection name that was used
      */
     @JsonProperty(value = "connectionName")
     private String connectionName;
-    public String connectionName() {
-        return this.connectionName;
-    }
-    public TokenExchangeState withConnectionName(String connectionName) {
-        this.connectionName = connectionName;
-        return this;
-    }
 
     /**
      * A reference to the conversation
      */
     @JsonProperty(value = "conversation")
     private ConversationReference conversation;
-    public ConversationReference conversation() {
-        return this.conversation;
-    }
-    public TokenExchangeState withConversation(ConversationReference conversation) {
-        this.conversation = conversation;
-        return this;
-    }
 
     /**
      * The URL of the bot messaging endpoint
      */
     @JsonProperty("botUrl")
     private String botUrl;
-    public String botUrl() {
-        return this.botUrl;
-    }
-    public TokenExchangeState withBotUrl(String botUrl) {
-        this.botUrl = botUrl;
-        return this;
+
+    public String getConnectionName() {
+        return this.connectionName;
     }
 
-    /**
-     * The bot's registered application ID
-     */
-    @JsonProperty("msAppId")
-    String msAppId;
-    public String msAppId() {
+    public void setConnectionName(String withConnectionName) {
+        this.connectionName = withConnectionName;
+    }
+
+    public ConversationReference getConversation() {
+        return this.conversation;
+    }
+
+    public void setConversation(ConversationReference withConversation) {
+        this.conversation = withConversation;
+    }
+
+    public String getBotUrl() {
+        return this.botUrl;
+    }
+
+    public void setBotUrl(String withBotUrl) {
+        this.botUrl = withBotUrl;
+    }
+
+    public String getMsAppId() {
         return this.msAppId;
     }
-    public TokenExchangeState withMsAppId(String msAppId) {
-        this.msAppId = msAppId;
-        return this;
+
+    public void setMsAppId(String withMsAppId) {
+        this.msAppId = withMsAppId;
     }
 }

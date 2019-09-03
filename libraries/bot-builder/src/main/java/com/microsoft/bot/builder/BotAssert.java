@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
-import com.microsoft.bot.schema.models.ConversationReference;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides methods for debugging Bot Builder code.
@@ -16,19 +16,7 @@ public class BotAssert
     /**
      * Checks that an activity object is not {@code null}.
      * @param activity The activity object.
-     * @throws NullPointerException 
-     * {@code activity} is {@code null}.
-     */
-    public static void ActivityNotNull(ActivityImpl activity)
-    {
-        if (activity == null)
-            throw new IllegalArgumentException ("Activity");
-    }
-
-    /**
-     * Checks that an activity object is not {@code null}.
-     * @param activity The activity object.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code activity} is {@code null}.
      */
     public static void ActivityNotNull(Activity activity)
@@ -40,7 +28,7 @@ public class BotAssert
     /**
      * Checks that a context object is not {@code null}.
      * @param context The context object.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code context} is {@code null}.
      */
     public static void ContextNotNull(TurnContext context)
@@ -52,7 +40,7 @@ public class BotAssert
     /**
      * Checks that a conversation reference object is not {@code null}.
      * @param reference The conversation reference object.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code reference} is {@code null}.
      */
     public static void ConversationReferenceNotNull(ConversationReference reference)
@@ -64,10 +52,10 @@ public class BotAssert
     /**
      * Checks that an activity collection is not {@code null}.
      * @param activities The activities.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code activities} is {@code null}.
      */
-    public static void ActivityListNotNull(ArrayList<Activity> activities)
+    public static void ActivityListNotNull(List<Activity> activities)
     {
         if (activities == null)
             throw new NullPointerException("List<Activity>");
@@ -76,7 +64,7 @@ public class BotAssert
     /**
      * Checks that a middleware object is not {@code null}.
      * @param middleware The middleware object.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code middleware} is {@code null}.
      */
     public static void MiddlewareNotNull(Middleware middleware)
@@ -88,7 +76,7 @@ public class BotAssert
     /**
      * Checks that a middleware collection is not {@code null}.
      * @param middleware The middleware.
-     * @throws NullPointerException 
+     * @throws NullPointerException
      * {@code middleware} is {@code null}.
      */
     public static void MiddlewareNotNull(ArrayList<Middleware> middleware)

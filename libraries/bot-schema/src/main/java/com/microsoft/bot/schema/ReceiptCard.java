@@ -1,0 +1,210 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
+package com.microsoft.bot.schema;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+/**
+ * A receipt card.
+ */
+public class ReceiptCard {
+    /**
+     * Title of the card.
+     */
+    @JsonProperty(value = "title")
+    private String title;
+
+    /**
+     * Array of Fact objects.
+     */
+    @JsonProperty(value = "facts")
+    private List<Fact> facts;
+
+    /**
+     * Array of Receipt Items.
+     */
+    @JsonProperty(value = "items")
+    private List<ReceiptItem> items;
+
+    /**
+     * This action will be activated when user taps on the card.
+     */
+    @JsonProperty(value = "tap")
+    private CardAction tap;
+
+    /**
+     * Total amount of money paid (or to be paid).
+     */
+    @JsonProperty(value = "total")
+    private String total;
+
+    /**
+     * Total amount of tax paid (or to be paid).
+     */
+    @JsonProperty(value = "tax")
+    private String tax;
+
+    /**
+     * Total amount of VAT paid (or to be paid).
+     */
+    @JsonProperty(value = "vat")
+    private String vat;
+
+    /**
+     * Set of actions applicable to the current card.
+     */
+    @JsonProperty(value = "buttons")
+    private List<CardAction> buttons;
+
+    /**
+     * Get the title value.
+     *
+     * @return the title value
+     */
+    public String getTitle() {
+        return this.title;
+    }
+
+    /**
+     * Set the title value.
+     *
+     * @param withTitle the title value to set
+     */
+    public void setTitle(String withTitle) {
+        this.title = withTitle;
+    }
+
+    /**
+     * Get the facts value.
+     *
+     * @return the facts value
+     */
+    public List<Fact> getFacts() {
+        return this.facts;
+    }
+
+    /**
+     * Set the facts value.
+     *
+     * @param withFacts the facts value to set
+     */
+    public void setFacts(List<Fact> withFacts) {
+        this.facts = withFacts;
+    }
+
+    /**
+     * Get the items value.
+     *
+     * @return the items value
+     */
+    public List<ReceiptItem> getItems() {
+        return this.items;
+    }
+
+    /**
+     * Set the items value.
+     *
+     * @param withItems the items value to set
+     */
+    public void setItems(List<ReceiptItem> withItems) {
+        this.items = withItems;
+    }
+
+    /**
+     * Get the tap value.
+     *
+     * @return the tap value
+     */
+    public CardAction getTap() {
+        return this.tap;
+    }
+
+    /**
+     * Set the tap value.
+     *
+     * @param withTap the tap value to set
+     */
+    public void setTap(CardAction withTap) {
+        this.tap = withTap;
+    }
+
+    /**
+     * Get the total value.
+     *
+     * @return the total value
+     */
+    public String getTotal() {
+        return this.total;
+    }
+
+    /**
+     * Set the total value.
+     *
+     * @param withTotal the total value to set
+     */
+    public void setTotal(String withTotal) {
+        this.total = withTotal;
+    }
+
+    /**
+     * Get the tax value.
+     *
+     * @return the tax value
+     */
+    public String geTax() {
+        return this.tax;
+    }
+
+    /**
+     * Set the tax value.
+     *
+     * @param withTax the tax value to set
+     * @return the ReceiptCard object itself.
+     */
+    public void setTax(String withTax) {
+        this.tax = withTax;
+    }
+
+    /**
+     * Get the vat value.
+     *
+     * @return the vat value
+     */
+    public String getVat() {
+        return this.vat;
+    }
+
+    /**
+     * Set the vat value.
+     *
+     * @param withVat the vat value to set
+     */
+    public void setVat(String withVat) {
+        this.vat = withVat;
+    }
+
+    /**
+     * Get the buttons value.
+     *
+     * @return the buttons value
+     */
+    public List<CardAction> getButtons() {
+        return this.buttons;
+    }
+
+    /**
+     * Set the buttons value.
+     *
+     * @param withButtons the buttons value to set
+     * @return the ReceipCard object itself.
+     */
+    public void setButtons(List<CardAction> withButtons) {
+        this.buttons = withButtons;
+    }
+}

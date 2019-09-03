@@ -3,8 +3,7 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.schema.ActivityImpl;
-import com.microsoft.bot.schema.models.Activity;
+import com.microsoft.bot.schema.Activity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,9 +21,9 @@ public class CatchException_MiddlewareTest {
                     public <T> CompletableFuture apply(TurnContext context, T t) throws Exception {
                         return CompletableFuture.runAsync(() -> {
                             Activity activity = context.getActivity();
-                            if (activity instanceof ActivityImpl) {
+                            if (activity instanceof Activity) {
                                 try {
-                                    context.SendActivity(((ActivityImpl) activity).CreateReply(t.toString()));
+                                    context.SendActivity(((Activity) activity).createReply(t.toString()));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
@@ -49,14 +48,14 @@ public class CatchException_MiddlewareTest {
         new TestFlow(adapter, (context) ->
                 {
 
-                    if (context.getActivity().text() == "foo") {
+                    if (context.getActivity().getText() == "foo") {
                         try {
-                            context.SendActivity(context.getActivity().text());
+                            context.SendActivity(context.getActivity().getText());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
-                    if (context.getActivity().text() == "UnsupportedOperationException") {
+                    if (context.getActivity().getText() == "UnsupportedOperationException") {
                         throw new UnsupportedOperationException("Test");
                     }
 
