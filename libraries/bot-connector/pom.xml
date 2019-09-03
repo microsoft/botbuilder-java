@@ -94,7 +94,6 @@
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-schema</artifactId>
-      <version>4.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

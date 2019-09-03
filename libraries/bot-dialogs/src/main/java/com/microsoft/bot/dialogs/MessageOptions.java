@@ -1,4 +1,4 @@
-package com.microsoft.bot.builder.dialogs;
+package com.microsoft.bot.dialogs;
 
 import com.microsoft.bot.schema.AttachmentLayoutTypes;
 import com.microsoft.bot.schema.TextFormatTypes;

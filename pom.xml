@@ -128,14 +128,57 @@
         <scope>test</scope>
       </dependency>
 
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-schema</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-connector</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-builder</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-dialogs</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-configuration</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-ai-luis-v3</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-applicationinsights</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
   <modules>
     <module>libraries/bot-schema</module>
-    <module>libraries/bot-builder</module>
     <module>libraries/bot-connector</module>
+    <module>libraries/bot-builder</module>
     <module>libraries/bot-integration-core</module>
+    <module>libraries/bot-dialogs</module>
+    <module>libraries/bot-configuration</module>
+    <module>libraries/bot-ai-luis-v3</module>
+    <module>libraries/bot-ai-qna</module>
+    <module>libraries/bot-applicationinsights</module>
+    <module>libraries/bot-azure</module>
+
     <module>samples/bot-connector-sample</module>
     <module>samples/servlet-echo</module>
     <module>samples/spring-echo</module>
