@@ -1,33 +1,21 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.aad.adal4j.ClientCredential;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.OAuthClient;
-import com.microsoft.bot.connector.base.TestBase;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
-import com.microsoft.bot.schema.models.TokenResponse;
-import com.microsoft.rest.RestClient;
-import org.apache.commons.lang3.StringUtils;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
 public class OAuthConnectorTest extends OAuthTestBase  {
 
 
-    private ConnectorClientImpl mockConnectorClient;
+    private RestConnectorClient mockConnectorClient;
     private MicrosoftAppCredentials credentials;
 
     public OAuthConnectorTest() throws IOException, ExecutionException, InterruptedException, URISyntaxException {

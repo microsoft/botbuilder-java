@@ -8,12 +8,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.ClaimsIdentity;
-import com.microsoft.bot.connector.authentication.CredentialProvider;
-import com.microsoft.bot.connector.authentication.CredentialProviderImpl;
-import com.microsoft.bot.connector.authentication.JwtTokenValidation;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.ExecutorFactory;
+import com.microsoft.bot.connector.authentication.*;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 import javax.servlet.*;
@@ -24,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.Properties;
+import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +52,7 @@ public class EchoServlet extends HttpServlet {
             String appId = p.getProperty("MicrosoftAppId");
             String appPassword = p.getProperty("MicrosoftAppPassword");
 
-            this.credentialProvider = new CredentialProviderImpl(appId, appPassword);
+            this.credentialProvider = new SimpleCredentialProvider(appId, appPassword);
             this.credentials = new MicrosoftAppCredentials(appId, appPassword);
         }
         catch(IOException ioe){
@@ -67,11 +66,11 @@ public class EchoServlet extends HttpServlet {
             final Activity activity = getActivity(request);
             String authHeader = request.getHeader("Authorization");
 
-            CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider);
+            CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider, new SimpleChannelProvider());
             authenticateRequest.thenRunAsync(() -> {
                 if (activity.type().equals(ActivityTypes.MESSAGE)) {
                     // reply activity with the same text
-                    ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), this.credentials);
+                    ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), this.credentials);
                     connector.conversations().sendToConversation(activity.conversation().id(),
                             new Activity()
                                     .withType(ActivityTypes.MESSAGE)
@@ -80,13 +79,21 @@ public class EchoServlet extends HttpServlet {
                                     .withFrom(activity.recipient())
                     );
                 }
-            });
-        } catch (AuthenticationException ex) {
-            response.setStatus(401);
-            LOGGER.log(Level.WARNING, "Auth failed!", ex);
+            }, ExecutorFactory.getExecutor()).join();
+
+            response.setStatus(200);
+        } catch (CompletionException ex) {
+            if (ex.getCause() instanceof AuthenticationException) {
+                LOGGER.log(Level.WARNING, "Auth failed!", ex);
+                response.setStatus(401);
+            }
+            else {
+                LOGGER.log(Level.WARNING, "Execution failed", ex);
+                response.setStatus(500);
+            }
         } catch (Exception ex) {
-            response.setStatus(500);
             LOGGER.log(Level.WARNING, "Execution failed", ex);
+            response.setStatus(500);
         }
     }
 

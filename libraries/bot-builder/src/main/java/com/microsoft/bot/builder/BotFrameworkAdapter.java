@@ -5,9 +5,10 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
-import com.microsoft.bot.connector.implementation.ConversationsImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
+import com.microsoft.bot.connector.rest.RestConversations;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.*;
 import com.microsoft.rest.retry.RetryStrategy;
@@ -129,9 +130,9 @@ public class BotFrameworkAdapter extends BotAdapter {
         try (TurnContextImpl context = new TurnContextImpl(this, new ConversationReferenceHelper(reference).GetPostToBotMessage())) {
             // Hand craft Claims Identity.
             HashMap<String, String> claims = new HashMap<String, String>();
-            claims.put(AuthenticationConstants.AudienceClaim, botAppId);
-            claims.put(AuthenticationConstants.AppIdClaim, botAppId);
-            ClaimsIdentityImpl claimsIdentity = new ClaimsIdentityImpl("ExternalBearer", claims);
+            claims.put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+            claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
 
             context.getServices().Add("BotIdentity", claimsIdentity);
 
@@ -351,7 +352,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
     public void DeleteActivity(TurnContext context, ConversationReference reference) {
-        ConnectorClientImpl connectorClient = context.getServices().Get("ConnectorClient");
+        RestConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
         try {
             connectorClient.conversations().deleteConversationMemberFuture(reference.conversation().id(), reference.activityId()).join();
         } catch (ExecutionException e) {
@@ -592,8 +593,8 @@ public class BotFrameworkAdapter extends BotAdapter {
 
             Conversations conv = connectorClient.conversations();
             List<ConversationResourceResponse> results = null;
-            if (conv instanceof ConversationsImpl) {
-                ConversationsImpl convImpl = (ConversationsImpl) conv;
+            if (conv instanceof RestConversations) {
+                RestConversations convImpl = (RestConversations) conv;
                 results = convImpl.CreateConversationAsync(conversationParameters).join();
             } else {
                 results = new ArrayList<ConversationResourceResponse>();
@@ -628,7 +629,7 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // Should never happen
                 throw new RuntimeException(String.format("Conversations create issue - returned %d conversations", results.size()));
             }
-        });
+        }, ExecutorFactory.getExecutor());
 
     }
 
@@ -643,14 +644,14 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     protected OAuthClient CreateOAuthApiClient(TurnContext context) throws MalformedURLException, URISyntaxException {
-        ConnectorClientImpl client = context.getServices().Get("ConnectorClient");
+        RestConnectorClient client = context.getServices().Get("ConnectorClient");
         if (client == null) {
             throw new IllegalArgumentException("CreateOAuthApiClient: OAuth requires a valid ConnectorClient instance");
         }
         if (isEmulatingOAuthCards) {
             return new OAuthClient(client, context.getActivity().serviceUrl());
         }
-        return new OAuthClient(client, AuthenticationConstants.OAuthUrl);
+        return new OAuthClient(client, AuthenticationConstants.OAUTH_URL);
     }
 
     /**
@@ -686,12 +687,12 @@ public class BotFrameworkAdapter extends BotAdapter {
             // For anonymous requests (requests with no header) appId is not set in claims.
 
             Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                    .filter(claim -> claim.getKey() == AuthenticationConstants.AudienceClaim)
+                    .filter(claim -> claim.getKey() == AuthenticationConstants.AUDIENCE_CLAIM)
                     .findFirst()
                     .orElse(null);
             if (botAppIdClaim == null) {
                 botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                        .filter(claim -> claim.getKey() == AuthenticationConstants.AppIdClaim)
+                        .filter(claim -> claim.getKey() == AuthenticationConstants.APPID_CLAIM)
                         .findFirst()
                         .orElse(null);
             }
@@ -719,7 +720,7 @@ public class BotFrameworkAdapter extends BotAdapter {
                     throw new RuntimeException(String.format("Bad Service URL: %s", serviceUrl));
                 }
             }
-        });
+        }, ExecutorFactory.getExecutor());
 
     }
 
@@ -735,9 +736,9 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     private ConnectorClient CreateConnectorClient(String serviceUrl, MicrosoftAppCredentials appCredentials) throws MalformedURLException, URISyntaxException {
-        ConnectorClientImpl connectorClient = null;
+        RestConnectorClient connectorClient = null;
         if (appCredentials != null) {
-            connectorClient = new ConnectorClientImpl(new URI(serviceUrl).toURL().toString(), appCredentials);
+            connectorClient = new RestConnectorClient(new URI(serviceUrl).toURL().toString(), appCredentials);
         }
         // TODO: Constructor necessary?
 //        else {
@@ -763,7 +764,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     private CompletableFuture<MicrosoftAppCredentials> GetAppCredentialsAsync(String appId) {
         CompletableFuture<MicrosoftAppCredentials> result = CompletableFuture.supplyAsync(() -> {
             if (appId == null) {
-                return MicrosoftAppCredentials.Empty;
+                return MicrosoftAppCredentials.empty();
             }
             if (this.appCredentialMap.containsKey(appId))
                 return this.appCredentialMap.get(appId);
@@ -772,7 +773,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             this.appCredentialMap.put(appId, appCredentials);
             return appCredentials;
 
-        });
+        }, ExecutorFactory.getExecutor());
         return result;
     }
 

@@ -1,9 +1,8 @@
 package com.microsoft.bot.builder;
 
 
-import com.microsoft.bot.builder.ActionDel;
 import com.microsoft.bot.builder.base.TestBase;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.ChannelAccount;
 import com.microsoft.rest.RestClient;
 import org.junit.Assert;
@@ -16,7 +15,7 @@ import java.util.function.Consumer;
 // [TestCategory("Russian Doll Middleware, Nested Middleware sets")]
 public class MiddlewareSetTest extends TestBase
 {
-    protected ConnectorClientImpl connector;
+    protected RestConnectorClient connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
     private boolean innerOnreceiveCalled;
@@ -28,7 +27,7 @@ public class MiddlewareSetTest extends TestBase
     @Override
     protected void initializeClients(RestClient restClient, String botId, String userId) {
 
-        connector = new ConnectorClientImpl(restClient);
+        connector = new RestConnectorClient(restClient);
         bot = new ChannelAccount().withId(botId);
         user = new ChannelAccount().withId(userId);
 

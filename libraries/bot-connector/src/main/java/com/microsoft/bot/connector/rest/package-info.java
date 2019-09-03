@@ -22,4 +22,4 @@
  * Generate your own from the [Connector API Swagger file](https://raw.githubusercontent.com/Microsoft/BotBuilder/master/CSharp/Library/Microsoft.Bot.Connector.Shared/Swagger/ConnectorAPI.json)
  © 2016 Microsoft.
  */
-package com.microsoft.bot.connector.implementation;
+package com.microsoft.bot.connector.rest;

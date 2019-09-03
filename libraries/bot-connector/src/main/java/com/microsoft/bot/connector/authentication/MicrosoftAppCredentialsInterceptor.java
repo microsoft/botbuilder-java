@@ -31,8 +31,15 @@ class MicrosoftAppCredentialsInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         if (MicrosoftAppCredentials.isTrustedServiceUrl(chain.request().url().url().toString())) {
+            String token;
+            try {
+                token = this.credentials.getToken().get().getAccessToken();
+            } catch (Throwable t) {
+                throw new IOException(t);
+            }
+
             Request newRequest = chain.request().newBuilder()
-                .header("Authorization", "Bearer " + this.credentials.getToken(chain.request()))
+                .header("Authorization", "Bearer " + token)
                 .build();
             return chain.proceed(newRequest);
         }

@@ -86,6 +86,10 @@
       <groupId>com.auth0</groupId>
       <artifactId>jwks-rsa</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.microsoft.bot</groupId>

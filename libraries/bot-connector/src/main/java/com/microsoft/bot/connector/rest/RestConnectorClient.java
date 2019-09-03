@@ -2,10 +2,9 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
- *
  */
 
-package com.microsoft.bot.connector.implementation;
+package com.microsoft.bot.connector.rest;
 
 import com.microsoft.azure.AzureClient;
 import com.microsoft.azure.AzureResponseBuilder;
@@ -24,12 +23,27 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Initializes a new instance of the ConnectorClientImpl class.
+ * The Bot Connector REST API allows your bot to send and receive messages
+ * to channels configured in the
+ * [Bot Framework Developer Portal](https://dev.botframework.com). The
+ * Connector service uses industry-standard REST
+ * and JSON over HTTPS.
+ *
+ * Client libraries for this REST API are available. See below for a list.
+ *
+ * Many bots will use both the Bot Connector REST API and the associated
+ * [Bot State REST API](/en-us/restapi/state). The
+ * Bot State REST API allows a bot to store and retrieve state associated
+ * with users and conversations.
+ *
+ * Authentication for both the Bot Connector and Bot State REST APIs is
+ * accomplished with JWT Bearer tokens, and is
+ * described in detail in the [Connector
+ * Authentication](/en-us/restapi/authentication) document.
  */
-public class ConnectorClientImpl extends AzureServiceClient implements ConnectorClient {
+public class RestConnectorClient extends AzureServiceClient implements ConnectorClient {
     /** the {@link AzureClient} used for long running operations. */
     private AzureClient azureClient;
-
 
     /**
      * Gets the {@link AzureClient} used for long running operations.
@@ -58,7 +72,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * @param acceptLanguage the acceptLanguage value.
      * @return the service client itself
      */
-    public ConnectorClientImpl withAcceptLanguage(String acceptLanguage) {
+    public RestConnectorClient withAcceptLanguage(String acceptLanguage) {
         this.acceptLanguage = acceptLanguage;
         return this;
     }
@@ -68,7 +82,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * TODO: Use this.
      */
     private RetryStrategy retryStrategy = null;
-    public ConnectorClientImpl withRestRetryStrategy(RetryStrategy retryStrategy) {
+    public RestConnectorClient withRestRetryStrategy(RetryStrategy retryStrategy) {
         this.retryStrategy = retryStrategy;
         return this;
     }
@@ -94,7 +108,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
      * @return the service client itself
      */
-    public ConnectorClientImpl withLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
+    public RestConnectorClient withLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
         this.longRunningOperationRetryTimeout = longRunningOperationRetryTimeout;
         return this;
     }
@@ -117,7 +131,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * @param generateClientRequestId the generateClientRequestId value.
      * @return the service client itself
      */
-    public ConnectorClientImpl withGenerateClientRequestId(boolean generateClientRequestId) {
+    public RestConnectorClient withGenerateClientRequestId(boolean generateClientRequestId) {
         this.generateClientRequestId = generateClientRequestId;
         return this;
     }
@@ -138,14 +152,14 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
     /**
      * The Conversations object to access its operations.
      */
-    private ConversationsImpl conversations;
+    private RestConversations conversations;
 
     /**
      * Gets the Conversations object to access its operations.
      * @return the Conversations object.
      */
     @Override
-    public ConversationsImpl conversations() {
+    public RestConversations conversations() {
         return this.conversations;
     }
 
@@ -154,7 +168,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      *
      * @param credentials the management credentials for Azure
      */
-    public ConnectorClientImpl(ServiceClientCredentials credentials) {
+    public RestConnectorClient(ServiceClientCredentials credentials) {
         this("https://api.botframework.com", credentials);
     }
 
@@ -164,7 +178,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      * @param baseUrl the base URL of the host
      * @param credentials the management credentials for Azure
      */
-    public ConnectorClientImpl(String baseUrl, ServiceClientCredentials credentials) {
+    public RestConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
         super(baseUrl, credentials);
         initialize();
     }
@@ -174,7 +188,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
      *
      * @param restClient the REST client to connect to Azure.
      */
-    public ConnectorClientImpl(RestClient restClient){
+    public RestConnectorClient(RestClient restClient){
         super(restClient);
         initialize();
     }
@@ -183,8 +197,8 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
-        this.attachments = new AttachmentsImpl(restClient().retrofit(), this);
-        this.conversations = new ConversationsImpl(restClient().retrofit(), this);
+        this.attachments = new RestAttachments(restClient().retrofit(), this);
+        this.conversations = new RestConversations(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
 
 
@@ -192,7 +206,7 @@ public class ConnectorClientImpl extends AzureServiceClient implements Connector
         String build_version;
         final Properties properties = new Properties();
         try {
-            InputStream propStream = ConnectorClientImpl.class.getClassLoader().getResourceAsStream("project.properties");
+            InputStream propStream = RestConnectorClient.class.getClassLoader().getResourceAsStream("project.properties");
             properties.load(propStream);
             build_version = properties.getProperty("version");
         } catch (IOException e) {

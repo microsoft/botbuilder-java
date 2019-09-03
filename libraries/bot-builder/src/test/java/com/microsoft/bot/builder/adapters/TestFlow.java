@@ -1,6 +1,7 @@
 package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import org.joda.time.DateTime;
@@ -297,7 +298,7 @@ public class TestFlow {
                     return e.getMessage();
                 }
 
-            })
+            }, ExecutorFactory.getExecutor())
                     .thenApply(arg -> { // Assert Reply
                         int finalTimeout = Integer.MAX_VALUE;
                         if (isDebug())

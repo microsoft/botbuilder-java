@@ -2,6 +2,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.ActivityImpl;
 import com.microsoft.bot.schema.models.Activity;
 import org.junit.Assert;
@@ -31,7 +32,7 @@ public class CatchException_MiddlewareTest {
                             } else
                                 Assert.assertTrue("Test was built for ActivityImpl", false);
 
-                        });
+                        }, ExecutorFactory.getExecutor());
 
                     }
                 }, Exception.class))

@@ -6,11 +6,9 @@ package com.microsoft.bot.connector.sample;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.CredentialProvider;
-import com.microsoft.bot.connector.authentication.CredentialProviderImpl;
-import com.microsoft.bot.connector.authentication.JwtTokenValidation;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.authentication.*;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 import com.microsoft.bot.schema.models.ResourceResponse;
@@ -30,7 +28,7 @@ public class App {
     private static String appPassword = ""; // <-- app password -->
 
     public static void main( String[] args ) throws IOException {
-        CredentialProvider credentialProvider = new CredentialProviderImpl(appId, appPassword);
+        CredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
         HttpServer server = HttpServer.create(new InetSocketAddress(3978), 0);
         server.createContext("/api/messages", new MessageHandle(credentialProvider));
         server.setExecutor(null);
@@ -55,7 +53,7 @@ public class App {
                 Activity activity = getActivity(httpExchange);
                 String authHeader = httpExchange.getRequestHeaders().getFirst("Authorization");
                 try {
-                    JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider);
+                    JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider, new SimpleChannelProvider());
 
                     // send ack to user activity
                     httpExchange.sendResponseHeaders(202, 0);
@@ -63,7 +61,7 @@ public class App {
 
                     if (activity.type().equals(ActivityTypes.MESSAGE)) {
                         // reply activity with the same text
-                        ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), this.credentials);
+                        ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), this.credentials);
                         ResourceResponse response = connector.conversations().sendToConversation(activity.conversation().id(),
                                 new Activity()
                                         .withType(ActivityTypes.MESSAGE)

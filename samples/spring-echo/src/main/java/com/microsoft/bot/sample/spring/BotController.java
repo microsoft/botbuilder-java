@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 
 package com.microsoft.bot.sample.spring;
+import com.microsoft.bot.connector.ConnectorClient;
+import com.microsoft.bot.connector.ExecutorFactory;
+import com.microsoft.bot.connector.authentication.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,16 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 
 import com.microsoft.aad.adal4j.AuthenticationException;
-import com.microsoft.bot.connector.authentication.ClaimsIdentity;
-import com.microsoft.bot.connector.authentication.CredentialProvider;
-import com.microsoft.bot.connector.authentication.CredentialProviderImpl;
-import com.microsoft.bot.connector.authentication.JwtTokenValidation;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.implementation.ConnectorClientImpl;
+import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.models.Activity;
 import com.microsoft.bot.schema.models.ActivityTypes;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * This is the controller that will receive incoming Channel Activity messages.
@@ -51,7 +49,7 @@ public class BotController {
      */
     @PostConstruct
     public void init() {
-        _credentialProvider = new CredentialProviderImpl(appId, appPassword);
+        _credentialProvider = new SimpleCredentialProvider(appId, appPassword);
         _credentials = new MicrosoftAppCredentials(appId, appPassword);
     }
 
@@ -66,20 +64,25 @@ public class BotController {
     public ResponseEntity<Object> incoming(@RequestBody Activity activity,
             @RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
         try {
-            CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider);
-            authenticateRequest.thenRunAsync(() -> {
-                if (activity.type().equals(ActivityTypes.MESSAGE)) {
-                    logger.info("Received: " + activity.text());
+            JwtTokenValidation.authenticateRequest(activity, authHeader, _credentialProvider, new SimpleChannelProvider())
+                .thenRunAsync(() -> {
+                    if (activity.type().equals(ActivityTypes.MESSAGE)) {
+                        logger.info("Received: " + activity.text());
 
-                    // reply activity with the same text
-                    ConnectorClientImpl connector = new ConnectorClientImpl(activity.serviceUrl(), _credentials);
-                    connector.conversations().sendToConversation(activity.conversation().id(),
-                            new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
-                                    .withRecipient(activity.from()).withFrom(activity.recipient()));
-                }
-            });
-        } catch (AuthenticationException ex) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                        // reply activity with the same text
+                        ConnectorClient connector = new RestConnectorClient(activity.serviceUrl(), _credentials);
+                        connector.conversations().sendToConversation(activity.conversation().id(),
+                                new Activity().withType(ActivityTypes.MESSAGE).withText("Echo: " + activity.text())
+                                        .withRecipient(activity.from()).withFrom(activity.recipient()));
+                    }
+                }, ExecutorFactory.getExecutor()).join();
+        } catch (CompletionException ex) {
+            if (ex.getCause() instanceof AuthenticationException) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
