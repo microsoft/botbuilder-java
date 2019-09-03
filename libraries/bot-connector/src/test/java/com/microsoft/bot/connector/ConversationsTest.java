@@ -10,9 +10,11 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 public class ConversationsTest extends BotConnectorTestBase {
 
@@ -54,10 +56,14 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().startsWith("Invalid userId"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().startsWith("Invalid userId"));
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -78,10 +84,14 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("BadArgument", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().startsWith("Conversations"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("BadArgument", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().startsWith("Conversations"));
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -102,9 +112,19 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("BadArgument", e.body().getError().getCode().toString());
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            Assert.assertEquals("BadArgument", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+        }
+    }
+
+    @Test
+    public void CreateConversationWithNullParameter() {
+        try {
+            ConversationResourceResponse result = connector.getConversations().createConversation(null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 
@@ -142,10 +162,24 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             List<ChannelAccount> members = connector.getConversations().getConversationMembers(conversation.getId().concat("M"));
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("The specified channel was not found"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("The specified channel was not found"));
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Test
+    public void GetConversationMembersWithNullConversationId() {
+        try {
+            List<ChannelAccount> members = connector.getConversations().getConversationMembers(null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 
@@ -171,6 +205,34 @@ public class ConversationsTest extends BotConnectorTestBase {
             Assert.assertTrue(hasUser);
         } catch (ErrorResponseException e) {
             Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
+        }
+    }
+
+    @Test
+    public void GetConversationPagedMembersWithInvalidConversationId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Get Activity Members");
+        }};
+
+        ConversationParameters createMessage = new ConversationParameters() {{
+            setMembers(Collections.singletonList(user));
+            setBot(bot);
+            setActivity(activity);
+        }};
+
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+
+        try {
+            connector.getConversations().getConversationPagedMembers(conversation.getId().concat("M"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals(400, ((ErrorResponseException)e.getCause()).response().code());
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -215,10 +277,14 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId().concat("M"), activity);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("The specified channel was not found"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("The specified channel was not found"));
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -242,12 +308,43 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("MissingProperty", e.body().getError().getCode().toString());
-            Assert.assertEquals("The bot referenced by the 'from' field is unrecognized", e.body().getError().getMessage());
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("MissingProperty", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertEquals("The bot referenced by the 'from' field is unrecognized", ((ErrorResponseException)e.getCause()).body().getError().getMessage());
+            } else {
+                throw e;
+            }
         }
     }
+
+    @Test
+    public void SendToConversationWithNullConversationId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Send to Conversation with null conversation id");
+        }};
+
+        try {
+            connector.getConversations().sendToConversation(null, activity);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void SendToConversationWithNullActivity() {
+        try {
+            connector.getConversations().sendToConversation("id",null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
 
     @Test
     public void SendCardToConversation() {
@@ -341,10 +438,34 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             List<ChannelAccount> members = connector.getConversations().getActivityMembers(conversation.getId().concat("M"), conversation.getActivityId());
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("The specified channel was not found"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("The specified channel was not found"));
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Test
+    public void GetActivityMembersWithNullConversationId() {
+        try {
+            connector.getConversations().getActivityMembers(null, "id");
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void GetActivityMembersWithNullActivityId() {
+        try {
+            connector.getConversations().getActivityMembers("id", null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 
@@ -403,10 +524,81 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId().concat("M"), response.getId(), reply);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("The specified channel was not found"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("The specified channel was not found"));
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Test
+    public void ReplyToActivityWithNullConversationId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Reply activity with null conversation id");
+        }};
+
+        try {
+            connector.getConversations().replyToActivity(null, "id", activity);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void ReplyToActivityWithNullActivityId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Reply activity with null activity id");
+        }};
+
+        try {
+            connector.getConversations().replyToActivity("id", null, activity);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void ReplyToActivityWithNullActivity() {
+        try {
+            connector.getConversations().replyToActivity("id", "id", null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void ReplyToActivityWithNullReply() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Reply activity with null reply");
+        }};
+
+        ConversationParameters createMessage = new ConversationParameters() {{
+            setMembers(Collections.singletonList(user));
+            setBot(bot);
+        }};
+
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+
+        try {
+            ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 
@@ -451,10 +643,34 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             connector.getConversations().deleteActivity("B21S8SG7K:T03CWQ0QB", conversation.getActivityId());
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("Invalid ConversationId"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("Invalid ConversationId"));
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Test
+    public void DeleteActivityWithNullConversationId() {
+        try {
+            connector.getConversations().deleteActivity(null, "id");
+            Assert.fail("expected exception did not occur.");
+        } catch(IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void DeleteActivityWithNullActivityId() {
+        try {
+            connector.getConversations().deleteActivity("id", null);
+            Assert.fail("expected exception did not occur.");
+        } catch(IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 
@@ -507,10 +723,56 @@ public class ConversationsTest extends BotConnectorTestBase {
 
         try {
             ResourceResponse updateResponse = connector.getConversations().updateActivity("B21S8SG7K:T03CWQ0QB", response.getId(), activity);
-            Assert.fail("expected exception was not occurred.");
-        } catch (ErrorResponseException e) {
-            Assert.assertEquals("ServiceError", e.body().getError().getCode().toString());
-            Assert.assertTrue(e.body().getError().getMessage().contains("Invalid ConversationId"));
+            Assert.fail("expected exception did not occur.");
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof ErrorResponseException) {
+                Assert.assertEquals("ServiceError", ((ErrorResponseException)e.getCause()).body().getError().getCode());
+                Assert.assertTrue(((ErrorResponseException)e.getCause()).body().getError().getMessage().contains("Invalid ConversationId"));
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Test
+    public void UpdateActivityWithNullConversationId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Activity to be updated with null conversation Id");
+        }};
+
+        try {
+            connector.getConversations().updateActivity(null, "id", activity);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void UpdateActivityWithNullActivityId() {
+        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
+            setRecipient(user);
+            setFrom(bot);
+            setText("TEST Activity to be updated with null activity Id");
+        }};
+
+        try {
+            connector.getConversations().updateActivity("id", null, activity);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        }
+    }
+
+    @Test
+    public void UpdateActivityWithNullActivity() {
+        try {
+            connector.getConversations().updateActivity("id", "id", null);
+            Assert.fail("expected exception did not occur.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("cannot be null"));
         }
     }
 

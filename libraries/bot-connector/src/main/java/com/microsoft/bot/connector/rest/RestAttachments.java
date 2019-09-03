@@ -10,11 +10,11 @@ import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Attachments;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.schema.AttachmentInfo;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -22,8 +22,6 @@ import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
 import retrofit2.Response;
-import rx.functions.Func1;
-import rx.Observable;
 
 /**
  * An instance of this class provides access to all the operations defined
@@ -53,14 +51,14 @@ public class RestAttachments implements Attachments {
     interface AttachmentsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
         @GET("v3/attachments/{attachmentId}")
-        Observable<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId,
-                                                             @Header("accept-language") String acceptLanguage,
-                                                             @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId,
+                                                                    @Header("accept-language") String acceptLanguage,
+                                                                    @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachment" })
         @GET("v3/attachments/{attachmentId}/views/{viewId}")
         @Streaming
-        Observable<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId,
+        CompletableFuture<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId,
                                                          @Path("viewId") String viewId,
                                                          @Header("accept-language") String acceptLanguage,
                                                          @Header("User-Agent") String userAgent);
@@ -78,21 +76,7 @@ public class RestAttachments implements Attachments {
      * @return the AttachmentInfo object if successful.
      */
     public AttachmentInfo getAttachmentInfo(String attachmentId) {
-        return getAttachmentInfoWithServiceResponseAsync(attachmentId).toBlocking().single().body();
-    }
-
-    /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
-     *
-     * @param attachmentId attachment id
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
-     */
-    public ServiceFuture<AttachmentInfo> getAttachmentInfoAsync(
-        String attachmentId, final ServiceCallback<AttachmentInfo> serviceCallback) {
-        return ServiceFuture.fromResponse(getAttachmentInfoWithServiceResponseAsync(attachmentId), serviceCallback);
+        return getAttachmentInfoAsync(attachmentId).join();
     }
 
     /**
@@ -103,29 +87,19 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the AttachmentInfo object
      */
-    public Observable<AttachmentInfo> getAttachmentInfoAsync(String attachmentId) {
-        return getAttachmentInfoWithServiceResponseAsync(attachmentId).map(response -> response.body());
-    }
-
-    /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
-     *
-     * @param attachmentId attachment id
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the AttachmentInfo object
-     */
-    public Observable<ServiceResponse<AttachmentInfo>> getAttachmentInfoWithServiceResponseAsync(String attachmentId) {
+    public CompletableFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId) {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
+
         return service.getAttachmentInfo(attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .flatMap((Func1<Response<ResponseBody>, Observable<ServiceResponse<AttachmentInfo>>>) response -> {
+            .thenApply(responseBodyResponse -> {
                 try {
-                    ServiceResponse<AttachmentInfo> clientResponse = getAttachmentInfoDelegate(response);
-                    return Observable.just(clientResponse);
+                    return getAttachmentInfoDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
                 } catch (Throwable t) {
-                    return Observable.error(t);
+                    throw new ErrorResponseException("getAttachmentInfoAsync", responseBodyResponse);
                 }
             });
     }
@@ -151,23 +125,7 @@ public class RestAttachments implements Attachments {
      * @return the InputStream object if successful.
      */
     public InputStream getAttachment(String attachmentId, String viewId) {
-        return getAttachmentWithServiceResponseAsync(attachmentId, viewId).toBlocking().single().body();
-    }
-
-    /**
-     * GetAttachment.
-     * Get the named view as binary content.
-     *
-     * @param attachmentId attachment id
-     * @param viewId View id from attachmentInfo
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
-     */
-    public ServiceFuture<InputStream> getAttachmentAsync(String attachmentId,
-                                                         String viewId,
-                                                         final ServiceCallback<InputStream> serviceCallback) {
-        return ServiceFuture.fromResponse(getAttachmentWithServiceResponseAsync(attachmentId, viewId), serviceCallback);
+        return getAttachmentAsync(attachmentId, viewId).join();
     }
 
     /**
@@ -179,21 +137,7 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the InputStream object
      */
-    public Observable<InputStream> getAttachmentAsync(String attachmentId, String viewId) {
-        return getAttachmentWithServiceResponseAsync(attachmentId, viewId).map(response -> response.body());
-    }
-
-    /**
-     * GetAttachment.
-     * Get the named view as binary content.
-     *
-     * @param attachmentId attachment id
-     * @param viewId View id from attachmentInfo
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the InputStream object
-     */
-    public Observable<ServiceResponse<InputStream>> getAttachmentWithServiceResponseAsync(String attachmentId,
-                                                                                          String viewId) {
+    public CompletableFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId) {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
@@ -201,12 +145,13 @@ public class RestAttachments implements Attachments {
             throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
         }
         return service.getAttachment(attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .flatMap((Func1<Response<ResponseBody>, Observable<ServiceResponse<InputStream>>>) response -> {
+            .thenApply(responseBodyResponse -> {
                 try {
-                    ServiceResponse<InputStream> clientResponse = getAttachmentDelegate(response);
-                    return Observable.just(clientResponse);
+                    return getAttachmentDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
                 } catch (Throwable t) {
-                    return Observable.error(t);
+                    throw new ErrorResponseException("getAttachmentAsync", responseBodyResponse);
                 }
             });
     }
