@@ -179,7 +179,6 @@
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
 
-    <module>samples/bot-connector-sample</module>
     <module>samples/servlet-echo</module>
     <module>samples/spring-echo</module>
   </modules>
