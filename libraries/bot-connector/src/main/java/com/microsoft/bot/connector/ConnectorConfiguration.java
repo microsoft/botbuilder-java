@@ -19,9 +19,9 @@ import java.util.function.Consumer;
 public class ConnectorConfiguration {
     public void process(Consumer<Properties> func) {
         final Properties properties = new Properties();
-        try {
-            InputStream propStream = UserAgent.class.getClassLoader()
-                .getResourceAsStream("connector.properties");
+        try ( InputStream propStream = UserAgent.class.getClassLoader()
+            .getResourceAsStream("connector.properties")) {
+
             properties.load(propStream);
             func.accept(properties);
         } catch (Throwable t) {
