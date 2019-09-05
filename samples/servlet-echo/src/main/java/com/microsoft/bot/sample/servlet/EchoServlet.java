@@ -16,15 +16,17 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.concurrent.CompletionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is the Servlet that will receive incoming Channel Activity messages.
@@ -32,7 +34,7 @@ import java.util.logging.Logger;
 @WebServlet(name = "EchoServlet", urlPatterns = "/api/messages")
 public class EchoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(EchoServlet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EchoServlet.class);
 
     private ObjectMapper objectMapper;
     private CredentialProvider credentialProvider;
@@ -62,8 +64,20 @@ public class EchoServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try (PrintWriter out = response.getWriter()) {
+            out.println("hello world");
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        } catch (Throwable t) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
+            LOGGER.debug("Received request");
+
             Activity activity = getActivity(request);
             String authHeader = request.getHeader("Authorization");
 
@@ -82,14 +96,14 @@ public class EchoServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
         } catch (CompletionException ex) {
             if (ex.getCause() instanceof AuthenticationException) {
-                LOGGER.log(Level.WARNING, "Auth failed!", ex);
+                LOGGER.error("Auth failed!", ex);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
-                LOGGER.log(Level.WARNING, "Execution failed", ex);
+                LOGGER.error("Execution failed", ex);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Execution failed", ex);
+            LOGGER.error("Execution failed", ex);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -97,7 +111,7 @@ public class EchoServlet extends HttpServlet {
     // Creates an Activity object from the request
     private Activity getActivity(HttpServletRequest request) throws IOException, JsonParseException, JsonMappingException {
         String body = getRequestBody(request);
-        LOGGER.log(Level.INFO, body);
+        LOGGER.debug(body);
         return objectMapper.readValue(body, Activity.class);
     }
 
