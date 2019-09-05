@@ -3,6 +3,7 @@ package com.microsoft.bot.integration;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -18,10 +19,10 @@ public class ClasspathPropertiesConfiguration implements Configuration {
      * Loads properties from the 'application.properties' file.
      */
     public ClasspathPropertiesConfiguration() {
-        try {
+        try (InputStream input = Thread.currentThread().getContextClassLoader()
+            .getResourceAsStream("application.properties")) {
             properties = new Properties();
-            properties.load(Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("application.properties"));
+            properties.load(input);
         } catch (IOException e) {
             (LoggerFactory.getLogger(ClasspathPropertiesConfiguration.class)).error("Unable to load properties", e);
         }
