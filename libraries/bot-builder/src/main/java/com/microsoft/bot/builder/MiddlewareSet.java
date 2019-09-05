@@ -3,95 +3,77 @@
 
 package com.microsoft.bot.builder;
 
-
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
+/**
+ * Contains an ordered set of {@link Middleware}.
+ */
 public class MiddlewareSet implements Middleware {
     public NextDelegate Next;
+    private final ArrayList<Middleware> middleware = new ArrayList<>();
 
-    private final ArrayList<Middleware> _middleware = new ArrayList<Middleware>();
-
-    public MiddlewareSet Use(Middleware middleware) {
+    /**
+     * Adds a middleware object to the end of the set.
+     *
+     * @param middleware The middleware to add.
+     * @return The updated middleware set.
+     */
+    public MiddlewareSet use(Middleware middleware) {
         BotAssert.MiddlewareNotNull(middleware);
-        _middleware.add(middleware);
+        this.middleware.add(middleware);
         return this;
     }
 
-    public void ReceiveActivity(TurnContextImpl context)
-            throws Exception {
-        ReceiveActivityInternal(context, null);
-    }
-
     @Override
-    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        ReceiveActivityInternal((TurnContextImpl) context, null);
-        try {
-            next.next();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(String.format("MiddlewareSet::OnTurn next delegate: %s", e.toString()));
-        }
-    }
-
-
-    public void OnTurn(TurnContextImpl context, CompletableFuture next)
-            throws ExecutionException, InterruptedException {
-        return;
+    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
+        return receiveActivityInternal((TurnContextImpl) context, null)
+            .thenCompose((result) -> next.next());
     }
 
     /**
-     * Intended to be called from Bot, this method performs exactly the same as the
-     * standard ReceiveActivity, except that it runs a user-defined delegate returns
-     * if all Middleware in the receive pipeline was run.
+     * Processes an activity.
+     *
+     * @param context The context object for the turn.
+     * @param callback The delegate to call when the set finishes processing the activity.
+     * @return A task that represents the work queued to execute.
      */
-    public void ReceiveActivityWithStatus(TurnContext context, Consumer<TurnContext> callback)
-            throws Exception {
-        ReceiveActivityInternal(context, callback);
+    public CompletableFuture<Void> receiveActivityWithStatusAsync(TurnContext context, BotCallbackHandler callback) {
+        return receiveActivityInternal(context, callback);
     }
 
-    private void ReceiveActivityInternal(TurnContext context, Consumer<TurnContext> callback)
-            throws Exception {
-        ReceiveActivityInternal(context, callback, 0);
+    private CompletableFuture<Void> receiveActivityInternal(TurnContext context, BotCallbackHandler callback) {
+        return receiveActivityInternal(context, callback, 0);
     }
 
-    private void ReceiveActivityInternal(TurnContext context, Consumer<TurnContext> callback, int nextMiddlewareIndex)
-            throws Exception {
+    private CompletableFuture<Void> receiveActivityInternal(TurnContext context,
+                                                            BotCallbackHandler callback,
+                                                            int nextMiddlewareIndex) {
         // Check if we're at the end of the middleware list yet
-        if (nextMiddlewareIndex == _middleware.size()) {
-            // If all the Middlware ran, the "leading edge" of the tree is now complete. 
-            // This means it's time to run any developer specified callback. 
+        if (nextMiddlewareIndex == middleware.size()) {
+            // If all the Middlware ran, the "leading edge" of the tree is now complete.
+            // This means it's time to run any developer specified callback.
             // Once this callback is done, the "trailing edge" calls are then completed. This
             // allows code that looks like:
             //      Trace.TraceInformation("before");
             //      await next();
-            //      Trace.TraceInformation("after"); 
+            //      Trace.TraceInformation("after");
             // to run as expected.
 
             // If a callback was provided invoke it now and return its task, otherwise just return the completed task
             if (callback == null) {
-                return ;
+                return CompletableFuture.completedFuture(null);
             } else {
-                callback.accept(context);
-                return;
+                return callback.invoke(context);
             }
         }
 
-        // Get the next piece of middleware 
-        Middleware nextMiddleware = _middleware.get(nextMiddlewareIndex);
-        NextDelegate next = new NextDelegate() {
-            public void next() throws Exception {
-                ReceiveActivityInternal(context, callback, nextMiddlewareIndex + 1);
-            }
-        };
+        // Get the next piece of middleware
+        Middleware nextMiddleware = middleware.get(nextMiddlewareIndex);
 
-        // Execute the next middleware passing a closure that will recurse back into this method at the next piece of middlware as the NextDelegate
-        nextMiddleware.OnTurn(
-                context,
-                next);
+        // Execute the next middleware passing a closure that will recurse back into this method at the
+        // next piece of middlware as the NextDelegate
+        return nextMiddleware.onTurnAsync(context, () ->
+            receiveActivityInternal(context, callback, nextMiddlewareIndex + 1));
     }
-
-
 }

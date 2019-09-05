@@ -1,11 +1,11 @@
-package com.microsoft.bot.builder;
-
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Transcript logger stores activities for conversations for recall.
@@ -17,5 +17,5 @@ public interface TranscriptLogger {
      * @param activity The activity to transcribe.
      * @return A task that represents the work queued to execute.
      */
-    void LogActivityAsync(Activity activity);
+    CompletableFuture<Void> logActivityAsync(Activity activity);
 }

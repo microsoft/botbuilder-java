@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -59,7 +60,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
      * @return
      */
     @Override
-    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
+    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
             JsonNode role = null;
@@ -79,17 +80,12 @@ public class TranscriptLoggerMiddleware implements Middleware {
         }
 
         // hook up onSend pipeline
-        context.OnSendActivities((ctx, activities, nextSend) ->
-        {
-
+        context.onSendActivities((ctx, activities, nextSend) -> {
             // run full pipeline
-            ResourceResponse[] responses = new ResourceResponse[0];
-            try {
-                if (nextSend != null) {
-                    responses = nextSend.call();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            CompletableFuture<ResourceResponse[]> responses = null;
+
+            if (nextSend != null) {
+                responses = nextSend.get();
             }
 
             for (Activity activity : activities) {
@@ -97,50 +93,32 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             return responses;
-
-
         });
 
         // hook up update activity pipeline
-        context.OnUpdateActivity((ctx, activity, nextUpdate) ->
-        {
-
+        context.onUpdateActivity((ctx, activity, nextUpdate) -> {
             // run full pipeline
-            ResourceResponse response = null;
-            try {
-                if (nextUpdate != null) {
-                    response = nextUpdate.call();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            CompletableFuture<ResourceResponse> response = null;
 
-
-                throw new RuntimeException(String.format("Error on Logging.OnUpdateActivity : %s", e.toString()));
+            if (nextUpdate != null) {
+                response = nextUpdate.get();
             }
 
             // add Message Update activity
             Activity updateActivity = Activity.clone(activity);
             updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
             LogActivity(updateActivity);
+
             return response;
-
-
         });
 
         // hook up delete activity pipeline
-        context.OnDeleteActivity((ctxt, reference, nextDel) -> {
+        context.onDeleteActivity((ctxt, reference, nextDel) -> {
             // run full pipeline
 
-            try {
-                if (nextDel != null) {
-                    logger.error(String.format("Transcript logActivity next delegate: %s)", nextDel));
-                    nextDel.run();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error(String.format("Transcript logActivity failed with %s (next delegate: %s)", e.toString(), nextDel));
-                throw new RuntimeException(String.format("Transcript logActivity failed with %s", e.getMessage()));
-
+            if (nextDel != null) {
+                logger.debug(String.format("Transcript logActivity next delegate: %s)", nextDel));
+                nextDel.get();
             }
 
             // add MessageDelete activity
@@ -151,18 +129,13 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }};
 
             LogActivity(deleteActivity);
-            return;
 
+            return null;
         });
 
 
         // process bot logic
-        try {
-            next.next();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(String.format("Error on Logging.next : %s", e.toString()));
-        }
+        CompletableFuture<Void> result = next.next();
 
         // flush transcript at end of turn
         while (!transcript.isEmpty()) {
@@ -174,8 +147,8 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
         }
 
+        return result;
     }
-
 
     private void LogActivity(Activity activity) {
         if (activity.getTimestamp() == null) {
@@ -183,7 +156,6 @@ public class TranscriptLoggerMiddleware implements Middleware {
         }
         transcript.offer(activity);
     }
-
 }
 
 

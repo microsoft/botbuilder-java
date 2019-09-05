@@ -95,7 +95,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
+    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
@@ -120,7 +120,7 @@ public class TestAdapter extends BotAdapter {
                 // to keep the behavior as close as possible to facillitate
                 // more realistic tests.
                 int delayMs = (int) activity.getValue();
-                Thread.sleep(delayMs);
+                try { Thread.sleep(delayMs); } catch (InterruptedException e) {}
             } else {
                 synchronized (this.botReplies) {
                     this.botReplies.add(activity);

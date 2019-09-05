@@ -61,11 +61,9 @@ public class MiddlewareSetTest extends TestBase
     public void NestedSet_OnReceive() throws Exception {
         final boolean[] wasCalled = {false};
         MiddlewareSet inner = new MiddlewareSet();
-        inner.Use(new AnonymousReceiveMiddleware(new MiddlewareCall() {
-            public void requestHandler(TurnContext tc, NextDelegate nd) throws Exception {
-                wasCalled[0] = true;
-                nd.next();
-            }
+        inner.Use(new AnonymousReceiveMiddleware((MiddlewareCall) (tc, nd) -> {
+            wasCalled[0] = true;
+            return nd.next();
         }));
         MiddlewareSet outer = new MiddlewareSet();
         outer.Use(inner);

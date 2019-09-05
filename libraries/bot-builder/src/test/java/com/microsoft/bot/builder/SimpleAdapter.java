@@ -36,7 +36,7 @@ public class SimpleAdapter extends BotAdapter {
 
 
     @Override
-    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
+    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", activities);
         Assert.assertTrue("SimpleAdapter.sendActivities: empty activities array.", activities.length > 0);
 
@@ -49,8 +49,6 @@ public class SimpleAdapter extends BotAdapter {
         }
         ResourceResponse[] result = new ResourceResponse[responses.size()];
         return responses.toArray(result);
-
-
     }
 
     @Override

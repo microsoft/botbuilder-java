@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 import static com.microsoft.bot.schema.ActivityTypes.MESSAGE;
 import static com.microsoft.bot.schema.ActivityTypes.TRACE;
@@ -37,7 +38,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final List<UpdateActivityHandler> onUpdateActivity = new ArrayList<UpdateActivityHandler>();
     private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<DeleteActivityHandler>();
 
-    private final TurnContextServiceCollection turnServices;
+    private final TurnContextStateCollection turnState;
 
     /**
      * Creates a context object.
@@ -57,7 +58,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             throw new IllegalArgumentException("activity");
         this.activity = activity;
 
-        turnServices = new TurnContextServiceCollectionImpl();
+        turnState = new TurnContextStateCollection();
     }
 
 
@@ -67,12 +68,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #SendActivity( Activity )}
-     *                                  or {@link #SendActivities( Activity[])} methods are called,
+     *                                  When the context's {@link #sendActivityAsync( Activity )}
+     *                                  or {@link #sendActivitiesAsync( Activity[])} methods are called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
-    public TurnContextImpl OnSendActivities(SendActivitiesHandler handler) {
+    @Override
+    public TurnContext onSendActivities(SendActivitiesHandler handler) {
         if (handler == null)
             throw new IllegalArgumentException("handler");
 
@@ -86,11 +88,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #UpdateActivity( Activity )} is called,
+     *                                  When the context's {@link #updateActivityAsync( Activity )} is called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
-    public TurnContextImpl OnUpdateActivity(UpdateActivityHandler handler) {
+    @Override
+    public TurnContext onUpdateActivity(UpdateActivityHandler handler) {
         if (handler == null)
             throw new IllegalArgumentException("handler");
 
@@ -104,11 +107,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #DeleteActivity(String)} is called,
+     *                                  When the context's {@link #deleteActivityAsync(String)} is called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
-    public TurnContextImpl OnDeleteActivity(DeleteActivityHandler handler) {
+    @Override
+    public TurnContext onDeleteActivity(DeleteActivityHandler handler) {
         if (handler == null)
             throw new IllegalArgumentException("handler");
 
@@ -126,8 +130,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /**
      * Gets the services registered on this context object.
      */
-    public TurnContextServiceCollection getServices() {
-        return this.turnServices;
+    public TurnContextStateCollection getTurnState() {
+        return this.turnState;
     }
 
     /**
@@ -145,11 +149,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return {@code true} if at least one response was sent for the current turn.
      * @throws IllegalArgumentException You attempted to set the value to {@code false}.
      */
+    @Override
     public boolean getResponded() {
         return this.responded;
     }
 
-    public void setResponded(boolean responded) {
+    private void setResponded(boolean responded) {
         if (responded == false) {
             throw new IllegalArgumentException("TurnContext: cannot set 'responded' to a value of 'false'.");
         }
@@ -172,17 +177,17 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *                                  Speech Synthesis Markup Language (SSML) format.</p>
      */
     @Override
-    public ResourceResponse SendActivity(String textReplyToSend) throws Exception {
-        return SendActivity(textReplyToSend, null, null);
+    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend) {
+        return sendActivityAsync(textReplyToSend, null, null);
     }
 
     @Override
-    public ResourceResponse SendActivity(String textReplyToSend, String speak) throws Exception {
-        return SendActivity(textReplyToSend, speak, null);
+    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend, String speak) {
+        return sendActivityAsync(textReplyToSend, speak, null);
     }
 
     @Override
-    public ResourceResponse SendActivity(String textReplyToSend, String speak, String inputHint) throws Exception {
+    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend, String speak, String inputHint) {
         if (StringUtils.isEmpty(textReplyToSend))
             throw new IllegalArgumentException("textReplyToSend");
 
@@ -195,7 +200,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         if (StringUtils.isNotEmpty(inputHint))
             activityToSend.setInputHint(InputHints.fromString(inputHint));
 
-        return SendActivity(activityToSend);
+        return sendActivityAsync(activityToSend);
     }
 
     /**
@@ -209,28 +214,19 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *                                  channel assigned to the activity.
      */
     @Override
-    public ResourceResponse SendActivity(Activity activity) throws Exception {
-        if (activity == null)
+    public CompletableFuture<ResourceResponse> sendActivityAsync(Activity activity) {
+        if (activity == null) {
             throw new IllegalArgumentException("activity");
+        }
 
-        System.out.printf("In SENDEACTIVITYASYNC:");
-        System.out.flush();
         Activity[] activities = {activity};
-        ResourceResponse[] responses;
-        try {
-            responses = SendActivities(activities);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(String.format("TurnContext:SendActivity fail %s", e.toString()));
-        }
-        if (responses == null || responses.length == 0) {
-            // It's possible an interceptor prevented the activity from having been sent.
-            // Just return an empty response in that case.
-            return null;
-        } else {
-            return responses[0];
-        }
-
+        return sendActivitiesAsync(activities)
+            .thenApply(resourceResponses -> {
+                if (resourceResponses == null || resourceResponses.length == 0) {
+                    return null;
+                }
+                return resourceResponses[0];
+            });
     }
 
     /**
@@ -243,23 +239,22 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * the receiving channel assigned to the activities.
      */
     @Override
-    public ResourceResponse[] SendActivities(Activity[] activities) throws Exception {
+    public CompletableFuture<ResourceResponse[]> sendActivitiesAsync(Activity[] activities) {
         // Bind the relevant Conversation Reference properties, such as URLs and
         // ChannelId's, to the activities we're about to send.
-        ConversationReference cr = GetConversationReference(this.activity);
+        ConversationReference cr = getConversationReference(this.activity);
         for (Activity a : activities) {
-            ApplyConversationReference(a, cr);
+            applyConversationReference(a, cr);
         }
 
         // Convert the IActivities to Activies.
         // Activity[] activityArray = Array.ConvertAll(activities, (input) => (Activity)input);
         List<Activity> activityArray = Arrays.stream(activities).map(input -> input).collect(toList());
 
-
         // Create the list used by the recursive methods.
         List<Activity> activityList = new ArrayList<Activity>(activityArray);
 
-        Callable<ResourceResponse[]> ActuallySendStuff = () -> {
+        Supplier<CompletableFuture<ResourceResponse[]>> actuallySendStuff = () -> {
             // Are the any non-trace activities to send?
             // The thinking here is that a Trace event isn't user relevant data
             // so the "Responded" flag should not be set by Trace messages being
@@ -268,6 +263,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             if (!activityList.stream().anyMatch((a) -> a.getType() == TRACE)) {
                 sentNonTraceActivities = true;
             }
+
             // Send from the list, which may have been manipulated via the event handlers.
             // Note that 'responses' was captured from the root of the call, and will be
             // returned to the original caller.
@@ -290,7 +286,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         };
 
         List<Activity> act_list = new ArrayList<>(activityList);
-        return SendActivitiesInternal(act_list, onSendActivities.iterator(), ActuallySendStuff);
+        return sendActivitiesInternal(act_list, onSendActivities.iterator(), actuallySendStuff);
     }
 
     /**
@@ -301,17 +297,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the response contained additional information.
      */
     @Override
-    public ResourceResponse UpdateActivity(Activity activity) throws Exception {
-
-
-        Callable<ResourceResponse> ActuallyUpdateStuff = () -> {
+    public CompletableFuture<ResourceResponse> updateActivityAsync(Activity activity) {
+        Supplier<ResourceResponse> ActuallyUpdateStuff = () -> {
             return this.getAdapter().UpdateActivity(this, activity);
         };
 
-        return UpdateActivityInternal(activity, onUpdateActivity.iterator(), ActuallyUpdateStuff);
+        return updateActivityInternal(activity, onUpdateActivity.iterator(), ActuallyUpdateStuff);
     }
-
-
 
     /**
      * Deletes an existing activity.
@@ -320,7 +312,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return A task that represents the work queued to execute.
      * @throws Exception The HTTP operation failed and the response contained additional information.
      */
-    public CompletableFuture<Void> DeleteActivity(String activityId) throws Exception {
+    public CompletableFuture<Void> deleteActivityAsync(String activityId) {
         if (StringUtils.isWhitespace(activityId) || activityId == null)
             throw new IllegalArgumentException("activityId");
 
@@ -342,7 +334,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             };
 
             try {
-                DeleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff);
+                deleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(String.format("Failed to delete activity %s", e.getMessage()));
@@ -350,7 +342,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             return;
 
         }, ExecutorFactory.getExecutor());
-
     }
 
     /**
@@ -362,7 +353,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *                                                     The conversation reference's {@link ConversationReference#getActivityId}
      *                                                     indicates the activity in the conversation to delete.
      */
-    public void DeleteActivity(ConversationReference conversationReference) throws Exception {
+    public CompletableFuture<Void> deleteActivityAsync(ConversationReference conversationReference) {
         if (conversationReference == null)
             throw new IllegalArgumentException("conversationReference");
 
@@ -378,11 +369,14 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             throw new RuntimeException("DeleteActivity failed");
         };
 
-        DeleteActivityInternal(conversationReference, onDeleteActivity.iterator(), ActuallyDeleteStuff);
-        return ;
+        return deleteActivityInternal(conversationReference, onDeleteActivity.iterator(), ActuallyDeleteStuff);
     }
 
-    private ResourceResponse[] SendActivitiesInternal(List<Activity> activities, Iterator<SendActivitiesHandler> sendHandlers, Callable<ResourceResponse[]> callAtBottom) throws Exception {
+    private CompletableFuture<ResourceResponse[]> sendActivitiesInternal(
+        List<Activity> activities,
+        Iterator<SendActivitiesHandler> sendHandlers,
+        Supplier<CompletableFuture<ResourceResponse[]>> callAtBottom) {
+
         if (activities == null)
             throw new IllegalArgumentException("activities");
         if (sendHandlers == null)
@@ -390,24 +384,24 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
         if (false == sendHandlers.hasNext()) { // No middleware to run.
             if (callAtBottom != null)
-                return callAtBottom.call();
+                return callAtBottom.get();
             return new ResourceResponse[0];
         }
 
         // Default to "No more Middleware after this".
-        Callable<ResourceResponse[]> next = () -> {
+        Supplier<CompletableFuture<ResourceResponse[]>> next = () -> {
             // Remove the first item from the list of middleware to call,
             // so that the next call just has the remaining items to worry about.
             //Iterable<SendActivitiesHandler> remaining = sendHandlers.Skip(1);
             //Iterator<SendActivitiesHandler> remaining = sendHandlers.iterator();
             if (sendHandlers.hasNext())
                 sendHandlers.next();
-            return SendActivitiesInternal(activities, sendHandlers, callAtBottom);
+            return sendActivitiesInternal(activities, sendHandlers, callAtBottom);
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it
         SendActivitiesHandler caller = sendHandlers.next();
-        return caller.handle(this, activities, next);
+        return caller.invoke(this, activities, next);
     }
 
     //         private async Task<ResourceResponse> UpdateActivityInternal(Activity activity,
@@ -449,29 +443,29 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     //            UpdateActivityHandler toCall = updateHandlers.First();
     //            return await toCall(this, activity, next);
     //        }
-    private ResourceResponse UpdateActivityInternal(Activity activity,
+    private CompletableFuture<ResourceResponse> updateActivityInternal(Activity activity,
                                                     Iterator<UpdateActivityHandler> updateHandlers,
-                                                    Callable<ResourceResponse> callAtBottom) throws Exception {
+                                                    Supplier<ResourceResponse> callAtBottom) {
         BotAssert.ActivityNotNull(activity);
         if (updateHandlers == null)
             throw new IllegalArgumentException("updateHandlers");
 
         if (false == updateHandlers.hasNext()) { // No middleware to run.
             if (callAtBottom != null) {
-                return callAtBottom.call();
+                return callAtBottom.get();
             }
             return null;
         }
 
         // Default to "No more Middleware after this".
-        Callable<ResourceResponse> next = () -> {
+        Supplier<CompletableFuture<ResourceResponse>> next = () -> {
                 // Remove the first item from the list of middleware to call,
                 // so that the next call just has the remaining items to worry about.
                 if (updateHandlers.hasNext())
                     updateHandlers.next();
                 ResourceResponse result = null;
                 try {
-                    result = UpdateActivityInternal(activity, updateHandlers, callAtBottom);
+                    result = updateActivityInternal(activity, updateHandlers, callAtBottom);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(String.format("Error updating activity: %s", e.toString()));
@@ -482,13 +476,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
         // Grab the current middleware, which is the 1st element in the array, and execute it
         UpdateActivityHandler toCall = updateHandlers.next();
-        return toCall.handle(this, activity, next);
+        return toCall.invoke(this, activity, next);
     }
 
 
-    private void DeleteActivityInternal(ConversationReference cr,
+    private CompletableFuture<Void> deleteActivityInternal(ConversationReference cr,
                                                            Iterator<DeleteActivityHandler> deleteHandlers,
-                                                           Runnable callAtBottom) throws Exception {
+                                                           Runnable callAtBottom) {
         BotAssert.ConversationReferenceNotNull(cr);
         if (deleteHandlers == null)
             throw new IllegalArgumentException("deleteHandlers");
@@ -501,7 +495,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         }
 
         // Default to "No more Middleware after this".
-        Runnable next = () -> {
+        Supplier<CompletableFuture<Void>> next = () -> {
             // Remove the first item from the list of middleware to call,
             // so that the next call just has the remaining items to worry about.
 
@@ -511,17 +505,18 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
 
             try {
-                DeleteActivityInternal(cr, deleteHandlers, callAtBottom);
+                deleteActivityInternal(cr, deleteHandlers, callAtBottom);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("DeleteActivityInternal failed");
             }
-            return;
+
+            return null;
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it.
         DeleteActivityHandler toCall = deleteHandlers.next();
-        toCall.handle(this, cr, next);
+        toCall.invoke(this, cr, next);
     }
 
     /**
@@ -531,7 +526,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return A conversation reference for the conversation that contains the activity.
      * @throws IllegalArgumentException {@code activity} is {@code null}.
      */
-    public static ConversationReference GetConversationReference(Activity activity) {
+    public static ConversationReference getConversationReference(Activity activity) {
         BotAssert.ActivityNotNull(activity);
 
         ConversationReference r = new ConversationReference() {{
@@ -553,8 +548,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param activity   The activity to update.
      * @param reference  The conversation reference.
      */
-    public static Activity ApplyConversationReference(Activity activity, ConversationReference reference) {
-        return ApplyConversationReference(activity, reference, false);
+    public static Activity applyConversationReference(Activity activity, ConversationReference reference) {
+        return applyConversationReference(activity, reference, false);
     }
 
     /**
@@ -566,13 +561,16 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @param isIncoming (Optional) {@code true} to treat the activity as an
      *                   incoming activity, where the bot is the recipient; otherwaire {@code false}.
      *                   Default is {@code false}, and the activity will show the bot as the sender.
-     *                   Call {@link #GetConversationReference( Activity )} on an incoming
+     *                   Call {@link #getConversationReference( Activity )} on an incoming
      *                   activity to get a conversation reference that you can then use to update an
      *                   outgoing activity with the correct delivery information.
-     *                   <p>The {@link #SendActivity( Activity )} and {@link #SendActivities( Activity[])}
+     *                   <p>The {@link #sendActivityAsync( Activity )} and {@link #sendActivitiesAsync( Activity[])}
      *                   methods do this for you.</p>
      */
-    public static Activity ApplyConversationReference(Activity activity, ConversationReference reference, boolean isIncoming) {
+    public static Activity applyConversationReference(Activity activity,
+                                                      ConversationReference reference,
+                                                      boolean isIncoming) {
+
         activity.setChannelId(reference.getChannelId());
         activity.setServiceUrl(reference.getServiceUrl());
         activity.setConversation(reference.getConversation());
@@ -592,6 +590,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
 
     public void close() throws Exception {
-        turnServices.close();
+        turnState.close();
     }
 }

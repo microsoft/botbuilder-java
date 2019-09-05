@@ -1,34 +1,30 @@
-package com.microsoft.bot.builder;
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+package com.microsoft.bot.builder;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public interface Storage
-{
+public interface Storage {
     /**
      * Read StoreItems from storage
      * @param keys keys of the storeItems to read
      * @return StoreItem dictionary
      */
-    CompletableFuture<Map<String, ? extends Object>> Read(String... keys) throws JsonProcessingException;
+    CompletableFuture<Map<String, Object>> readAsync(String[] keys);
 
     /**
      * Write StoreItems to storage
-     * @param changes 
+     * @param changes
      */
-    CompletableFuture Write(Map<String, ? extends Object> changes) throws Exception;
+    CompletableFuture<Void> writeAsync(Map<String, Object> changes);
 
     /**
      * Delete StoreItems from storage
      * @param keys keys of the storeItems to delete
      */
-    CompletableFuture Delete(String... keys);
+    CompletableFuture<Void> deleteAsync(String[] keys);
 }
 
 

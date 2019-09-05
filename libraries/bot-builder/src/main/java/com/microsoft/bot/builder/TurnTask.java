@@ -4,5 +4,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface TurnTask {
-    CompletableFuture invoke(TurnContext context);
+    CompletableFuture<Void> invoke(TurnContext context);
 }

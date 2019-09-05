@@ -17,7 +17,7 @@ import java.util.function.Function;
  * activities to and receives activities from the Bot Connector Service. When your
  * bot receives an activity, the adapter creates a context object, passes it to your
  * bot's application logic, and sends responses back to the user's channel.
- * <p>Use {@link Use(Middleware)} to add {@link Middleware} objects
+ * <p>Use {@link #use(Middleware)} to add {@link Middleware} objects
  * to your adapter’s middleware collection. The adapter processes and directs
  * incoming activities in through the bot middleware pipeline to your bot’s logic
  * and then back out again. As each activity flows in and out of the bot, each piece
@@ -50,7 +50,7 @@ public abstract class BotAdapter {
      * Middleware is added to the adapter at initialization time.
      * For each turn, the adapter calls middleware in the order in which you added it.
      */
-    public BotAdapter Use(Middleware middleware) {
+    public BotAdapter use(Middleware middleware) {
         _middlewareSet.Use(middleware);
         return this;
     }
@@ -66,7 +66,8 @@ public abstract class BotAdapter {
      * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
-    public abstract ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException;
+    public abstract CompletableFuture<ResourceResponse[]> sendActivitiesAsync(TurnContext context,
+                                                                              Activity[] activities);
 
     /**
      * When overridden in a derived class, replaces an existing activity in the
@@ -82,7 +83,8 @@ public abstract class BotAdapter {
      * of the activity to replace.</p>
      * {@linkalso TurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
-    public abstract ResourceResponse UpdateActivity(TurnContext context, Activity activity);
+    public abstract CompletableFuture<ResourceResponse> updateActivityAsync(TurnContext context,
+                                                                            Activity activity);
 
     /**
      * When overridden in a derived class, deletes an existing activity in the
@@ -91,11 +93,12 @@ public abstract class BotAdapter {
      * @param context   The context object for the turn.
      * @param reference Conversation reference for the activity to delete.
      * @return A task that represents the work queued to execute.
-     * The {@link ConversationReference.ActivityId} of the conversation
+     * The {@link ConversationReference#getActivityId} of the conversation
      * reference identifies the activity to delete.
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
-    public abstract void DeleteActivity(TurnContext context, ConversationReference reference) throws ExecutionException, InterruptedException;
+    public abstract CompletableFuture<Void> deleteActivityAsync(TurnContext context,
+                                                                ConversationReference reference);
 
 
     /**
@@ -111,24 +114,24 @@ public abstract class BotAdapter {
      *                              in the pipeline. Once control reaches the end of the pipeline, the adapter calls
      *                              the {@code callback} method. If a middleware component doesn’t call
      *                              the next delegate, the adapter does not call  any of the subsequent middleware’s
-     *                              {@link Middleware.OnTurn(TurnContext, MiddlewareSet.NextDelegate)}
+     *                              {@link Middleware#onTurnAsync(TurnContext, NextDelegate)}
      *                              methods or the callback method, and the pipeline short circuits.
      *                              <p>When the turn is initiated by a user activity (reactive messaging), the
      *                              callback method will be a reference to the bot's
-     *                              {@link Bot.OnTurn(TurnContext)} method. When the turn is
-     *                              initiated by a call to {@link ContinueConversation(ConversationReference, Func{TurnContext, Task})}
+     *                              {@link Bot#onTurnAsync(TurnContext)} method. When the turn is
+     *                              initiated by a call to {@link #continueConversationAsync(String, ConversationReference, BotCallbackHandler)}
      *                              (proactive messaging), the callback method is the callback method that was provided in the call.</p>
      */
-    protected void RunPipeline(TurnContext context, Consumer<TurnContext> callback) throws Exception {
+    protected void runPipeline(TurnContext context, BotCallbackHandler callback) throws Exception {
         BotAssert.ContextNotNull(context);
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
-            _middlewareSet.ReceiveActivityWithStatus(context, callback);
+            _middlewareSet.receiveActivityWithStatus(context, callback);
         } else {
             // call back to caller on proactive case
             if (callback != null) {
-                callback.accept(context);
+                callback.invoke(context);
             }
         }
     }
@@ -142,7 +145,8 @@ public abstract class BotAdapter {
      * @return A task that represents the work queued to execute.
      * @throws UnsupportedOperationException No base implementation is provided.
      */
-    public CompletableFuture CreateConversation(String channelId, Function<TurnContext, CompletableFuture> callback) {
+    public CompletableFuture<Void> createConversationAsync(String channelId,
+                                                           Function<TurnContext, BotCallbackHandler> callback) {
         throw new UnsupportedOperationException("Adapter does not support CreateConversation with this arguments");
     }
 
@@ -160,13 +164,15 @@ public abstract class BotAdapter {
      * before the bot can send activities to the user.
      * {@linkalso RunPipeline(TurnContext, Func { TurnContext, Task })}
      */
-    public void ContinueConversation(String botId, ConversationReference reference, Consumer<TurnContext> callback) throws Exception {
+    public CompletableFuture<Void> continueConversationAsync(String botId,
+                                                             ConversationReference reference,
+                                                             BotCallbackHandler callback) {
 
         ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
         Activity activity = conv.getPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            this.RunPipeline(context, callback);
+            this.runPipeline(context, callback);
         }
     }
 }

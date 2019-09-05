@@ -2,23 +2,25 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Represents middleware that can operate on incoming activities.
  * A {@link BotAdapter} passes incoming activities from the user's
- * channel to the middleware's {@link OnTurn(TurnContext, NextDelegate)}
+ * channel to the middleware's {@link #onTurn(TurnContext, NextDelegate)}
  * method.
  * <p>You can add middleware objects to your adapter’s middleware collection. The
- * adapter processes and directs incoming activities in through the bot middleware 
- * pipeline to your bot’s logic and then back out again. As each activity flows in 
- * and out of the bot, each piece of middleware can inspect or act upon the activity, 
+ * adapter processes and directs incoming activities in through the bot middleware
+ * pipeline to your bot’s logic and then back out again. As each activity flows in
+ * and out of the bot, each piece of middleware can inspect or act upon the activity,
  * both before and after the bot logic runs.</p>
- * <p>For each activity, the adapter calls middleware in the order in which you 
+ * <p>For each activity, the adapter calls middleware in the order in which you
  * added it.</p>
  *
  * <example>
  * This defines middleware that sends "before" and "after" messages
- * before and after the adapter calls the bot's 
- * {@link Bot.OnTurn(TurnContext)} method.
+ * before and after the adapter calls the bot's
+ * {@link Bot#onTurnAsync(TurnContext)} method.
  * <code>
  * public class SampleMiddleware : Middleware
  * {
@@ -33,8 +35,7 @@ package com.microsoft.bot.builder;
  * </example>
  * {@linkalso Bot}
  */
-public interface Middleware
-{
+public interface Middleware {
     /**
      * Processess an incoming activity.
      * @param context The context object for this turn.
@@ -42,15 +43,15 @@ public interface Middleware
      * @return A task that represents the work queued to execute.
      * Middleware calls the {@code next} delegate to pass control to
      * the next middleware in the pipeline. If middleware doesn’t call the next delegate,
-     * the adapter does not call any of the subsequent middleware’s request handlers or the 
+     * the adapter does not call any of the subsequent middleware’s request handlers or the
      * bot’s receive handler, and the pipeline short circuits.
-     * <p>The {@code context} provides information about the 
+     * <p>The {@code context} provides information about the
      * incoming activity, and other data needed to process the activity.</p>
      *
-     * {@linkalso TurnContext}
-     * {@linkalso Bot.Schema.Activity}
+     * {@link TurnContext}
+     * {@link com.microsoft.bot.schema.Activity}
      */
-    void OnTurn(TurnContext context, NextDelegate next) throws Exception;
+    CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next);
 }
 
 

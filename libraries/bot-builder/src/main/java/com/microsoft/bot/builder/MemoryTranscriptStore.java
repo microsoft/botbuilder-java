@@ -37,7 +37,8 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @param activity The activity to log.
      * @return A CompletableFuture that represents the work queued to execute.
      */
-    public final void LogActivityAsync(Activity activity) {
+    @Override
+    public final CompletableFuture<Void> logActivityAsync(Activity activity) {
         if (activity == null) {
             throw new NullPointerException("activity cannot be null for LogActivity()");
         }
@@ -53,7 +54,6 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
             ArrayList<Activity> transcript = null;
 
-
             if (!channel.containsKey(activity.getConversation().getId())) {
                 transcript = new ArrayList<Activity>();
                 channel.put(activity.getConversation().getId(), transcript);
@@ -64,33 +64,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
             transcript.add(activity);
         }
 
-    }
-
-    /**
-     * Gets from the store activities that match a set of criteria.
-     *
-     * @param channelId         The ID of the channel the conversation is in.
-     * @param conversationId    The ID of the conversation.
-     * @param continuationToken
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
-     */
-
-    public final CompletableFuture<PagedResult<Activity>> GetTranscriptActivitiesAsync(String channelId, String conversationId, String continuationToken) {
-        return GetTranscriptActivitiesAsync(channelId, conversationId, continuationToken, null);
-    }
-
-    /**
-     * Gets from the store activities that match a set of criteria.
-     *
-     * @param channelId      The ID of the channel the conversation is in.
-     * @param conversationId The ID of the conversation.
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
-     */
-
-    public final CompletableFuture<PagedResult<Activity>> GetTranscriptActivitiesAsync(String channelId, String conversationId) {
-        return GetTranscriptActivitiesAsync(channelId, conversationId, null, null);
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -103,16 +77,20 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
      */
-    public final CompletableFuture<PagedResult<Activity>> GetTranscriptActivitiesAsync(String channelId, String conversationId, String continuationToken, DateTime startDate) {
+    @Override
+    public CompletableFuture<PagedResult<Activity>> getTranscriptActivitiesAsync(String channelId,
+                                                                                 String conversationId,
+                                                                                 String continuationToken,
+                                                                                 DateTime startDate) {
+        if (channelId == null) {
+            throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
+        }
+
+        if (conversationId == null) {
+            throw new IllegalArgumentException(String.format("missing %1$s", "conversationId"));
+        }
+
         return CompletableFuture.supplyAsync(() -> {
-            if (channelId == null) {
-                throw new NullPointerException(String.format("missing %1$s", "channelId"));
-            }
-
-            if (conversationId == null) {
-                throw new NullPointerException(String.format("missing %1$s", "conversationId"));
-            }
-
             PagedResult<Activity> pagedResult = new PagedResult<Activity>();
             synchronized (channels) {
                 HashMap<String, ArrayList<Activity>> channel;
@@ -165,16 +143,17 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @param conversationId The ID of the conversation to delete.
      * @return A task that represents the work queued to execute.
      */
-    public final CompletableFuture DeleteTranscriptAsync(String channelId, String conversationId) {
+    @Override
+    public CompletableFuture<Void> deleteTranscriptAsync(String channelId, String conversationId) {
+        if (channelId == null) {
+            throw new IllegalArgumentException(String.format("%1$s should not be null", "channelId"));
+        }
+
+        if (conversationId == null) {
+            throw new IllegalArgumentException(String.format("%1$s should not be null", "conversationId"));
+        }
+
         return CompletableFuture.runAsync(() -> {
-            if (channelId == null) {
-                throw new NullPointerException(String.format("%1$s should not be null", "channelId"));
-            }
-
-            if (conversationId == null) {
-                throw new NullPointerException(String.format("%1$s should not be null", "conversationId"));
-            }
-
             synchronized (this.channels) {
                 if (!this.channels.containsKey(channelId)) {
                     return;
@@ -190,28 +169,17 @@ public class MemoryTranscriptStore implements TranscriptStore {
     /**
      * Gets the conversations on a channel from the store.
      *
-     * @param channelId The ID of the channel.
-     * @return A task that represents the work queued to execute.
-     */
-
-    public final CompletableFuture<PagedResult<Transcript>> ListTranscriptsAsync(String channelId) {
-        return ListTranscriptsAsync(channelId, null);
-    }
-
-    /**
-     * Gets the conversations on a channel from the store.
-     *
      * @param channelId         The ID of the channel.
      * @param continuationToken
      * @return A task that represents the work queued to execute.
      */
+    @Override
+    public CompletableFuture<PagedResult<Transcript>> listTranscriptsAsync(String channelId, String continuationToken) {
+        if (channelId == null) {
+            throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
+        }
 
-    public final CompletableFuture<PagedResult<Transcript>> ListTranscriptsAsync(String channelId, String continuationToken) {
         return CompletableFuture.supplyAsync(() -> {
-            if (channelId == null) {
-                throw new NullPointerException(String.format("missing %1$s", "channelId"));
-            }
-
             PagedResult<Transcript> pagedResult = new PagedResult<Transcript>();
             synchronized (channels) {
 

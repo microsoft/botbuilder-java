@@ -132,10 +132,10 @@ public class BotFrameworkAdapter extends BotAdapter {
             claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
             ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
 
-            context.getServices().Add("BotIdentity", claimsIdentity);
+            context.getTurnState().add("BotIdentity", claimsIdentity);
 
             ConnectorClient connectorClient = this.CreateConnectorClientAsync(reference.getServiceUrl(), claimsIdentity).join();
-            context.getServices().Add("ConnectorClient", connectorClient);
+            context.getTurnState().add("ConnectorClient", connectorClient);
             RunPipeline(context, callback);
         }
         return;
@@ -218,18 +218,18 @@ public class BotFrameworkAdapter extends BotAdapter {
         BotAssert.ActivityNotNull(activity);
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            context.getServices().Add("BotIdentity", identity);
+            context.getTurnState().add("BotIdentity", identity);
 
             ConnectorClient connectorClient = this.CreateConnectorClientAsync(activity.getServiceUrl(), identity).join();
             // TODO: Verify key that C# uses
-            context.getServices().Add("ConnectorClient", connectorClient);
+            context.getTurnState().add("ConnectorClient", connectorClient);
 
             super.RunPipeline(context, callback);
 
             // Handle Invoke scenarios, which deviate from the request/response model in that
             // the Bot will return a specific body and return code.
             if (activity.getType() == ActivityTypes.INVOKE) {
-                Activity invokeResponse = context.getServices().Get(InvokeReponseKey);
+                Activity invokeResponse = context.getTurnState().get(InvokeReponseKey);
                 if (invokeResponse == null) {
                     // ToDo: Trace Here
                     throw new IllegalStateException("Bot failed to return a valid 'invokeResponse' activity.");
@@ -255,7 +255,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
-    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) throws InterruptedException {
+    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) {
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
@@ -283,20 +283,20 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // The Activity Schema doesn't have a delay type build in, so it's simulated
                 // here in the Bot. This matches the behavior in the Node connector.
                 int delayMs = (int) activity.getValue();
-                Thread.sleep(delayMs);
+                try { Thread.sleep(delayMs); } catch (InterruptedException e) {}
                 //await(Task.Delay(delayMs));
                 // No need to create a response. One will be created below.
             } else if (activity.getType().toString().equals("invokeResponse")) // Aligning name with Node
             {
-                context.getServices().Add(InvokeReponseKey, activity);
+                context.getTurnState().add(InvokeReponseKey, activity);
                 // No need to create a response. One will be created below.
             } else if (activity.getType() == ActivityTypes.TRACE && !activity.getChannelId().equals("emulator")) {
                 // if it is a Trace activity we only send to the channel if it's the emulator.
             } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
-                ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+                ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
                 response = connectorClient.getConversations().replyToActivity(activity.getConversation().getId(), activity.getId(), activity);
             } else {
-                ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+                ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
                 response = connectorClient.getConversations().sendToConversation(activity.getConversation().getId(), activity);
             }
 
@@ -334,7 +334,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      */
     @Override
     public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
-        ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         // TODO String conversationId, String activityId, Activity activity)
         return connectorClient.getConversations().updateActivity(activity.getConversation().getId(), activity.getId(), activity);
     }
@@ -348,7 +348,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
     public void DeleteActivity(TurnContext context, ConversationReference reference) {
-        RestConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        RestConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         try {
             connectorClient.getConversations().deleteConversationMemberAsync(
                     reference.getConversation().getId(), reference.getActivityId()).join();
@@ -373,7 +373,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId()))
             throw new IllegalArgumentException("BotFrameworkAdapter.deleteConversationMember(): missing conversation.id");
 
-        ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
 
         String conversationId = context.getActivity().getConversation().getId();
 
@@ -404,7 +404,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         if (StringUtils.isEmpty((context.getActivity().getConversation().getId())))
             throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation.id");
 
-        ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         String conversationId = context.getActivity().getConversation().getId();
 
         // TODO:
@@ -426,7 +426,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId()))
             throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation.id");
 
-        ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         String conversationId = context.getActivity().getConversation().getId();
 
         // TODO
@@ -487,7 +487,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     public CompletableFuture<ConversationsResult> GetConversations(TurnContextImpl context, String continuationToken) {
-        ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
+        ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         // TODO
         //ConversationsResult results = await(connectorClient.conversations().getConversationsAsync());
         return completedFuture(null);
@@ -626,7 +626,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     protected OAuthClient CreateOAuthApiClient(TurnContext context) throws MalformedURLException, URISyntaxException {
-        RestConnectorClient client = context.getServices().Get("ConnectorClient");
+        RestConnectorClient client = context.getTurnState().get("ConnectorClient");
         if (client == null) {
             throw new IllegalArgumentException("CreateOAuthApiClient: OAuth requires a valid ConnectorClient instance");
         }

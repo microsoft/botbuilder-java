@@ -1,11 +1,9 @@
 package com.microsoft.bot.builder;
 
-public interface StoreItem
-{
+public interface StoreItem {
     /**
      * eTag for concurrency
      */
-
-    String geteTag();
-    void seteTag(String eTag);
+    String getETag();
+    void setETag(String eTag);
 }

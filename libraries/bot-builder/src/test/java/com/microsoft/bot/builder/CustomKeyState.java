@@ -9,7 +9,7 @@ public class CustomKeyState extends BotState<CustomState> {
     }
 
     public static CustomState Get(TurnContext context) {
-        return context.getServices().<CustomState>Get(PropertyName);
+        return context.getTurnState().<CustomState>Get(PropertyName);
     }
 }
 

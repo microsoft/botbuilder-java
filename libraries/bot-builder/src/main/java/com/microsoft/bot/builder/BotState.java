@@ -2,164 +2,380 @@
 // Licensed under the MIT License.
 package com.microsoft.bot.builder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
- * Abstract Base class which manages details of automatic loading and saving of bot state.
- *
- * @param TState The type of the bot state object.
+ * Reads and writes state for your bot to storage.
  */
-//public class BotState<TState> : Middleware
-//    where TState : class, new()
-public class BotState<TState> implements Middleware {
-
-    private final StateSettings settings;
-    private final Storage storage;
-    private final Function<TurnContext, String> keyDelegate;
-    private final String propertyName;
-    private final Supplier<? extends TState> ctor;
+public abstract class BotState implements PropertyManager {
+    private String contextServiceKey;
+    private Storage storage;
 
     /**
-     * Creates a new {@link BotState{TState}} middleware object.
+     * Initializes a new instance of the BotState class.
      *
-     * @param name     The name to use to load or save the state object.
-     * @param storage  The storage provider to use.
-     * @param settings The state persistance options to use.
+     * @param withStorage The storage provider to use.
+     * @param withContextServiceKey The key for caching on the context services dictionary.
      */
-    public BotState(Storage storage, String propertyName, Function<TurnContext, String> keyDelegate, Supplier<? extends TState> ctor) {
-        this(storage, propertyName, keyDelegate, ctor, null);
-    }
+    public BotState(Storage withStorage, String withContextServiceKey) {
+        if (withStorage == null) {
+            throw new IllegalArgumentException("Storage cannot be null");
+        }
+        storage = withStorage;
 
-    public BotState(Storage storage, String propertyName, Function<TurnContext, String> keyDelegate, Supplier<? extends TState> ctor, StateSettings settings) {
-        if (null == storage) {
-            throw new IllegalArgumentException("Storage");
+        if (StringUtils.isEmpty(withContextServiceKey)) {
+            throw new IllegalArgumentException("context service key cannot be empty");
         }
-        if (null == propertyName) {
-            throw new IllegalArgumentException("String propertyName");
-        }
-        if (null == keyDelegate) {
-            throw new IllegalArgumentException("Key Delegate");
-        }
-        if (null == ctor) {
-            throw new IllegalArgumentException("ctor");
-        }
-        this.ctor = ctor;
-        this.storage = storage;
-        this.propertyName = propertyName;
-        this.keyDelegate = keyDelegate;
-        if (null == settings)
-            this.settings = new StateSettings();
-        else
-            this.settings = settings;
+        contextServiceKey = withContextServiceKey;
     }
-
 
     /**
-     * Processess an incoming activity.
+     * Create a property definition and register it with this BotState.
      *
-     * @param context The context object for this turn.
-     * @param next    The delegate to call to continue the bot middleware pipeline.
+     * @param name name of property.
+     * @param <T> type of property.
+     * @return The created state property accessor.
+     */
+    public <T extends Object> StatePropertyAccessor<T> createProperty(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("name cannot be empty");
+        }
+
+        return new BotStatePropertyAccessor<>(this, name);
+    }
+
+    /**
+     * Reads in  the current state object and caches it in the context object for this turn.
+     *
+     * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
-     * This middleware loads the state object on the leading edge of the middleware pipeline
-     * and persists the state object on the trailing edge.
      */
-    public void OnTurn(TurnContext context, NextDelegate next) throws Exception {
-        ReadToContextService(context);
-        next.next();
-        WriteFromContextService(context).join();
-        return;
-    }
-
-    protected void ReadToContextService(TurnContext context) throws IllegalArgumentException, JsonProcessingException {
-        String key = this.keyDelegate.apply(context);
-        Map<String, ?> items = null;
-        try {
-            CompletableFuture<Map<String, ?>> result = storage.Read(new String[]{key});
-            items = result.get();
-            System.out.println(String.format("BotState:OnTurn(tid:%s) ReadToContextService: Found %s items", Thread.currentThread().getId(), items.size()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException(String.format("Error waiting context storage read: %s", e.toString()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
-                .filter(entry -> entry.getKey() == key)
-                .map(Map.Entry::getValue)
-                .map(entry -> (TState) entry)
-                .findFirst()
-                .orElse(null);
-
-
-        //var state = items.Where(entry => entry.Key == key).Select(entry => entry.Value).OfType<TState>().FirstOrDefault();
-        if (state == null)
-            state = ctor.get();
-        context.getServices().Add(this.propertyName, state);
-    }
-
-    protected CompletableFuture WriteFromContextService(TurnContext context) throws Exception {
-        TState state = context.getServices().Get(this.propertyName);
-        return Write(context, state);
+    public CompletableFuture<Void> loadAsync(TurnContext turnContext) {
+        return loadAsync(turnContext, false);
     }
 
     /**
-     * Reads state from storage.
+     * Reads in  the current state object and caches it in the context object for this turn.
      *
-     * @param TState  The type of the bot state object.
-     * @param context The context object for this turn.
+     * @param turnContext The context object for this turn.
+     * @param force True to bypass the cache.
+     * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<TState> Read(TurnContext context) throws JsonProcessingException {
-        String key = this.keyDelegate.apply(context);
-        Map<String, ?> items = storage.Read(new String[]{key}).join();
-        TState state = StreamSupport.stream(items.entrySet().spliterator(), false)
-                .filter(item -> item.getKey() == key)
-                .map(Map.Entry::getValue)
-                .map(item -> (TState) item)
-                .findFirst()
-                .orElse(null);
-        //var state = items.Where(entry => entry.Key == key).Select(entry => entry.Value).OfType<TState>().FirstOrDefault();
-        if (state == null)
-            state = ctor.get();
-        return completedFuture(state);
+    public CompletableFuture<Void> loadAsync(TurnContext turnContext, boolean force) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        String storageKey = getStorageKey(turnContext);
+        if (force || cachedState == null || cachedState.getState() == null) {
+            return storage.readAsync(new String[]{storageKey})
+                .thenApply(val -> {
+                    turnContext.getTurnState().put(contextServiceKey, new CachedBotState(val));
+                    return null;
+                });
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
-     * Writes state to storage.
+     * If it has changed, writes to storage the state object that is cached in the current
+     * context object for this turn.
      *
-     * @param context The context object for this turn.
-     * @param state   The state object.
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture Write(TurnContext context, TState state) throws Exception {
-        HashMap<String, TState> changes = new HashMap<String, TState>();
-        //List<Map.Entry<String, ?>> changes = new ArrayList<Map.Entry<String, ?>>();
-        if (state == null)
-            state = ctor.get();
-        String key = keyDelegate.apply(context);
-        changes.put(key, state);
+    public CompletableFuture<Void> saveChangesAsync(TurnContext turnContext) {
+        return saveChangesAsync(turnContext, false);
+    }
 
-        if (this.settings.getLastWriterWins()) {
-            for (Map.Entry<String, ?> item : changes.entrySet()) {
-                if (item.getValue() instanceof StoreItem) {
-                    StoreItem valueStoreItem = (StoreItem) item.getValue();
-                    valueStoreItem.seteTag("*");
-                }
-            }
+    /**
+     * If it has changed, writes to storage the state object that is cached in the current
+     * context object for this turn.
+     *
+     * @param turnContext The context object for this turn.
+     * @param force True to save state to storage whether or not there are changes.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> saveChangesAsync(TurnContext turnContext, boolean force) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
         }
-        return completedFuture(storage.Write(changes).join());
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        if (force || (cachedState != null && cachedState.isChanged())) {
+            String storageKey = getStorageKey(turnContext);
+            Map<String, Object> changes = new HashMap<String, Object>() {{
+                put(storageKey, cachedState.state);
+            }};
+
+            return storage.writeAsync(changes)
+                .thenApply(val -> {
+                    cachedState.setHashCode(cachedState.computeHashCode(cachedState.state));
+                    return null;
+                });
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Clears any state currently stored in this state scope.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> clearStateAsync(TurnContext turnContext) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        turnContext.getTurnState().put(contextServiceKey, new CachedBotState(new HashMap<>()));
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Delete any state currently stored in this state scope.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> deleteAsync(TurnContext turnContext) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        if (cachedState != null) {
+            turnContext.getTurnState().remove(contextServiceKey);
+        }
+
+        String storageKey = getStorageKey(turnContext);
+        return storage.deleteAsync(new String[] {storageKey});
+    }
+
+    /**
+     * Returns a copy of the raw cached data from the TurnContext, this can be used for tracing scenarios.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A JSON representation of the cached state.
+     */
+    public JsonNode get(TurnContext turnContext) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        String stateKey = getClass().getName();
+        CachedBotState cachedState = turnContext.getTurnState().get(stateKey);
+        return new ObjectMapper().valueToTree(cachedState.state);
+    }
+
+    /**
+     * When overridden in a derived class, gets the key to use when reading and writing state to and from storage.
+     *
+     * @param turnContext The context object for this turn.
+     * @return The storage key.
+     */
+    public abstract String getStorageKey(TurnContext turnContext);
+
+    /**
+     * Gets a property from the state cache in the turn context.
+     *
+     * @param turnContext The context object for this turn.
+     * @param propertyName The name of the property to get.
+     * @param <T> The property type.
+     * @return A task that represents the work queued to execute.
+     */
+    protected <T> CompletableFuture<T> getPropertyValueAsync(TurnContext turnContext,
+                                                             String propertyName) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        if (StringUtils.isEmpty(propertyName)) {
+            throw new IllegalArgumentException("propertyName cannot be empty");
+        }
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        return (CompletableFuture<T>) CompletableFuture.completedFuture(cachedState.getState().get(propertyName));
+    }
+
+    /**
+     * Deletes a property from the state cache in the turn context.
+     *
+     * @param turnContext The context object for this turn.
+     * @param propertyName The name of the property to delete.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> deletePropertyValueAsync(TurnContext turnContext, String propertyName) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        if (StringUtils.isEmpty(propertyName)) {
+            throw new IllegalArgumentException("propertyName cannot be empty");
+        }
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        cachedState.getState().remove(propertyName);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Set the value of a property in the state cache in the turn context.
+     *
+     * @param turnContext The context object for this turn.
+     * @param propertyName The name of the property to set.
+     * @param value The value to set on the property.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> setPropertyValueAsync(TurnContext turnContext,
+                                                            String propertyName,
+                                                            Object value) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        if (StringUtils.isEmpty(propertyName)) {
+            throw new IllegalArgumentException("propertyName cannot be empty");
+        }
+
+        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+        cachedState.getState().put(propertyName, value);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Internal cached bot state.
+     */
+    private static class CachedBotState {
+        private Map<String, Object> state;
+        private int hash;
+
+        public CachedBotState(Map<String, Object> withState) {
+            state = withState;
+            hash = computeHashCode(withState);
+        }
+
+        public Map<String, Object> getState() {
+            return state;
+        }
+
+        public void setState(Map<String, Object> withState) {
+            state = withState;
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        public void setHashCode(int witHashCode) {
+            hash = witHashCode;
+        }
+
+        public boolean isChanged() {
+            return hash != computeHashCode(state);
+        }
+
+        public int computeHashCode(Object obj) {
+            //TODO: this may not be the same as in dotnet
+            return obj.hashCode();
+        }
+    }
+
+    /**
+     * Implements IPropertyAccessor for an IPropertyContainer.
+     *
+     * Note the semantic of this accessor are intended to be lazy, this means teh Get, Set and Delete
+     * methods will first call LoadAsync. This will be a no-op if the data is already loaded.
+     * The implication is you can just use this accessor in the application code directly without first calling LoadAsync
+     * this approach works with the AutoSaveStateMiddleware which will save as needed at the end of a turn.
+     *
+     * @param <T> type of value the propertyAccessor accesses.
+     */
+    private static class BotStatePropertyAccessor<T> implements StatePropertyAccessor<T> {
+        private String name;
+        private BotState botState;
+
+        public BotStatePropertyAccessor(BotState withState, String withName) {
+            botState = withState;
+            name = withName;
+        }
+
+        /**
+         * Get the property value. The semantics are intended to be lazy, note the use of LoadAsync at the start.
+         *
+         * @param turnContext The context object for this turn.
+         * @param defaultValueFactory Defines the default value. Invoked when no value been set for the requested
+         *                            state property.  If defaultValueFactory is defined as null,
+         *                            the MissingMemberException will be thrown if the underlying property is not set.
+         * @param <T> type of value the propertyAccessor accesses.
+         * @return A task that represents the work queued to execute.
+         */
+        @Override
+        public <T, S> CompletableFuture<T> getAsync(TurnContext turnContext, Supplier<S> defaultValueFactory) {
+            return botState.loadAsync(turnContext)
+                .thenCombine(botState.getPropertyValueAsync(turnContext, name), (loadResult, value) -> {
+                    if (value == null) {
+                        value = defaultValueFactory.get();
+                    }
+
+                    return (T) value;
+                });
+        }
+
+        /**
+         * Delete the property. The semantics are intended to be lazy, note the use of LoadAsync at the start.
+         *
+         * @param turnContext The turn context.
+         * @return A task that represents the work queued to execute.
+         */
+        @Override
+        public CompletableFuture<Void> deleteAsync(TurnContext turnContext) {
+            return botState.loadAsync(turnContext)
+                .thenCompose(state -> botState.deletePropertyValueAsync(turnContext, name));
+        }
+
+        /**
+         * Set the property value. The semantics are intended to be lazy, note the use of LoadAsync at the start.
+         *
+         * @param turnContext The turn context.
+         * @param value The value to set.
+         * @return A task that represents the work queued to execute.
+         */
+        @Override
+        public CompletableFuture<Void> setAsync(TurnContext turnContext, T value) {
+            return botState.loadAsync(turnContext)
+                .thenCompose(state -> botState.setPropertyValueAsync(turnContext, name, value));
+        }
+
+        /**
+         * Gets name of the property.
+         *
+         * @return Name of the property.
+         */
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Sets name of the property.
+         *
+         * @param withName Name of the property.
+         */
+        @Override
+        public void setName(String withName) {
+            name = withName;
+        }
     }
 }
-
-
-

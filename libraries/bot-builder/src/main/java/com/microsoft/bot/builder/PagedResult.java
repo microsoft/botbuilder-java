@@ -1,43 +1,37 @@
-package com.microsoft.bot.builder;
-
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder;
+
+
 /**
- Page of results from an enumeration.
-
- <typeparam name="T"></typeparam>
+ * Page of results from an enumeration.
+ * @param <T> The type of items in the results.
  */
-public class PagedResult<T>
-{
+public class PagedResult<T> {
     /**
-     Page of items.
+     * Page of items.
      */
-
-//C# TO JAVA CONVERTER WARNING: Java does not allow direct instantiation of arrays of generic type parameters:
-//ORIGINAL LINE: private T[] Items = new T[0];
     private T[] items = (T[])new Object[0];
-    public final T[] getItems()
-    {
-        return this.items;
-    }
-    public final void items(T[] value)
-    {
-        this.items = value;
-    }
 
     /**
      Token used to page through multiple pages.
      */
     private String continuationToken;
-    public final String continuationToken()
-    {
-        return this.continuationToken;
+
+    public T[] getItems() {
+        return this.items;
     }
-    public final PagedResult<T> withContinuationToken(String value)
-    {
-        this.continuationToken = value;
-        return this;
+
+    public void setItems(T[] value) {
+        this.items = value;
+    }
+
+    public String getContinuationToken() {
+        return continuationToken;
+    }
+
+    public void setContinuationToken(String withValue) {
+        continuationToken = withValue;
     }
 }

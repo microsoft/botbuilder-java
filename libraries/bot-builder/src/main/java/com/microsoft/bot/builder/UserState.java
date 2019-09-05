@@ -1,9 +1,5 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.builder.StateSettings;
-import com.microsoft.bot.builder.Storage;
-import com.microsoft.bot.builder.TurnContext;
-
 
 import java.util.function.Supplier;
 
@@ -45,6 +41,6 @@ public class UserState<TState> extends BotState<TState>
      * @return The user state object.
      */
     public static <TState> TState Get(TurnContext context) throws IllegalArgumentException {
-        return context.getServices().<TState>Get(PropertyName());
+        return context.getTurnState().<TState>Get(PropertyName());
     }
 }

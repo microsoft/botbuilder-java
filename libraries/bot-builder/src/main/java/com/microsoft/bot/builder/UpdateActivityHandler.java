@@ -1,9 +1,13 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ResourceResponse;
 
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 @FunctionalInterface
 public interface UpdateActivityHandler {
@@ -19,10 +23,11 @@ public interface UpdateActivityHandler {
      * activity.
      * <p>The activity's {@link Activity#getId} indicates the activity in the
      * conversation to replace.</p>
-     *
-     * {@linkalso BotAdapter}
-     * {@linkalso SendActivitiesHandler}
-     * {@linkalso DeleteActivityHandler}
+     * <p>If the activity is successfully sent, the <paramref name="next"/> delegate returns
+     * a {@link ResourceResponse} object containing the ID that the receiving channel assigned
+     * to the activity. Use this response object as the return value of this handler.</p>
      */
-    ResourceResponse handle(TurnContext context, Activity activity, Callable<ResourceResponse> next);
+    CompletableFuture<ResourceResponse> invoke(TurnContext context,
+                                               Activity activity,
+                                               Supplier<CompletableFuture<ResourceResponse>> next);
 }
