@@ -116,10 +116,9 @@
                             "apiVersion": "2018-02-01",
                             "location": "[variables('effectivePlanLocation')]",
                             "sku": "[parameters('newAppServicePlanSku')]",
-                            "kind": "linux",
+                            "kind": "app",
                             "properties": {
-                                "name": "[variables('appServicePlanName')]",
-                                "reserved":true
+                                "name": "[variables('appServicePlanName')]"
                             }
                         },
                         {

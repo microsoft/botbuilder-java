@@ -87,10 +87,9 @@
             "apiVersion": "2018-02-01",
             "location": "[variables('resourcesLocation')]",
             "sku": "[parameters('newAppServicePlanSku')]",
-            "kind": "linux",
+            "kind": "app",
             "properties": {
-                "name": "[variables('servicePlanName')]",
-                "reserved":true
+                "name": "[variables('servicePlanName')]"
             }
         },
         {
@@ -107,7 +106,6 @@
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[variables('servicePlanName')]",
                 "siteConfig": {
-                    "linuxFxVersion": "JAVA|8-jre8",
                     "appSettings": [
                         {
                             "name": "JAVA_OPTS",

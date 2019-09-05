@@ -137,8 +137,8 @@
                         </property>
                     </appSettings>
                     <runtime>
-                        <os>linux</os>
-                        <javaVersion>jre8</javaVersion>
+                        <os>windows</os>
+                        <javaVersion>1.8</javaVersion>
                         <webContainer>tomcat 9.0</webContainer>
                     </runtime>
                     <deployment>
