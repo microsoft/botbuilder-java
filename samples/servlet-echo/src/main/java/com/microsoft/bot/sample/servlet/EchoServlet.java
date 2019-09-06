@@ -9,22 +9,24 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
+import com.microsoft.bot.integration.ClasspathPropertiesConfiguration;
+import com.microsoft.bot.integration.Configuration;
+import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.CompletableFuture;
-import java.util.Properties;
+import java.io.PrintWriter;
 import java.util.concurrent.CompletionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is the Servlet that will receive incoming Channel Activity messages.
@@ -32,71 +34,84 @@ import java.util.logging.Logger;
 @WebServlet(name = "EchoServlet", urlPatterns = "/api/messages")
 public class EchoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(EchoServlet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EchoServlet.class);
 
     private ObjectMapper objectMapper;
     private CredentialProvider credentialProvider;
     private MicrosoftAppCredentials credentials;
+    private Configuration configuration;
+    private ChannelProvider channelProvider;
 
     @Override
     public void init() throws ServletException {
-        try{
-            this.objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .findAndRegisterModules();
+        objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .findAndRegisterModules();
 
-            // Load the application.properties from the classpath
-            Properties p = new Properties();
-            p.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
+        // Load the application.properties from the classpath
+        configuration = new ClasspathPropertiesConfiguration();
+        String appId = configuration.getProperty("MicrosoftAppId");
+        String appPassword = configuration.getProperty("MicrosoftAppPassword");
 
-            String appId = p.getProperty("MicrosoftAppId");
-            String appPassword = p.getProperty("MicrosoftAppPassword");
+        credentialProvider = new SimpleCredentialProvider(appId, appPassword);
+        channelProvider = new ConfigurationChannelProvider(configuration);
 
-            this.credentialProvider = new SimpleCredentialProvider(appId, appPassword);
-            this.credentials = new MicrosoftAppCredentials(appId, appPassword);
-        }
-        catch(IOException ioe){
-            throw new ServletException(ioe);
+        if (channelProvider.isGovernment()) {
+            credentials = new MicrosoftGovernmentAppCredentials(appId, appPassword);
+        } else {
+            credentials = new MicrosoftAppCredentials(appId, appPassword);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try (PrintWriter out = response.getWriter()) {
+            out.println("hello world");
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        } catch (Throwable t) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
-            final Activity activity = getActivity(request);
+            LOGGER.debug("Received request");
+
+            Activity activity = getActivity(request);
             String authHeader = request.getHeader("Authorization");
 
-            CompletableFuture<ClaimsIdentity> authenticateRequest = JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider, new SimpleChannelProvider());
-            authenticateRequest.thenRunAsync(() -> {
-                if (activity.getType().equals(ActivityTypes.MESSAGE)) {
-                    // reply activity with the same text
-                    ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), this.credentials);
-                    connector.getConversations().sendToConversation(
-                        activity.getConversation().getId(),
-                        activity.createReply("Echo: " + activity.getText()));
-                }
-            }, ExecutorFactory.getExecutor()).join();
+            JwtTokenValidation.authenticateRequest(activity, authHeader, credentialProvider, channelProvider)
+                .thenAccept(identity -> {
+                   if (activity.getType().equals(ActivityTypes.MESSAGE)) {
+                       // reply activity with the same text
+                       ConnectorClient connector = new RestConnectorClient(activity.getServiceUrl(), credentials);
+                       connector.getConversations().sendToConversation(
+                           activity.getConversation().getId(),
+                           activity.createReply("Echo: " + activity.getText()));
+                   }
+                })
+                .join();
 
-            response.setStatus(200);
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
         } catch (CompletionException ex) {
             if (ex.getCause() instanceof AuthenticationException) {
-                LOGGER.log(Level.WARNING, "Auth failed!", ex);
-                response.setStatus(401);
-            }
-            else {
-                LOGGER.log(Level.WARNING, "Execution failed", ex);
-                response.setStatus(500);
+                LOGGER.error("Auth failed!", ex);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            } else {
+                LOGGER.error("Execution failed", ex);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Execution failed", ex);
-            response.setStatus(500);
+            LOGGER.error("Execution failed", ex);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
     // Creates an Activity object from the request
     private Activity getActivity(HttpServletRequest request) throws IOException, JsonParseException, JsonMappingException {
         String body = getRequestBody(request);
-        LOGGER.log(Level.INFO, body);
+        LOGGER.debug(body);
         return objectMapper.readValue(body, Activity.class);
     }
 
