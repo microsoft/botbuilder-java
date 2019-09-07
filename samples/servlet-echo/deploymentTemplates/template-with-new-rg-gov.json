@@ -34,7 +34,7 @@
             }
         },
         "botSku": {
-            "defaultValue": "F0",
+            "defaultValue": "S1",
             "type": "string",
             "metadata": {
                 "description": "The pricing tier of the Bot Service Registration. Acceptable values are F0 and S1."
@@ -50,10 +50,10 @@
         "newAppServicePlanSku": {
             "type": "object",
             "defaultValue": {
-                "name": "P1v2",
-                "tier": "PremiumV2",
-                "size": "P1v2",
-                "family": "Pv2",
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
                 "capacity": 1
             },
             "metadata": {
@@ -81,7 +81,7 @@
         "effectivePlanLocation": "[if(empty(parameters('newAppServicePlanLocation')), variables('resourcesLocation'), parameters('newAppServicePlanLocation'))]",
         "appServicePlanName": "[if(empty(parameters('newAppServicePlanName')), concat(parameters('botId'), 'ServicePlan'), parameters('newAppServicePlanName'))]",
         "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
-        "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
+        "siteHost": "[concat(variables('webAppName'), '.azurewebsites.us')]",
         "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]"
     },
     "resources": [
@@ -151,9 +151,11 @@
                                     ],
                                     "cors": {
                                         "allowedOrigins": [
-                                            "https://botservice.hosting.portal.azure.net",
+                                            "https://botservice.hosting.azureportal.usgovcloudapi.net",
+                                            "https://botservice-ms.hosting.azureportal.usgovcloudapi.net",
                                             "https://hosting.onecloud.azure-test.net/"
-                                        ]
+                                        ],
+                                        "supportCredentials": false
                                     }
                                 }
                             }
