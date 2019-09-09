@@ -294,10 +294,10 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // if it is a Trace activity we only send to the channel if it's the emulator.
             } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
                 ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
-                response = connectorClient.getConversations().replyToActivity(activity.getConversation().getId(), activity.getId(), activity);
+                response = connectorClient.getConversations().replyToActivity(activity.getConversation().getId(), activity.getId(), activity).join();
             } else {
                 ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
-                response = connectorClient.getConversations().sendToConversation(activity.getConversation().getId(), activity);
+                response = connectorClient.getConversations().sendToConversation(activity.getConversation().getId(), activity).join();
             }
 
             // If No response is set, then defult to a "simple" response. This can't really be done
@@ -336,7 +336,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
         ConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
         // TODO String conversationId, String activityId, Activity activity)
-        return connectorClient.getConversations().updateActivity(activity.getConversation().getId(), activity.getId(), activity);
+        return connectorClient.getConversations().updateActivity(activity.getConversation().getId(), activity.getId(), activity).join();
     }
 
     /**
@@ -350,7 +350,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     public void DeleteActivity(TurnContext context, ConversationReference reference) {
         RestConnectorClient connectorClient = context.getServices().Get("ConnectorClient");
         try {
-            connectorClient.getConversations().deleteConversationMemberAsync(
+            connectorClient.getConversations().deleteConversationMember(
                     reference.getConversation().getId(), reference.getActivityId()).join();
         } catch (CompletionException e) {
             e.printStackTrace();
@@ -586,7 +586,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             }
 
             Conversations conversations = connectorClient.getConversations();
-            CompletableFuture<ConversationResourceResponse> result = conversations.createConversationAsync(conversationParameters);
+            CompletableFuture<ConversationResourceResponse> result = conversations.createConversation(conversationParameters);
 
             ConversationResourceResponse response = result.join();
 
@@ -618,7 +618,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     protected CompletableFuture<Boolean> TrySetEmulatingOAuthCards(TurnContext turnContext) {
         if (!isEmulatingOAuthCards &&
                 turnContext.getActivity().getChannelId().equals("emulator") &&
-                (_credentialProvider.isAuthenticationDisabledAsync().join())) {
+                (_credentialProvider.isAuthenticationDisabled().join())) {
             isEmulatingOAuthCards = true;
         }
         return completedFuture(isEmulatingOAuthCards);
@@ -750,7 +750,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             }
             if (this.appCredentialMap.containsKey(appId))
                 return this.appCredentialMap.get(appId);
-            String appPassword = this._credentialProvider.getAppPasswordAsync(appId).join();
+            String appPassword = this._credentialProvider.getAppPassword(appId).join();
             MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
             this.appCredentialMap.put(appId, appCredentials);
             return appCredentials;
