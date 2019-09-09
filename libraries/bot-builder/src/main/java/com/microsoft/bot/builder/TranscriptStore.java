@@ -62,7 +62,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param channelId         The ID of the channel.
      * @return A task that represents the work queued to execute.
      */
-    default CompletableFuture<PagedResult<Transcript>> listTranscriptsAsync(String channelId) {
+    default CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId) {
         return listTranscriptsAsync(channelId, null);
     }
 
@@ -73,7 +73,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param continuationToken
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<PagedResult<Transcript>> listTranscriptsAsync(String channelId, String continuationToken);
+    CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId, String continuationToken);
 
     /**
      * Deletes conversation data from the store.

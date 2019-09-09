@@ -6,8 +6,7 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.schema.*;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 
 /**
@@ -35,6 +34,16 @@ public abstract class BotAdapter {
      */
     protected final MiddlewareSet _middlewareSet = new MiddlewareSet();
 
+    private OnTurnErrorHandler onTurnError;
+
+    public OnTurnErrorHandler getOnTurnError() {
+        return onTurnError;
+    }
+
+    public void setOnTurnError(OnTurnErrorHandler withTurnError) {
+        onTurnError = withTurnError;
+    }
+
     /**
      * Creates a default adapter.
      */
@@ -51,7 +60,7 @@ public abstract class BotAdapter {
      * For each turn, the adapter calls middleware in the order in which you added it.
      */
     public BotAdapter use(Middleware middleware) {
-        _middlewareSet.Use(middleware);
+        _middlewareSet.use(middleware);
         return this;
     }
 
@@ -122,17 +131,26 @@ public abstract class BotAdapter {
      *                              initiated by a call to {@link #continueConversationAsync(String, ConversationReference, BotCallbackHandler)}
      *                              (proactive messaging), the callback method is the callback method that was provided in the call.</p>
      */
-    protected void runPipeline(TurnContext context, BotCallbackHandler callback) throws Exception {
-        BotAssert.ContextNotNull(context);
+    protected CompletableFuture<Void> runPipelineAsync(TurnContext context, BotCallbackHandler callback) {
+        BotAssert.contextNotNull(context);
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
-            _middlewareSet.receiveActivityWithStatus(context, callback);
+            return _middlewareSet.receiveActivityWithStatusAsync(context, callback)
+                .exceptionally(exception -> {
+                    if (onTurnError != null) {
+                        return onTurnError.invoke(context, exception);
+                    }
+
+                    throw new CompletionException(exception);
+                });
         } else {
             // call back to caller on proactive case
             if (callback != null) {
-                callback.invoke(context);
+                return callback.invoke(context);
             }
+
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -172,7 +190,7 @@ public abstract class BotAdapter {
         Activity activity = conv.getPostToBotMessage();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            this.runPipeline(context, callback);
+            return runPipelineAsync(context, callback);
         }
     }
 }

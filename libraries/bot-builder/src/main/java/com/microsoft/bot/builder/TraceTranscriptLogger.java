@@ -1,9 +1,6 @@
 package com.microsoft.bot.builder;
-
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,9 +9,7 @@ import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a transcript logger that writes activites to a <see cref="Trace"/> object.
@@ -32,14 +27,16 @@ public class TraceTranscriptLogger implements TranscriptLogger {
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public void LogActivityAsync(Activity activity) {
-            BotAssert.ActivityNotNull(activity);
-            String event = null;
-            try {
-                event = mapper.writeValueAsString(activity);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            this.logger.info(event);
+    public CompletableFuture<Void> logActivityAsync(Activity activity) {
+        BotAssert.activityNotNull(activity);
+        String event = null;
+        try {
+            event = mapper.writeValueAsString(activity);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        this.logger.info(event);
+
+        return CompletableFuture.completedFuture(null);
     }
 }

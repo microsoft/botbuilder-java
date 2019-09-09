@@ -38,7 +38,7 @@ import java.util.concurrent.CompletableFuture;
 public interface Middleware {
     /**
      * Processess an incoming activity.
-     * @param context The context object for this turn.
+     * @param turnContext The context object for this turn.
      * @param next The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
      * Middleware calls the {@code next} delegate to pass control to
@@ -51,7 +51,7 @@ public interface Middleware {
      * {@link TurnContext}
      * {@link com.microsoft.bot.schema.Activity}
      */
-    CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next);
+    CompletableFuture<Void> onTurnAsync(TurnContext turnContext, NextDelegate next);
 }
 
 

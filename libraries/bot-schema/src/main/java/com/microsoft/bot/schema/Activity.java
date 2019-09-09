@@ -315,8 +315,13 @@ public class Activity {
      *
      * @param withName      Name of the operation
      * @param withValueType valueType if helpful to identify the value schema (default is value.GetType().Name)
+     * @param withValue The content for this trace operation.
+     * @param withLabel A descriptive label for this trace operation.
      */
-    public static Activity createTraceActivity(String withName, Object withValue, String withValueType, String withLabel) {
+    public static Activity createTraceActivity(String withName,
+                                               String withValueType,
+                                               Object withValue,
+                                               String withLabel) {
         return new Activity(ActivityTypes.TRACE) {{
             setName(withName);
             setLabel(withLabel);

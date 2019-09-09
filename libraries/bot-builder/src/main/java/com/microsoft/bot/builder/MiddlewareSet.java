@@ -20,7 +20,7 @@ public class MiddlewareSet implements Middleware {
      * @return The updated middleware set.
      */
     public MiddlewareSet use(Middleware middleware) {
-        BotAssert.MiddlewareNotNull(middleware);
+        BotAssert.middlewareNotNull(middleware);
         this.middleware.add(middleware);
         return this;
     }

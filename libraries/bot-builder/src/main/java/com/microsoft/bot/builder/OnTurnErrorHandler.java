@@ -11,5 +11,5 @@ public interface OnTurnErrorHandler {
      * @param exception The exception thrown.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<Void> invoke(TurnContext turnContext, Throwable exception);
+    Void invoke(TurnContext turnContext, Throwable exception);
 }

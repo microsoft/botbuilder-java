@@ -113,7 +113,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
         });
 
         // hook up delete activity pipeline
-        context.onDeleteActivity((ctxt, reference, nextDel) -> {
+        context.onDeleteActivity((ctx, reference, nextDel) -> {
             // run full pipeline
 
             if (nextDel != null) {
@@ -141,7 +141,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
         while (!transcript.isEmpty()) {
             Activity activity = transcript.poll();
             try {
-                this.transcriptLogger.LogActivityAsync(activity);
+                this.transcriptLogger.logActivityAsync(activity);
             } catch (RuntimeException err) {
                 logger.error(String.format("Transcript poll failed : %1$s", err));
             }

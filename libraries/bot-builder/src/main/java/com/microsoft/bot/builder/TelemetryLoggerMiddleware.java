@@ -1,0 +1,295 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+package com.microsoft.bot.builder;
+
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * Middleware for logging incoming, outgoing, updated or deleted Activity messages.
+ * Uses the {@link BotTelemetryClient} interface.
+ */
+public class TelemetryLoggerMiddleware implements Middleware {
+    /**
+     * Indicates whether determines whether to log personal information that came from the user.
+     */
+    private boolean logPersonalInformation;
+
+    /**
+     * The currently configured {@link BotTelemetryClient} that logs the QnaMessage event.
+     */
+    private BotTelemetryClient telemetryClient;
+
+    /**
+     * Initializes a new instance of the class.
+     *
+     * @param withTelemetryClient The IBotTelemetryClient implementation used for registering telemetry events.
+     * @param withLogPersonalInformation TRUE to include personally identifiable information.
+     */
+    public TelemetryLoggerMiddleware(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
+        telemetryClient = withTelemetryClient == null ? new NullBotTelemetryClient() : withTelemetryClient;
+        logPersonalInformation = withLogPersonalInformation;
+    }
+
+    /**
+     * Logs events based on incoming and outgoing activities using the {@link BotTelemetryClient} interface.
+     *
+     * @param context The context object for this turn.
+     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @return
+     */
+    @Override
+    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
+        BotAssert.contextNotNull(context);
+
+        // log incoming activity at beginning of turn
+        return onReceiveActivityAsync(context.getActivity())
+            .thenCompose(receiveResult -> {
+                // hook up onSend pipeline
+                context.onSendActivities((sendContext, sendActivities, sendNext) -> sendNext.get()
+                    .thenApply(responses -> {
+                        for (Activity sendActivity : sendActivities) {
+                            onSendActivityAsync(sendActivity);
+                        }
+
+                        return responses;
+                    }));
+
+                // hook up update activity pipeline
+                context.onUpdateActivity((updateContext, updateActivity, updateNext) -> updateNext.get()
+                    .thenCombine(onUpdateActivityAsync(updateActivity), (resourceResponse, updateResult) -> resourceResponse));
+
+                // hook up delete activity pipeline
+                context.onDeleteActivity((deleteContext, deleteReference, deleteNext) -> deleteNext.get()
+                    .thenCompose(nextResult -> {
+                        Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {{
+                            setId(deleteReference.getActivityId());
+                            applyConversationReference(deleteReference, false);
+                        }};
+
+                        return onDeleteActivityAsync(deleteActivity);
+                    }));
+
+                if (next != null) {
+                    return next.next();
+                }
+
+                return CompletableFuture.completedFuture(null);
+            });
+    }
+
+    /**
+     * Invoked when a message is received from the user.
+     * Performs logging of telemetry data using the {@link BotTelemetryClient#trackEvent} method.
+     * This event name used is "BotMessageReceived".
+     *
+     * @param activity Current activity sent from user.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onReceiveActivityAsync(Activity activity) {
+        if (activity == null) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        return fillReceiveEventPropertiesAsync(activity, null)
+            .thenAccept(properties -> {
+                telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGRECEIVEEVENT, properties);
+            });
+    }
+
+    /**
+     * Invoked when the bot sends a message to the user.
+     * Performs logging of telemetry data using the {@link BotTelemetryClient#trackEvent} method.
+     * This event name used is "BotMessageSend".
+     *
+     * @param activity Current activity sent from user.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onSendActivityAsync(Activity activity) {
+        return fillSendEventPropertiesAsync(activity, null)
+            .thenAccept(properties -> {
+                telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGSENDEVENT, properties);
+            });
+    }
+
+    /**
+     * Invoked when the bot updates a message.
+     * Performs logging of telemetry data using the {@link BotTelemetryClient#trackEvent} method.
+     * This event name used is "BotMessageUpdate".
+     *
+     * @param activity Current activity sent from user.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onUpdateActivityAsync(Activity activity) {
+        return fillUpdateEventPropertiesAsync(activity, null)
+            .thenAccept(properties -> {
+                telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGUPDATEEVENT, properties);
+            });
+    }
+
+    /**
+     * Invoked when the bot deletes a message.
+     * Performs logging of telemetry data using the {@link BotTelemetryClient#trackEvent} method.
+     * This event name used is "BotMessageDelete".
+     *
+     * @param activity Current activity sent from user.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onDeleteActivityAsync(Activity activity) {
+        return fillDeleteEventPropertiesAsync(activity, null)
+            .thenAccept(properties -> {
+                telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGDELETEEVENT, properties);
+            });
+    }
+
+    /**
+     * Fills the event properties for the BotMessageReceived.
+     * Adheres to the LogPersonalInformation flag to filter Name, Text and Speak properties.
+     *
+     * @param activity Last activity sent from user.
+     * @param additionalProperties Additional properties to add to the event.
+     * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
+     * the BotMessageReceived event.
+     */
+    protected CompletableFuture<Map<String, String>> fillReceiveEventPropertiesAsync(
+        Activity activity, Map<String, String> additionalProperties) {
+
+        Map<String, String> properties = new HashMap<String, String>() {{
+            put(TelemetryConstants.FROMIDPROPERTY, activity.getFrom().getId());
+            put(TelemetryConstants.CONVERSATIONNAMEPROPERTY, activity.getConversation().getName());
+            put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
+            put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+            put(TelemetryConstants.RECIPIENTNAMEPROPERTY, activity.getRecipient().getName());
+        }};
+
+        // Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
+        if (logPersonalInformation) {
+            if (!StringUtils.isEmpty(activity.getFrom().getName())) {
+                properties.put(TelemetryConstants.FROMNAMEPROPERTY, activity.getFrom().getName());
+            }
+
+            if (!StringUtils.isEmpty(activity.getText())) {
+                properties.put(TelemetryConstants.TEXTPROPERTY, activity.getText());
+            }
+
+            if (!StringUtils.isEmpty(activity.getSpeak())) {
+                properties.put(TelemetryConstants.SPEAKPROPERTY, activity.getSpeak());
+            }
+        }
+
+        // Additional Properties can override "stock" properties.
+        if (additionalProperties != null) {
+            properties.putAll(additionalProperties);
+        }
+
+        return CompletableFuture.completedFuture(properties);
+    }
+
+    /**
+     * Fills the event properties for BotMessageSend.
+     * These properties are logged when an activity message is sent by the Bot to the user.
+     *
+     * @param activity Last activity sent from user.
+     * @param additionalProperties Additional properties to add to the event.
+     * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
+     * the BotMessageSend event.
+     */
+    protected CompletableFuture<Map<String, String>> fillSendEventPropertiesAsync(
+        Activity activity, Map<String, String> additionalProperties) {
+
+        Map<String, String> properties = new HashMap<String, String>() {{
+            put(TelemetryConstants.REPLYACTIVITYIDPROPERTY, activity.getReplyToId());
+            put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+            put(TelemetryConstants.CONVERSATIONNAMEPROPERTY, activity.getConversation().getName());
+            put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
+        }};
+
+        // Use the LogPersonalInformation flag to toggle logging PII data, text and user name are common examples
+        if (logPersonalInformation) {
+            if (!StringUtils.isEmpty(activity.getRecipient().getName())) {
+                properties.put(TelemetryConstants.RECIPIENTNAMEPROPERTY, activity.getRecipient().getName());
+            }
+
+            if (!StringUtils.isEmpty(activity.getText())) {
+                properties.put(TelemetryConstants.TEXTPROPERTY, activity.getText());
+            }
+
+            if (!StringUtils.isEmpty(activity.getSpeak())) {
+                properties.put(TelemetryConstants.SPEAKPROPERTY, activity.getSpeak());
+            }
+        }
+
+        // Additional Properties can override "stock" properties.
+        if (additionalProperties != null) {
+            properties.putAll(additionalProperties);
+        }
+
+        return CompletableFuture.completedFuture(properties);
+    }
+
+    /**
+     * Fills the event properties for BotMessageUpdate.
+     * These properties are logged when an activity message is sent by the Bot to the user.
+     *
+     * @param activity Last activity sent from user.
+     * @param additionalProperties Additional properties to add to the event.
+     * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
+     * the BotMessageUpdate event.
+     */
+    protected CompletableFuture<Map<String, String>> fillUpdateEventPropertiesAsync(
+        Activity activity, Map<String, String> additionalProperties) {
+
+        Map<String, String> properties = new HashMap<String, String>() {{
+            put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+            put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
+            put(TelemetryConstants.CONVERSATIONNAMEPROPERTY, activity.getConversation().getName());
+            put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
+        }};
+
+        // Use the LogPersonalInformation flag to toggle logging PII data, text is a common example
+        if (logPersonalInformation) {
+            if (!StringUtils.isEmpty(activity.getText())) {
+                properties.put(TelemetryConstants.TEXTPROPERTY, activity.getText());
+            }
+        }
+
+        // Additional Properties can override "stock" properties.
+        if (additionalProperties != null) {
+            properties.putAll(additionalProperties);
+        }
+
+        return CompletableFuture.completedFuture(properties);
+    }
+
+    /**
+     * Fills the event properties for BotMessageDelete.
+     * These properties are logged when an activity message is sent by the Bot to the user.
+     *
+     * @param activity Last activity sent from user.
+     * @param additionalProperties Additional properties to add to the event.
+     * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
+     * the BotMessageDelete event.
+     */
+    protected CompletableFuture<Map<String, String>> fillDeleteEventPropertiesAsync(
+        Activity activity, Map<String, String> additionalProperties) {
+
+        Map<String, String> properties = new HashMap<String, String>() {{
+            put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+            put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
+            put(TelemetryConstants.CONVERSATIONNAMEPROPERTY, activity.getConversation().getName());
+        }};
+
+        // Additional Properties can override "stock" properties.
+        if (additionalProperties != null) {
+            properties.putAll(additionalProperties);
+        }
+
+        return CompletableFuture.completedFuture(properties);
+    }
+}

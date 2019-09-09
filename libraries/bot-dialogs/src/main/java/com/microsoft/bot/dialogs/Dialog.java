@@ -29,7 +29,7 @@ public abstract class Dialog
     }
     public CompletableFuture<DialogCompletion> Begin(TurnContext context, HashMap<String, Object> state, HashMap<String, Object> options)
     {
-        BotAssert.ContextNotNull(context);
+        BotAssert.contextNotNull(context);
         if (state == null)
             throw new NullPointerException("HashMap<String, Object> state");
 
@@ -74,7 +74,7 @@ public abstract class Dialog
      */
     public CompletableFuture<DialogCompletion> Continue(TurnContext context, HashMap<String, Object> state)
     {
-        BotAssert.ContextNotNull(context);
+        BotAssert.contextNotNull(context);
         if (state == null)
             throw new NullPointerException("HashMap<String, Object>");
 

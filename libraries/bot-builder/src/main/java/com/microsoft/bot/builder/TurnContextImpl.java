@@ -3,7 +3,6 @@ package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.InputHints;
@@ -247,42 +246,36 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             applyConversationReference(a, cr);
         }
 
-        // Convert the IActivities to Activies.
-        // Activity[] activityArray = Array.ConvertAll(activities, (input) => (Activity)input);
+        // Convert the IActivities to Activities.
         List<Activity> activityArray = Arrays.stream(activities).map(input -> input).collect(toList());
 
         // Create the list used by the recursive methods.
         List<Activity> activityList = new ArrayList<Activity>(activityArray);
 
         Supplier<CompletableFuture<ResourceResponse[]>> actuallySendStuff = () -> {
-            // Are the any non-trace activities to send?
-            // The thinking here is that a Trace event isn't user relevant data
-            // so the "Responded" flag should not be set by Trace messages being
-            // sent out.
-            boolean sentNonTraceActivities = false;
-            if (!activityList.stream().anyMatch((a) -> a.getType() == TRACE)) {
-                sentNonTraceActivities = true;
-            }
-
             // Send from the list, which may have been manipulated via the event handlers.
             // Note that 'responses' was captured from the root of the call, and will be
             // returned to the original caller.
-            ResourceResponse[] responses = new ResourceResponse[0];
-            responses = this.getAdapter().SendActivities(this, activityList.toArray(new Activity[activityList.size()]));
-            if (responses != null && responses.length == activityList.size()) {
-                // stitch up activity ids
-                for (int i = 0; i < responses.length; i++) {
-                    ResourceResponse response = responses[i];
-                    Activity activity = activityList.get(i);
-                    activity.setId(response.getId());
-                }
-            }
+            return getAdapter().sendActivitiesAsync(this, activityList.toArray(new Activity[activityList.size()]))
+                .thenApply(responses -> {
+                    if (responses != null && responses.length == activityList.size()) {
+                        // stitch up activity ids
+                        for (int i = 0; i < responses.length; i++) {
+                            ResourceResponse response = responses[i];
+                            Activity activity = activityList.get(i);
+                            activity.setId(response.getId());
+                        }
+                    }
 
-            // If we actually sent something (that's not Trace), set the flag.
-            if (sentNonTraceActivities) {
-                this.setResponded(true);
-            }
-            return responses;
+                    // Are the any non-trace activities to send?
+                    // The thinking here is that a Trace event isn't user relevant data
+                    // so the "Responded" flag should not be set by Trace messages being
+                    // sent out.
+                    if (activityList.stream().anyMatch((a) -> a.getType() == TRACE)) {
+                        this.setResponded(true);
+                    }
+                    return responses;
+                });
         };
 
         List<Activity> act_list = new ArrayList<>(activityList);
@@ -298,8 +291,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivityAsync(Activity activity) {
-        Supplier<ResourceResponse> ActuallyUpdateStuff = () -> {
-            return this.getAdapter().UpdateActivity(this, activity);
+        Supplier<CompletableFuture<ResourceResponse>> ActuallyUpdateStuff = () -> {
+            return getAdapter().updateActivityAsync(this, activity);
         };
 
         return updateActivityInternal(activity, onUpdateActivity.iterator(), ActuallyUpdateStuff);
@@ -313,35 +306,17 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @throws Exception The HTTP operation failed and the response contained additional information.
      */
     public CompletableFuture<Void> deleteActivityAsync(String activityId) {
-        if (StringUtils.isWhitespace(activityId) || activityId == null)
+        if (StringUtils.isWhitespace(activityId) || activityId == null) {
             throw new IllegalArgumentException("activityId");
+        }
 
-        return CompletableFuture.runAsync(() -> {
-            ConversationReference cr = this.GetConversationReference(this.getActivity());
-            cr.setActivityId(activityId);
+        ConversationReference cr = getConversationReference(getActivity());
+        cr.setActivityId(activityId);
 
-            Runnable ActuallyDeleteStuff = () -> {
-                try {
-                    this.getAdapter().DeleteActivity(this, cr);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(String.format("Failed to delete activity %s", e.toString()));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(String.format("Failed to delete activity %s", e.toString()));
-                }
-                return;
-            };
+        Supplier<CompletableFuture<Void>> ActuallyDeleteStuff = () ->
+            getAdapter().deleteActivityAsync(this, cr);
 
-            try {
-                deleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(String.format("Failed to delete activity %s", e.getMessage()));
-            }
-            return;
-
-        }, ExecutorFactory.getExecutor());
+        return deleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff);
     }
 
     /**
@@ -357,17 +332,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         if (conversationReference == null)
             throw new IllegalArgumentException("conversationReference");
 
-        Runnable ActuallyDeleteStuff = () -> {
-            try {
-                this.getAdapter().DeleteActivity(this, conversationReference);
-                return;
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            throw new RuntimeException("DeleteActivity failed");
-        };
+        Supplier<CompletableFuture<Void>> ActuallyDeleteStuff = () ->
+            getAdapter().deleteActivityAsync(this, conversationReference);
 
         return deleteActivityInternal(conversationReference, onDeleteActivity.iterator(), ActuallyDeleteStuff);
     }
@@ -377,15 +343,18 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Iterator<SendActivitiesHandler> sendHandlers,
         Supplier<CompletableFuture<ResourceResponse[]>> callAtBottom) {
 
-        if (activities == null)
+        if (activities == null) {
             throw new IllegalArgumentException("activities");
-        if (sendHandlers == null)
+        }
+        if (sendHandlers == null) {
             throw new IllegalArgumentException("sendHandlers");
+        }
 
-        if (false == sendHandlers.hasNext()) { // No middleware to run.
-            if (callAtBottom != null)
+        if (!sendHandlers.hasNext()) { // No middleware to run.
+            if (callAtBottom != null) {
                 return callAtBottom.get();
-            return new ResourceResponse[0];
+            }
+            return CompletableFuture.completedFuture(new ResourceResponse[0]);
         }
 
         // Default to "No more Middleware after this".
@@ -445,8 +414,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     //        }
     private CompletableFuture<ResourceResponse> updateActivityInternal(Activity activity,
                                                     Iterator<UpdateActivityHandler> updateHandlers,
-                                                    Supplier<ResourceResponse> callAtBottom) {
-        BotAssert.ActivityNotNull(activity);
+                                                    Supplier<CompletableFuture<ResourceResponse>> callAtBottom) {
+        BotAssert.activityNotNull(activity);
         if (updateHandlers == null)
             throw new IllegalArgumentException("updateHandlers");
 
@@ -463,15 +432,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 // so that the next call just has the remaining items to worry about.
                 if (updateHandlers.hasNext())
                     updateHandlers.next();
-                ResourceResponse result = null;
-                try {
-                    result = updateActivityInternal(activity, updateHandlers, callAtBottom);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(String.format("Error updating activity: %s", e.toString()));
-                }
-                activity.setId(result.getId());
-                return result;
+
+                return updateActivityInternal(activity, updateHandlers, callAtBottom)
+                    .thenApply(resourceResponse -> {
+                        activity.setId(resourceResponse.getId());
+                        return resourceResponse;
+                    });
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it
@@ -482,16 +448,16 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     private CompletableFuture<Void> deleteActivityInternal(ConversationReference cr,
                                                            Iterator<DeleteActivityHandler> deleteHandlers,
-                                                           Runnable callAtBottom) {
-        BotAssert.ConversationReferenceNotNull(cr);
+                                                           Supplier<CompletableFuture<Void>> callAtBottom) {
+        BotAssert.conversationReferenceNotNull(cr);
         if (deleteHandlers == null)
             throw new IllegalArgumentException("deleteHandlers");
 
-        if (deleteHandlers.hasNext() == false) { // No middleware to run.
+        if (!deleteHandlers.hasNext()) { // No middleware to run.
             if (callAtBottom != null) {
-                callAtBottom.run();
+                return callAtBottom.get();
             }
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
         // Default to "No more Middleware after this".
@@ -503,20 +469,12 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             if (deleteHandlers.hasNext())
                 deleteHandlers.next();
 
-
-            try {
-                deleteActivityInternal(cr, deleteHandlers, callAtBottom);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("DeleteActivityInternal failed");
-            }
-
-            return null;
+            return deleteActivityInternal(cr, deleteHandlers, callAtBottom);
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it.
         DeleteActivityHandler toCall = deleteHandlers.next();
-        toCall.invoke(this, cr, next);
+        return toCall.invoke(this, cr, next);
     }
 
     /**
@@ -527,7 +485,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @throws IllegalArgumentException {@code activity} is {@code null}.
      */
     public static ConversationReference getConversationReference(Activity activity) {
-        BotAssert.ActivityNotNull(activity);
+        BotAssert.activityNotNull(activity);
 
         ConversationReference r = new ConversationReference() {{
             setActivityId(activity.getId());

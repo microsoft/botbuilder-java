@@ -206,7 +206,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      *                                     {@linkalso BotAdapter.RunPipeline(TurnContext, Func { TurnContext, Task })}
      */
     public CompletableFuture<InvokeResponse> ProcessActivity(String authHeader, Activity activity, Function<TurnContextImpl, CompletableFuture> callback) throws Exception {
-        BotAssert.ActivityNotNull(activity);
+        BotAssert.activityNotNull(activity);
 
         //ClaimsIdentity claimsIdentity = await(JwtTokenValidation.validateAuthHeader(activity, authHeader, _credentialProvider));
 
@@ -215,7 +215,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, Activity activity, Consumer<TurnContext> callback) throws Exception {
-        BotAssert.ActivityNotNull(activity);
+        BotAssert.activityNotNull(activity);
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
             context.getTurnState().add("BotIdentity", identity);
@@ -503,7 +503,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return Token Response
      */
     public CompletableFuture<TokenResponse> GetUserToken(TurnContextImpl context, String connectionName, String magicCode) {
-        BotAssert.ContextNotNull(context);
+        BotAssert.contextNotNull(context);
         if (context.getActivity().getFrom() == null || StringUtils.isEmpty(context.getActivity().getFrom().getId()))
             throw new IllegalArgumentException("BotFrameworkAdapter.GetuserToken(): missing from or from.id");
 
@@ -523,7 +523,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return
      */
     public CompletableFuture<String> GetOauthSignInLink(TurnContextImpl context, String connectionName) {
-        BotAssert.ContextNotNull(context);
+        BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName))
             throw new IllegalArgumentException("connectionName");
 
@@ -540,7 +540,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return
      */
     public CompletableFuture SignOutUser(TurnContextImpl context, String connectionName) {
-        BotAssert.ContextNotNull(context);
+        BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName))
             throw new IllegalArgumentException("connectionName");
 

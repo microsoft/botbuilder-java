@@ -86,6 +86,16 @@ public interface BotTelemetryClient {
      *
      * @param eventName A name for the event.
      * @param properties Named string values you can use to search and classify events.
+     */
+    default void trackEvent(String eventName, Map<String, String> properties) {
+        trackEvent(eventName, properties, null);
+    }
+
+    /**
+     * Logs custom events with extensible named fields.
+     *
+     * @param eventName A name for the event.
+     * @param properties Named string values you can use to search and classify events.
      * @param metrics Measurements associated with this event.
      */
     void trackEvent(String eventName, Map<String, String> properties, Map<String, Double> metrics);

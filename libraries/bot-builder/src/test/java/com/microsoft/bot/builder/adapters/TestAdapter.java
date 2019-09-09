@@ -3,10 +3,7 @@ package com.microsoft.bot.builder.adapters;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import com.microsoft.bot.builder.BotAdapter;
-import com.microsoft.bot.builder.Middleware;
-import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.builder.TurnContextImpl;
+import com.microsoft.bot.builder.*;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
@@ -57,12 +54,12 @@ public class TestAdapter extends BotAdapter {
     }
 
     public TestAdapter Use(Middleware middleware) {
-        super.Use(middleware);
+        super.use(middleware);
         return this;
     }
 
     public void ProcessActivity(Activity activity,
-                                Consumer<TurnContext> callback
+                               BotCallbackHandler callback
     ) throws Exception {
         synchronized (this.conversationReference()) {
             // ready for next reply
@@ -81,7 +78,7 @@ public class TestAdapter extends BotAdapter {
             activity.setTimestamp(DateTime.now());
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            super.RunPipeline(context, callback);
+            super.runPipelineAsync(context, callback);
         }
         return;
     }
@@ -95,7 +92,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivitiesAsync(TurnContext context, Activity[] activities) {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
@@ -127,12 +124,12 @@ public class TestAdapter extends BotAdapter {
                 }
             }
         }
-        return responses.toArray(new ResourceResponse[responses.size()]);
+        return CompletableFuture.completedFuture(responses.toArray(new ResourceResponse[responses.size()]));
     }
 
 
     @Override
-    public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivityAsync(TurnContext context, Activity activity) {
         synchronized (this.botReplies) {
             List<Activity> replies = new ArrayList<>(botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {
@@ -143,15 +140,15 @@ public class TestAdapter extends BotAdapter {
                     for (Activity item : replies) {
                         this.botReplies.add(item);
                     }
-                    return new ResourceResponse(activity.getId());
+                    return CompletableFuture.completedFuture(new ResourceResponse(activity.getId()));
                 }
             }
         }
-        return new ResourceResponse();
+        return CompletableFuture.completedFuture(new ResourceResponse());
     }
 
     @Override
-    public void DeleteActivity(TurnContext context, ConversationReference reference) {
+    public CompletableFuture<Void> deleteActivityAsync(TurnContext context, ConversationReference reference) {
         synchronized (this.botReplies) {
             ArrayList<Activity> replies = new ArrayList<>(this.botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {
@@ -165,7 +162,7 @@ public class TestAdapter extends BotAdapter {
                 }
             }
         }
-        return;
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -229,7 +226,7 @@ public class TestAdapter extends BotAdapter {
      * @param userSays
      * @return
      */
-    public void SendTextToBot(String userSays, Consumer<TurnContext> callback) throws Exception {
+    public void SendTextToBot(String userSays, BotCallbackHandler callback) throws Exception {
         this.ProcessActivity(this.MakeActivity(userSays), callback);
     }
 }

@@ -174,13 +174,13 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<PagedResult<Transcript>> listTranscriptsAsync(String channelId, String continuationToken) {
+    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId, String continuationToken) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
 
         return CompletableFuture.supplyAsync(() -> {
-            PagedResult<Transcript> pagedResult = new PagedResult<Transcript>();
+            PagedResult<TranscriptInfo> pagedResult = new PagedResult<TranscriptInfo>();
             synchronized (channels) {
 
                 if (!channels.containsKey(channelId)) {
@@ -189,7 +189,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
                 if (continuationToken != null) {
-                    List<Transcript> items = channel.entrySet().stream()
+                    List<TranscriptInfo> items = channel.entrySet().stream()
                             .map(c -> {
                                         OffsetDateTime offsetDateTime = null;
                                         if (c.getValue().stream().findFirst().isPresent()) {
@@ -201,24 +201,24 @@ public class MemoryTranscriptStore implements TranscriptStore {
                                         } else {
                                             offsetDateTime = OffsetDateTime.now();
                                         }
-                                        return new Transcript()
+                                        return new TranscriptInfo()
                                                 .withChannelId(channelId)
                                                 .withId(c.getKey())
                                                 .withCreated(offsetDateTime);
                                     }
                             )
-                            .sorted(Comparator.comparing(Transcript::getCreated))
+                            .sorted(Comparator.comparing(TranscriptInfo::getCreated))
                             .filter(skipwhile(c -> !c.getId().equals(continuationToken)))
                             .skip(1)
                             .limit(20)
                             .collect(Collectors.toList());
-                    pagedResult.items(items.toArray(new Transcript[items.size()]));
+                    pagedResult.items(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
                         pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
                     }
                 } else {
 
-                    List<Transcript> items = channel.entrySet().stream()
+                    List<TranscriptInfo> items = channel.entrySet().stream()
                             .map(c -> {
                                         OffsetDateTime offsetDateTime = null;
                                         if (c.getValue().stream().findFirst().isPresent()) {
@@ -230,16 +230,16 @@ public class MemoryTranscriptStore implements TranscriptStore {
                                         } else {
                                             offsetDateTime = OffsetDateTime.now();
                                         }
-                                        return new Transcript()
+                                        return new TranscriptInfo()
                                                 .withChannelId(channelId)
                                                 .withId(c.getKey())
                                                 .withCreated(offsetDateTime);
                                     }
                             )
-                            .sorted(Comparator.comparing(Transcript::getCreated))
+                            .sorted(Comparator.comparing(TranscriptInfo::getCreated))
                             .limit(20)
                             .collect(Collectors.toList());
-                    pagedResult.items(items.toArray(new Transcript[items.size()]));
+                    pagedResult.items(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
                         pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
                     }
