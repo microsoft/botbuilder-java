@@ -47,10 +47,10 @@ public class JwtTokenValidation {
                                                                         CredentialProvider credentials,
                                                                         ChannelProvider channelProvider,
                                                                         AuthenticationConfiguration authConfig) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             if (StringUtils.isEmpty(authHeader)) {
                 // No auth header was sent. We might be on the anonymous code path.
-                boolean isAuthDisable = credentials.isAuthenticationDisabledAsync().join();
+                boolean isAuthDisable = credentials.isAuthenticationDisabled().join();
                 if (isAuthDisable) {
                     // In the scenario where Auth is disabled, we still want to have the
                     // IsAuthenticated flag set in the ClaimsIdentity. To do this requires

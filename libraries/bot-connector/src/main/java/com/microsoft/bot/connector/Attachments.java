@@ -35,7 +35,7 @@ public interface Attachments {
      * @return the observable to the AttachmentInfo object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    CompletableFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId);
+    CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId);
 
     /**
      * GetAttachment.
@@ -58,5 +58,5 @@ public interface Attachments {
      * @return the observable to the InputStream object
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
-    CompletableFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId);
+    CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId);
 }

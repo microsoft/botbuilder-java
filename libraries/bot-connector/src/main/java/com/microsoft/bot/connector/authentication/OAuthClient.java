@@ -75,8 +75,8 @@ public class OAuthClient extends ServiceClient {
      * @param magicCode
      * @return CompletableFuture<TokenResponse> on success; otherwise null.
      */
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
-        return GetUserTokenAsync(userId, connectionName, magicCode, null);
+    public CompletableFuture<TokenResponse> GetUserToken(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
+        return GetUserToken(userId, connectionName, magicCode, null);
     }
 
     protected URI MakeUri(String uri, HashMap<String, String> queryStrings) throws URISyntaxException {
@@ -103,7 +103,7 @@ public class OAuthClient extends ServiceClient {
      * @param customHeaders
      * @return CompletableFuture<TokenResponse> on success; null otherwise.
      */
-    public CompletableFuture<TokenResponse> GetUserTokenAsync(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
+    public CompletableFuture<TokenResponse> GetUserToken(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
@@ -111,7 +111,7 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             // Construct URL
             HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
@@ -172,7 +172,7 @@ public class OAuthClient extends ServiceClient {
      * @param connectionName
      * @return True on successful sign-out; False otherwise.
      */
-    public CompletableFuture<Boolean> SignOutUserAsync(String userId, String connectionName) throws URISyntaxException, IOException {
+    public CompletableFuture<Boolean> SignOutUser(String userId, String connectionName) throws URISyntaxException, IOException {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
@@ -180,7 +180,7 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             // Construct URL
             HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
@@ -233,7 +233,7 @@ public class OAuthClient extends ServiceClient {
      * @param connectionName
      * @return Sign in link on success; null otherwise.
      */
-    public CompletableFuture<String> GetSignInLinkAsync(Activity activity, String connectionName) throws IllegalArgumentException, URISyntaxException, JsonProcessingException {
+    public CompletableFuture<String> GetSignInLink(Activity activity, String connectionName) throws IllegalArgumentException, URISyntaxException, JsonProcessingException {
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
@@ -264,7 +264,7 @@ public class OAuthClient extends ServiceClient {
         String strUri = String.format("%sapi/botsignin/getsigninurl", this.uri);
         final URI tokenUrl = MakeUri(strUri, qstrings);
 
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
 
             // add botframework api service url to the list of trusted service url's for these app credentials.
             MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
@@ -299,7 +299,7 @@ public class OAuthClient extends ServiceClient {
      * @param emulateOAuthCards
      * @return CompletableFuture with no result code
      */
-    public CompletableFuture SendEmulateOAuthCardsAsync(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
+    public CompletableFuture SendEmulateOAuthCards(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
 
         // Construct URL
         HashMap<String, String> qstrings = new HashMap<>();
@@ -310,7 +310,7 @@ public class OAuthClient extends ServiceClient {
         // add botframework api service url to the list of trusted service url's for these app credentials.
         MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
 
-        return CompletableFuture.runAsync(() -> {
+        return CompletableFuture.run(() -> {
             // Construct dummy body
             RequestBody body = RequestBody.create(JSON, "{}");
 

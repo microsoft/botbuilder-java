@@ -68,7 +68,7 @@ public class GovernmentChannelValidation {
             GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
-        return tokenExtractor.getIdentityAsync(authHeader, channelId, authConfig.requiredEndorsements())
+        return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
             .thenCompose(identity -> {
                 return validateIdentity(identity, credentials, serviceUrl);
             });
@@ -89,7 +89,7 @@ public class GovernmentChannelValidation {
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
 
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             if (identity == null || !identity.isAuthenticated()) {
                 throw new AuthenticationException("Invalid Identity");
             }
@@ -111,7 +111,7 @@ public class GovernmentChannelValidation {
                 throw new AuthenticationException("No Audience Claim");
             }
 
-            boolean isValid = credentials.isValidAppIdAsync(appIdFromAudienceClaim).join();
+            boolean isValid = credentials.isValidAppId(appIdFromAudienceClaim).join();
             if (!isValid) {
                 throw new AuthenticationException(
                     String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));

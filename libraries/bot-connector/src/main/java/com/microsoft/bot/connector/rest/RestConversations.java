@@ -145,7 +145,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ConversationsResult getConversations() {
-        return getConversationsAsync().join();
+        return getConversations().join();
     }
 
     /**
@@ -154,8 +154,8 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationsAsync
      */
     @Override
-    public CompletableFuture<ConversationsResult> getConversationsAsync() {
-        return getConversationsAsync(null);
+    public CompletableFuture<ConversationsResult> getConversations() {
+        return getConversations(null);
     }
 
     /**
@@ -165,7 +165,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ConversationsResult getConversations(String continuationToken) {
-        return getConversationsAsync(continuationToken).join();
+        return getConversations(continuationToken).join();
     }
 
     /**
@@ -174,7 +174,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationsAsync
      */
     @Override
-    public CompletableFuture<ConversationsResult> getConversationsAsync(String continuationToken) {
+    public CompletableFuture<ConversationsResult> getConversations(String continuationToken) {
         return service.getConversations(continuationToken, this.client.getAcceptLanguage(), this.client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
@@ -203,7 +203,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ConversationResourceResponse createConversation(ConversationParameters parameters) {
-        return createConversationAsync(parameters).join();
+        return createConversation(parameters).join();
     }
 
     /**
@@ -212,7 +212,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#createConversationAsync
      */
     @Override
-    public CompletableFuture<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters) {
+    public CompletableFuture<ConversationResourceResponse> createConversation(ConversationParameters parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
@@ -248,7 +248,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ResourceResponse sendToConversation(String conversationId, Activity activity) {
-        return sendToConversationAsync(conversationId, activity).join();
+        return sendToConversation(conversationId, activity).join();
     }
 
     /**
@@ -257,7 +257,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#sendToConversationAsync
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity) {
+    public CompletableFuture<ResourceResponse> sendToConversation(String conversationId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -296,7 +296,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ResourceResponse updateActivity(String conversationId, String activityId, Activity activity) {
-        return updateActivityAsync(conversationId, activityId, activity).join();
+        return updateActivity(conversationId, activityId, activity).join();
     }
 
     /**
@@ -305,7 +305,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#updateActivityAsync
      */
     @Override
-    public CompletableFuture<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -347,7 +347,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ResourceResponse replyToActivity(String conversationId, String activityId, Activity activity) {
-        return replyToActivityAsync(conversationId, activityId, activity).join();
+        return replyToActivity(conversationId, activityId, activity).join();
     }
 
     /**
@@ -356,7 +356,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#replyToActivityAsync
      */
     @Override
-    public CompletableFuture<ResourceResponse> replyToActivityAsync(String conversationId,
+    public CompletableFuture<ResourceResponse> replyToActivity(String conversationId,
                                                              String activityId,
                                                              Activity activity) {
         if (conversationId == null) {
@@ -400,7 +400,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public void deleteActivity(String conversationId, String activityId) {
-        deleteActivityAsync(conversationId, activityId).join();
+        deleteActivity(conversationId, activityId).join();
     }
 
     /**
@@ -409,7 +409,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#deleteActivityAsync
      */
     @Override
-    public CompletableFuture<Void> deleteActivityAsync(String conversationId, String activityId) {
+    public CompletableFuture<Void> deleteActivity(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -446,7 +446,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public List<ChannelAccount> getConversationMembers(String conversationId) {
-        return getConversationMembersAsync(conversationId).join();
+        return getConversationMembers(conversationId).join();
     }
 
     /**
@@ -455,7 +455,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationMembersAsync
      */
     @Override
-    public CompletableFuture<List<ChannelAccount>> getConversationMembersAsync(String conversationId) {
+    public CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -487,7 +487,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public void deleteConversationMember(String conversationId, String memberId) {
-        deleteConversationMemberAsync(conversationId, memberId).join();
+        deleteConversationMember(conversationId, memberId).join();
     }
 
     /**
@@ -496,7 +496,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#deleteConversationMemberAsync
      */
     @Override
-    public CompletableFuture<Void> deleteConversationMemberAsync(String conversationId, String memberId) {
+    public CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -534,7 +534,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public List<ChannelAccount> getActivityMembers(String conversationId, String activityId) {
-        return getActivityMembersAsync(conversationId, activityId).join();
+        return getActivityMembers(conversationId, activityId).join();
     }
 
     /**
@@ -543,7 +543,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#getActivityMembersAsync
      */
     @Override
-    public CompletableFuture<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId) {
+    public CompletableFuture<List<ChannelAccount>> getActivityMembers(String conversationId, String activityId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -579,7 +579,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ResourceResponse uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
-        return uploadAttachmentAsync(conversationId, attachmentUpload).join();
+        return uploadAttachment(conversationId, attachmentUpload).join();
     }
 
     /**
@@ -588,7 +588,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#uploadAttachmentAsync
      */
     @Override
-    public CompletableFuture<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload) {
+    public CompletableFuture<ResourceResponse> uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -628,7 +628,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public ResourceResponse sendConversationHistory(String conversationId, Transcript history) {
-        return sendConversationHistoryAsync(conversationId, history).join();
+        return sendConversationHistory(conversationId, history).join();
     }
 
     /**
@@ -637,7 +637,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#sendConversationHistoryAsync
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history) {
+    public CompletableFuture<ResourceResponse> sendConversationHistory(String conversationId, Transcript history) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -677,7 +677,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public PagedMembersResult getConversationPagedMembers(String conversationId){
-        return getConversationPagedMembersAsync(conversationId).join();
+        return getConversationPagedMembers(conversationId).join();
     }
 
     /**
@@ -686,7 +686,7 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationPagedMembersAsync
      */
     @Override
-    public CompletableFuture<PagedMembersResult> getConversationPagedMembersAsync(String conversationId){
+    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId){
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }

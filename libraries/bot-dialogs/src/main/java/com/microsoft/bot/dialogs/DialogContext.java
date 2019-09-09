@@ -58,7 +58,7 @@ public delegate Task ResumeAfter<in T>(IDialogContext context, IAwaitable<T> res
  * @param context The dialog context.
  * @return A task that represents the start code for a dialog.
  */
-//public delegate Task StartAsync(IDialogContext context);
+//public delegate Task Start(IDialogContext context);
 
 
 
@@ -88,7 +88,7 @@ public static partial class Extensions
      * @return A task that represents the post operation.
      */
 /*
-    public static async Task PostAsync(this BotToUser botToUser, string text, string locale = null)
+    public static async Task Post(this BotToUser botToUser, string text, string locale = null)
     {
         var message = botToUser.MakeMessage();
         message.Text = text;
@@ -98,7 +98,7 @@ public static partial class Extensions
             message.Locale = locale;
         }
 
-        await botToUser.PostAsync(message);
+        await botToUser.Post(message);
     }
 */
 
@@ -115,7 +115,7 @@ public static partial class Extensions
      * @param locale The locale of the text.
      * @return A task that represents the post operation.
      */
-   /* public static async Task SayAsync(this BotToUser botToUser, string text, string speak = null, MessageOptions options = null, string locale = null)
+   /* public static async Task Say(this BotToUser botToUser, string text, string speak = null, MessageOptions options = null, string locale = null)
     {
         var message = botToUser.MakeMessage();
 
@@ -136,7 +136,7 @@ public static partial class Extensions
             message.Entities = options.Entities;
         }
 
-        await botToUser.PostAsync(message);
+        await botToUser.Post(message);
     }*/
 
     /**

@@ -20,7 +20,7 @@ public interface CredentialProvider {
      * @return A task that represents the work queued to execute.  If the task is successful, the result is
      * true if appId is valid for the controller; otherwise, false.
      */
-    CompletableFuture<Boolean> isValidAppIdAsync(String appId);
+    CompletableFuture<Boolean> isValidAppId(String appId);
 
     /**
      * Gets the app password for a given bot app ID.
@@ -30,7 +30,7 @@ public interface CredentialProvider {
      * the result contains the password; otherwise, null. This method is async to enable custom implementations
      * that may need to call out to serviced to validate the appId / password pair.
      */
-    CompletableFuture<String> getAppPasswordAsync(String appId);
+    CompletableFuture<String> getAppPassword(String appId);
 
     /**
      * Checks whether bot authentication is disabled.
@@ -39,5 +39,5 @@ public interface CredentialProvider {
      * is disabled, the result is true; otherwise, false. This method is async to enable custom implementations
      * that may need to call out to serviced to validate the appId / password pair.
      */
-    CompletableFuture<Boolean> isAuthenticationDisabledAsync();
+    CompletableFuture<Boolean> isAuthenticationDisabled();
 }
