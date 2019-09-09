@@ -39,11 +39,11 @@ public class JwtTokenExtractor {
         this.openIdMetadata = openIdMetadataCache.computeIfAbsent(metadataUrl, key -> new OpenIdMetadata(metadataUrl));
     }
 
-    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader, String channelId) {
-        return getIdentityAsync(authorizationHeader, channelId, new ArrayList<>());
+    public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader, String channelId) {
+        return getIdentity(authorizationHeader, channelId, new ArrayList<>());
     }
 
-    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String authorizationHeader,
+    public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader,
                                                               String channelId,
                                                               List<String> requiredEndorsements) {
         if (authorizationHeader == null) {
@@ -52,13 +52,13 @@ public class JwtTokenExtractor {
 
         String[] parts = authorizationHeader.split(" ");
         if (parts.length == 2) {
-            return getIdentityAsync(parts[0], parts[1], channelId, requiredEndorsements);
+            return getIdentity(parts[0], parts[1], channelId, requiredEndorsements);
         }
 
         return CompletableFuture.completedFuture(null);
     }
 
-    public CompletableFuture<ClaimsIdentity> getIdentityAsync(String schema,
+    public CompletableFuture<ClaimsIdentity> getIdentity(String schema,
                                                               String token,
                                                               String channelId,
                                                               List<String> requiredEndorsements) {
@@ -72,7 +72,7 @@ public class JwtTokenExtractor {
             return CompletableFuture.completedFuture(null);
         }
 
-        return validateTokenAsync(token, channelId, requiredEndorsements);
+        return validateToken(token, channelId, requiredEndorsements);
     }
 
     private boolean hasAllowedIssuer(String token) {
@@ -82,7 +82,7 @@ public class JwtTokenExtractor {
     }
 
     @SuppressWarnings("unchecked")
-    private CompletableFuture<ClaimsIdentity> validateTokenAsync(String token,
+    private CompletableFuture<ClaimsIdentity> validateToken(String token,
                                                                  String channelId,
                                                                  List<String> requiredEndorsements) {
         DecodedJWT decodedJWT = JWT.decode(token);
@@ -92,7 +92,7 @@ public class JwtTokenExtractor {
             return CompletableFuture.completedFuture(null);
         }
 
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             Verification verification = JWT.require(Algorithm.RSA256(key.key, null));
             try {
                 verification.build().verify(token);

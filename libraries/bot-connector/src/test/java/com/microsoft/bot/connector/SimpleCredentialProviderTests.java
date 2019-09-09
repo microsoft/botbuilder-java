@@ -9,24 +9,24 @@ import org.junit.Test;
 
 public class SimpleCredentialProviderTests {
     @Test
-    public void ValidAppIdAsync() {
+    public void ValidAppId() {
         SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider("appid", "pwd");
 
-        Assert.assertTrue(credentialProvider.isValidAppIdAsync("appid").join());
-        Assert.assertFalse(credentialProvider.isValidAppIdAsync("wrongappid").join());
+        Assert.assertTrue(credentialProvider.isValidAppId("appid").join());
+        Assert.assertFalse(credentialProvider.isValidAppId("wrongappid").join());
     }
 
     @Test
-    public void AppPasswordAsync() {
+    public void AppPassword() {
         SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider("appid", "pwd");
 
-        Assert.assertEquals(credentialProvider.getAppPasswordAsync("appid").join(), "pwd");
-        Assert.assertNull(credentialProvider.getAppPasswordAsync("wrongappid").join());
+        Assert.assertEquals(credentialProvider.getAppPassword("appid").join(), "pwd");
+        Assert.assertNull(credentialProvider.getAppPassword("wrongappid").join());
     }
 
     @Test
-    public void AuthenticationDisabledAsync() {
-        Assert.assertFalse(new SimpleCredentialProvider("appid", "pwd").isAuthenticationDisabledAsync().join());
-        Assert.assertTrue(new SimpleCredentialProvider(null, null).isAuthenticationDisabledAsync().join());
+    public void AuthenticationDisabled() {
+        Assert.assertFalse(new SimpleCredentialProvider("appid", "pwd").isAuthenticationDisabled().join());
+        Assert.assertTrue(new SimpleCredentialProvider(null, null).isAuthenticationDisabled().join());
     }
 }

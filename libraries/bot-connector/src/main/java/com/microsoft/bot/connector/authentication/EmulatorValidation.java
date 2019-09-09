@@ -129,7 +129,7 @@ public class EmulatorValidation {
             openIdMetadataUrl,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
-        return tokenExtractor.getIdentityAsync(authHeader, channelId, authConfig.requiredEndorsements())
+        return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
             .thenApply(identity -> {
                 if (identity == null) {
                     // No valid identity. Not Authorized.
@@ -182,7 +182,7 @@ public class EmulatorValidation {
                         String.format("Unknown Emulator Token version '%s'.", tokenVersion));
                 }
 
-                if (!credentials.isValidAppIdAsync(appId).join()) {
+                if (!credentials.isValidAppId(appId).join()) {
                     throw new AuthenticationException(
                         String.format("Invalid AppId passed on token: '%s'.", appId));
                 }

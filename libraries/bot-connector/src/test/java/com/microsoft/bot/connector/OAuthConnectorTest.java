@@ -35,13 +35,13 @@ public class OAuthConnectorTest extends OAuthTestBase  {
     @Test(expected = IllegalArgumentException.class)
     public void GetUserToken_ShouldThrowOnEmptyUserId() throws URISyntaxException, IOException, ExecutionException, InterruptedException {
         OAuthClient client = new OAuthClient(this.connector, "https://localhost");
-        client.GetUserTokenAsync("", "mockConnection", "");
+        client.GetUserToken("", "mockConnection", "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void GetUserToken_ShouldThrowOnEmptyConnectionName() throws URISyntaxException, IOException, ExecutionException, InterruptedException {
         OAuthClient client = new OAuthClient(this.connector, "https://localhost");
-        client.GetUserTokenAsync("userid", "", "");
+        client.GetUserToken("userid", "", "");
     }
 /*
    TODO: Need to set up a bot and login with AADv2 to perform new recording (or convert the C# recordings)
@@ -53,7 +53,7 @@ public class OAuthConnectorTest extends OAuthTestBase  {
             TokenResponse token = null;
             try {
                 System.out.println("This is a test  asdfasdfasdf");
-                token = await(client.GetUserTokenAsync("default-user", "mygithubconnection", ""));
+                token = await(client.GetUserToken("default-user", "mygithubconnection", ""));
                 if (null==token) {
                     System.out.println(String.format("This is a test 2 - NULL TOKEN"));
                     System.out.flush();
@@ -84,7 +84,7 @@ public class OAuthConnectorTest extends OAuthTestBase  {
 public async Task GetUserToken_ShouldReturnNullOnInvalidConnectionString() throws URISyntaxException {
         await UseOAuthClientFor(async client =>
         {
-        var token = await client.GetUserTokenAsync("default-user", "mygithubconnection1", "");
+        var token = await client.GetUserToken("default-user", "mygithubconnection1", "");
         Assert.Null(token);
         });
         }
@@ -100,7 +100,7 @@ public async Task GetUserToken_ShouldReturnNullOnInvalidConnectionString() throw
         //    };
         //    await UseOAuthClientFor(async client =>
         //     {
-        //         var uri = await client.GetSignInLinkAsync(activity, "mygithubconnection");
+        //         var uri = await client.GetSignInLink(activity, "mygithubconnection");
         //         Assert.False(string.IsNullOrEmpty(uri));
         //         Uri uriResult;
         //         Assert.True(Uri.TryCreate(uri, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttps);
@@ -110,26 +110,26 @@ public async Task GetUserToken_ShouldReturnNullOnInvalidConnectionString() throw
         @Test
 public async Task SignOutUser_ShouldThrowOnEmptyUserId() throws URISyntaxException {
         var client = new OAuthClient(mockConnectorClient, "https://localhost");
-        await Assert.ThrowsAsync<ArgumentNullException>(() => client.SignOutUserAsync("", "mockConnection"));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => client.SignOutUser("", "mockConnection"));
         }
 
         @Test
 public async Task SignOutUser_ShouldThrowOnEmptyConnectionName() throws URISyntaxException {
         var client = new OAuthClient(mockConnectorClient, "https://localhost");
-        await Assert.ThrowsAsync<ArgumentNullException>(() => client.SignOutUserAsync("userid", ""));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => client.SignOutUser("userid", ""));
         }
 
         @Test
 public async Task GetSigninLink_ShouldThrowOnEmptyConnectionName() throws URISyntaxException {
         var activity = new Activity();
         var client = new OAuthClient(mockConnectorClient, "https://localhost");
-        await Assert.ThrowsAsync<ArgumentNullException>(() => client.GetSignInLinkAsync(activity, ""));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => client.GetSignInLink(activity, ""));
         }
 
         @Test
 public async Task GetSigninLink_ShouldThrowOnNullActivity() throws URISyntaxException {
         var client = new OAuthClient(mockConnectorClient, "https://localhost");
-        await Assert.ThrowsAsync<ArgumentNullException>(() => client.GetSignInLinkAsync(null, "mockConnection"));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => client.GetSignInLink(null, "mockConnection"));
         }
         */
         }

@@ -80,7 +80,7 @@ public class EnterpriseChannelValidation {
                         channelService),
                     AuthenticationConstants.AllowedSigningAlgorithms);
 
-                return tokenExtractor.getIdentityAsync(authHeader, channelId, authConfig.requiredEndorsements());
+                return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements());
             })
 
             .thenCompose(identity -> {
@@ -96,7 +96,7 @@ public class EnterpriseChannelValidation {
     public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity,
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supply(() -> {
             if (identity == null || !identity.isAuthenticated()) {
                 throw new AuthenticationException("Invalid Identity");
             }
@@ -118,7 +118,7 @@ public class EnterpriseChannelValidation {
                 throw new AuthenticationException("No Audience Claim");
             }
 
-            boolean isValid = credentials.isValidAppIdAsync(appIdFromAudienceClaim).join();
+            boolean isValid = credentials.isValidAppId(appIdFromAudienceClaim).join();
             if (!isValid) {
                 throw new AuthenticationException(
                     String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));

@@ -76,7 +76,7 @@ public class RestAttachments implements Attachments {
      * @return the AttachmentInfo object if successful.
      */
     public AttachmentInfo getAttachmentInfo(String attachmentId) {
-        return getAttachmentInfoAsync(attachmentId).join();
+        return getAttachmentInfo(attachmentId).join();
     }
 
     /**
@@ -87,7 +87,7 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the AttachmentInfo object
      */
-    public CompletableFuture<AttachmentInfo> getAttachmentInfoAsync(String attachmentId) {
+    public CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId) {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }
@@ -125,7 +125,7 @@ public class RestAttachments implements Attachments {
      * @return the InputStream object if successful.
      */
     public InputStream getAttachment(String attachmentId, String viewId) {
-        return getAttachmentAsync(attachmentId, viewId).join();
+        return getAttachment(attachmentId, viewId).join();
     }
 
     /**
@@ -137,7 +137,7 @@ public class RestAttachments implements Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the InputStream object
      */
-    public CompletableFuture<InputStream> getAttachmentAsync(String attachmentId, String viewId) {
+    public CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId) {
         if (attachmentId == null) {
             throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
         }

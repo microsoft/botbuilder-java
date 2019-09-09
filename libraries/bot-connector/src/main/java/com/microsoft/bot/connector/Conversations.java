@@ -52,7 +52,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
-    CompletableFuture<ConversationsResult> getConversationsAsync();
+    CompletableFuture<ConversationsResult> getConversations();
 
     /**
      * GetConversations.
@@ -86,7 +86,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationsResult object
      */
-    CompletableFuture<ConversationsResult> getConversationsAsync(String continuationToken);
+    CompletableFuture<ConversationsResult> getConversations(String continuationToken);
 
     /**
      * CreateConversation.
@@ -102,7 +102,7 @@ public interface Conversations {
      * ```
      * var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot,
      *     members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     * await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
+     * await connect.Conversations.SendToConversation(resource.Id, new Activity() ... ) ;
      * ```.
      *
      * @param parameters Parameters to create the conversation from
@@ -126,14 +126,14 @@ public interface Conversations {
      * ```
      * var resource = await connector.conversations.CreateConversation(new ConversationParameters(){ Bot = bot,
      *     members = new ChannelAccount[] { new ChannelAccount("user1") } );
-     * await connect.Conversations.SendToConversationAsync(resource.Id, new Activity() ... ) ;
+     * await connect.Conversations.SendToConversation(resource.Id, new Activity() ... ) ;
      * ```
      *
      * @param parameters Parameters to create the conversation from
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ConversationResourceResponse object
      */
-    CompletableFuture<ConversationResourceResponse> createConversationAsync(ConversationParameters parameters);
+    CompletableFuture<ConversationResourceResponse> createConversation(ConversationParameters parameters);
 
     /**
      * SendToConversation.
@@ -170,7 +170,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
-    CompletableFuture<ResourceResponse> sendToConversationAsync(String conversationId, Activity activity);
+    CompletableFuture<ResourceResponse> sendToConversation(String conversationId, Activity activity);
 
     /**
      * UpdateActivity.
@@ -199,7 +199,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
-    CompletableFuture<ResourceResponse> updateActivityAsync(String conversationId, String activityId, Activity activity);
+    CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity);
 
     /**
      * ReplyToActivity.
@@ -238,7 +238,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
-    CompletableFuture<ResourceResponse> replyToActivityAsync(String conversationId, String activityId, Activity activity);
+    CompletableFuture<ResourceResponse> replyToActivity(String conversationId, String activityId, Activity activity);
 
     /**
      * DeleteActivity.
@@ -264,7 +264,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
-    CompletableFuture<Void> deleteActivityAsync(String conversationId, String activityId);
+    CompletableFuture<Void> deleteActivity(String conversationId, String activityId);
 
     /**
      * GetConversationMembers.
@@ -289,7 +289,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
-    CompletableFuture<List<ChannelAccount>> getConversationMembersAsync(String conversationId);
+    CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId);
 
     /**
      * DeleteConversationMember.
@@ -315,7 +315,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
-    CompletableFuture<Void> deleteConversationMemberAsync(String conversationId, String memberId);
+    CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId);
 
     /**
      * GetActivityMembers.
@@ -342,7 +342,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ChannelAccount&gt; object
      */
-    CompletableFuture<List<ChannelAccount>> getActivityMembersAsync(String conversationId, String activityId);
+    CompletableFuture<List<ChannelAccount>> getActivityMembers(String conversationId, String activityId);
 
     /**
      * UploadAttachment.
@@ -371,7 +371,7 @@ public interface Conversations {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the ResourceResponse object
      */
-    CompletableFuture<ResourceResponse> uploadAttachmentAsync(String conversationId, AttachmentData attachmentUpload);
+    CompletableFuture<ResourceResponse> uploadAttachment(String conversationId, AttachmentData attachmentUpload);
 
     /**
      * This method allows you to upload the historic activities to the conversation.
@@ -401,7 +401,7 @@ public interface Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ResourceResponse object if successful.
      */
-    CompletableFuture<ResourceResponse> sendConversationHistoryAsync(String conversationId, Transcript history);
+    CompletableFuture<ResourceResponse> sendConversationHistory(String conversationId, Transcript history);
 
     /**
      * Enumerate the members of a conversation one page at a time.
@@ -445,5 +445,5 @@ public interface Conversations {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the PagedMembersResult object if successful.
      */
-    CompletableFuture<PagedMembersResult> getConversationPagedMembersAsync(String conversationId);
+    CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId);
 }

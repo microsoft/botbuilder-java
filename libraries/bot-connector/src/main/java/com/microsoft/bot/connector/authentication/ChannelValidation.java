@@ -60,7 +60,7 @@ public class ChannelValidation {
             AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
-        return tokenExtractor.getIdentityAsync(authHeader, channelId)
+        return tokenExtractor.getIdentity(authHeader, channelId)
             .thenApply(identity -> {
                 if (identity == null) {
                     // No valid identity. Not Authorized.
@@ -90,7 +90,7 @@ public class ChannelValidation {
                     throw new AuthenticationException("No Audience Claim");
                 }
 
-                if (!credentials.isValidAppIdAsync(appIdFromAudienceClaim).join()) {
+                if (!credentials.isValidAppId(appIdFromAudienceClaim).join()) {
                     throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.",
                         appIdFromAudienceClaim));
                 }

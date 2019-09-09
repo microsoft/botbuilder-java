@@ -54,7 +54,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
      * @return If the task is successful, the result is true if appId is valid for the controller; otherwise, false.
      */
     @Override
-    public CompletableFuture<Boolean> isValidAppIdAsync(String appId) {
+    public CompletableFuture<Boolean> isValidAppId(String appId) {
         return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId));
     }
 
@@ -66,7 +66,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
      * contains the password; otherwise, null.
      */
     @Override
-    public CompletableFuture<String> getAppPasswordAsync(String appId) {
+    public CompletableFuture<String> getAppPassword(String appId) {
         return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId) ? this.password : null);
     }
 
@@ -77,7 +77,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
      * is disabled, the result is true; otherwise, false.
      */
     @Override
-    public CompletableFuture<Boolean> isAuthenticationDisabledAsync() {
+    public CompletableFuture<Boolean> isAuthenticationDisabled() {
         return CompletableFuture.completedFuture(StringUtils.isEmpty(this.appId));
     }
 }
