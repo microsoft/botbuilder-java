@@ -24,11 +24,11 @@ public class AttachmentsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment);
+        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment).join();
 
-        AttachmentInfo response = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId());
+        AttachmentInfo response = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId()).join();
 
         Assert.assertEquals(attachment.getName(), response.getName());
     }
@@ -57,14 +57,14 @@ public class AttachmentsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment);
+        ResourceResponse attachmentResponse = connector.getConversations().uploadAttachment(conversation.getId(), attachment).join();
 
-        AttachmentInfo attachmentInfo = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId());
+        AttachmentInfo attachmentInfo = connector.getAttachments().getAttachmentInfo(attachmentResponse.getId()).join();
 
         for (AttachmentView attView : attachmentInfo.getViews()) {
-            InputStream retrievedAttachment = connector.getAttachments().getAttachment(attachmentResponse.getId(), attView.getViewId());
+            InputStream retrievedAttachment = connector.getAttachments().getAttachment(attachmentResponse.getId(), attView.getViewId()).join();
 
             Assert.assertTrue(isSame(retrievedAttachment, attachmentStream));
         }

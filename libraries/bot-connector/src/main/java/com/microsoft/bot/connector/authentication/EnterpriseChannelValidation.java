@@ -96,7 +96,7 @@ public class EnterpriseChannelValidation {
     public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity,
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             if (identity == null || !identity.isAuthenticated()) {
                 throw new AuthenticationException("Invalid Identity");
             }

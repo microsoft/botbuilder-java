@@ -111,7 +111,7 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             // Construct URL
             HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
@@ -180,7 +180,7 @@ public class OAuthClient extends ServiceClient {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             // Construct URL
             HashMap<String, String> qstrings = new HashMap<>();
             qstrings.put("userId", userId);
@@ -264,7 +264,7 @@ public class OAuthClient extends ServiceClient {
         String strUri = String.format("%sapi/botsignin/getsigninurl", this.uri);
         final URI tokenUrl = MakeUri(strUri, qstrings);
 
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
 
             // add botframework api service url to the list of trusted service url's for these app credentials.
             MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
@@ -310,7 +310,7 @@ public class OAuthClient extends ServiceClient {
         // add botframework api service url to the list of trusted service url's for these app credentials.
         MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
 
-        return CompletableFuture.run(() -> {
+        return CompletableFuture.runAsync(() -> {
             // Construct dummy body
             RequestBody body = RequestBody.create(JSON, "{}");
 

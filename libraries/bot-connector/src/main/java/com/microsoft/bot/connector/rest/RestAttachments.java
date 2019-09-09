@@ -71,20 +71,6 @@ public class RestAttachments implements Attachments {
      *
      * @param attachmentId attachment id
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the AttachmentInfo object if successful.
-     */
-    public AttachmentInfo getAttachmentInfo(String attachmentId) {
-        return getAttachmentInfo(attachmentId).join();
-    }
-
-    /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
-     *
-     * @param attachmentId attachment id
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the AttachmentInfo object
      */
     public CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId) {
@@ -111,21 +97,6 @@ public class RestAttachments implements Attachments {
                 .register(200, new TypeToken<AttachmentInfo>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
-    }
-
-    /**
-     * GetAttachment.
-     * Get the named view as binary content.
-     *
-     * @param attachmentId attachment id
-     * @param viewId View id from attachmentInfo
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws ErrorResponseException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the InputStream object if successful.
-     */
-    public InputStream getAttachment(String attachmentId, String viewId) {
-        return getAttachment(attachmentId, viewId).join();
     }
 
     /**

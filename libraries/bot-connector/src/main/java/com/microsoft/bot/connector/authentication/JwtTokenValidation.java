@@ -47,7 +47,7 @@ public class JwtTokenValidation {
                                                                         CredentialProvider credentials,
                                                                         ChannelProvider channelProvider,
                                                                         AuthenticationConfiguration authConfig) {
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             if (StringUtils.isEmpty(authHeader)) {
                 // No auth header was sent. We might be on the anonymous code path.
                 boolean isAuthDisable = credentials.isAuthenticationDisabled().join();

@@ -33,7 +33,7 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse result = connector.getConversations().createConversation(params);
+        ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
 
         Assert.assertNotNull(result.getActivityId());
     }
@@ -55,7 +55,7 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            ConversationResourceResponse result = connector.getConversations().createConversation(params);
+            ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -83,7 +83,7 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            ConversationResourceResponse result = connector.getConversations().createConversation(params);
+            ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -111,7 +111,7 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            ConversationResourceResponse result = connector.getConversations().createConversation(params);
+            ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             Assert.assertEquals("BadArgument", ((ErrorResponseException)e.getCause()).body().getError().getCode());
@@ -121,7 +121,7 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithNullParameter() {
         try {
-            ConversationResourceResponse result = connector.getConversations().createConversation(null);
+            ConversationResourceResponse result = connector.getConversations().createConversation(null).join();
             Assert.fail("expected exception did not occur.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage().contains("cannot be null"));
@@ -136,9 +136,9 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        List<ChannelAccount> members = connector.getConversations().getConversationMembers(conversation.getId());
+        List<ChannelAccount> members = connector.getConversations().getConversationMembers(conversation.getId()).join();
 
         boolean hasUser = false;
 
@@ -158,10 +158,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            List<ChannelAccount> members = connector.getConversations().getConversationMembers(conversation.getId().concat("M"));
+            List<ChannelAccount> members = connector.getConversations().getConversationMembers(conversation.getId().concat("M")).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -176,7 +176,7 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetConversationMembersWithNullConversationId() {
         try {
-            List<ChannelAccount> members = connector.getConversations().getConversationMembers(null);
+            List<ChannelAccount> members = connector.getConversations().getConversationMembers(null).join();
             Assert.fail("expected exception did not occur.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage().contains("cannot be null"));
@@ -190,10 +190,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            PagedMembersResult pagedMembers = connector.getConversations().getConversationPagedMembers(conversation.getId());
+            PagedMembersResult pagedMembers = connector.getConversations().getConversationPagedMembers(conversation.getId()).join();
 
             boolean hasUser = false;
             for (ChannelAccount member : pagedMembers.getMembers()) {
@@ -222,10 +222,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            connector.getConversations().getConversationPagedMembers(conversation.getId().concat("M"));
+            connector.getConversations().getConversationPagedMembers(conversation.getId().concat("M")).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -251,9 +251,9 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         Assert.assertNotNull(response.getId());
     }
@@ -273,10 +273,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId().concat("M"), activity);
+            ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId().concat("M"), activity).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -296,7 +296,7 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         bot.setId("B21S8SG7K:T03CWQ0QB");
         Activity activity = new Activity(ActivityTypes.MESSAGE) {{
@@ -307,7 +307,7 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+            ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -383,9 +383,9 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         Assert.assertNotNull(response.getId());
     }
@@ -405,9 +405,9 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        List<ChannelAccount> members = connector.getConversations().getActivityMembers(conversation.getId(), conversation.getActivityId());
+        List<ChannelAccount> members = connector.getConversations().getActivityMembers(conversation.getId(), conversation.getActivityId()).join();
 
         boolean hasUser = false;
 
@@ -434,10 +434,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            List<ChannelAccount> members = connector.getConversations().getActivityMembers(conversation.getId().concat("M"), conversation.getActivityId());
+            List<ChannelAccount> members = connector.getConversations().getActivityMembers(conversation.getId().concat("M"), conversation.getActivityId()).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -489,11 +489,11 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
-        ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), reply);
+        ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), reply).join();
 
         Assert.assertNotNull(replyResponse.getId());
     }
@@ -518,12 +518,12 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         try {
-            ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId().concat("M"), response.getId(), reply);
+            ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId().concat("M"), response.getId(), reply).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -590,12 +590,12 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         try {
-            ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), null);
+            ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), null).join();
             Assert.fail("expected exception did not occur.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage().contains("cannot be null"));
@@ -617,7 +617,7 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         connector.getConversations().deleteActivity(conversation.getId(), conversation.getActivityId());
 
@@ -639,10 +639,10 @@ public class ConversationsTest extends BotConnectorTestBase {
             setActivity(activity);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         try {
-            connector.getConversations().deleteActivity("B21S8SG7K:T03CWQ0QB", conversation.getActivityId());
+            connector.getConversations().deleteActivity("B21S8SG7K:T03CWQ0QB", conversation.getActivityId()).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -657,7 +657,7 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivityWithNullConversationId() {
         try {
-            connector.getConversations().deleteActivity(null, "id");
+            connector.getConversations().deleteActivity(null, "id").join();
             Assert.fail("expected exception did not occur.");
         } catch(IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage().contains("cannot be null"));
@@ -667,7 +667,7 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivityWithNullActivityId() {
         try {
-            connector.getConversations().deleteActivity("id", null);
+            connector.getConversations().deleteActivity("id", null).join();
             Assert.fail("expected exception did not occur.");
         } catch(IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage().contains("cannot be null"));
@@ -688,14 +688,14 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         activity.setId(response.getId());
         activity.setText("TEST Update Activity");
 
-        ResourceResponse updateResponse = connector.getConversations().updateActivity(conversation.getId(), response.getId(), activity);
+        ResourceResponse updateResponse = connector.getConversations().updateActivity(conversation.getId(), response.getId(), activity).join();
 
         Assert.assertNotNull(updateResponse.getId());
     }
@@ -714,15 +714,15 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity);
+        ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
 
         activity.setId(response.getId());
         activity.setText("TEST Update Activity");
 
         try {
-            ResourceResponse updateResponse = connector.getConversations().updateActivity("B21S8SG7K:T03CWQ0QB", response.getId(), activity);
+            ResourceResponse updateResponse = connector.getConversations().updateActivity("B21S8SG7K:T03CWQ0QB", response.getId(), activity).join();
             Assert.fail("expected exception did not occur.");
         } catch (CompletionException e) {
             if (e.getCause() instanceof ErrorResponseException) {
@@ -790,9 +790,9 @@ public class ConversationsTest extends BotConnectorTestBase {
             setBot(bot);
         }};
 
-        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage);
+        ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
-        ResourceResponse response = connector.getConversations().uploadAttachment(conversation.getId(), attachment);
+        ResourceResponse response = connector.getConversations().uploadAttachment(conversation.getId(), attachment).join();
 
         Assert.assertNotNull(response.getId());
     }
