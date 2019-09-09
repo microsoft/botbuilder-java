@@ -139,19 +139,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of getConversations.
-     *
-     * @see Conversations#getConversations
-     */
-    @Override
-    public ConversationsResult getConversations() {
-        return getConversations().join();
-    }
-
-    /**
      * Implementation of getConversationsAsync.
      *
-     * @see Conversations#getConversationsAsync
+     * @see Conversations#getConversations
      */
     @Override
     public CompletableFuture<ConversationsResult> getConversations() {
@@ -159,19 +149,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of getConversations.
-     *
-     * @see Conversations#getConversations
-     */
-    @Override
-    public ConversationsResult getConversations(String continuationToken) {
-        return getConversations(continuationToken).join();
-    }
-
-    /**
      * Implementation of getConversationsAsync.
      *
-     * @see Conversations#getConversationsAsync
+     * @see Conversations#getConversations
      */
     @Override
     public CompletableFuture<ConversationsResult> getConversations(String continuationToken) {
@@ -197,19 +177,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of CreateConversation.
-     *
-     * @see Conversations#createConversation
-     */
-    @Override
-    public ConversationResourceResponse createConversation(ConversationParameters parameters) {
-        return createConversation(parameters).join();
-    }
-
-    /**
      * Implementation of createConversationWithServiceResponseAsync.
      *
-     * @see Conversations#createConversationAsync
+     * @see Conversations#createConversation
      */
     @Override
     public CompletableFuture<ConversationResourceResponse> createConversation(ConversationParameters parameters) {
@@ -242,19 +212,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of sendToConversation.
-     *
-     * @see Conversations#sendToConversation
-     */
-    @Override
-    public ResourceResponse sendToConversation(String conversationId, Activity activity) {
-        return sendToConversation(conversationId, activity).join();
-    }
-
-    /**
      * Implementation of sendToConversationAsync.
      *
-     * @see Conversations#sendToConversationAsync
+     * @see Conversations#sendToConversation
      */
     @Override
     public CompletableFuture<ResourceResponse> sendToConversation(String conversationId, Activity activity) {
@@ -290,19 +250,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of updateActivity.
-     *
-     * @see Conversations#updateActivity
-     */
-    @Override
-    public ResourceResponse updateActivity(String conversationId, String activityId, Activity activity) {
-        return updateActivity(conversationId, activityId, activity).join();
-    }
-
-    /**
      * Implementation of updateActivityAsync.
      *
-     * @see Conversations#updateActivityAsync
+     * @see Conversations#updateActivity
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity) {
@@ -341,19 +291,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of replyToActivity.
-     *
-     * @see Conversations#replyToActivity
-     */
-    @Override
-    public ResourceResponse replyToActivity(String conversationId, String activityId, Activity activity) {
-        return replyToActivity(conversationId, activityId, activity).join();
-    }
-
-    /**
      * Implementation of replyToActivityAsync.
      *
-     * @see Conversations#replyToActivityAsync
+     * @see Conversations#replyToActivity
      */
     @Override
     public CompletableFuture<ResourceResponse> replyToActivity(String conversationId,
@@ -394,19 +334,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of deleteActivity.
-     *
-     * @see Conversations#deleteActivity
-     */
-    @Override
-    public void deleteActivity(String conversationId, String activityId) {
-        deleteActivity(conversationId, activityId).join();
-    }
-
-    /**
      * Implementation of deleteActivityWithServiceResponseAsync.
      *
-     * @see Conversations#deleteActivityAsync
+     * @see Conversations#deleteActivity
      */
     @Override
     public CompletableFuture<Void> deleteActivity(String conversationId, String activityId) {
@@ -440,19 +370,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of getConversationMembers.
-     *
-     * @see Conversations#getConversationMembers
-     */
-    @Override
-    public List<ChannelAccount> getConversationMembers(String conversationId) {
-        return getConversationMembers(conversationId).join();
-    }
-
-    /**
      * Implementation of getConversationMembersAsync.
      *
-     * @see Conversations#getConversationMembersAsync
+     * @see Conversations#getConversationMembers
      */
     @Override
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId) {
@@ -481,19 +401,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of deleteConversationMember.
-     *
-     * @see Conversations#deleteConversationMember
-     */
-    @Override
-    public void deleteConversationMember(String conversationId, String memberId) {
-        deleteConversationMember(conversationId, memberId).join();
-    }
-
-    /**
      * Implementation of deleteConversationMemberWithServiceResponseAsync.
      *
-     * @see Conversations#deleteConversationMemberAsync
+     * @see Conversations#deleteConversationMember
      */
     @Override
     public CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId) {
@@ -528,19 +438,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of getActivityMembers.
-     *
-     * @see Conversations#getActivityMembers
-     */
-    @Override
-    public List<ChannelAccount> getActivityMembers(String conversationId, String activityId) {
-        return getActivityMembers(conversationId, activityId).join();
-    }
-
-    /**
      * Implementation of getActivityMembersAsync.
      *
-     * @see Conversations#getActivityMembersAsync
+     * @see Conversations#getActivityMembers
      */
     @Override
     public CompletableFuture<List<ChannelAccount>> getActivityMembers(String conversationId, String activityId) {
@@ -573,19 +473,9 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of uploadAttachment.
-     *
-     * @see Conversations#uploadAttachment
-     */
-    @Override
-    public ResourceResponse uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
-        return uploadAttachment(conversationId, attachmentUpload).join();
-    }
-
-    /**
      * Implementation of uploadAttachmentAsync.
      *
-     * @see Conversations#uploadAttachmentAsync
+     * @see Conversations#uploadAttachment
      */
     @Override
     public CompletableFuture<ResourceResponse> uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
@@ -622,19 +512,9 @@ public class RestConversations implements Conversations {
 
 
     /**
-     * Implementation of sendConversationHistory.
-     *
-     * @see Conversations#sendConversationHistory
-     */
-    @Override
-    public ResourceResponse sendConversationHistory(String conversationId, Transcript history) {
-        return sendConversationHistory(conversationId, history).join();
-    }
-
-    /**
      * Implementation of sendConversationHistoryAsync.
      *
-     * @see Conversations#sendConversationHistoryAsync
+     * @see Conversations#sendConversationHistory
      */
     @Override
     public CompletableFuture<ResourceResponse> sendConversationHistory(String conversationId, Transcript history) {
@@ -671,19 +551,9 @@ public class RestConversations implements Conversations {
 
 
     /**
-     * Implementation of getConversationPagedMembers.
-     *
-     * @see Conversations#getConversationPagedMembers
-     */
-    @Override
-    public PagedMembersResult getConversationPagedMembers(String conversationId){
-        return getConversationPagedMembers(conversationId).join();
-    }
-
-    /**
      * Implementation of getConversationPagedMembersAsync.
      *
-     * @see Conversations#getConversationPagedMembersAsync
+     * @see Conversations#getConversationPagedMembers
      */
     @Override
     public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId){

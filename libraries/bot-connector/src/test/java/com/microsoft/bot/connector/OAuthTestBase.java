@@ -106,7 +106,7 @@ public class OAuthTestBase extends TestBase {
     }
 
     public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
-        return CompletableFuture.run(() -> {
+        return CompletableFuture.runAsync(() -> {
             OAuthClient oauthClient = null;
             try {
                 oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAUTH_URL);

@@ -89,7 +89,7 @@ public class GovernmentChannelValidation {
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
 
-        return CompletableFuture.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             if (identity == null || !identity.isAuthenticated()) {
                 throw new AuthenticationException("Invalid Identity");
             }
