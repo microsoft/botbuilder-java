@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 
@@ -33,7 +34,7 @@ public class TranscriptMiddlewareTest {
                     setRelatesTo(context.getActivity().getRelatesTo());
                 }};
                 try {
-                    ResourceResponse response = context.SendActivity(typingActivity);
+                    ResourceResponse response = context.sendActivity(typingActivity).join();
                     System.out.printf("Here's the response:");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -46,12 +47,13 @@ public class TranscriptMiddlewareTest {
                     Assert.fail();
                 }
                 try {
-                    context.SendActivity("echo:" + context.getActivity().getText());
+                    context.sendActivity("echo:" + context.getActivity().getText()).join();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail();
                 }
 
+                return CompletableFuture.completedFuture(null);
         }).Send("foo")
                 .AssertReply((activity) -> {
                     Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
@@ -72,10 +74,10 @@ public class TranscriptMiddlewareTest {
         TurnContextImpl context = new TurnContextImpl(adapter, activity);
         NextDelegate nd = new NextDelegate() {
             @Override
-            public void next() throws Exception {
+            public CompletableFuture<Void> next() {
                 System.out.printf("Delegate called!");
                 System.out.flush();
-                return ;
+                return null;
             }
         };
         Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
@@ -83,7 +85,7 @@ public class TranscriptMiddlewareTest {
         }};
 
         try {
-            context.SendActivity(typingActivity);
+            context.sendActivity(typingActivity).join();
             System.out.printf("HI");
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +112,7 @@ public class TranscriptMiddlewareTest {
                     setRelatesTo(context.getActivity().getRelatesTo());
                 }};
                 try {
-                    context.SendActivity((Activity)typingActivity);
+                    context.sendActivity((Activity)typingActivity).join();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail();
@@ -122,11 +124,13 @@ public class TranscriptMiddlewareTest {
                     Assert.fail();
                 }
                 try {
-                    context.SendActivity("echo:" + context.getActivity().getText());
+                    context.sendActivity("echo:" + context.getActivity().getText()).join();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail();
                 }
+
+                return CompletableFuture.completedFuture(null);
         }).Send("foo")
                 .AssertReply((activity) -> {
                     Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
@@ -142,7 +146,7 @@ public class TranscriptMiddlewareTest {
                 .StartTest();
 
 
-        PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(6, pagedResult.getItems().length);
         Assert.assertEquals( "foo", ((Activity)pagedResult.getItems()[0]).getText());
         Assert.assertNotEquals(((Activity)pagedResult.getItems()[1]), null);
@@ -167,38 +171,40 @@ public class TranscriptMiddlewareTest {
         final Activity[] activityToUpdate = {null};
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
-        new TestFlow(adapter, (context) ->
-        {
-
-                conversationId[0] = context.getActivity().getConversation().getId();
-                if (context.getActivity().getText().equals("update")) {
-                    activityToUpdate[0].setText("new response");
-                    try {
-                        context.UpdateActivity(activityToUpdate[0]);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Activity activity = ((Activity) context.getActivity()).createReply("response");
-                    ResourceResponse response = null;
-                    try {
-                        response = context.SendActivity(activity);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Assert.fail();
-                    }
-                    activity.setId(response.getId());
-
-                    // clone the activity, so we can use it to do an update
-                    activityToUpdate[0] = Activity.clone(activity);
-                    //JsonConvert.<Activity>DeserializeObject(JsonConvert.SerializeObject(activity));
+        new TestFlow(adapter, (context) -> {
+            conversationId[0] = context.getActivity().getConversation().getId();
+            if (context.getActivity().getText().equals("update")) {
+                activityToUpdate[0].setText("new response");
+                try {
+                    context.updateActivity(activityToUpdate[0]).join();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-        }).Send("foo")
-                .Send("update")
-                .AssertReply("new response")
-                .StartTest();
+            } else {
+                Activity activity = ((Activity) context.getActivity()).createReply("response");
+                ResourceResponse response = null;
+                try {
+                    response = context.sendActivity(activity).join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Assert.fail();
+                }
+                activity.setId(response.getId());
+
+                // clone the activity, so we can use it to do an update
+                activityToUpdate[0] = Activity.clone(activity);
+                //JsonConvert.<Activity>DeserializeObject(JsonConvert.SerializeObject(activity));
+            }
+
+            return null;
+        })
+            .Send("foo")
+            .Send("update")
+            .AssertReply("new response")
+            .StartTest();
+
         Thread.sleep(500);
-        PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().length);
         Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).getText());
         Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).getText());
@@ -215,36 +221,36 @@ public class TranscriptMiddlewareTest {
         TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
         final String[] activityId = {null};
-        new TestFlow(adapter, (context) ->
-        {
-
-                conversationId[0] = context.getActivity().getConversation().getId();
-                if (context.getActivity().getText().equals("deleteIt")) {
-                    try {
-                        context.DeleteActivity(activityId[0]).join();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Assert.fail();
-                    }
-                } else {
-                    Activity activity = ((Activity) context.getActivity()).createReply("response");
-                    ResourceResponse response = null;
-                    try {
-                        response = context.SendActivity(activity);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Assert.fail();
-                    }
-                    activityId[0] = response.getId();
+        new TestFlow(adapter, (context) -> {
+            conversationId[0] = context.getActivity().getConversation().getId();
+            if (context.getActivity().getText().equals("deleteIt")) {
+                try {
+                    context.deleteActivity(activityId[0]).join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Assert.fail();
                 }
+            } else {
+                Activity activity = ((Activity) context.getActivity()).createReply("response");
+                ResourceResponse response = null;
+                try {
+                    response = context.sendActivity(activity).join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Assert.fail();
+                }
+                activityId[0] = response.getId();
+            }
 
+            return null;
+        })
+            .Send("foo")
+            .AssertReply("response")
+            .Send("deleteIt")
+            .StartTest();
 
-        }).Send("foo")
-                .AssertReply("response")
-                .Send("deleteIt")
-                .StartTest();
         Thread.sleep(1500);
-        PagedResult pagedResult = transcriptStore.GetTranscriptActivitiesAsync("test", conversationId[0]).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         for (Object act : pagedResult.getItems()) {
             System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity)act).getType());
         }

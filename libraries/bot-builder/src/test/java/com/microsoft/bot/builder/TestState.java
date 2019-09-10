@@ -1,27 +1,24 @@
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.builder.StoreItem;
-
 public class TestState implements StoreItem {
     private String etag;
+    private String value;
 
     @Override
-    public String geteTag() {
+    public String getETag() {
         return this.etag;
     }
 
     @Override
-    public void seteTag(String etag) {
+    public void setETag(String etag) {
         this.etag = etag;
     }
 
-    private String value;
-
-    public String value() {
+    public String getValue() {
         return this.value;
     }
 
-    public void withValue(String value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }

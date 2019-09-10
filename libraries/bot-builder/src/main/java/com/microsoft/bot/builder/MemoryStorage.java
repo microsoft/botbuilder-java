@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,10 +16,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class MemoryStorage implements Storage {
-    private ObjectMapper objectMapper;
-    private Map<String, JsonNode> memory = new HashMap<>();
     private static final String TYPENAMEFORNONENTITY = "__type_name_";
     private final Object syncroot = new Object();
+    private ObjectMapper objectMapper;
+    private Map<String, JsonNode> memory = new HashMap<>();
     private Logger logger = LoggerFactory.getLogger(MemoryStorage.class);
     private int _eTag = 0;
 
@@ -30,7 +33,7 @@ public class MemoryStorage implements Storage {
     }
 
     @Override
-    public CompletableFuture<Map<String, Object>> readAsync(String[] keys) {
+    public CompletableFuture<Map<String, Object>> read(String[] keys) {
         if (keys == null) {
             throw new IllegalArgumentException("keys cannot be null");
         }
@@ -49,7 +52,7 @@ public class MemoryStorage implements Storage {
 
                             // Check if type info is set for the class
                             if (!(stateNode.hasNonNull(TYPENAMEFORNONENTITY))) {
-                                logger.error("Read failed: Type info not present for " + key );
+                                logger.error("Read failed: Type info not present for " + key);
                                 throw new RuntimeException(String.format("Read failed: Type info not present for key " + key));
                             }
                             String clsName = stateNode.get(TYPENAMEFORNONENTITY).textValue();
@@ -64,7 +67,7 @@ public class MemoryStorage implements Storage {
                             }
 
                             // Populate dictionary
-                            storeItems.put(key,objectMapper.treeToValue(stateNode, cls ));
+                            storeItems.put(key, objectMapper.treeToValue(stateNode, cls));
                         } catch (JsonProcessingException e) {
                             logger.error("Read failed: {}", e.toString());
                             throw new RuntimeException(String.format("Read failed: %s", e.toString()));
@@ -78,7 +81,7 @@ public class MemoryStorage implements Storage {
     }
 
     @Override
-    public CompletableFuture<Void> writeAsync(Map<String, Object> changes) {
+    public CompletableFuture<Void> write(Map<String, Object> changes) {
         synchronized (this.syncroot) {
             for (Map.Entry change : changes.entrySet()) {
                 Object newValue = change.getValue();
@@ -94,12 +97,12 @@ public class MemoryStorage implements Storage {
 
                 // Dictionary stores Key:JsonNode (with type information held within the JsonNode)
                 JsonNode newState = objectMapper.valueToTree(newValue);
-                ((ObjectNode)newState).put(this.TYPENAMEFORNONENTITY, newValue.getClass().getTypeName());
+                ((ObjectNode) newState).put(TYPENAMEFORNONENTITY, newValue.getClass().getTypeName());
 
                 // Set ETag if applicable
                 if (newValue instanceof StoreItem) {
                     StoreItem newStoreItem = (StoreItem) newValue;
-                    if(oldStateETag != null && newStoreItem.getETag() != "*" &&
+                    if (oldStateETag != null && newStoreItem.getETag() != "*" &&
                         newStoreItem.getETag() != oldStateETag) {
                         String msg = String.format("Etag conflict. Original: %s, Current: %s",
                             newStoreItem.getETag(), oldStateETag);
@@ -107,10 +110,10 @@ public class MemoryStorage implements Storage {
                         throw new RuntimeException(msg);
                     }
                     Integer newTag = _eTag++;
-                    ((ObjectNode)newState).put("eTag", newTag.toString());
+                    ((ObjectNode) newState).put("eTag", newTag.toString());
                 }
 
-                memory.put((String)change.getKey(), newState);
+                memory.put((String) change.getKey(), newState);
             }
         }
 
@@ -118,13 +121,13 @@ public class MemoryStorage implements Storage {
     }
 
     @Override
-    public CompletableFuture<Void> deleteAsync(String[] keys) {
+    public CompletableFuture<Void> delete(String[] keys) {
         if (keys == null) {
             throw new IllegalArgumentException("keys cannot be null");
         }
 
         synchronized (this.syncroot) {
-            for (String key : keys)  {
+            for (String key : keys) {
                 Object o = memory.get(key);
                 memory.remove(o);
             }

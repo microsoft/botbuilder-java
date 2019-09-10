@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,16 +21,16 @@ import java.util.concurrent.CompletableFuture;
  * <example>
  * This defines middleware that sends "before" and "after" messages
  * before and after the adapter calls the bot's
- * {@link Bot#onTurnAsync(TurnContext)} method.
+ * {@link Bot#onTurn(TurnContext)} method.
  * <code>
  * public class SampleMiddleware : Middleware
  * {
- *     public async Task OnTurn(TurnContext context, MiddlewareSet.NextDelegate next)
- *     {
- *         context.SendActivity("before");
- *         await next().ConfigureAwait(false);
- *         context.SendActivity("after");
- *     }
+ * public async Task OnTurn(TurnContext context, MiddlewareSet.NextDelegate next)
+ * {
+ * context.SendActivity("before");
+ * await next().ConfigureAwait(false);
+ * context.SendActivity("after");
+ * }
  * }
  * </code>
  * </example>
@@ -38,8 +39,9 @@ import java.util.concurrent.CompletableFuture;
 public interface Middleware {
     /**
      * Processess an incoming activity.
+     *
      * @param turnContext The context object for this turn.
-     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @param next        The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
      * Middleware calls the {@code next} delegate to pass control to
      * the next middleware in the pipeline. If middleware doesn’t call the next delegate,
@@ -47,11 +49,11 @@ public interface Middleware {
      * bot’s receive handler, and the pipeline short circuits.
      * <p>The {@code context} provides information about the
      * incoming activity, and other data needed to process the activity.</p>
-     *
+     * <p>
      * {@link TurnContext}
      * {@link com.microsoft.bot.schema.Activity}
      */
-    CompletableFuture<Void> onTurnAsync(TurnContext turnContext, NextDelegate next);
+    CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next);
 }
 
 

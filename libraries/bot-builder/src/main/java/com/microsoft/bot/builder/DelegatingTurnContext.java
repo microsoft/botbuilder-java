@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
@@ -37,43 +40,43 @@ public class DelegatingTurnContext implements TurnContext {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend) {
-        return innerTurnContext.sendActivityAsync(textReplyToSend);
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend) {
+        return innerTurnContext.sendActivity(textReplyToSend);
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend, String speak) {
-        return innerTurnContext.sendActivityAsync(textReplyToSend, speak);
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak) {
+        return innerTurnContext.sendActivity(textReplyToSend, speak);
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> sendActivityAsync(String textReplyToSend, String speak, String inputHint) {
-        return innerTurnContext.sendActivityAsync(textReplyToSend, speak, inputHint);
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, String inputHint) {
+        return innerTurnContext.sendActivity(textReplyToSend, speak, inputHint);
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> sendActivityAsync(Activity activity) {
-        return innerTurnContext.sendActivityAsync(activity);
+    public CompletableFuture<ResourceResponse> sendActivity(Activity activity) {
+        return innerTurnContext.sendActivity(activity);
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivitiesAsync(Activity[] activities) {
-        return innerTurnContext.sendActivitiesAsync(activities);
+    public CompletableFuture<ResourceResponse[]> sendActivities(Activity[] activities) {
+        return innerTurnContext.sendActivities(activities);
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> updateActivityAsync(Activity activity) {
-        return innerTurnContext.updateActivityAsync(activity);
+    public CompletableFuture<ResourceResponse> updateActivity(Activity activity) {
+        return innerTurnContext.updateActivity(activity);
     }
 
     @Override
-    public CompletableFuture<Void> deleteActivityAsync(String activityId) {
-        return innerTurnContext.deleteActivityAsync(activityId);
+    public CompletableFuture<Void> deleteActivity(String activityId) {
+        return innerTurnContext.deleteActivity(activityId);
     }
 
     @Override
-    public CompletableFuture<Void> deleteActivityAsync(ConversationReference conversationReference) {
-        return innerTurnContext.deleteActivityAsync(conversationReference);
+    public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
+        return innerTurnContext.deleteActivity(conversationReference);
     }
 
     @Override

@@ -1,7 +1,7 @@
-package com.microsoft.bot.builder;
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
@@ -16,10 +16,12 @@ import sun.net.www.http.HttpClient;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -30,7 +32,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  * activities to and receives activities from the Bot Connector Service. When your
  * bot receives an activity, the adapter creates a context object, passes it to your
  * bot's application logic, and sends responses back to the user's channel.
- * <p>Use {@link Use(Middleware)} to add {@link Middleware} objects
+ * <p>Use {@link #use(Middleware)} to add {@link Middleware} objects
  * to your adapter’s middleware collection. The adapter processes and directs
  * incoming activities in through the bot middleware pipeline to your bot’s logic
  * and then back out again. As each activity flows in and out of the bot, each piece
@@ -46,22 +48,18 @@ public class BotFrameworkAdapter extends BotAdapter {
     private final CredentialProvider _credentialProvider;
 
     private final RetryStrategy connectorClientRetryStrategy;
-    private Map<String, MicrosoftAppCredentials> appCredentialMap = new HashMap<String, MicrosoftAppCredentials>();
-
     private final String InvokeReponseKey = "BotFrameworkAdapter.InvokeResponse";
+    private Map<String, MicrosoftAppCredentials> appCredentialMap = new HashMap<String, MicrosoftAppCredentials>();
     private boolean isEmulatingOAuthCards = false;
 
     /**
      * Initializes a new instance of the {@link BotFrameworkAdapter} class,
      * using a credential provider.
      *
-     * @param credentialProvider           The credential provider.
-     * @param connectorClientRetryStrategy Retry strategy for retrying HTTP operations.
-     * @param httpClient                   The HTTP client.
-     * @param middleware                   The middleware to initially add to the adapter.
+     * @param credentialProvider The credential provider.
      * @throws IllegalArgumentException {@code credentialProvider} is {@code null}.
      *                                  Use a {@link MiddlewareSet} object to add multiple middleware
-     *                                  components in the conustructor. Use the {@link Use(Middleware)} method to
+     *                                  components in the conustructor. Use the {@link #use(Middleware)} method to
      *                                  add additional middleware to the adapter after construction.
      */
     public BotFrameworkAdapter(CredentialProvider credentialProvider) {
@@ -80,7 +78,6 @@ public class BotFrameworkAdapter extends BotAdapter {
         if (credentialProvider == null)
             throw new IllegalArgumentException("credentialProvider");
         _credentialProvider = credentialProvider;
-        //_httpClient = httpClient ?? new HttpClient();
         this.connectorClientRetryStrategy = connectorClientRetryStrategy;
 
         if (middleware != null) {
@@ -89,70 +86,11 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     /**
-     * Sends a proactive message from the bot to a conversation.
-     *
-     * @param botAppId  The application ID of the bot. This is the appId returned by Portal registration, and is
-     *                  generally found in the "MicrosoftAppId" parameter in appSettings.json.
-     * @param reference A reference to the conversation to continue.
-     * @param callback  The method to call for the resulting bot turn.
-     * @return A task that represents the work queued to execute.
-     * @throws IllegalArgumentException {@code botAppId}, {@code reference}, or
-     *                                  {@code callback} is {@code null}.
-     *                                  Call this method to proactively send a message to a conversation.
-     *                                  Most channels require a user to initaiate a conversation with a bot
-     *                                  before the bot can send activities to the user.
-     *                                  <p>This method registers the following.services().for the turn.<list type="bullet
-     *                                  <item>{@link Identity} (key = "BotIdentity"), a claims identity for the bot.</item>
-     *                                  <item>{@link ConnectorClient}, the channel connector client to use this turn.</item>
-     *                                  </list></p>
-     *                                  <p>
-     *                                  This overload differers from the Node implementation by requiring the BotId to be
-     *                                  passed in. The .Net code allows multiple bots to be hosted in a single adapter which
-     *                                  isn't something supported by Node.
-     *                                  </p>
-     *                                  <p>
-     *                                  {@linkalso ProcessActivity(String, Activity, Func { TurnContext, Task })}
-     *                                  {@linkalso BotAdapter.RunPipeline(TurnContext, Func { TurnContext, Task } }
-     */
-    @Override
-    public void ContinueConversation(String botAppId, ConversationReference reference, Consumer<TurnContext> callback) throws Exception {
-        if (StringUtils.isEmpty(botAppId))
-            throw new IllegalArgumentException("botAppId");
-
-        if (reference == null)
-            throw new IllegalArgumentException("reference");
-
-        if (callback == null)
-            throw new IllegalArgumentException("callback");
-
-        try (TurnContextImpl context = new TurnContextImpl(this, new ConversationReferenceHelper(reference).getPostToBotMessage())) {
-            // Hand craft Claims Identity.
-            HashMap<String, String> claims = new HashMap<String, String>();
-            claims.put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
-            claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
-
-            context.getTurnState().add("BotIdentity", claimsIdentity);
-
-            ConnectorClient connectorClient = this.CreateConnectorClientAsync(reference.getServiceUrl(), claimsIdentity).join();
-            context.getTurnState().add("ConnectorClient", connectorClient);
-            RunPipeline(context, callback);
-        }
-        return;
-    }
-
-    /**
      * Initializes a new instance of the {@link BotFrameworkAdapter} class,
      * using an application ID and secret.
      *
-     * @param appId                        The application ID of the bot.
-     * @param appPassword                  The application secret for the bot.
-     * @param connectorClientRetryStrategy Retry policy for retrying HTTP operations.
-     * @param httpClient                   The HTTP client.
-     * @param middleware                   The middleware to initially add to the adapter.
-     *                                     Use a {@link MiddlewareSet} object to add multiple middleware
-     *                                     components in the conustructor. Use the {@link Use(Middleware)} method to
-     *                                     add additional middleware to the adapter after construction.
+     * @param appId       The application ID of the bot.
+     * @param appPassword The application secret for the bot.
      */
     public BotFrameworkAdapter(String appId, String appPassword) {
         this(appId, appPassword, null, null, null);
@@ -171,6 +109,57 @@ public class BotFrameworkAdapter extends BotAdapter {
     }
 
     /**
+     * Sends a proactive message from the bot to a conversation.
+     *
+     * @param botAppId  The application ID of the bot. This is the appId returned by Portal registration, and is
+     *                  generally found in the "MicrosoftAppId" parameter in appSettings.json.
+     * @param reference A reference to the conversation to continue.
+     * @param callback  The method to call for the resulting bot turn.
+     * @return A task that represents the work queued to execute.
+     * @throws IllegalArgumentException {@code botAppId}, {@code reference}, or
+     *                                  {@code callback} is {@code null}.
+     *                                  Call this method to proactively send a message to a conversation.
+     *                                  Most channels require a user to initaiate a conversation with a bot
+     *                                  before the bot can send activities to the user.
+     *                                  <p>This method registers the following.services().for the turn.<list type="bullet
+     *                                  <item>{@link ConnectorClient}, the channel connector client to use this turn.</item>
+     *                                  </list></p>
+     *                                  <p>
+     *                                  This overload differers from the Node implementation by requiring the BotId to be
+     *                                  passed in. The .Net code allows multiple bots to be hosted in a single adapter which
+     *                                  isn't something supported by Node.
+     *                                  </p>
+     *                                  <p>
+     *                                  {@linkalso ProcessActivity(String, Activity, Func { TurnContext, Task })}
+     *                                  {@linkalso BotAdapter.RunPipeline(TurnContext, Func { TurnContext, Task } }
+     */
+    @Override
+    public CompletableFuture<Void> continueConversation(String botAppId, ConversationReference reference, BotCallbackHandler callback) {
+        if (StringUtils.isEmpty(botAppId))
+            throw new IllegalArgumentException("botAppId");
+
+        if (reference == null)
+            throw new IllegalArgumentException("reference");
+
+        if (callback == null)
+            throw new IllegalArgumentException("callback");
+
+        TurnContextImpl context = new TurnContextImpl(this, new ConversationReferenceHelper(reference).getPostToBotMessage());
+
+        // Hand craft Claims Identity.
+        HashMap<String, String> claims = new HashMap<String, String>();
+        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+        claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
+        ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
+
+        context.getTurnState().add(TurnContextStateNames.BOT_IDENTITY, claimsIdentity);
+
+        ConnectorClient connectorClient = this.CreateConnectorClientAsync(reference.getServiceUrl(), claimsIdentity).join();
+        context.getTurnState().add(TurnContextStateNames.CONNECTOR_CLIENT, connectorClient);
+        return runPipeline(context, callback);
+    }
+
+    /**
      * Adds middleware to the adapter's pipeline.
      *
      * @param middleware The middleware to add.
@@ -180,7 +169,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      */
 
     public BotFrameworkAdapter Use(Middleware middleware) {
-        super._middlewareSet.Use(middleware);
+        super._middlewareSet.use(middleware);
         return this;
     }
 
@@ -194,16 +183,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return A task that represents the work queued to execute. If the activity type
      * was 'Invoke' and the corresponding key (channelId + activityId) was found
      * then an InvokeResponse is returned, otherwise null is returned.
-     * @throws IllegalArgumentException    {@code activity} is {@code null}.
-     * @throws UnauthorizedAccessException authentication failed.
-     *                                     Call this method to reactively send a message to a conversation.
-     *                                     <p>This method registers the following.services().for the turn.<list type="bullet
-     *                                     <item>{@link Identity} (key = "BotIdentity"), a claims identity for the bot.</item>
-     *                                     <item>{@link ConnectorClient}, the channel connector client to use this turn.</item>
-     *                                     </list></p>
-     *                                     <p>
-     *                                     {@linkalso ContinueConversation(String, ConversationReference, Func { TurnContext, Task })}
-     *                                     {@linkalso BotAdapter.RunPipeline(TurnContext, Func { TurnContext, Task })}
+     * @throws IllegalArgumentException {@code activity} is {@code null}.
      */
     public CompletableFuture<InvokeResponse> ProcessActivity(String authHeader, Activity activity, Function<TurnContextImpl, CompletableFuture> callback) throws Exception {
         BotAssert.activityNotNull(activity);
@@ -214,7 +194,7 @@ public class BotFrameworkAdapter extends BotAdapter {
         return completedFuture(null);
     }
 
-    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, Activity activity, Consumer<TurnContext> callback) throws Exception {
+    public CompletableFuture<InvokeResponse> ProcessActivity(ClaimsIdentity identity, Activity activity, BotCallbackHandler callback) throws Exception {
         BotAssert.activityNotNull(activity);
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
@@ -224,7 +204,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             // TODO: Verify key that C# uses
             context.getTurnState().add("ConnectorClient", connectorClient);
 
-            super.RunPipeline(context, callback);
+            super.runPipeline(context, callback);
 
             // Handle Invoke scenarios, which deviate from the request/response model in that
             // the Bot will return a specific body and return code.
@@ -255,7 +235,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * the receiving channel assigned to the activities.
      * {@linkalso TurnContext.OnSendActivities(SendActivitiesHandler)}
      */
-    public ResourceResponse[] SendActivities(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
@@ -283,7 +263,10 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // The Activity Schema doesn't have a delay type build in, so it's simulated
                 // here in the Bot. This matches the behavior in the Node connector.
                 int delayMs = (int) activity.getValue();
-                try { Thread.sleep(delayMs); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException e) {
+                }
                 //await(Task.Delay(delayMs));
                 // No need to create a response. One will be created below.
             } else if (activity.getType().toString().equals("invokeResponse")) // Aligning name with Node
@@ -294,10 +277,10 @@ public class BotFrameworkAdapter extends BotAdapter {
                 // if it is a Trace activity we only send to the channel if it's the emulator.
             } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
                 ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
-                response = connectorClient.getConversations().replyToActivity(activity.getConversation().getId(), activity.getId(), activity);
+                response = connectorClient.getConversations().replyToActivity(activity.getConversation().getId(), activity.getId(), activity).join();
             } else {
                 ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
-                response = connectorClient.getConversations().sendToConversation(activity.getConversation().getId(), activity);
+                response = connectorClient.getConversations().sendToConversation(activity.getConversation().getId(), activity).join();
             }
 
             // If No response is set, then defult to a "simple" response. This can't really be done
@@ -316,7 +299,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             responses[index] = response;
         }
 
-        return responses;
+        return CompletableFuture.completedFuture(responses);
     }
 
     /**
@@ -333,7 +316,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * {@linkalso TurnContext.OnUpdateActivity(UpdateActivityHandler)}
      */
     @Override
-    public ResourceResponse UpdateActivity(TurnContext context, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
         ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         // TODO String conversationId, String activityId, Activity activity)
         return connectorClient.getConversations().updateActivity(activity.getConversation().getId(), activity.getId(), activity);
@@ -347,16 +330,17 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return A task that represents the work queued to execute.
      * {@linkalso TurnContext.OnDeleteActivity(DeleteActivityHandler)}
      */
-    public void DeleteActivity(TurnContext context, ConversationReference reference) {
+    @Override
+    public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
         RestConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");
         try {
-            connectorClient.getConversations().deleteConversationMemberAsync(
-                    reference.getConversation().getId(), reference.getActivityId()).join();
+            connectorClient.getConversations().deleteConversationMember(
+                reference.getConversation().getId(), reference.getActivityId()).join();
         } catch (CompletionException e) {
             e.printStackTrace();
             throw new RuntimeException(String.format("Failed deleting activity (%s)", e.toString()));
         }
-        return;
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -385,8 +369,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     /**
      * Lists the members of a given activity.
      *
-     * @param context    The context object for the turn.
-     * @param activityId (Optional) Activity ID to enumerate. If not specified the current activities ID will be used.
+     * @param context The context object for the turn.
      * @return List of Members of the activity
      */
     public CompletableFuture<List<ChannelAccount>> GetActivityMembers(TurnContextImpl context) {
@@ -439,12 +422,9 @@ public class BotFrameworkAdapter extends BotAdapter {
      * channel server returns results in pages and each page will include a `continuationToken`
      * that can be used to fetch the next page of results from the server.
      *
-     * @param serviceUrl        The URL of the channel server to query.  This can be retrieved
-     *                          from `context.activity.serviceUrl`.
-     * @param credentials       The credentials needed for the Bot to connect to the.services().
-     * @param continuationToken (Optional) token used to fetch the next page of results
-     *                          from the channel server. This should be left as `null` to retrieve the first page
-     *                          of results.
+     * @param serviceUrl  The URL of the channel server to query.  This can be retrieved
+     *                    from `context.activity.serviceUrl`.
+     * @param credentials The credentials needed for the Bot to connect to the.services().
      * @return List of Members of the current conversation
      * <p>
      * This overload may be called from outside the context of a conversation, as only the
@@ -472,10 +452,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * channel server returns results in pages and each page will include a `continuationToken`
      * that can be used to fetch the next page of results from the server.
      *
-     * @param context           The context object for the turn.
-     * @param continuationToken (Optional) token used to fetch the next page of results
-     *                          from the channel server. This should be left as `null` to retrieve the first page
-     *                          of results.
+     * @param context The context object for the turn.
      * @return List of Members of the current conversation
      * <p>
      * This overload may be called during standard Activity processing, at which point the Bot's
@@ -570,7 +547,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * will contain the ID of the new conversation.</p>
      */
     public CompletableFuture CreateConversation(String channelId, String serviceUrl, MicrosoftAppCredentials
-            credentials, ConversationParameters conversationParameters, Consumer<TurnContext> callback) throws Exception {
+        credentials, ConversationParameters conversationParameters, BotCallbackHandler callback) throws Exception {
         // Validate serviceUrl - can throw
         URI uri = new URI(serviceUrl);
         return CompletableFuture.runAsync(() -> {
@@ -586,7 +563,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             }
 
             Conversations conversations = connectorClient.getConversations();
-            CompletableFuture<ConversationResourceResponse> result = conversations.createConversationAsync(conversationParameters);
+            CompletableFuture<ConversationResourceResponse> result = conversations.createConversation(conversationParameters);
 
             ConversationResourceResponse response = result.join();
 
@@ -602,7 +579,7 @@ public class BotFrameworkAdapter extends BotAdapter {
 
             try (TurnContextImpl context = new TurnContextImpl(this, conversationUpdate)) {
                 try {
-                    this.RunPipeline(context, callback);
+                    this.runPipeline(context, callback);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(String.format("Running pipeline failed : %s", e));
@@ -617,8 +594,8 @@ public class BotFrameworkAdapter extends BotAdapter {
 
     protected CompletableFuture<Boolean> TrySetEmulatingOAuthCards(TurnContext turnContext) {
         if (!isEmulatingOAuthCards &&
-                turnContext.getActivity().getChannelId().equals("emulator") &&
-                (_credentialProvider.isAuthenticationDisabledAsync().join())) {
+            turnContext.getActivity().getChannelId().equals("emulator") &&
+            (_credentialProvider.isAuthenticationDisabled().join())) {
             isEmulatingOAuthCards = true;
         }
         return completedFuture(isEmulatingOAuthCards);
@@ -669,19 +646,19 @@ public class BotFrameworkAdapter extends BotAdapter {
             // For anonymous requests (requests with no header) appId is not set in claims.
 
             Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                    .filter(claim -> claim.getKey() == AuthenticationConstants.AUDIENCE_CLAIM)
-                    .findFirst()
-                    .orElse(null);
+                .filter(claim -> claim.getKey() == AuthenticationConstants.AUDIENCE_CLAIM)
+                .findFirst()
+                .orElse(null);
             if (botAppIdClaim == null) {
                 botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                        .filter(claim -> claim.getKey() == AuthenticationConstants.APPID_CLAIM)
-                        .findFirst()
-                        .orElse(null);
+                    .filter(claim -> claim.getKey() == AuthenticationConstants.APPID_CLAIM)
+                    .findFirst()
+                    .orElse(null);
             }
 
             if (botAppIdClaim != null) {
                 String botId = botAppIdClaim.getValue();
-                MicrosoftAppCredentials appCredentials = this.GetAppCredentialsAsync(botId).join();
+                MicrosoftAppCredentials appCredentials = this.GetAppCredentials(botId).join();
                 try {
                     return this.CreateConnectorClient(serviceUrl, appCredentials);
                 } catch (MalformedURLException e) {
@@ -709,8 +686,7 @@ public class BotFrameworkAdapter extends BotAdapter {
     /**
      * Creates the connector client.
      *
-     * @param serviceUrl     The service URL.
-     * @param appCredentials The application credentials for the bot.
+     * @param serviceUrl The service URL.
      * @return Connector client instance.
      */
     private ConnectorClient CreateConnectorClient(String serviceUrl) throws MalformedURLException, URISyntaxException {
@@ -743,14 +719,14 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @param appId The application identifier (AAD Id for the bot).
      * @return App credentials.
      */
-    private CompletableFuture<MicrosoftAppCredentials> GetAppCredentialsAsync(String appId) {
+    private CompletableFuture<MicrosoftAppCredentials> GetAppCredentials(String appId) {
         CompletableFuture<MicrosoftAppCredentials> result = CompletableFuture.supplyAsync(() -> {
             if (appId == null) {
                 return MicrosoftAppCredentials.empty();
             }
             if (this.appCredentialMap.containsKey(appId))
                 return this.appCredentialMap.get(appId);
-            String appPassword = this._credentialProvider.getAppPasswordAsync(appId).join();
+            String appPassword = this._credentialProvider.getAppPassword(appId).join();
             MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
             this.appCredentialMap.put(appId, appCredentials);
             return appCredentials;

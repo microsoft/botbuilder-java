@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
  * Contains an ordered set of {@link Middleware}.
  */
 public class MiddlewareSet implements Middleware {
-    public NextDelegate Next;
     private final ArrayList<Middleware> middleware = new ArrayList<>();
+    public NextDelegate Next;
 
     /**
      * Adds a middleware object to the end of the set.
@@ -26,19 +26,19 @@ public class MiddlewareSet implements Middleware {
     }
 
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
-        return receiveActivityInternal((TurnContextImpl) context, null)
+    public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
+        return receiveActivityInternal(context, null)
             .thenCompose((result) -> next.next());
     }
 
     /**
      * Processes an activity.
      *
-     * @param context The context object for the turn.
+     * @param context  The context object for the turn.
      * @param callback The delegate to call when the set finishes processing the activity.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> receiveActivityWithStatusAsync(TurnContext context, BotCallbackHandler callback) {
+    public CompletableFuture<Void> receiveActivityWithStatus(TurnContext context, BotCallbackHandler callback) {
         return receiveActivityInternal(context, callback);
     }
 
@@ -73,7 +73,7 @@ public class MiddlewareSet implements Middleware {
 
         // Execute the next middleware passing a closure that will recurse back into this method at the
         // next piece of middlware as the NextDelegate
-        return nextMiddleware.onTurnAsync(context, () ->
+        return nextMiddleware.onTurn(context, () ->
             receiveActivityInternal(context, callback, nextMiddlewareIndex + 1));
     }
 }

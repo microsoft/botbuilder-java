@@ -6,16 +6,17 @@ package com.microsoft.bot.builder;
 
 /**
  * Page of results from an enumeration.
+ *
  * @param <T> The type of items in the results.
  */
 public class PagedResult<T> {
     /**
      * Page of items.
      */
-    private T[] items = (T[])new Object[0];
+    private T[] items = (T[]) new Object[0];
 
     /**
-     Token used to page through multiple pages.
+     * Token used to page through multiple pages.
      */
     private String continuationToken;
 

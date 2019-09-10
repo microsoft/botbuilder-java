@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -10,17 +13,13 @@ import java.util.Map;
 
 public class RecognizerResult implements RecognizerConvert {
     @JsonProperty
+    JsonNode entities;
+    @JsonProperty
     private String text;
-
     @JsonProperty
     private String alteredText;
-
     @JsonProperty
     private Map<String, IntentScore> intents;
-
-    @JsonProperty
-    JsonNode entities;
-
     private HashMap<String, JsonNode> properties = new HashMap<>();
 
     public IntentScore getTopScoringIntent() {
@@ -83,13 +82,13 @@ public class RecognizerResult implements RecognizerConvert {
 
     @Override
     public void convert(Object result) {
-        setText(((RecognizerResult)result).getText());
-        setAlteredText((((RecognizerResult)result).getAlteredText()));
-        setIntents(((RecognizerResult)result).getIntents());
-        setEntities(((RecognizerResult)result).getEntities());
+        setText(((RecognizerResult) result).getText());
+        setAlteredText((((RecognizerResult) result).getAlteredText()));
+        setIntents(((RecognizerResult) result).getIntents());
+        setEntities(((RecognizerResult) result).getEntities());
 
-        for (String key : ((RecognizerResult)result).getProperties().keySet()) {
-            setProperties(key, ((RecognizerResult)result).getProperties().get(key));
+        for (String key : ((RecognizerResult) result).getProperties().keySet()) {
+            setProperties(key, ((RecognizerResult) result).getProperties().get(key));
         }
     }
 }

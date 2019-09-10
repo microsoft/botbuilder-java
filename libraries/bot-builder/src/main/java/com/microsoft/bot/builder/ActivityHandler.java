@@ -27,7 +27,7 @@ public class ActivityHandler implements Bot {
      * @return
      */
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext turnContext) {
+    public CompletableFuture<Void> onTurn(TurnContext turnContext) {
         if (turnContext == null) {
             throw new IllegalArgumentException("TurnContext cannot be null.");
         }
@@ -42,60 +42,60 @@ public class ActivityHandler implements Bot {
 
         switch (turnContext.getActivity().getType()) {
             case MESSAGE:
-                return onMessageActivityAsync(turnContext);
+                return onMessageActivity(turnContext);
             case CONVERSATION_UPDATE:
-                return onConversationUpdateActivityAsync(turnContext);
+                return onConversationUpdateActivity(turnContext);
             case MESSAGE_REACTION:
-                return onMessageReactionActivityAsync(turnContext);
+                return onMessageReactionActivity(turnContext);
             case EVENT:
-                return onEventActivityAsync(turnContext);
+                return onEventActivity(turnContext);
 
             default:
-                return onUnrecognizedActivityAsync(turnContext);
+                return onUnrecognizedActivity(turnContext);
         }
     }
 
     /**
      * Invoked when a message activity is received from the user when the base behavior of
-     * {@link #onTurnAsync(TurnContext)} is used.
-     *
+     * {@link #onTurn(TurnContext)} is used.
+     * <p>
      * If overridden, this could potentially contain conversational logic.
      * By default, this method does nothing.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> onMessageActivityAsync(TurnContext turnContext) {
+    public CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when a conversation update activity is received from the channel when the base behavior of
-     * {@link #onTurnAsync(TurnContext)} is used.
-     *
+     * {@link #onTurn(TurnContext)} is used.
+     * <p>
      * Conversation update activities are useful when it comes to responding to users being added to or removed
      * from the conversation.
-     *
+     * <p>
      * For example, a bot could respond to a user being added by greeting the user.
-     * By default, this method will call {@link #onMembersAddedAsync(List, TurnContext)} if any users have been added,
-     * or {@link #onMembersRemovedAsync(List, TurnContext)} if any users have been removed. The method checks the member
+     * By default, this method will call {@link #onMembersAdded(List, TurnContext)} if any users have been added,
+     * or {@link #onMembersRemoved(List, TurnContext)} if any users have been removed. The method checks the member
      * ID so that it only responds to updates regarding members other than the bot itself.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> onConversationUpdateActivityAsync(TurnContext turnContext) {
+    public CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
         if (turnContext.getActivity().getMembersAdded() != null) {
             if (turnContext.getActivity().getMembersAdded().stream()
                 .anyMatch(m -> StringUtils.equals(m.getId(), turnContext.getActivity().getId()))) {
 
-                return onMembersAddedAsync(turnContext.getActivity().getMembersAdded(), turnContext);
+                return onMembersAdded(turnContext.getActivity().getMembersAdded(), turnContext);
             }
         } else if (turnContext.getActivity().getMembersRemoved() != null) {
             if (turnContext.getActivity().getMembersRemoved().stream()
                 .anyMatch(m -> StringUtils.equals(m.getId(), turnContext.getActivity().getId()))) {
 
-                return onMembersRemovedAsync(turnContext.getActivity().getMembersRemoved(), turnContext);
+                return onMembersRemoved(turnContext.getActivity().getMembersRemoved(), turnContext);
             }
         }
 
@@ -104,44 +104,44 @@ public class ActivityHandler implements Bot {
 
     /**
      * Invoked when members other than this bot (like a user) are added to the conversation when the base behavior of
-     * {@link #onConversationUpdateActivityAsync(TurnContext)} is used.
-     *
+     * {@link #onConversationUpdateActivity(TurnContext)} is used.
+     * <p>
      * If overridden, this could potentially send a greeting message to the user instead of waiting for the user to
      * send a message first.
-     *
+     * <p>
      * By default, this method does nothing.
      *
      * @param membersAdded A list of all the users that have been added in the conversation update.
-     * @param turnContext The context object for this turn.
+     * @param turnContext  The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onMembersAddedAsync(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when members other than this bot (like a user) are removed from the conversation when the base
-     * behavior of {@link #onConversationUpdateActivityAsync(TurnContext)} is used.
-     *
+     * behavior of {@link #onConversationUpdateActivity(TurnContext)} is used.
+     * <p>
      * This method could optionally be overridden to perform actions related to users leaving a group conversation.
-     *
+     * <p>
      * By default, this method does nothing.
      *
      * @param membersRemoved A list of all the users that have been removed in the conversation update.
-     * @param turnContext The context object for this turn.
+     * @param turnContext    The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onMembersRemovedAsync(List<ChannelAccount> membersRemoved, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersRemoved(List<ChannelAccount> membersRemoved, TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when an event activity is received from the connector when the base behavior of
-     * {@link #onTurnAsync(TurnContext)} is used.
-     *
+     * {@link #onTurn(TurnContext)} is used.
+     * <p>
      * Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
      * previously sent activity. Message reactions are only supported by a few channels.
-     *
+     * <p>
      * The activity that the message reaction corresponds to is indicated in the replyToId property.
      * The value of this property is the activity id of a previously sent activity given back to the
      * bot as the response from a send call.
@@ -149,19 +149,19 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture onMessageReactionActivityAsync(TurnContext turnContext) {
+    public CompletableFuture onMessageReactionActivity(TurnContext turnContext) {
         CompletableFuture task = null;
 
         if (turnContext.getActivity().getReactionsAdded() != null) {
-            task = onReactionsAddedAsync(turnContext.getActivity().getReactionsAdded(), turnContext);
+            task = onReactionsAdded(turnContext.getActivity().getReactionsAdded(), turnContext);
         }
 
         if (turnContext.getActivity().getReactionsRemoved() != null) {
             if (task != null) {
-                task.thenApply((result) -> onReactionsRemovedAsync(
+                task.thenApply((result) -> onReactionsRemoved(
                     turnContext.getActivity().getReactionsRemoved(), turnContext));
             } else {
-                task = onReactionsRemovedAsync(turnContext.getActivity().getReactionsRemoved(), turnContext);
+                task = onReactionsRemoved(turnContext.getActivity().getReactionsRemoved(), turnContext);
             }
         }
 
@@ -172,10 +172,10 @@ public class ActivityHandler implements Bot {
      * Called when there have been Reactions added that reference a previous Activity.
      *
      * @param messageReactions The list of reactions added.
-     * @param turnContext The context object for this turn.
+     * @param turnContext      The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onReactionsAddedAsync(List<MessageReaction> messageReactions,
+    protected CompletableFuture onReactionsAdded(List<MessageReaction> messageReactions,
                                                       TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
@@ -184,79 +184,79 @@ public class ActivityHandler implements Bot {
      * Called when there have been Reactions removed that reference a previous Activity.
      *
      * @param messageReactions The list of reactions removed.
-     * @param turnContext The context object for this turn.
+     * @param turnContext      The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onReactionsRemovedAsync(List<MessageReaction> messageReactions,
+    protected CompletableFuture onReactionsRemoved(List<MessageReaction> messageReactions,
                                                         TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when an event activity is received from the connector when the base behavior of
-     * {@link #onTurnAsync(TurnContext)} is used.
-     *
+     * {@link #onTurn(TurnContext)} is used.
+     * <p>
      * Event activities can be used to communicate many different things.
-     *
-     * By default, this method will call {@link #onTokenResponseEventAsync(TurnContext)} if the
-     * activity's name is "tokens/response" or {@link #onEventAsync(TurnContext)} otherwise.
+     * <p>
+     * By default, this method will call {@link #onTokenResponseEvent(TurnContext)} if the
+     * activity's name is "tokens/response" or {@link #onEvent(TurnContext)} otherwise.
      * "tokens/response" event can be triggered by an {@link com.microsoft.bot.schema.OAuthCard}.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onEventActivityAsync(TurnContext turnContext) {
+    protected CompletableFuture onEventActivity(TurnContext turnContext) {
         if (StringUtils.equals(turnContext.getActivity().getName(), "tokens/response")) {
-            return onTokenResponseEventAsync(turnContext);
+            return onTokenResponseEvent(turnContext);
         }
 
-        return onEventAsync(turnContext);
+        return onEvent(turnContext);
     }
 
     /**
      * Invoked when a "tokens/response" event is received when the base behavior of
-     * {@link #onEventActivityAsync(TurnContext)} is used.
-     *
+     * {@link #onEventActivity(TurnContext)} is used.
+     * <p>
      * If using an OAuthPrompt, override this method to forward this {@link Activity} to the current dialog.
-     *
+     * <p>
      * By default, this method does nothing.
      *
      * @param turnContext
      * @return
      */
-    protected CompletableFuture onTokenResponseEventAsync(TurnContext turnContext) {
+    protected CompletableFuture onTokenResponseEvent(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when an event other than <c>tokens/response</c> is received when the base behavior of
-     * {@link #onEventActivityAsync(TurnContext)} is used.
-     *
+     * {@link #onEventActivity(TurnContext)} is used.
+     * <p>
      * This method could optionally be overridden if the bot is meant to handle miscellaneous events.
-     *
+     * <p>
      * By default, this method does nothing.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onEventAsync(TurnContext turnContext) {
+    protected CompletableFuture onEvent(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Invoked when an activity other than a message, conversation update, or event is received when the base behavior of
-     * {@link #onTurnAsync(TurnContext)} is used.
-     *
+     * {@link #onTurn(TurnContext)} is used.
+     * <p>
      * If overridden, this could potentially respond to any of the other activity types like
      * {@link com.microsoft.bot.schema.ActivityTypes#CONTACT_RELATION_UPDATE} or
      * {@link com.microsoft.bot.schema.ActivityTypes#END_OF_CONVERSATION}.
-     *
+     * <p>
      * By default, this method does nothing.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onUnrecognizedActivityAsync(TurnContext turnContext) {
+    protected CompletableFuture onUnrecognizedActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 }

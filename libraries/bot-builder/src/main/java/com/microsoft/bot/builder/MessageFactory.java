@@ -13,11 +13,11 @@ import java.util.List;
 
 /**
  * Contains utility methods for various message types a bot can return.
- *
+ * <p>
  * Create and send a message.
  * <code>
- *     Activity message = MessageFactory.text("Hello World");
- *     conext.sendActivity(message);
+ * Activity message = MessageFactory.text("Hello World");
+ * conext.sendActivity(message);
  * </code>
  *
  * <p>The following apply to message actions in general.
@@ -54,8 +54,8 @@ public final class MessageFactory {
     /**
      * Returns a simple text message.
      *
-     * @param text The text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enabled channel.
+     * @param text      The text of the message to send.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enabled channel.
      * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
      *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the text.
@@ -72,14 +72,15 @@ public final class MessageFactory {
      * <code>
      * // Create the activity and add suggested actions.
      * Activity  activity = MessageFactory.suggestedActions(
-     *    new String[] { "red", "green", "blue" },
-     *    "Choose a color");
+     * new String[] { "red", "green", "blue" },
+     * "Choose a color");
+     * <p>
+     * // Send the activity as a reply to the user.
+     * context.sendActivity(activity);
+     * </code>
      *
-     *  // Send the activity as a reply to the user.
-     *  context.sendActivity(activity);
-     *  </code>
      * @param actions The text of the actions to create.
-     * @param text Optional.  The text of the message to send.
+     * @param text    Optional.  The text of the message to send.
      * @return A message activity containing the suggested actions.
      */
     public static Activity suggestedActions(List<String> actions, String text) {
@@ -92,15 +93,16 @@ public final class MessageFactory {
      * <code>
      * // Create the activity and add suggested actions.
      * Activity  activity = MessageFactory.suggestedActions(
-     *    new String[] { "red", "green", "blue" },
-     *    "Choose a color");
+     * new String[] { "red", "green", "blue" },
+     * "Choose a color");
+     * <p>
+     * // Send the activity as a reply to the user.
+     * context.sendActivity(activity);
+     * </code>
      *
-     *  // Send the activity as a reply to the user.
-     *  context.sendActivity(activity);
-     *  </code>
-     * @param actions The text of the actions to create.
-     * @param text Optional.  The text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param actions   The text of the actions to create.
+     * @param text      Optional.  The text of the message to send.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enable channel.
      * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
      *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the suggested actions.
@@ -128,7 +130,7 @@ public final class MessageFactory {
      * Returns a message that includes a set of suggested actions and optional text.
      *
      * @param actions The card actions to include.
-     * @param text Optional, the text of the message to send.
+     * @param text    Optional, the text of the message to send.
      * @return
      */
     public static Activity suggestedCardActions(List<CardAction> actions, String text) {
@@ -138,9 +140,9 @@ public final class MessageFactory {
     /**
      * Returns a message that includes a set of suggested actions and optional text.
      *
-     * @param actions The card actions to include.
-     * @param text Optional, the text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param actions   The card actions to include.
+     * @param text      Optional, the text of the message to send.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enable channel.
      * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
      *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return
@@ -165,7 +167,7 @@ public final class MessageFactory {
      * Returns a message activity that contains an attachment.
      *
      * @param attachment Attachment to include in the message.
-     * @param text Optional, the text of the message to send.
+     * @param text       Optional, the text of the message to send.
      * @return A message activity containing the attachment.
      */
     public static Activity attachment(Attachment attachment, String text) {
@@ -176,10 +178,10 @@ public final class MessageFactory {
      * Returns a message activity that contains an attachment.
      *
      * @param attachment Attachment to include in the message.
-     * @param text Optional, the text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param text       Optional, the text of the message to send.
+     * @param ssml       Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param inputHint  Optional, indicates whether your bot is accepting, expecting, or ignoring user input
+     *                   after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
     public static Activity attachment(Attachment attachment, String text, String ssml, InputHints inputHint) {
@@ -194,10 +196,10 @@ public final class MessageFactory {
      * Returns a message activity that contains an attachment.
      *
      * @param attachments Attachments to include in the message.
-     * @param text Optional, the text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param text        Optional, the text of the message to send.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
+     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
     public static Activity attachment(List<Attachment> attachments, String text, String ssml, InputHints inputHint) {
@@ -212,7 +214,7 @@ public final class MessageFactory {
      * Returns a message activity that contains a collection of attachments, in a list.
      *
      * @param attachments Attachments to include in the message.
-     * @param text Optional, the text of the message to send.
+     * @param text        Optional, the text of the message to send.
      * @return A message activity containing the attachment.
      */
     public static Activity carousel(List<Attachment> attachments, String text) {
@@ -223,10 +225,10 @@ public final class MessageFactory {
      * Returns a message activity that contains a collection of attachments, in a list.
      *
      * @param attachments Attachments to include in the message.
-     * @param text Optional, the text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param text        Optional, the text of the message to send.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
+     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
     public static Activity carousel(List<Attachment> attachments, String text, String ssml, InputHints inputHint) {
@@ -240,7 +242,7 @@ public final class MessageFactory {
     /**
      * Returns a message activity that contains a single image or video.
      *
-     * @param url The URL of the image or video to send.
+     * @param url         The URL of the image or video to send.
      * @param contentType The MIME type of the image or video.
      * @return A message activity containing the attachment.
      */
@@ -251,13 +253,13 @@ public final class MessageFactory {
     /**
      * Returns a message activity that contains a single image or video.
      *
-     * @param url The URL of the image or video to send.
+     * @param url         The URL of the image or video to send.
      * @param contentType The MIME type of the image or video.
-     * @param name Optional, the name of the image or video file.
-     * @param text Optional, the text of the message to send.
-     * @param ssml Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param name        Optional, the name of the image or video file.
+     * @param text        Optional, the text of the message to send.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
+     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
     public static Activity contentUrl(String url,
@@ -274,13 +276,13 @@ public final class MessageFactory {
             throw new IllegalArgumentException("contentType cannot be null or empty");
         }
 
-        Attachment attachment = new Attachment(){{
+        Attachment attachment = new Attachment() {{
             setContentType(contentType);
             setContentUrl(url);
             setName(StringUtils.isEmpty(name) ? null : name);
         }};
 
-        return attachmentActivity(AttachmentLayoutTypes.LIST, Arrays.asList(new Attachment[]{attachment}),
+        return attachmentActivity(AttachmentLayoutTypes.LIST, Arrays.asList(attachment),
             text, ssml, inputHint);
     }
 

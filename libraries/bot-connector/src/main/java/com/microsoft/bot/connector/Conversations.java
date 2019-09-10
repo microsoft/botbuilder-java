@@ -95,6 +95,25 @@ public interface Conversations {
     CompletableFuture<ResourceResponse> sendToConversation(String conversationId, Activity activity);
 
     /**
+     * SendToConversation.
+     * This method allows you to send an activity to the end of a conversation.
+     * This is slightly different from ReplyToActivity().
+     * sendToConverstion(activity) - will append the activity to the end of the conversation according to the
+     * timestamp or semantics of the channel, using the Activity.getConversation.getId for the conversation id.
+     * replyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel
+     * supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
+     * Use ReplyToActivity when replying to a specific activity in the conversation.
+     * Use SendToConversation in all other cases.
+     *
+     * @param activity Activity to send
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ResourceResponse object
+     */
+    default CompletableFuture<ResourceResponse> sendToConversation(Activity activity) {
+        return sendToConversation(activity.getConversation().getId(), activity);
+    }
+
+    /**
      * UpdateActivity.
      * Edit an existing activity.
      * Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.

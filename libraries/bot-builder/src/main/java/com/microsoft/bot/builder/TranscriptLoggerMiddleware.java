@@ -1,8 +1,7 @@
-package com.microsoft.bot.builder;
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,10 +10,10 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -25,18 +24,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * When added, this middleware will log incoming and outgoing activitites to a ITranscriptStore.
  */
 public class TranscriptLoggerMiddleware implements Middleware {
+    private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
     // https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features
     private static ObjectMapper mapper;
 
     static {
         mapper = new ObjectMapper()
-                .enable(SerializationFeature.INDENT_OUTPUT);
+            .enable(SerializationFeature.INDENT_OUTPUT);
         mapper.findAndRegisterModules();
     }
 
     private TranscriptLogger transcriptLogger;
-    private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
-
     private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
     /**
@@ -60,7 +58,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
      * @return
      */
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
+    public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
             JsonNode role = null;
@@ -141,7 +139,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
         while (!transcript.isEmpty()) {
             Activity activity = transcript.poll();
             try {
-                this.transcriptLogger.logActivityAsync(activity);
+                this.transcriptLogger.logActivity(activity);
             } catch (RuntimeException err) {
                 logger.error(String.format("Transcript poll failed : %1$s", err));
             }

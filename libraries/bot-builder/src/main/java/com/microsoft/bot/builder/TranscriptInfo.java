@@ -13,6 +13,20 @@ public class TranscriptInfo {
      * channelId that the transcript was taken from.
      */
     private String channelId;
+    /**
+     * Conversation id.
+     */
+    private String id;
+    /**
+     * Date conversation was started.
+     */
+    private OffsetDateTime created = OffsetDateTime.now();
+
+    public TranscriptInfo(String withId, String withChannelId, OffsetDateTime withCreated) {
+        id = withId;
+        channelId = withChannelId;
+        created = withCreated;
+    }
 
     public String channelId() {
         return this.channelId;
@@ -22,11 +36,6 @@ public class TranscriptInfo {
         channelId = withValue;
     }
 
-    /**
-     * Conversation id.
-     */
-    private String id;
-
     public String getId() {
         return id;
     }
@@ -34,11 +43,6 @@ public class TranscriptInfo {
     public void setId(String witValue) {
         id = witValue;
     }
-
-    /**
-     * Date conversation was started.
-     */
-    private OffsetDateTime created = OffsetDateTime.now();
 
     public OffsetDateTime getCreated() {
         return created;

@@ -1,46 +1,42 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 
-import java.util.function.Supplier;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Handles persistence of a user state object using the user ID as part of the key.
- * @param TState The type of the user state object.
  */
-public class UserState<TState> extends BotState<TState>
-{
-    /**
-     * The key to use to read and write this conversation state object to storage.
-     */
-    // Note: Hard coded to maintain compatibility with C#
-    // "UserState:{typeof(UserState<TState>).Namespace}.{typeof(UserState<TState>).Name}"
-    public static String PropertyName() {
-        return String.format("UserState:Microsoft.Bot.Builder.Core.Extensions.UserState`1");
-    }
-
+public class UserState extends BotState {
     /**
      * Creates a new {@link UserState{TState}} object.
-     * @param storage The storage provider to use.
-     * @param settings The state persistance options to use.
+     *
+     * @param withStorage  The storage provider to use.
      */
-    public UserState(Storage storage, Supplier<? extends TState> ctor) {
-        this(storage, ctor, null);
-    }
-    public UserState(Storage storage, Supplier<? extends TState> ctor, StateSettings settings) {
-        super(storage, PropertyName(),
-                (context) -> {
-                    return String.format("user/%s/%s", context.getActivity().getChannelId(), context.getActivity().getConversation().getId());
-                },
-                ctor,
-                settings);
+    public UserState(Storage withStorage) {
+        super(withStorage, UserState.class.getName());
     }
 
-    /**
-     * Gets the user state object from turn context.
-     * @param context The context object for this turn.
-     * @return The user state object.
-     */
-    public static <TState> TState Get(TurnContext context) throws IllegalArgumentException {
-        return context.getTurnState().<TState>Get(PropertyName());
+    @Override
+    public String getStorageKey(TurnContext turnContext) {
+        if (turnContext.getActivity() == null) {
+            throw new IllegalArgumentException("invalid activity");
+        }
+
+        if (StringUtils.isEmpty(turnContext.getActivity().getChannelId())) {
+            throw new IllegalArgumentException("invalid activity-missing channelId");
+        }
+
+        if (turnContext.getActivity().getFrom() == null
+            || StringUtils.isEmpty(turnContext.getActivity().getFrom().getId())) {
+            throw new IllegalArgumentException("invalid activity-missing From.Id");
+        }
+
+        // {channelId}/users/{conversationId}
+        return turnContext.getActivity().getChannelId()
+            + "/users/"
+            + turnContext.getActivity().getFrom().getId();
     }
 }

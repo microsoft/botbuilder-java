@@ -1,5 +1,6 @@
 package com.microsoft.bot.builder.adapters;
 
+import com.microsoft.bot.builder.BotCallbackHandler;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
@@ -19,7 +20,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 public class TestFlow {
     final TestAdapter adapter;
     CompletableFuture<String> testTask;
-    Consumer<TurnContext> callback;
+    BotCallbackHandler callback;
 
     ArrayList<Supplier<String>> tasks = new ArrayList<Supplier<String>>();
     ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
@@ -40,7 +41,7 @@ public class TestFlow {
         this(adapter, null);
     }
 
-    public TestFlow(TestAdapter adapter, Consumer<TurnContext> callback) {
+    public TestFlow(TestAdapter adapter, BotCallbackHandler callback) {
         this.adapter = adapter;
         this.callback = callback;
         this.testTask = completedFuture(null);

@@ -1,6 +1,7 @@
-package com.microsoft.bot.builder;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +16,10 @@ import java.util.concurrent.CompletableFuture;
  * Represents a transcript logger that writes activites to a <see cref="Trace"/> object.
  */
 public class TraceTranscriptLogger implements TranscriptLogger {
+    private static final Logger logger = LoggerFactory.getLogger(TraceTranscriptLogger.class);
     // https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features
     private static ObjectMapper mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
-    private static final Logger logger = LoggerFactory.getLogger(TraceTranscriptLogger.class);
+        .enable(SerializationFeature.INDENT_OUTPUT);
 
     /**
      * Log an activity to the transcript.
@@ -27,7 +28,7 @@ public class TraceTranscriptLogger implements TranscriptLogger {
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<Void> logActivityAsync(Activity activity) {
+    public CompletableFuture<Void> logActivity(Activity activity) {
         BotAssert.activityNotNull(activity);
         String event = null;
         try {
@@ -35,7 +36,7 @@ public class TraceTranscriptLogger implements TranscriptLogger {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        this.logger.info(event);
+        logger.info(event);
 
         return CompletableFuture.completedFuture(null);
     }

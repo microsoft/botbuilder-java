@@ -7,6 +7,7 @@ package com.microsoft.bot.builder;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
@@ -17,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -25,6 +28,24 @@ import java.util.function.Consumer;
 //    [TestClass]
 //            [TestCategory("State Management")]
 public class BotStateTest {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void State_EmptyName() {
+        Map<String, JsonNode> dictionary = new HashMap<>();
+        UserState userState = new UserState(new MemoryStorage(dictionary));
+
+        StatePropertyAccessor<String> propertyA = userState.createProperty("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void State_NullName() {
+        Map<String, JsonNode> dictionary = new HashMap<>();
+        UserState userState = new UserState(new MemoryStorage(dictionary));
+
+        StatePropertyAccessor<String> propertyA = userState.createProperty(null);
+    }
+
+    /*
     protected RestConnectorClient connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
@@ -373,6 +394,6 @@ public class BotStateTest {
                 .StartTest();
     }
 
-
+*/
 }
 

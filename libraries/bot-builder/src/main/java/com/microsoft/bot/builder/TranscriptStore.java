@@ -16,14 +16,14 @@ public interface TranscriptStore extends TranscriptLogger {
     /**
      * Gets from the store activities that match a set of criteria.
      *
-     * @param channelId         The ID of the channel the conversation is in.
-     * @param conversationId    The ID of the conversation.
+     * @param channelId      The ID of the channel the conversation is in.
+     * @param conversationId The ID of the conversation.
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
      */
-    default CompletableFuture<PagedResult<Activity>> getTranscriptActivitiesAsync(String channelId,
+    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
                                                                                   String conversationId) {
-        return getTranscriptActivitiesAsync(channelId, conversationId, null);
+        return getTranscriptActivities(channelId, conversationId, null);
     }
 
     /**
@@ -35,10 +35,10 @@ public interface TranscriptStore extends TranscriptLogger {
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
      */
-    default CompletableFuture<PagedResult<Activity>> getTranscriptActivitiesAsync(String channelId,
-                                                                          String conversationId,
-                                                                          String continuationToken) {
-        return getTranscriptActivitiesAsync(channelId, conversationId, continuationToken, DateTime.now());
+    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
+                                                                                  String conversationId,
+                                                                                  String continuationToken) {
+        return getTranscriptActivities(channelId, conversationId, continuationToken, DateTime.now());
     }
 
     /**
@@ -51,7 +51,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
      */
-    CompletableFuture<PagedResult<Activity>> getTranscriptActivitiesAsync(String channelId,
+    CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
                                                                           String conversationId,
                                                                           String continuationToken,
                                                                           DateTime startDate);
@@ -59,11 +59,11 @@ public interface TranscriptStore extends TranscriptLogger {
     /**
      * Gets the conversations on a channel from the store.
      *
-     * @param channelId         The ID of the channel.
+     * @param channelId The ID of the channel.
      * @return A task that represents the work queued to execute.
      */
-    default CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId) {
-        return listTranscriptsAsync(channelId, null);
+    default CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId) {
+        return listTranscripts(channelId, null);
     }
 
     /**
@@ -73,7 +73,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param continuationToken
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId, String continuationToken);
+    CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId, String continuationToken);
 
     /**
      * Deletes conversation data from the store.
@@ -82,5 +82,5 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param conversationId The ID of the conversation to delete.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<Void> deleteTranscriptAsync(String channelId, String conversationId);
+    CompletableFuture<Void> deleteTranscript(String channelId, String conversationId);
 }

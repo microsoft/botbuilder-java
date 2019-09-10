@@ -29,7 +29,7 @@ public class TelemetryLoggerMiddleware implements Middleware {
     /**
      * Initializes a new instance of the class.
      *
-     * @param withTelemetryClient The IBotTelemetryClient implementation used for registering telemetry events.
+     * @param withTelemetryClient        The IBotTelemetryClient implementation used for registering telemetry events.
      * @param withLogPersonalInformation TRUE to include personally identifiable information.
      */
     public TelemetryLoggerMiddleware(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
@@ -41,21 +41,21 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * Logs events based on incoming and outgoing activities using the {@link BotTelemetryClient} interface.
      *
      * @param context The context object for this turn.
-     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @param next    The delegate to call to continue the bot middleware pipeline.
      * @return
      */
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
+    public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
         BotAssert.contextNotNull(context);
 
         // log incoming activity at beginning of turn
-        return onReceiveActivityAsync(context.getActivity())
+        return onReceiveActivity(context.getActivity())
             .thenCompose(receiveResult -> {
                 // hook up onSend pipeline
                 context.onSendActivities((sendContext, sendActivities, sendNext) -> sendNext.get()
                     .thenApply(responses -> {
                         for (Activity sendActivity : sendActivities) {
-                            onSendActivityAsync(sendActivity);
+                            onSendActivity(sendActivity);
                         }
 
                         return responses;
@@ -63,7 +63,7 @@ public class TelemetryLoggerMiddleware implements Middleware {
 
                 // hook up update activity pipeline
                 context.onUpdateActivity((updateContext, updateActivity, updateNext) -> updateNext.get()
-                    .thenCombine(onUpdateActivityAsync(updateActivity), (resourceResponse, updateResult) -> resourceResponse));
+                    .thenCombine(onUpdateActivity(updateActivity), (resourceResponse, updateResult) -> resourceResponse));
 
                 // hook up delete activity pipeline
                 context.onDeleteActivity((deleteContext, deleteReference, deleteNext) -> deleteNext.get()
@@ -73,7 +73,7 @@ public class TelemetryLoggerMiddleware implements Middleware {
                             applyConversationReference(deleteReference, false);
                         }};
 
-                        return onDeleteActivityAsync(deleteActivity);
+                        return onDeleteActivity(deleteActivity);
                     }));
 
                 if (next != null) {
@@ -92,12 +92,12 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * @param activity Current activity sent from user.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onReceiveActivityAsync(Activity activity) {
+    protected CompletableFuture<Void> onReceiveActivity(Activity activity) {
         if (activity == null) {
             return CompletableFuture.completedFuture(null);
         }
 
-        return fillReceiveEventPropertiesAsync(activity, null)
+        return fillReceiveEventProperties(activity, null)
             .thenAccept(properties -> {
                 telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGRECEIVEEVENT, properties);
             });
@@ -111,8 +111,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * @param activity Current activity sent from user.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onSendActivityAsync(Activity activity) {
-        return fillSendEventPropertiesAsync(activity, null)
+    protected CompletableFuture<Void> onSendActivity(Activity activity) {
+        return fillSendEventProperties(activity, null)
             .thenAccept(properties -> {
                 telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGSENDEVENT, properties);
             });
@@ -126,8 +126,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * @param activity Current activity sent from user.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onUpdateActivityAsync(Activity activity) {
-        return fillUpdateEventPropertiesAsync(activity, null)
+    protected CompletableFuture<Void> onUpdateActivity(Activity activity) {
+        return fillUpdateEventProperties(activity, null)
             .thenAccept(properties -> {
                 telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGUPDATEEVENT, properties);
             });
@@ -141,8 +141,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * @param activity Current activity sent from user.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> onDeleteActivityAsync(Activity activity) {
-        return fillDeleteEventPropertiesAsync(activity, null)
+    protected CompletableFuture<Void> onDeleteActivity(Activity activity) {
+        return fillDeleteEventProperties(activity, null)
             .thenAccept(properties -> {
                 telemetryClient.trackEvent(TelemetryLoggerConstants.BOTMSGDELETEEVENT, properties);
             });
@@ -152,12 +152,12 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * Fills the event properties for the BotMessageReceived.
      * Adheres to the LogPersonalInformation flag to filter Name, Text and Speak properties.
      *
-     * @param activity Last activity sent from user.
+     * @param activity             Last activity sent from user.
      * @param additionalProperties Additional properties to add to the event.
      * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
      * the BotMessageReceived event.
      */
-    protected CompletableFuture<Map<String, String>> fillReceiveEventPropertiesAsync(
+    protected CompletableFuture<Map<String, String>> fillReceiveEventProperties(
         Activity activity, Map<String, String> additionalProperties) {
 
         Map<String, String> properties = new HashMap<String, String>() {{
@@ -195,12 +195,12 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * Fills the event properties for BotMessageSend.
      * These properties are logged when an activity message is sent by the Bot to the user.
      *
-     * @param activity Last activity sent from user.
+     * @param activity             Last activity sent from user.
      * @param additionalProperties Additional properties to add to the event.
      * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
      * the BotMessageSend event.
      */
-    protected CompletableFuture<Map<String, String>> fillSendEventPropertiesAsync(
+    protected CompletableFuture<Map<String, String>> fillSendEventProperties(
         Activity activity, Map<String, String> additionalProperties) {
 
         Map<String, String> properties = new HashMap<String, String>() {{
@@ -237,12 +237,12 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * Fills the event properties for BotMessageUpdate.
      * These properties are logged when an activity message is sent by the Bot to the user.
      *
-     * @param activity Last activity sent from user.
+     * @param activity             Last activity sent from user.
      * @param additionalProperties Additional properties to add to the event.
      * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
      * the BotMessageUpdate event.
      */
-    protected CompletableFuture<Map<String, String>> fillUpdateEventPropertiesAsync(
+    protected CompletableFuture<Map<String, String>> fillUpdateEventProperties(
         Activity activity, Map<String, String> additionalProperties) {
 
         Map<String, String> properties = new HashMap<String, String>() {{
@@ -271,12 +271,12 @@ public class TelemetryLoggerMiddleware implements Middleware {
      * Fills the event properties for BotMessageDelete.
      * These properties are logged when an activity message is sent by the Bot to the user.
      *
-     * @param activity Last activity sent from user.
+     * @param activity             Last activity sent from user.
      * @param additionalProperties Additional properties to add to the event.
      * @return A dictionary that is sent as "Properties" to {@link BotTelemetryClient#trackEvent} method for
      * the BotMessageDelete event.
      */
-    protected CompletableFuture<Map<String, String>> fillDeleteEventPropertiesAsync(
+    protected CompletableFuture<Map<String, String>> fillDeleteEventProperties(
         Activity activity, Map<String, String> additionalProperties) {
 
         Map<String, String> properties = new HashMap<String, String>() {{

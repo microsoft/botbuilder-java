@@ -4,6 +4,7 @@ import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,12 +19,12 @@ public class CatchException_MiddlewareTest {
         TestAdapter adapter = new TestAdapter()
                 .Use(new CatchExceptionMiddleware<Exception>(new CallOnException() {
                     @Override
-                    public <T> CompletableFuture apply(TurnContext context, T t) throws Exception {
+                    public <T> CompletableFuture apply(TurnContext context, T t) {
                         return CompletableFuture.runAsync(() -> {
                             Activity activity = context.getActivity();
                             if (activity instanceof Activity) {
                                 try {
-                                    context.SendActivity(((Activity) activity).createReply(t.toString()));
+                                    context.sendActivity(((Activity) activity).createReply(t.toString())).join();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
@@ -38,34 +39,32 @@ public class CatchException_MiddlewareTest {
                 // Add middleware to catch NullReferenceExceptions before throwing up to the general exception instance
                 .Use(new CatchExceptionMiddleware<NullPointerException>(new CallOnException() {
                     @Override
-                    public <T> CompletableFuture apply(TurnContext context, T t) throws Exception {
-                        context.SendActivity("Sorry - Null Reference Exception");
+                    public <T> CompletableFuture apply(TurnContext context, T t) {
+                        context.sendActivity("Sorry - Null Reference Exception").join();
                         return CompletableFuture.completedFuture(null);
                     }
                 }, NullPointerException.class));
 
 
-        new TestFlow(adapter, (context) ->
-                {
-
-                    if (context.getActivity().getText() == "foo") {
-                        try {
-                            context.SendActivity(context.getActivity().getText());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+        new TestFlow(adapter, (context) -> {
+                if (StringUtils.equals(context.getActivity().getText(), "foo")) {
+                    try {
+                        context.sendActivity(context.getActivity().getText()).join();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    if (context.getActivity().getText() == "UnsupportedOperationException") {
-                        throw new UnsupportedOperationException("Test");
-                    }
-
                 }
-        )
-                .Send("foo")
-                .AssertReply("foo", "passthrough")
-                .Send("UnsupportedOperationException")
-                .AssertReply("Test")
-                .StartTest();
+                if (StringUtils.equals(context.getActivity().getText(), "UnsupportedOperationException")) {
+                    throw new UnsupportedOperationException("Test");
+                }
+
+                return null;
+            })
+            .Send("foo")
+            .AssertReply("foo", "passthrough")
+            .Send("UnsupportedOperationException")
+            .AssertReply("Test")
+            .StartTest();
 
     }
 

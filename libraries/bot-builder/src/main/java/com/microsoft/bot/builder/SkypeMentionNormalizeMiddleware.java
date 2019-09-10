@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -13,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Middleware to patch mention Entities from Skype since they don't conform to expected values.
  * Bots that interact with Skype should use this middleware if mentions are used.
- *
+ * <p>
  * A Skype mention "text" field is of the format:
  * &lt;at id=\"28:2bc5b54d-5d48-4ff1-bd25-03dcbb5ce918\">botname&lt;/at&gt;
  * But Activity.Text doesn't contain those tags and RemoveMentionText can't remove
@@ -49,11 +52,11 @@ public class SkypeMentionNormalizeMiddleware implements Middleware {
      * Middleware implementation which corrects Enity.Mention.Text to a value RemoveMentionText can work with.
      *
      * @param context The context object for this turn.
-     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @param next    The delegate to call to continue the bot middleware pipeline.
      * @return
      */
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext context, NextDelegate next) {
+    public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
         normalizeSkypMentionText(context.getActivity());
         return next.next();
     }

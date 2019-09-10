@@ -15,14 +15,14 @@ public class BotFrameworkAdapterTest {
     public void AdapterSingleUse()
     {
         SimpleAdapter a = new SimpleAdapter();
-        a.Use(new CallCountingMiddleware());
+        a.use(new CallCountingMiddleware());
     }
 
     @Test
     public void AdapterUseChaining()
     {
         SimpleAdapter a = new SimpleAdapter();
-        a.Use(new CallCountingMiddleware()).Use(new CallCountingMiddleware());
+        a.use(new CallCountingMiddleware()).use(new CallCountingMiddleware());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class BotFrameworkAdapterTest {
         Activity activity = TestMessage.Message();
         activity.setId(activityId);
 
-        ResourceResponse resourceResponse = c.SendActivity(activity);
+        ResourceResponse resourceResponse = c.sendActivity(activity).join();
         Assert.assertTrue("Incorrect response Id returned", StringUtils.equals(resourceResponse.getId(), activityId));
     }
 }

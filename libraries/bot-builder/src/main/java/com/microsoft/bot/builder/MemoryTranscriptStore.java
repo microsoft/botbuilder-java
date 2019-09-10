@@ -1,9 +1,7 @@
-package com.microsoft.bot.builder;
-
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
@@ -32,13 +30,26 @@ public class MemoryTranscriptStore implements TranscriptStore {
     private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<String, HashMap<String, ArrayList<Activity>>>();
 
     /**
+     * Emulate C# SkipWhile.
+     * Stateful
+     *
+     * @param func1 predicate to apply
+     * @param <T>   type
+     * @return if the predicate condition is true
+     */
+    public static <T> Predicate<T> skipwhile(Function<? super T, Object> func1) {
+        final boolean[] started = {false};
+        return t -> started[0] || (started[0] = (boolean) func1.apply(t));
+    }
+
+    /**
      * Logs an activity to the transcript.
      *
      * @param activity The activity to log.
      * @return A CompletableFuture that represents the work queued to execute.
      */
     @Override
-    public final CompletableFuture<Void> logActivityAsync(Activity activity) {
+    public final CompletableFuture<Void> logActivity(Activity activity) {
         if (activity == null) {
             throw new NullPointerException("activity cannot be null for LogActivity()");
         }
@@ -78,7 +89,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * If the task completes successfully, the result contains the matching activities.
      */
     @Override
-    public CompletableFuture<PagedResult<Activity>> getTranscriptActivitiesAsync(String channelId,
+    public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
                                                                                  String conversationId,
                                                                                  String continuationToken,
                                                                                  DateTime startDate) {
@@ -106,27 +117,27 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 transcript = channel.get(conversationId);
                 if (continuationToken != null) {
                     List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::getTimestamp))
-                            .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
-                            .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
-                            .skip(1)
-                            .limit(20)
-                            .collect(Collectors.toList());
+                        .sorted(Comparator.comparing(Activity::getTimestamp))
+                        .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
+                        .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
+                        .skip(1)
+                        .limit(20)
+                        .collect(Collectors.toList());
 
-                    pagedResult.items(items.toArray(new Activity[items.size()]));
+                    pagedResult.setItems(items.toArray(new Activity[items.size()]));
 
                     if (pagedResult.getItems().length == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
+                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 } else {
                     List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::getTimestamp))
-                            .filter(a -> a.getTimestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
-                            .limit(20)
-                            .collect(Collectors.toList());
-                    pagedResult.items(items.toArray(new Activity[items.size()]));
+                        .sorted(Comparator.comparing(Activity::getTimestamp))
+                        .filter(a -> a.getTimestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
+                        .limit(20)
+                        .collect(Collectors.toList());
+                    pagedResult.setItems(items.toArray(new Activity[items.size()]));
                     if (items.size() == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
+                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 }
             }
@@ -144,7 +155,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<Void> deleteTranscriptAsync(String channelId, String conversationId) {
+    public CompletableFuture<Void> deleteTranscript(String channelId, String conversationId) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("%1$s should not be null", "channelId"));
         }
@@ -159,9 +170,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
                     return;
                 }
                 HashMap<String, ArrayList<Activity>> channel = this.channels.get(channelId);
-                if (channel.containsKey(conversationId)) {
-                    channel.remove(conversationId);
-                }
+                channel.remove(conversationId);
             }
         }, ExecutorFactory.getExecutor());
     }
@@ -174,7 +183,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscriptsAsync(String channelId, String continuationToken) {
+    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId, String continuationToken) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
@@ -190,76 +199,59 @@ public class MemoryTranscriptStore implements TranscriptStore {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
                 if (continuationToken != null) {
                     List<TranscriptInfo> items = channel.entrySet().stream()
-                            .map(c -> {
-                                        OffsetDateTime offsetDateTime = null;
-                                        if (c.getValue().stream().findFirst().isPresent()) {
-                                            DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
-                                            // convert to DateTime to OffsetDateTime
-                                            Instant instant = Instant.ofEpochMilli(dt.getMillis());
-                                            ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
-                                            offsetDateTime = instant.atOffset(offset);
-                                        } else {
-                                            offsetDateTime = OffsetDateTime.now();
-                                        }
-                                        return new TranscriptInfo()
-                                                .withChannelId(channelId)
-                                                .withId(c.getKey())
-                                                .withCreated(offsetDateTime);
-                                    }
-                            )
-                            .sorted(Comparator.comparing(TranscriptInfo::getCreated))
-                            .filter(skipwhile(c -> !c.getId().equals(continuationToken)))
-                            .skip(1)
-                            .limit(20)
-                            .collect(Collectors.toList());
-                    pagedResult.items(items.toArray(new TranscriptInfo[items.size()]));
+                        .map(c -> {
+                                OffsetDateTime offsetDateTime = null;
+
+                                if (c.getValue().stream().findFirst().isPresent()) {
+                                    DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
+                                    // convert to DateTime to OffsetDateTime
+                                    Instant instant = Instant.ofEpochMilli(dt.getMillis());
+                                    ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
+                                    offsetDateTime = instant.atOffset(offset);
+                                } else {
+                                    offsetDateTime = OffsetDateTime.now();
+                                }
+
+                                return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                            }
+                        )
+                        .sorted(Comparator.comparing(TranscriptInfo::getCreated))
+                        .filter(skipwhile(c -> !c.getId().equals(continuationToken)))
+                        .skip(1)
+                        .limit(20)
+                        .collect(Collectors.toList());
+                    pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
+                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 } else {
 
                     List<TranscriptInfo> items = channel.entrySet().stream()
-                            .map(c -> {
-                                        OffsetDateTime offsetDateTime = null;
-                                        if (c.getValue().stream().findFirst().isPresent()) {
-                                            DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
-                                            // convert to DateTime to OffsetDateTime
-                                            Instant instant = Instant.ofEpochMilli(dt.getMillis());
-                                            ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
-                                            offsetDateTime = instant.atOffset(offset);
-                                        } else {
-                                            offsetDateTime = OffsetDateTime.now();
-                                        }
-                                        return new TranscriptInfo()
-                                                .withChannelId(channelId)
-                                                .withId(c.getKey())
-                                                .withCreated(offsetDateTime);
-                                    }
-                            )
-                            .sorted(Comparator.comparing(TranscriptInfo::getCreated))
-                            .limit(20)
-                            .collect(Collectors.toList());
-                    pagedResult.items(items.toArray(new TranscriptInfo[items.size()]));
+                        .map(c -> {
+                                OffsetDateTime offsetDateTime = null;
+                                if (c.getValue().stream().findFirst().isPresent()) {
+                                    DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
+                                    // convert to DateTime to OffsetDateTime
+                                    Instant instant = Instant.ofEpochMilli(dt.getMillis());
+                                    ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
+                                    offsetDateTime = instant.atOffset(offset);
+                                } else {
+                                    offsetDateTime = OffsetDateTime.now();
+                                }
+                                return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                            }
+                        )
+                        .sorted(Comparator.comparing(TranscriptInfo::getCreated))
+                        .limit(20)
+                        .collect(Collectors.toList());
+                    pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
-                        pagedResult.withContinuationToken(items.get(items.size() - 1).getId());
+                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 }
             }
             return pagedResult;
         }, ExecutorFactory.getExecutor());
-    }
-
-    /**
-     * Emulate C# SkipWhile.
-     * Stateful
-     *
-     * @param func1 predicate to apply
-     * @param <T>   type
-     * @return if the predicate condition is true
-     */
-    public static <T> Predicate<T> skipwhile(Function<? super T, Object> func1) {
-        final boolean[] started = {false};
-        return t -> started[0] || (started[0] = (boolean) func1.apply(t));
     }
 
 }

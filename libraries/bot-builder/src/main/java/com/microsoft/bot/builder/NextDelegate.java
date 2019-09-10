@@ -4,5 +4,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface NextDelegate {
-     CompletableFuture<Void> next();
+    CompletableFuture<Void> next();
 }

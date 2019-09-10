@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 public class PrivateConversationState extends BotState {
     /**
      * Initializes a new instance of the PrivateConversationState class.
+     *
      * @param storage The storage provider to use.
      */
     public PrivateConversationState(Storage storage) {

@@ -32,9 +32,13 @@ public abstract class InterceptionMiddleware implements Middleware {
         logger = withLogger;
     }
 
+    protected Logger getLogger() {
+        return logger;
+    }
+
     @Override
-    public CompletableFuture<Void> onTurnAsync(TurnContext turnContext, NextDelegate next) {
-        return invokeInboundAsync(turnContext, InspectionActivityExtensions
+    public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
+        return invokeInbound(turnContext, InspectionActivityExtensions
             .traceActivity(turnContext.getActivity(),"ReceivedActivity","Received Activity"))
 
             .thenCompose(intercept -> {
@@ -44,7 +48,7 @@ public abstract class InterceptionMiddleware implements Middleware {
                             .map(a ->
                                 InspectionActivityExtensions.traceActivity(a, "SentActivity", "Sent Activity"))
                             .collect(Collectors.toList());
-                        return invokeOutboundAsync(sendContext, traceActivities)
+                        return invokeOutbound(sendContext, traceActivities)
                             .thenCompose(response -> {
                                 return sendNext.get();
                             });
@@ -55,55 +59,55 @@ public abstract class InterceptionMiddleware implements Middleware {
                     next.next()
                         .exceptionally(exception -> {
                             Activity traceActivity = InspectionActivityExtensions.traceActivity(exception);
-                            invokeTraceExceptionAsync(turnContext, traceActivity).join();
+                            invokeTraceException(turnContext, traceActivity).join();
                             throw new CompletionException(exception);
                         }).join();
                 }
 
                 if (intercept.shouldIntercept) {
-                    return invokeTraceStateAsync(turnContext);
+                    return invokeTraceState(turnContext);
                 }
 
                 return null;
             });
     }
 
-    protected abstract CompletableFuture<Intercept> inboundAsync(TurnContext turnContext, Activity activity);
+    protected abstract CompletableFuture<Intercept> inbound(TurnContext turnContext, Activity activity);
 
-    protected abstract CompletableFuture<Void> outboundAsync(TurnContext turnContext, List<Activity> clonedActivities);
+    protected abstract CompletableFuture<Void> outbound(TurnContext turnContext, List<Activity> clonedActivities);
 
-    protected abstract CompletableFuture<Void> traceStateAsync(TurnContext turnContext);
+    protected abstract CompletableFuture<Void> traceState(TurnContext turnContext);
 
-    private CompletableFuture<Intercept> invokeInboundAsync(TurnContext turnContext, Activity traceActivity) {
-        return inboundAsync(turnContext, traceActivity)
+    private CompletableFuture<Intercept> invokeInbound(TurnContext turnContext, Activity traceActivity) {
+        return inbound(turnContext, traceActivity)
             .exceptionally(exception -> {
                 logger.warn("Exception in inbound interception {}", exception.getMessage());
                 return new Intercept(true, false);
             });
     }
 
-    private CompletableFuture<Void> invokeOutboundAsync(TurnContext turnContext, List<Activity> traceActivities) {
-        return outboundAsync(turnContext, traceActivities)
+    private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, List<Activity> traceActivities) {
+        return outbound(turnContext, traceActivities)
             .exceptionally(exception -> {
             logger.warn("Exception in outbound interception {}", exception.getMessage());
             return null;
         });
     }
 
-    private CompletableFuture<Void> invokeOutboundAsync(TurnContext turnContext, Activity activity) {
-        return invokeOutboundAsync(turnContext, Collections.singletonList(activity));
+    private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, Activity activity) {
+        return invokeOutbound(turnContext, Collections.singletonList(activity));
     }
 
-    private CompletableFuture<Void> invokeTraceStateAsync(TurnContext turnContext) {
-        return traceStateAsync(turnContext)
+    private CompletableFuture<Void> invokeTraceState(TurnContext turnContext) {
+        return traceState(turnContext)
             .exceptionally(exception -> {
                 logger.warn("Exception in state interception {}", exception.getMessage());
                 return null;
             });
     }
 
-    private CompletableFuture<Void> invokeTraceExceptionAsync(TurnContext turnContext, Activity traceActivity) {
-        return outboundAsync(turnContext, Collections.singletonList(Activity.createContactRelationUpdateActivity()))
+    private CompletableFuture<Void> invokeTraceException(TurnContext turnContext, Activity traceActivity) {
+        return outbound(turnContext, Collections.singletonList(Activity.createContactRelationUpdateActivity()))
             .exceptionally(exception -> {
             logger.warn("Exception in exception interception {}", exception.getMessage());
             return null;

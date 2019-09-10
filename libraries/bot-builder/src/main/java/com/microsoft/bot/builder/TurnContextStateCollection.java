@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import java.util.HashMap;
@@ -15,7 +18,7 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
         Object service = get(key);
         try {
             T result = (T) service;
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             return null;
         }
 
@@ -24,6 +27,7 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
 
     /**
      * Get a service by type using its full type name as the key.
+     *
      * @param type The type of service to be retrieved.
      * @return The service stored under the specified key.
      */
@@ -31,7 +35,7 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
         return get(type.getName());
     }
 
-    public <T> void add(String key, T value) throws IllegalArgumentException  {
+    public <T> void add(String key, T value) throws IllegalArgumentException {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
@@ -41,16 +45,26 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
         }
 
         if (containsKey(key))
-            throw new IllegalArgumentException (String.format("Key %s already exists", key));
+            throw new IllegalArgumentException(String.format("Key %s already exists", key));
         put(key, value);
     }
+
     /**
      * Add a service using its full type name as the key.
+     *
      * @param value The service to add.
      */
-
     public <T> void add(T value) throws IllegalArgumentException {
         add(value.getClass().getName(), value);
+    }
+
+    @Override
+    public void finalize() {
+        try {
+            close();
+        } catch (Exception e) {
+
+        }
     }
 
     @Override

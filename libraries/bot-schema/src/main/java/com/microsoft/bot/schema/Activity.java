@@ -1361,4 +1361,64 @@ public class Activity {
 
         return this;
     }
+
+    /**
+     * Remove recipient mention text from Text property.
+     * Use with caution because this function is altering the text on the Activity.
+     *
+     * @return new .Text property value.
+     */
+    public String removeRecipientMention() {
+        if (getRecipient() == null) {
+            return text;
+        }
+
+        return removeMentionText(getRecipient().getId());
+    }
+
+    /**
+     * Remove any mention text for given id from the Activity.Text property.  For example, given the message
+     * "@echoBot Hi Bot", this will remove "@echoBot", leaving "Hi Bot".
+     *
+     * Typically this would be used to remove the mention text for the target recipient (the bot usually), though
+     * it could be called for each member.  For example:
+     *     turnContext.Activity.RemoveMentionText(turnContext.Activity.Recipient.Id);
+     * The format of a mention Activity.Entity is dependent on the Channel.  But in all cases we
+     * expect the Mention.Text to contain the exact text for the user as it appears in
+     * Activity.Text.
+     * For example, Teams uses &lt;at&gt;username&lt;/at&gt;, whereas slack use @username. It
+     * is expected that text is in Activity.Text and this method will remove that value from
+     * Activity.Text.
+     *
+     * @param id Mention id to match.
+     * @return new Activity.Text property value.
+     */
+    public String removeMentionText(String id) {
+        setText(removeMentionTextImmutable(this, id));
+        return getText();
+    }
+
+    public static String removeRecipientMentionImmutable(Activity activity) {
+        if (activity.getRecipient() == null) {
+            return activity.getText();
+        }
+
+        return removeMentionTextImmutable(activity, activity.getRecipient().getId());
+    }
+
+    public static String removeMentionTextImmutable(Activity activity, String id) {
+        if (StringUtils.isEmpty(id)) {
+            return activity.getText();
+        }
+
+        String text = activity.getText();
+
+        for (Mention mention : activity.getMentions()) {
+            if (StringUtils.equals(mention.getMentioned().getId(), id)) {
+                text = text.replaceAll(mention.getText(), "");
+            }
+        }
+
+        return text;
+    }
 }

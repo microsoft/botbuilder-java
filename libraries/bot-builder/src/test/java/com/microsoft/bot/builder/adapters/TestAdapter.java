@@ -78,7 +78,7 @@ public class TestAdapter extends BotAdapter {
             activity.setTimestamp(DateTime.now());
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            super.runPipelineAsync(context, callback);
+            super.runPipeline(context, callback);
         }
         return;
     }
@@ -92,7 +92,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivitiesAsync(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
@@ -129,7 +129,7 @@ public class TestAdapter extends BotAdapter {
 
 
     @Override
-    public CompletableFuture<ResourceResponse> updateActivityAsync(TurnContext context, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
         synchronized (this.botReplies) {
             List<Activity> replies = new ArrayList<>(botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {
@@ -148,7 +148,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<Void> deleteActivityAsync(TurnContext context, ConversationReference reference) {
+    public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
         synchronized (this.botReplies) {
             ArrayList<Activity> replies = new ArrayList<>(this.botReplies);
             for (int i = 0; i < this.botReplies.size(); i++) {

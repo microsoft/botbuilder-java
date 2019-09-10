@@ -15,9 +15,9 @@ public interface SendActivitiesHandler {
     /**
      * A method that can participate in send activity events for the current turn.
      *
-     * @param context The context object for the turn.
+     * @param context    The context object for the turn.
      * @param activities The activities to send.
-     * @param next The delegate to call to continue event processing.
+     * @param next       The delegate to call to continue event processing.
      * @return A task that represents the work queued to execute.
      */
     CompletableFuture<ResourceResponse[]> invoke(TurnContext context,
