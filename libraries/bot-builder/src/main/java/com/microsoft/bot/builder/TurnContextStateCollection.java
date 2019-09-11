@@ -15,7 +15,7 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
             throw new IllegalArgumentException("key");
         }
 
-        Object service = get(key);
+        Object service = super.get(key);
         try {
             T result = (T) service;
         } catch (ClassCastException e) {

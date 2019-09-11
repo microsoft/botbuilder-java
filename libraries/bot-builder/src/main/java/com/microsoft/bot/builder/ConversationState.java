@@ -13,7 +13,7 @@ public class ConversationState extends BotState {
      * Creates a new {@link ConversationState} object.
      */
     public ConversationState(Storage withStorage) {
-        super(withStorage, ConversationState.class.getName());
+        super(withStorage, ConversationState.class.getSimpleName());
     }
 
     @Override

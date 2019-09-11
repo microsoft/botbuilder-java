@@ -21,45 +21,45 @@ public class TranscriptMiddlewareTest {
     @Test
     public final void Transcript_SimpleReceive() throws Exception {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
+        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
 
 
         new TestFlow(adapter, (ctxt) ->
         {
 
-                TurnContextImpl context = (TurnContextImpl) ctxt;
-                conversationId[0] = context.getActivity().getConversation().getId();
-                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
-                    setRelatesTo(context.getActivity().getRelatesTo());
-                }};
-                try {
-                    ResourceResponse response = context.sendActivity(typingActivity).join();
-                    System.out.printf("Here's the response:");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
-                try {
-                    context.sendActivity("echo:" + context.getActivity().getText()).join();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
+            TurnContextImpl context = (TurnContextImpl) ctxt;
+            conversationId[0] = context.getActivity().getConversation().getId();
+            Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+                setRelatesTo(context.getActivity().getRelatesTo());
+            }};
+            try {
+                ResourceResponse response = context.sendActivity(typingActivity).join();
+                System.out.printf("Here's the response:");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
+            try {
+                context.sendActivity("echo:" + context.getActivity().getText()).join();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
 
-                return CompletableFuture.completedFuture(null);
-        }).Send("foo")
-                .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                    return null;
-                }).StartTest();
-                //.AssertReply("echo:foo").StartTest();
+            return CompletableFuture.completedFuture(null);
+        }).send("foo")
+            .assertReply((activity) -> {
+                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+                return null;
+            }).startTest();
+        //.AssertReply("echo:foo").StartTest();
 
 
     }
@@ -99,66 +99,65 @@ public class TranscriptMiddlewareTest {
     @Test
     public final void Transcript_LogActivities() throws ExecutionException, InterruptedException {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
+        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
 
 
         String result = new TestFlow(adapter, (context) ->
         {
 
-                //TurnContextImpl context = (TurnContextImpl) ctxt;
-                conversationId[0] = context.getActivity().getConversation().getId();
-                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
-                    setRelatesTo(context.getActivity().getRelatesTo());
-                }};
-                try {
-                    context.sendActivity((Activity)typingActivity).join();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
-                try {
-                    context.sendActivity("echo:" + context.getActivity().getText()).join();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Assert.fail();
-                }
+            //TurnContextImpl context = (TurnContextImpl) ctxt;
+            conversationId[0] = context.getActivity().getConversation().getId();
+            Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+                setRelatesTo(context.getActivity().getRelatesTo());
+            }};
+            try {
+                context.sendActivity(typingActivity).join();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
+            try {
+                context.sendActivity("echo:" + context.getActivity().getText()).join();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
 
-                return CompletableFuture.completedFuture(null);
-        }).Send("foo")
-                .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                    return null;
-                })
-                .AssertReply("echo:foo")
-                .Send("bar")
-                .AssertReply((activity) -> {
-                    Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                    return null;
-                })
-                .AssertReply("echo:bar")
-                .StartTest();
+            return CompletableFuture.completedFuture(null);
+        }).send("foo")
+            .assertReply((activity) -> {
+                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+                return null;
+            })
+            .assertReply("echo:foo")
+            .send("bar")
+            .assertReply((activity) -> {
+                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+                return null;
+            })
+            .assertReply("echo:bar")
+            .startTest();
 
 
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(6, pagedResult.getItems().length);
-        Assert.assertEquals( "foo", ((Activity)pagedResult.getItems()[0]).getText());
-        Assert.assertNotEquals(((Activity)pagedResult.getItems()[1]), null);
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
+        Assert.assertNotEquals(pagedResult.getItems()[1], null);
         Assert.assertEquals("echo:foo", ((Activity) pagedResult.getItems()[2]).getText());
-        Assert.assertEquals("bar", ((Activity)pagedResult.getItems()[3]).getText());
+        Assert.assertEquals("bar", ((Activity) pagedResult.getItems()[3]).getText());
 
         Assert.assertTrue(pagedResult.getItems()[4] != null);
-        Assert.assertEquals("echo:bar", ((Activity)pagedResult.getItems()[5]).getText());
-        for (Object activity : pagedResult.getItems())
-        {
+        Assert.assertEquals("echo:bar", ((Activity) pagedResult.getItems()[5]).getText());
+        for (Object activity : pagedResult.getItems()) {
             Assert.assertFalse(StringUtils.isBlank(((Activity) activity).getId()));
-            Assert.assertTrue(((Activity)activity).getTimestamp().isAfter(Long.MIN_VALUE));
+            Assert.assertTrue(((Activity) activity).getTimestamp().isAfter(Long.MIN_VALUE));
         }
         System.out.printf("Complete");
     }
@@ -166,7 +165,7 @@ public class TranscriptMiddlewareTest {
     @Test
     public void Transcript_LogUpdateActivities() throws InterruptedException, ExecutionException {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
+        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
         final Activity[] activityToUpdate = {null};
         ObjectMapper mapper = new ObjectMapper();
@@ -181,7 +180,7 @@ public class TranscriptMiddlewareTest {
                     e.printStackTrace();
                 }
             } else {
-                Activity activity = ((Activity) context.getActivity()).createReply("response");
+                Activity activity = context.getActivity().createReply("response");
                 ResourceResponse response = null;
                 try {
                     response = context.sendActivity(activity).join();
@@ -198,16 +197,16 @@ public class TranscriptMiddlewareTest {
 
             return null;
         })
-            .Send("foo")
-            .Send("update")
-            .AssertReply("new response")
-            .StartTest();
+            .send("foo")
+            .send("update")
+            .assertReply("new response")
+            .startTest();
 
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).getText());
-        Assert.assertEquals( "response", ((Activity)pagedResult.getItems()[1]).getText());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
         // TODO: Fix the following 3 asserts so they work correctly. They succeed in the travis builds and fail in the
         // BotBuilder-Java 4.0 master build.
         //Assert.assertEquals( "new response", ((Activity)pagedResult.getItems()[2]).text());
@@ -218,7 +217,7 @@ public class TranscriptMiddlewareTest {
     @Test
     public final void Transcript_LogDeleteActivities() throws InterruptedException, ExecutionException {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).Use(new TranscriptLoggerMiddleware(transcriptStore));
+        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
         final String[] activityId = {null};
         new TestFlow(adapter, (context) -> {
@@ -231,7 +230,7 @@ public class TranscriptMiddlewareTest {
                     Assert.fail();
                 }
             } else {
-                Activity activity = ((Activity) context.getActivity()).createReply("response");
+                Activity activity = context.getActivity().createReply("response");
                 ResourceResponse response = null;
                 try {
                     response = context.sendActivity(activity).join();
@@ -244,26 +243,26 @@ public class TranscriptMiddlewareTest {
 
             return null;
         })
-            .Send("foo")
-            .AssertReply("response")
-            .Send("deleteIt")
-            .StartTest();
+            .send("foo")
+            .assertReply("response")
+            .send("deleteIt")
+            .startTest();
 
         Thread.sleep(1500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         for (Object act : pagedResult.getItems()) {
-            System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity)act).getType());
+            System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity) act).getType());
         }
 
-        for (Object activity : pagedResult.getItems() ) {
-            System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).getRecipient().getName(), ((Activity)activity).getText());
+        for (Object activity : pagedResult.getItems()) {
+            System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).getRecipient().getName(), ((Activity) activity).getText());
         }
         Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity)pagedResult.getItems()[0]).getText());
-        Assert.assertEquals("response", ((Activity)pagedResult.getItems()[1]).getText());
-        Assert.assertEquals("deleteIt", ((Activity)pagedResult.getItems()[2]).getText());
-        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity)pagedResult.getItems()[3]).getType());
-        Assert.assertEquals(((Activity)pagedResult.getItems()[1]).getId(), ((Activity) pagedResult.getItems()[3]).getId());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
+        Assert.assertEquals("deleteIt", ((Activity) pagedResult.getItems()[2]).getText());
+        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity) pagedResult.getItems()[3]).getType());
+        Assert.assertEquals(((Activity) pagedResult.getItems()[1]).getId(), ((Activity) pagedResult.getItems()[3]).getId());
     }
 }
 

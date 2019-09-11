@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 //[TestClass]
@@ -112,7 +115,7 @@ public class TurnContextTests {
     {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContext(a, new Activity());
-        Assert.IsFalse(c.Responded);            
+        Assert.IsFalse(c.Responded);
         var response = await c.SendActivity(TestMessage.Message("testtest"));
 
         Assert.IsTrue(c.Responded);
@@ -156,13 +159,13 @@ public class TurnContextTests {
         TurnContext c = new TurnContext(a, new Activity());
         Assert.IsFalse(c.Responded);
 
-        // Send a Trace Activity, and make sure responded is NOT set. 
-        ITraceActivity trace  = Activity.CreateTraceActivity("trace");            
+        // Send a Trace Activity, and make sure responded is NOT set.
+        ITraceActivity trace  = Activity.CreateTraceActivity("trace");
         await c.SendActivity(trace);
         Assert.IsFalse(c.Responded);
 
-        // Just to sanity check everything, send a Message and verify the 
-        // responded flag IS set. 
+        // Just to sanity check everything, send a Message and verify the
+        // responded flag IS set.
         MessageActivity msg = TestMessage.Message().AsMessageActivity();
         await c.SendActivity(msg);
         Assert.IsTrue(c.Responded);
@@ -181,23 +184,23 @@ public class TurnContextTests {
         }
 
         SimpleAdapter a = new SimpleAdapter(ValidateResponses);
-        TurnContext c = new TurnContext(a, new Activity());            
+        TurnContext c = new TurnContext(a, new Activity());
         await c.SendActivity(TestMessage.Message());
         Assert.IsTrue(foundActivity);
     }
 
     [TestMethod]
     public async Task CallOnSendBeforeDelivery()
-    {         
+    {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContext(a, new Activity());
 
         int count = 0;
         c.OnSendActivities(async (context, activities, next) =>
-        {               
+        {
             Assert.IsNotNull(activities, "Null Array passed in");
             count = activities.Count();
-            return await next(); 
+            return await next();
         });
 
         await c.SendActivity(TestMessage.Message());
@@ -208,7 +211,7 @@ public class TurnContextTests {
     [TestMethod]
     public async Task AllowInterceptionOfDeliveryOnSend()
     {
-        bool responsesSent = false; 
+        bool responsesSent = false;
         void ValidateResponses(Activity[] activities)
         {
             responsesSent = true;
@@ -217,13 +220,13 @@ public class TurnContextTests {
 
         SimpleAdapter a = new SimpleAdapter(ValidateResponses);
         TurnContext c = new TurnContext(a, new Activity());
-        
+
         int count = 0;
         c.OnSendActivities(async (context, activities, next) =>
         {
             Assert.IsNotNull(activities, "Null Array passed in");
             count = activities.Count();
-            // Do not call next. 
+            // Do not call next.
             return null;
         });
 
@@ -247,20 +250,20 @@ public class TurnContextTests {
 
         SimpleAdapter a = new SimpleAdapter(ValidateResponses);
         TurnContext c = new TurnContext(a, new Activity());
-        
+
         c.OnSendActivities(async (context, activities, next) =>
         {
             Assert.IsNotNull(activities, "Null Array passed in");
             Assert.IsTrue(activities.Count() == 1);
             Assert.IsTrue(activities[0].Id == "1234", "Unknown Id Passed In");
             activities[0].Id = "changed";
-            return await next(); 
+            return await next();
         });
 
         await c.SendActivity(TestMessage.Message());
 
         // Intercepted the message, changed it, and sent it on to the Adapter
-        Assert.IsTrue(foundIt);            
+        Assert.IsTrue(foundIt);
     }
 
     [TestMethod]
@@ -277,8 +280,8 @@ public class TurnContextTests {
 
         SimpleAdapter a = new SimpleAdapter(ValidateUpdate);
         TurnContext c = new TurnContext(a, new Activity());
-        
-        var message = TestMessage.Message("test");            
+
+        var message = TestMessage.Message("test");
         var updateResult = await c.UpdateActivity(message);
 
         Assert.IsTrue(foundActivity);
@@ -308,7 +311,7 @@ public class TurnContextTests {
             return await next();
         });
         await c.UpdateActivity(TestMessage.Message());
-        Assert.IsTrue(wasCalled);            
+        Assert.IsTrue(wasCalled);
         Assert.IsTrue(foundActivity);
     }
 
@@ -336,7 +339,7 @@ public class TurnContextTests {
 
         await c.UpdateActivity(TestMessage.Message());
         Assert.IsTrue(wasCalled); // Interceptor was called
-        Assert.IsFalse(adapterCalled); // Adapter was not                        
+        Assert.IsFalse(adapterCalled); // Adapter was not
     }
 
     [TestMethod]
@@ -344,7 +347,7 @@ public class TurnContextTests {
     {
         bool adapterCalled = false;
         void ValidateUpdate(Activity activity)
-        {                
+        {
             Assert.IsTrue(activity.Id == "mutated");
             adapterCalled = true;
         }
@@ -357,11 +360,11 @@ public class TurnContextTests {
             Assert.IsNotNull(activity, "Null activity passed in");
             Assert.IsTrue(activity.Id == "1234");
             activity.Id = "mutated";
-            return await next(); 
+            return await next();
         });
 
         await c.UpdateActivity(TestMessage.Message());
-        Assert.IsTrue(adapterCalled); // Adapter was not                        
+        Assert.IsTrue(adapterCalled); // Adapter was not
     }
 
     [TestMethod]
@@ -377,8 +380,8 @@ public class TurnContextTests {
         }
 
         SimpleAdapter a = new SimpleAdapter(ValidateDelete);
-        TurnContext c = new TurnContext(a, TestMessage.Message()); 
-        await c.DeleteActivity("12345"); 
+        TurnContext c = new TurnContext(a, TestMessage.Message());
+        await c.DeleteActivity("12345");
         Assert.IsTrue(deleteCalled);
     }
 
@@ -425,7 +428,7 @@ public class TurnContextTests {
             // Do Not Call Next
         });
 
-        await c.DeleteActivity("1234"); 
+        await c.DeleteActivity("1234");
         Assert.IsTrue(wasCalled); // Interceptor was called
         Assert.IsFalse(adapterCalled); // Adapter was not
     }
@@ -438,12 +441,12 @@ public class TurnContextTests {
         void ValidateDelete(ConversationReference r)
         {
             Assert.IsTrue(r.ActivityId == "mutated");
-            adapterCalled = true;                
+            adapterCalled = true;
         }
 
         SimpleAdapter a = new SimpleAdapter(ValidateDelete);
         TurnContext c = new TurnContext(a, new Activity());
-        
+
         c.OnDeleteActivity(async (context, convRef, next) =>
         {
             Assert.IsNotNull(convRef, "Null activity passed in");
@@ -461,10 +464,10 @@ public class TurnContextTests {
     {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContext(a, new Activity());
-        
+
         c.OnSendActivities(async (context, activities, next) =>
         {
-            throw new Exception("test");                 
+            throw new Exception("test");
         });
 
         try
@@ -475,8 +478,8 @@ public class TurnContextTests {
         catch(Exception ex)
         {
             Assert.IsTrue(ex.Message == "test");
-        }            
-    }        
+        }
+    }
 
     public async Task MyBotLogic(TurnContext context)
     {

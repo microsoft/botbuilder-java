@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
@@ -8,7 +11,6 @@ import org.junit.Assert;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class SimpleAdapter extends BotAdapter {

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 
@@ -10,13 +13,10 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 
 // [TestCategory("Russian Doll Middleware, Nested Middleware sets")]
-public class MiddlewareSetTest extends TestBase
-{
+public class MiddlewareSetTest extends TestBase {
     protected RestConnectorClient connector;
     protected ChannelAccount bot;
     protected ChannelAccount user;
@@ -75,7 +75,7 @@ public class MiddlewareSetTest extends TestBase
         MiddlewareSet m = new MiddlewareSet();
         wasCalled = false;
 
-        BotCallbackHandler cb = (ctx) ->{
+        BotCallbackHandler cb = (ctx) -> {
             wasCalled = true;
             return null;
         };
@@ -101,7 +101,7 @@ public class MiddlewareSetTest extends TestBase
         Assert.assertFalse(simple.getCalled());
         m.receiveActivityWithStatus(null, cb).join();
         Assert.assertTrue(simple.getCalled());
-        Assert.assertTrue( "Delegate was not called", wasCalled);
+        Assert.assertTrue("Delegate was not called", wasCalled);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class MiddlewareSetTest extends TestBase
         try {
             m.receiveActivityWithStatus(null, null).join();
             Assert.assertFalse("Should never have gotten here", true);
-        } catch(CompletionException ce) {
+        } catch (CompletionException ce) {
             Assert.assertTrue(ce.getCause() instanceof IllegalStateException);
         }
     }
@@ -150,7 +150,7 @@ public class MiddlewareSetTest extends TestBase
         WasCalledMiddleware one = new WasCalledMiddleware();
         WasCalledMiddleware two = new WasCalledMiddleware();
 
-        final int called[] = {0};
+        final int[] called = {0};
         BotCallbackHandler cb = (context) -> {
             called[0]++;
             return null;
@@ -163,16 +163,16 @@ public class MiddlewareSetTest extends TestBase
         m.receiveActivityWithStatus(null, cb).join();
         Assert.assertTrue(one.getCalled());
         Assert.assertTrue(two.getCalled());
-        Assert.assertTrue("Incorrect number of calls to Delegate", called[0] == 1 );
+        Assert.assertTrue("Incorrect number of calls to Delegate", called[0] == 1);
     }
 
     @Test
     public void TwoMiddlewareItemsInOrder() throws Exception {
-        final boolean called1[] = {false};
-        final boolean called2[] = {false};
+        final boolean[] called1 = {false};
+        final boolean[] called2 = {false};
 
         CallMeMiddleware one = new CallMeMiddleware(() -> {
-            Assert.assertFalse( "Second Middleware was called", called2[0]);
+            Assert.assertFalse("Second Middleware was called", called2[0]);
             called1[0] = true;
         });
 
@@ -193,7 +193,7 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void Status_OneMiddlewareRan() {
-        final boolean called1[] = {false};
+        final boolean[] called1 = {false};
 
         CallMeMiddleware one = new CallMeMiddleware(() -> called1[0] = true);
 
@@ -201,8 +201,8 @@ public class MiddlewareSetTest extends TestBase
         m.use(one);
 
         // The middlware in this pipeline calls next(), so the delegate should be called
-        final boolean didAllRun[] = {false};
-        BotCallbackHandler cb  = (context) -> {
+        final boolean[] didAllRun = {false};
+        BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return null;
         };
@@ -215,8 +215,8 @@ public class MiddlewareSetTest extends TestBase
     @Test
     public void Status_RunAtEndEmptyPipeline() {
         MiddlewareSet m = new MiddlewareSet();
-        final boolean didAllRun[] = {false};
-        BotCallbackHandler cb = (context)-> {
+        final boolean[] didAllRun = {false};
+        BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return null;
         };
@@ -231,8 +231,8 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void Status_TwoItemsOneDoesNotCallNext() {
-        final boolean called1[] = {false};
-        final boolean called2[] = {false};
+        final boolean[] called1 = {false};
+        final boolean[] called2 = {false};
 
         CallMeMiddleware one = new CallMeMiddleware(() -> {
             Assert.assertFalse("Second Middleware was called", called2[0]);
@@ -248,8 +248,8 @@ public class MiddlewareSetTest extends TestBase
         m.use(one);
         m.use(two);
 
-        boolean didAllRun[] = {false};
-        BotCallbackHandler cb= (context) -> {
+        boolean[] didAllRun = {false};
+        BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return null;
         };
@@ -265,7 +265,7 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void Status_OneEntryThatDoesNotCallNext() {
-        final boolean called1[] = {false};
+        final boolean[] called1 = {false};
 
         DoNotCallNextMiddleware one = new DoNotCallNextMiddleware(() -> called1[0] = true);
 
@@ -273,7 +273,7 @@ public class MiddlewareSetTest extends TestBase
         m.use(one);
 
         // The middleware in this pipeline DOES NOT call next(), so this must not be called
-        boolean didAllRun[] = {false};
+        boolean[] didAllRun = {false};
         BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return null;
@@ -289,7 +289,7 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void AnonymousMiddleware() {
-        final boolean didRun[] = {false};
+        final boolean[] didRun = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc = (tc, nd) -> {
@@ -305,8 +305,8 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void TwoAnonymousMiddleware() throws Exception {
-        final boolean didRun1[] = {false};
-        final boolean didRun2[] = {false};
+        final boolean[] didRun1 = {false};
+        final boolean[] didRun2 = {false};
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -330,8 +330,8 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void TwoAnonymousMiddlewareInOrder() {
-        final boolean didRun1[] = {false};
-        final boolean didRun2[] = {false};
+        final boolean[] didRun1 = {false};
+        final boolean[] didRun2 = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = (tc, nd) -> {
@@ -356,8 +356,8 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void MixedMiddlewareInOrderAnonymousFirst() throws Exception {
-        final boolean didRun1[] = {false};
-        final boolean didRun2[] = {false};
+        final boolean[] didRun1 = {false};
+        final boolean[] didRun2 = {false};
 
         MiddlewareSet m = new MiddlewareSet();
         MiddlewareCall mwc1 = new MiddlewareCall() {
@@ -386,8 +386,8 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void MixedMiddlewareInOrderAnonymousLast() {
-        final boolean didRun1[] = {false};
-        final boolean didRun2[] = {false};
+        final boolean[] didRun1 = {false};
+        final boolean[] didRun2 = {false};
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -413,9 +413,9 @@ public class MiddlewareSetTest extends TestBase
 
     @Test
     public void RunCodeBeforeAndAfter() throws Exception {
-        final boolean didRun1[] = {false};
-        final boolean codeafter2run[] = {false};
-        final boolean didRun2[] = {false};
+        final boolean[] didRun1 = {false};
+        final boolean[] codeafter2run = {false};
+        final boolean[] didRun2 = {false};
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -446,7 +446,7 @@ public class MiddlewareSetTest extends TestBase
     @Test
     public void CatchAnExceptionViaMiddlware() {
         MiddlewareSet m = new MiddlewareSet();
-        final boolean caughtException[] = {false};
+        final boolean[] caughtException = {false};
 
         MiddlewareCall mwc1 = new MiddlewareCall() {
             public CompletableFuture<Void> requestHandler(TurnContext tc, NextDelegate nd) {
@@ -456,7 +456,8 @@ public class MiddlewareSetTest extends TestBase
                         caughtException[0] = true;
                         return null;
                     });
-        }};
+            }
+        };
 
         m.use(new AnonymousReceiveMiddleware(mwc1));
 

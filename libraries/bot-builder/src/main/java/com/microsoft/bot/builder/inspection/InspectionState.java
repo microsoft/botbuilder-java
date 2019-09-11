@@ -14,7 +14,7 @@ public class InspectionState extends BotState {
      * @param withStorage           The storage provider to use.
      */
     public InspectionState(Storage withStorage) {
-        super(withStorage, InspectionState.class.getName());
+        super(withStorage, InspectionState.class.getSimpleName());
     }
 
     @Override

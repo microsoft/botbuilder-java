@@ -1,7 +1,9 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.BotCallbackHandler;
-import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +13,6 @@ import org.junit.Assert;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -23,11 +24,9 @@ public class TestFlow {
     BotCallbackHandler callback;
 
     ArrayList<Supplier<String>> tasks = new ArrayList<Supplier<String>>();
-    ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory()
-    {
+    ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
         @Override
-        public ForkJoinWorkerThread newThread(ForkJoinPool pool)
-        {
+        public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
             final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
             worker.setName("TestFlow-" + worker.getPoolIndex());
             return worker;
@@ -62,7 +61,7 @@ public class TestFlow {
      *
      * @return
      */
-    public String StartTest() throws ExecutionException, InterruptedException {
+    public String startTest() {
 
         System.out.printf("+------------------------------------------+\n");
         int count = 0;
@@ -84,7 +83,7 @@ public class TestFlow {
      * @param userSays
      * @return
      */
-    public TestFlow Send(String userSays) throws IllegalArgumentException {
+    public TestFlow send(String userSays) throws IllegalArgumentException {
         if (userSays == null)
             throw new IllegalArgumentException("You have to pass a userSays parameter");
 
@@ -108,7 +107,7 @@ public class TestFlow {
      * @param userActivity
      * @return
      */
-    public TestFlow Send(Activity userActivity) {
+    public TestFlow send(Activity userActivity) {
         if (userActivity == null)
             throw new IllegalArgumentException("You have to pass an Activity");
 
@@ -118,7 +117,7 @@ public class TestFlow {
 
 
             try {
-                this.adapter.ProcessActivity((Activity) userActivity, this.callback);
+                this.adapter.ProcessActivity(userActivity, this.callback);
                 return "TestFlow: Send() -> ProcessActivity: " + userActivity.getText();
             } catch (Exception e) {
                 return e.getMessage();
@@ -134,13 +133,13 @@ public class TestFlow {
      * @param ms
      * @return
      */
-    public TestFlow Delay(int ms) {
+    public TestFlow delay(int ms) {
         return new TestFlow(() ->
         {
             System.out.printf("TestFlow(%s): Delay(%s ms) called. ", Thread.currentThread().getId(), ms);
             System.out.flush();
             try {
-                Thread.sleep((int) ms);
+                Thread.sleep(ms);
             } catch (InterruptedException e) {
                 return e.getMessage();
             }
@@ -154,16 +153,16 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow AssertReply(String expected) {
-        return this.AssertReply(expected, null, 3000);
+    public TestFlow assertReply(String expected) {
+        return this.assertReply(expected, null, 3000);
     }
 
-    public TestFlow AssertReply(String expected, String description) {
-        return this.AssertReply(expected, description, 3000);
+    public TestFlow assertReply(String expected, String description) {
+        return this.assertReply(expected, description, 3000);
     }
 
-    public TestFlow AssertReply(String expected, String description, int timeout) {
-        return this.AssertReply(this.adapter.MakeActivity(expected), description, timeout);
+    public TestFlow assertReply(String expected, String description, int timeout) {
+        return this.assertReply(this.adapter.MakeActivity(expected), description, timeout);
     }
 
     /**
@@ -172,16 +171,16 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow AssertReply(Activity expected) {
+    public TestFlow assertReply(Activity expected) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
-        return AssertReply(expected, description, 3000);
+        return assertReply(expected, description, 3000);
     }
 
-    public TestFlow AssertReply(Activity expected, String description, int timeout) {
+    public TestFlow assertReply(Activity expected, String description, int timeout) {
         if (description == null)
             description = Thread.currentThread().getStackTrace()[1].getMethodName();
         String finalDescription = description;
-        return this.AssertReply((reply) -> {
+        return this.assertReply((reply) -> {
             if (expected.getType() != reply.getType())
                 return String.format("%s: Type should match", finalDescription);
             if (expected.getText().equals(reply.getText())) {
@@ -201,16 +200,16 @@ public class TestFlow {
      * @param validateActivity
      * @return
      */
-    public TestFlow AssertReply(Function<Activity, String> validateActivity) {
+    public TestFlow assertReply(Function<Activity, String> validateActivity) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
-        return AssertReply(validateActivity, description, 3000);
+        return assertReply(validateActivity, description, 3000);
     }
 
-    public TestFlow AssertReply(Function<Activity, String> validateActivity, String description) {
-        return AssertReply(validateActivity, description, 3000);
+    public TestFlow assertReply(Function<Activity, String> validateActivity, String description) {
+        return assertReply(validateActivity, description, 3000);
     }
 
-    public TestFlow AssertReply(Function<Activity, String> validateActivity, String description, int timeout) {
+    public TestFlow assertReply(Function<Activity, String> validateActivity, String description, int timeout) {
         return new TestFlow(() -> {
             System.out.println(String.format("AssertReply: Starting loop : %s (Thread:%s)", description, Thread.currentThread().getId()));
             System.out.flush();
@@ -240,7 +239,7 @@ public class TestFlow {
                     System.out.printf("AssertReply(tid:%s): Received Reply: %s ", Thread.currentThread().getId(), (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText());
                     System.out.flush();
                     System.out.printf("=============\n From: %s\n To:%s\n ==========\n", (replyActivity.getFrom() == null) ? "No from set" : replyActivity.getFrom().getName(),
-                            (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName());
+                        (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName());
                     System.out.flush();
 
                     // if we have a reply
@@ -274,7 +273,7 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow Turn(String userSays, String expected, String description, int timeout) {
+    public TestFlow turn(String userSays, String expected, String description, int timeout) {
         String result = null;
         try {
 
@@ -294,58 +293,58 @@ public class TestFlow {
                 }
 
             }, ExecutorFactory.getExecutor())
-                    .thenApply(arg -> { // Assert Reply
-                        int finalTimeout = Integer.MAX_VALUE;
-                        if (isDebug())
-                            finalTimeout = Integer.MAX_VALUE;
-                        Function<Activity, String> validateActivity = activity -> {
-                            if (activity.getText().equals(expected)) {
-                                System.out.println(String.format("TestTurn(tid:%s): Validated text is: %s", Thread.currentThread().getId(), expected));
-                                System.out.flush();
-
-                                return "SUCCESS";
-                            }
-                            System.out.println(String.format("TestTurn(tid:%s): Failed validate text is: %s", Thread.currentThread().getId(), expected));
+                .thenApply(arg -> { // Assert Reply
+                    int finalTimeout = Integer.MAX_VALUE;
+                    if (isDebug())
+                        finalTimeout = Integer.MAX_VALUE;
+                    Function<Activity, String> validateActivity = activity -> {
+                        if (activity.getText().equals(expected)) {
+                            System.out.println(String.format("TestTurn(tid:%s): Validated text is: %s", Thread.currentThread().getId(), expected));
                             System.out.flush();
 
-                            return String.format("FAIL: %s received in Activity.text (%s expected)", activity.getText(), expected);
-                        };
-
-
-                        System.out.println(String.format("TestTurn(tid:%s): Started receive loop: %s", Thread.currentThread().getId(), description));
-                        System.out.flush();
-                        DateTime start = DateTime.now();
-                        while (true) {
-                            DateTime current = DateTime.now();
-
-                            if ((current.getMillis() - start.getMillis()) > (long) finalTimeout)
-                                return String.format("TestTurn: %d ms Timed out waiting for:'%s'", finalTimeout, description);
-
-
-                            Activity replyActivity = this.adapter.GetNextReply();
-
-
-                            if (replyActivity != null) {
-                                // if we have a reply
-                                System.out.println(String.format("TestTurn(tid:%s): Received Reply: %s",
-                                        Thread.currentThread().getId(),
-                                        String.format("\n========\n To:%s\n From:%s\n Msg:%s\n=======", replyActivity.getRecipient().getName(), replyActivity.getFrom().getName(), replyActivity.getText())
-                                ));
-                                System.out.flush();
-                                return validateActivity.apply(replyActivity);
-                            } else {
-                                System.out.println(String.format("TestTurn(tid:%s): No reply..", Thread.currentThread().getId()));
-                                System.out.flush();
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
+                            return "SUCCESS";
                         }
-                    })
-                    .get(timeout, TimeUnit.MILLISECONDS);
+                        System.out.println(String.format("TestTurn(tid:%s): Failed validate text is: %s", Thread.currentThread().getId(), expected));
+                        System.out.flush();
+
+                        return String.format("FAIL: %s received in Activity.text (%s expected)", activity.getText(), expected);
+                    };
+
+
+                    System.out.println(String.format("TestTurn(tid:%s): Started receive loop: %s", Thread.currentThread().getId(), description));
+                    System.out.flush();
+                    DateTime start = DateTime.now();
+                    while (true) {
+                        DateTime current = DateTime.now();
+
+                        if ((current.getMillis() - start.getMillis()) > (long) finalTimeout)
+                            return String.format("TestTurn: %d ms Timed out waiting for:'%s'", finalTimeout, description);
+
+
+                        Activity replyActivity = this.adapter.GetNextReply();
+
+
+                        if (replyActivity != null) {
+                            // if we have a reply
+                            System.out.println(String.format("TestTurn(tid:%s): Received Reply: %s",
+                                Thread.currentThread().getId(),
+                                String.format("\n========\n To:%s\n From:%s\n Msg:%s\n=======", replyActivity.getRecipient().getName(), replyActivity.getFrom().getName(), replyActivity.getText())
+                            ));
+                            System.out.flush();
+                            return validateActivity.apply(replyActivity);
+                        } else {
+                            System.out.println(String.format("TestTurn(tid:%s): No reply..", Thread.currentThread().getId()));
+                            System.out.flush();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                })
+                .get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -364,20 +363,20 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow Test(String userSays, String expected) {
-        return Test(userSays, expected, null, 3000);
+    public TestFlow test(String userSays, String expected) {
+        return test(userSays, expected, null, 3000);
     }
 
-    public TestFlow Test(String userSays, String expected, String description) {
-        return Test(userSays, expected, description, 3000);
+    public TestFlow test(String userSays, String expected, String description) {
+        return test(userSays, expected, description, 3000);
     }
 
-    public TestFlow Test(String userSays, String expected, String description, int timeout) {
+    public TestFlow test(String userSays, String expected, String description, int timeout) {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.Send(userSays)
-                .AssertReply(expected, description, timeout);
+        return this.send(userSays)
+            .assertReply(expected, description, timeout);
     }
 
     /**
@@ -387,20 +386,20 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow Test(String userSays, Activity expected) {
-        return Test(userSays, expected, null, 3000);
+    public TestFlow test(String userSays, Activity expected) {
+        return test(userSays, expected, null, 3000);
     }
 
-    public TestFlow Test(String userSays, Activity expected, String description) {
-        return Test(userSays, expected, description, 3000);
+    public TestFlow test(String userSays, Activity expected, String description) {
+        return test(userSays, expected, description, 3000);
     }
 
-    public TestFlow Test(String userSays, Activity expected, String description, int timeout) {
+    public TestFlow test(String userSays, Activity expected, String description, int timeout) {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.Send(userSays)
-                .AssertReply(expected, description, timeout);
+        return this.send(userSays)
+            .assertReply(expected, description, timeout);
     }
 
     /**
@@ -410,20 +409,20 @@ public class TestFlow {
      * @param expected
      * @return
      */
-    public TestFlow Test(String userSays, Function<Activity, String> expected) {
-        return Test(userSays, expected, null, 3000);
+    public TestFlow test(String userSays, Function<Activity, String> expected) {
+        return test(userSays, expected, null, 3000);
     }
 
-    public TestFlow Test(String userSays, Function<Activity, String> expected, String description) {
-        return Test(userSays, expected, description, 3000);
+    public TestFlow test(String userSays, Function<Activity, String> expected, String description) {
+        return test(userSays, expected, description, 3000);
     }
 
-    public TestFlow Test(String userSays, Function<Activity, String> expected, String description, int timeout) {
+    public TestFlow test(String userSays, Function<Activity, String> expected, String description, int timeout) {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.Send(userSays)
-                .AssertReply(expected, description, timeout);
+        return this.send(userSays)
+            .assertReply(expected, description, timeout);
     }
 
     /**
@@ -432,19 +431,19 @@ public class TestFlow {
      * @param candidates
      * @return
      */
-    public TestFlow AssertReplyOneOf(String[] candidates) {
-        return AssertReplyOneOf(candidates, null, 3000);
+    public TestFlow assertReplyOneOf(String[] candidates) {
+        return assertReplyOneOf(candidates, null, 3000);
     }
 
-    public TestFlow AssertReplyOneOf(String[] candidates, String description) {
-        return AssertReplyOneOf(candidates, description, 3000);
+    public TestFlow assertReplyOneOf(String[] candidates, String description) {
+        return assertReplyOneOf(candidates, description, 3000);
     }
 
-    public TestFlow AssertReplyOneOf(String[] candidates, String description, int timeout) {
+    public TestFlow assertReplyOneOf(String[] candidates, String description, int timeout) {
         if (candidates == null)
             throw new IllegalArgumentException("candidates");
 
-        return this.AssertReply((reply) -> {
+        return this.assertReply((reply) -> {
             for (String candidate : candidates) {
                 if (StringUtils.equals(reply.getText(), candidate))
                     return null;

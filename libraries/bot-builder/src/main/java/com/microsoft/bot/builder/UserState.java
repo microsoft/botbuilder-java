@@ -16,7 +16,7 @@ public class UserState extends BotState {
      * @param withStorage  The storage provider to use.
      */
     public UserState(Storage withStorage) {
-        super(withStorage, UserState.class.getName());
+        super(withStorage, UserState.class.getSimpleName());
     }
 
     @Override

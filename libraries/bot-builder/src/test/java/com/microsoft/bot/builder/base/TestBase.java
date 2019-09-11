@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder.base;
 
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
@@ -20,56 +23,29 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class TestBase {
 
-    private PrintStream out;
-
-    protected enum RunCondition {
-        MOCK_ONLY,
-        LIVE_ONLY,
-        BOTH
-    }
-
-    public enum TestMode {
-        PLAYBACK,
-        RECORD
-    }
-
-    private final RunCondition runCondition;
-
-    protected TestBase() {
-        this(RunCondition.BOTH);
-    }
-
-    protected TestBase(RunCondition runCondition) {
-        this.runCondition = runCondition;
-    }
-
-    private String shouldCancelTest(boolean isPlaybackMode) {
-        // Determine whether to run the test based on the condition the test has been configured with
-        switch (this.runCondition) {
-            case MOCK_ONLY:
-                return (!isPlaybackMode) ? "Test configured to run only as mocked, not live." : null;
-            case LIVE_ONLY:
-                return (isPlaybackMode) ? "Test configured to run only as live, not mocked." : null;
-            default:
-                return null;
-        }
-    }
-
-    private static TestMode testMode = null;
-
     protected final static String ZERO_CLIENT_ID = "00000000-0000-0000-0000-000000000000";
     protected final static String ZERO_CLIENT_SECRET = "00000000000000000000000";
     protected final static String ZERO_USER_ID = "<--dummy-user-id-->";
     protected final static String ZERO_BOT_ID = "<--dummy-bot-id-->";
     protected final static String ZERO_TOKEN = "<--dummy-token-->";
-
     private static final String PLAYBACK_URI = "http://localhost:1234";
-
     protected static String hostUri = null;
     protected static String clientId = null;
     protected static String clientSecret = null;
     protected static String userId = null;
     protected static String botId = null;
+    private static TestMode testMode = null;
+    private final RunCondition runCondition;
+    @Rule
+    public TestName testName = new TestName();
+    protected InterceptorManager interceptorManager = null;
+    private PrintStream out;
+    protected TestBase() {
+        this(RunCondition.BOTH);
+    }
+    protected TestBase(RunCondition runCondition) {
+        this.runCondition = runCondition;
+    }
 
     private static void initTestMode() throws IOException {
         String azureTestMode = System.getenv("AZURE_TEST_MODE");
@@ -121,13 +97,8 @@ public abstract class TestBase {
     }
 
     public static boolean isRecordMode() {
-        return  !isPlaybackMode();
+        return !isPlaybackMode();
     }
-
-    @Rule
-    public TestName testName = new TestName();
-
-    protected InterceptorManager interceptorManager = null;
 
     private static void printThreadInfo(String what) {
         long id = Thread.currentThread().getId();
@@ -140,6 +111,18 @@ public abstract class TestBase {
         printThreadInfo("beforeClass");
         initTestMode();
         initParams();
+    }
+
+    private String shouldCancelTest(boolean isPlaybackMode) {
+        // Determine whether to run the test based on the condition the test has been configured with
+        switch (this.runCondition) {
+            case MOCK_ONLY:
+                return (!isPlaybackMode) ? "Test configured to run only as mocked, not live." : null;
+            case LIVE_ONLY:
+                return (isPlaybackMode) ? "Test configured to run only as live, not mocked." : null;
+            default:
+                return null;
+        }
     }
 
     @Before
@@ -156,14 +139,14 @@ public abstract class TestBase {
         if (isPlaybackMode()) {
             credentials = new TokenCredentials(null, ZERO_TOKEN);
             restClient = buildRestClient(new RestClient.Builder()
-                            .withBaseUrl(hostUri + "/")
-                            .withSerializerAdapter(new JacksonAdapter())
-                            .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
-                            .withCredentials(credentials)
-                            .withLogLevel(LogLevel.NONE)
-                            .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
-                            .withInterceptor(interceptorManager.initInterceptor())
-                    ,true);
+                    .withBaseUrl(hostUri + "/")
+                    .withSerializerAdapter(new JacksonAdapter())
+                    .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
+                    .withCredentials(credentials)
+                    .withLogLevel(LogLevel.NONE)
+                    .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
+                    .withInterceptor(interceptorManager.initInterceptor())
+                , true);
 
             out = System.out;
             System.setOut(new PrintStream(new OutputStream() {
@@ -171,19 +154,18 @@ public abstract class TestBase {
                     //DO NOTHING
                 }
             }));
-        }
-        else { // Record mode
+        } else { // Record mode
             credentials = new MicrosoftAppCredentials(clientId, clientSecret);
             restClient = buildRestClient(new RestClient.Builder()
-                            .withBaseUrl(hostUri + "/")
-                            .withSerializerAdapter(new JacksonAdapter())
-                            .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
-                            .withCredentials(credentials)
-                            .withLogLevel(LogLevel.NONE)
-                            .withReadTimeout(3, TimeUnit.MINUTES)
-                            .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
-                            .withInterceptor(interceptorManager.initInterceptor())
-                    ,false);
+                    .withBaseUrl(hostUri + "/")
+                    .withSerializerAdapter(new JacksonAdapter())
+                    .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
+                    .withCredentials(credentials)
+                    .withLogLevel(LogLevel.NONE)
+                    .withReadTimeout(3, TimeUnit.MINUTES)
+                    .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
+                    .withInterceptor(interceptorManager.initInterceptor())
+                , false);
 
             //interceptorManager.addTextReplacementRule(hostUri, PLAYBACK_URI);
         }
@@ -192,14 +174,14 @@ public abstract class TestBase {
 
     @After
     public void afterTest() throws IOException {
-        if(shouldCancelTest(isPlaybackMode()) != null) {
+        if (shouldCancelTest(isPlaybackMode()) != null) {
             return;
         }
         cleanUpResources();
         interceptorManager.finalizeInterceptor();
     }
 
-    protected void addTextReplacementRule(String from, String to ) {
+    protected void addTextReplacementRule(String from, String to) {
         interceptorManager.addTextReplacementRule(from, to);
     }
 
@@ -208,5 +190,17 @@ public abstract class TestBase {
     }
 
     protected abstract void initializeClients(RestClient restClient, String botId, String userId) throws IOException;
+
     protected abstract void cleanUpResources();
+
+    protected enum RunCondition {
+        MOCK_ONLY,
+        LIVE_ONLY,
+        BOTH
+    }
+
+    public enum TestMode {
+        PLAYBACK,
+        RECORD
+    }
 }

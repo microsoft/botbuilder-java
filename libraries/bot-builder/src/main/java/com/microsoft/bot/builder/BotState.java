@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -79,7 +81,7 @@ public abstract class BotState implements PropertyManager {
         if (force || cachedState == null || cachedState.getState() == null) {
             return storage.read(new String[]{storageKey})
                 .thenApply(val -> {
-                    turnContext.getTurnState().put(contextServiceKey, new CachedBotState(val));
+                    turnContext.getTurnState().put(contextServiceKey, new CachedBotState((Map<String, Object>)val.get(storageKey)));
                     return null;
                 });
         }
@@ -120,7 +122,7 @@ public abstract class BotState implements PropertyManager {
 
             return storage.write(changes)
                 .thenApply(val -> {
-                    cachedState.setHashCode(cachedState.computeHashCode(cachedState.state));
+                    cachedState.setHash(cachedState.computeHash(cachedState.state));
                     return null;
                 });
         }
@@ -139,7 +141,7 @@ public abstract class BotState implements PropertyManager {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
 
-        turnContext.getTurnState().put(contextServiceKey, new CachedBotState(new HashMap<>()));
+        turnContext.getTurnState().put(contextServiceKey, new CachedBotState());
         return CompletableFuture.completedFuture(null);
     }
 
@@ -154,13 +156,16 @@ public abstract class BotState implements PropertyManager {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
 
-        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        if (cachedState != null) {
-            turnContext.getTurnState().remove(contextServiceKey);
-        }
-
         String storageKey = getStorageKey(turnContext);
-        return storage.delete(new String[]{storageKey});
+        return storage.delete(new String[]{storageKey})
+            .thenApply(result -> {
+                CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+                if (cachedState != null) {
+                    turnContext.getTurnState().remove(contextServiceKey);
+                }
+
+                return null;
+            });
     }
 
     /**
@@ -259,11 +264,16 @@ public abstract class BotState implements PropertyManager {
      */
     private static class CachedBotState {
         private Map<String, Object> state;
-        private int hash;
+        private String hash;
+        private ObjectMapper mapper = new ObjectMapper();
+
+        public CachedBotState() {
+            this(null);
+        }
 
         public CachedBotState(Map<String, Object> withState) {
-            state = withState;
-            hash = computeHashCode(withState);
+            state = withState != null ? withState : new ConcurrentHashMap<>();
+            hash = computeHash(withState);
         }
 
         public Map<String, Object> getState() {
@@ -274,22 +284,28 @@ public abstract class BotState implements PropertyManager {
             state = withState;
         }
 
-        @Override
-        public int hashCode() {
+        public String getHash() {
             return hash;
         }
 
-        public void setHashCode(int witHashCode) {
+        public void setHash(String witHashCode) {
             hash = witHashCode;
         }
 
         public boolean isChanged() {
-            return hash != computeHashCode(state);
+            return !StringUtils.equals(hash, computeHash(state));
         }
 
-        public int computeHashCode(Object obj) {
-            //TODO: this may not be the same as in dotnet
-            return obj.hashCode();
+        public String computeHash(Object obj) {
+            if (obj == null) {
+                return "";
+            }
+
+            try {
+                return mapper.writeValueAsString(obj);
+            } catch (JsonProcessingException e) {
+                return null;
+            }
         }
     }
 
@@ -319,17 +335,22 @@ public abstract class BotState implements PropertyManager {
          * @param defaultValueFactory Defines the default value. Invoked when no value been set for the requested
          *                            state property.  If defaultValueFactory is defined as null,
          *                            the MissingMemberException will be thrown if the underlying property is not set.
-         * @param <T>                 type of value the propertyAccessor accesses.
          * @return A task that represents the work queued to execute.
          */
         @Override
-        public <T, S> CompletableFuture<T> get(TurnContext turnContext, Supplier<S> defaultValueFactory) {
+        public CompletableFuture<T> get(TurnContext turnContext, Supplier<T> defaultValueFactory) {
             return botState.load(turnContext)
                 .thenCombine(botState.getPropertyValue(turnContext, name), (loadResult, value) -> {
-                    if (value == null) {
-                        value = defaultValueFactory.get();
+                    if (value != null) {
+                        return (T) value;
                     }
 
+                    if (defaultValueFactory == null) {
+                        return null;
+                    }
+
+                    value = defaultValueFactory.get();
+                    set(turnContext, (T) value).join();
                     return (T) value;
                 });
         }

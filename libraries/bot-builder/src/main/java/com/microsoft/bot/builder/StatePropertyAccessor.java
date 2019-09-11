@@ -7,7 +7,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public interface StatePropertyAccessor<T> extends StatePropertyInfo {
-    <T extends Object, S> CompletableFuture<T> get(TurnContext turnContext, Supplier<S> defaultValueFactory);
+    default CompletableFuture<T> get(TurnContext turnContext) {
+        return get(turnContext, null);
+    }
+
+    CompletableFuture<T> get(TurnContext turnContext, Supplier<T> defaultValueFactory);
 
     CompletableFuture<Void> delete(TurnContext turnContext);
 

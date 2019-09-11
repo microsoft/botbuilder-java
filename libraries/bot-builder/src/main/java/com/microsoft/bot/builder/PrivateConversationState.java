@@ -15,7 +15,7 @@ public class PrivateConversationState extends BotState {
      * @param storage The storage provider to use.
      */
     public PrivateConversationState(Storage storage) {
-        super(storage, PrivateConversationState.class.getName());
+        super(storage, PrivateConversationState.class.getSimpleName());
     }
 
     /**

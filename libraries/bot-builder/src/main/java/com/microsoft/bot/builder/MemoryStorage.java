@@ -8,28 +8,33 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStorage implements Storage {
     private static final String TYPENAMEFORNONENTITY = "__type_name_";
     private final Object syncroot = new Object();
     private ObjectMapper objectMapper;
-    private Map<String, JsonNode> memory = new HashMap<>();
+    private Map<String, JsonNode> memory;
     private Logger logger = LoggerFactory.getLogger(MemoryStorage.class);
     private int _eTag = 0;
+
+    public MemoryStorage() {
+        this(null);
+    }
 
     public MemoryStorage(Map<String, JsonNode> values) {
         objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .findAndRegisterModules();
+        objectMapper.enableDefaultTyping();
 
-        if (values != null)
-            memory = values;
+        memory = values != null  ? values : new ConcurrentHashMap<>();
     }
 
     @Override
@@ -38,7 +43,7 @@ public class MemoryStorage implements Storage {
             throw new IllegalArgumentException("keys cannot be null");
         }
 
-        Map<String, Object> storeItems = new HashMap<String, Object>(keys.length);
+        Map<String, Object> storeItems = new ConcurrentHashMap<>(keys.length);
         synchronized (this.syncroot) {
             for (String key : keys) {
                 if (memory.containsKey(key)) {
@@ -83,15 +88,15 @@ public class MemoryStorage implements Storage {
     @Override
     public CompletableFuture<Void> write(Map<String, Object> changes) {
         synchronized (this.syncroot) {
-            for (Map.Entry change : changes.entrySet()) {
+            for (Map.Entry<String, Object> change : changes.entrySet()) {
                 Object newValue = change.getValue();
 
                 String oldStateETag = null;
-                if (memory.containsValue(change.getKey())) {
-                    Map oldState = (Map) memory.get(change.getKey());
-                    if (oldState.containsValue("eTag")) {
-                        Map.Entry eTagToken = (Map.Entry) oldState.get("eTag");
-                        oldStateETag = (String) eTagToken.getValue();
+                if (memory.containsKey(change.getKey())) {
+                    JsonNode oldState = memory.get(change.getKey());
+                    if (oldState.has("eTag")) {
+                        JsonNode eTagToken = oldState.get("eTag");
+                        oldStateETag = eTagToken.asText();
                     }
                 }
 
@@ -102,8 +107,10 @@ public class MemoryStorage implements Storage {
                 // Set ETag if applicable
                 if (newValue instanceof StoreItem) {
                     StoreItem newStoreItem = (StoreItem) newValue;
-                    if (oldStateETag != null && newStoreItem.getETag() != "*" &&
-                        newStoreItem.getETag() != oldStateETag) {
+                    if (oldStateETag != null
+                        && !StringUtils.equals(newStoreItem.getETag(), "*")
+                        && !StringUtils.equals(newStoreItem.getETag(), oldStateETag)) {
+
                         String msg = String.format("Etag conflict. Original: %s, Current: %s",
                             newStoreItem.getETag(), oldStateETag);
                         logger.error(msg);
@@ -113,7 +120,7 @@ public class MemoryStorage implements Storage {
                     ((ObjectNode) newState).put("eTag", newTag.toString());
                 }
 
-                memory.put((String) change.getKey(), newState);
+                memory.put(change.getKey(), newState);
             }
         }
 
@@ -128,8 +135,7 @@ public class MemoryStorage implements Storage {
 
         synchronized (this.syncroot) {
             for (String key : keys) {
-                Object o = memory.get(key);
-                memory.remove(o);
+                memory.remove(key);
             }
         }
 

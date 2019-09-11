@@ -1,4 +1,5 @@
-
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.builder;
 
@@ -11,7 +12,6 @@ import java.util.concurrent.CompletionException;
  * send an appropriate message to the user to let them know that something has gone wrong.
  * You can specify the type of exception the middleware should catch and this middleware can be added
  * multiple times to allow you to handle different exception types in different ways.
- *
  */
 public class CatchExceptionMiddleware<T extends Exception> implements Middleware {
     private final CallOnException _handler;
@@ -33,7 +33,7 @@ public class CatchExceptionMiddleware<T extends Exception> implements Middleware
         return next.next()
             .exceptionally(exception -> {
                 if (_exceptionType.isInstance(exception)) {
-                    _handler.<T>apply(context, (T) exception);
+                    _handler.apply(context, (T) exception);
                 } else {
                     throw new CompletionException(exception);
                 }

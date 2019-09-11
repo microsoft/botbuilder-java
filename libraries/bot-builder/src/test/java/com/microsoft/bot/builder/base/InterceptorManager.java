@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,24 +25,16 @@ import java.util.zip.GZIPInputStream;
 public class InterceptorManager {
 
     private final static String RECORD_FOLDER = "session-records/";
-
-    private Map<String, String> textReplacementRules = new HashMap<String, String>();
+    private final String testName;
     // Stores a map of all the HTTP properties in a session
     // A state machine ensuring a test is always reset before another one is setup
-
-    protected RecordedData recordedData;
-
-    private final String testName;
-
     private final TestBase.TestMode testMode;
+    protected RecordedData recordedData;
+    private Map<String, String> textReplacementRules = new HashMap<String, String>();
 
     private InterceptorManager(String testName, TestBase.TestMode testMode) {
         this.testName = testName;
         this.testMode = testMode;
-    }
-
-    public void addTextReplacementRule(String regex, String replacement) {
-        textReplacementRules.put(regex, replacement);
     }
 
     // factory method
@@ -46,6 +42,10 @@ public class InterceptorManager {
         InterceptorManager interceptorManager = new InterceptorManager(testName, testMode);
 
         return interceptorManager;
+    }
+
+    public void addTextReplacementRule(String regex, String replacement) {
+        textReplacementRules.put(regex, replacement);
     }
 
     public boolean isRecordMode() {
@@ -76,7 +76,7 @@ public class InterceptorManager {
                 };
             default:
                 System.out.println("==> Unknown AZURE_TEST_MODE: " + testMode);
-        };
+        }
         return null;
     }
 
@@ -90,7 +90,7 @@ public class InterceptorManager {
                 break;
             default:
                 System.out.println("==> Unknown AZURE_TEST_MODE: " + testMode);
-        };
+        }
     }
 
     private Response record(Interceptor.Chain chain) throws IOException {
@@ -123,7 +123,7 @@ public class InterceptorManager {
         // remove pre-added header if this is a waiting or redirection
         if (networkCallRecord.Response.get("Body") != null) {
             if (networkCallRecord.Response.get("Body").contains("<Status>InProgress</Status>")
-                    || Integer.parseInt(networkCallRecord.Response.get("StatusCode")) == 307) {
+                || Integer.parseInt(networkCallRecord.Response.get("StatusCode")) == 307) {
                 // Do nothing
             } else {
                 synchronized (recordedData.getNetworkCallRecords()) {
@@ -176,9 +176,9 @@ public class InterceptorManager {
         //originalResponse.body().close();
 
         Response.Builder responseBuilder = new Response.Builder()
-                .request(request.newBuilder().build())
-                .protocol(Protocol.HTTP_2)
-                .code(recordStatusCode).message("-");
+            .request(request.newBuilder().build())
+            .protocol(Protocol.HTTP_2)
+            .code(recordStatusCode).message("-");
 
         for (Map.Entry<String, String> pair : networkCallRecord.Response.entrySet()) {
             if (!pair.getKey().equals("StatusCode") && !pair.getKey().equals("Body") && !pair.getKey().equals("Content-Length")) {
@@ -201,9 +201,9 @@ public class InterceptorManager {
             }
 
             String rawContentType = networkCallRecord.Response.get("content-type");
-            String contentType =  rawContentType == null
-                    ? "application/json; charset=utf-8"
-                    : rawContentType;
+            String contentType = rawContentType == null
+                ? "application/json; charset=utf-8"
+                : rawContentType;
 
             ResponseBody responseBody;
 
@@ -214,7 +214,7 @@ public class InterceptorManager {
             }
 
             responseBuilder.body(responseBody);
-            responseBuilder.addHeader("Content-Length", String.valueOf(rawBody.getBytes("UTF-8").length));
+            responseBuilder.addHeader("Content-Length", String.valueOf(rawBody.getBytes(StandardCharsets.UTF_8).length));
         }
 
         Response newResponse = responseBuilder.build();
@@ -250,8 +250,7 @@ public class InterceptorManager {
         if (response.header("Content-Encoding") == null) {
             String contentType = response.header("Content-Type");
             if (contentType != null) {
-                if (contentType.startsWith("application/json"))
-                {
+                if (contentType.startsWith("application/json")) {
                     content = buffer.readString(Util.UTF_8);
                 } else {
                     content = BaseEncoding.base64().encode(buffer.readByteArray());

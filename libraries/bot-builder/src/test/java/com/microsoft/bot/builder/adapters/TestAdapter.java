@@ -1,22 +1,20 @@
-package com.microsoft.bot.builder.adapters;
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder.adapters;
+
 import com.microsoft.bot.builder.*;
-import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TestAdapter extends BotAdapter {
-    private int nextId = 0;
     private final Queue<Activity> botReplies = new LinkedList<>();
+    private int nextId = 0;
     private ConversationReference conversationReference;
 
     public TestAdapter() {
@@ -53,13 +51,14 @@ public class TestAdapter extends BotAdapter {
         return botReplies;
     }
 
-    public TestAdapter Use(Middleware middleware) {
+    @Override
+    public TestAdapter use(Middleware middleware) {
         super.use(middleware);
         return this;
     }
 
     public void ProcessActivity(Activity activity,
-                               BotCallbackHandler callback
+                                BotCallbackHandler callback
     ) throws Exception {
         synchronized (this.conversationReference()) {
             // ready for next reply
@@ -117,7 +116,10 @@ public class TestAdapter extends BotAdapter {
                 // to keep the behavior as close as possible to facillitate
                 // more realistic tests.
                 int delayMs = (int) activity.getValue();
-                try { Thread.sleep(delayMs); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException e) {
+                }
             } else {
                 synchronized (this.botReplies) {
                     this.botReplies.add(activity);

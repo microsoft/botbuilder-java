@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.adapters.TestAdapter;
@@ -17,54 +20,54 @@ public class CatchException_MiddlewareTest {
     public void CatchException_TestMiddleware_TestStackedErrorMiddleware() throws ExecutionException, InterruptedException {
 
         TestAdapter adapter = new TestAdapter()
-                .Use(new CatchExceptionMiddleware<Exception>(new CallOnException() {
-                    @Override
-                    public <T> CompletableFuture apply(TurnContext context, T t) {
-                        return CompletableFuture.runAsync(() -> {
-                            Activity activity = context.getActivity();
-                            if (activity instanceof Activity) {
-                                try {
-                                    context.sendActivity(((Activity) activity).createReply(t.toString())).join();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
-                                }
-                            } else
-                                Assert.assertTrue("Test was built for ActivityImpl", false);
+            .use(new CatchExceptionMiddleware<Exception>(new CallOnException() {
+                @Override
+                public <T> CompletableFuture apply(TurnContext context, T t) {
+                    return CompletableFuture.runAsync(() -> {
+                        Activity activity = context.getActivity();
+                        if (activity instanceof Activity) {
+                            try {
+                                context.sendActivity(activity.createReply(t.toString())).join();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                throw new RuntimeException(String.format("CatchException_TestMiddleware_TestStackedErrorMiddleware:SendActivity failed %s", e.toString()));
+                            }
+                        } else
+                            Assert.assertTrue("Test was built for ActivityImpl", false);
 
-                        }, ExecutorFactory.getExecutor());
+                    }, ExecutorFactory.getExecutor());
 
-                    }
-                }, Exception.class))
-                // Add middleware to catch NullReferenceExceptions before throwing up to the general exception instance
-                .Use(new CatchExceptionMiddleware<NullPointerException>(new CallOnException() {
-                    @Override
-                    public <T> CompletableFuture apply(TurnContext context, T t) {
-                        context.sendActivity("Sorry - Null Reference Exception").join();
-                        return CompletableFuture.completedFuture(null);
-                    }
-                }, NullPointerException.class));
+                }
+            }, Exception.class))
+            // Add middleware to catch NullReferenceExceptions before throwing up to the general exception instance
+            .use(new CatchExceptionMiddleware<NullPointerException>(new CallOnException() {
+                @Override
+                public <T> CompletableFuture apply(TurnContext context, T t) {
+                    context.sendActivity("Sorry - Null Reference Exception").join();
+                    return CompletableFuture.completedFuture(null);
+                }
+            }, NullPointerException.class));
 
 
         new TestFlow(adapter, (context) -> {
-                if (StringUtils.equals(context.getActivity().getText(), "foo")) {
-                    try {
-                        context.sendActivity(context.getActivity().getText()).join();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            if (StringUtils.equals(context.getActivity().getText(), "foo")) {
+                try {
+                    context.sendActivity(context.getActivity().getText()).join();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                if (StringUtils.equals(context.getActivity().getText(), "UnsupportedOperationException")) {
-                    throw new UnsupportedOperationException("Test");
-                }
+            }
+            if (StringUtils.equals(context.getActivity().getText(), "UnsupportedOperationException")) {
+                throw new UnsupportedOperationException("Test");
+            }
 
-                return null;
-            })
-            .Send("foo")
-            .AssertReply("foo", "passthrough")
-            .Send("UnsupportedOperationException")
-            .AssertReply("Test")
-            .StartTest();
+            return null;
+        })
+            .send("foo")
+            .assertReply("foo", "passthrough")
+            .send("UnsupportedOperationException")
+            .assertReply("Test")
+            .startTest();
 
     }
 

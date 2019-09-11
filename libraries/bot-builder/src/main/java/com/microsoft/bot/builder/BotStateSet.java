@@ -17,10 +17,10 @@ public class BotStateSet {
     /**
      * Initializes a new instance of the BotStateSet class.
      *
-     * @param botStates initial list of {@link BotState} objects to manage.
+     * @param withBotStates initial list of {@link BotState} objects to manage.
      */
-    public BotStateSet(List<BotState> botStates) {
-        botStates.addAll(botStates);
+    public BotStateSet(List<BotState> withBotStates) {
+        botStates.addAll(withBotStates);
     }
 
     /**
@@ -96,7 +96,7 @@ public class BotStateSet {
      */
     public CompletableFuture<Void> saveAllChanges(TurnContext turnContext, boolean force) {
         List<CompletableFuture<Void>> saveFutures = botStates.stream()
-            .map(future -> future.saveChanges(turnContext, force))
+            .map(botState -> botState.saveChanges(turnContext, force))
             .collect(Collectors.toList());
 
         return CompletableFuture.allOf(saveFutures.toArray(new CompletableFuture[saveFutures.size()]));
