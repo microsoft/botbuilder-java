@@ -208,7 +208,7 @@ public class BotFrameworkAdapter extends BotAdapter {
 
             // Handle Invoke scenarios, which deviate from the request/response model in that
             // the Bot will return a specific body and return code.
-            if (activity.getType() == ActivityTypes.INVOKE) {
+            if (StringUtils.equals(activity.getType(), ActivityTypes.INVOKE)) {
                 Activity invokeResponse = context.getTurnState().get(InvokeReponseKey);
                 if (invokeResponse == null) {
                     // ToDo: Trace Here
@@ -273,7 +273,7 @@ public class BotFrameworkAdapter extends BotAdapter {
             {
                 context.getTurnState().add(InvokeReponseKey, activity);
                 // No need to create a response. One will be created below.
-            } else if (activity.getType() == ActivityTypes.TRACE && !activity.getChannelId().equals("emulator")) {
+            } else if (StringUtils.equals(activity.getType(), ActivityTypes.TRACE) && !activity.getChannelId().equals("emulator")) {
                 // if it is a Trace activity we only send to the channel if it's the emulator.
             } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
                 ConnectorClient connectorClient = context.getTurnState().get("ConnectorClient");

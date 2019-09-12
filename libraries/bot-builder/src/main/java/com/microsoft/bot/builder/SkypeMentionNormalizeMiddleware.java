@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class SkypeMentionNormalizeMiddleware implements Middleware {
     public static void normalizeSkypMentionText(Activity activity) {
         if (StringUtils.equals(activity.getChannelId(), Channels.SKYPE)
-            && activity.getType() == ActivityTypes.MESSAGE) {
+            && StringUtils.equals(activity.getType(), ActivityTypes.MESSAGE)) {
 
             for (Entity entity : activity.getEntities()) {
                 if (StringUtils.equals(entity.getType(), "mention")) {

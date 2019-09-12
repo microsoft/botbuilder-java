@@ -49,7 +49,7 @@ public class InspectionMiddleware extends InterceptionMiddleware {
     }
 
     public CompletableFuture<Boolean> processCommand(TurnContext turnContext) {
-        if (turnContext.getActivity().getType() != ActivityTypes.MESSAGE
+        if (!StringUtils.equals(turnContext.getActivity().getType(), ActivityTypes.MESSAGE)
             || StringUtils.isEmpty(turnContext.getActivity().getText())) {
 
             return CompletableFuture.completedFuture(false);

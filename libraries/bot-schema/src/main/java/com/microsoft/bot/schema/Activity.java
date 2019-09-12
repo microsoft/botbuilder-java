@@ -469,6 +469,10 @@ public class Activity {
         this.type = withType;
     }
 
+    public boolean isType(String compareTo) {
+        return StringUtils.equals(type, compareTo);
+    }
+
     /**
      * @see #id
      */
