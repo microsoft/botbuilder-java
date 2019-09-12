@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Copyright  = c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
@@ -12,116 +12,79 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Defines values for ActivityTypes.
  */
-public enum ActivityTypes {
+public final class ActivityTypes {
     /**
      * Enum value message.
      */
-    MESSAGE("message"),
+    public static final String MESSAGE = "message";
 
     /**
      * Enum value contactRelationUpdate.
      */
-    CONTACT_RELATION_UPDATE("contactRelationUpdate"),
+    public static final String CONTACT_RELATION_UPDATE = "contactRelationUpdate";
 
     /**
      * Enum value conversationUpdate.
      */
-    CONVERSATION_UPDATE("conversationUpdate"),
+    public static final String CONVERSATION_UPDATE = "conversationUpdate";
 
     /**
      * Enum value typing.
      */
-    TYPING("typing"),
+    public static final String TYPING = "typing";
 
     /**
      * Enum value endOfConversation.
      */
-    END_OF_CONVERSATION("endOfConversation"),
+    public static final String END_OF_CONVERSATION = "endOfConversation";
 
     /**
      * Enum value event.
      */
-    EVENT("event"),
+    public static final String EVENT = "event";
 
     /**
      * Enum value invoke.
      */
-    INVOKE("invoke"),
+    public static final String INVOKE = "invoke";
 
     /**
      * Enum value deleteUserData.
      */
-    DELETE_USER_DATA("deleteUserData"),
+    public static final String DELETE_USER_DATA = "deleteUserData";
 
     /**
      * Enum value messageUpdate.
      */
-    MESSAGE_UPDATE("messageUpdate"),
+    public static final String MESSAGE_UPDATE = "messageUpdate";
 
     /**
      * Enum value messageDelete.
      */
-    MESSAGE_DELETE("messageDelete"),
+    public static final String MESSAGE_DELETE = "messageDelete";
 
     /**
      * Enum value installationUpdate.
      */
-    INSTALLATION_UPDATE("installationUpdate"),
+    public static final String INSTALLATION_UPDATE = "installationUpdate";
 
     /**
      * Enum value messageReaction.
      */
-    MESSAGE_REACTION("messageReaction"),
+    public static final String MESSAGE_REACTION = "messageReaction";
 
     /**
      * Enum value suggestion.
      */
-    SUGGESTION("suggestion"),
+    public static final String SUGGESTION = "suggestion";
 
     /**
      * Enum value trace.
      */
-    TRACE("trace"),
+    public static final String TRACE = "trace";
 
     /**
      * Enum value handoff.
      */
-    HANDOFF("handoff");
-
-    /**
-     * The actual serialized value for a ActivityTypes instance.
-     */
-    private String value;
-
-    /**
-     * Creates a ActivityTypes enum from a string.
-     * @param withValue The string value.  Should be a valid enum value.
-     * @throws IllegalArgumentException If the string doesn't match a valid value.
-     */
-    ActivityTypes(String withValue) {
-        this.value = withValue;
-    }
-
-    /**
-     * Parses a serialized value to a ActivityTypes instance.
-     *
-     * @param value the serialized value to parse.
-     * @return the parsed ActivityTypes object, or null if unable to parse.
-     */
-    @JsonCreator
-    public static ActivityTypes fromString(String value) {
-        ActivityTypes[] items = ActivityTypes.values();
-        for (ActivityTypes item : items) {
-            if (item.toString().equalsIgnoreCase(value)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @JsonValue
-    @Override
-    public String toString() {
-        return this.value;
-    }
+    public static final String HANDOFF = "handoff";
 }

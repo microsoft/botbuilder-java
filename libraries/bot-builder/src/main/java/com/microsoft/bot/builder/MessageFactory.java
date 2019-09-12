@@ -48,7 +48,7 @@ public final class MessageFactory {
      * @return A message activity containing the text.
      */
     public static Activity text(String text) {
-        return text(text);
+        return text(text, null, null);
     }
 
     /**

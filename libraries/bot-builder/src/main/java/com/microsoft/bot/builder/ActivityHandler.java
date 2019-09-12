@@ -4,6 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.MessageReaction;
 import org.apache.commons.lang3.StringUtils;
@@ -41,17 +42,17 @@ public class ActivityHandler implements Bot {
         }
 
         switch (turnContext.getActivity().getType()) {
-            case MESSAGE:
+            case ActivityTypes.MESSAGE:
                 return onMessageActivity(turnContext);
-            case CONVERSATION_UPDATE:
+            case ActivityTypes.CONVERSATION_UPDATE:
                 return onConversationUpdateActivity(turnContext);
-            case MESSAGE_REACTION:
+            case ActivityTypes.MESSAGE_REACTION:
                 return onMessageReactionActivity(turnContext);
-            case EVENT:
+            case ActivityTypes.EVENT:
                 return onEventActivity(turnContext);
 
             default:
-                return onUnrecognizedActivity(turnContext);
+                return onUnrecognizedActivityType(turnContext);
         }
     }
 
@@ -65,7 +66,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
+    protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
@@ -84,18 +85,20 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
-        if (turnContext.getActivity().getMembersAdded() != null) {
-            if (turnContext.getActivity().getMembersAdded().stream()
-                .anyMatch(m -> StringUtils.equals(m.getId(), turnContext.getActivity().getId()))) {
+    protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
+        Activity activity = turnContext.getActivity();
 
-                return onMembersAdded(turnContext.getActivity().getMembersAdded(), turnContext);
+        if (activity.getMembersAdded() != null) {
+            if (activity.getRecipient() != null && activity.getMembersAdded().stream()
+                .anyMatch(m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
+
+                return onMembersAdded(activity.getMembersAdded(), turnContext);
             }
-        } else if (turnContext.getActivity().getMembersRemoved() != null) {
-            if (turnContext.getActivity().getMembersRemoved().stream()
-                .anyMatch(m -> StringUtils.equals(m.getId(), turnContext.getActivity().getId()))) {
+        } else if (activity.getRecipient() != null && activity.getMembersRemoved() != null) {
+            if (activity.getMembersRemoved().stream()
+                .anyMatch(m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
 
-                return onMembersRemoved(turnContext.getActivity().getMembersRemoved(), turnContext);
+                return onMembersRemoved(activity.getMembersRemoved(), turnContext);
             }
         }
 
@@ -149,7 +152,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture onMessageReactionActivity(TurnContext turnContext) {
+    protected CompletableFuture<Void> onMessageReactionActivity(TurnContext turnContext) {
         CompletableFuture task = null;
 
         if (turnContext.getActivity().getReactionsAdded() != null) {
@@ -175,7 +178,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext      The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onReactionsAdded(List<MessageReaction> messageReactions,
+    protected CompletableFuture<Void> onReactionsAdded(List<MessageReaction> messageReactions,
                                                       TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
@@ -187,7 +190,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext      The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onReactionsRemoved(List<MessageReaction> messageReactions,
+    protected CompletableFuture<Void> onReactionsRemoved(List<MessageReaction> messageReactions,
                                                         TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
@@ -205,7 +208,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onEventActivity(TurnContext turnContext) {
+    protected CompletableFuture<Void> onEventActivity(TurnContext turnContext) {
         if (StringUtils.equals(turnContext.getActivity().getName(), "tokens/response")) {
             return onTokenResponseEvent(turnContext);
         }
@@ -224,12 +227,12 @@ public class ActivityHandler implements Bot {
      * @param turnContext
      * @return
      */
-    protected CompletableFuture onTokenResponseEvent(TurnContext turnContext) {
+    protected CompletableFuture<Void> onTokenResponseEvent(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
     /**
-     * Invoked when an event other than <c>tokens/response</c> is received when the base behavior of
+     * Invoked when an event other than tokens/response is received when the base behavior of
      * {@link #onEventActivity(TurnContext)} is used.
      * <p>
      * This method could optionally be overridden if the bot is meant to handle miscellaneous events.
@@ -239,7 +242,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onEvent(TurnContext turnContext) {
+    protected CompletableFuture<Void> onEvent(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
@@ -256,7 +259,7 @@ public class ActivityHandler implements Bot {
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture onUnrecognizedActivity(TurnContext turnContext) {
+    protected CompletableFuture<Void> onUnrecognizedActivityType(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 }

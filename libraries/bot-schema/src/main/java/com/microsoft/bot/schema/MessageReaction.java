@@ -20,7 +20,7 @@ public class MessageReaction {
      * Message reaction type. Possible values include: 'like', 'plusOne'.
      */
     @JsonProperty(value = "type")
-    private MessageReactionTypes type;
+    private String type;
 
     public static MessageReaction clone(MessageReaction messageReaction) {
         if (messageReaction == null) {
@@ -42,13 +42,21 @@ public class MessageReaction {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public MessageReaction() {
+
+    }
+
+    public MessageReaction(String withType) {
+        type = withType;
+    }
+
 
     /**
      * Get the type value.
      *
      * @return the type value
      */
-    public MessageReactionTypes getType() {
+    public String getType() {
         return this.type;
     }
 
@@ -57,7 +65,7 @@ public class MessageReaction {
      *
      * @param withType the type value to set
      */
-    public void setType(MessageReactionTypes withType) {
+    public void setType(String withType) {
         this.type = withType;
     }
 }

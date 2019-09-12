@@ -35,7 +35,7 @@ public class Activity {
      * The {@link ActivityTypes} of the activity.
      */
     @JsonProperty(value = "type")
-    private ActivityTypes type;
+    private String type;
 
     /**
      * Contains an ID that uniquely identifies the activity on the channel.
@@ -305,7 +305,7 @@ public class Activity {
      * Construct an Activity of the specified type.
      * @param withType The activity type.
      */
-    public Activity(ActivityTypes withType) {
+    public Activity(String withType) {
         this();
         setType(withType);
     }
@@ -458,14 +458,14 @@ public class Activity {
     /**
      * @see #type
      */
-    public ActivityTypes getType() {
+    public String getType() {
         return this.type;
     }
 
     /**
      * @see #type
      */
-    public void setType(ActivityTypes withType) {
+    public void setType(String withType) {
         this.type = withType;
     }
 
@@ -1291,7 +1291,7 @@ public class Activity {
          * "pseudo-cast" the activity based on its type.
          */
 
-        ActivityTypes type = this.getType();
+        String type = this.getType();
 
         // If there's no type set then we can't tell if it's the type they're looking for
         if (type == null) {
@@ -1299,20 +1299,20 @@ public class Activity {
         }
 
         // Check if the full type value starts with the type they're looking for
-        boolean result = StringUtils.startsWith(type.toString().toLowerCase(), activityType.toLowerCase());
+        boolean result = StringUtils.startsWith(type.toLowerCase(), activityType.toLowerCase());
 
         // If the full type value starts with the type they're looking for, then we need to check a little further
         // to check if it's definitely the right type
         if (result) {
             // If the lengths are equal, then it's the exact type they're looking for
-            result = type.toString().length() == activityType.length();
+            result = type.length() == activityType.length();
 
             if (!result) {
                 // Finally, if the type is longer than the type they're looking for then we need to check if there's
                 // a / separator right after the type they're looking for
-                result = type.toString().length() > activityType.length()
+                result = type.length() > activityType.length()
                     &&
-                    type.toString().indexOf(activityType.length()) == '/';
+                    type.indexOf(activityType.length()) == '/';
             }
         }
 
