@@ -93,7 +93,9 @@ public class JwtTokenExtractor {
         }
 
         return CompletableFuture.supplyAsync(() -> {
-            Verification verification = JWT.require(Algorithm.RSA256(key.key, null));
+            Verification verification = JWT
+                .require(Algorithm.RSA256(key.key, null))
+                .acceptLeeway(tokenValidationParameters.clockSkew.getSeconds());
             try {
                 verification.build().verify(token);
 
