@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public class MiddlewareSet implements Middleware {
     private final ArrayList<Middleware> middleware = new ArrayList<>();
-    public NextDelegate Next;
 
     /**
      * Adds a middleware object to the end of the set.
@@ -51,7 +50,7 @@ public class MiddlewareSet implements Middleware {
                                                             int nextMiddlewareIndex) {
         // Check if we're at the end of the middleware list yet
         if (nextMiddlewareIndex == middleware.size()) {
-            // If all the Middlware ran, the "leading edge" of the tree is now complete.
+            // If all the Middleware ran, the "leading edge" of the tree is now complete.
             // This means it's time to run any developer specified callback.
             // Once this callback is done, the "trailing edge" calls are then completed. This
             // allows code that looks like:
@@ -72,7 +71,7 @@ public class MiddlewareSet implements Middleware {
         Middleware nextMiddleware = middleware.get(nextMiddlewareIndex);
 
         // Execute the next middleware passing a closure that will recurse back into this method at the
-        // next piece of middlware as the NextDelegate
+        // next piece of middleware as the NextDelegate
         return nextMiddleware.onTurn(context, () ->
             receiveActivityInternal(context, callback, nextMiddlewareIndex + 1));
     }

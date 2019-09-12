@@ -11,6 +11,11 @@ import java.util.concurrent.CompletableFuture;
 public class AnonymousReceiveMiddleware implements Middleware {
     private MiddlewareCall _toCall;
 
+    @FunctionalInterface
+    public interface MiddlewareCall {
+        CompletableFuture<Void> onTurn(TurnContext tc, NextDelegate nd);
+    }
+
     /**
      * Creates a middleware object that uses the provided method as its
      * process request handler.
@@ -35,6 +40,6 @@ public class AnonymousReceiveMiddleware implements Middleware {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
-        return _toCall.requestHandler(context, next);
+        return _toCall.onTurn(context, next);
     }
 }
