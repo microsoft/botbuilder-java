@@ -3,11 +3,15 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public interface StoreItem {
     /**
      * eTag for concurrency
      */
+    @JsonProperty(value = "eTag")
     String getETag();
 
-    void setETag(String eTag);
+    @JsonProperty(value = "eTag")
+    void setETag(String withETag);
 }

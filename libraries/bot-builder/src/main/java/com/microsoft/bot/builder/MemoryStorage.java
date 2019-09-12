@@ -111,7 +111,7 @@ public class MemoryStorage implements Storage {
                         && !StringUtils.equals(newStoreItem.getETag(), "*")
                         && !StringUtils.equals(newStoreItem.getETag(), oldStateETag)) {
 
-                        String msg = String.format("Etag conflict. Original: %s, Current: %s",
+                        String msg = String.format("eTag conflict. Original: %s, Current: %s",
                             newStoreItem.getETag(), oldStateETag);
                         logger.error(msg);
                         throw new RuntimeException(msg);
