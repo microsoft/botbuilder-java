@@ -13,7 +13,7 @@ public final class OAuthClientConfig {
     public static String OAUTHENDPOINT = AuthenticationConstants.OAUTH_URL;
     public static boolean EMULATEOAUTHCARDS = false;
 
-    public static CompletableFuture<Void> sendEmulateOAuthCards(OAuthClient client, boolean emulateOAuthCards) {
+    public static CompletableFuture<Void> sendEmulateOAuthCards(OAuthClientOld client, boolean emulateOAuthCards) {
         throw new NotImplementedException("sendEmulateOAuthCards");
     }
 }

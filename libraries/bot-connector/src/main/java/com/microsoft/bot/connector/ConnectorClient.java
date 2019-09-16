@@ -16,7 +16,7 @@ import com.microsoft.rest.RestClient;
 /**
  * The interface for ConnectorClient class.
  */
-public interface ConnectorClient {
+public interface ConnectorClient extends OAuthClient {
     /**
      * Gets the REST client.
      *
@@ -94,16 +94,4 @@ public interface ConnectorClient {
      * @return the Conversations object.
      */
     Conversations getConversations();
-
-    /**
-     * Gets the BotSignIns object to access its operations.
-     * @return the BotSignIns object.
-     */
-    BotSignIn botSignIn();
-
-    /**
-     * Gets the UserTokens object to access its operations.
-     * @return the UserTokens object.
-     */
-    UserToken userToken();
 }

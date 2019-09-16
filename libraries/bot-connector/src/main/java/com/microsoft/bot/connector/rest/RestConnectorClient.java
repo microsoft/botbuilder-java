@@ -169,7 +169,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * @return the BotSignIns object.
      */
     @Override
-    public BotSignIn botSignIn() {
+    public BotSignIn getBotSignIn() {
         return this.botSignIn;
     }
 
@@ -183,7 +183,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * @return the UserTokens object.
      */
     @Override
-    public UserToken userToken() {
+    public UserToken getUserToken() {
         return this.userToken;
     }
 
