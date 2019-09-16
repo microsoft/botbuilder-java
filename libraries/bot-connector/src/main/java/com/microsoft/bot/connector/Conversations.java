@@ -12,6 +12,7 @@ package com.microsoft.bot.connector;
 
 import com.microsoft.bot.schema.*;
 import com.microsoft.rest.ServiceResponse;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -127,6 +128,10 @@ public interface Conversations {
      */
     CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity);
 
+    default CompletableFuture<ResourceResponse> updateActivity(Activity activity) {
+        return updateActivity(activity.getConversation().getId(), activity.getId(), activity);
+    }
+
     /**
      * ReplyToActivity.
      * This method allows you to reply to an activity.
@@ -145,6 +150,14 @@ public interface Conversations {
      * @return the observable to the ResourceResponse object
      */
     CompletableFuture<ResourceResponse> replyToActivity(String conversationId, String activityId, Activity activity);
+
+    default CompletableFuture<ResourceResponse> replyToActivity(Activity activity) {
+        if (StringUtils.isEmpty(activity.getReplyToId())) {
+            throw new IllegalArgumentException("ReplyToId cannot be emoty");
+        }
+
+        return replyToActivity(activity.getConversation().getId(), activity.getReplyToId(), activity);
+    }
 
     /**
      * DeleteActivity.

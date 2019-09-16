@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Token credentials filter for placing a token credential into request headers.
  */
-class MicrosoftAppCredentialsInterceptor implements Interceptor {
+public class MicrosoftAppCredentialsInterceptor implements Interceptor {
     /**
      * The credentials instance to apply to the HTTP client pipeline.
      */
@@ -24,7 +24,7 @@ class MicrosoftAppCredentialsInterceptor implements Interceptor {
      *
      * @param credentials a TokenCredentials instance
      */
-    MicrosoftAppCredentialsInterceptor(MicrosoftAppCredentials credentials) {
+    public MicrosoftAppCredentialsInterceptor(MicrosoftAppCredentials credentials) {
         this.credentials = credentials;
     }
 

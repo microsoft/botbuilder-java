@@ -9,10 +9,7 @@ package com.microsoft.bot.connector.rest;
 import com.microsoft.azure.AzureClient;
 import com.microsoft.azure.AzureResponseBuilder;
 import com.microsoft.azure.AzureServiceClient;
-import com.microsoft.bot.connector.Attachments;
-import com.microsoft.bot.connector.ConnectorClient;
-import com.microsoft.bot.connector.Conversations;
-import com.microsoft.bot.connector.UserAgent;
+import com.microsoft.bot.connector.*;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.retry.RetryStrategy;
@@ -163,6 +160,35 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
+     * The BotSignIns object to access its operations.
+     */
+    private BotSignIn botSignIn;
+
+    /**
+     * Gets the BotSignIns object to access its operations.
+     * @return the BotSignIns object.
+     */
+    @Override
+    public BotSignIn botSignIn() {
+        return this.botSignIn;
+    }
+
+    /**
+     * The UserTokens object to access its operations.
+     */
+    private UserToken userToken;
+
+    /**
+     * Gets the UserTokens object to access its operations.
+     * @return the UserTokens object.
+     */
+    @Override
+    public UserToken userToken() {
+        return this.userToken;
+    }
+
+
+    /**
      * Initializes an instance of ConnectorClient client.
      *
      * @param credentials the management credentials for Azure
@@ -198,6 +224,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.generateClientRequestId = true;
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
+        this.botSignIn = new RestBotSignIn(restClient().retrofit(), this);
+        this.userToken = new RestUserToken(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
         this.user_agent_string = UserAgent.value();
     }

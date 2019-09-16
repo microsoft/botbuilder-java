@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.connector.authentication;
+package com.microsoft.bot.connector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.UserAgent;
+import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
+import com.microsoft.bot.connector.authentication.MicrosoftAppCredentialsInterceptor;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.TokenExchangeState;
@@ -31,13 +33,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 import static com.microsoft.bot.connector.authentication.MicrosoftAppCredentials.JSON;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.stream.Collectors.joining;
-
 
 /**
  * Service client to handle requests to the botframework api service.
@@ -75,11 +77,11 @@ public class OAuthClient extends ServiceClient {
      * @param magicCode
      * @return CompletableFuture<TokenResponse> on success; otherwise null.
      */
-    public CompletableFuture<TokenResponse> GetUserToken(String userId, String connectionName, String magicCode) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
-        return GetUserToken(userId, connectionName, magicCode, null);
+    public CompletableFuture<TokenResponse> getUserToken(String userId, String connectionName, String magicCode) {
+        return getUserToken(userId, connectionName, magicCode, null);
     }
 
-    protected URI MakeUri(String uri, HashMap<String, String> queryStrings) throws URISyntaxException {
+    protected URI makeUri(String uri, HashMap<String, String> queryStrings) throws URISyntaxException {
         String newUri = queryStrings.keySet().stream()
             .map(key -> {
                 try {
@@ -90,8 +92,6 @@ public class OAuthClient extends ServiceClient {
             })
             .collect(joining("&", uri.endsWith("?") ? uri : uri + "?", ""));
         return new URI(newUri);
-
-
     }
 
     /**
@@ -103,7 +103,10 @@ public class OAuthClient extends ServiceClient {
      * @param customHeaders
      * @return CompletableFuture<TokenResponse> on success; null otherwise.
      */
-    public CompletableFuture<TokenResponse> GetUserToken(String userId, String connectionName, String magicCode, Map<String, ArrayList<String>> customHeaders) throws IllegalArgumentException {
+    public CompletableFuture<TokenResponse> getUserToken(String userId,
+                                                         String connectionName,
+                                                         String magicCode,
+                                                         Map<String, ArrayList<String>> customHeaders) {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
@@ -122,7 +125,7 @@ public class OAuthClient extends ServiceClient {
             String strUri = String.format("%sapi/usertoken/GetToken", this.uri);
             URI tokenUrl = null;
             try {
-                tokenUrl = MakeUri(strUri, qstrings);
+                tokenUrl = makeUri(strUri, qstrings);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
                 return null;
@@ -172,7 +175,7 @@ public class OAuthClient extends ServiceClient {
      * @param connectionName
      * @return True on successful sign-out; False otherwise.
      */
-    public CompletableFuture<Boolean> SignOutUser(String userId, String connectionName) throws URISyntaxException, IOException {
+    public CompletableFuture<Boolean> signOutUser(String userId, String connectionName) {
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
@@ -188,7 +191,7 @@ public class OAuthClient extends ServiceClient {
             String strUri = String.format("%sapi/usertoken/SignOut", this.uri);
             URI tokenUrl = null;
             try {
-                tokenUrl = MakeUri(strUri, qstrings);
+                tokenUrl = makeUri(strUri, qstrings);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
                 return false;
@@ -221,7 +224,6 @@ public class OAuthClient extends ServiceClient {
                 e.printStackTrace();
             }
             return false;
-
         }, ExecutorFactory.getExecutor());
     }
 
@@ -233,42 +235,52 @@ public class OAuthClient extends ServiceClient {
      * @param connectionName
      * @return Sign in link on success; null otherwise.
      */
-    public CompletableFuture<String> GetSignInLink(Activity activity, String connectionName) throws IllegalArgumentException, URISyntaxException, JsonProcessingException {
+    public CompletableFuture<String> getSignInLink(Activity activity, String connectionName) {
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
         if (activity == null) {
             throw new IllegalArgumentException("activity");
         }
-        final MicrosoftAppCredentials creds = (MicrosoftAppCredentials) this.client.restClient().credentials();
-        TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
-            setConnectionName(connectionName);
-            setConversation(new ConversationReference() {{
-                setActivityId(activity.getId());
-                setBot(activity.getRecipient());
-                setChannelId(activity.getChannelId());
-                setConversation(activity.getConversation());
-                setServiceUrl(activity.getServiceUrl());
-                setUser(activity.getFrom());
-                }});
-            setMsAppId((creds == null) ? null : creds.appId());
-        }};
-
-        String serializedState = this.mapper.writeValueAsString(tokenExchangeState);
-
-        // Construct URL
-        String encoded = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
-        HashMap<String, String> qstrings = new HashMap<>();
-        qstrings.put("state", encoded);
-
-        String strUri = String.format("%sapi/botsignin/getsigninurl", this.uri);
-        final URI tokenUrl = MakeUri(strUri, qstrings);
 
         return CompletableFuture.supplyAsync(() -> {
+            final MicrosoftAppCredentials creds = (MicrosoftAppCredentials) this.client.restClient().credentials();
+            TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
+                setConnectionName(connectionName);
+                setConversation(new ConversationReference() {{
+                    setActivityId(activity.getId());
+                    setBot(activity.getRecipient());
+                    setChannelId(activity.getChannelId());
+                    setConversation(activity.getConversation());
+                    setServiceUrl(activity.getServiceUrl());
+                    setUser(activity.getFrom());
+                }});
+                setMsAppId((creds == null) ? null : creds.appId());
+            }};
+
+            String serializedState;
+            try {
+                serializedState = mapper.writeValueAsString(tokenExchangeState);
+            } catch(Throwable t) {
+                throw new CompletionException(t);
+            }
+
+            // Construct URL
+            String encoded = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
+            HashMap<String, String> qstrings = new HashMap<>();
+            qstrings.put("state", encoded);
+
+            String strUri = String.format("%sapi/botsignin/getsigninurl", this.uri);
+            final URI tokenUrl;
+
+            try {
+                tokenUrl = makeUri(strUri, qstrings);
+            } catch(Throwable t) {
+                throw new CompletionException(t);
+            }
 
             // add botframework api service url to the list of trusted service url's for these app credentials.
             MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
-
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
@@ -299,18 +311,23 @@ public class OAuthClient extends ServiceClient {
      * @param emulateOAuthCards
      * @return CompletableFuture with no result code
      */
-    public CompletableFuture SendEmulateOAuthCards(Boolean emulateOAuthCards) throws URISyntaxException, IOException {
-
+    public CompletableFuture<Void> sendEmulateOAuthCards(Boolean emulateOAuthCards) {
         // Construct URL
         HashMap<String, String> qstrings = new HashMap<>();
         qstrings.put("emulate", emulateOAuthCards.toString());
         String strUri = String.format("%sapi/usertoken/emulateOAuthCards", this.uri);
-        URI tokenUrl = MakeUri(strUri, qstrings);
-
-        // add botframework api service url to the list of trusted service url's for these app credentials.
-        MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
 
         return CompletableFuture.runAsync(() -> {
+            URI tokenUrl;
+            try {
+                tokenUrl = makeUri(strUri, qstrings);
+            } catch(Throwable t) {
+                throw new CompletionException(t);
+            }
+
+            // add botframework api service url to the list of trusted service url's for these app credentials.
+            MicrosoftAppCredentials.trustServiceUrl(tokenUrl);
+
             // Construct dummy body
             RequestBody body = RequestBody.create(JSON, "{}");
 

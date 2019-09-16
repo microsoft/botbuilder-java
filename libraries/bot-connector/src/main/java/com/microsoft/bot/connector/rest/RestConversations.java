@@ -226,7 +226,9 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(activity);
 
-        return service.sendToConversation(conversationId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.sendToConversation(conversationId, activity,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return sendToConversationDelegate(responseBodyResponse).body();
@@ -255,7 +257,9 @@ public class RestConversations implements Conversations {
      * @see Conversations#updateActivity
      */
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(String conversationId,
+                                                              String activityId,
+                                                              Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -267,7 +271,9 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(activity);
 
-        return service.updateActivity(conversationId, activityId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.updateActivity(conversationId, activityId, activity,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return updateActivityDelegate(responseBodyResponse).body();
@@ -310,7 +316,9 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(activity);
 
-        return service.replyToActivity(conversationId, activityId, activity, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.replyToActivity(conversationId, activityId, activity,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return replyToActivityDelegate(responseBodyResponse).body();
@@ -347,7 +355,9 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
 
-        return service.deleteActivity(conversationId, activityId, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.deleteActivity(conversationId, activityId,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return deleteActivityDelegate(responseBodyResponse).body();
@@ -379,7 +389,9 @@ public class RestConversations implements Conversations {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
-        return service.getConversationMembers(conversationId, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.getConversationMembers(conversationId,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationMembersDelegate(responseBodyResponse).body();
@@ -414,7 +426,9 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter memberId is required and cannot be null.");
         }
 
-        return service.deleteConversationMember(conversationId, memberId, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.deleteConversationMember(conversationId, memberId,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return deleteConversationMemberDelegate(responseBodyResponse).body();
@@ -451,7 +465,9 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
 
-        return service.getActivityMembers(conversationId, activityId, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.getActivityMembers(conversationId, activityId,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return getActivityMembersDelegate(responseBodyResponse).body();
@@ -478,7 +494,8 @@ public class RestConversations implements Conversations {
      * @see Conversations#uploadAttachment
      */
     @Override
-    public CompletableFuture<ResourceResponse> uploadAttachment(String conversationId, AttachmentData attachmentUpload) {
+    public CompletableFuture<ResourceResponse> uploadAttachment(String conversationId,
+                                                                AttachmentData attachmentUpload) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -487,7 +504,9 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(attachmentUpload);
 
-        return service.uploadAttachment(conversationId, attachmentUpload, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.uploadAttachment(conversationId, attachmentUpload,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return uploadAttachmentDelegate(responseBodyResponse).body();
@@ -526,7 +545,9 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(history);
 
-        return service.sendConversationHistory(conversationId, history, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.sendConversationHistory(conversationId, history,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return sendConversationHistoryDelegate(responseBodyResponse).body();
@@ -556,12 +577,14 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationPagedMembers
      */
     @Override
-    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId){
+    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
 
-        return service.getConversationPagedMembers(conversationId, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.getConversationPagedMembers(conversationId,
+            this.client.getAcceptLanguage(), this.client.getUserAgent())
+
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationPagedMembersDelegate(responseBodyResponse).body();

@@ -94,4 +94,16 @@ public interface ConnectorClient {
      * @return the Conversations object.
      */
     Conversations getConversations();
+
+    /**
+     * Gets the BotSignIns object to access its operations.
+     * @return the BotSignIns object.
+     */
+    BotSignIn botSignIn();
+
+    /**
+     * Gets the UserTokens object to access its operations.
+     * @return the UserTokens object.
+     */
+    UserToken userToken();
 }
