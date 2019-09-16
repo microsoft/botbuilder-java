@@ -41,6 +41,46 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     private AzureClient azureClient;
 
     /**
+     * Initializes an instance of ConnectorClient client.
+     *
+     * @param credentials the management credentials for Azure
+     */
+    public RestConnectorClient(ServiceClientCredentials credentials) {
+        this("https://api.botframework.com", credentials);
+    }
+
+    /**
+     * Initializes an instance of ConnectorClient client.
+     *
+     * @param baseUrl the base URL of the host
+     * @param credentials the management credentials for Azure
+     */
+    public RestConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
+        super(baseUrl, credentials);
+        initialize();
+    }
+
+    /**
+     * Initializes an instance of ConnectorClient client.
+     *
+     * @param restClient the REST client to connect to Azure.
+     */
+    public RestConnectorClient(RestClient restClient) {
+        super(restClient);
+        initialize();
+    }
+
+    protected void initialize() {
+        this.acceptLanguage = "en-US";
+        this.longRunningOperationRetryTimeout = 30;
+        this.generateClientRequestId = true;
+        this.attachments = new RestAttachments(restClient().retrofit(), this);
+        this.conversations = new RestConversations(restClient().retrofit(), this);
+        this.azureClient = new AzureClient(this);
+        this.user_agent_string = UserAgent.value();
+    }
+
+    /**
      * Gets the {@link AzureClient} used for long running operations.
      * @return the azure client;
      */
@@ -157,77 +197,6 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     @Override
     public Conversations getConversations() {
         return this.conversations;
-    }
-
-    /**
-     * The BotSignIns object to access its operations.
-     */
-    private BotSignIn botSignIn;
-
-    /**
-     * Gets the BotSignIns object to access its operations.
-     * @return the BotSignIns object.
-     */
-    @Override
-    public BotSignIn getBotSignIn() {
-        return this.botSignIn;
-    }
-
-    /**
-     * The UserTokens object to access its operations.
-     */
-    private UserToken userToken;
-
-    /**
-     * Gets the UserTokens object to access its operations.
-     * @return the UserTokens object.
-     */
-    @Override
-    public UserToken getUserToken() {
-        return this.userToken;
-    }
-
-
-    /**
-     * Initializes an instance of ConnectorClient client.
-     *
-     * @param credentials the management credentials for Azure
-     */
-    public RestConnectorClient(ServiceClientCredentials credentials) {
-        this("https://api.botframework.com", credentials);
-    }
-
-    /**
-     * Initializes an instance of ConnectorClient client.
-     *
-     * @param baseUrl the base URL of the host
-     * @param credentials the management credentials for Azure
-     */
-    public RestConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
-        super(baseUrl, credentials);
-        initialize();
-    }
-
-    /**
-     * Initializes an instance of ConnectorClient client.
-     *
-     * @param restClient the REST client to connect to Azure.
-     */
-    public RestConnectorClient(RestClient restClient){
-        super(restClient);
-        initialize();
-    }
-
-    protected void initialize() {
-        this.acceptLanguage = "en-US";
-        this.longRunningOperationRetryTimeout = 30;
-        this.generateClientRequestId = true;
-        this.attachments = new RestAttachments(restClient().retrofit(), this);
-        this.conversations = new RestConversations(restClient().retrofit(), this);
-        this.botSignIn = new RestBotSignIn(restClient().retrofit(), this);
-        this.userToken = new RestUserToken(restClient().retrofit(), this);
-        this.azureClient = new AzureClient(this);
-        this.user_agent_string = UserAgent.value();
     }
 
     /**

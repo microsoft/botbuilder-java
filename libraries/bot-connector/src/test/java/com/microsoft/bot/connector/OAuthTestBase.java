@@ -3,7 +3,6 @@ package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.authentication.OAuthClient;
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -97,19 +96,19 @@ public class OAuthTestBase extends TestBase {
     }
 
 
-    public CompletableFuture UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest) throws MalformedURLException, URISyntaxException {
+    public CompletableFuture UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest) throws MalformedURLException, URISyntaxException {
         return this.UseOAuthClientFor(doTest, null, "");
     }
 
-    public CompletableFuture UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className) throws MalformedURLException, URISyntaxException {
+    public CompletableFuture UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest, String className) throws MalformedURLException, URISyntaxException {
         return this.UseOAuthClientFor(doTest, className, "");
     }
 
-    public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
+    public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
         return CompletableFuture.runAsync(() -> {
-            OAuthClient oauthClient = null;
+            OAuthClientOld oauthClient = null;
             try {
-                oauthClient = new OAuthClient(this.connector, AuthenticationConstants.OAUTH_URL);
+                oauthClient = new OAuthClientOld(this.connector, AuthenticationConstants.OAUTH_URL);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {

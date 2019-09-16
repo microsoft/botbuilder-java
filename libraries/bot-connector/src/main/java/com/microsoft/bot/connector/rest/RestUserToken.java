@@ -10,11 +10,8 @@ import retrofit2.Retrofit;
 import com.microsoft.bot.connector.UserToken;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.schema.AadResourceUrls;
-import com.microsoft.bot.connector.rest.ErrorResponseException;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
 import com.microsoft.rest.Validator;
 import java.io.IOException;
@@ -25,14 +22,11 @@ import java.util.concurrent.CompletableFuture;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.Response;
-import rx.functions.Func1;
-import rx.Observable;
 
 /**
  * An instance of this class provides access to all the operations defined
@@ -42,7 +36,7 @@ public class RestUserToken implements UserToken {
     /** The Retrofit service to perform REST calls. */
     private UserTokensService service;
     /** The service client containing this operation class. */
-    private RestConnectorClient client;
+    private RestOAuthClient client;
 
     /**
      * Initializes an instance of UserTokensImpl.
@@ -50,7 +44,7 @@ public class RestUserToken implements UserToken {
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
      */
-    public RestUserToken(Retrofit retrofit, RestConnectorClient client) {
+    public RestUserToken(Retrofit retrofit, RestOAuthClient client) {
         this.service = retrofit.create(UserTokensService.class);
         this.client = client;
     }
@@ -63,20 +57,19 @@ public class RestUserToken implements UserToken {
     interface UserTokensService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getToken" })
         @GET("api/usertoken/GetToken")
-        CompletableFuture<Response<ResponseBody>> getToken(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId, @Query("code") String code, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getToken(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId, @Query("code") String code);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getAadTokens" })
         @POST("api/usertoken/GetAadTokens")
-        CompletableFuture<Response<ResponseBody>> getAadTokens(@Query("userId") String userId, @Query("connectionName") String connectionName, @Body AadResourceUrls aadResourceUrls, @Query("channelId") String channelId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getAadTokens(@Query("userId") String userId, @Query("connectionName") String connectionName, @Body AadResourceUrls aadResourceUrls, @Query("channelId") String channelId);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
         @HTTP(path = "api/usertoken/SignOut", method = "DELETE", hasBody = true)
-        CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getTokenStatus" })
         @GET("api/usertoken/GetTokenStatus")
-        CompletableFuture<Response<ResponseBody>> getTokenStatus(@Query("userId") String userId, @Query("channelId") String channelId, @Query("include") String include, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
-
+        CompletableFuture<Response<ResponseBody>> getTokenStatus(@Query("userId") String userId, @Query("channelId") String channelId, @Query("include") String include);
     }
 
     /**
@@ -96,9 +89,7 @@ public class RestUserToken implements UserToken {
         }
         final String channelId = null;
         final String code = null;
-        return service.getToken(userId, connectionName, channelId, code,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getToken(userId, connectionName, channelId, code)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getTokenDelegate(responseBodyResponse).body();
@@ -130,9 +121,7 @@ public class RestUserToken implements UserToken {
         if (connectionName == null) {
             throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
         }
-        return service.getToken(userId, connectionName, channelId, code,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getToken(userId, connectionName, channelId, code)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getTokenDelegate(responseBodyResponse).body();
@@ -179,9 +168,7 @@ public class RestUserToken implements UserToken {
         }
         Validator.validate(aadResourceUrls);
         final String channelId = null;
-        return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getAadTokensDelegate(responseBodyResponse).body();
@@ -217,9 +204,7 @@ public class RestUserToken implements UserToken {
             throw new IllegalArgumentException("Parameter aadResourceUrls is required and cannot be null.");
         }
         Validator.validate(aadResourceUrls);
-        return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getAadTokensDelegate(responseBodyResponse).body();
@@ -255,9 +240,7 @@ public class RestUserToken implements UserToken {
         }
         final String connectionName = null;
         final String channelId = null;
-        return service.signOut(userId, connectionName, channelId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.signOut(userId, connectionName, channelId)
             .thenApply(responseBodyResponse -> {
                 try {
                     return signOutDelegate(responseBodyResponse).body();
@@ -282,9 +265,7 @@ public class RestUserToken implements UserToken {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
-        return service.signOut(userId, connectionName, channelId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.signOut(userId, connectionName, channelId)
             .thenApply(responseBodyResponse -> {
                 try {
                     return signOutDelegate(responseBodyResponse).body();
@@ -321,9 +302,7 @@ public class RestUserToken implements UserToken {
         }
         final String channelId = null;
         final String include = null;
-        return service.getTokenStatus(userId, channelId, include,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getTokenStatus(userId, channelId, include)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getTokenStatusDelegate(responseBodyResponse).body();
@@ -348,9 +327,7 @@ public class RestUserToken implements UserToken {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
-        return service.getTokenStatus(userId, channelId, include,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getTokenStatus(userId, channelId, include)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getTokenStatusDelegate(responseBodyResponse).body();

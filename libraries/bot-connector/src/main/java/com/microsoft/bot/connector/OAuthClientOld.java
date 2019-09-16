@@ -3,10 +3,7 @@
 
 package com.microsoft.bot.connector;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.connector.ExecutorFactory;
-import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentialsInterceptor;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
@@ -34,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 
 import static com.microsoft.bot.connector.authentication.MicrosoftAppCredentials.JSON;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
@@ -255,7 +251,7 @@ public class OAuthClientOld extends ServiceClient {
                     setServiceUrl(activity.getServiceUrl());
                     setUser(activity.getFrom());
                 }});
-                setMsAppId((creds == null) ? null : creds.appId());
+                setMsAppId((creds == null) ? null : creds.getAppId());
             }};
 
             String serializedState;

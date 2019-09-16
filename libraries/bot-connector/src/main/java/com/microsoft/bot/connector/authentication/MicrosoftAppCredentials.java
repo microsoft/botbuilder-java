@@ -99,22 +99,20 @@ public class MicrosoftAppCredentials implements ServiceClientCredentials {
             url.host(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(5));
     }
 
-    public String appId() {
+    public String getAppId() {
         return this.appId;
     }
 
-    public String appPassword() {
+    public String getAppPassword() {
         return this.appPassword;
     }
 
-    public MicrosoftAppCredentials withAppId(String appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
-        return this;
     }
 
-    public MicrosoftAppCredentials withAppPassword(String appPassword) {
+    public void setAppPassword(String appPassword) {
         this.appPassword = appPassword;
-        return this;
     }
 
     public String channelAuthTenant() {

@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import retrofit2.Response;
@@ -29,7 +28,7 @@ public class RestBotSignIn implements BotSignIn {
     /** The Retrofit service to perform REST calls. */
     private BotSignInsService service;
     /** The service client containing this operation class. */
-    private RestConnectorClient client;
+    private RestOAuthClient client;
 
     /**
      * Initializes an instance of BotSignInsImpl.
@@ -37,7 +36,7 @@ public class RestBotSignIn implements BotSignIn {
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
      */
-    public RestBotSignIn(Retrofit retrofit, RestConnectorClient client) {
+    public RestBotSignIn(Retrofit retrofit, RestOAuthClient client) {
         this.service = retrofit.create(BotSignInsService.class);
         this.client = client;
     }
@@ -50,7 +49,7 @@ public class RestBotSignIn implements BotSignIn {
     interface BotSignInsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl" })
         @GET("api/botsignin/GetSignInUrl")
-        CompletableFuture<Response<ResponseBody>> getSignInUrl(@Query("state") String state, @Query("code_challenge") String codeChallenge, @Query("emulatorUrl") String emulatorUrl, @Query("finalRedirect") String finalRedirect, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getSignInUrl(@Query("state") String state, @Query("code_challenge") String codeChallenge, @Query("emulatorUrl") String emulatorUrl, @Query("finalRedirect") String finalRedirect);
     }
 
     /**
@@ -66,9 +65,7 @@ public class RestBotSignIn implements BotSignIn {
         final String codeChallenge = null;
         final String emulatorUrl = null;
         final String finalRedirect = null;
-        return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect)
             .thenApply(responseBodyResponse -> {
                 try {
                    return getSignInUrlDelegate(responseBodyResponse).body();
@@ -96,9 +93,7 @@ public class RestBotSignIn implements BotSignIn {
         if (state == null) {
             throw new IllegalArgumentException("Parameter state is required and cannot be null.");
         }
-        return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect)
             .thenApply(responseBodyResponse -> {
                 try {
                     return getSignInUrlDelegate(responseBodyResponse).body();
@@ -113,7 +108,7 @@ public class RestBotSignIn implements BotSignIn {
     private ServiceResponse<String> getSignInUrlDelegate(Response<ResponseBody> response)
         throws CloudException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<String, CloudException>newInstance(this.client.serializerAdapter())
+        return client.restClient().responseBuilderFactory().<String, CloudException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<String>() { }.getType())
                 .registerError(CloudException.class)
                 .build(response);

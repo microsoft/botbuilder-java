@@ -16,7 +16,7 @@ import com.microsoft.rest.RestClient;
 /**
  * The interface for ConnectorClient class.
  */
-public interface ConnectorClient extends OAuthClient {
+public interface ConnectorClient {
     /**
      * Gets the REST client.
      *
