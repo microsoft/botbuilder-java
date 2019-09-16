@@ -153,7 +153,7 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onMessageReactionActivity(TurnContext turnContext) {
-        CompletableFuture task = null;
+        CompletableFuture<Void> task = null;
 
         if (turnContext.getActivity().getReactionsAdded() != null) {
             task = onReactionsAdded(turnContext.getActivity().getReactionsAdded(), turnContext);
@@ -224,8 +224,8 @@ public class ActivityHandler implements Bot {
      * <p>
      * By default, this method does nothing.
      *
-     * @param turnContext
-     * @return
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onTokenResponseEvent(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
@@ -247,9 +247,9 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Invoked when an activity other than a message, conversation update, or event is received when the base behavior of
-     * {@link #onTurn(TurnContext)} is used.
-     * <p>
+     * Invoked when an activity other than a message, conversation update, or event is received
+     * when the base behavior of {@link #onTurn(TurnContext)} is used.
+     *
      * If overridden, this could potentially respond to any of the other activity types like
      * {@link com.microsoft.bot.schema.ActivityTypes#CONTACT_RELATION_UPDATE} or
      * {@link com.microsoft.bot.schema.ActivityTypes#END_OF_CONVERSATION}.

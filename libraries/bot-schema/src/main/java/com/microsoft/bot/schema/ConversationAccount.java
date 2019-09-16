@@ -151,7 +151,7 @@ public class ConversationAccount {
      * Gets this conversation's {@link #tenantId}.
      * @return The tenantId value.
      */
-    public String setTenantId() {
+    public String getTenantId() {
         return this.tenantId;
     }
 
@@ -159,7 +159,7 @@ public class ConversationAccount {
      * Sets this conversation's {@link #tenantId}.
      * @param withTenantId this conversation's tenant ID
      */
-    public void getTenantId(String withTenantId) {
+    public void setTenantId(String withTenantId) {
         this.tenantId = withTenantId;
     }
 

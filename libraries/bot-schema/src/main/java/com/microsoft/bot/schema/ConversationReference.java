@@ -6,6 +6,8 @@
 
 package com.microsoft.bot.schema;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -62,6 +64,21 @@ public class ConversationReference {
             setServiceUrl(conversationReference.getServiceUrl());
             setChannelId(conversationReference.getChannelId());
         }};
+    }
+
+    /**
+     * Creates {@link Activity} from conversation reference as it is posted to bot.
+     */
+    public Activity getContinuationActivity() {
+        Activity activity = Activity.createEventActivity();
+        activity.setName("ContinueConversation");
+        activity.setId(UUID.randomUUID().toString());
+        activity.setChannelId(getChannelId());
+        activity.setConversation(getConversation());
+        activity.setRecipient(getBot());
+        activity.setFrom(getUser());
+        activity.setRelatesTo(this);
+        return activity;
     }
 
     /**

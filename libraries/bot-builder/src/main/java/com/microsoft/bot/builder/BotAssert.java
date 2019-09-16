@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
@@ -11,7 +12,14 @@ import java.util.List;
 /**
  * Provides methods for debugging Bot Builder code.
  */
-public class BotAssert {
+public final class BotAssert {
+    /**
+     * This class can't be created.
+     */
+    private BotAssert() {
+
+    }
+
     /**
      * Checks that an activity object is not {@code null}.
      *
@@ -19,8 +27,9 @@ public class BotAssert {
      * @throws NullPointerException {@code activity} is {@code null}.
      */
     public static void activityNotNull(Activity activity) {
-        if (activity == null)
+        if (activity == null) {
             throw new IllegalArgumentException("Activity");
+        }
     }
 
     /**
@@ -30,8 +39,9 @@ public class BotAssert {
      * @throws NullPointerException {@code context} is {@code null}.
      */
     public static void contextNotNull(TurnContext context) {
-        if (context == null)
+        if (context == null) {
             throw new IllegalArgumentException("TurnContext");
+        }
     }
 
     /**
@@ -41,8 +51,9 @@ public class BotAssert {
      * @throws NullPointerException {@code reference} is {@code null}.
      */
     public static void conversationReferenceNotNull(ConversationReference reference) {
-        if (reference == null)
+        if (reference == null) {
             throw new IllegalArgumentException("ConversationReference");
+        }
     }
 
     /**
@@ -52,8 +63,9 @@ public class BotAssert {
      * @throws NullPointerException {@code activities} is {@code null}.
      */
     public static void activityListNotNull(List<Activity> activities) {
-        if (activities == null)
+        if (activities == null) {
             throw new NullPointerException("List<Activity>");
+        }
     }
 
     /**
@@ -63,8 +75,9 @@ public class BotAssert {
      * @throws NullPointerException {@code middleware} is {@code null}.
      */
     public static void middlewareNotNull(Middleware middleware) {
-        if (middleware == null)
+        if (middleware == null) {
             throw new NullPointerException("Middleware");
+        }
     }
 
     /**
@@ -74,7 +87,8 @@ public class BotAssert {
      * @throws NullPointerException {@code middleware} is {@code null}.
      */
     public static void middlewareNotNull(ArrayList<Middleware> middleware) {
-        if (middleware == null)
+        if (middleware == null) {
             throw new NullPointerException("List<Middleware>");
+        }
     }
 }
