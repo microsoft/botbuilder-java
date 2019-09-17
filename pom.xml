@@ -19,8 +19,23 @@
     <checkstyle.version>3.1.0</checkstyle.version>
     <pmd.version>3.12.0</pmd.version>
     <repo.url>https://botbuilder.myget.org/F/scratch/maven/</repo.url>
-    <package.version>4.0.0-SNAPSHOT</package.version>
   </properties>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Bot Framework Development</name>
+      <email></email>
+      <organization>Microsoft</organization>
+      <organizationUrl>https://dev.botframework.com/</organizationUrl>
+    </developer>
+  </developers>
 
   <profiles>
     <profile>
@@ -132,37 +147,37 @@
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-schema</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-connector</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-builder</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-dialogs</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-configuration</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-ai-luis-v3</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-applicationinsights</artifactId>
-        <version>${package.version}</version>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
