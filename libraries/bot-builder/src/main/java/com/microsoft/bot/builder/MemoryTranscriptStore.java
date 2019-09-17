@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 /**
  * The memory transcript store stores transcripts in volatile memory in a Dictionary.
- * <p>
- * <p>
- * Because this uses an unbounded volitile dictionary this should only be used for unit tests or non-production environments.
+ *
+ * Because this uses an unbounded volatile dictionary this should only be used for unit tests or
+ * non-production environments.
  */
 public class MemoryTranscriptStore implements TranscriptStore {
     private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<String, HashMap<String, ArrayList<Activity>>>();

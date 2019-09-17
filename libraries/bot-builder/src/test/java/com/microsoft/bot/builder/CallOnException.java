@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 
 import java.util.concurrent.CompletableFuture;
 
+@FunctionalInterface
 public interface CallOnException {
-    <T> CompletableFuture<Void> apply(TurnContext context, T t);
+    <T> CompletableFuture<Void> invoke(TurnContext context, T t);
 }

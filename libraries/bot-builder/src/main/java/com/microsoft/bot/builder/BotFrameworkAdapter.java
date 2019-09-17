@@ -192,7 +192,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      * @return The updated adapter object.
      */
     public BotFrameworkAdapter use(Middleware middleware) {
-        super._middlewareSet.use(middleware);
+        super.middlewareSet.use(middleware);
         return this;
     }
 
@@ -261,7 +261,7 @@ public class BotFrameworkAdapter extends BotAdapter {
 
                 // For all non-invoke scenarios, the HTTP layers above don't have to mess
                 // with the Body and return codes.
-                return null;
+                return CompletableFuture.completedFuture(null);
             });
     }
 

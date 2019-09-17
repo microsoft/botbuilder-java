@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 
-public class BotStateTest {
+public class BotStateTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void State_EmptyName() {

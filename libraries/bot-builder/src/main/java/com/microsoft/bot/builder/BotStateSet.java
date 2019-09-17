@@ -4,6 +4,8 @@
 package com.microsoft.bot.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -13,6 +15,10 @@ import java.util.stream.Collectors;
  */
 public class BotStateSet {
     private List<BotState> botStates = new ArrayList<>();
+
+    public BotStateSet(BotState... withBotStates) {
+        this(Arrays.asList(withBotStates));
+    }
 
     /**
      * Initializes a new instance of the BotStateSet class.

@@ -14,26 +14,26 @@ import java.util.concurrent.CompletionException;
  * multiple times to allow you to handle different exception types in different ways.
  */
 public class CatchExceptionMiddleware<T extends Exception> implements Middleware {
-    private final CallOnException _handler;
-    private final Class<T> _exceptionType;
+    private CallOnException handler;
+    private Class<T> exceptionType;
 
-    public CatchExceptionMiddleware(CallOnException callOnException, Class<T> exceptionType) {
-        _handler = callOnException;
-        _exceptionType = exceptionType;
+    public CatchExceptionMiddleware(CallOnException withCallOnException, Class<T> withExceptionType) {
+        handler = withCallOnException;
+        exceptionType = withExceptionType;
     }
 
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
 
-        Class c = _exceptionType.getDeclaringClass();
+        Class c = exceptionType.getDeclaringClass();
 
         // Continue to route the activity through the pipeline
         // any errors further down the pipeline will be caught by
         // this try / catch
         return next.next()
             .exceptionally(exception -> {
-                if (_exceptionType.isInstance(exception)) {
-                    _handler.apply(context, (T) exception);
+                if (exceptionType.isInstance(exception)) {
+                    handler.invoke(context, exception);
                 } else {
                     throw new CompletionException(exception);
                 }

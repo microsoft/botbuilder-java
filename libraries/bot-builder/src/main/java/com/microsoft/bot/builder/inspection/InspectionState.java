@@ -19,6 +19,6 @@ public class InspectionState extends BotState {
 
     @Override
     public String getStorageKey(TurnContext turnContext) {
-        return InspectionState.class.getName();
+        return InspectionState.class.getSimpleName();
     }
 }
