@@ -16,7 +16,7 @@ import com.microsoft.rest.RestClient;
 /**
  * The interface for ConnectorClient class.
  */
-public interface ConnectorClient {
+public interface ConnectorClient extends AutoCloseable {
     /**
      * Gets the REST client.
      *
@@ -94,4 +94,9 @@ public interface ConnectorClient {
      * @return the Conversations object.
      */
     Conversations getConversations();
+
+    @Override
+    default void close() throws Exception {
+
+    }
 }

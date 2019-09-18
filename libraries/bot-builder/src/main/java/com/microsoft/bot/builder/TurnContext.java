@@ -4,8 +4,10 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -117,7 +119,7 @@ public interface TurnContext {
      * rate, volume, pronunciation, and pitch, specify {@code speak} in
      * Speech Synthesis Markup Language (SSML) format.</p>
      */
-    CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, String inputHint);
+    CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, InputHints inputHint);
 
     /**
      * Sends an activity to the sender of the incoming activity.
@@ -139,12 +141,12 @@ public interface TurnContext {
      * an array of {@link ResourceResponse} objects containing the IDs that
      * the receiving channel assigned to the activities.
      */
-    CompletableFuture<ResourceResponse[]> sendActivities(Activity[] activities);
+    CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities);
 
     /**
      * Replaces an existing activity.
      *
-     * @param activity New replacement activity.
+     * @param withActivity New replacement activity.
      * @return A task that represents the work queued to execute.
      * If the activity is successfully sent, the task result contains
      * a {@link ResourceResponse} object containing the ID that the receiving
@@ -152,7 +154,7 @@ public interface TurnContext {
      * <p>Before calling this, set the ID of the replacement activity to the ID
      * of the activity to replace.</p>
      */
-    CompletableFuture<ResourceResponse> updateActivity(Activity activity);
+    CompletableFuture<ResourceResponse> updateActivity(Activity withActivity);
 
     /**
      * Deletes an existing activity.
@@ -178,7 +180,7 @@ public interface TurnContext {
      * @param handler The handler to add to the context object.
      * @return The updated context object.
      * When the context's {@link #sendActivity(Activity)}
-     * or {@link #sendActivities(Activity[])} methods are called,
+     * or {@link #sendActivities(List<Activity>)} methods are called,
      * the adapter calls the registered handlers in the order in which they were
      * added to the context object.
      */

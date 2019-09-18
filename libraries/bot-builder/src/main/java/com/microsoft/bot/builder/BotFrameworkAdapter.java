@@ -279,7 +279,7 @@ public class BotFrameworkAdapter extends BotAdapter {
      */
     @SuppressWarnings("checkstyle:EmptyBlock")
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
@@ -288,20 +288,20 @@ public class BotFrameworkAdapter extends BotAdapter {
             throw new IllegalArgumentException("activities");
         }
 
-        if (activities.length == 0) {
+        if (activities.size() == 0) {
             throw new IllegalArgumentException("Expecting one or more activities, but the array was empty.");
         }
 
         return CompletableFuture.supplyAsync(() -> {
-            ResourceResponse[] responses = new ResourceResponse[activities.length];
+            ResourceResponse[] responses = new ResourceResponse[activities.size()];
 
             /*
              * NOTE: we're using for here (vs. foreach) because we want to simultaneously index into the
              * activities array to get the activity to process as well as use that index to assign
              * the response to the responses array and this is the most cost effective way to do that.
              */
-            for (int index = 0; index < activities.length; index++) {
-                Activity activity = activities[index];
+            for (int index = 0; index < activities.size(); index++) {
+                Activity activity = activities.get(index);
                 ResourceResponse response = null;
 
                 if (activity.isType(ActivityTypes.DELAY)) {

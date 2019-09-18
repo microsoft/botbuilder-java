@@ -6,9 +6,6 @@
 
 package com.microsoft.bot.schema;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * Defines values for ActivityTypes.
  */

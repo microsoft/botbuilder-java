@@ -279,7 +279,7 @@ public class ActivityHandlerTests {
 
     private static class NotImplementedAdapter extends BotAdapter {
         @Override
-        public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
+        public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
             throw new NotImplementedException();
         }
 

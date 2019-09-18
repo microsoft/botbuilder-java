@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.ConnectorClient;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +73,9 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
     public void close() throws Exception {
         for (Map.Entry entry : entrySet()) {
             if (entry.getValue() instanceof AutoCloseable) {
+                if (entry.getValue() instanceof ConnectorClient) {
+                    continue;
+                }
                 ((AutoCloseable) entry.getValue()).close();
             }
         }

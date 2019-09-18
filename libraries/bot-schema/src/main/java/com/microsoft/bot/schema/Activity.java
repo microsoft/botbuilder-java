@@ -313,11 +313,21 @@ public class Activity {
     /**
      * Create a TRACE type Activity.
      *
-     * @param withName      Name of the operation
-     * @param withValueType valueType if helpful to identify the value schema (default is value.GetType().Name)
-     * @param withValue The content for this trace operation.
-     * @param withLabel A descriptive label for this trace operation.
+     * @param withName Name of the operation
      */
+    public static Activity createTraceActivity(String withName) {
+        return createTraceActivity(withName, null, null, null);
+    }
+
+
+   /**
+    * Create a TRACE type Activity.
+    *
+    * @param withName      Name of the operation
+    * @param withValueType valueType if helpful to identify the value schema (default is value.GetType().Name)
+    * @param withValue The content for this trace operation.
+    * @param withLabel A descriptive label for this trace operation.
+    */
     public static Activity createTraceActivity(String withName,
                                                String withValueType,
                                                Object withValue,
@@ -325,7 +335,11 @@ public class Activity {
         return new Activity(ActivityTypes.TRACE) {{
             setName(withName);
             setLabel(withLabel);
-            setValueType((withValueType == null) ? withValue.getClass().getTypeName() : withValueType);
+            if (withValue != null) {
+                setValueType((withValueType == null) ? withValue.getClass().getTypeName() : withValueType);
+            } else {
+                setValueType(withValueType);
+            }
             setValue(withValue);
         }};
     }

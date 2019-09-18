@@ -91,7 +91,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
@@ -104,7 +104,7 @@ public class TestAdapter extends BotAdapter {
             responses.add(new ResourceResponse(activity.getId()));
             // This is simulating DELAY
 
-            System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.length));
+            System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.size()));
             for (Activity act : activities) {
                 System.out.printf(":--------\n: To:%s\n", act.getRecipient().getName());
                 System.out.printf(": From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());

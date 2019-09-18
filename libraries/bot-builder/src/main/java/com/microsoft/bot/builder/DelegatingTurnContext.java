@@ -5,8 +5,10 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -50,7 +52,7 @@ public class DelegatingTurnContext implements TurnContext {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, String inputHint) {
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, InputHints inputHint) {
         return innerTurnContext.sendActivity(textReplyToSend, speak, inputHint);
     }
 
@@ -60,7 +62,7 @@ public class DelegatingTurnContext implements TurnContext {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
         return innerTurnContext.sendActivities(activities);
     }
 

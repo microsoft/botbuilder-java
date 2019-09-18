@@ -1,131 +1,78 @@
-package com.microsoft.bot.builder;
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.builder;
+
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-
-import static com.microsoft.bot.schema.ActivityTypes.MESSAGE;
-import static com.microsoft.bot.schema.ActivityTypes.TRACE;
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
 /**
  * Provides context for a turn of a bot.
  * Context provides information needed to process an incoming activity.
  * The context object is created by a {@link BotAdapter} and persists for the
  * length of the turn.
- * {@linkalso Bot}
- * {@linkalso Middleware}
+ * {@link Bot}
+ * {@link Middleware}
  */
 public class TurnContextImpl implements TurnContext, AutoCloseable {
+    /**
+     * The bot adapter that created this context object.
+     */
     private final BotAdapter adapter;
+
+    /**
+     * The activity associated with this turn; or null when processing a proactive message.
+     */
     private final Activity activity;
+
     private final List<SendActivitiesHandler> onSendActivities = new ArrayList<SendActivitiesHandler>();
     private final List<UpdateActivityHandler> onUpdateActivity = new ArrayList<UpdateActivityHandler>();
     private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<DeleteActivityHandler>();
+
+    /**
+     * The services registered on this context object.
+     */
     private final TurnContextStateCollection turnState;
+
+    /**
+     * Indicates whether at least one response was sent for the current turn.
+     */
     private Boolean responded = false;
 
     /**
      * Creates a context object.
      *
-     * @param adapter  The adapter creating the context.
-     * @param activity The incoming activity for the turn;
+     * @param withAdapter  The adapter creating the context.
+     * @param withActivity The incoming activity for the turn;
      *                 or {@code null} for a turn for a proactive message.
      * @throws IllegalArgumentException {@code activity} or
      *                                  {@code adapter} is {@code null}.
      *                                  For use by bot adapter implementations only.
      */
-    public TurnContextImpl(BotAdapter adapter, Activity activity) {
-        if (adapter == null)
+    public TurnContextImpl(BotAdapter withAdapter, Activity withActivity) {
+        if (withAdapter == null) {
             throw new IllegalArgumentException("adapter");
-        this.adapter = adapter;
-        if (activity == null)
+        }
+        adapter = withAdapter;
+
+        if (withActivity == null) {
             throw new IllegalArgumentException("activity");
-        this.activity = activity;
+        }
+        activity = withActivity;
 
         turnState = new TurnContextStateCollection();
-    }
-
-    /**
-     * Creates a conversation reference from an activity.
-     *
-     * @param activity The activity.
-     * @return A conversation reference for the conversation that contains the activity.
-     * @throws IllegalArgumentException {@code activity} is {@code null}.
-     */
-    public static ConversationReference getConversationReference(Activity activity) {
-        BotAssert.activityNotNull(activity);
-
-        ConversationReference r = new ConversationReference() {{
-            setActivityId(activity.getId());
-            setUser(activity.getFrom());
-            setBot(activity.getRecipient());
-            setConversation(activity.getConversation());
-            setChannelId(activity.getChannelId());
-            setServiceUrl(activity.getServiceUrl());
-        }};
-
-        return r;
-    }
-
-    /**
-     * Updates an activity with the delivery information from an existing
-     * conversation reference.
-     *
-     * @param activity  The activity to update.
-     * @param reference The conversation reference.
-     */
-    public static Activity applyConversationReference(Activity activity, ConversationReference reference) {
-        return applyConversationReference(activity, reference, false);
-    }
-
-    /**
-     * Updates an activity with the delivery information from an existing
-     * conversation reference.
-     *
-     * @param activity   The activity to update.
-     * @param reference  The conversation reference.
-     * @param isIncoming (Optional) {@code true} to treat the activity as an
-     *                   incoming activity, where the bot is the recipient; otherwaire {@code false}.
-     *                   Default is {@code false}, and the activity will show the bot as the sender.
-     *                   Call {@link #getConversationReference(Activity)} on an incoming
-     *                   activity to get a conversation reference that you can then use to update an
-     *                   outgoing activity with the correct delivery information.
-     *                   <p>The {@link #sendActivity(Activity)} and {@link #sendActivities(Activity[])}
-     *                   methods do this for you.</p>
-     */
-    public static Activity applyConversationReference(Activity activity,
-                                                      ConversationReference reference,
-                                                      boolean isIncoming) {
-
-        activity.setChannelId(reference.getChannelId());
-        activity.setServiceUrl(reference.getServiceUrl());
-        activity.setConversation(reference.getConversation());
-
-        if (isIncoming) {
-            activity.setFrom(reference.getUser());
-            activity.setRecipient(reference.getBot());
-            if (reference.getActivityId() != null)
-                activity.setId(reference.getActivityId());
-        } else { // Outgoing
-            activity.setFrom(reference.getBot());
-            activity.setRecipient(reference.getUser());
-            if (reference.getActivityId() != null)
-                activity.setReplyToId(reference.getActivityId());
-        }
-        return activity;
     }
 
     /**
@@ -135,16 +82,17 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
      *                                  When the context's {@link #sendActivity(Activity)}
-     *                                  or {@link #sendActivities(Activity[])} methods are called,
+     *                                  or {@link #sendActivities(List<Activity>)} methods are called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
     @Override
     public TurnContext onSendActivities(SendActivitiesHandler handler) {
-        if (handler == null)
+        if (handler == null) {
             throw new IllegalArgumentException("handler");
+        }
 
-        this.onSendActivities.add(handler);
+        onSendActivities.add(handler);
         return this;
     }
 
@@ -160,10 +108,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public TurnContext onUpdateActivity(UpdateActivityHandler handler) {
-        if (handler == null)
+        if (handler == null) {
             throw new IllegalArgumentException("handler");
+        }
 
-        this.onUpdateActivity.add(handler);
+        onUpdateActivity.add(handler);
         return this;
     }
 
@@ -179,10 +128,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public TurnContext onDeleteActivity(DeleteActivityHandler handler) {
-        if (handler == null)
+        if (handler == null) {
             throw new IllegalArgumentException("handler");
+        }
 
-        this.onDeleteActivity.add(handler);
+        onDeleteActivity.add(handler);
         return this;
     }
 
@@ -213,58 +163,90 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Indicates whether at least one response was sent for the current turn.
      *
      * @return {@code true} if at least one response was sent for the current turn.
-     * @throws IllegalArgumentException You attempted to set the value to {@code false}.
      */
     @Override
     public boolean getResponded() {
-        return this.responded;
-    }
-
-    private void setResponded(boolean responded) {
-        if (responded == false) {
-            throw new IllegalArgumentException("TurnContext: cannot set 'responded' to a value of 'false'.");
-        }
-        this.responded = true;
+        return responded;
     }
 
     /**
      * Sends a message activity to the sender of the incoming activity.
      *
+     * <p>If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.</p>
+     *
+     * <p>See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.</p>
+     *
      * @param textReplyToSend The text of the message to send.
      * @return A task that represents the work queued to execute.
      * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
-     *                                  If the activity is successfully sent, the task result contains
-     *                                  a {@link ResourceResponse} object containing the ID that the receiving
-     *                                  channel assigned to the activity.
-     *                                  <p>See the channel's documentation for limits imposed upon the contents of
-     *                                  {@code textReplyToSend}.</p>
-     *                                  <p>To control various characteristics of your bot's speech such as voice,
-     *                                  rate, volume, pronunciation, and pitch, specify {@code speak} in
-     *                                  Speech Synthesis Markup Language (SSML) format.</p>
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend) {
         return sendActivity(textReplyToSend, null, null);
     }
 
+    /**
+     * Sends a message activity to the sender of the incoming activity.
+     *
+     * <p>If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.</p>
+     *
+     * <p>See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.</p>
+     *
+     * @param textReplyToSend The text of the message to send.
+     * @param speak To control various characteristics of your bot's speech such as voice
+     *              rate, volume, pronunciation, and pitch, specify Speech Synthesis Markup
+     *              Language (SSML) format.
+     * @return A task that represents the work queued to execute.
+     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
+     */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak) {
         return sendActivity(textReplyToSend, speak, null);
     }
 
+    /**
+     * Sends a message activity to the sender of the incoming activity.
+     *
+     * <p>If the activity is successfully sent, the task result contains
+     * a {@link ResourceResponse} object containing the ID that the receiving
+     * channel assigned to the activity.</p>
+     *
+     * <p>See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.</p>
+     *
+     * @param textReplyToSend The text of the message to send.
+     * @param speak To control various characteristics of your bot's speech such as voice
+     *              rate, volume, pronunciation, and pitch, specify Speech Synthesis Markup
+     *              Language (SSML) format.
+     * @param inputHint (Optional) Input hint.
+     * @return A task that represents the work queued to execute.
+     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
+     */
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, String inputHint) {
-        if (StringUtils.isEmpty(textReplyToSend))
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend,
+                                                            String speak,
+                                                            InputHints inputHint) {
+        if (StringUtils.isEmpty(textReplyToSend)) {
             throw new IllegalArgumentException("textReplyToSend");
+        }
 
-        Activity activityToSend = new Activity(MESSAGE) {{
+        Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {{
             setText(textReplyToSend);
         }};
-        if (speak != null)
-            activityToSend.setSpeak(speak);
 
-        if (StringUtils.isNotEmpty(inputHint))
-            activityToSend.setInputHint(InputHints.fromString(inputHint));
+        if (StringUtils.isNotEmpty(speak)) {
+            activityToSend.setSpeak(speak);
+        }
+
+        if (inputHint != null) {
+            activityToSend.setInputHint(inputHint);
+        }
 
         return sendActivity(activityToSend);
     }
@@ -281,15 +263,14 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(Activity activity) {
-        if (activity == null) {
-            throw new IllegalArgumentException("activity");
-        }
+        BotAssert.activityNotNull(activity);
 
-        Activity[] activities = {activity};
-        return sendActivities(activities)
+        return sendActivities(Collections.singletonList(activity))
             .thenApply(resourceResponses -> {
                 if (resourceResponses == null || resourceResponses.length == 0) {
-                    return null;
+                    // It's possible an interceptor prevented the activity from having been sent.
+                    // Just return an empty response in that case.
+                    return new ResourceResponse();
                 }
                 return resourceResponses[0];
             });
@@ -305,201 +286,104 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * the receiving channel assigned to the activities.
      */
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(Activity[] activities) {
-        // Bind the relevant Conversation Reference properties, such as URLs and
-        // ChannelId's, to the activities we're about to send.
-        ConversationReference cr = getConversationReference(this.activity);
-        for (Activity a : activities) {
-            applyConversationReference(a, cr);
+    public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
+        if (activities == null || activities.size() == 0) {
+            throw new IllegalArgumentException("activities");
         }
 
-        // Convert the IActivities to Activities.
-        List<Activity> activityArray = Arrays.stream(activities).map(input -> input).collect(toList());
+        // Bind the relevant Conversation Reference properties, such as URLs and
+        // ChannelId's, to the activities we're about to send.
+        ConversationReference cr = activity.getConversationReference();
 
-        // Create the list used by the recursive methods.
-        List<Activity> activityList = new ArrayList<Activity>(activityArray);
+        // Buffer the incoming activities into a List<T> since we allow the set to be manipulated by the callbacks
+        // Bind the relevant Conversation Reference properties, such as URLs and
+        // ChannelId's, to the activity we're about to send
+        List<Activity> bufferedActivities = activities.stream()
+            .map(a -> a.applyConversationReference(cr)).collect(Collectors.toList());
 
-        Supplier<CompletableFuture<ResourceResponse[]>> actuallySendStuff = () -> {
-            // Send from the list, which may have been manipulated via the event handlers.
-            // Note that 'responses' was captured from the root of the call, and will be
-            // returned to the original caller.
-            return getAdapter().sendActivities(this, activityList.toArray(new Activity[activityList.size()]))
-                .thenApply(responses -> {
-                    if (responses != null && responses.length == activityList.size()) {
-                        // stitch up activity ids
-                        for (int i = 0; i < responses.length; i++) {
-                            ResourceResponse response = responses[i];
-                            Activity activity = activityList.get(i);
-                            activity.setId(response.getId());
-                        }
-                    }
+        if (onSendActivities.size() == 0) {
+            return sendActivitiesThroughAdapter(bufferedActivities);
+        }
 
-                    // Are the any non-trace activities to send?
-                    // The thinking here is that a Trace event isn't user relevant data
-                    // so the "Responded" flag should not be set by Trace messages being
-                    // sent out.
-                    if (activityList.stream().anyMatch((a) -> a.getType() == TRACE)) {
-                        this.setResponded(true);
-                    }
-                    return responses;
-                });
-        };
+        return sendActivitiesThroughCallbackPipeline(bufferedActivities, 0);
+    }
 
-        List<Activity> act_list = new ArrayList<>(activityList);
-        return sendActivitiesInternal(act_list, onSendActivities.iterator(), actuallySendStuff);
+    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughAdapter(List<Activity> activities) {
+        return adapter.sendActivities(this, activities)
+            .thenApply(responses -> {
+                boolean sentNonTraceActivity = false;
+
+                for (int index = 0; index < responses.length; index++) {
+                    Activity activity = activities.get(index);
+                    activity.setId(responses[index].getId());
+                    sentNonTraceActivity |= !activity.isType(ActivityTypes.TRACE);
+                }
+
+                if (sentNonTraceActivity) {
+                    responded = true;
+                }
+
+                return responses;
+            });
+    }
+
+    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughCallbackPipeline(List<Activity> activities,
+                                                                                        int nextCallbackIndex) {
+
+        if (nextCallbackIndex == onSendActivities.size()) {
+            return sendActivitiesThroughAdapter(activities);
+        }
+
+        return onSendActivities.get(nextCallbackIndex).invoke(this,
+            activities, () -> sendActivitiesThroughCallbackPipeline(activities, nextCallbackIndex + 1));
     }
 
     /**
      * Replaces an existing activity.
      *
-     * @param activity New replacement activity.
+     * @param withActivity New replacement activity.
      * @return A task that represents the work queued to execute.
-     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the response contained additional information.
+     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the
+     * response contained additional information.
      */
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(Activity activity) {
-        Supplier<CompletableFuture<ResourceResponse>> ActuallyUpdateStuff = () -> {
-            return getAdapter().updateActivity(this, activity);
-        };
-
-        return updateActivityInternal(activity, onUpdateActivity.iterator(), ActuallyUpdateStuff);
-    }
-
-    /**
-     * Deletes an existing activity.
-     *
-     * @param activityId The ID of the activity to delete.
-     * @return A task that represents the work queued to execute.
-     * @throws Exception The HTTP operation failed and the response contained additional information.
-     */
-    public CompletableFuture<Void> deleteActivity(String activityId) {
-        if (StringUtils.isWhitespace(activityId) || activityId == null) {
-            throw new IllegalArgumentException("activityId");
-        }
-
-        ConversationReference cr = getConversationReference(getActivity());
-        cr.setActivityId(activityId);
-
-        Supplier<CompletableFuture<Void>> ActuallyDeleteStuff = () ->
-            getAdapter().deleteActivity(this, cr);
-
-        return deleteActivityInternal(cr, onDeleteActivity.iterator(), ActuallyDeleteStuff);
-    }
-
-    /**
-     * Deletes an existing activity.
-     *
-     * @param conversationReference The conversation containing the activity to delete.
-     * @return A task that represents the work queued to execute.
-     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the response contained additional information.
-     *                                                                 The conversation reference's {@link ConversationReference#getActivityId}
-     *                                                                 indicates the activity in the conversation to delete.
-     */
-    @Override
-    public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
-        if (conversationReference == null)
-            throw new IllegalArgumentException("conversationReference");
-
-        Supplier<CompletableFuture<Void>> ActuallyDeleteStuff = () ->
-            getAdapter().deleteActivity(this, conversationReference);
-
-        return deleteActivityInternal(conversationReference, onDeleteActivity.iterator(), ActuallyDeleteStuff);
-    }
-
-    private CompletableFuture<ResourceResponse[]> sendActivitiesInternal(
-        List<Activity> activities,
-        Iterator<SendActivitiesHandler> sendHandlers,
-        Supplier<CompletableFuture<ResourceResponse[]>> callAtBottom) {
-
-        if (activities == null) {
-            throw new IllegalArgumentException("activities");
-        }
-        if (sendHandlers == null) {
-            throw new IllegalArgumentException("sendHandlers");
-        }
-
-        if (!sendHandlers.hasNext()) { // No middleware to run.
-            if (callAtBottom != null) {
-                return callAtBottom.get();
-            }
-            return CompletableFuture.completedFuture(new ResourceResponse[0]);
-        }
-
-        // Default to "No more Middleware after this".
-        Supplier<CompletableFuture<ResourceResponse[]>> next = () -> {
-            // Remove the first item from the list of middleware to call,
-            // so that the next call just has the remaining items to worry about.
-            //Iterable<SendActivitiesHandler> remaining = sendHandlers.Skip(1);
-            //Iterator<SendActivitiesHandler> remaining = sendHandlers.iterator();
-            if (sendHandlers.hasNext())
-                sendHandlers.next();
-            return sendActivitiesInternal(activities, sendHandlers, callAtBottom);
-        };
-
-        // Grab the current middleware, which is the 1st element in the array, and execute it
-        SendActivitiesHandler caller = sendHandlers.next();
-        return caller.invoke(this, activities, next);
-    }
-
-    //         private async Task<ResourceResponse> UpdateActivityInternal(Activity activity,
-    //            IEnumerable<UpdateActivityHandler> updateHandlers,
-    //            Func<Task<ResourceResponse>> callAtBottom)
-    //        {
-    //            BotAssert.ActivityNotNull(activity);
-    //            if (updateHandlers == null)
-    //                throw new ArgumentException(nameof(updateHandlers));
-    //
-    //            if (updateHandlers.Count() == 0) // No middleware to run.
-    //            {
-    //                if (callAtBottom != null)
-    //                {
-    //                    return await callAtBottom();
-    //                }
-    //
-    //                return null;
-    //            }
-    //
-    //          /**
-    //           */ Default to "No more Middleware after this".
-    //           */
-    //            async Task<ResourceResponse> next()
-    //            {
-    //              /**
-    //               */ Remove the first item from the list of middleware to call,
-    //               */ so that the next call just has the remaining items to worry about.
-    //               */
-    //                IEnumerable<UpdateActivityHandler> remaining = updateHandlers.Skip(1);
-    //                var result = await UpdateActivityInternal(activity, remaining, callAtBottom).ConfigureAwait(false);
-    //                activity.Id = result.Id;
-    //                return result;
-    //            }
-    //
-    //          /**
-    //           */ Grab the current middleware, which is the 1st element in the array, and execute it
-    //           */
-    //            UpdateActivityHandler toCall = updateHandlers.First();
-    //            return await toCall(this, activity, next);
-    //        }
-    private CompletableFuture<ResourceResponse> updateActivityInternal(Activity activity,
-                                                                       Iterator<UpdateActivityHandler> updateHandlers,
-                                                                       Supplier<CompletableFuture<ResourceResponse>> callAtBottom) {
+    public CompletableFuture<ResourceResponse> updateActivity(Activity withActivity) {
         BotAssert.activityNotNull(activity);
-        if (updateHandlers == null)
-            throw new IllegalArgumentException("updateHandlers");
 
-        if (false == updateHandlers.hasNext()) { // No middleware to run.
+        ConversationReference conversationReference = activity.getConversationReference();
+        withActivity.applyConversationReference(conversationReference);
+
+        Supplier<CompletableFuture<ResourceResponse>> actuallyUpdateStuff =
+            () -> getAdapter().updateActivity(this, withActivity);
+
+        return updateActivityInternal(withActivity, onUpdateActivity.iterator(), actuallyUpdateStuff);
+    }
+
+    private CompletableFuture<ResourceResponse> updateActivityInternal(
+        Activity activity,
+        Iterator<UpdateActivityHandler> updateHandlers,
+        Supplier<CompletableFuture<ResourceResponse>> callAtBottom) {
+
+        BotAssert.activityNotNull(activity);
+        if (updateHandlers == null) {
+            throw new IllegalArgumentException("updateHandlers");
+        }
+
+        // No middleware to run.
+        if (!updateHandlers.hasNext()) {
             if (callAtBottom != null) {
                 return callAtBottom.get();
             }
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
 
         // Default to "No more Middleware after this".
         Supplier<CompletableFuture<ResourceResponse>> next = () -> {
             // Remove the first item from the list of middleware to call,
             // so that the next call just has the remaining items to worry about.
-            if (updateHandlers.hasNext())
+            if (updateHandlers.hasNext()) {
                 updateHandlers.next();
+            }
 
             return updateActivityInternal(activity, updateHandlers, callAtBottom)
                 .thenApply(resourceResponse -> {
@@ -513,14 +397,57 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         return toCall.invoke(this, activity, next);
     }
 
+    /**
+     * Deletes an existing activity.
+     *
+     * @param activityId The ID of the activity to delete.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> deleteActivity(String activityId) {
+        if (StringUtils.isWhitespace(activityId) || StringUtils.isEmpty(activityId)) {
+            throw new IllegalArgumentException("activityId");
+        }
+
+        ConversationReference cr = activity.getConversationReference();
+        cr.setActivityId(activityId);
+
+        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () ->
+            getAdapter().deleteActivity(this, cr);
+
+        return deleteActivityInternal(cr, onDeleteActivity.iterator(), actuallyDeleteStuff);
+    }
+
+    /**
+     * Deletes an existing activity.
+     *
+     * The conversation reference's {@link ConversationReference#getActivityId}
+     * indicates the activity in the conversation to delete.
+     *
+     * @param conversationReference The conversation containing the activity to delete.
+     * @return A task that represents the work queued to execute.
+     */
+    @Override
+    public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
+        if (conversationReference == null) {
+            throw new IllegalArgumentException("conversationReference");
+        }
+
+        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () ->
+            getAdapter().deleteActivity(this, conversationReference);
+
+        return deleteActivityInternal(conversationReference, onDeleteActivity.iterator(), actuallyDeleteStuff);
+    }
+
     private CompletableFuture<Void> deleteActivityInternal(ConversationReference cr,
                                                            Iterator<DeleteActivityHandler> deleteHandlers,
                                                            Supplier<CompletableFuture<Void>> callAtBottom) {
         BotAssert.conversationReferenceNotNull(cr);
-        if (deleteHandlers == null)
+        if (deleteHandlers == null) {
             throw new IllegalArgumentException("deleteHandlers");
+        }
 
-        if (!deleteHandlers.hasNext()) { // No middleware to run.
+        // No middleware to run.
+        if (!deleteHandlers.hasNext()) {
             if (callAtBottom != null) {
                 return callAtBottom.get();
             }
@@ -531,10 +458,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Supplier<CompletableFuture<Void>> next = () -> {
             // Remove the first item from the list of middleware to call,
             // so that the next call just has the remaining items to worry about.
-
-            //Iterator<UpdateActivityHandler> remaining = (deleteHandlers.hasNext()) ? deleteHandlers.next() : null;
-            if (deleteHandlers.hasNext())
+            if (deleteHandlers.hasNext()) {
                 deleteHandlers.next();
+            }
 
             return deleteActivityInternal(cr, deleteHandlers, callAtBottom);
         };
@@ -544,6 +470,16 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         return toCall.invoke(this, cr, next);
     }
 
+    @Override
+    public void finalize() {
+        try {
+            close();
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
     public void close() throws Exception {
         turnState.close();
     }

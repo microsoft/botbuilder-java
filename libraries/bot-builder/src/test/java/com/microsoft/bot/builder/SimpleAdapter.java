@@ -14,20 +14,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class SimpleAdapter extends BotAdapter {
-    private Consumer<Activity[]> callOnSend = null;
+    private Consumer<List<Activity>> callOnSend = null;
     private Consumer<Activity> callOnUpdate = null;
     private Consumer<ConversationReference> callOnDelete = null;
 
     // Callback Function but doesn't need to be.  Avoid java legacy type erasure
-    public SimpleAdapter(Consumer<Activity[]> callOnSend) {
+    public SimpleAdapter(Consumer<List<Activity>> callOnSend) {
         this(callOnSend, null, null);
     }
 
-    public SimpleAdapter(Consumer<Activity[]> callOnSend, Consumer<Activity> callOnUpdate) {
+    public SimpleAdapter(Consumer<List<Activity>> callOnSend, Consumer<Activity> callOnUpdate) {
         this(callOnSend, callOnUpdate, null);
     }
 
-    public SimpleAdapter(Consumer<Activity[]> callOnSend, Consumer<Activity> callOnUpdate, Consumer<ConversationReference> callOnDelete) {
+    public SimpleAdapter(Consumer<List<Activity>> callOnSend, Consumer<Activity> callOnUpdate, Consumer<ConversationReference> callOnDelete) {
         this.callOnSend = callOnSend;
         this.callOnUpdate = callOnUpdate;
         this.callOnDelete = callOnDelete;
@@ -39,9 +39,9 @@ public class SimpleAdapter extends BotAdapter {
 
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", activities);
-        Assert.assertTrue("SimpleAdapter.sendActivities: empty activities array.", activities.length > 0);
+        Assert.assertTrue("SimpleAdapter.sendActivities: empty activities array.", activities.size() > 0);
 
         if (this.callOnSend != null)
             this.callOnSend.accept(activities);
@@ -67,7 +67,7 @@ public class SimpleAdapter extends BotAdapter {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", reference);
         if (callOnDelete != null)
             this.callOnDelete.accept(reference);
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
 

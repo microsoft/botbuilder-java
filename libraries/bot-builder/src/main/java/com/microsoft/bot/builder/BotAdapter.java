@@ -8,6 +8,7 @@ import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationReferenceHelper;
 import com.microsoft.bot.schema.ResourceResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
@@ -81,7 +82,7 @@ public abstract class BotAdapter {
      * the receiving channel assigned to the activities.
      * {@link TurnContext#onSendActivities(SendActivitiesHandler)}
      */
-    public abstract CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, Activity[] activities);
+    public abstract CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities);
 
     /**
      * When overridden in a derived class, replaces an existing activity in the
