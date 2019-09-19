@@ -3,8 +3,8 @@ package com.microsoft.bot.connector.authentication;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.joda.time.DateTime;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 /**
@@ -32,11 +32,11 @@ public class OAuthResponse
         return this.access_token;
     }
     @JsonProperty
-    private DateTime expiration_time;
-    public DateTime getExpirationTime() {
+    private LocalDateTime expiration_time;
+    public LocalDateTime getExpirationTime() {
         return this.expiration_time;
     }
-    public OAuthResponse withExpirationTime(DateTime expirationTime) {
+    public OAuthResponse withExpirationTime(LocalDateTime expirationTime) {
         this.expiration_time = expirationTime;
         return this;
     }

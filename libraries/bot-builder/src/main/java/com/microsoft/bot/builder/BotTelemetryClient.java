@@ -3,9 +3,8 @@
 
 package com.microsoft.bot.builder;
 
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 /**
@@ -23,7 +22,7 @@ public interface BotTelemetryClient {
      * @param success     True if the availability test ran successfully.
      */
     default void trackAvailability(String name,
-                                   DateTime timeStamp,
+                                   OffsetDateTime timeStamp,
                                    Duration duration,
                                    String runLocation,
                                    boolean success) {
@@ -43,7 +42,7 @@ public interface BotTelemetryClient {
      * @param metrics     Additional values associated with this availability telemetry.
      */
     void trackAvailability(String name,
-                           DateTime timeStamp,
+                           OffsetDateTime timeStamp,
                            Duration duration,
                            String runLocation,
                            boolean success,
@@ -70,7 +69,7 @@ public interface BotTelemetryClient {
                          String target,
                          String dependencyName,
                          String data,
-                         DateTime startTime,
+                         OffsetDateTime startTime,
                          Duration duration,
                          String resultCode,
                          boolean success);

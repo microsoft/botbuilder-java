@@ -5,12 +5,13 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
-import org.joda.time.DateTime;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,19 +52,19 @@ public class MemoryTranscriptStore implements TranscriptStore {
     @Override
     public final CompletableFuture<Void> logActivity(Activity activity) {
         if (activity == null) {
-            throw new NullPointerException("activity cannot be null for LogActivity()");
+            throw new IllegalArgumentException("activity cannot be null for LogActivity()");
         }
 
         synchronized (this.channels) {
             HashMap<String, ArrayList<Activity>> channel;
-            if (!this.channels.containsKey(activity.getChannelId())) {
+            if (!channels.containsKey(activity.getChannelId())) {
                 channel = new HashMap<String, ArrayList<Activity>>();
-                this.channels.put(activity.getChannelId(), channel);
+                channels.put(activity.getChannelId(), channel);
             } else {
-                channel = this.channels.get(activity.getChannelId());
+                channel = channels.get(activity.getChannelId());
             }
 
-            ArrayList<Activity> transcript = null;
+            ArrayList<Activity> transcript;
 
             if (!channel.containsKey(activity.getConversation().getId())) {
                 transcript = new ArrayList<Activity>();
@@ -90,9 +91,9 @@ public class MemoryTranscriptStore implements TranscriptStore {
      */
     @Override
     public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                                 String conversationId,
-                                                                                 String continuationToken,
-                                                                                 DateTime startDate) {
+                                                                            String conversationId,
+                                                                            String continuationToken,
+                                                                            OffsetDateTime startDate) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
@@ -101,50 +102,46 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("missing %1$s", "conversationId"));
         }
 
-        return CompletableFuture.supplyAsync(() -> {
-            PagedResult<Activity> pagedResult = new PagedResult<Activity>();
-            synchronized (channels) {
-                HashMap<String, ArrayList<Activity>> channel;
-                if (!channels.containsKey(channelId)) {
-                    return pagedResult;
-                }
-                channel = channels.get(channelId);
-                ArrayList<Activity> transcript;
+        PagedResult<Activity> pagedResult = new PagedResult<Activity>();
+        synchronized (channels) {
+            if (channels.containsKey(channelId)) {
+                HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
+                if (channel.containsKey(conversationId)) {
+                    ArrayList<Activity> transcript = channel.get(conversationId);
+                    if (continuationToken != null) {
+                        List<Activity> items = transcript.stream()
+                            .sorted(Comparator.comparing(Activity::getTimestamp))
+                            .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
+                            .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
+                            .skip(1)
+                            .limit(20)
+                            .collect(Collectors.toList());
 
-                if (!channel.containsKey(conversationId)) {
-                    return pagedResult;
-                }
-                transcript = channel.get(conversationId);
-                if (continuationToken != null) {
-                    List<Activity> items = transcript.stream()
-                        .sorted(Comparator.comparing(Activity::getTimestamp))
-                        .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
-                        .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
-                        .skip(1)
-                        .limit(20)
-                        .collect(Collectors.toList());
+                        pagedResult.setItems(items.toArray(new Activity[items.size()]));
 
-                    pagedResult.setItems(items.toArray(new Activity[items.size()]));
+                        if (pagedResult.getItems().length == 20) {
+                            pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
+                        }
+                    } else {
+                        List<Activity> items = transcript.stream()
+                            .sorted(Comparator.comparing(Activity::getTimestamp))
+                            .filter(a -> a.getTimestamp().compareTo((startDate == null)
+                                ? OffsetDateTime.MIN
+                                : startDate) >= 0)
+                            .limit(20)
+                            .collect(Collectors.toList());
 
-                    if (pagedResult.getItems().length == 20) {
-                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
-                    }
-                } else {
-                    List<Activity> items = transcript.stream()
-                        .sorted(Comparator.comparing(Activity::getTimestamp))
-                        .filter(a -> a.getTimestamp().compareTo((startDate == null) ? new DateTime(Long.MIN_VALUE) : startDate) >= 0)
-                        .limit(20)
-                        .collect(Collectors.toList());
-                    pagedResult.setItems(items.toArray(new Activity[items.size()]));
-                    if (items.size() == 20) {
-                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
+                        pagedResult.setItems(items.toArray(new Activity[items.size()]));
+
+                        if (items.size() == 20) {
+                            pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
+                        }
                     }
                 }
             }
+        }
 
-            return pagedResult;
-
-        }, ExecutorFactory.getExecutor());
+        return CompletableFuture.completedFuture(pagedResult);
     }
 
     /**
@@ -164,15 +161,14 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("%1$s should not be null", "conversationId"));
         }
 
-        return CompletableFuture.runAsync(() -> {
-            synchronized (this.channels) {
-                if (!this.channels.containsKey(channelId)) {
-                    return;
-                }
+        synchronized (this.channels) {
+            if (this.channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = this.channels.get(channelId);
                 channel.remove(conversationId);
             }
-        }, ExecutorFactory.getExecutor());
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -188,38 +184,29 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
 
-        return CompletableFuture.supplyAsync(() -> {
-            PagedResult<TranscriptInfo> pagedResult = new PagedResult<TranscriptInfo>();
-            synchronized (channels) {
-
-                if (!channels.containsKey(channelId)) {
-                    return pagedResult;
-                }
-
+        PagedResult<TranscriptInfo> pagedResult = new PagedResult<TranscriptInfo>();
+        synchronized (channels) {
+            if (channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
                 if (continuationToken != null) {
                     List<TranscriptInfo> items = channel.entrySet().stream()
                         .map(c -> {
-                                OffsetDateTime offsetDateTime = null;
+                            OffsetDateTime offsetDateTime;
 
-                                if (c.getValue().stream().findFirst().isPresent()) {
-                                    DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
-                                    // convert to DateTime to OffsetDateTime
-                                    Instant instant = Instant.ofEpochMilli(dt.getMillis());
-                                    ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
-                                    offsetDateTime = instant.atOffset(offset);
-                                } else {
-                                    offsetDateTime = OffsetDateTime.now();
-                                }
-
-                                return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                            if (c.getValue().stream().findFirst().isPresent()) {
+                                offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
+                            } else {
+                                offsetDateTime = OffsetDateTime.now();
                             }
-                        )
+
+                            return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                        })
                         .sorted(Comparator.comparing(TranscriptInfo::getCreated))
                         .filter(skipwhile(c -> !c.getId().equals(continuationToken)))
                         .skip(1)
                         .limit(20)
                         .collect(Collectors.toList());
+
                     pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
                         pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
@@ -228,30 +215,26 @@ public class MemoryTranscriptStore implements TranscriptStore {
 
                     List<TranscriptInfo> items = channel.entrySet().stream()
                         .map(c -> {
-                                OffsetDateTime offsetDateTime = null;
-                                if (c.getValue().stream().findFirst().isPresent()) {
-                                    DateTime dt = c.getValue().stream().findFirst().get().getTimestamp();
-                                    // convert to DateTime to OffsetDateTime
-                                    Instant instant = Instant.ofEpochMilli(dt.getMillis());
-                                    ZoneOffset offset = ZoneId.of(dt.getZone().getID()).getRules().getOffset(instant);
-                                    offsetDateTime = instant.atOffset(offset);
-                                } else {
-                                    offsetDateTime = OffsetDateTime.now();
-                                }
-                                return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                            OffsetDateTime offsetDateTime;
+                            if (c.getValue().stream().findFirst().isPresent()) {
+                                offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
+                            } else {
+                                offsetDateTime = OffsetDateTime.now();
                             }
-                        )
+                            return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                        })
                         .sorted(Comparator.comparing(TranscriptInfo::getCreated))
                         .limit(20)
                         .collect(Collectors.toList());
+
                     pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
                     if (items.size() == 20) {
                         pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 }
             }
-            return pagedResult;
-        }, ExecutorFactory.getExecutor());
-    }
+        }
 
+        return CompletableFuture.completedFuture(pagedResult);
+    }
 }

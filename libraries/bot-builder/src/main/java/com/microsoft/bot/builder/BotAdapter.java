@@ -160,20 +160,6 @@ public abstract class BotAdapter {
         }
     }
 
-
-    /**
-     * Creates a conversation on the specified channel.
-     *
-     * @param channelId The ID of the channel.
-     * @param callback  A method to call when the new conversation is available.
-     * @return A task that represents the work queued to execute.
-     * @throws UnsupportedOperationException No base implementation is provided.
-     */
-    public CompletableFuture<Void> createConversation(String channelId,
-                                                      Function<TurnContext, BotCallbackHandler> callback) {
-        throw new UnsupportedOperationException("Adapter does not support CreateConversation with this arguments");
-    }
-
     /**
      * Sends a proactive message to a conversation.
      *

@@ -8,20 +8,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
-import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.ChannelAccount;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**
- * When added, this middleware will log incoming and outgoing activitites to a ITranscriptStore.
+ * When added, this middleware will log incoming and outgoing activities to a TranscriptStore.
  */
 public class TranscriptLoggerMiddleware implements Middleware {
     private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
@@ -40,14 +40,15 @@ public class TranscriptLoggerMiddleware implements Middleware {
     /**
      * Initializes a new instance of the <see cref="TranscriptLoggerMiddleware"/> class.
      *
-     * @param transcriptLogger The transcript logger to use.
+     * @param withTranscriptLogger The transcript logger to use.
      */
-    public TranscriptLoggerMiddleware(TranscriptLogger transcriptLogger) {
-        if (transcriptLogger == null)
-            throw new NullPointerException("TranscriptLoggerMiddleware requires a ITranscriptLogger implementation.  ");
+    public TranscriptLoggerMiddleware(TranscriptLogger withTranscriptLogger) {
+        if (withTranscriptLogger == null) {
+            throw new IllegalArgumentException(
+                "TranscriptLoggerMiddleware requires a ITranscriptLogger implementation.");
+        }
 
-        this.transcriptLogger = transcriptLogger;
-
+        transcriptLogger = withTranscriptLogger;
     }
 
     /**
@@ -61,10 +62,11 @@ public class TranscriptLoggerMiddleware implements Middleware {
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
-            JsonNode role = null;
             if (context.getActivity().getFrom() == null) {
-                throw new RuntimeException("Activity does not contain From field");
+                context.getActivity().setFrom(new ChannelAccount());
             }
+
+            JsonNode role = null;
             if (context.getActivity().getFrom().getProperties().containsKey("role")) {
                 role = context.getActivity().getFrom().getProperties().get("role");
             }
@@ -72,85 +74,70 @@ public class TranscriptLoggerMiddleware implements Middleware {
             if (role == null || StringUtils.isBlank(role.asText())) {
                 context.getActivity().getFrom().getProperties().put("role", mapper.createObjectNode().with("user"));
             }
-            Activity activityTemp = Activity.clone(context.getActivity());
 
-            LogActivity(Activity.clone(context.getActivity()));
+            logActivity(Activity.clone(context.getActivity()));
         }
 
         // hook up onSend pipeline
         context.onSendActivities((ctx, activities, nextSend) -> {
             // run full pipeline
-            CompletableFuture<ResourceResponse[]> responses = null;
+            return nextSend.get()
+                .thenApply(responses -> {
+                    for (Activity activity : activities) {
+                        logActivity(Activity.clone(activity));
+                    }
 
-            if (nextSend != null) {
-                responses = nextSend.get();
-            }
-
-            for (Activity activity : activities) {
-                LogActivity(Activity.clone(activity));
-            }
-
-            return responses;
+                    return responses;
+                });
         });
 
         // hook up update activity pipeline
         context.onUpdateActivity((ctx, activity, nextUpdate) -> {
             // run full pipeline
-            CompletableFuture<ResourceResponse> response = null;
+            return nextUpdate.get()
+                .thenApply(resourceResponse -> {
+                    // add Message Update activity
+                    Activity updateActivity = Activity.clone(activity);
+                    updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
+                    logActivity(updateActivity);
 
-            if (nextUpdate != null) {
-                response = nextUpdate.get();
-            }
-
-            // add Message Update activity
-            Activity updateActivity = Activity.clone(activity);
-            updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
-            LogActivity(updateActivity);
-
-            return response;
+                    return resourceResponse;
+                });
         });
 
         // hook up delete activity pipeline
         context.onDeleteActivity((ctx, reference, nextDel) -> {
             // run full pipeline
+            return nextDel.get()
+                .thenApply(nextDelResult -> {
+                    // add MessageDelete activity
+                    // log as MessageDelete activity
+                    Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {{
+                        setId(reference.getActivityId());
+                        applyConversationReference(reference, false);
+                    }};
 
-            if (nextDel != null) {
-                logger.debug(String.format("Transcript logActivity next delegate: %s)", nextDel));
-                nextDel.get();
-            }
+                    logActivity(deleteActivity);
 
-            // add MessageDelete activity
-            // log as MessageDelete activity
-            Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {{
-                setId(reference.getActivityId());
-                applyConversationReference(reference, false);
-            }};
-
-            LogActivity(deleteActivity);
-
-            return null;
+                    return null;
+                });
         });
 
 
         // process bot logic
-        CompletableFuture<Void> result = next.next();
-
-        // flush transcript at end of turn
-        while (!transcript.isEmpty()) {
-            Activity activity = transcript.poll();
-            try {
-                this.transcriptLogger.logActivity(activity);
-            } catch (RuntimeException err) {
-                logger.error(String.format("Transcript poll failed : %1$s", err));
-            }
-        }
-
-        return result;
+        return next.next()
+            .thenAccept(nextResult -> {
+                // flush transcript at end of turn
+                while (!transcript.isEmpty()) {
+                    Activity activity = transcript.poll();
+                    transcriptLogger.logActivity(activity);
+                }
+            });
     }
 
-    private void LogActivity(Activity activity) {
+    private void logActivity(Activity activity) {
         if (activity.getTimestamp() == null) {
-            activity.setTimestamp(DateTime.now(DateTimeZone.UTC));
+            activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
         }
         transcript.offer(activity);
     }

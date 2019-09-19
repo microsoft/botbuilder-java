@@ -7,7 +7,6 @@ import com.microsoft.bot.builder.BotCallbackHandler;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.junit.Assert;
 
 import java.lang.management.ManagementFactory;
@@ -92,7 +91,7 @@ public class TestFlow {
             System.out.print(String.format("USER SAYS: %s (Thread Id: %s)\n", userSays, Thread.currentThread().getId()));
             System.out.flush();
             try {
-                this.adapter.SendTextToBot(userSays, this.callback);
+                this.adapter.sendTextToBot(userSays, this.callback);
                 return "Successfully sent " + userSays;
             } catch (Exception e) {
                 Assert.fail(e.getMessage());
@@ -117,7 +116,7 @@ public class TestFlow {
 
 
             try {
-                this.adapter.ProcessActivity(userActivity, this.callback);
+                this.adapter.processActivity(userActivity, this.callback);
                 return "TestFlow: Send() -> ProcessActivity: " + userActivity.getText();
             } catch (Exception e) {
                 return e.getMessage();
@@ -162,7 +161,7 @@ public class TestFlow {
     }
 
     public TestFlow assertReply(String expected, String description, int timeout) {
-        return this.assertReply(this.adapter.MakeActivity(expected), description, timeout);
+        return this.assertReply(this.adapter.makeActivity(expected), description, timeout);
     }
 
     /**
@@ -218,11 +217,11 @@ public class TestFlow {
             if (isDebug())
                 finalTimeout = Integer.MAX_VALUE;
 
-            DateTime start = DateTime.now();
+            long start = System.currentTimeMillis();
             while (true) {
-                DateTime current = DateTime.now();
+                long current = System.currentTimeMillis();
 
-                if ((current.getMillis() - start.getMillis()) > (long) finalTimeout) {
+                if ((current - start) > (long) finalTimeout) {
                     System.out.println("AssertReply: Timeout!\n");
                     System.out.flush();
                     return String.format("%d ms Timed out waiting for:'%s'", finalTimeout, description);
@@ -231,7 +230,7 @@ public class TestFlow {
 //                System.out.println("Before GetNextReply\n");
 //                System.out.flush();
 
-                Activity replyActivity = this.adapter.GetNextReply();
+                Activity replyActivity = this.adapter.getNextReply();
 //                System.out.println("After GetNextReply\n");
 //                System.out.flush();
 
@@ -286,7 +285,7 @@ public class TestFlow {
                 System.out.flush();
 
                 try {
-                    this.adapter.SendTextToBot(userSays, this.callback);
+                    this.adapter.sendTextToBot(userSays, this.callback);
                     return null;
                 } catch (Exception e) {
                     return e.getMessage();
@@ -313,15 +312,15 @@ public class TestFlow {
 
                     System.out.println(String.format("TestTurn(tid:%s): Started receive loop: %s", Thread.currentThread().getId(), description));
                     System.out.flush();
-                    DateTime start = DateTime.now();
+                    long start = System.currentTimeMillis();
                     while (true) {
-                        DateTime current = DateTime.now();
+                        long current = System.currentTimeMillis();
 
-                        if ((current.getMillis() - start.getMillis()) > (long) finalTimeout)
+                        if ((current - start) > (long) finalTimeout)
                             return String.format("TestTurn: %d ms Timed out waiting for:'%s'", finalTimeout, description);
 
 
-                        Activity replyActivity = this.adapter.GetNextReply();
+                        Activity replyActivity = this.adapter.getNextReply();
 
 
                         if (replyActivity != null) {

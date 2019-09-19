@@ -13,8 +13,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,14 +49,14 @@ public class Activity {
      * Contains the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
      */
     @JsonProperty(value = "timestamp")
-    private DateTime timestamp;
+    private OffsetDateTime timestamp;
 
     /**
      * Contains the local date and time of the message, expressed in ISO-8601 format.
      * For example, 2016-09-23T13:07:49.4714686-07:00.
      */
     @JsonProperty(value = "localTimestamp")
-    private DateTime localTimestamp;
+    private OffsetDateTime localTimestamp;
 
     /**
      * Contains the name of the local timezone of the message, expressed in IANA Time Zone database format.
@@ -259,7 +261,7 @@ public class Activity {
      * The time at which the activity should be considered to be expired and should not be presented to the recipient.
      */
     @JsonProperty(value = "expiration")
-    private DateTime expiration;
+    private LocalDateTime expiration;
 
     /**
      * The importance of the activity.
@@ -298,7 +300,7 @@ public class Activity {
      * Default constructor.  Normally this wouldn't be used as the ActivityType is normally required.
      */
     protected Activity() {
-        setTimestamp(DateTime.now());
+        setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
     }
 
     /**
@@ -504,28 +506,28 @@ public class Activity {
     /**
      * @see #timestamp
      */
-    public DateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return this.timestamp;
     }
 
     /**
      * @see #timestamp
      */
-    public void setTimestamp(DateTime withTimestamp) {
+    public void setTimestamp(OffsetDateTime withTimestamp) {
         this.timestamp = withTimestamp;
     }
 
     /**
      * @see #localTimestamp
      */
-    public DateTime getLocalTimestamp() {
+    public OffsetDateTime getLocalTimestamp() {
         return this.localTimestamp;
     }
 
     /**
      * @see #localTimestamp
      */
-    public void setLocalTimestamp(DateTime withLocalTimestamp) {
+    public void setLocalTimestamp(OffsetDateTime withLocalTimestamp) {
         this.localTimestamp = withLocalTimestamp;
     }
 
@@ -858,14 +860,14 @@ public class Activity {
     /**
      * @see #expiration
      */
-    public DateTime getExpiration() {
+    public LocalDateTime getExpiration() {
         return this.expiration;
     }
 
     /**
      * @see #expiration
      */
-    public void setExpiration(DateTime withExpiration) {
+    public void setExpiration(LocalDateTime withExpiration) {
         this.expiration = withExpiration;
     }
 

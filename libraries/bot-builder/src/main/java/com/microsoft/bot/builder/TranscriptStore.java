@@ -4,8 +4,8 @@
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
-import org.joda.time.DateTime;
 
+import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -22,7 +22,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * If the task completes successfully, the result contains the matching activities.
      */
     default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                                  String conversationId) {
+                                                                             String conversationId) {
         return getTranscriptActivities(channelId, conversationId, null);
     }
 
@@ -36,9 +36,9 @@ public interface TranscriptStore extends TranscriptLogger {
      * If the task completes successfully, the result contains the matching activities.
      */
     default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                                  String conversationId,
-                                                                                  String continuationToken) {
-        return getTranscriptActivities(channelId, conversationId, continuationToken, DateTime.now());
+                                                                             String conversationId,
+                                                                             String continuationToken) {
+        return getTranscriptActivities(channelId, conversationId, continuationToken, null);
     }
 
     /**
@@ -52,9 +52,9 @@ public interface TranscriptStore extends TranscriptLogger {
      * If the task completes successfully, the result contains the matching activities.
      */
     CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                          String conversationId,
-                                                                          String continuationToken,
-                                                                          DateTime startDate);
+                                                                     String conversationId,
+                                                                     String continuationToken,
+                                                                     OffsetDateTime startDate);
 
     /**
      * Gets the conversations on a channel from the store.

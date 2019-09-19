@@ -6,11 +6,11 @@ package com.microsoft.bot.builder.adapters;
 import com.microsoft.bot.builder.*;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class TestAdapter extends BotAdapter {
     private final Queue<Activity> botReplies = new LinkedList<>();
@@ -24,22 +24,22 @@ public class TestAdapter extends BotAdapter {
 
     public TestAdapter(ConversationReference reference) {
         if (reference != null) {
-            this.setConversationReference(reference);
+            setConversationReference(reference);
         } else {
-            this.setConversationReference(new ConversationReference() {{
+            setConversationReference(new ConversationReference() {{
                 setChannelId("test");
                 setServiceUrl("https://test.com");
             }});
 
-            this.conversationReference().setUser(new ChannelAccount() {{
+            conversationReference().setUser(new ChannelAccount() {{
                 setId("user1");
                 setName("User1");
             }});
-            this.conversationReference().setBot(new ChannelAccount() {{
+            conversationReference().setBot(new ChannelAccount() {{
                 setId("bot");
                 setName("Bot");
             }});
-            this.conversationReference().setConversation(new ConversationAccount() {{
+            conversationReference().setConversation(new ConversationAccount() {{
                 setIsGroup(Boolean.FALSE);
                 setConversationType("convo1");
                 setId("Conversation1");
@@ -57,29 +57,27 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-    public void ProcessActivity(Activity activity,
-                                BotCallbackHandler callback
-    ) throws Exception {
-        synchronized (this.conversationReference()) {
+    public void processActivity(Activity activity,
+                                BotCallbackHandler callback) throws Exception {
+        synchronized (conversationReference()) {
             // ready for next reply
             if (activity.getType() == null)
                 activity.setType(ActivityTypes.MESSAGE);
-            activity.setChannelId(this.conversationReference().getChannelId());
-            activity.setFrom(this.conversationReference().getUser());
-            activity.setRecipient(this.conversationReference().getBot());
-            activity.setConversation(this.conversationReference().getConversation());
-            activity.setServiceUrl(this.conversationReference().getServiceUrl());
-            Integer next = this.nextId++;
+            activity.setChannelId(conversationReference().getChannelId());
+            activity.setFrom(conversationReference().getUser());
+            activity.setRecipient(conversationReference().getBot());
+            activity.setConversation(conversationReference().getConversation());
+            activity.setServiceUrl(conversationReference().getServiceUrl());
+            Integer next = nextId++;
             activity.setId(next.toString());
         }
         // Assume Default DateTime : DateTime(0)
-        if (activity.getTimestamp() == null || activity.getTimestamp() == new DateTime(0))
-            activity.setTimestamp(DateTime.now());
+        if (activity.getTimestamp() == null || activity.getTimestamp().toEpochSecond() == 0)
+            activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            super.runPipeline(context, callback);
+            super.runPipeline(context, callback).join();
         }
-        return;
     }
 
     public ConversationReference conversationReference() {
@@ -99,10 +97,9 @@ public class TestAdapter extends BotAdapter {
                 activity.setId(UUID.randomUUID().toString());
 
             if (activity.getTimestamp() == null)
-                activity.setTimestamp(DateTime.now());
+                activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
 
             responses.add(new ResourceResponse(activity.getId()));
-            // This is simulating DELAY
 
             System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.size()));
             for (Activity act : activities) {
@@ -110,10 +107,12 @@ public class TestAdapter extends BotAdapter {
                 System.out.printf(": From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
                 System.out.printf(": Text:%s\n:---------", (act.getText() == null) ? "No text set" : act.getText());
             }
+
+            // This is simulating DELAY
             if (activity.getType().toString().equals("delay")) {
                 // The BotFrameworkAdapter and Console adapter implement this
                 // hack directly in the POST method. Replicating that here
-                // to keep the behavior as close as possible to facillitate
+                // to keep the behavior as close as possible to facilitate
                 // more realistic tests.
                 int delayMs = (int) activity.getValue();
                 try {
@@ -121,8 +120,8 @@ public class TestAdapter extends BotAdapter {
                 } catch (InterruptedException e) {
                 }
             } else {
-                synchronized (this.botReplies) {
-                    this.botReplies.add(activity);
+                synchronized (botReplies) {
+                    botReplies.add(activity);
                 }
             }
         }
@@ -132,15 +131,15 @@ public class TestAdapter extends BotAdapter {
 
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
-        synchronized (this.botReplies) {
+        synchronized (botReplies) {
             List<Activity> replies = new ArrayList<>(botReplies);
-            for (int i = 0; i < this.botReplies.size(); i++) {
+            for (int i = 0; i < botReplies.size(); i++) {
                 if (replies.get(i).getId().equals(activity.getId())) {
                     replies.set(i, activity);
-                    this.botReplies.clear();
+                    botReplies.clear();
 
                     for (Activity item : replies) {
-                        this.botReplies.add(item);
+                        botReplies.add(item);
                     }
                     return CompletableFuture.completedFuture(new ResourceResponse(activity.getId()));
                 }
@@ -151,14 +150,14 @@ public class TestAdapter extends BotAdapter {
 
     @Override
     public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
-        synchronized (this.botReplies) {
-            ArrayList<Activity> replies = new ArrayList<>(this.botReplies);
-            for (int i = 0; i < this.botReplies.size(); i++) {
+        synchronized (botReplies) {
+            ArrayList<Activity> replies = new ArrayList<>(botReplies);
+            for (int i = 0; i < botReplies.size(); i++) {
                 if (replies.get(i).getId().equals(reference.getActivityId())) {
                     replies.remove(i);
-                    this.botReplies.clear();
+                    botReplies.clear();
                     for (Activity item : replies) {
-                        this.botReplies.add(item);
+                        botReplies.add(item);
                     }
                     break;
                 }
@@ -168,31 +167,14 @@ public class TestAdapter extends BotAdapter {
     }
 
     /**
-     * NOTE: this resets the queue, it doesn't actually maintain multiple converstion queues
-     *
-     * @param channelId
-     * @param callback
-     * @return
-     */
-    //@Override
-    public CompletableFuture CreateConversation(String channelId, Function<TurnContext, CompletableFuture> callback) {
-        this.activeQueue().clear();
-        Activity update = Activity.createConversationUpdateActivity();
-
-        update.setConversation(new ConversationAccount(UUID.randomUUID().toString()));
-        TurnContextImpl context = new TurnContextImpl(this, update);
-        return callback.apply(context);
-    }
-
-    /**
      * Called by TestFlow to check next reply
      *
      * @return
      */
-    public Activity GetNextReply() {
-        synchronized (this.botReplies) {
-            if (this.botReplies.size() > 0) {
-                return this.botReplies.remove();
+    public Activity getNextReply() {
+        synchronized (botReplies) {
+            if (botReplies.size() > 0) {
+                return botReplies.remove();
             }
         }
         return null;
@@ -203,11 +185,11 @@ public class TestAdapter extends BotAdapter {
      *
      * @return
      */
-    public Activity MakeActivity() {
-        return MakeActivity(null);
+    public Activity makeActivity() {
+        return makeActivity(null);
     }
 
-    public Activity MakeActivity(String withText) {
+    public Activity makeActivity(String withText) {
         Integer next = nextId++;
         Activity activity = new Activity(ActivityTypes.MESSAGE) {{
             setFrom(conversationReference().getUser());
@@ -228,8 +210,8 @@ public class TestAdapter extends BotAdapter {
      * @param userSays
      * @return
      */
-    public void SendTextToBot(String userSays, BotCallbackHandler callback) throws Exception {
-        this.ProcessActivity(this.MakeActivity(userSays), callback);
+    public void sendTextToBot(String userSays, BotCallbackHandler callback) throws Exception {
+        processActivity(this.makeActivity(userSays), callback);
     }
 }
 
