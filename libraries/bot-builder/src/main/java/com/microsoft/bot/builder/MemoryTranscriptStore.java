@@ -3,45 +3,39 @@
 
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.connector.ExecutorFactory;
+import com.codepoetics.protonpack.StreamUtils;
 import com.microsoft.bot.schema.Activity;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The memory transcript store stores transcripts in volatile memory in a Dictionary.
  *
- * Because this uses an unbounded volatile dictionary this should only be used for unit tests or
- * non-production environments.
+ * <p>Because this uses an unbounded volatile dictionary this should only be used for unit tests or
+ * non-production environments.</p>
  */
 public class MemoryTranscriptStore implements TranscriptStore {
-    private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<String, HashMap<String, ArrayList<Activity>>>();
+    /**
+     * Numbers of results in a paged request.
+     */
+    private static final int PAGE_SIZE = 20;
 
     /**
-     * Emulate C# SkipWhile.
-     * Stateful
-     *
-     * @param func1 predicate to apply
-     * @param <T>   type
-     * @return if the predicate condition is true
+     * Sync object for locking.
      */
-    public static <T> Predicate<T> skipwhile(Function<? super T, Object> func1) {
-        final boolean[] started = {false};
-        return t -> started[0] || (started[0] = (boolean) func1.apply(t));
-    }
+    private final Object sync = new Object();
+
+    /**
+     * Map of channel transcripts.
+     */
+    private HashMap<String, HashMap<String, ArrayList<Activity>>> channels = new HashMap<>();
 
     /**
      * Logs an activity to the transcript.
@@ -55,10 +49,10 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException("activity cannot be null for LogActivity()");
         }
 
-        synchronized (this.channels) {
+        synchronized (sync) {
             HashMap<String, ArrayList<Activity>> channel;
             if (!channels.containsKey(activity.getChannelId())) {
-                channel = new HashMap<String, ArrayList<Activity>>();
+                channel = new HashMap<>();
                 channels.put(activity.getChannelId(), channel);
             } else {
                 channel = channels.get(activity.getChannelId());
@@ -67,7 +61,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
             ArrayList<Activity> transcript;
 
             if (!channel.containsKey(activity.getConversation().getId())) {
-                transcript = new ArrayList<Activity>();
+                transcript = new ArrayList<>();
                 channel.put(activity.getConversation().getId(), transcript);
             } else {
                 transcript = channel.get(activity.getConversation().getId());
@@ -84,7 +78,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
      *
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
-     * @param continuationToken
+     * @param continuationToken The continuation token from the previous page of results.
      * @param startDate         A cutoff date. Activities older than this date are not included.
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
@@ -102,40 +96,30 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("missing %1$s", "conversationId"));
         }
 
-        PagedResult<Activity> pagedResult = new PagedResult<Activity>();
-        synchronized (channels) {
+        PagedResult<Activity> pagedResult = new PagedResult<>();
+        synchronized (sync) {
             if (channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
                 if (channel.containsKey(conversationId)) {
+                    OffsetDateTime effectiveStartDate = (startDate == null) ? OffsetDateTime.MIN : startDate;
+
                     ArrayList<Activity> transcript = channel.get(conversationId);
+
+                    Stream<Activity> stream = transcript.stream()
+                        .sorted(Comparator.comparing(Activity::getTimestamp))
+                        .filter(a -> a.getTimestamp().compareTo(effectiveStartDate) >= 0);
+
                     if (continuationToken != null) {
-                        List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::getTimestamp))
-                            .filter(a -> a.getTimestamp().compareTo(startDate) >= 0)
-                            .filter(skipwhile(a -> !a.getId().equals(continuationToken)))
-                            .skip(1)
-                            .limit(20)
-                            .collect(Collectors.toList());
+                        stream = StreamUtils.skipWhile(stream, a -> !a.getId().equals(continuationToken)).skip(1);
+                    }
 
-                        pagedResult.setItems(items.toArray(new Activity[items.size()]));
+                    List<Activity> items = stream
+                        .limit(PAGE_SIZE)
+                        .collect(Collectors.toList());
 
-                        if (pagedResult.getItems().length == 20) {
-                            pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
-                        }
-                    } else {
-                        List<Activity> items = transcript.stream()
-                            .sorted(Comparator.comparing(Activity::getTimestamp))
-                            .filter(a -> a.getTimestamp().compareTo((startDate == null)
-                                ? OffsetDateTime.MIN
-                                : startDate) >= 0)
-                            .limit(20)
-                            .collect(Collectors.toList());
-
-                        pagedResult.setItems(items.toArray(new Activity[items.size()]));
-
-                        if (items.size() == 20) {
-                            pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
-                        }
+                    pagedResult.setItems(items);
+                    if (pagedResult.getItems().size() == PAGE_SIZE) {
+                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                     }
                 }
             }
@@ -161,7 +145,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("%1$s should not be null", "conversationId"));
         }
 
-        synchronized (this.channels) {
+        synchronized (sync) {
             if (this.channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = this.channels.get(channelId);
                 channel.remove(conversationId);
@@ -175,7 +159,7 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * Gets the conversations on a channel from the store.
      *
      * @param channelId         The ID of the channel.
-     * @param continuationToken
+     * @param continuationToken The continuation token from the previous page of results.
      * @return A task that represents the work queued to execute.
      */
     @Override
@@ -184,53 +168,35 @@ public class MemoryTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
 
-        PagedResult<TranscriptInfo> pagedResult = new PagedResult<TranscriptInfo>();
-        synchronized (channels) {
+        PagedResult<TranscriptInfo> pagedResult = new PagedResult<>();
+        synchronized (sync) {
             if (channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
+                Stream<TranscriptInfo> stream = channel.entrySet().stream()
+                    .map(c -> {
+                        OffsetDateTime offsetDateTime;
+
+                        if (c.getValue().stream().findFirst().isPresent()) {
+                            offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
+                        } else {
+                            offsetDateTime = OffsetDateTime.now();
+                        }
+
+                        return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                    })
+                    .sorted(Comparator.comparing(TranscriptInfo::getCreated));
+
                 if (continuationToken != null) {
-                    List<TranscriptInfo> items = channel.entrySet().stream()
-                        .map(c -> {
-                            OffsetDateTime offsetDateTime;
+                    stream = StreamUtils.skipWhile(stream, c -> !c.getId().equals(continuationToken)).skip(1);
+                }
 
-                            if (c.getValue().stream().findFirst().isPresent()) {
-                                offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
-                            } else {
-                                offsetDateTime = OffsetDateTime.now();
-                            }
+                List<TranscriptInfo> items = stream
+                    .limit(PAGE_SIZE)
+                    .collect(Collectors.toList());
 
-                            return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
-                        })
-                        .sorted(Comparator.comparing(TranscriptInfo::getCreated))
-                        .filter(skipwhile(c -> !c.getId().equals(continuationToken)))
-                        .skip(1)
-                        .limit(20)
-                        .collect(Collectors.toList());
-
-                    pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
-                    if (items.size() == 20) {
-                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
-                    }
-                } else {
-
-                    List<TranscriptInfo> items = channel.entrySet().stream()
-                        .map(c -> {
-                            OffsetDateTime offsetDateTime;
-                            if (c.getValue().stream().findFirst().isPresent()) {
-                                offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
-                            } else {
-                                offsetDateTime = OffsetDateTime.now();
-                            }
-                            return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
-                        })
-                        .sorted(Comparator.comparing(TranscriptInfo::getCreated))
-                        .limit(20)
-                        .collect(Collectors.toList());
-
-                    pagedResult.setItems(items.toArray(new TranscriptInfo[items.size()]));
-                    if (items.size() == 20) {
-                        pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
-                    }
+                pagedResult.setItems(items);
+                if (items.size() == PAGE_SIZE) {
+                    pagedResult.setContinuationToken(items.get(items.size() - 1).getId());
                 }
             }
         }

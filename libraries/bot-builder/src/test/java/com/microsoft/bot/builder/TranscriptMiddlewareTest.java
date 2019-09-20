@@ -86,14 +86,14 @@ public class TranscriptMiddlewareTest {
             .startTest();
 
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
-        Assert.assertEquals(6, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
-        Assert.assertNotEquals(pagedResult.getItems()[1], null);
-        Assert.assertEquals("echo:foo", ((Activity) pagedResult.getItems()[2]).getText());
-        Assert.assertEquals("bar", ((Activity) pagedResult.getItems()[3]).getText());
+        Assert.assertEquals(6, pagedResult.getItems().size());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
+        Assert.assertNotEquals(pagedResult.getItems().get(1), null);
+        Assert.assertEquals("echo:foo", ((Activity) pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("bar", ((Activity) pagedResult.getItems().get(3)).getText());
 
-        Assert.assertTrue(pagedResult.getItems()[4] != null);
-        Assert.assertEquals("echo:bar", ((Activity) pagedResult.getItems()[5]).getText());
+        Assert.assertTrue(pagedResult.getItems().get(4) != null);
+        Assert.assertEquals("echo:bar", ((Activity) pagedResult.getItems().get(5)).getText());
         for (Object activity : pagedResult.getItems()) {
             Assert.assertFalse(StringUtils.isBlank(((Activity) activity).getId()));
             Assert.assertTrue(((Activity) activity).getTimestamp().isAfter(OffsetDateTime.MIN));
@@ -130,12 +130,12 @@ public class TranscriptMiddlewareTest {
 
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
-        Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
-        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems()[2]).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).getText());
-        Assert.assertEquals( ((Activity)pagedResult.getItems()[1]).getId(),  ((Activity) pagedResult.getItems()[2]).getId());
+        Assert.assertEquals(4, pagedResult.getItems().size());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
+        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals( ((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
     }
 
     @Test
@@ -170,12 +170,12 @@ public class TranscriptMiddlewareTest {
         for (Object activity : pagedResult.getItems()) {
             System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).getRecipient().getName(), ((Activity) activity).getText());
         }
-        Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
-        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
-        Assert.assertEquals("deleteIt", ((Activity) pagedResult.getItems()[2]).getText());
-        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity) pagedResult.getItems()[3]).getType());
-        Assert.assertEquals(((Activity) pagedResult.getItems()[1]).getId(), ((Activity) pagedResult.getItems()[3]).getId());
+        Assert.assertEquals(4, pagedResult.getItems().size());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
+        Assert.assertEquals("deleteIt", ((Activity) pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity) pagedResult.getItems().get(3)).getType());
+        Assert.assertEquals(((Activity) pagedResult.getItems().get(1)).getId(), ((Activity) pagedResult.getItems().get(3)).getId());
     }
 
     @Test
@@ -210,23 +210,23 @@ public class TranscriptMiddlewareTest {
         Thread.sleep(500);
 
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, dateTimeStartOffset1).join();
-        Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
-        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems()[2]).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).getText());
-        Assert.assertEquals(((Activity)pagedResult.getItems()[1]).getId(),  ((Activity) pagedResult.getItems()[2]).getId());
+        Assert.assertEquals(4, pagedResult.getItems().size());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
+        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals(((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
 
         pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, OffsetDateTime.MIN).join();
-        Assert.assertEquals(4, pagedResult.getItems().length);
-        Assert.assertEquals("foo", ((Activity) pagedResult.getItems()[0]).getText());
-        Assert.assertEquals("response", ((Activity) pagedResult.getItems()[1]).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems()[2]).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems()[3]).getText());
-        Assert.assertEquals(((Activity)pagedResult.getItems()[1]).getId(),  ((Activity) pagedResult.getItems()[2]).getId());
+        Assert.assertEquals(4, pagedResult.getItems().size());
+        Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
+        Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
+        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals(((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
 
         pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, OffsetDateTime.MAX).join();
-        Assert.assertEquals(0, pagedResult.getItems().length);
+        Assert.assertEquals(0, pagedResult.getItems().size());
     }
 }
 

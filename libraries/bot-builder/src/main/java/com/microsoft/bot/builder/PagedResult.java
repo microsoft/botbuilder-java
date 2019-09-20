@@ -4,6 +4,9 @@
 package com.microsoft.bot.builder;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Page of results from an enumeration.
  *
@@ -13,18 +16,18 @@ public class PagedResult<T> {
     /**
      * Page of items.
      */
-    private T[] items = (T[]) new Object[0];
+    private List<T> items = new ArrayList<>();
 
     /**
      * Token used to page through multiple pages.
      */
     private String continuationToken;
 
-    public T[] getItems() {
+    public List<T> getItems() {
         return this.items;
     }
 
-    public void setItems(T[] value) {
+    public void setItems(List<T> value) {
         this.items = value;
     }
 
