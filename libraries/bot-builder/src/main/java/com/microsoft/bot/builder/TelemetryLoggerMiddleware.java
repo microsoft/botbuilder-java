@@ -37,6 +37,10 @@ public class TelemetryLoggerMiddleware implements Middleware {
         logPersonalInformation = withLogPersonalInformation;
     }
 
+    public BotTelemetryClient getTelemetryClient() {
+        return telemetryClient;
+    }
+
     /**
      * Logs events based on incoming and outgoing activities using the {@link BotTelemetryClient} interface.
      *

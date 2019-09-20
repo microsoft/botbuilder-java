@@ -1,5 +1,7 @@
 package com.microsoft.bot.builder;
 
+import java.util.concurrent.CompletableFuture;
+
 @FunctionalInterface
 public interface OnTurnErrorHandler {
     /**
@@ -9,5 +11,5 @@ public interface OnTurnErrorHandler {
      * @param exception   The exception thrown.
      * @return A task that represents the work queued to execute.
      */
-    Void invoke(TurnContext turnContext, Throwable exception);
+    CompletableFuture<Void> invoke(TurnContext turnContext, Throwable exception);
 }

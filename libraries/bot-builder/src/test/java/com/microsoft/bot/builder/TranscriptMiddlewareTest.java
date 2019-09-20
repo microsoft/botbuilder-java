@@ -185,6 +185,7 @@ public class TranscriptMiddlewareTest {
 
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
         TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
+
         final String[] conversationId = {null};
         final Activity[] activityToUpdate = {null};
         new TestFlow(adapter, (context) -> {

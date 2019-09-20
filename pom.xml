@@ -60,6 +60,13 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>3.0.0</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
         <groupId>com.microsoft.rest</groupId>
         <artifactId>client-runtime</artifactId>
         <version>1.6.12</version>

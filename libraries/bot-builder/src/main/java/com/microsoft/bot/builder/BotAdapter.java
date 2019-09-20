@@ -145,7 +145,7 @@ public abstract class BotAdapter {
             return middlewareSet.receiveActivityWithStatus(context, callback)
                 .exceptionally(exception -> {
                     if (onTurnError != null) {
-                        return onTurnError.invoke(context, exception);
+                        return onTurnError.invoke(context, exception).join();
                     }
 
                     throw new CompletionException(exception);
