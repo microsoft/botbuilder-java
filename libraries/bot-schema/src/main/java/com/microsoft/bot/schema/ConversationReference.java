@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -18,30 +19,35 @@ public class ConversationReference {
      * (Optional) ID of the activity to refer to.
      */
     @JsonProperty(value = "activityId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String activityId;
 
     /**
      * (Optional) User participating in this conversation.
      */
     @JsonProperty(value = "user")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount user;
 
     /**
      * Bot participating in this conversation.
      */
     @JsonProperty(value = "bot")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount bot;
 
     /**
      * Conversation reference.
      */
     @JsonProperty(value = "conversation")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationAccount conversation;
 
     /**
      * Channel ID.
      */
     @JsonProperty(value = "channelId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
     /**
@@ -49,6 +55,7 @@ public class ConversationReference {
      * may be performed.
      */
     @JsonProperty(value = "serviceUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
 
     public static ConversationReference clone(ConversationReference conversationReference) {

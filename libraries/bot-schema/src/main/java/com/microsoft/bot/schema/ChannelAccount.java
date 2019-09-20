@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -26,18 +27,21 @@ public class ChannelAccount {
      * or @joesmith or 123456).
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Display friendly name.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * This account's object ID within Azure Active Directory (AAD).
      */
     @JsonProperty(value = "aadObjectId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aadObjectId;
 
     /**
@@ -45,6 +49,7 @@ public class ChannelAccount {
      * Possible values include: 'user', 'bot'.
      */
     @JsonProperty(value = "role")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private RoleTypes role;
 
     /**

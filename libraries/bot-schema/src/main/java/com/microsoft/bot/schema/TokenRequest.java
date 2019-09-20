@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
@@ -18,12 +19,14 @@ public class TokenRequest {
      * The provider to request a user token from.
      */
     @JsonProperty(value = "provider")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String provider;
 
     /**
      * A collection of settings for the specific provider for this request.
      */
     @JsonProperty(value = "settings")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> settings;
 
     /**

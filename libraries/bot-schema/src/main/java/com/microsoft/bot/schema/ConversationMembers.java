@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,12 +19,14 @@ public class ConversationMembers {
      * Conversation ID.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * List of members in this conversation.
      */
     @JsonProperty(value = "members")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> members;
 
     /**

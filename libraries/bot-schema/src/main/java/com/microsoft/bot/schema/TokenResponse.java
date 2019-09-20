@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,24 +17,28 @@ public class TokenResponse {
      * The channelId of the TokenResponse.
      */
     @JsonProperty(value = "channelId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
     /**
      * The connection name.
      */
     @JsonProperty(value = "connectionName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String connectionName;
 
     /**
      * The user token.
      */
     @JsonProperty(value = "token")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String token;
 
     /**
      * Expiration for the token, in ISO 8601 format (e.g. "2007-04-05T14:30Z").
      */
     @JsonProperty(value = "expiration")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String expiration;
 
     /**

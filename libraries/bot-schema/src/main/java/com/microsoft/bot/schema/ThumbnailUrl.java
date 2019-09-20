@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,12 +17,14 @@ public class ThumbnailUrl {
      * URL pointing to the thumbnail to use for media content.
      */
     @JsonProperty(value = "url")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String url;
 
     /**
      * HTML alt text to include on this thumbnail image.
      */
     @JsonProperty(value = "alt")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String alt;
 
     /**

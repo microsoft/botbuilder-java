@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class MessageReaction {
      * Message reaction type. Possible values include: 'like', 'plusOne'.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     public static MessageReaction clone(MessageReaction messageReaction) {

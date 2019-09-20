@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,24 +19,28 @@ public class AnimationCard {
      * Title of this card.
      */
     @JsonProperty(value = "title")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
     /**
      * Subtitle of this card.
      */
     @JsonProperty(value = "subtitle")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
     /**
      * Text of this card.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Thumbnail placeholder.
      */
     @JsonProperty(value = "image")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ThumbnailUrl image;
 
     /**
@@ -43,24 +48,28 @@ public class AnimationCard {
      * format of the same content.
      */
     @JsonProperty(value = "media")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MediaUrl> media;
 
     /**
      * Actions on this card.
      */
     @JsonProperty(value = "buttons")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
     /**
      * This content may be shared with others (default:true).
      */
     @JsonProperty(value = "shareable")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean shareable;
 
     /**
      * Should the client loop playback at end of content (default:true).
      */
     @JsonProperty(value = "autoloop")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean autoloop;
 
     /**
@@ -75,6 +84,7 @@ public class AnimationCard {
      * and "4:3".
      */
     @JsonProperty(value = "aspect")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aspect;
 
     /**
@@ -82,12 +92,14 @@ public class AnimationCard {
      * an ISO 8601 Duration field.
      */
     @JsonProperty(value = "duration")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String duration;
 
     /**
      * Supplementary parameter for this card.
      */
     @JsonProperty(value = "value")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object value;
 
     /**

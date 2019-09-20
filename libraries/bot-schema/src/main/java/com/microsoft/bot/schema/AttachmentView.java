@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,12 +17,14 @@ public class AttachmentView {
      * Id of the attachment.
      */
     @JsonProperty(value = "viewId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String viewId;
 
     /**
      * Size of the attachment.
      */
     @JsonProperty(value = "size")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Integer size;
 
     /**

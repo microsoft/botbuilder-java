@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,12 +17,14 @@ public class InnerHttpError {
      * HttpStatusCode from failed request.
      */
     @JsonProperty(value = "statusCode")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private int statusCode;
 
     /**
      * Body from failed request.
      */
     @JsonProperty(value = "body")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object body;
 
     /**

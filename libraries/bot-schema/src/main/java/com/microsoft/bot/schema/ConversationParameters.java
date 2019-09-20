@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -24,24 +25,28 @@ public class ConversationParameters {
      * The bot address for this conversation.
      */
     @JsonProperty(value = "bot")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount bot;
 
     /**
      * Members to add to the conversation.
      */
     @JsonProperty(value = "members")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> members;
 
     /**
      * (Optional) Topic of the conversation (if supported by the channel).
      */
     @JsonProperty(value = "topicName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String topicName;
 
     /**
      * (Optional) The tenant ID in which the conversation should be created.
      */
     @JsonProperty(value = "tenantId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String tenantId;
 
     /**
@@ -49,12 +54,14 @@ public class ConversationParameters {
      * intial message to the conversation.
      */
     @JsonProperty(value = "activity")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Activity activity;
 
     /**
      * Channel specific payload for creating the conversation.
      */
     @JsonProperty(value = "channelData")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object channelData;
 
     /**

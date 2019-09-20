@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -12,25 +13,29 @@ public class TokenStatus {
     /**
      * The channelId of the token status pertains to.
      */
-    @JsonProperty
+    @JsonProperty(value = "channelId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
     /**
      * The name of the connection the token status pertains to.
      */
-    @JsonProperty
+    @JsonProperty(value = "connectionName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String connectionName;
 
     /**
      * True if a token is stored for this ConnectionName.
      */
-    @JsonProperty
+    @JsonProperty(value = "hasToken")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean hasToken;
 
     /**
      * The display name of the service provider for which this Token belongs to.
      */
-    @JsonProperty
+    @JsonProperty(value = "serviceProviderDisplayName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceProviderDisplayName;
 
     /**

@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -17,6 +18,7 @@ public class Place implements EntitySerialization {
      * `PostalAddress`).
      */
     @JsonProperty(value = "address")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object address;
 
     /**
@@ -24,6 +26,7 @@ public class Place implements EntitySerialization {
      * `GeoCoordinates` or `GeoShape`).
      */
     @JsonProperty(value = "geo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object geo;
 
     /**
@@ -31,18 +34,21 @@ public class Place implements EntitySerialization {
      * `Map`).
      */
     @JsonProperty(value = "hasMap")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object hasMap;
 
     /**
      * The type of the thing.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     /**
      * The name of the thing.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     public Place() {

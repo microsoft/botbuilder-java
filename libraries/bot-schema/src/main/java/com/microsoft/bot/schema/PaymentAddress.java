@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class PaymentAddress {
      * example, US, GB, CN, or JP.
      */
     @JsonProperty(value = "country")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String country;
 
     /**
@@ -27,6 +29,7 @@ public class PaymentAddress {
      * delivery route, descriptive instructions, or a post office box number.
      */
     @JsonProperty(value = "addressLine")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> addressLine;
 
     /**
@@ -34,12 +37,14 @@ public class PaymentAddress {
      * example, this can be a state, a province, an oblast, or a prefecture.
      */
     @JsonProperty(value = "region")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String region;
 
     /**
      * This is the city/town portion of the address.
      */
     @JsonProperty(value = "city")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String city;
 
     /**
@@ -48,18 +53,21 @@ public class PaymentAddress {
      * localities.
      */
     @JsonProperty(value = "dependentLocality")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String dependentLocality;
 
     /**
      * This is the postal code or ZIP code, also known as PIN code in India.
      */
     @JsonProperty(value = "postalCode")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String postalCode;
 
     /**
      * This is the sorting code as used in, for example, France.
      */
     @JsonProperty(value = "sortingCode")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String sortingCode;
 
     /**
@@ -68,24 +76,28 @@ public class PaymentAddress {
      * for display.
      */
     @JsonProperty(value = "languageCode")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String languageCode;
 
     /**
      * This is the organization, firm, company, or institution at this address.
      */
     @JsonProperty(value = "organization")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String organization;
 
     /**
      * This is the name of the recipient or contact person.
      */
     @JsonProperty(value = "recipient")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String recipient;
 
     /**
      * This is the phone number of the recipient or contact person.
      */
     @JsonProperty(value = "phone")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String phone;
 
     /**

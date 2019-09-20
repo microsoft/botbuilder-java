@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -20,6 +21,7 @@ public class ErrorResponse {
      * Error message.
      */
     @JsonProperty(value = "error")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Error error;
 
     public ErrorResponse(Error withError) {

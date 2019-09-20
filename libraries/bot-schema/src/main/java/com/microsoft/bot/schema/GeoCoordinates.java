@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -37,12 +38,14 @@ public class GeoCoordinates implements EntitySerialization {
      * The type of the thing.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     /**
      * The name of the thing.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     public GeoCoordinates() {

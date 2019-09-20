@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,24 +17,28 @@ public class PaymentShippingOption {
      * String identifier used to reference this PaymentShippingOption.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Human-readable description of the item.
      */
     @JsonProperty(value = "label")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String label;
 
     /**
      * Contains the monetary amount for the item.
      */
     @JsonProperty(value = "amount")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentCurrencyAmount amount;
 
     /**
      * Indicates whether this is the default selected PaymentShippingOption.
      */
     @JsonProperty(value = "selected")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean selected;
 
     /**

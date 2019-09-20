@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,18 +17,21 @@ public class PaymentCurrencyAmount {
      * A currency identifier.
      */
     @JsonProperty(value = "currency")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String currency;
 
     /**
      * Decimal monetary value.
      */
     @JsonProperty(value = "value")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String value;
 
     /**
      * Currency system.
      */
     @JsonProperty(value = "currencySystem")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String currencySystem;
 
     /**

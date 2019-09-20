@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class PaymentDetails {
      * Contains the total amount of the payment request.
      */
     @JsonProperty(value = "total")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentItem total;
 
     /**
@@ -25,6 +27,7 @@ public class PaymentDetails {
      * display.
      */
     @JsonProperty(value = "displayItems")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<PaymentItem> displayItems;
 
     /**
@@ -32,18 +35,21 @@ public class PaymentDetails {
      * choose from.
      */
     @JsonProperty(value = "shippingOptions")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<PaymentShippingOption> shippingOptions;
 
     /**
      * Contains modifiers for particular payment method identifiers.
      */
     @JsonProperty(value = "modifiers")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<PaymentDetailsModifier> modifiers;
 
     /**
      * Error description.
      */
     @JsonProperty(value = "error")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String error;
 
     /**

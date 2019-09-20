@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -25,30 +26,35 @@ public class Attachment {
      * mimetype/Contenttype for the file.
      */
     @JsonProperty(value = "contentType")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String contentType;
 
     /**
      * Content Url.
      */
     @JsonProperty(value = "contentUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String contentUrl;
 
     /**
      * Embedded content.
      */
     @JsonProperty(value = "content")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object content;
 
     /**
      * (OPTIONAL) The name of the attachment.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * (OPTIONAL) Thumbnail associated with attachment.
      */
     @JsonProperty(value = "thumbnailUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String thumbnailUrl;
     /**
      * Holds the overflow properties that aren't first class

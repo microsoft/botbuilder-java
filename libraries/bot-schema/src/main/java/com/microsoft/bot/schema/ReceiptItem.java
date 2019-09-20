@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,6 +17,7 @@ public class ReceiptItem {
      * Title of the Card.
      */
     @JsonProperty(value = "title")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
     /**
@@ -23,6 +25,7 @@ public class ReceiptItem {
      * styling only.
      */
     @JsonProperty(value = "subtitle")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
     /**
@@ -30,30 +33,35 @@ public class ReceiptItem {
      * styling only.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Image.
      */
     @JsonProperty(value = "image")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardImage image;
 
     /**
      * Amount with currency.
      */
     @JsonProperty(value = "price")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String price;
 
     /**
      * Number of items of given kind.
      */
     @JsonProperty(value = "quantity")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String quantity;
 
     /**
      * This action will be activated when user taps on the Item bubble.
      */
     @JsonProperty(value = "tap")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardAction tap;
 
     /**

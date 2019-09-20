@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class PaymentMethodData {
      * payment methods that the merchant web site accepts.
      */
     @JsonProperty(value = "supportedMethods")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> supportedMethods;
 
     /**
@@ -27,6 +29,7 @@ public class PaymentMethodData {
      * be needed by the supported payment methods.
      */
     @JsonProperty(value = "data")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object data;
 
     /**

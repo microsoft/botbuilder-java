@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -19,12 +20,14 @@ public class Fact {
      * The key for this Fact.
      */
     @JsonProperty(value = "key")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String key;
 
     /**
      * The value for this Fact.
      */
     @JsonProperty(value = "value")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String value;
 
     /**

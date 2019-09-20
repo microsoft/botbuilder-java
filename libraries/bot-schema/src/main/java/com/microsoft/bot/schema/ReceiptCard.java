@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,48 +19,56 @@ public class ReceiptCard {
      * Title of the card.
      */
     @JsonProperty(value = "title")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
     /**
      * Array of Fact objects.
      */
     @JsonProperty(value = "facts")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Fact> facts;
 
     /**
      * Array of Receipt Items.
      */
     @JsonProperty(value = "items")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ReceiptItem> items;
 
     /**
      * This action will be activated when user taps on the card.
      */
     @JsonProperty(value = "tap")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardAction tap;
 
     /**
      * Total amount of money paid (or to be paid).
      */
     @JsonProperty(value = "total")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String total;
 
     /**
      * Total amount of tax paid (or to be paid).
      */
     @JsonProperty(value = "tax")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String tax;
 
     /**
      * Total amount of VAT paid (or to be paid).
      */
     @JsonProperty(value = "vat")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String vat;
 
     /**
      * Set of actions applicable to the current card.
      */
     @JsonProperty(value = "buttons")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
     /**

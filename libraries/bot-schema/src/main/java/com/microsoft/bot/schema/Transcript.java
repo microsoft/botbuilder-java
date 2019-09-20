@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class Transcript {
      * List of members in this conversation.
      */
     @JsonProperty(value = "activities")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Activity> activities;
 
     /**

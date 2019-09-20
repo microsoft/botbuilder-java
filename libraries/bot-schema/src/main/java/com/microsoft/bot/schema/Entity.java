@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +25,12 @@ import java.util.stream.Collectors;
  * Metadata object pertaining to an activity.
  */
 public class Entity {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper;
+
+    static {
+        objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+    }
 
     /**
      */
@@ -34,6 +40,7 @@ public class Entity {
      * Type of this entity (RFC 3987 IRI).
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     public static Entity clone(Entity entity) {

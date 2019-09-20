@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,12 +17,14 @@ public class PaymentItem {
      * Human-readable description of the item.
      */
     @JsonProperty(value = "label")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String label;
 
     /**
      * Monetary amount for the item.
      */
     @JsonProperty(value = "amount")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentCurrencyAmount amount;
 
     /**

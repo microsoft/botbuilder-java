@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
@@ -18,12 +19,14 @@ public class SemanticAction {
      * Entities associated with this action.
      */
     @JsonProperty(value = "entities")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Entity> entities;
 
     /**
      * ID of this action.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**

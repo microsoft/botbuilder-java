@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,24 +17,28 @@ public class AttachmentData {
      * Content-Type of the attachment.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     /**
      * Name of the attachment.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * Attachment content.
      */
     @JsonProperty(value = "originalBase64")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private byte[] originalBase64;
 
     /**
      * Attachment thumbnail.
      */
     @JsonProperty(value = "thumbnailBase64")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private byte[] thumbnailBase64;
 
     /**

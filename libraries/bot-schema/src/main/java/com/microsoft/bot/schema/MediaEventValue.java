@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -17,6 +18,7 @@ public class MediaEventValue {
      * originated this event.
      */
     @JsonProperty(value = "cardValue")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object cardValue;
 
     public MediaEventValue(Object withCardValue) {

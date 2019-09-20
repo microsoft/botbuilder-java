@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,12 +19,14 @@ public class SigninCard {
      * Text for signin request.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Action to use to perform signin.
      */
     @JsonProperty(value = "buttons")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
     /**

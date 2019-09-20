@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,30 +19,35 @@ public class PaymentRequest {
      * ID of this payment request.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Allowed payment methods for this request.
      */
     @JsonProperty(value = "methodData")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<PaymentMethodData> methodData;
 
     /**
      * Details for this request.
      */
     @JsonProperty(value = "details")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentDetails details;
 
     /**
      * Provides information about the options desired for the payment request.
      */
     @JsonProperty(value = "options")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentOptions options;
 
     /**
      * Expiration for this request, in ISO 8601 duration format (e.g., 'P1D').
      */
     @JsonProperty(value = "expires")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String expires;
 
     /**

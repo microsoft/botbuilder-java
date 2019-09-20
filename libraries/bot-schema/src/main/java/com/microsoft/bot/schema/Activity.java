@@ -8,6 +8,9 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +41,22 @@ public class Activity {
      * The {@link ActivityTypes} of the activity.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     /**
      * Contains an ID that uniquely identifies the activity on the channel.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Contains the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
      */
     @JsonProperty(value = "timestamp")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm'Z'", timezone = "UTC")
     private OffsetDateTime timestamp;
 
     /**
@@ -56,6 +64,8 @@ public class Activity {
      * For example, 2016-09-23T13:07:49.4714686-07:00.
      */
     @JsonProperty(value = "localTimestamp")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm'Z'")
     private OffsetDateTime localTimestamp;
 
     /**
@@ -63,6 +73,7 @@ public class Activity {
      * For example, America/Los_Angeles.
      */
     @JsonProperty(value = "localTimezone")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String localTimezone;
 
     /**
@@ -71,36 +82,42 @@ public class Activity {
      * that asserts the identity of the callers (e.g. tokens).
      */
     @JsonProperty(value = "callerId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String callerId;
 
     /**
      * Contains the URL that specifies the channel's service endpoint. Set by the channel.
      */
     @JsonProperty(value = "serviceUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
 
     /**
      * Contains an ID that uniquely identifies the channel. Set by the channel.
      */
     @JsonProperty(value = "channelId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
     /**
      * Identifies the sender of the message.
      */
     @JsonProperty(value = "from")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount from;
 
     /**
      * Identifies the conversation to which the activity belongs.
      */
     @JsonProperty(value = "conversation")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationAccount conversation;
 
     /**
      * Identifies the recipient of the message.
      */
     @JsonProperty(value = "recipient")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount recipient;
 
     /**
@@ -108,48 +125,56 @@ public class Activity {
      * 'markdown', 'plain', 'xml'.
      */
     @JsonProperty(value = "textFormat")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TextFormatTypes textFormat;
 
     /**
      * The layout hint for multiple attachments. Default: list.
      */
     @JsonProperty(value = "attachmentLayout")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private AttachmentLayoutTypes attachmentLayout;
 
     /**
      * The collection of members added to the conversation.
      */
     @JsonProperty(value = "membersAdded")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> membersAdded;
 
     /**
      * The collection of members removed from the conversation.
      */
     @JsonProperty(value = "membersRemoved")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> membersRemoved;
 
     /**
      * The collection of reactions added to the conversation.
      */
     @JsonProperty(value = "reactionsAdded")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MessageReaction> reactionsAdded;
 
     /**
      * The collection of reactions removed from the conversation.
      */
     @JsonProperty(value = "reactionsRemoved")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MessageReaction> reactionsRemoved;
 
     /**
      * The updated topic name of the conversation.
      */
     @JsonProperty(value = "topicName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String topicName;
 
     /**
      * Indicates whether the prior history of the channel is disclosed.
      */
     @JsonProperty(value = "historyDisclosed")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean historyDisclosed;
 
     /**
@@ -160,18 +185,21 @@ public class Activity {
      * The locale name can also correspond to a valid BCP-47 language tag.
      */
     @JsonProperty(value = "locale")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String locale;
 
     /**
      * The text content of the message.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * The text to speak.
      */
     @JsonProperty(value = "speak")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String speak;
 
     /**
@@ -179,94 +207,110 @@ public class Activity {
      * is delivered to the client.
      */
     @JsonProperty(value = "inputHint")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private InputHints inputHint;
     /**
      * The text to display if the channel cannot render cards.
      */
     @JsonProperty(value = "summary")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String summary;
 
     /**
      * The suggested actions for the activity.
      */
     @JsonProperty(value = "suggestedActions")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private SuggestedActions suggestedActions;
 
     /**
      * Attachments.
      */
     @JsonProperty(value = "attachments")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Attachment> attachments;
 
     /**
      * Represents the entities that were mentioned in the message.
      */
     @JsonProperty(value = "entities")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Entity> entities;
 
     /**
      * Contains channel-specific content.
      */
     @JsonProperty(value = "channelData")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object channelData;
     /**
      * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
      */
     @JsonProperty(value = "action")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String action;
 
     /**
      * Contains the ID of the message to which this message is a reply.
      */
     @JsonProperty(value = "replyToId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String replyToId;
 
     /**
      * A descriptive label for the activity.
      */
     @JsonProperty(value = "label")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String label;
 
     /**
      * The type of the activity's value object.
      */
     @JsonProperty(value = "valueType")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String valueType;
 
     /**
      * A value that is associated with the activity.
      */
     @JsonProperty(value = "value")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object value;
 
     /**
      * The name of the operation associated with an invoke or event activity.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * A reference to another conversation or activity.
      */
     @JsonProperty(value = "relatesTo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference relatesTo;
 
     /**
      * The a code for endOfConversation activities that indicates why the conversation ended.
      */
     @JsonProperty(value = "code")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private EndOfConversationCodes code;
 
     /**
      * The time at which the activity should be considered to be expired and should not be presented to the recipient.
      */
     @JsonProperty(value = "expiration")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private LocalDateTime expiration;
 
     /**
      * The importance of the activity.
      */
     @JsonProperty(value = "importance")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String importance;
 
     /**
@@ -275,18 +319,21 @@ public class Activity {
      * The default delivery mode is \"default\".
      */
     @JsonProperty(value = "deliveryMode")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String deliveryMode;
 
     /**
      * List of phrases and references that speech and language priming systems should listen for.
      */
     @JsonProperty(value = "listenFor")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> listenFor;
 
     /**
      * The collection of text fragments to highlight when the activity contains a ReplyToId value.
      */
     @JsonProperty(value = "textHighlights")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<TextHighlight> textHighlights;
 
     /**
@@ -1228,7 +1275,12 @@ public class Activity {
      *
      * @return The array of mentions; or an empty array, if none are found.
      */
+    @JsonIgnore
     public List<Mention> getMentions() {
+        if (this.getEntities() == null) {
+            return Collections.emptyList();
+        }
+
         return this.getEntities().stream()
             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
             .map(entity -> entity.getAs(Mention.class))
@@ -1275,6 +1327,7 @@ public class Activity {
      * Creates a {@link ConversationReference} based on this activity.
      * @return A conversation reference for the conversation that contains this activity.
      */
+    @JsonIgnore
     public ConversationReference getConversationReference() {
         return new ConversationReference() {{
             setActivityId(Activity.this.getId());
@@ -1292,6 +1345,7 @@ public class Activity {
      * @param reply ResourceResponse returned from sendActivity.
      * @return A ConversationReference that can be stored and used later to delete or update the activity.
      */
+    @JsonIgnore
     public ConversationReference getReplyConversationReference(ResourceResponse reply) {
         ConversationReference reference = getConversationReference();
         reference.setActivityId(reply.getId());

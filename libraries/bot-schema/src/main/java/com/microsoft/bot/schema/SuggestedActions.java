@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -23,12 +24,14 @@ public class SuggestedActions {
      * activity.
      */
     @JsonProperty(value = "to")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> to;
 
     /**
      * Actions that can be shown to the user.
      */
     @JsonProperty(value = "actions")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> actions;
 
     public static SuggestedActions clone(SuggestedActions suggestedActions) {

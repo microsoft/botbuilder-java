@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,12 +17,14 @@ public class TextHighlight {
      * Defines the snippet of text to highlight.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Occurrence of the text field within the referenced text, if multiple exist.
      */
     @JsonProperty(value = "occurence")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Integer occurence;
 
     /**

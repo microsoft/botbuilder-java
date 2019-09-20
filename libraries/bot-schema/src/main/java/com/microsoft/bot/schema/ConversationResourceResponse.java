@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,6 +17,7 @@ public class ConversationResourceResponse {
      * ID of the Activity (if sent).
      */
     @JsonProperty(value = "activityId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String activityId;
 
     /**
@@ -23,12 +25,14 @@ public class ConversationResourceResponse {
      * performed.
      */
     @JsonProperty(value = "serviceUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
 
     /**
      * Id of the resource.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**

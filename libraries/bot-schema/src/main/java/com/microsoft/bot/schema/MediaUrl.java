@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,6 +17,7 @@ public class MediaUrl {
      * Url for the media.
      */
     @JsonProperty(value = "url")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String url;
 
     /**
@@ -23,6 +25,7 @@ public class MediaUrl {
      * objects from each other.
      */
     @JsonProperty(value = "profile")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String profile;
 
     /**

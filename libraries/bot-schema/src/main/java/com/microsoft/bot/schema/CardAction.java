@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -18,30 +19,35 @@ public class CardAction {
      * 'downloadFile', 'signin', 'call', 'payment', 'messageBack'.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ActionTypes type;
 
     /**
      * Text description which appears on the button.
      */
     @JsonProperty(value = "title")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
     /**
      * Image URL which will appear on the button, next to text label.
      */
     @JsonProperty(value = "image")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String image;
 
     /**
      * Text for this action.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * (Optional) text to display in the chat feed if the button is clicked.
      */
     @JsonProperty(value = "displayText")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String displayText;
 
     /**
@@ -49,12 +55,14 @@ public class CardAction {
      * the ActionType.
      */
     @JsonProperty(value = "value")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object value;
 
     /**
      * Channel-specific data associated with this action.
      */
     @JsonProperty(value = "channelData")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object channelData;
 
     public static CardAction clone(CardAction cardAction) {

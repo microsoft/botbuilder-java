@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,6 +17,7 @@ public class PaymentRequestCompleteResult {
      * Result of the payment request completion.
      */
     @JsonProperty(value = "result")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String result;
 
     /**

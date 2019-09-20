@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class PaymentDetailsModifier {
      * Contains a sequence of payment method identifiers.
      */
     @JsonProperty(value = "supportedMethods")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> supportedMethods;
 
     /**
@@ -26,6 +28,7 @@ public class PaymentDetailsModifier {
      * for the payment method identifiers in the supportedMethods field.
      */
     @JsonProperty(value = "total")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentItem total;
 
     /**
@@ -34,6 +37,7 @@ public class PaymentDetailsModifier {
      * identifiers in the supportedMethods field.
      */
     @JsonProperty(value = "additionalDisplayItems")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<PaymentItem> additionalDisplayItems;
 
     /**

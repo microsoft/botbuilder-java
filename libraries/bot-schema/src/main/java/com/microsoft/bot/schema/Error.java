@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,18 +17,21 @@ public class Error {
      * Error code.
      */
     @JsonProperty(value = "code")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String code;
 
     /**
      * Error message.
      */
     @JsonProperty(value = "message")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String message;
 
     /**
      * Error from inner http call
      */
     @JsonProperty(value = "innerHttpError")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private InnerHttpError innerHttpError;
 
     /**

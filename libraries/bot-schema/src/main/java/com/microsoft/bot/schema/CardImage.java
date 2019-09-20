@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,18 +17,21 @@ public class CardImage {
      * URL thumbnail image for major content property.
      */
     @JsonProperty(value = "url")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String url;
 
     /**
      * Image description intended for screen readers.
      */
     @JsonProperty(value = "alt")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String alt;
 
     /**
      * Action assigned to specific Attachment.
      */
     @JsonProperty(value = "tap")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardAction tap;
 
     /**

@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -16,12 +17,14 @@ import java.util.List;
 public class PagedMembersResult {
 
     @JsonProperty(value = "continuationToken")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String continuationToken;
 
     /**
      * List of members in this conversation.
      */
     @JsonProperty(value = "members")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> members;
 
     /**

@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -18,6 +19,7 @@ public class PaymentResponse {
      * selected to fulfil the transaction.
      */
     @JsonProperty(value = "methodName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String methodName;
 
     /**
@@ -26,6 +28,7 @@ public class PaymentResponse {
      * successful fund transfer.
      */
     @JsonProperty(value = "details")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object details;
 
     /**
@@ -34,6 +37,7 @@ public class PaymentResponse {
      * and final shipping address chosen by the user.
      */
     @JsonProperty(value = "shippingAddress")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentAddress shippingAddress;
 
     /**
@@ -42,6 +46,7 @@ public class PaymentResponse {
      * attribute of the selected shipping option.
      */
     @JsonProperty(value = "shippingOption")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String shippingOption;
 
     /**
@@ -50,6 +55,7 @@ public class PaymentResponse {
      * email address chosen by the user.
      */
     @JsonProperty(value = "payerEmail")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String payerEmail;
 
     /**
@@ -58,6 +64,7 @@ public class PaymentResponse {
      * phone number chosen by the user.
      */
     @JsonProperty(value = "payerPhone")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String payerPhone;
 
     /**

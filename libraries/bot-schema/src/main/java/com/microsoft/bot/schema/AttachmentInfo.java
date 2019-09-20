@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,18 +19,21 @@ public class AttachmentInfo {
      * Name of the attachment.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * ContentType of the attachment.
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     /**
      * attachment views.
      */
     @JsonProperty(value = "views")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<AttachmentView> views;
 
     /**

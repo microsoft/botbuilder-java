@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,18 +17,21 @@ public class Mention implements EntitySerialization {
      * The mentioned user.
      */
     @JsonProperty(value = "mentioned")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount mentioned;
 
     /**
      * Sub Text which represents the mention (can be null or empty).
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Type of this entity (RFC 3987 IRI).
      */
     @JsonProperty(value = "type")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
     public Mention() {

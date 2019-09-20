@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,36 +19,42 @@ public class ThumbnailCard {
      * Title of the card.
      */
     @JsonProperty(value = "title")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
     /**
      * Subtitle of the card.
      */
     @JsonProperty(value = "subtitle")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
     /**
      * Text for the card.
      */
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     /**
      * Array of images for the card.
      */
     @JsonProperty(value = "images")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardImage> images;
 
     /**
      * Set of actions applicable to the current card.
      */
     @JsonProperty(value = "buttons")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
     /**
      * This action will be activated when user taps on the card itself.
      */
     @JsonProperty(value = "tap")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardAction tap;
 
     /**

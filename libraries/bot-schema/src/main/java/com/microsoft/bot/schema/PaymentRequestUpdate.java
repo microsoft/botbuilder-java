@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,24 +17,28 @@ public class PaymentRequestUpdate {
      * ID for the payment request to update.
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Update payment details.
      */
     @JsonProperty(value = "details")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentDetails details;
 
     /**
      * Updated shipping address.
      */
     @JsonProperty(value = "shippingAddress")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private PaymentAddress shippingAddress;
 
     /**
      * Updated shipping options.
      */
     @JsonProperty(value = "shippingOption")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String shippingOption;
 
     /**

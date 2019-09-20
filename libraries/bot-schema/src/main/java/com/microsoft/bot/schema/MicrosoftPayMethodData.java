@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -18,18 +19,21 @@ public class MicrosoftPayMethodData {
      * Microsoft Pay Merchant ID.
      */
     @JsonProperty(value = "merchantId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String merchantId;
 
     /**
      * Supported payment networks (e.g., "visa" and "mastercard").
      */
     @JsonProperty(value = "supportedNetworks")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> supportedNetworks;
 
     /**
      * Supported payment types (e.g., "credit").
      */
     @JsonProperty(value = "supportedTypes")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> supportedTypes;
 
     /**

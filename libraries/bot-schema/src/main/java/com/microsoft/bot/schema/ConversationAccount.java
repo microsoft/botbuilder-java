@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -30,12 +31,14 @@ public class ConversationAccount {
      * between conversation types.
      */
     @JsonProperty(value = "conversationType")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String conversationType;
 
     /**
      * This conversation's tenant ID.
      */
     @JsonProperty(value = "tenantId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String tenantId;
 
     /**
@@ -43,18 +46,21 @@ public class ConversationAccount {
      * or @joesmith or 123456).
      */
     @JsonProperty(value = "id")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
     /**
      * Display friendly name.
      */
     @JsonProperty(value = "name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     /**
      * This account's object ID within Azure Active Directory (AAD).
      */
     @JsonProperty(value = "aadObjectId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aadObjectId;
 
     /**
@@ -62,6 +68,7 @@ public class ConversationAccount {
      * Possible values include: 'user', 'bot'.
      */
     @JsonProperty(value = "role")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private RoleTypes role;
 
     public ConversationAccount() {

@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,24 +17,28 @@ public class TokenExchangeState {
      * The bot's registered application ID
      */
     @JsonProperty("msAppId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String msAppId;
 
     /**
      * The connection name that was used
      */
     @JsonProperty(value = "connectionName")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String connectionName;
 
     /**
      * A reference to the conversation
      */
     @JsonProperty(value = "conversation")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference conversation;
 
     /**
      * The URL of the bot messaging endpoint
      */
     @JsonProperty("botUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String botUrl;
 
     public String getConnectionName() {
