@@ -75,7 +75,7 @@ public class TurnContextTests {
             return CompletableFuture.completedFuture(null);
         }))
             .send("TestResponded")
-            .startTest();
+            .startTest().join();
     }
 
     @Test(expected = IllegalArgumentException.class)

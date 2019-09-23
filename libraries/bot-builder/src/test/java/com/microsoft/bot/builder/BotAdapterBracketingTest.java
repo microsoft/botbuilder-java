@@ -27,7 +27,7 @@ public class BotAdapterBracketingTest {
             .assertReply("BEFORE")
             .assertReply("ECHO:test")
             .assertReply("AFTER")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -40,8 +40,10 @@ public class BotAdapterBracketingTest {
         BotCallbackHandler echoWithException = (turnContext -> {
             String toEcho = "ECHO:" + turnContext.getActivity().getText();
             return turnContext.sendActivity(turnContext.getActivity().createReply(toEcho))
-                .thenApply(resourceResponse -> {
-                    throw new RuntimeException(uniqueId);
+                .thenCompose(resourceResponse -> {
+                    CompletableFuture<Void> result = new CompletableFuture();
+                    result.completeExceptionally(new RuntimeException(uniqueId));
+                    return result;
                 });
         });
 
@@ -49,9 +51,9 @@ public class BotAdapterBracketingTest {
             .send("test")
             .assertReply("BEFORE")
             .assertReply("ECHO:test")
-            .assertReply("CAUGHT:" + uniqueId)
+            .assertReply("CAUGHT: " + uniqueId)
             .assertReply("AFTER")
-            .startTest();
+            .startTest().join();
     }
 
     private static class CatchExceptionMiddleware implements Middleware {
@@ -60,7 +62,7 @@ public class BotAdapterBracketingTest {
             return turnContext.sendActivity(turnContext.getActivity().createReply("BEFORE"))
                 .thenCompose(resourceResponse -> next.next())
                     .exceptionally(exception -> {
-                        turnContext.sendActivity(turnContext.getActivity().createReply("CAUGHT:" + exception.getMessage())).join();
+                        turnContext.sendActivity(turnContext.getActivity().createReply("CAUGHT: " + exception.getCause().getMessage())).join();
                         return null;
                     })
                 .thenCompose(result -> turnContext.sendActivity(turnContext.getActivity().createReply("AFTER"))

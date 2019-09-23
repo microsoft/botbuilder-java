@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
@@ -25,7 +26,7 @@ public class AutoSaveStateMiddlewareTests {
 
         // setup convState
         ConversationState convState = new ConversationState(storage);
-        StatePropertyAccessor<Integer> convProperty = userState.createProperty("convCount");
+        StatePropertyAccessor<Integer> convProperty = convState.createProperty("convCount");
 
         TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(userState, convState));
 
@@ -38,20 +39,20 @@ public class AutoSaveStateMiddlewareTests {
 
             if(turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
                 if (StringUtils.equals(turnContext.getActivity().getText(), "get userCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString()));
+                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString())).join();
                 }
                 else if (StringUtils.equals(turnContext.getActivity().getText(), "get convCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString()));
+                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString())).join();
                 }
             }
 
             // increment userCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
             userCount++;
-            userProperty.set(turnContext, userCount);
+            userProperty.set(turnContext, userCount).join();
 
             // increment convCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
             convCount++;
-            convProperty.set(turnContext, convCount);
+            convProperty.set(turnContext, convCount).join();
 
             return CompletableFuture.completedFuture(null);
         });
@@ -63,8 +64,8 @@ public class AutoSaveStateMiddlewareTests {
             .send("get userCount")
             .assertReply(String.format("%d", USER_INITIAL_COUNT + 2))
             .send("get convCount")
-            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 1))
-            .startTest();
+            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3))
+            .startTest().join();
 
         adapter = new TestAdapter(new ConversationReference(){{
             setChannelId("test");
@@ -79,7 +80,7 @@ public class AutoSaveStateMiddlewareTests {
             .assertReply(String.format("%d", USER_INITIAL_COUNT + 4))
             .send("get convCount")
             .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 1))
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -92,7 +93,7 @@ public class AutoSaveStateMiddlewareTests {
 
         // setup convState
         ConversationState convState = new ConversationState(storage);
-        StatePropertyAccessor<Integer> convProperty = userState.createProperty("convCount");
+        StatePropertyAccessor<Integer> convProperty = convState.createProperty("convCount");
 
         AutoSaveStateMiddleware bss = new AutoSaveStateMiddleware(){{
            add(userState);
@@ -110,20 +111,20 @@ public class AutoSaveStateMiddlewareTests {
 
             if(turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
                 if (StringUtils.equals(turnContext.getActivity().getText(), "get userCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString()));
+                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString())).join();
                 }
                 else if (StringUtils.equals(turnContext.getActivity().getText(), "get convCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString()));
+                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString())).join();
                 }
             }
 
             // increment userCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
             userCount++;
-            userProperty.set(turnContext, userCount);
+            userProperty.set(turnContext, userCount).join();
 
             // increment convCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
             convCount++;
-            convProperty.set(turnContext, convCount);
+            convProperty.set(turnContext, convCount).join();
 
             return CompletableFuture.completedFuture(null);
         });
@@ -136,7 +137,7 @@ public class AutoSaveStateMiddlewareTests {
             .assertReply(String.format("%d", USER_INITIAL_COUNT + 2))
             .send("get convCount")
             .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3))
-            .startTest();
+            .startTest().join();
 
         // new adapter on new conversation
         AutoSaveStateMiddleware bss2 = new AutoSaveStateMiddleware(){{
@@ -145,7 +146,7 @@ public class AutoSaveStateMiddlewareTests {
         }};
 
         adapter = new TestAdapter(new ConversationReference(){{
-            setChannelId("test");
+            setChannelId(Channels.TEST);
             setServiceUrl("https://test.com");
             setUser(new ChannelAccount("user1", "User1"));
             setBot(new ChannelAccount("bot", "Bot"));
@@ -157,7 +158,7 @@ public class AutoSaveStateMiddlewareTests {
             .assertReply(String.format("%d", USER_INITIAL_COUNT + 4))
             .send("get convCount")
             .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 1))
-            .startTest();
+            .startTest().join();
     }
 
 }

@@ -322,7 +322,7 @@ public class BotStateTests {
             return CompletableFuture.completedFuture(null);
         }))
         .send("set value")
-        .startTest();
+        .startTest().join();
     }
 
     @Test
@@ -352,7 +352,7 @@ public class BotStateTests {
         new TestFlow(adapter, callback)
             .test("set value", "value saved")
             .test("get value", "test")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -380,7 +380,7 @@ public class BotStateTests {
         }))
         .test("set value", "value saved")
         .test("get value", "test")
-        .startTest();
+        .startTest().join();
     }
 
     @Test
@@ -408,7 +408,7 @@ public class BotStateTests {
         }))
             .test("set value", "value saved")
             .test("get value", "test")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -436,7 +436,7 @@ public class BotStateTests {
         }))
             .test("set value", "value saved")
             .test("get value", "test")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -464,7 +464,7 @@ public class BotStateTests {
         }))
             .test("set value", "value saved")
             .test("get value", "test")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -495,7 +495,7 @@ public class BotStateTests {
         }))
             .test("set value", "value saved")
             .test("get value", testGuid)
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -523,7 +523,7 @@ public class BotStateTests {
         }))
             .test("set value", "value saved")
             .test("get value", "TypedObject")
-            .startTest();
+            .startTest().join();
     }
 
     @Test
@@ -559,7 +559,7 @@ public class BotStateTests {
             return CompletableFuture.completedFuture(null);
         })
             .send(Activity.createConversationUpdateActivity())
-            .startTest();
+            .startTest().join();
     }
 
     @Test(expected = IllegalArgumentException.class)

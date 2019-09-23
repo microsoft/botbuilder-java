@@ -39,6 +39,6 @@ public class OnTurnErrorTests {
             .assertReply("foo", "passthrough")
             .send("NotImplementedException")
             .assertReply("Test")
-            .startTest();
+            .startTest().join();
     }
 }

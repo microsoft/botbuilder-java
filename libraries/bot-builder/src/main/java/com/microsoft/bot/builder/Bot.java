@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Represents a bot that can operate on incoming activities.
  */
+@FunctionalInterface
 public interface Bot {
     /**
      * When implemented in a bot, handles an incoming activity.
@@ -16,5 +17,5 @@ public interface Bot {
      *                    incoming activity, and other data needed to process the activity.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture onTurn(TurnContext turnContext);
+    CompletableFuture<Void> onTurn(TurnContext turnContext);
 }

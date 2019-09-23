@@ -4,6 +4,7 @@
 package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.*;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,22 +28,21 @@ public class TestAdapter extends BotAdapter {
             setConversationReference(reference);
         } else {
             setConversationReference(new ConversationReference() {{
-                setChannelId("test");
+                setChannelId(Channels.TEST);
                 setServiceUrl("https://test.com");
-            }});
-
-            conversationReference().setUser(new ChannelAccount() {{
-                setId("user1");
-                setName("User1");
-            }});
-            conversationReference().setBot(new ChannelAccount() {{
-                setId("bot");
-                setName("Bot");
-            }});
-            conversationReference().setConversation(new ConversationAccount() {{
-                setIsGroup(Boolean.FALSE);
-                setConversationType("convo1");
-                setId("Conversation1");
+                setUser(new ChannelAccount() {{
+                    setId("user1");
+                    setName("User1");
+                }});
+                setBot(new ChannelAccount() {{
+                    setId("bot");
+                    setName("Bot");
+                }});
+                setConversation(new ConversationAccount() {{
+                    setIsGroup(false);
+                    setConversationType("convo1");
+                    setId("Conversation1");
+                }});
             }});
         }
     }
@@ -57,27 +57,30 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-    public void processActivity(Activity activity,
-                                BotCallbackHandler callback) throws Exception {
-        synchronized (conversationReference()) {
-            // ready for next reply
-            if (activity.getType() == null)
-                activity.setType(ActivityTypes.MESSAGE);
-            activity.setChannelId(conversationReference().getChannelId());
-            activity.setFrom(conversationReference().getUser());
-            activity.setRecipient(conversationReference().getBot());
-            activity.setConversation(conversationReference().getConversation());
-            activity.setServiceUrl(conversationReference().getServiceUrl());
-            Integer next = nextId++;
-            activity.setId(next.toString());
-        }
-        // Assume Default DateTime : DateTime(0)
-        if (activity.getTimestamp() == null || activity.getTimestamp().toEpochSecond() == 0)
-            activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
+    public CompletableFuture<Void> processActivity(Activity activity,
+                                BotCallbackHandler callback) {
+        return CompletableFuture.supplyAsync(() -> {
+                synchronized (conversationReference()) {
+                    // ready for next reply
+                    if (activity.getType() == null)
+                        activity.setType(ActivityTypes.MESSAGE);
+                    activity.setChannelId(conversationReference().getChannelId());
+                    activity.setFrom(conversationReference().getUser());
+                    activity.setRecipient(conversationReference().getBot());
+                    activity.setConversation(conversationReference().getConversation());
+                    activity.setServiceUrl(conversationReference().getServiceUrl());
+                    Integer next = nextId++;
+                    activity.setId(next.toString());
+                }
+                // Assume Default DateTime : DateTime(0)
+                if (activity.getTimestamp() == null || activity.getTimestamp().toEpochSecond() == 0)
+                    activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
 
-        try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
-            super.runPipeline(context, callback).join();
-        }
+                return activity;
+            }).thenCompose(activity1 -> {
+                TurnContextImpl context = new TurnContextImpl(this, activity1);
+                return super.runPipeline(context, callback);
+        });
     }
 
     public ConversationReference conversationReference() {
@@ -210,8 +213,8 @@ public class TestAdapter extends BotAdapter {
      * @param userSays
      * @return
      */
-    public void sendTextToBot(String userSays, BotCallbackHandler callback) throws Exception {
-        processActivity(this.makeActivity(userSays), callback);
+    public CompletableFuture<Void> sendTextToBot(String userSays, BotCallbackHandler callback) {
+        return processActivity(this.makeActivity(userSays), callback);
     }
 }
 

@@ -54,16 +54,14 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:foo")
             .send("bar")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:bar")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 6 times, and capture arguments.
         verify(mockTelemetryClient, times(6)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -130,16 +128,14 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:foo")
             .send("bar")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:bar")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 6 times, and capture arguments.
         verify(mockTelemetryClient, times(6)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -210,7 +206,7 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .send("update")
             .assertReply("new response")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 4 times, and capture arguments.
         verify(mockTelemetryClient, times(4)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -251,7 +247,7 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .assertReply("response")
             .send("deleteIt")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 4 times, and capture arguments.
         verify(mockTelemetryClient, times(4)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -284,16 +280,14 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:foo")
             .send("bar")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:bar")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 8 times, and capture arguments.
         verify(mockTelemetryClient, times(8)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -356,16 +350,14 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:foo")
             .send("bar")
             .assertReply(activity -> {
                 Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
             })
             .assertReply("echo:bar")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 10 times, and capture arguments.
         verify(mockTelemetryClient, times(10)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -411,7 +403,7 @@ public class TelemetryMiddlewareTests {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
 
             if (StringUtils.equals(turnContext.getActivity().getText(), "update")) {
-                activityToUpdate[0].setText("update");
+                activityToUpdate[0].setText("new response");
                 turnContext.updateActivity(activityToUpdate[0]).join();
                 turnContext.deleteActivity(turnContext.getActivity().getId()).join();
             } else {
@@ -426,8 +418,8 @@ public class TelemetryMiddlewareTests {
         }))
             .send("foo")
             .send("update")
-            .assertReply("response")
-            .startTest();
+            .assertReply("new response")
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 5 times, and capture arguments.
         verify(mockTelemetryClient, times(5)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
@@ -477,7 +469,7 @@ public class TelemetryMiddlewareTests {
             .send("foo")
             .send("update")
             .assertReply("new response")
-            .startTest();
+            .startTest().join();
 
         // verify BotTelemetryClient was invoked 5 times, and capture arguments.
         verify(mockTelemetryClient, times(5)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());

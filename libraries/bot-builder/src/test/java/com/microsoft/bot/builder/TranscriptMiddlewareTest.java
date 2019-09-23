@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.schema.*;
@@ -54,36 +53,30 @@ public class TranscriptMiddlewareTest {
         final String[] conversationId = {null};
 
         new TestFlow(adapter, (context) -> {
-            conversationId[0] = context.getActivity().getConversation().getId();
-            Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
-                setRelatesTo(context.getActivity().getRelatesTo());
-            }};
+                conversationId[0] = context.getActivity().getConversation().getId();
+                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+                    setRelatesTo(context.getActivity().getRelatesTo());
+                }};
 
-            context.sendActivity(typingActivity).join();
+                context.sendActivity(typingActivity).join();
 
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Assert.fail();
-            }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Assert.fail();
+                }
 
-            context.sendActivity("echo:" + context.getActivity().getText()).join();
-
-            return CompletableFuture.completedFuture(null);
-        }).send("foo")
-            .assertReply((activity) -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
-            })
+                context.sendActivity("echo:" + context.getActivity().getText()).join();
+                return CompletableFuture.completedFuture(null);
+        })
+            .send("foo")
+            .assertReply((activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING))
             .assertReply("echo:foo")
             .send("bar")
-            .assertReply((activity) -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-                return null;
-            })
+            .assertReply((activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING))
             .assertReply("echo:bar")
-            .startTest();
+            .startTest().join();
 
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(6, pagedResult.getItems().size());
@@ -126,13 +119,16 @@ public class TranscriptMiddlewareTest {
             .send("foo")
             .send("update")
             .assertReply("new response")
-            .startTest();
+            .startTest().join();
 
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
+        if (!StringUtils.equals(((Activity)pagedResult.getItems().get(2)).getText(), "new response")) {
+            Assert.fail("fail");
+        }
         Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
         Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
         Assert.assertEquals( ((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
@@ -159,7 +155,7 @@ public class TranscriptMiddlewareTest {
             .send("foo")
             .assertReply("response")
             .send("deleteIt")
-            .startTest();
+            .startTest().join();
 
         Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
@@ -206,7 +202,7 @@ public class TranscriptMiddlewareTest {
             .send("foo")
             .send("update")
             .assertReply("new response")
-            .startTest();
+            .startTest().join();
 
         Thread.sleep(500);
 
