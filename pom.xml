@@ -18,7 +18,7 @@
     <jdk.version>1.8</jdk.version>
     <checkstyle.version>3.1.0</checkstyle.version>
     <pmd.version>3.12.0</pmd.version>
-    <repo.url>https://botbuilder.myget.org/F/scratch/maven/</repo.url>
+    <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url>
   </properties>
 
   <licenses>
@@ -36,6 +36,12 @@
       <organizationUrl>https://dev.botframework.com/</organizationUrl>
     </developer>
   </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/Microsoft/botbuilder-java</connection>
+    <developerConnection>scm:git:https://github.com/Microsoft/botbuilder-java</developerConnection>
+    <url>https://github.com/Microsoft/botbuilder-java</url>
+  </scm>
 
   <profiles>
     <profile>
@@ -182,6 +188,22 @@
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <id>MyGet</id>
+      <url>${repo.url}</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+<!--      <url>${repo.url}</url>-->
+      <url>https://oss.sonatype.org/</url>
+<!--      <url>https://repo.maven.apache.org/maven2</url>-->
+    </repository>
+  </distributionManagement>
+
   <modules>
     <module>libraries/bot-schema</module>
     <module>libraries/bot-connector</module>
@@ -194,8 +216,8 @@
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
 
-    <module>samples/servlet-echo</module>
-    <module>samples/spring-echo</module>
+<!--    <module>samples/servlet-echo</module>-->
+<!--    <module>samples/spring-echo</module>-->
   </modules>
 
   <build>
@@ -332,6 +354,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
+          <version>3.1.0</version>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -344,6 +367,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.1.1</version>
           <executions>
             <execution>
               <id>attach-javadocs</id>

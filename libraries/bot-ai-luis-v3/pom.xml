@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
-  <description>Bot Framework Dialogs</description>
+  <description>Bot Framework Luis V3</description>
   <url>https://dev.botframework.com/</url>
 
   <licenses>
@@ -67,20 +67,6 @@
       <artifactId>bot-applicationinsights</artifactId>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>MyGet</id>
-      <url>${repo.url}</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>MyGet</id>
-      <url>${repo.url}</url>
-    </repository>
-  </distributionManagement>
 
   <profiles>
     <profile>
@@ -148,13 +134,8 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -168,6 +149,7 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -183,6 +165,10 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <source>8</source>
+              <failOnError>false</failOnError>
+            </configuration>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
