@@ -71,20 +71,6 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>MyGet</id>
-      <url>${repo.url}</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>MyGet</id>
-      <url>${repo.url}</url>
-    </repository>
-  </distributionManagement>
-
   <profiles>
     <profile>
       <id>build</id>
@@ -144,18 +130,21 @@
               <source>8</source>
               <failOnError>false</failOnError>
             </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
 
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
