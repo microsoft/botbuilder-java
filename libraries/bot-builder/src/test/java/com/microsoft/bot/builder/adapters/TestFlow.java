@@ -62,7 +62,7 @@ public class TestFlow {
         return new TestFlow(
             testTask
             .thenCompose(result -> {
-                System.out.print(String.format("USER SAYS: %s (Thread Id: %s)\n", userSays, Thread.currentThread().getId()));
+                System.out.print(String.format("USER SAYS: %s (tid: %s)\n", userSays, Thread.currentThread().getId()));
                 return this.adapter.sendTextToBot(userSays, this.callback);
             }), this);
     }
@@ -79,7 +79,7 @@ public class TestFlow {
 
         return new TestFlow(
             testTask.thenCompose(result -> {
-                System.out.printf("TestFlow(%s): Send with User Activity! %s", Thread.currentThread().getId(), userActivity.getText());
+                System.out.printf("TestFlow: Send with User Activity! %s (tid:%s)", userActivity.getText(), Thread.currentThread().getId());
                 return this.adapter.processActivity(userActivity, this.callback);
             }
         ), this);
@@ -92,17 +92,18 @@ public class TestFlow {
      * @return
      */
     public TestFlow delay(int ms) {
-        return new TestFlow(CompletableFuture.supplyAsync(() ->
-        {
-            System.out.printf("TestFlow(%s): Delay(%s ms) called. ", Thread.currentThread().getId(), ms);
-            System.out.flush();
-            try {
-                Thread.sleep(ms);
-            } catch (InterruptedException e) {
+        return new TestFlow(
+            testTask
+            .thenCompose(result -> {
+                System.out.printf("TestFlow: Delay(%s ms) called. (tid:%s)\n", ms, Thread.currentThread().getId());
+                System.out.flush();
+                try {
+                    Thread.sleep(ms);
+                } catch (InterruptedException e) {
 
-            }
-            return null;
-        }, ExecutorFactory.getExecutor()), this);
+                }
+                return CompletableFuture.completedFuture(null);
+            }), this);
     }
 
     /**
@@ -164,7 +165,7 @@ public class TestFlow {
     public TestFlow assertReply(Consumer<Activity> validateActivity, String description, int timeout) {
         return new TestFlow(testTask
             .thenApply(result -> {
-                System.out.println(String.format("AssertReply: Starting loop : %s (Thread:%s)", description, Thread.currentThread().getId()));
+                System.out.println(String.format("AssertReply: Starting loop : %s (tid:%s)", description, Thread.currentThread().getId()));
                 System.out.flush();
 
                 int finalTimeout = Integer.MAX_VALUE;
@@ -189,10 +190,12 @@ public class TestFlow {
                     //                System.out.flush();
 
                     if (replyActivity != null) {
-                        System.out.printf("AssertReply(tid:%s): Received Reply: %s ", Thread.currentThread().getId(), (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText());
+                        System.out.printf("AssertReply: Received Reply (tid:%s)", Thread.currentThread().getId());
                         System.out.flush();
-                        System.out.printf("=============\n From: %s\n To:%s\n ==========\n", (replyActivity.getFrom() == null) ? "No from set" : replyActivity.getFrom().getName(),
-                            (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName());
+                        System.out.printf("\n =============\n From: %s\n To:%s\n Text:%s\n ==========\n",
+                            (replyActivity.getFrom() == null) ? "No from set" : replyActivity.getFrom().getName(),
+                            (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName(),
+                            (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText());
                         System.out.flush();
 
                         // if we have a reply

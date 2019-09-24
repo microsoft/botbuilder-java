@@ -95,7 +95,7 @@ public class TranscriptMiddlewareTest {
     }
 
     @Test
-    public void Transcript_LogUpdateActivities() throws InterruptedException {
+    public void Transcript_LogUpdateActivities() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
         TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
@@ -117,25 +117,23 @@ public class TranscriptMiddlewareTest {
             return CompletableFuture.completedFuture(null);
         })
             .send("foo")
+            .delay(50)
             .send("update")
+            .delay(50)
             .assertReply("new response")
             .startTest().join();
 
-        Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
-        if (!StringUtils.equals(((Activity)pagedResult.getItems().get(2)).getText(), "new response")) {
-            Assert.fail("fail");
-        }
         Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
         Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
         Assert.assertEquals( ((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
     }
 
     @Test
-    public final void Transcript_LogDeleteActivities() throws InterruptedException {
+    public final void Transcript_LogDeleteActivities() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
         TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
         final String[] conversationId = {null};
@@ -153,11 +151,11 @@ public class TranscriptMiddlewareTest {
             return CompletableFuture.completedFuture(null);
         })
             .send("foo")
+            .delay(50)
             .assertReply("response")
             .send("deleteIt")
             .startTest().join();
 
-        Thread.sleep(500);
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
         for (Object act : pagedResult.getItems()) {
             System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity) act).getType());
@@ -175,7 +173,7 @@ public class TranscriptMiddlewareTest {
     }
 
     @Test
-    public void Transcript_TestDateLogUpdateActivities() throws InterruptedException {
+    public void Transcript_TestDateLogUpdateActivities() {
         OffsetDateTime dateTimeStartOffset1 = OffsetDateTime.now();
         OffsetDateTime dateTimeStartOffset2 = OffsetDateTime.now(ZoneId.of("UTC"));
 
@@ -200,11 +198,11 @@ public class TranscriptMiddlewareTest {
             return CompletableFuture.completedFuture(null);
         })
             .send("foo")
+            .delay(50)
             .send("update")
+            .delay(50)
             .assertReply("new response")
             .startTest().join();
-
-        Thread.sleep(500);
 
         PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, dateTimeStartOffset1).join();
         Assert.assertEquals(4, pagedResult.getItems().size());

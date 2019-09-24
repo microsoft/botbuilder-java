@@ -57,8 +57,7 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-    public CompletableFuture<Void> processActivity(Activity activity,
-                                BotCallbackHandler callback) {
+    public CompletableFuture<Void> processActivity(Activity activity, BotCallbackHandler callback) {
         return CompletableFuture.supplyAsync(() -> {
                 synchronized (conversationReference()) {
                     // ready for next reply
@@ -69,6 +68,7 @@ public class TestAdapter extends BotAdapter {
                     activity.setRecipient(conversationReference().getBot());
                     activity.setConversation(conversationReference().getConversation());
                     activity.setServiceUrl(conversationReference().getServiceUrl());
+
                     Integer next = nextId++;
                     activity.setId(next.toString());
                 }
@@ -104,11 +104,11 @@ public class TestAdapter extends BotAdapter {
 
             responses.add(new ResourceResponse(activity.getId()));
 
-            System.out.println(String.format("TestAdapter:SendActivities(tid:%s):Count:%s", Thread.currentThread().getId(), activities.size()));
+            System.out.println(String.format("TestAdapter:SendActivities, Count:%s (tid:%s)", activities.size(), Thread.currentThread().getId()));
             for (Activity act : activities) {
-                System.out.printf(":--------\n: To:%s\n", act.getRecipient().getName());
-                System.out.printf(": From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
-                System.out.printf(": Text:%s\n:---------", (act.getText() == null) ? "No text set" : act.getText());
+                System.out.printf(" :--------\n : To:%s\n", act.getRecipient().getName());
+                System.out.printf(" : From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
+                System.out.printf(" : Text:%s\n :---------\n", (act.getText() == null) ? "No text set" : act.getText());
             }
 
             // This is simulating DELAY
