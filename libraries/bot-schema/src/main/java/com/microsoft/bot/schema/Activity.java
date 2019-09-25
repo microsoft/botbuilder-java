@@ -1486,10 +1486,19 @@ public class Activity {
         }
 
         String text = activity.getText();
+        if (StringUtils.isEmpty(text)) {
+            return text;
+        }
 
         for (Mention mention : activity.getMentions()) {
             if (StringUtils.equals(mention.getMentioned().getId(), id)) {
-                text = text.replaceAll(mention.getText(), "");
+                if (StringUtils.isEmpty(mention.getText())) {
+                    text = text.replaceAll("<at>" + mention.getMentioned().getName() + "</at>", "");
+                } else {
+                    text = text.replaceAll(mention.getText(), "");
+                }
+
+                text = text.trim();
             }
         }
 

@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.connector.Channels;
@@ -35,11 +36,10 @@ public class SkypeMentionNormalizeMiddleware implements Middleware {
                     if (closingBracket != -1) {
                         int openingBracket = text.indexOf("<", closingBracket);
                         if (openingBracket != -1) {
-                            String mention = text.substring(closingBracket + 1, openingBracket);
+                            String mention = text.substring(closingBracket + 1, openingBracket).trim();
 
                             // create new JsonNode with new mention value
-                            ObjectNode node = JsonNodeFactory.instance.objectNode();
-                            node.put("text", mention);
+                            JsonNode node = JsonNodeFactory.instance.textNode(mention);
                             entity.setProperties("text", node);
                         }
                     }

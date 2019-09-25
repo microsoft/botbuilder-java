@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -105,6 +106,7 @@ public class Entity {
      * @param classType Class extended EntitySerialization
      * @return Entity converted to type T
      */
+    @JsonIgnore
     public <T extends EntitySerialization> T getAs(Class<T> classType) {
 
         // Serialize
@@ -139,6 +141,7 @@ public class Entity {
      * @param obj of type T
      * @param obj
      */
+    @JsonIgnore
     public <T extends EntitySerialization> Entity setAs(T obj) {
         // Serialize
         String tempJson;
