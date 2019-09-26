@@ -21,18 +21,34 @@ public class InvokeResponse {
      */
     private Object body;
 
+    /**
+     * Gets the HTTP status code for the response.
+     * @return The HTTP status code.
+     */
     public int getStatus() {
         return status;
     }
 
+    /**
+     * Sets the HTTP status code for the response.
+     * @param withStatus The HTTP status code.
+     */
     public void setStatus(int withStatus) {
         this.status = withStatus;
     }
 
+    /**
+     * Gets the body content for the response.
+     * @return The body content.
+     */
     public Object getBody() {
         return body;
     }
 
+    /**
+     * Sets the body content for the response.
+     * @param withBody The body content.
+     */
     public void setBody(Object withBody) {
         body = withBody;
     }

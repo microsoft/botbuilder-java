@@ -25,16 +25,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TranscriptLoggerMiddleware implements Middleware {
     private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
-    // https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features
+
+    /**
+     * To/From JSON.
+     */
     private static ObjectMapper mapper;
 
     static {
         mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.findAndRegisterModules();
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .findAndRegisterModules();
     }
 
+    /**
+     * The TranscriptLogger to log to.
+     */
     private TranscriptLogger transcriptLogger;
+
+    /**
+     * Activity queue.
+     */
     private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
     /**
@@ -52,11 +62,11 @@ public class TranscriptLoggerMiddleware implements Middleware {
     }
 
     /**
-     * initialization for middleware turn.
+     * Records incoming and outgoing activities to the conversation store.
      *
-     * @param context
-     * @param next
-     * @return
+     * @param context The context object for this turn.
+     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @return A task that represents the work queued to execute.
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {

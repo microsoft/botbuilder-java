@@ -37,6 +37,10 @@ public class TelemetryLoggerMiddleware implements Middleware {
         logPersonalInformation = withLogPersonalInformation;
     }
 
+    /**
+     * Gets the currently configured BotTelemetryClient that logs the event.
+     * @return The {@link BotTelemetryClient} being used to log events.
+     */
     public BotTelemetryClient getTelemetryClient() {
         return telemetryClient;
     }
@@ -46,7 +50,7 @@ public class TelemetryLoggerMiddleware implements Middleware {
      *
      * @param context The context object for this turn.
      * @param next    The delegate to call to continue the bot middleware pipeline.
-     * @return
+     * @return A task that represents the work queued to execute.
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
@@ -67,7 +71,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
 
                 // hook up update activity pipeline
                 context.onUpdateActivity((updateContext, updateActivity, updateNext) -> updateNext.get()
-                    .thenCombine(onUpdateActivity(updateActivity), (resourceResponse, updateResult) -> resourceResponse));
+                    .thenCombine(
+                        onUpdateActivity(updateActivity), (resourceResponse, updateResult) -> resourceResponse));
 
                 // hook up delete activity pipeline
                 context.onDeleteActivity((deleteContext, deleteReference, deleteNext) -> deleteNext.get()

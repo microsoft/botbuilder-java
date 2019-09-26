@@ -40,6 +40,13 @@ public class TurnContextStateCollection implements AutoCloseable {
         return get(type.getSimpleName());
     }
 
+    /**
+     * Adds a value to the turn's context.
+     * @param key The name of the value.
+     * @param value The value to add.
+     * @param <T> The type of the value.
+     * @throws IllegalArgumentException
+     */
     public <T> void add(String key, T value) throws IllegalArgumentException {
         if (key == null) {
             throw new IllegalArgumentException("key");
@@ -69,10 +76,19 @@ public class TurnContextStateCollection implements AutoCloseable {
         add(value.getClass().getSimpleName(), value);
     }
 
+    /**
+     * Removes a value.
+     * @param key The name of the value to remove.
+     */
     public void remove(String key) {
         state.remove(key);
     }
 
+    /**
+     * Replaces a value.
+     * @param key The name of the value to replace.
+     * @param value The new value.
+     */
     public void replace(String key, Object value) {
         state.remove(key);
         add(key, value);

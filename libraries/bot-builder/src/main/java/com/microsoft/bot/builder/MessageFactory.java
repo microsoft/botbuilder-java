@@ -3,11 +3,16 @@
 
 package com.microsoft.bot.builder;
 
-import com.microsoft.bot.schema.*;
+import com.microsoft.bot.schema.ActionTypes;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.Attachment;
+import com.microsoft.bot.schema.AttachmentLayoutTypes;
+import com.microsoft.bot.schema.CardAction;
+import com.microsoft.bot.schema.InputHints;
+import com.microsoft.bot.schema.SuggestedActions;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -131,7 +136,7 @@ public final class MessageFactory {
      *
      * @param actions The card actions to include.
      * @param text    Optional, the text of the message to send.
-     * @return
+     * @return A message activity that contains the suggested actions.
      */
     public static Activity suggestedCardActions(List<CardAction> actions, String text) {
         return suggestedCardActions(actions, text, null, null);
@@ -145,7 +150,7 @@ public final class MessageFactory {
      * @param ssml      Optional, text to be spoken by your bot on a speech-enable channel.
      * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
      *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
-     * @return
+     * @return A message activity that contains the suggested actions.
      */
     public static Activity suggestedCardActions(List<CardAction> actions,
                                                 String text,
@@ -158,7 +163,7 @@ public final class MessageFactory {
         Activity activity = Activity.createMessageActivity();
         setTextAndSpeech(activity, text, ssml, inputHint);
 
-        activity.setSuggestedActions(new SuggestedActions(actions.toArray(new CardAction[actions.size()])));
+        activity.setSuggestedActions(new SuggestedActions(actions.toArray(new CardAction[0])));
 
         return activity;
     }
@@ -282,7 +287,7 @@ public final class MessageFactory {
             setName(StringUtils.isEmpty(name) ? null : name);
         }};
 
-        return attachmentActivity(AttachmentLayoutTypes.LIST, Arrays.asList(attachment),
+        return attachmentActivity(AttachmentLayoutTypes.LIST, Collections.singletonList(attachment),
             text, ssml, inputHint);
     }
 

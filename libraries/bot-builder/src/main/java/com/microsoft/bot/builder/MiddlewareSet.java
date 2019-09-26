@@ -4,13 +4,17 @@
 package com.microsoft.bot.builder;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Contains an ordered set of {@link Middleware}.
  */
 public class MiddlewareSet implements Middleware {
-    private final ArrayList<Middleware> middleware = new ArrayList<>();
+    /**
+     * List of {@link Middleware} objects this class manages.
+     */
+    private final List<Middleware> middlewareList = new ArrayList<>();
 
     /**
      * Adds a middleware object to the end of the set.
@@ -20,13 +24,29 @@ public class MiddlewareSet implements Middleware {
      */
     public MiddlewareSet use(Middleware middleware) {
         BotAssert.middlewareNotNull(middleware);
-        this.middleware.add(middleware);
+        this.middlewareList.add(middleware);
         return this;
     }
 
+    /**
+     * Processes an incoming activity.
+     *
+     * @param turnContext The context object for this turn.
+     * @param next        The delegate to call to continue the bot middleware pipeline.
+     * @return A task that represents the work queued to execute.
+     * Middleware calls the {@code next} delegate to pass control to
+     * the next middleware in the pipeline. If middleware doesn’t call the next delegate,
+     * the adapter does not call any of the subsequent middleware’s request handlers or the
+     * bot’s receive handler, and the pipeline short circuits.
+     * <p>The {@code context} provides information about the
+     * incoming activity, and other data needed to process the activity.</p>
+     * <p>
+     * {@link TurnContext}
+     * {@link com.microsoft.bot.schema.Activity}
+     */
     @Override
-    public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
-        return receiveActivityInternal(context, null)
+    public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
+        return receiveActivityInternal(turnContext, null)
             .thenCompose((result) -> next.next());
     }
 
@@ -49,7 +69,7 @@ public class MiddlewareSet implements Middleware {
                                                             BotCallbackHandler callback,
                                                             int nextMiddlewareIndex) {
         // Check if we're at the end of the middleware list yet
-        if (nextMiddlewareIndex == middleware.size()) {
+        if (nextMiddlewareIndex == middlewareList.size()) {
             // If all the Middleware ran, the "leading edge" of the tree is now complete.
             // This means it's time to run any developer specified callback.
             // Once this callback is done, the "trailing edge" calls are then completed. This
@@ -68,7 +88,7 @@ public class MiddlewareSet implements Middleware {
         }
 
         // Get the next piece of middleware
-        Middleware nextMiddleware = middleware.get(nextMiddlewareIndex);
+        Middleware nextMiddleware = middlewareList.get(nextMiddlewareIndex);
 
         // Execute the next middleware passing a closure that will recurse back into this method at the
         // next piece of middleware as the NextDelegate

@@ -19,8 +19,8 @@ public interface UserTokenProvider {
      * @return Token Response.
      */
     CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext,
-                                                       String connectionName,
-                                                       String magicCode);
+                                                  String connectionName,
+                                                  String magicCode);
 
     /**
      * Get the raw signin link to be sent to the user for signin for a connection name.
@@ -30,9 +30,7 @@ public interface UserTokenProvider {
      * @return A task that represents the work queued to execute. If the task completes successfully,
      * the result contains the raw signin link.
      */
-    default CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName) {
-        return getOauthSignInLink(turnContext, connectionName, null, null);
-    }
+    CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName);
 
     /**
      * Get the raw signin link to be sent to the user for signin for a connection name.
@@ -45,9 +43,9 @@ public interface UserTokenProvider {
      * the result contains the raw signin link.
      */
     CompletableFuture<String> getOauthSignInLink(TurnContext turnContext,
-                                                      String connectionName,
-                                                      String userId,
-                                                      String finalRedirect);
+                                                 String connectionName,
+                                                 String userId,
+                                                 String finalRedirect);
 
     /**
      * Signs the user out with the token server.
@@ -100,8 +98,8 @@ public interface UserTokenProvider {
      * @return Dictionary of resourceUrl to the corresponding TokenResponse.
      */
     default CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext turnContext,
-                                                                           String connectionName,
-                                                                           String[] resourceUrls) {
+                                                                       String connectionName,
+                                                                       String[] resourceUrls) {
         return getAadTokens(turnContext, connectionName, resourceUrls, null);
     }
 
@@ -116,7 +114,7 @@ public interface UserTokenProvider {
      * @return Dictionary of resourceUrl to the corresponding TokenResponse.
      */
     CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext turnContext,
-                                                                   String connectionName,
-                                                                   String[] resourceUrls,
-                                                                   String userId);
+                                                               String connectionName,
+                                                               String[] resourceUrls,
+                                                               String userId);
 }

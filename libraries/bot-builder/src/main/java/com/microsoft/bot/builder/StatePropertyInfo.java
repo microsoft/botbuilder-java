@@ -3,8 +3,13 @@
 
 package com.microsoft.bot.builder;
 
+/**
+ * This is metadata about the property including policy info.
+ */
 public interface StatePropertyInfo {
+    /**
+     * Gets the name of the property.
+     * @return The name of the property.
+     */
     String getName();
-
-    void setName(String withName);
 }

@@ -18,27 +18,26 @@ import java.util.concurrent.CompletableFuture;
  * <p>For each activity, the adapter calls middleware in the order in which you
  * added it.</p>
  *
- * <example>
- * This defines middleware that sends "before" and "after" messages
- * before and after the adapter calls the bot's
- * {@link Bot#onTurn(TurnContext)} method.
- * <code>
+ * This defines middleware that sends "before" and "after" messages before and after
+ * the adapter calls the bot's {@link Bot#onTurn(TurnContext)} method.
+ *
+ * {@code
  * public class SampleMiddleware : Middleware
  * {
- * public async Task OnTurn(TurnContext context, MiddlewareSet.NextDelegate next)
- * {
- * context.SendActivity("before");
- * await next().ConfigureAwait(false);
- * context.SendActivity("after");
+ *    public async Task OnTurn(TurnContext context, MiddlewareSet.NextDelegate next)
+ *    {
+ *       context.SendActivity("before");
+ *       await next().ConfigureAwait(false);
+ *       context.SendActivity("after");
+ *    }
  * }
  * }
- * </code>
- * </example>
- * {@linkalso Bot}
+ *
+ * {@link Bot}
  */
 public interface Middleware {
     /**
-     * Processess an incoming activity.
+     * Processes an incoming activity.
      *
      * @param turnContext The context object for this turn.
      * @param next        The delegate to call to continue the bot middleware pipeline.

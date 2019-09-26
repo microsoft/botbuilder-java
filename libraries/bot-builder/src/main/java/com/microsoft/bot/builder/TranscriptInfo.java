@@ -20,7 +20,7 @@ public class TranscriptInfo {
     /**
      * Date conversation was started.
      */
-    private OffsetDateTime created = OffsetDateTime.now();
+    private OffsetDateTime created;
 
     public TranscriptInfo(String withId, String withChannelId, OffsetDateTime withCreated) {
         id = withId;
@@ -28,27 +28,51 @@ public class TranscriptInfo {
         created = withCreated;
     }
 
+    /**
+     * Gets the ID of the channel in which the conversation occurred.
+     * @return The ID of the channel in which the conversation occurred.
+     */
     public String channelId() {
-        return this.channelId;
+        return channelId;
     }
 
-    public void setChannelId(String withValue) {
-        channelId = withValue;
+    /**
+     * Sets the ID of the channel in which the conversation occurred.
+     * @param withChannelId The ID of the channel in which the conversation occurred.
+     */
+    public void setChannelId(String withChannelId) {
+        channelId = withChannelId;
     }
 
+    /**
+     * Gets the ID of the conversation.
+     * @return The ID of the conversation.
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String witValue) {
-        id = witValue;
+    /**
+     * Sets the ID of the conversation.
+     * @param withId The ID of the conversation.
+     */
+    public void setId(String withId) {
+        id = withId;
     }
 
+    /**
+     * Gets the date the conversation began.
+     * @return The date then conversation began.
+     */
     public OffsetDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(OffsetDateTime withValue) {
-        created = withValue;
+    /**
+     * Sets the date the conversation began.
+     * @param withCreated The date then conversation began.
+     */
+    public void setCreated(OffsetDateTime withCreated) {
+        created = withCreated;
     }
 }

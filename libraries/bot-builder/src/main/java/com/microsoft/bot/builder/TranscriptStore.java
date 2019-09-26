@@ -31,7 +31,7 @@ public interface TranscriptStore extends TranscriptLogger {
      *
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
-     * @param continuationToken
+     * @param continuationToken The continuation token (if available).
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
      */
@@ -46,7 +46,7 @@ public interface TranscriptStore extends TranscriptLogger {
      *
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
-     * @param continuationToken
+     * @param continuationToken The continuation token (if available).
      * @param startDate         A cutoff date. Activities older than this date are not included.
      * @return A task that represents the work queued to execute.
      * If the task completes successfully, the result contains the matching activities.
@@ -70,7 +70,7 @@ public interface TranscriptStore extends TranscriptLogger {
      * Gets the conversations on a channel from the store.
      *
      * @param channelId         The ID of the channel.
-     * @param continuationToken
+     * @param continuationToken The continuation token (if available).
      * @return A task that represents the work queued to execute.
      */
     CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId, String continuationToken);

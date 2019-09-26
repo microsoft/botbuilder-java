@@ -41,6 +41,7 @@ public interface BotTelemetryClient {
      * @param properties  Named string values you can use to classify and search for this availability telemetry.
      * @param metrics     Additional values associated with this availability telemetry.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     void trackAvailability(String name,
                            OffsetDateTime timeStamp,
                            Duration duration,
@@ -65,6 +66,7 @@ public interface BotTelemetryClient {
      * @param resultCode         Result code of dependency call execution.
      * @param success            True if the dependency call was handled successfully.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     void trackDependency(String dependencyTypeName,
                          String target,
                          String dependencyName,

@@ -6,16 +6,24 @@ package com.microsoft.bot.builder;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Handles persistence of a conversation state object using the conversation ID as part of the key.
+ * Defines a state management object for conversation state.
  */
 public class ConversationState extends BotState {
     /**
      * Creates a new {@link ConversationState} object.
+     *
+     * @param withStorage The storage layer to use.
      */
     public ConversationState(Storage withStorage) {
         super(withStorage, ConversationState.class.getSimpleName());
     }
 
+    /**
+     * Gets the key to use when reading and writing state to and from storage.
+     *
+     * @param turnContext The context object for this turn.
+     * @return The storage key.
+     */
     @Override
     public String getStorageKey(TurnContext turnContext) {
         if (turnContext.getActivity() == null) {

@@ -13,19 +13,28 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An implementation of the IBot interface intended for further subclassing.
- * Derive from this class to plug in code to handle particular Activity types.
+ * An implementation of the {@link Bot} interface intended for further subclassing.
+ * Derive from this class to plug in code to handle particular {@link Activity} types.
  * Pre and post processing of Activities can be plugged in by deriving and calling
  * the base class implementation.
  */
 public class ActivityHandler implements Bot {
     /**
-     * The OnTurnAsync function is called by the Adapter (for example, the {@link BotFrameworkAdapter} at
-     * runtime in order to process an inbound Activity.
+     * Called by the adapter (for example, a {@link BotFrameworkAdapter}) at runtime in order
+     * to process an inbound {@link Activity}.
+     *
+     * <p>This method calls other methods in this class based on the type of the activity to
+     * process, which allows a derived class to provide type-specific logic in a controlled way.</p>
+     *
+     * <p>In a derived class, override this method to add logic that applies to all activity types.
+     * Add logic to apply before the type-specific logic before the call to the base class
+     * {@link Bot#onTurn(TurnContext)} method.
+     * Add logic to apply after the type-specific logic after the call to the base class
+     * {@link Bot#onTurn(TurnContext)} method.</p>
      *
      * @param turnContext The context object for this turn. Provides information about the
      *                    incoming activity, and other data needed to process the activity.
-     * @return
+     * @return A task that represents the work queued to execute.
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
@@ -57,11 +66,10 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Invoked when a message activity is received from the user when the base behavior of
-     * {@link #onTurn(TurnContext)} is used.
-     * <p>
-     * If overridden, this could potentially contain conversational logic.
-     * By default, this method does nothing.
+     * Override this in a derived class to provide logic specific to {@link ActivityTypes#MESSAGE}
+     * activities, such as the conversational logic.
+     *
+     * When the {@link #onTurn(TurnContext)} method receives a message activity, it calls this method.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -73,14 +81,15 @@ public class ActivityHandler implements Bot {
     /**
      * Invoked when a conversation update activity is received from the channel when the base behavior of
      * {@link #onTurn(TurnContext)} is used.
-     * <p>
-     * Conversation update activities are useful when it comes to responding to users being added to or removed
-     * from the conversation.
-     * <p>
+     *
+     * Conversation update activities are useful when it comes to responding to users being added to or
+     * removed from the conversation.
+     *
      * For example, a bot could respond to a user being added by greeting the user.
-     * By default, this method will call {@link #onMembersAdded(List, TurnContext)} if any users have been added,
-     * or {@link #onMembersRemoved(List, TurnContext)} if any users have been removed. The method checks the member
-     * ID so that it only responds to updates regarding members other than the bot itself.
+     * By default, this method will call {@link #onMembersAdded(List, TurnContext)} if any users have
+     * been added or {@link #onMembersRemoved(List, TurnContext)} if any users have been removed. The
+     * method checks the member ID so that it only responds to updates regarding members other than the
+     * bot itself.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -106,15 +115,15 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Invoked when members other than this bot (like a user) are added to the conversation when the base behavior of
-     * {@link #onConversationUpdateActivity(TurnContext)} is used.
-     * <p>
-     * If overridden, this could potentially send a greeting message to the user instead of waiting for the user to
-     * send a message first.
-     * <p>
-     * By default, this method does nothing.
+     * Override this in a derived class to provide logic for when members other than the bot
+     * join the conversation, such as your bot's welcome logic.
      *
-     * @param membersAdded A list of all the users that have been added in the conversation update.
+     * <p>When the {@link #onConversationUpdateActivity(TurnContext)} method receives a conversation
+     * update activity that indicates one or more users other than the bo are joining the conversation,
+     * it calls this method.</p>
+     *
+     * @param membersAdded A list of all the members added to the conversation, as described by
+     *                     the conversation update activity.
      * @param turnContext  The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
@@ -123,14 +132,15 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Invoked when members other than this bot (like a user) are removed from the conversation when the base
-     * behavior of {@link #onConversationUpdateActivity(TurnContext)} is used.
-     * <p>
-     * This method could optionally be overridden to perform actions related to users leaving a group conversation.
-     * <p>
-     * By default, this method does nothing.
+     * Override this in a derived class to provide logic for when members other than the bot
+     * leave the conversation, such as your bot's good-bye logic.
      *
-     * @param membersRemoved A list of all the users that have been removed in the conversation update.
+     * <p>When the {@link #onConversationUpdateActivity(TurnContext)} method receives a conversation
+     * update activity that indicates one or more users other than the bot are leaving the conversation,
+     * it calls this method.</p>
+     *
+     * @param membersRemoved A list of all the members removed from the conversation, as described
+     *                       by the conversation update activity.
      * @param turnContext    The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
@@ -141,13 +151,22 @@ public class ActivityHandler implements Bot {
     /**
      * Invoked when an event activity is received from the connector when the base behavior of
      * {@link #onTurn(TurnContext)} is used.
-     * <p>
-     * Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
-     * previously sent activity. Message reactions are only supported by a few channels.
-     * <p>
-     * The activity that the message reaction corresponds to is indicated in the replyToId property.
+     *
+     * <p>Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
+     * previously sent activity. Message reactions are only supported by a few channels.</p>
+     *
+     * <p>The activity that the message reaction corresponds to is indicated in the replyToId property.
      * The value of this property is the activity id of a previously sent activity given back to the
-     * bot as the response from a send call.
+     * bot as the response from a send call.</p>
+     *
+     * <p>When the {@link #onTurn(TurnContext)} method receives a message reaction activity, it calls this
+     * method.  If the message reaction indicates that reactions were added to a message, it calls
+     * {@link #onReactionsAdded(List, TurnContext)}. If the message reaction indicates that reactions were
+     * removed from a message, it calls {@link #onReactionsRemoved(List, TurnContext)}.</p>
+     *
+     * <p>In a derived class, override this method to add logic that applies to all message reaction activities.
+     * Add logic to apply before the reactions added or removed logic before the call to the base class
+     * method. Add logic to apply after the reactions added or removed logic after the call to the base class.</p>
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -172,7 +191,15 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Called when there have been Reactions added that reference a previous Activity.
+     * Override this in a derived class to provide logic for when reactions to a previous activity
+     * are added to the conversation.
+     *
+     * <p>Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
+     * previously sent message on the conversation. Message reactions are supported by only a few channels.
+     * The activity that the message is in reaction to is identified by the activity's
+     * {@link Activity#getReplyToId()} property. The value of this property is the activity ID
+     * of a previously sent activity. When the bot sends an activity, the channel assigns an ID to it,
+     * which is available in the {@link com.microsoft.bot.schema.ResourceResponse#getId} of the result.</p>
      *
      * @param messageReactions The list of reactions added.
      * @param turnContext      The context object for this turn.
@@ -184,7 +211,15 @@ public class ActivityHandler implements Bot {
     }
 
     /**
-     * Called when there have been Reactions removed that reference a previous Activity.
+     * Override this in a derived class to provide logic for when reactions to a previous activity
+     * are removed from the conversation.
+     *
+     * <p>Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
+     * previously sent message on the conversation. Message reactions are supported by only a few channels.
+     * The activity that the message is in reaction to is identified by the activity's
+     * {@link Activity#getReplyToId()} property. The value of this property is the activity ID
+     * of a previously sent activity. When the bot sends an activity, the channel assigns an ID to it,
+     * which is available in the {@link com.microsoft.bot.schema.ResourceResponse#getId} of the result.</p>
      *
      * @param messageReactions The list of reactions removed.
      * @param turnContext      The context object for this turn.
@@ -198,12 +233,28 @@ public class ActivityHandler implements Bot {
     /**
      * Invoked when an event activity is received from the connector when the base behavior of
      * {@link #onTurn(TurnContext)} is used.
-     * <p>
-     * Event activities can be used to communicate many different things.
-     * <p>
-     * By default, this method will call {@link #onTokenResponseEvent(TurnContext)} if the
+     *
+     * <p>Event activities can be used to communicate many different things.</p>
+     *
+     * <p>By default, this method will call {@link #onTokenResponseEvent(TurnContext)} if the
      * activity's name is "tokens/response" or {@link #onEvent(TurnContext)} otherwise.
-     * "tokens/response" event can be triggered by an {@link com.microsoft.bot.schema.OAuthCard}.
+     * "tokens/response" event can be triggered by an {@link com.microsoft.bot.schema.OAuthCard}.</p>
+     *
+     * <p>When the {@link #onTurn(TurnContext)} method receives an event activity, it calls this method.</p>
+     *
+     * <p>If the event {@link Activity#getName} is `tokens/response`, it calls
+     * {@link #onTokenResponseEvent(TurnContext)} otherwise, it calls {@link #onEvent(TurnContext)}.</p>
+     *
+     * <p>In a derived class, override this method to add logic that applies to all event activities.
+     * Add logic to apply before the specific event-handling logic before the call to the base class
+     * method. Add logic to apply after the specific event-handling logic after the call to the base class
+     * method.</p>
+     *
+     * <p>Event activities communicate programmatic information from a client or channel to a bot.
+     * The meaning of an event activity is defined by the {@link Activity#getName} property,
+     * which is meaningful within the scope of a channel.
+     * A `tokens/response` event can be triggered by an {@link com.microsoft.bot.schema.OAuthCard} or
+     * an OAuth prompt.</p>
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -219,10 +270,14 @@ public class ActivityHandler implements Bot {
     /**
      * Invoked when a "tokens/response" event is received when the base behavior of
      * {@link #onEventActivity(TurnContext)} is used.
-     * <p>
-     * If using an OAuthPrompt, override this method to forward this {@link Activity} to the current dialog.
-     * <p>
-     * By default, this method does nothing.
+     *
+     * <p>If using an OAuthPrompt, override this method to forward this {@link Activity} to the
+     * current dialog.</p>
+     *
+     * <p>By default, this method does nothing.</p>
+     *
+     * When the {@link #onEventActivity(TurnContext)} method receives an event with a {@link Activity#getName()}
+     * of `tokens/response`, it calls this method.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -234,10 +289,13 @@ public class ActivityHandler implements Bot {
     /**
      * Invoked when an event other than tokens/response is received when the base behavior of
      * {@link #onEventActivity(TurnContext)} is used.
-     * <p>
-     * This method could optionally be overridden if the bot is meant to handle miscellaneous events.
-     * <p>
-     * By default, this method does nothing.
+     *
+     * <p>This method could optionally be overridden if the bot is meant to handle miscellaneous events.</p>
+     *
+     * <p>By default, this method does nothing.</p>
+     *
+     * When the {@link #onEventActivity(TurnContext)} method receives an event with a {@link Activity#getName()}
+     * other than `tokens/response`, it calls this method.
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -250,11 +308,14 @@ public class ActivityHandler implements Bot {
      * Invoked when an activity other than a message, conversation update, or event is received
      * when the base behavior of {@link #onTurn(TurnContext)} is used.
      *
-     * If overridden, this could potentially respond to any of the other activity types like
+     * <p>If overridden, this could potentially respond to any of the other activity types like
      * {@link com.microsoft.bot.schema.ActivityTypes#CONTACT_RELATION_UPDATE} or
-     * {@link com.microsoft.bot.schema.ActivityTypes#END_OF_CONVERSATION}.
-     * <p>
-     * By default, this method does nothing.
+     * {@link com.microsoft.bot.schema.ActivityTypes#END_OF_CONVERSATION}.</p>
+     *
+     * <p>By default, this method does nothing.</p>
+     *
+     * <p>When the {@link #onTurn(TurnContext)} method receives an activity that is not a message,
+     * conversation update, message reaction, or event activity, it calls this method.</p>
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.

@@ -8,13 +8,29 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 public class NullBotTelemetryClient implements BotTelemetryClient {
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @Override
-    public void trackAvailability(String name, OffsetDateTime timeStamp, Duration duration, String runLocation, boolean success, String message, Map<String, String> properties, Map<String, Double> metrics) {
+    public void trackAvailability(String name,
+                                  OffsetDateTime timeStamp,
+                                  Duration duration,
+                                  String runLocation,
+                                  boolean success,
+                                  String message,
+                                  Map<String, String> properties,
+                                  Map<String, Double> metrics) {
 
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @Override
-    public void trackDependency(String dependencyTypeName, String target, String dependencyName, String data, OffsetDateTime startTime, Duration duration, String resultCode, boolean success) {
+    public void trackDependency(String dependencyTypeName,
+                                String target,
+                                String dependencyName,
+                                String data,
+                                OffsetDateTime startTime,
+                                Duration duration,
+                                String resultCode,
+                                boolean success) {
 
     }
 

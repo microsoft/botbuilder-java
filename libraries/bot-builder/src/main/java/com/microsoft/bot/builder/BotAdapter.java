@@ -5,13 +5,11 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
-import com.microsoft.bot.schema.ConversationReferenceHelper;
 import com.microsoft.bot.schema.ResourceResponse;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.function.Function;
 
 /**
  * Represents a bot adapter that can connect a bot to a service endpoint.
@@ -36,7 +34,7 @@ public abstract class BotAdapter {
     /**
      * The collection of middleware in the adapter's pipeline.
      */
-    protected final MiddlewareSet middlewareSet = new MiddlewareSet();
+    private final MiddlewareSet middlewareSet = new MiddlewareSet();
 
     /**
      * Error handler that can catch exceptions in the middleware or application.
@@ -44,18 +42,30 @@ public abstract class BotAdapter {
     private OnTurnErrorHandler onTurnError;
 
     /**
-     * Creates a default adapter.
+     * Gets the error handler that can catch exceptions in the middleware or application.
+     *
+     * @return An error handler that can catch exceptions in the middleware or application.
      */
-    public BotAdapter() {
-        super();
-    }
-
     public OnTurnErrorHandler getOnTurnError() {
         return onTurnError;
     }
 
+    /**
+     * Sets the error handler that can catch exceptions in the middleware or application.
+     *
+     * @param withTurnError An error handler that can catch exceptions in the middleware or application.
+     */
     public void setOnTurnError(OnTurnErrorHandler withTurnError) {
         onTurnError = withTurnError;
+    }
+
+    /**
+     * Gets the collection of middleware in the adapter's pipeline.
+     *
+     * @return The middleware collection for the pipeline.
+     */
+    protected MiddlewareSet getMiddlewareSet() {
+        return middlewareSet;
     }
 
     /**
@@ -82,7 +92,8 @@ public abstract class BotAdapter {
      * the receiving channel assigned to the activities.
      * {@link TurnContext#onSendActivities(SendActivitiesHandler)}
      */
-    public abstract CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities);
+    public abstract CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context,
+                                                                         List<Activity> activities);
 
     /**
      * When overridden in a derived class, replaces an existing activity in the
@@ -98,7 +109,8 @@ public abstract class BotAdapter {
      * of the activity to replace.</p>
      * {@link TurnContext#onUpdateActivity(UpdateActivityHandler)}
      */
-    public abstract CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity);
+    public abstract CompletableFuture<ResourceResponse> updateActivity(TurnContext context,
+                                                                       Activity activity);
 
     /**
      * When overridden in a derived class, deletes an existing activity in the
@@ -113,7 +125,6 @@ public abstract class BotAdapter {
      */
     public abstract CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference);
 
-
     /**
      * Starts activity processing for the current bot turn.
      *
@@ -121,7 +132,7 @@ public abstract class BotAdapter {
      * The adapter passes in the context object for the turn and a next delegate,
      * and the middleware calls the delegate to pass control to the next middleware
      * in the pipeline. Once control reaches the end of the pipeline, the adapter calls
-     * the {@code callback} method. If a middleware component doesn’t call
+     * the {@code callback} method. If a middleware component does not call
      * the next delegate, the adapter does not call  any of the subsequent middleware’s
      * {@link Middleware#onTurn(TurnContext, NextDelegate)}
      * methods or the callback method, and the pipeline short circuits.
@@ -163,24 +174,22 @@ public abstract class BotAdapter {
     /**
      * Sends a proactive message to a conversation.
      *
-     * @param botId     The application ID of the bot. This paramter is ignored in
-     *                  single tenant the Adpters (Console, Test, etc) but is critical to the BotFrameworkAdapter
+     * @param botId     The application ID of the bot. This parameter is ignored in
+     *                  single tenant the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
      *                  which is multi-tenant aware.
      * @param reference A reference to the conversation to continue.
      * @param callback  The method to call for the resulting bot turn.
      * @return A task that represents the work queued to execute.
      * Call this method to proactively send a message to a conversation.
-     * Most channels require a user to initaiate a conversation with a bot
+     * Most channels require a user to initiate a conversation with a bot
      * before the bot can send activities to the user.
-     * {@linkalso RunPipeline(TurnContext, Func { TurnContext, Task })}
+     *
+     * {@link #runPipeline(TurnContext, BotCallbackHandler)}
      */
     public CompletableFuture<Void> continueConversation(String botId,
                                                         ConversationReference reference,
                                                         BotCallbackHandler callback) {
 
-        ConversationReferenceHelper conv = new ConversationReferenceHelper(reference);
-        Activity activity = conv.getPostToBotMessage();
-
-        return runPipeline(new TurnContextImpl(this, activity), callback);
+        return runPipeline(new TurnContextImpl(this, reference.getContinuationActivity()), callback);
     }
 }

@@ -15,82 +15,118 @@ import java.util.concurrent.CompletableFuture;
  * A TurnContext that wraps an untyped inner TurnContext.
  */
 public class DelegatingTurnContext implements TurnContext {
+    /**
+     * The TurnContext being wrapped.
+     */
     private TurnContext innerTurnContext;
 
+    /**
+     * Initializes a new instance of the DelegatingTurnContext class.
+     * @param withTurnContext The TurnContext to wrap.
+     */
     public DelegatingTurnContext(TurnContext withTurnContext) {
         innerTurnContext = withTurnContext;
     }
 
+    /**
+     * Gets the inner context's activity.
+     * @return The inner {@link TurnContext#getAdapter()}.
+     */
     @Override
     public BotAdapter getAdapter() {
         return innerTurnContext.getAdapter();
     }
 
+    /**
+     * Gets the inner context's activity.
+     * @return The inner {@link TurnContext#getTurnState()}.
+     */
     @Override
     public TurnContextStateCollection getTurnState() {
         return innerTurnContext.getTurnState();
     }
 
+    /**
+     * Gets the inner context's activity.
+     * @return The inner {@link TurnContext#getActivity()}.
+     */
     @Override
     public Activity getActivity() {
         return innerTurnContext.getActivity();
     }
 
+    /**
+     * Gets the inner context's responded value.
+     * @return The inner {@link TurnContext#getResponded()}.
+     */
     @Override
     public boolean getResponded() {
         return innerTurnContext.getResponded();
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend) {
         return innerTurnContext.sendActivity(textReplyToSend);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak) {
         return innerTurnContext.sendActivity(textReplyToSend, speak);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak, InputHints inputHint) {
+    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend,
+                                                            String speak,
+                                                            InputHints inputHint) {
         return innerTurnContext.sendActivity(textReplyToSend, speak, inputHint);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(Activity activity) {
         return innerTurnContext.sendActivity(activity);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
         return innerTurnContext.sendActivities(activities);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(Activity activity) {
         return innerTurnContext.updateActivity(activity);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<Void> deleteActivity(String activityId) {
         return innerTurnContext.deleteActivity(activityId);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
         return innerTurnContext.deleteActivity(conversationReference);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public TurnContext onSendActivities(SendActivitiesHandler handler) {
         return innerTurnContext.onSendActivities(handler);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public TurnContext onUpdateActivity(UpdateActivityHandler handler) {
         return innerTurnContext.onUpdateActivity(handler);
     }
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
     public TurnContext onDeleteActivity(DeleteActivityHandler handler) {
         return innerTurnContext.onDeleteActivity(handler);
