@@ -11,13 +11,15 @@ import java.util.Map;
 /**
  * Represents a set of collection of services associated with the {@link TurnContext}.
  */
-public class TurnContextStateCollection extends HashMap<String, Object> implements AutoCloseable {
+public class TurnContextStateCollection implements AutoCloseable {
+    private Map<String, Object> state = new HashMap<>();
+
     public <T> T get(String key) throws IllegalArgumentException {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
 
-        Object service = super.get(key);
+        Object service = state.get(key);
         try {
             T result = (T) service;
         } catch (ClassCastException e) {
@@ -30,11 +32,12 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
     /**
      * Get a service by type using its full type name as the key.
      *
-     * @param type The type of service to be retrieved.
+     * @param type The type of service to be retrieved.  This will use the value returned
+     *             by Class.getSimpleName as the key.
      * @return The service stored under the specified key.
      */
     public <T> T get(Class<T> type) throws IllegalArgumentException {
-        return get(type.getName());
+        return get(type.getSimpleName());
     }
 
     public <T> void add(String key, T value) throws IllegalArgumentException {
@@ -43,21 +46,36 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
         }
 
         if (value == null) {
-            throw new IllegalArgumentException("service");
+            throw new IllegalArgumentException("value");
         }
 
-        if (containsKey(key))
+        if (state.containsKey(key)) {
             throw new IllegalArgumentException(String.format("Key %s already exists", key));
-        put(key, value);
+        }
+
+        state.put(key, value);
     }
 
     /**
-     * Add a service using its full type name as the key.
+     * Add a service using its type name ({@link Class#getSimpleName()} as the key.
      *
      * @param value The service to add.
      */
     public <T> void add(T value) throws IllegalArgumentException {
-        add(value.getClass().getName(), value);
+        if (value == null) {
+            throw new IllegalArgumentException("value");
+        }
+
+        add(value.getClass().getSimpleName(), value);
+    }
+
+    public void remove(String key) {
+        state.remove(key);
+    }
+
+    public void replace(String key, Object value) {
+        state.remove(key);
+        add(key, value);
     }
 
     @Override
@@ -71,7 +89,7 @@ public class TurnContextStateCollection extends HashMap<String, Object> implemen
 
     @Override
     public void close() throws Exception {
-        for (Map.Entry entry : entrySet()) {
+        for (Map.Entry entry : state.entrySet()) {
             if (entry.getValue() instanceof AutoCloseable) {
                 if (entry.getValue() instanceof ConnectorClient) {
                     continue;

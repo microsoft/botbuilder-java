@@ -81,7 +81,7 @@ public abstract class BotState implements PropertyManager {
         if (force || cachedState == null || cachedState.getState() == null) {
             return storage.read(new String[]{storageKey})
                 .thenApply(val -> {
-                    turnContext.getTurnState().put(contextServiceKey, new CachedBotState((Map<String, Object>)val.get(storageKey)));
+                    turnContext.getTurnState().replace(contextServiceKey, new CachedBotState((Map<String, Object>)val.get(storageKey)));
                     return null;
                 });
         }
@@ -141,7 +141,7 @@ public abstract class BotState implements PropertyManager {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
 
-        turnContext.getTurnState().put(contextServiceKey, new CachedBotState());
+        turnContext.getTurnState().replace(contextServiceKey, new CachedBotState());
         return CompletableFuture.completedFuture(null);
     }
 
@@ -179,7 +179,7 @@ public abstract class BotState implements PropertyManager {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
 
-        String stateKey = getClass().getName();
+        String stateKey = getClass().getSimpleName();
         CachedBotState cachedState = turnContext.getTurnState().get(stateKey);
         return new ObjectMapper().valueToTree(cachedState.state);
     }

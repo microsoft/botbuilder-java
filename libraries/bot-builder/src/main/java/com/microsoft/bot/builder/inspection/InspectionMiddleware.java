@@ -11,7 +11,6 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -31,16 +30,14 @@ public class InspectionMiddleware extends InterceptionMiddleware {
         this(withInspectionState,
             null,
             null,
-            null,
-            LoggerFactory.getLogger(InspectionMiddleware.class));
+            null);
     }
 
     public InspectionMiddleware(InspectionState withInspectionState,
                                 UserState withUserState,
                                 ConversationState withConversationState,
-                                MicrosoftAppCredentials withCredentials,
-                                Logger withLogger) {
-        super(withLogger);
+                                MicrosoftAppCredentials withCredentials) {
+        super(LoggerFactory.getLogger(InspectionMiddleware.class));
 
         inspectionState = withInspectionState;
         userState = withUserState;
@@ -49,7 +46,7 @@ public class InspectionMiddleware extends InterceptionMiddleware {
     }
 
     public CompletableFuture<Boolean> processCommand(TurnContext turnContext) {
-        if (!StringUtils.equals(turnContext.getActivity().getType(), ActivityTypes.MESSAGE)
+        if (!turnContext.getActivity().isType(ActivityTypes.MESSAGE)
             || StringUtils.isEmpty(turnContext.getActivity().getText())) {
 
             return CompletableFuture.completedFuture(false);
@@ -58,7 +55,7 @@ public class InspectionMiddleware extends InterceptionMiddleware {
         String text = Activity.removeRecipientMentionImmutable(turnContext.getActivity());
         String[] command = text.split(" ");
 
-        if (command.length > 1 && StringUtils.equals(command[1], COMMAND)) {
+        if (command.length > 1 && StringUtils.equals(command[0], COMMAND)) {
             if (command.length == 2 && StringUtils.equals(command[1], "open")) {
                 return processOpenCommand(turnContext)
                     .thenApply((result) -> true);
@@ -76,14 +73,25 @@ public class InspectionMiddleware extends InterceptionMiddleware {
     @Override
     protected CompletableFuture<Intercept> inbound(TurnContext turnContext, Activity activity) {
         return processCommand(turnContext)
-            .thenCombine(findSession(turnContext), (processResult, session) -> {
-                if (session != null) {
-                    if (invokeSend(turnContext, session, activity).join()) {
-                        return new Intercept(true, true);
-                    }
+            .thenCompose(processResult -> {
+                if (processResult) {
+                    return CompletableFuture.completedFuture(new Intercept(false, false));
                 }
 
-                return new Intercept(true, false);
+                return findSession(turnContext)
+                    .thenCompose(session -> {
+                        if (session == null) {
+                            return CompletableFuture.completedFuture(new Intercept(true, false));
+                        }
+
+                        return invokeSend(turnContext, session, activity)
+                            .thenCompose(invokeResult -> {
+                                if (invokeResult) {
+                                    return CompletableFuture.completedFuture(new Intercept(true, true));
+                                }
+                                return CompletableFuture.completedFuture(new Intercept(true, false));
+                            });
+                    });
             });
     }
 
@@ -108,30 +116,34 @@ public class InspectionMiddleware extends InterceptionMiddleware {
     @Override
     protected CompletableFuture<Void> traceState(TurnContext turnContext) {
         return findSession(turnContext)
-            .thenAccept(session -> {
-                if (session != null) {
-                    CompletableFuture<Void> userLoad = userState == null
-                        ? CompletableFuture.completedFuture(null)
-                        : userState.load(turnContext);
-
-                    CompletableFuture<Void> conversationLoad = conversationState == null
-                        ? CompletableFuture.completedFuture(null)
-                        : conversationState.load(turnContext);
-
-                    CompletableFuture.allOf(userLoad, conversationLoad).join();
-
-                    ObjectNode botState = JsonNodeFactory.instance.objectNode();
-                    if (userState != null) {
-                        botState.set("userState", userState.get(turnContext));
-                    }
-
-                    if (conversationState != null) {
-                        botState.set("conversationState", conversationState.get(turnContext));
-                    }
-
-                    invokeSend(turnContext, session, InspectionActivityExtensions.traceActivity(botState)).join();
+            .thenCompose(session -> {
+                if (session == null) {
+                    return CompletableFuture.completedFuture(null);
                 }
-            });
+
+                CompletableFuture<Void> userLoad = userState == null
+                    ? CompletableFuture.completedFuture(null)
+                    : userState.load(turnContext);
+
+                CompletableFuture<Void> conversationLoad = conversationState == null
+                    ? CompletableFuture.completedFuture(null)
+                    : conversationState.load(turnContext);
+
+                return CompletableFuture.allOf(userLoad, conversationLoad)
+                    .thenCompose(loadResult -> {
+                        ObjectNode botState = JsonNodeFactory.instance.objectNode();
+                        if (userState != null) {
+                            botState.set("userState", userState.get(turnContext));
+                        }
+
+                        if (conversationState != null) {
+                            botState.set("conversationState", conversationState.get(turnContext));
+                        }
+
+                        return invokeSend(turnContext, session, InspectionActivityExtensions.traceActivity(botState))
+                            .thenCompose(invokeResult -> CompletableFuture.completedFuture(null));
+                    });
+        });
     }
 
     private CompletableFuture<Void> processOpenCommand(TurnContext turnContext) {
@@ -139,16 +151,14 @@ public class InspectionMiddleware extends InterceptionMiddleware {
             inspectionState.createProperty(InspectionSessionsByStatus.class.getName());
 
         return accessor.get(turnContext, InspectionSessionsByStatus::new)
-            .thenAccept(result -> {
+            .thenCompose(result -> {
                 InspectionSessionsByStatus sessions = (InspectionSessionsByStatus) result;
                 String sessionId = openCommand(sessions, turnContext.getActivity().getConversationReference());
 
                 String command = String.format("%s attach %s", COMMAND, sessionId);
-                turnContext.sendActivity(InspectionActivityExtensions.makeCommandActivity(command)).join();
+                return turnContext.sendActivity(InspectionActivityExtensions.makeCommandActivity(command));
             })
-            .thenRun(() -> {
-                inspectionState.saveChanges(turnContext);
-            });
+            .thenCompose(resourceResponse -> inspectionState.saveChanges(turnContext));
     }
 
     private CompletableFuture<Void> processAttachCommand(TurnContext turnContext, String sessionId) {
@@ -156,20 +166,16 @@ public class InspectionMiddleware extends InterceptionMiddleware {
             inspectionState.createProperty(InspectionSessionsByStatus.class.getName());
 
         return accessor.get(turnContext, InspectionSessionsByStatus::new)
-            .thenAccept(result -> {
-                InspectionSessionsByStatus sessions = (InspectionSessionsByStatus) result;
-
+            .thenCompose(sessions -> {
                 if (attachCommand(turnContext.getActivity().getConversation().getId(), sessions, sessionId)) {
-                    turnContext.sendActivity(MessageFactory.text(
-                        "Attached to session, all traffic is being replicated for inspection.")).join();
+                    return turnContext.sendActivity(MessageFactory.text(
+                        "Attached to session, all traffic is being replicated for inspection."));
                 } else {
-                    turnContext.sendActivity(MessageFactory.text(
-                        String.format("Open session with id %s does not exist.", sessionId))).join();
+                    return turnContext.sendActivity(MessageFactory.text(
+                        String.format("Open session with id %s does not exist.", sessionId)));
                 }
             })
-            .thenRun(() -> {
-                inspectionState.saveChanges(turnContext);
-            });
+            .thenCompose(resourceResponse -> inspectionState.saveChanges(turnContext));
     }
 
     private String openCommand(InspectionSessionsByStatus sessions, ConversationReference conversationReference) {
@@ -189,6 +195,10 @@ public class InspectionMiddleware extends InterceptionMiddleware {
         return true;
     }
 
+    protected InspectionSession createSession(ConversationReference reference, MicrosoftAppCredentials credentials) {
+        return new InspectionSession(reference, credentials);
+    }
+
     private CompletableFuture<InspectionSession> findSession(TurnContext turnContext) {
         StatePropertyAccessor<InspectionSessionsByStatus> accessor =
             inspectionState.createProperty(InspectionSessionsByStatus.class.getName());
@@ -201,7 +211,7 @@ public class InspectionMiddleware extends InterceptionMiddleware {
                     .get(turnContext.getActivity().getConversation().getId());
 
                 if (reference != null) {
-                    return new InspectionSession(reference, credentials, getLogger());
+                    return createSession(reference, credentials);
                 }
 
                 return null;
@@ -213,13 +223,13 @@ public class InspectionMiddleware extends InterceptionMiddleware {
                                                     Activity activity) {
 
         return session.send(activity)
-            .thenApply(result -> {
+            .thenCompose(result -> {
                 if (result) {
-                    return true;
+                    return CompletableFuture.completedFuture(true);
                 }
 
-                cleanupSession(turnContext).join();
-                return false;
+                return cleanupSession(turnContext)
+                    .thenCompose(cleanupResult -> CompletableFuture.completedFuture(false));
             });
     }
 

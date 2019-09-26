@@ -46,11 +46,29 @@ public abstract class InterceptionMiddleware implements Middleware {
                     turnContext.onSendActivities((sendContext, sendActivities, sendNext) -> {
                         List<Activity> traceActivities = sendActivities.stream()
                             .map(a ->
-                                InspectionActivityExtensions.traceActivity(a, "SentActivity", "Sent Activity"))
+                                InspectionActivityExtensions.traceActivity(a,
+                                    "SentActivity", "Sent Activity"))
                             .collect(Collectors.toList());
                         return invokeOutbound(sendContext, traceActivities)
                             .thenCompose(response -> {
                                 return sendNext.get();
+                            });
+                    });
+
+                    turnContext.onUpdateActivity((updateContext, updateActivity, updateNext) -> {
+                        Activity traceActivity = InspectionActivityExtensions.traceActivity(updateActivity,
+                            "MessageUpdate", "Message Update");
+                        return invokeOutbound(turnContext, traceActivity)
+                            .thenCompose(response -> {
+                                return updateNext.get();
+                            });
+                    });
+
+                    turnContext.onDeleteActivity((deleteContext, deleteReference, deleteNext) -> {
+                        Activity traceActivity = InspectionActivityExtensions.traceActivity(deleteReference);
+                        return invokeOutbound(turnContext, traceActivity)
+                            .thenCompose(response -> {
+                                return deleteNext.get();
                             });
                     });
                 }
@@ -68,7 +86,7 @@ public abstract class InterceptionMiddleware implements Middleware {
                     return invokeTraceState(turnContext);
                 }
 
-                return null;
+                return CompletableFuture.completedFuture(null);
             });
     }
 
@@ -89,9 +107,9 @@ public abstract class InterceptionMiddleware implements Middleware {
     private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, List<Activity> traceActivities) {
         return outbound(turnContext, traceActivities)
             .exceptionally(exception -> {
-            logger.warn("Exception in outbound interception {}", exception.getMessage());
-            return null;
-        });
+                logger.warn("Exception in outbound interception {}", exception.getMessage());
+                return null;
+            });
     }
 
     private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, Activity activity) {
@@ -109,8 +127,8 @@ public abstract class InterceptionMiddleware implements Middleware {
     private CompletableFuture<Void> invokeTraceException(TurnContext turnContext, Activity traceActivity) {
         return outbound(turnContext, Collections.singletonList(Activity.createContactRelationUpdateActivity()))
             .exceptionally(exception -> {
-            logger.warn("Exception in exception interception {}", exception.getMessage());
-            return null;
-        });
+                logger.warn("Exception in exception interception {}", exception.getMessage());
+                return null;
+            });
     }
 }

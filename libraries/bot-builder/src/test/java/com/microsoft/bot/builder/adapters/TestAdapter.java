@@ -19,9 +19,28 @@ public class TestAdapter extends BotAdapter {
     private ConversationReference conversationReference;
 
     public TestAdapter() {
-        this(null);
+        this((ConversationReference) null);
     }
 
+    public TestAdapter(String channelId) {
+        setConversationReference(new ConversationReference() {{
+            setChannelId(channelId);
+            setServiceUrl("https://test.com");
+            setUser(new ChannelAccount() {{
+                setId("user1");
+                setName("User1");
+            }});
+            setBot(new ChannelAccount() {{
+                setId("bot");
+                setName("Bot");
+            }});
+            setConversation(new ConversationAccount() {{
+                setIsGroup(false);
+                setConversationType("convo1");
+                setId("Conversation1");
+            }});
+        }});
+    }
 
     public TestAdapter(ConversationReference reference) {
         if (reference != null) {

@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -76,6 +77,7 @@ public class ConversationReference {
     /**
      * Creates {@link Activity} from conversation reference as it is posted to bot.
      */
+    @JsonIgnore
     public Activity getContinuationActivity() {
         Activity activity = Activity.createEventActivity();
         activity.setName("ContinueConversation");
