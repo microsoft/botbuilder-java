@@ -6,7 +6,11 @@ package com.microsoft.bot.builder;
 /**
  * Telemetry logger property names.
  */
-public class TelemetryConstants {
+public final class TelemetryConstants {
+    private TelemetryConstants() {
+
+    }
+
     public static final String CHANNELIDPROPERTY = "channelId";
     public static final String CONVERSATIONIDPROPERTY = "conversationId";
     public static final String CONVERSATIONNAMEPROPERTY = "conversationName";

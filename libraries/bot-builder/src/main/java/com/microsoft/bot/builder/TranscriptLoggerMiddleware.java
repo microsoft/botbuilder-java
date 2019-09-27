@@ -10,8 +10,6 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -24,8 +22,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * When added, this middleware will log incoming and outgoing activities to a TranscriptStore.
  */
 public class TranscriptLoggerMiddleware implements Middleware {
-    private static final Logger logger = LoggerFactory.getLogger(TranscriptLoggerMiddleware.class);
-
     /**
      * To/From JSON.
      */

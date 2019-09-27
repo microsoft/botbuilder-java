@@ -97,18 +97,18 @@ public class ActivityHandler implements Bot {
     protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
         Activity activity = turnContext.getActivity();
 
-        if (activity.getMembersAdded() != null) {
-            if (activity.getRecipient() != null && activity.getMembersAdded().stream()
-                .anyMatch(m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
+        if (activity.getMembersAdded() != null
+            && activity.getRecipient() != null
+            && activity.getMembersAdded().stream().anyMatch(
+                m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
 
-                return onMembersAdded(activity.getMembersAdded(), turnContext);
-            }
-        } else if (activity.getRecipient() != null && activity.getMembersRemoved() != null) {
-            if (activity.getMembersRemoved().stream()
-                .anyMatch(m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
+            return onMembersAdded(activity.getMembersAdded(), turnContext);
+        } else if (activity.getMembersRemoved() != null
+            && activity.getRecipient() != null
+            && activity.getMembersRemoved().stream()
+            .anyMatch(m -> !StringUtils.equals(m.getId(), activity.getRecipient().getId()))) {
 
-                return onMembersRemoved(activity.getMembersRemoved(), turnContext);
-            }
+            return onMembersRemoved(activity.getMembersRemoved(), turnContext);
         }
 
         return CompletableFuture.completedFuture(null);

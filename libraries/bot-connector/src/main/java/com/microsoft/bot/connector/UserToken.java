@@ -47,8 +47,8 @@ public interface UserToken {
      * @return the observable to the Map&lt;String, TokenResponse&gt; object
      */
     CompletableFuture<Map<String, TokenResponse>> getAadTokens(String userId,
-                                                                    String connectionName,
-                                                                    AadResourceUrls aadResourceUrls);
+                                                               String connectionName,
+                                                               AadResourceUrls aadResourceUrls);
 
     /**
      *

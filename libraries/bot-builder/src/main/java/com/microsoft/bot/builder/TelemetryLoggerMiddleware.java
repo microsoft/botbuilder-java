@@ -262,10 +262,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
         }};
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text is a common example
-        if (logPersonalInformation) {
-            if (!StringUtils.isEmpty(activity.getText())) {
-                properties.put(TelemetryConstants.TEXTPROPERTY, activity.getText());
-            }
+        if (logPersonalInformation && !StringUtils.isEmpty(activity.getText())) {
+            properties.put(TelemetryConstants.TEXTPROPERTY, activity.getText());
         }
 
         // Additional Properties can override "stock" properties.

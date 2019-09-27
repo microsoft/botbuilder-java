@@ -18,14 +18,16 @@ import java.util.stream.Collectors;
 public abstract class InterceptionMiddleware implements Middleware {
     private Logger logger;
 
-    public static class Intercept {
-        public Intercept(boolean forward, boolean intercept) {
+    static class Intercept {
+        Intercept(boolean forward, boolean intercept) {
             shouldForwardToApplication = forward;
             shouldIntercept = intercept;
         }
 
-        public boolean shouldForwardToApplication;
-        public boolean shouldIntercept;
+        @SuppressWarnings({"checkstyle:JavadocVariable", "checkstyle:VisibilityModifier"})
+        boolean shouldForwardToApplication;
+        @SuppressWarnings({"checkstyle:JavadocVariable", "checkstyle:VisibilityModifier"})
+        boolean shouldIntercept;
     }
 
     public InterceptionMiddleware(Logger withLogger) {
@@ -125,7 +127,7 @@ public abstract class InterceptionMiddleware implements Middleware {
     }
 
     private CompletableFuture<Void> invokeTraceException(TurnContext turnContext, Activity traceActivity) {
-        return outbound(turnContext, Collections.singletonList(Activity.createContactRelationUpdateActivity()))
+        return outbound(turnContext, Collections.singletonList(traceActivity))
             .exceptionally(exception -> {
                 logger.warn("Exception in exception interception {}", exception.getMessage());
                 return null;

@@ -8,6 +8,9 @@ import com.microsoft.bot.schema.ConversationReference;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * A method that can participate in delete activity events for the current turn.
+ */
 @FunctionalInterface
 public interface DeleteActivityHandler {
     /**

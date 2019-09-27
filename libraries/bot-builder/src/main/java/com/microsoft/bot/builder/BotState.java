@@ -96,7 +96,8 @@ public abstract class BotState implements PropertyManager {
         if (force || cachedState == null || cachedState.getState() == null) {
             return storage.read(new String[]{storageKey})
                 .thenApply(val -> {
-                    turnContext.getTurnState().replace(contextServiceKey, new CachedBotState((Map<String, Object>)val.get(storageKey)));
+                    turnContext.getTurnState().replace(
+                        contextServiceKey, new CachedBotState((Map<String, Object>) val.get(storageKey)));
                     return null;
                 });
         }
@@ -128,7 +129,7 @@ public abstract class BotState implements PropertyManager {
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        if (force || (cachedState != null && cachedState.isChanged())) {
+        if (force || cachedState != null && cachedState.isChanged()) {
             String storageKey = getStorageKey(turnContext);
             Map<String, Object> changes = new HashMap<String, Object>() {{
                 put(storageKey, cachedState.state);
@@ -298,36 +299,43 @@ public abstract class BotState implements PropertyManager {
          */
         private ObjectMapper mapper = new ObjectMapper();
 
-        public CachedBotState() {
+        /**
+         * Construct with empty state.
+         */
+        CachedBotState() {
             this(null);
         }
 
-        public CachedBotState(Map<String, Object> withState) {
+        /**
+         * Construct with supplied state.
+         * @param withState The initial state.
+         */
+        CachedBotState(Map<String, Object> withState) {
             state = withState != null ? withState : new ConcurrentHashMap<>();
             hash = computeHash(withState);
         }
 
-        public Map<String, Object> getState() {
+        Map<String, Object> getState() {
             return state;
         }
 
-        public void setState(Map<String, Object> withState) {
+        void setState(Map<String, Object> withState) {
             state = withState;
         }
 
-        public String getHash() {
+        String getHash() {
             return hash;
         }
 
-        public void setHash(String witHashCode) {
+        void setHash(String witHashCode) {
             hash = witHashCode;
         }
 
-        public boolean isChanged() {
+        boolean isChanged() {
             return !StringUtils.equals(hash, computeHash(state));
         }
 
-        public String computeHash(Object obj) {
+        String computeHash(Object obj) {
             if (obj == null) {
                 return "";
             }
@@ -345,8 +353,9 @@ public abstract class BotState implements PropertyManager {
      *
      * <p>Note the semantic of this accessor are intended to be lazy, this means teh Get, Set and Delete
      * methods will first call LoadAsync. This will be a no-op if the data is already loaded.
-     * The implication is you can just use this accessor in the application code directly without first calling LoadAsync
-     * this approach works with the AutoSaveStateMiddleware which will save as needed at the end of a turn.
+     * The implication is you can just use this accessor in the application code directly without first
+     * calling LoadAsync this approach works with the AutoSaveStateMiddleware which will save as needed
+     * at the end of a turn.</p>
      *
      * @param <T> type of value the propertyAccessor accesses.
      */

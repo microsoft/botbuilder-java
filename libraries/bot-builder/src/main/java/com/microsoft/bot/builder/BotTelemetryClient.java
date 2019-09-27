@@ -59,8 +59,8 @@ public interface BotTelemetryClient {
      * @param target             External dependency target.
      * @param dependencyName     Name of the command initiated with this dependency call. Low cardinality value.
      *                           Examples are stored procedure name and URL path template.
-     * @param data               Command initiated by this dependency call. Examples are SQL statement and HTTP URL's with
-     *                           all query parameters.
+     * @param data               Command initiated by this dependency call. Examples are SQL statement and HTTP URL's
+     *                           with all query parameters.
      * @param startTime          The time when the dependency was called.
      * @param duration           The time taken by the external dependency to handle the call.
      * @param resultCode         Result code of dependency call execution.

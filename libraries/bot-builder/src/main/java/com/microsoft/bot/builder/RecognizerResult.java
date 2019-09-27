@@ -159,7 +159,7 @@ public class RecognizerResult implements RecognizerConvert {
     @Override
     public void convert(Object result) {
         setText(((RecognizerResult) result).getText());
-        setAlteredText((((RecognizerResult) result).getAlteredText()));
+        setAlteredText(((RecognizerResult) result).getAlteredText());
         setIntents(((RecognizerResult) result).getIntents());
         setEntities(((RecognizerResult) result).getEntities());
 

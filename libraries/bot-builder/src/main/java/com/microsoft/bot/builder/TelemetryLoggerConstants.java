@@ -6,7 +6,11 @@ package com.microsoft.bot.builder;
 /**
  * The Telemetry Logger Event names.
  */
-public class TelemetryLoggerConstants {
+public final class TelemetryLoggerConstants {
+    private TelemetryLoggerConstants() {
+
+    }
+
     /**
      * The name of the event when a new message is received from the user.
      */

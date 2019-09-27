@@ -21,12 +21,10 @@ public class TurnContextStateCollection implements AutoCloseable {
 
         Object service = state.get(key);
         try {
-            T result = (T) service;
+            return (T) service;
         } catch (ClassCastException e) {
             return null;
         }
-
-        return (T) service;
     }
 
     /**
@@ -98,7 +96,7 @@ public class TurnContextStateCollection implements AutoCloseable {
     public void finalize() {
         try {
             close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }

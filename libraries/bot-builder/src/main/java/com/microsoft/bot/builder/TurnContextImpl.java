@@ -474,7 +474,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     public void finalize() {
         try {
             close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }

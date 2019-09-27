@@ -6,6 +6,7 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,7 +75,7 @@ public interface UserTokenProvider {
      * @param userId      The user Id for which token status is retrieved.
      * @return Array of TokenStatus.
      */
-    default CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, String userId) {
+    default CompletableFuture<List<TokenStatus>> getTokenStatus(TurnContext turnContext, String userId) {
         return getTokenStatus(turnContext, userId, null);
     }
 
@@ -87,7 +88,7 @@ public interface UserTokenProvider {
      *                      for all configured connections.
      * @return Array of TokenStatus.
      */
-    CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, String userId, String includeFilter);
+    CompletableFuture<List<TokenStatus>> getTokenStatus(TurnContext turnContext, String userId, String includeFilter);
 
     /**
      * Retrieves Azure Active Directory tokens for particular resources on a configured connection.

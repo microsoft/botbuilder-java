@@ -5,7 +5,11 @@ package com.microsoft.bot.builder.inspection;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.microsoft.bot.builder.*;
+import com.microsoft.bot.builder.ConversationState;
+import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.StatePropertyAccessor;
+import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
