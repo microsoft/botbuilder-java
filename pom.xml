@@ -199,6 +199,16 @@
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-integration-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-integration-spring</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-builder</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -246,6 +256,7 @@
     <module>libraries/bot-connector</module>
     <module>libraries/bot-builder</module>
     <module>libraries/bot-integration-core</module>
+    <module>libraries/bot-integration-spring</module>
     <module>libraries/bot-dialogs</module>
     <module>libraries/bot-configuration</module>
     <module>libraries/bot-ai-luis-v3</module>
@@ -253,8 +264,8 @@
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
 
-<!--    <module>samples/servlet-echo</module>-->
-<!--    <module>samples/spring-echo</module>-->
+    <module>samples/servlet-echo</module>
+    <module>samples/spring-echo</module>
   </modules>
 
   <build>

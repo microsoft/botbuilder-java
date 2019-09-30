@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class ChannelValidation {
+    private static String openIdMetaDataUrl = AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL;
+
     /**
      * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
      */
@@ -24,6 +26,14 @@ public class ChannelValidation {
             this.clockSkew = Duration.ofMinutes(5);
             this.requireSignedTokens = true;
         }};
+
+    public static String getOpenIdMetaDataUrl() {
+        return openIdMetaDataUrl;
+    }
+
+    public static void setOpenIdMetaDataUrl(String withOpenIdMetaDataUrl) {
+        openIdMetaDataUrl = withOpenIdMetaDataUrl;
+    }
 
     /**
      * Validate the incoming Auth Header as a token sent from the Bot Framework Service.
@@ -57,7 +67,7 @@ public class ChannelValidation {
         String authHeader, CredentialProvider credentials, String channelId, AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
-            AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
+            getOpenIdMetaDataUrl(),
             AuthenticationConstants.AllowedSigningAlgorithms);
 
         return tokenExtractor.getIdentity(authHeader, channelId)

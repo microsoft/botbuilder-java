@@ -15,6 +15,8 @@ import java.util.concurrent.CompletableFuture;
  * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting to a bot.
  */
 public class GovernmentChannelValidation {
+    private static String openIdMetaDataUrl = GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL;
+
     private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
         this.validateIssuer = true;
         this.validIssuers = new ArrayList<String>() {{
@@ -25,6 +27,14 @@ public class GovernmentChannelValidation {
         this.clockSkew = Duration.ofMinutes(5);
         this.requireSignedTokens = true;
     }};
+
+    public static String getOpenIdMetaDataUrl() {
+        return openIdMetaDataUrl;
+    }
+
+    public static void setOpenIdMetaDataUrl(String withOpenIdMetaDataUrl) {
+        openIdMetaDataUrl = withOpenIdMetaDataUrl;
+    }
 
     /**
      * Validate the incoming Auth Header as a token sent from a Bot Framework Government Channel Service.
@@ -65,7 +75,7 @@ public class GovernmentChannelValidation {
                                                                       AuthenticationConfiguration authConfig) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
-            GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL,
+            getOpenIdMetaDataUrl(),
             AuthenticationConstants.AllowedSigningAlgorithms);
 
         return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())

@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Represents a bot that can operate on incoming activities.
  */
-@FunctionalInterface
 public interface Bot {
     /**
      * When implemented in a bot, handles an incoming activity.
