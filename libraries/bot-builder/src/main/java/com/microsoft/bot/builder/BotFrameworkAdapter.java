@@ -13,6 +13,7 @@ import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.OAuthClient;
 import com.microsoft.bot.connector.OAuthClientConfig;
+import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
@@ -20,6 +21,8 @@ import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.connector.authentication.JwtTokenValidation;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
+import com.microsoft.bot.connector.authentication.MicrosoftGovernmentAppCredentials;
+import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.AadResourceUrls;
@@ -86,6 +89,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      */
     private static final String CONNECTOR_CLIENT_KEY = "ConnectorClient";
 
+    private AppCredentials appCredentials;
+
     /**
      * The credential provider.
      */
@@ -109,7 +114,7 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * AppCredentials dictionary.
      */
-    private Map<String, MicrosoftAppCredentials> appCredentialMap = new ConcurrentHashMap<>();
+    private Map<String, AppCredentials> appCredentialMap = new ConcurrentHashMap<>();
 
     /**
      * Initializes a new instance of the {@link BotFrameworkAdapter} class,
@@ -169,6 +174,48 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         credentialProvider = withCredentialProvider;
         channelProvider = withChannelProvider;
         connectorClientRetryStrategy = withRetryStrategy;
+        authConfiguration = withAuthConfig;
+
+        // Relocate the tenantId field used by MS Teams to a new location (from channelData to conversation)
+        // This will only occur on activities from teams that include tenant info in channelData but NOT in
+        // conversation, thus should be future friendly.  However, once the transition is complete. we can
+        // remove this.
+        use(new TenantIdWorkaroundForTeamsMiddleware());
+
+        if (withMiddleware != null) {
+            use(withMiddleware);
+        }
+    }
+
+    /**
+     * Initializes a new instance of the {@link BotFrameworkAdapter} class,
+     * using a credential provider.
+     *
+     * @param withCredentials The credentials to use.
+     * @param withAuthConfig The authentication configuration.
+     * @param withChannelProvider The channel provider.
+     * @param withRetryStrategy Retry policy for retrying HTTP operations.
+     * @param withMiddleware The middleware to initially add to the adapter.
+     */
+    public BotFrameworkAdapter(
+        AppCredentials withCredentials,
+        AuthenticationConfiguration withAuthConfig,
+        ChannelProvider withChannelProvider,
+        RetryStrategy withRetryStrategy,
+        Middleware withMiddleware) {
+
+        if (withCredentials == null) {
+            throw new IllegalArgumentException("credentials");
+        }
+        appCredentials = withCredentials;
+
+        credentialProvider = new SimpleCredentialProvider(withCredentials.getAppId(), null);
+        channelProvider = withChannelProvider;
+        connectorClientRetryStrategy = withRetryStrategy;
+
+        if (withAuthConfig == null) {
+            throw new IllegalArgumentException("authConfig");
+        }
         authConfiguration = withAuthConfig;
 
         // Relocate the tenantId field used by MS Teams to a new location (from channelData to conversation)
@@ -660,7 +707,7 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
 
                     TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
                         setConnectionName(connectionName);
-                        setConversation(new ConversationReference(){{
+                        setConversation(new ConversationReference() {{
                             setActivityId(activity.getId());
                             setBot(activity.getRecipient());
                             setChannelId(activity.getChannelId());
@@ -668,9 +715,6 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                             setServiceUrl(activity.getServiceUrl());
                             setUser(activity.getFrom());
                         }});
-
-                        // TODO: on what planet would this ever be valid (from dotnet)?
-                        //MsAppId = (_credentialProvider as MicrosoftAppCredentials)?.MicrosoftAppId,
                     }};
 
                     ObjectMapper mapper = new ObjectMapper();
@@ -713,7 +757,7 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                 try {
                     TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
                         setConnectionName(connectionName);
-                        setConversation(new ConversationReference(){{
+                        setConversation(new ConversationReference() {{
                             setActivityId(null);
                             setBot(new ChannelAccount() {{
                                 setRole(RoleTypes.BOT);
@@ -726,9 +770,6 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                                 setId(userId);
                             }});
                         }});
-
-                        // TODO: on what planet would this ever be valid (from dotnet)?
-                        //MsAppId = (_credentialProvider as MicrosoftAppCredentials)?.MicrosoftAppId,
                     }};
 
                     ObjectMapper mapper = new ObjectMapper();
@@ -1018,11 +1059,11 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             try {
                 if (botAppIdClaim != null) {
                     String botId = botAppIdClaim.getValue();
-                    MicrosoftAppCredentials appCredentials = this.getAppCredentials(botId).join();
+                    AppCredentials credentials = this.getAppCredentials(botId).join();
 
-                    return this.getOrCreateConnectorClient(serviceUrl, appCredentials);
+                    return getOrCreateConnectorClient(serviceUrl, credentials);
                 } else {
-                    return this.getOrCreateConnectorClient(serviceUrl);
+                    return getOrCreateConnectorClient(serviceUrl);
                 }
             } catch (MalformedURLException | URISyntaxException e) {
                 e.printStackTrace();
@@ -1037,13 +1078,13 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         return getOrCreateConnectorClient(serviceUrl, null);
     }
 
-    private ConnectorClient getOrCreateConnectorClient(String serviceUrl, MicrosoftAppCredentials appCredentials)
+    private ConnectorClient getOrCreateConnectorClient(String serviceUrl, AppCredentials usingAppCredentials)
         throws MalformedURLException, URISyntaxException {
 
         RestConnectorClient connectorClient;
-        if (appCredentials != null) {
+        if (usingAppCredentials != null) {
             connectorClient = new RestConnectorClient(
-                new URI(serviceUrl).toURL().toString(), appCredentials);
+                new URI(serviceUrl).toURL().toString(), usingAppCredentials);
         } else  {
             connectorClient = new RestConnectorClient(
                 new URI(serviceUrl).toURL().toString(), MicrosoftAppCredentials.empty());
@@ -1058,12 +1099,12 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
 
     /**
      * Gets the application credentials. App Credentials are cached so as to ensure we are not refreshing
-     * token everytime.
+     * token every time.
      *
      * @param appId The application identifier (AAD Id for the bot).
      * @return App credentials.
      */
-    private CompletableFuture<MicrosoftAppCredentials> getAppCredentials(String appId) {
+    private CompletableFuture<AppCredentials> getAppCredentials(String appId) {
         if (appId == null) {
             return CompletableFuture.completedFuture(MicrosoftAppCredentials.empty());
         }
@@ -1073,13 +1114,17 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         }
 
         // If app credentials were provided, use them as they are the preferred choice moving forward
-        //TODO use AppCredentials
+        if (appCredentials != null) {
+            appCredentialMap.put(appId, appCredentials);
+        }
 
         return credentialProvider.getAppPassword(appId)
             .thenApply(appPassword -> {
-                MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
-                appCredentialMap.put(appId, appCredentials);
-                return appCredentials;
+                AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
+                    ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
+                    : new MicrosoftAppCredentials(appId, appPassword);
+                appCredentialMap.put(appId, credentials);
+                return credentials;
             });
     }
 

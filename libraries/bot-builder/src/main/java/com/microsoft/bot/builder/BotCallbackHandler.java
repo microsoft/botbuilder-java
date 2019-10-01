@@ -5,6 +5,9 @@ package com.microsoft.bot.builder;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * The callback delegate for application code.
+ */
 @FunctionalInterface
 public interface BotCallbackHandler {
     /**

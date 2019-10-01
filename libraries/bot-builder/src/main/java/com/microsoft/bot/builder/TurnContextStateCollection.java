@@ -12,9 +12,20 @@ import java.util.Map;
  * Represents a set of collection of services associated with the {@link TurnContext}.
  */
 public class TurnContextStateCollection implements AutoCloseable {
+    /**
+     * Map of objects managed by this class.
+     */
     private Map<String, Object> state = new HashMap<>();
 
-    public <T> T get(String key) throws IllegalArgumentException {
+    /**
+     * Get a value.
+     *
+     * @param key The key.
+     * @param <T> The type of the value.
+     * @return The value.
+     * @throws IllegalArgumentException Null key.
+     */
+    public <T> T get(String key) {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
@@ -32,9 +43,10 @@ public class TurnContextStateCollection implements AutoCloseable {
      *
      * @param type The type of service to be retrieved.  This will use the value returned
      *             by Class.getSimpleName as the key.
+     * @param <T>  The type of the value.
      * @return The service stored under the specified key.
      */
-    public <T> T get(Class<T> type) throws IllegalArgumentException {
+    public <T> T get(Class<T> type) {
         return get(type.getSimpleName());
     }
 
@@ -43,9 +55,9 @@ public class TurnContextStateCollection implements AutoCloseable {
      * @param key The name of the value.
      * @param value The value to add.
      * @param <T> The type of the value.
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException For null key or value.
      */
-    public <T> void add(String key, T value) throws IllegalArgumentException {
+    public <T> void add(String key, T value) {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
@@ -65,8 +77,10 @@ public class TurnContextStateCollection implements AutoCloseable {
      * Add a service using its type name ({@link Class#getSimpleName()} as the key.
      *
      * @param value The service to add.
+     * @param <T> The type of the value.
+     * @throws IllegalArgumentException For null value.
      */
-    public <T> void add(T value) throws IllegalArgumentException {
+    public <T> void add(T value) {
         if (value == null) {
             throw new IllegalArgumentException("value");
         }
@@ -92,6 +106,9 @@ public class TurnContextStateCollection implements AutoCloseable {
         add(key, value);
     }
 
+    /**
+     * Auto call of {@link #close}.
+     */
     @Override
     public void finalize() {
         try {
@@ -101,6 +118,10 @@ public class TurnContextStateCollection implements AutoCloseable {
         }
     }
 
+    /**
+     * Close all contained {@link AutoCloseable} values.
+     * @throws Exception Exceptions encountered by children during close.
+     */
     @Override
     public void close() throws Exception {
         for (Map.Entry entry : state.entrySet()) {

@@ -3,9 +3,6 @@
 
 package com.microsoft.bot.integration;
 
-import com.microsoft.bot.integration.Configuration;
-import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
-
 /**
  * An Adapter that provides exception handling.
  */

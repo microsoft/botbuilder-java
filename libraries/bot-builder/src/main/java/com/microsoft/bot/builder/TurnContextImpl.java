@@ -37,9 +37,20 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     private final Activity activity;
 
-    private final List<SendActivitiesHandler> onSendActivities = new ArrayList<SendActivitiesHandler>();
-    private final List<UpdateActivityHandler> onUpdateActivity = new ArrayList<UpdateActivityHandler>();
-    private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<DeleteActivityHandler>();
+    /**
+     * Response handlers for send activity operations.
+     */
+    private final List<SendActivitiesHandler> onSendActivities = new ArrayList<>();
+
+    /**
+     * Response handlers for update activity operations.
+     */
+    private final List<UpdateActivityHandler> onUpdateActivity = new ArrayList<>();
+
+    /**
+     * Response handlers for delete activity operations.
+     */
+    private final List<DeleteActivityHandler> onDeleteActivity = new ArrayList<>();
 
     /**
      * The services registered on this context object.
@@ -82,7 +93,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * @return The updated context object.
      * @throws IllegalArgumentException {@code handler} is {@code null}.
      *                                  When the context's {@link #sendActivity(Activity)}
-     *                                  or {@link #sendActivities(List<Activity>)} methods are called,
+     *                                  or {@link #sendActivities(List)} methods are called,
      *                                  the adapter calls the registered handlers in the order in which they were
      *                                  added to the context object.
      */
@@ -138,6 +149,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     /**
      * Gets the bot adapter that created this context object.
+     * @return The BotAdaptor for this turn.
      */
     public BotAdapter getAdapter() {
         return this.adapter;
@@ -145,6 +157,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     /**
      * Gets the services registered on this context object.
+     * @return the TurnContextStateCollection for this turn.
      */
     public TurnContextStateCollection getTurnState() {
         return this.turnState;
@@ -254,7 +267,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /**
      * Sends an activity to the sender of the incoming activity.
      *
-     * @param activity The activity to send.
+     * @param activityToSend The activity to send.
      * @return A task that represents the work queued to execute.
      * @throws IllegalArgumentException {@code activity} is {@code null}.
      *                                  If the activity is successfully sent, the task result contains
@@ -262,10 +275,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *                                  channel assigned to the activity.
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(Activity activity) {
-        BotAssert.activityNotNull(activity);
+    public CompletableFuture<ResourceResponse> sendActivity(Activity activityToSend) {
+        BotAssert.activityNotNull(activityToSend);
 
-        return sendActivities(Collections.singletonList(activity))
+        return sendActivities(Collections.singletonList(activityToSend))
             .thenApply(resourceResponses -> {
                 if (resourceResponses == null || resourceResponses.length == 0) {
                     // It's possible an interceptor prevented the activity from having been sent.
@@ -314,9 +327,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 boolean sentNonTraceActivity = false;
 
                 for (int index = 0; index < responses.length; index++) {
-                    Activity activity = activities.get(index);
-                    activity.setId(responses[index].getId());
-                    sentNonTraceActivity |= !activity.isType(ActivityTypes.TRACE);
+                    Activity sendActivity = activities.get(index);
+                    sendActivity.setId(responses[index].getId());
+                    sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
                 }
 
                 if (sentNonTraceActivity) {
@@ -360,11 +373,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
 
     private CompletableFuture<ResourceResponse> updateActivityInternal(
-        Activity activity,
+        Activity updateActivity,
         Iterator<UpdateActivityHandler> updateHandlers,
         Supplier<CompletableFuture<ResourceResponse>> callAtBottom) {
 
-        BotAssert.activityNotNull(activity);
+        BotAssert.activityNotNull(updateActivity);
         if (updateHandlers == null) {
             throw new IllegalArgumentException("updateHandlers");
         }
@@ -385,16 +398,16 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 updateHandlers.next();
             }
 
-            return updateActivityInternal(activity, updateHandlers, callAtBottom)
+            return updateActivityInternal(updateActivity, updateHandlers, callAtBottom)
                 .thenApply(resourceResponse -> {
-                    activity.setId(resourceResponse.getId());
+                    updateActivity.setId(resourceResponse.getId());
                     return resourceResponse;
                 });
         };
 
         // Grab the current middleware, which is the 1st element in the array, and execute it
         UpdateActivityHandler toCall = updateHandlers.next();
-        return toCall.invoke(this, activity, next);
+        return toCall.invoke(this, updateActivity, next);
     }
 
     /**
@@ -470,6 +483,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         return toCall.invoke(this, cr, next);
     }
 
+    /**
+     * Auto call of {@link #close}.
+     */
     @Override
     public void finalize() {
         try {
@@ -479,6 +495,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         }
     }
 
+    /**
+     * AutoClosable#close.
+     * @throws Exception If the TurnContextStateCollection.
+     */
     @Override
     public void close() throws Exception {
         turnState.close();

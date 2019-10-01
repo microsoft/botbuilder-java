@@ -90,9 +90,13 @@
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html -->
-        <module name="JavadocMethod"/>
+        <module name="JavadocMethod">
+            <property name="excludeScope" value="private"/>
+        </module>
         <module name="JavadocType"/>
-        <module name="JavadocVariable"/>
+        <module name="JavadocVariable">
+            <property name="excludeScope" value="private"/>
+        </module>
         <module name="JavadocStyle"/>
 
         <!-- Checks for Naming Conventions.                  -->

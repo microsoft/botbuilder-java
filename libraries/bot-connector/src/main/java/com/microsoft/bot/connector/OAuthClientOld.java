@@ -5,7 +5,7 @@ package com.microsoft.bot.connector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentialsInterceptor;
+import com.microsoft.bot.connector.authentication.AppCredentialsInterceptor;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.TokenExchangeState;
@@ -135,7 +135,7 @@ public class OAuthClientOld extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .addInterceptor(new AppCredentialsInterceptor(appCredentials))
                 .build();
 
             Request request = new Request.Builder()
@@ -201,7 +201,7 @@ public class OAuthClientOld extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .addInterceptor(new AppCredentialsInterceptor(appCredentials))
                 .build();
 
             Request request = new Request.Builder()
@@ -280,7 +280,7 @@ public class OAuthClientOld extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new MicrosoftAppCredentialsInterceptor(creds))
+                .addInterceptor(new AppCredentialsInterceptor(creds))
                 .build();
 
             Request request = new Request.Builder()
@@ -332,7 +332,7 @@ public class OAuthClientOld extends ServiceClient {
 
             // Later: Use client in clientimpl?
             OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new MicrosoftAppCredentialsInterceptor(appCredentials))
+                .addInterceptor(new AppCredentialsInterceptor(appCredentials))
                 .build();
 
             Request request = new Request.Builder()

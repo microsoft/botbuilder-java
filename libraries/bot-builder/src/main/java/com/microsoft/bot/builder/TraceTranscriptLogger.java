@@ -13,13 +13,21 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents a transcript logger that writes activites to a <see cref="Trace"/> object.
+ * Represents a transcript logger that writes activities to a <see cref="Trace"/> object.
  */
 public class TraceTranscriptLogger implements TranscriptLogger {
-    private static final Logger logger = LoggerFactory.getLogger(TraceTranscriptLogger.class);
+    /**
+     * It's a logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraceTranscriptLogger.class);
+
+    /**
+     * For outputting Activity as JSON.
+     */
     // https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features
     private static ObjectMapper mapper = new ObjectMapper()
-        .enable(SerializationFeature.INDENT_OUTPUT);
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .findAndRegisterModules();
 
     /**
      * Log an activity to the transcript.
@@ -34,9 +42,10 @@ public class TraceTranscriptLogger implements TranscriptLogger {
         try {
             event = mapper.writeValueAsString(activity);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error("logActivity", e);
+            CompletableFuture.completedFuture(null);
         }
-        logger.info(event);
+        LOGGER.info(event);
 
         return CompletableFuture.completedFuture(null);
     }

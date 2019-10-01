@@ -376,7 +376,7 @@ public abstract class BotState implements PropertyManager {
          * @param withState The parent BotState.
          * @param withName The property name.
          */
-        public BotStatePropertyAccessor(BotState withState, String withName) {
+        BotStatePropertyAccessor(BotState withState, String withName) {
             botState = withState;
             name = withName;
         }
