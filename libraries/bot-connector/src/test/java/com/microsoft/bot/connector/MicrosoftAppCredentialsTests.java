@@ -3,7 +3,7 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.aad.adal4j.AuthenticationResult;
+import com.microsoft.aad.msal4j.IAuthenticationResult;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.concurrent.ExecutionException;
 
 public class MicrosoftAppCredentialsTests {
     @Test
@@ -58,7 +57,7 @@ public class MicrosoftAppCredentialsTests {
     @Test
     public void GetToken() {
         MicrosoftAppCredentials credentials = new MicrosoftAppCredentials("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F");
-        AuthenticationResult token = credentials.getToken().join();
-        Assert.assertFalse(StringUtils.isEmpty(token.getAccessToken()));
+        IAuthenticationResult token = credentials.getToken().join();
+        Assert.assertFalse(StringUtils.isEmpty(token.accessToken()));
     }
 }

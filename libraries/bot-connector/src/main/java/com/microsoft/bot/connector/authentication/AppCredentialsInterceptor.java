@@ -33,7 +33,7 @@ public class AppCredentialsInterceptor implements Interceptor {
         if (MicrosoftAppCredentials.isTrustedServiceUrl(chain.request().url().url().toString())) {
             String token;
             try {
-                token = this.credentials.getToken().get().getAccessToken();
+                token = this.credentials.getToken().get().accessToken();
             } catch (Throwable t) {
                 throw new IOException(t);
             }

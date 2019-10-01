@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.schema.Activity;
 import org.junit.Assert;
@@ -21,11 +20,11 @@ public class JwtTokenValidationTests {
     private static final String APPPASSWORD = "2.30Vs3VQLKt974F";
 
     private static String getHeaderToken() {
-        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().join().getAccessToken());
+        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().join().accessToken());
     }
 
     private static String getGovHeaderToken() {
-        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join().getAccessToken());
+        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join().accessToken());
     }
 
     @Test

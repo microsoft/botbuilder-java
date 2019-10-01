@@ -11,20 +11,18 @@ public class OAuthConfiguration {
     private String scope;
     private String authority;
 
-    public OAuthConfiguration(String authority, String scope) {
-        this.authority = authority;
-        this.scope = scope;
+    public OAuthConfiguration(String withAuthority, String withScope) {
+        this.authority = withAuthority;
+        this.scope = withScope;
     }
 
     /**
      * Sets oAuth Authority for authentication.
      *
-     * @param authority
-     * @return This OAuthConfiguration object.
+     * @param withAuthority oAuth Authority for authentication.
      */
-    public OAuthConfiguration withAuthority(String authority) {
-        this.authority = authority;
-        return this;
+    public void setAuthority(String withAuthority) {
+        authority = withAuthority;
     }
 
     /**
@@ -32,19 +30,17 @@ public class OAuthConfiguration {
      *
      * @return OAuth Authority for authentication.
      */
-    public String authority() {
+    public String getAuthority() {
         return authority;
     }
 
     /**
      * Sets oAuth scope for authentication.
      *
-     * @param scope
-     * @return This OAuthConfiguration object.
+     * @param withScope oAuth Authority for authentication.
      */
-    public OAuthConfiguration withScope(String scope) {
-        this.scope = scope;
-        return this;
+    public void setScope(String withScope) {
+        scope = withScope;
     }
 
     /**
@@ -52,7 +48,7 @@ public class OAuthConfiguration {
      *
      * @return OAuth scope for authentication.
      */
-    public String scope() {
+    public String getScope() {
         return scope;
     }
 }

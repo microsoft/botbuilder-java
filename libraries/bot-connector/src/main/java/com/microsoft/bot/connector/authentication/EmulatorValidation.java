@@ -5,7 +5,6 @@ package com.microsoft.bot.connector.authentication;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.microsoft.aad.adal4j.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;

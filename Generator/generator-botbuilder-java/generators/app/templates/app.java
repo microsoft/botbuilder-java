@@ -5,7 +5,6 @@ package com.microsoft.bot.connector.sample;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.customizations.CredentialProvider;
 import com.microsoft.bot.connector.customizations.CredentialProviderImpl;
 import com.microsoft.bot.connector.customizations.JwtTokenValidation;

@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.connector.ExecutorFactory;
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,9 +78,7 @@ public class GovernmentChannelValidation {
             AuthenticationConstants.AllowedSigningAlgorithms);
 
         return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
-            .thenCompose(identity -> {
-                return validateIdentity(identity, credentials, serviceUrl);
-            });
+            .thenCompose(identity -> validateIdentity(identity, credentials, serviceUrl));
     }
 
     /**

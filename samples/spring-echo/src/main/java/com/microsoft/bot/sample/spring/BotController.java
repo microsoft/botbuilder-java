@@ -4,6 +4,7 @@
 package com.microsoft.bot.sample.spring;
 
 import com.microsoft.bot.builder.Bot;
+import com.microsoft.bot.connector.authentication.AuthenticationException;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.microsoft.aad.adal4j.AuthenticationException;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;

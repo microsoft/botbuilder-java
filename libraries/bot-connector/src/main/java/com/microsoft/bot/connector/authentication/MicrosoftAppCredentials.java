@@ -3,9 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.aad.adal4j.ClientCredential;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 
 /**
@@ -46,18 +43,7 @@ public class MicrosoftAppCredentials extends AppCredentials {
         appPassword = withAppPassword;
     }
 
-    @Override
-    protected AdalAuthenticator buildAuthenticator() {
-        try {
-            return new AdalAuthenticator(
-                new ClientCredential(getAppId(), getAppPassword()),
-                new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
-        } catch (MalformedURLException e) {
-            // intentional no-op.  This class validates the URL on construction or setChannelAuthTenant.
-            // That is... this will never happen.
-            LoggerFactory.getLogger(MicrosoftAppCredentials.class).error("getAuthenticator", e);
-        }
-
-        return null;
+    protected Authenticator buildAuthenticator() throws MalformedURLException {
+        return new CredentialsAuthenticator(this, new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
     }
 }

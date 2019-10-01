@@ -23,7 +23,7 @@ public final class AuthenticationConstants {
     /**
      * TO CHANNEL FROM BOT: OAuth scope to request.
      */
-    public static final String TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com";
+    public static final String TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.com/.default";
 
     /**
      * TO BOT FROM CHANNEL: Token issuer.

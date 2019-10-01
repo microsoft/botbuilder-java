@@ -3,7 +3,7 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.aad.adal4j.AuthenticationResult;
+import com.microsoft.aad.msal4j.IAuthenticationResult;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -34,7 +34,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     private String appId;
     private String channelAuthTenant;
-    private AdalAuthenticator authenticator;
+    private Authenticator authenticator;
 
     public AppCredentials(String withChannelAuthTenant) {
         setChannelAuthTenant(withChannelAuthTenant);
@@ -100,7 +100,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
             new URL(endPointUrl).toString();
             channelAuthTenant = withAuthTenant;
         } catch(MalformedURLException e) {
-            throw new RuntimeException("Invalid channel auth tenant: " + withAuthTenant);
+            throw new AuthenticationException("Invalid channel auth tenant: " + withAuthTenant);
         }
     }
 
@@ -112,22 +112,31 @@ public abstract class AppCredentials implements ServiceClientCredentials {
         return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
     }
 
-    public CompletableFuture<AuthenticationResult> getToken() {
-        return getAuthenticator().acquireToken();
+    public CompletableFuture<IAuthenticationResult> getToken() {
+        CompletableFuture<IAuthenticationResult> result;
+
+        try {
+            result = getAuthenticator().acquireToken();
+        } catch (MalformedURLException e) {
+            result = new CompletableFuture<>();
+            result.completeExceptionally(new AuthenticationException(e));
+        }
+
+        return result;
     }
 
     protected boolean shouldSetToken(String url) {
         return isTrustedServiceUrl(url);
     }
 
-    private AdalAuthenticator getAuthenticator() {
+    private Authenticator getAuthenticator() throws MalformedURLException {
         if (authenticator == null) {
             authenticator =  buildAuthenticator();
         }
         return authenticator;
     }
 
-    protected abstract AdalAuthenticator buildAuthenticator();
+    protected abstract Authenticator buildAuthenticator() throws MalformedURLException;
 
     @Override
     public void applyCredentialsFilter(OkHttpClient.Builder clientBuilder) {

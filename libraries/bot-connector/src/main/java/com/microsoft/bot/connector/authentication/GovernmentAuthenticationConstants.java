@@ -19,7 +19,7 @@ public class GovernmentAuthenticationConstants {
     /**
      * TO GOVERNMENT CHANNEL FROM BOT: OAuth scope to request.
      */
-    public static final String TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.us";
+    public static final String TO_CHANNEL_FROM_BOT_OAUTH_SCOPE = "https://api.botframework.us/.default";
 
     /**
      * TO BOT FROM GOVERNMENT CHANNEL: Token issuer.

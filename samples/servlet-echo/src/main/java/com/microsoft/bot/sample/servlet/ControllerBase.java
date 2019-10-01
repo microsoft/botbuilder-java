@@ -2,8 +2,8 @@ package com.microsoft.bot.sample.servlet;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.aad.adal4j.AuthenticationException;
 import com.microsoft.bot.builder.Bot;
+import com.microsoft.bot.connector.authentication.AuthenticationException;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.ClasspathPropertiesConfiguration;
 import com.microsoft.bot.integration.Configuration;
