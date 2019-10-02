@@ -1,0 +1,25 @@
+{
+    "networkCallRecords": [{
+        "Method": "GET",
+        "Uri": "/api/usertoken/GetToken?userId=default-user&connectionName=mygithubconnection1",
+        "Body": "",
+        "Headers" : {
+            "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:9e47c26c664df3d17fb33da29e81da7dc1985b292e3d49ee55b301a3f3f92046 Java:1.8.0_151 (BotConnector, 3.0)"
+          },
+        "Response" : {
+            "Body": "",
+            "Content-Length": "0",
+            "Expires": "-1",
+            "Cache-Control": "no-cache",
+            "Date": "Tue, 22 May 2018 00:08:23 GMT",
+            "Pragma": "no-cache",
+            "Server": "Microsoft-IIS/10.0",
+            "Set-Cookie": "ARRAffinity=0f071bbc0c38ac0ae2ef389355a8918dd4593423458c60b7aadff1f36ebca65c;Path=/;HttpOnly;Domain=api.botframework.com",
+            "Request-Context": "appId=cid-v1:234f01b1-3f0f-49c0-b49c-c528b5cef7a8",
+            "X-Powered-By": "ASP.NET",
+            "X-Content-Type-Options": "nosniff",
+            "StatusCode": 404
+        }
+    }],
+    "variables": []
+}

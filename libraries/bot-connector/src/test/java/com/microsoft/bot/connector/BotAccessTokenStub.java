@@ -1,13 +1,13 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
+import com.microsoft.rest.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 
-public class BotAccessTokenStub extends MicrosoftAppCredentials {
+public class BotAccessTokenStub implements ServiceClientCredentials {
     private final String token;
 
-    public BotAccessTokenStub(String token, String appId, String appSecret) {
-        super(appId,appSecret);
+    public BotAccessTokenStub(String token) {
         this.token = token;
     }
 

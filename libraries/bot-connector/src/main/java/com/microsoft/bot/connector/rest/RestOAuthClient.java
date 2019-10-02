@@ -4,7 +4,9 @@ import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.bot.connector.BotSignIn;
 import com.microsoft.bot.connector.OAuthClient;
 import com.microsoft.bot.connector.UserToken;
+import com.microsoft.rest.RestClient;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
+import org.apache.commons.lang3.StringUtils;
 
 public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
     /**
@@ -16,6 +18,15 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
      * The UserTokens object to access its operations.
      */
     private UserToken userToken;
+
+    /**
+     * Initializes an instance of ConnectorClient client.
+     * @param restClient The RestClient to use.
+     */
+    public RestOAuthClient(RestClient restClient) {
+        super(restClient);
+        initialize();
+    }
 
     /**
      * Initializes an instance of ConnectorClient client.

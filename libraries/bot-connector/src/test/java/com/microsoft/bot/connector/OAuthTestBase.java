@@ -5,6 +5,7 @@ import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
+import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.rest.RestClient;
 
@@ -26,6 +27,7 @@ public class OAuthTestBase extends TestBase {
 
     private String token;
     protected RestConnectorClient connector;
+    protected RestOAuthClient oAuthClient;
 
     private ChannelAccount bot;
 
@@ -66,6 +68,8 @@ public class OAuthTestBase extends TestBase {
         }
 
         this.connector = new RestConnectorClient(restClient);
+        this.oAuthClient = new RestOAuthClient(restClient);
+
         if (this.clientId != null && this.clientSecret != null) {
             MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
 
@@ -96,26 +100,16 @@ public class OAuthTestBase extends TestBase {
     }
 
 
-    public CompletableFuture UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest) throws MalformedURLException, URISyntaxException {
+    public CompletableFuture UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest) {
         return this.UseOAuthClientFor(doTest, null, "");
     }
 
-    public CompletableFuture UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest, String className) throws MalformedURLException, URISyntaxException {
+    public CompletableFuture UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className) {
         return this.UseOAuthClientFor(doTest, className, "");
     }
 
-    public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClientOld, CompletableFuture<Void>> doTest, String className, String methodName) throws MalformedURLException, URISyntaxException {
-        return CompletableFuture.runAsync(() -> {
-            OAuthClientOld oauthClient = null;
-            try {
-                oauthClient = new OAuthClientOld(this.connector, AuthenticationConstants.OAUTH_URL);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            doTest.apply(oauthClient);
-        }, ExecutorFactory.getExecutor());
+    public CompletableFuture<Void> UseOAuthClientFor(Function<OAuthClient, CompletableFuture<Void>> doTest, String className, String methodName) {
+        return doTest.apply(oAuthClient);
     }
 }
 
