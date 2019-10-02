@@ -132,6 +132,10 @@ public class TestFlow {
      */
     public TestFlow assertReply(Activity expected) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
+        return assertReply(expected, description);
+    }
+
+    public TestFlow assertReply(Activity expected, String description) {
         return assertReply(expected, description, 3000);
     }
 

@@ -5,6 +5,7 @@ package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.*;
 import com.microsoft.bot.connector.Channels;
+import com.microsoft.bot.connector.UserToken;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,11 +13,42 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class TestAdapter extends BotAdapter {
     private final Queue<Activity> botReplies = new LinkedList<>();
     private int nextId = 0;
     private ConversationReference conversationReference;
+
+    private static class UserTokenKey {
+        public String connectionName;
+        public String userId;
+        public String channelId;
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (!(rhs instanceof UserTokenKey))
+                return false;
+            return StringUtils.equals(connectionName, ((UserTokenKey) rhs).connectionName)
+                && StringUtils.equals(userId, ((UserTokenKey) rhs).userId)
+                && StringUtils.equals(channelId, ((UserTokenKey) rhs).channelId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(connectionName, userId, channelId);
+        }
+    }
+
+    private static class TokenMagicCode {
+        public UserTokenKey key;
+        public String magicCode;
+        public String userToken;
+    }
+
+    private Map<UserTokenKey, String> userTokens = new HashMap<>();
+    private List<TokenMagicCode> magicCodes = new ArrayList<>();
+
 
     public TestAdapter() {
         this((ConversationReference) null);
@@ -225,7 +257,6 @@ public class TestAdapter extends BotAdapter {
         return activity;
     }
 
-
     /**
      * Called by TestFlow to send text to the bot
      *
@@ -234,6 +265,91 @@ public class TestAdapter extends BotAdapter {
      */
     public CompletableFuture<Void> sendTextToBot(String userSays, BotCallbackHandler callback) {
         return processActivity(this.makeActivity(userSays), callback);
+    }
+
+    public void addUserToken(String connectionName, String channelId, String userId, String token, String withMagicCode) {
+        UserTokenKey userKey = new UserTokenKey();
+        userKey.connectionName = connectionName;
+        userKey.channelId = channelId;
+        userKey.userId = userId;
+
+        if (withMagicCode == null) {
+            userTokens.put(userKey, token);
+        } else {
+            magicCodes.add(new TokenMagicCode() {{
+                key = userKey;
+                magicCode = withMagicCode;
+                userToken = token;
+            }});
+        }
+    }
+
+    public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext, String connectionName, String magicCode) {
+        UserTokenKey key = new UserTokenKey();
+        key.connectionName = connectionName;
+        key.channelId = turnContext.getActivity().getChannelId();
+        key.userId = turnContext.getActivity().getFrom().getId();
+
+        if (magicCode != null) {
+            TokenMagicCode magicCodeRecord = magicCodes.stream().filter(tokenMagicCode -> key.equals(tokenMagicCode.key)).findFirst().orElse(null);
+            if (magicCodeRecord != null && StringUtils.equals(magicCodeRecord.magicCode, magicCode)) {
+                addUserToken(connectionName, key.channelId, key.userId, magicCodeRecord.userToken, null);
+            }
+        }
+
+        if (userTokens.containsKey(key)) {
+            return CompletableFuture.completedFuture(new TokenResponse() {{
+                setConnectionName(connectionName);
+                setToken(userTokens.get(key));
+            }});
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName) {
+        return getOAuthSignInLink(turnContext, connectionName, turnContext.getActivity().getFrom().getId(), null);
+    }
+
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName, String userId, String finalRedirect) {
+        String link = String.format("https://fake.com/oauthsignin/%s/{turnContext.Activity.ChannelId}/%s", connectionName, userId == null ? "" : userId);
+        return CompletableFuture.completedFuture(link);
+    }
+
+    public CompletableFuture<Void> signOutUser(TurnContext turnContext, String connectionName, String userId) {
+        String channelId = turnContext.getActivity().getChannelId();
+        final String effectiveUserId = userId == null ? turnContext.getActivity().getFrom().getId() : userId;
+
+        userTokens.keySet().stream()
+            .filter(t -> StringUtils.equals(t.channelId, channelId)
+                && StringUtils.equals(t.userId, effectiveUserId)
+                && connectionName == null || StringUtils.equals(t.connectionName, connectionName))
+            .collect(Collectors.toList())
+            .forEach(key -> userTokens.remove(key));
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, String userId, String includeFilter) {
+        String[] filter = includeFilter == null ? null : includeFilter.split(",");
+        List<TokenStatus> records = userTokens.keySet().stream()
+            .filter(x -> StringUtils.equals(x.channelId, turnContext.getActivity().getChannelId())
+                && StringUtils.equals(x.userId, turnContext.getActivity().getFrom().getId())
+                && (includeFilter == null || Arrays.binarySearch(filter, x.connectionName) != -1))
+            .map(r -> new TokenStatus() {{
+                setConnectionName(r.connectionName);
+                setHasToken(true);
+                setServiceProviderDisplayName(r.connectionName);
+            }})
+            .collect(Collectors.toList());
+
+        if (records.size() > 0)
+            return CompletableFuture.completedFuture(records.toArray(new TokenStatus[0]));
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext turnContext, String connectionName, String[] resourceUrls, String userId) {
+        return CompletableFuture.completedFuture(new HashMap<>());
     }
 }
 
