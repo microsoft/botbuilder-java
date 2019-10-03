@@ -6,7 +6,6 @@ package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.bot.connector.ExecutorFactory;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

@@ -15,6 +15,7 @@ public class RetryException extends RuntimeException {
     }
 
     public RetryException(String message, List<Throwable> withExceptions) {
+        super(message);
         exceptions = withExceptions;
     }
 

@@ -6,7 +6,6 @@ import com.microsoft.bot.connector.OAuthClient;
 import com.microsoft.bot.connector.UserToken;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
-import org.apache.commons.lang3.StringUtils;
 
 public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
     /**
