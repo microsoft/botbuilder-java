@@ -74,30 +74,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <build>
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-          </plugin>
-
           <plugin>
             <groupId>org.eluder.coveralls</groupId>
             <artifactId>coveralls-maven-plugin</artifactId>
@@ -109,65 +86,13 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>cobertura-maven-plugin</artifactId>
             <configuration>
-              <outputDirectory>../../cobertura-report/bot-connector</outputDirectory>
+              <outputDirectory>../../cobertura-report/bot-integration-core</outputDirectory>
               <format>xml</format>
               <maxmem>256m</maxmem>
               <!-- aggregated reports for multi-module projects -->
               <aggregate>true</aggregate>
+              <check/>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-
-    </profile>
-
-    <profile>
-      <id>publish</id>
-      <build>
-        <plugins>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-          </plugin>
-
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
