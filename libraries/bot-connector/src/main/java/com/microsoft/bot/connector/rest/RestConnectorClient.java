@@ -6,17 +6,17 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.azure.AzureResponseBuilder;
-import com.microsoft.azure.AzureServiceClient;
-import com.microsoft.azure.serializer.AzureJacksonAdapter;
+import com.microsoft.bot.azure.AzureResponseBuilder;
+import com.microsoft.bot.azure.AzureServiceClient;
+import com.microsoft.bot.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.UserAgent;
-import com.microsoft.rest.LogLevel;
-import com.microsoft.rest.credentials.ServiceClientCredentials;
-import com.microsoft.rest.RestClient;
-import com.microsoft.rest.retry.RetryStrategy;
+import com.microsoft.bot.rest.LogLevel;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.rest.retry.RetryStrategy;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -79,20 +79,10 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.generateClientRequestId = true;
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
-//        this.azureClient = new AzureClient(this);
         this.user_agent_string = UserAgent.value();
 
-        this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
+        //this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
     }
-
-//    /**
-//     * Gets the {@link AzureClient} used for long running operations.
-//     * @return the azure client;
-//     */
-//    @Override
-//    public AzureClient getAzureClient() {
-//        return this.azureClient;
-//    }
 
     @Override
     public RestClient getRestClient() {

@@ -39,7 +39,7 @@ import com.microsoft.bot.schema.RoleTypes;
 import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
-import com.microsoft.rest.retry.RetryStrategy;
+import com.microsoft.bot.rest.retry.RetryStrategy;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;

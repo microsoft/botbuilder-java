@@ -13,7 +13,7 @@ import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
-import com.microsoft.rest.RestClient;
+import com.microsoft.bot.rest.RestClient;
 import org.junit.Assert;
 import org.junit.Test;
 

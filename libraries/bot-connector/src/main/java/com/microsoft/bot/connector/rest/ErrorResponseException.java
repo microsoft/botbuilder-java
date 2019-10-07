@@ -6,7 +6,7 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.rest.RestException;import com.microsoft.bot.schema.ErrorResponse;
+import com.microsoft.bot.rest.RestException;import com.microsoft.bot.schema.ErrorResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 

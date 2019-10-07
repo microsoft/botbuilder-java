@@ -1,11 +1,11 @@
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.azure.AzureServiceClient;
+import com.microsoft.bot.azure.AzureServiceClient;
 import com.microsoft.bot.connector.BotSignIn;
 import com.microsoft.bot.connector.OAuthClient;
 import com.microsoft.bot.connector.UserToken;
-import com.microsoft.rest.RestClient;
-import com.microsoft.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 
 public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
     /**

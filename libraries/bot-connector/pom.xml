@@ -165,8 +165,8 @@
             <configuration>
               <analysisCache>true</analysisCache>
               <excludes>
-                <exclude>com/microsoft/azure/**</exclude>
-                <exclude>com/microsoft/rest/**</exclude>
+                <exclude>com/microsoft/bot/azure/**</exclude>
+                <exclude>com/microsoft/bot/rest/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -174,7 +174,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
             <configuration>
-              <excludes>com/microsoft/rest/**,com/microsoft/azure/**</excludes>
+              <excludes>com/microsoft/bot/rest/**,com/microsoft/bot/azure/**</excludes>
             </configuration>
           </plugin>
         </plugins>

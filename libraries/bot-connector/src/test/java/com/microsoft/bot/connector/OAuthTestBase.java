@@ -1,16 +1,14 @@
 package com.microsoft.bot.connector;
 
 
-import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.ChannelAccount;
-import com.microsoft.rest.RestClient;
+import com.microsoft.bot.rest.RestClient;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

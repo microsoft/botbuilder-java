@@ -11,7 +11,7 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.schema.*;
-import com.microsoft.rest.ServiceResponse;
+import com.microsoft.bot.rest.ServiceResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

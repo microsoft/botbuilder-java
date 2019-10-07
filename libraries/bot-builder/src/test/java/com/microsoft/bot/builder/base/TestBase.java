@@ -4,13 +4,13 @@
 package com.microsoft.bot.builder.base;
 
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.rest.LogLevel;
-import com.microsoft.rest.RestClient;
-import com.microsoft.rest.ServiceResponseBuilder;
-import com.microsoft.rest.credentials.ServiceClientCredentials;
-import com.microsoft.rest.credentials.TokenCredentials;
-import com.microsoft.rest.interceptors.LoggingInterceptor;
-import com.microsoft.rest.serializer.JacksonAdapter;
+import com.microsoft.bot.rest.LogLevel;
+import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.rest.ServiceResponseBuilder;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.rest.credentials.TokenCredentials;
+import com.microsoft.bot.rest.interceptors.LoggingInterceptor;
+import com.microsoft.bot.rest.serializer.JacksonAdapter;
 import org.junit.*;
 import org.junit.rules.TestName;
 

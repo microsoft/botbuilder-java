@@ -1,7 +1,6 @@
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 
 public class BotAccessTokenStub implements ServiceClientCredentials {

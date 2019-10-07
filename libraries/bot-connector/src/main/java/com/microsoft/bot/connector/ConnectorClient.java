@@ -10,7 +10,7 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.rest.RestClient;
+import com.microsoft.bot.rest.RestClient;
 
 /**
  * The interface for ConnectorClient class.

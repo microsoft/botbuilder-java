@@ -6,11 +6,11 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.azure.CloudException;
+import com.microsoft.bot.azure.CloudException;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.BotSignIn;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.rest.ServiceResponse;
+import com.microsoft.bot.rest.ServiceResponse;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
