@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,37 +45,38 @@ public class JwtTokenValidation {
                                                                         CredentialProvider credentials,
                                                                         ChannelProvider channelProvider,
                                                                         AuthenticationConfiguration authConfig) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (StringUtils.isEmpty(authHeader)) {
-                // No auth header was sent. We might be on the anonymous code path.
-                boolean isAuthDisable = credentials.isAuthenticationDisabled().join();
-                if (isAuthDisable) {
-                    // In the scenario where Auth is disabled, we still want to have the
-                    // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
-                    // adding in an empty claim.
-                    return new ClaimsIdentity("anonymous");
-                }
 
-                // No Auth Header. Auth is required. Request is not authorized.
-                throw new AuthenticationException("No Auth Header. Auth is required.");
-            }
+        if (StringUtils.isEmpty(authHeader)) {
+            // No auth header was sent. We might be on the anonymous code path.
+            return credentials.isAuthenticationDisabled()
+                .thenApply(isAuthDisable -> {
+                    if (isAuthDisable) {
+                        // In the scenario where Auth is disabled, we still want to have the
+                        // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+                        // adding in an empty claim.
+                        return new ClaimsIdentity("anonymous");
+                    }
 
-            // Go through the standard authentication path.  This will throw AuthenticationException if
-            // it fails.
-            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
-                authHeader,
-                credentials,
-                channelProvider,
-                activity.getChannelId(),
-                activity.getServiceUrl(),
-                authConfig)
-                .join();
+                    // No Auth Header. Auth is required. Request is not authorized.
+                    throw new AuthenticationException("No Auth Header. Auth is required.");
+                });
+        }
 
-            // On the standard Auth path, we need to trust the URL that was incoming.
-            MicrosoftAppCredentials.trustServiceUrl(activity.getServiceUrl());
+        // Go through the standard authentication path.  This will throw AuthenticationException if
+        // it fails.
+        return JwtTokenValidation.validateAuthHeader(
+            authHeader,
+            credentials,
+            channelProvider,
+            activity.getChannelId(),
+            activity.getServiceUrl(),
+            authConfig)
 
-            return identity;
-        }, ExecutorFactory.getExecutor());
+            .thenApply(identity -> {
+                // On the standard Auth path, we need to trust the URL that was incoming.
+                MicrosoftAppCredentials.trustServiceUrl(activity.getServiceUrl());
+                return identity;
+            });
     }
 
     /**
