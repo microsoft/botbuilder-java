@@ -13,7 +13,6 @@ import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.UserAgent;
-import com.microsoft.bot.rest.LogLevel;
 import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 import com.microsoft.bot.rest.RestClient;
 import com.microsoft.bot.rest.retry.RetryStrategy;
