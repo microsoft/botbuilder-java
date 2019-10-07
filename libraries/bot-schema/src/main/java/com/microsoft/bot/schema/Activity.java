@@ -8,6 +8,7 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -55,7 +56,7 @@ public class Activity {
      */
     @JsonProperty(value = "timestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nX", timezone = "UTC")
     private OffsetDateTime timestamp;
 
     /**
@@ -64,7 +65,8 @@ public class Activity {
      */
     @JsonProperty(value = "localTimestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    //2019-10-07T09:49:37-05:00
     private OffsetDateTime localTimestamp;
 
     /**

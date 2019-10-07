@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.microsoft.azure.AzureClient;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.Attachments;
@@ -555,11 +554,6 @@ public class TurnContextTests {
 
         @Override
         public RestClient getRestClient() {
-            return null;
-        }
-
-        @Override
-        public AzureClient getAzureClient() {
             return null;
         }
 

@@ -10,7 +10,6 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.azure.AzureClient;
 import com.microsoft.rest.RestClient;
 
 /**
@@ -23,12 +22,6 @@ public interface ConnectorClient extends AutoCloseable {
      * @return the {@link RestClient} object.
      */
     RestClient getRestClient();
-
-    /**
-     * Gets the {@link AzureClient} used for long running operations.
-     * @return the azure client;
-     */
-    AzureClient getAzureClient();
 
     /**
      * Gets the User-Agent header for the client.

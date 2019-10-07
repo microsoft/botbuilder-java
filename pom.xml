@@ -215,25 +215,11 @@
       </dependency>
 
       <dependency>
-        <groupId>com.microsoft.rest</groupId>
-        <artifactId>client-runtime</artifactId>
-        <version>1.6.12</version>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.azure</groupId>
-        <artifactId>azure-client-runtime</artifactId>
-        <version>1.6.12</version>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.azure</groupId>
-        <artifactId>azure-client-authentication</artifactId>
-        <version>1.6.12</version>
-      </dependency>
-      <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>msal4j</artifactId>
         <version>0.5.0-preview</version>
       </dependency>
+
       <dependency>
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-parameter-names</artifactId>
@@ -254,6 +240,7 @@
         <artifactId>jackson-databind</artifactId>
         <version>2.9.9</version>
       </dependency>
+
       <dependency>
         <groupId>com.codepoetics</groupId>
         <artifactId>protonpack</artifactId>

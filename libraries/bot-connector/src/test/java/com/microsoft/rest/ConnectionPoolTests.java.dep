@@ -1,0 +1,163 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
+package com.microsoft.rest;
+
+import com.microsoft.rest.ServiceResponseBuilder.Factory;
+import com.microsoft.rest.serializer.JacksonAdapter;
+import okhttp3.Dispatcher;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.Protocol;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.apache.commons.lang3.time.StopWatch;
+import org.junit.Assert;
+import org.junit.Test;
+import retrofit2.http.GET;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+
+public class ConnectionPoolTests {
+    // Simulates a server with response latency of 1 second. A connection pool
+    // size 2 should only send 2 requests per second.
+    @Test
+    public void canUseOkHttpThreadPool() throws Exception {
+        RestClient restClient = new RestClient.Builder()
+                .withBaseUrl("https://microsoft.com")
+                .withSerializerAdapter(new JacksonAdapter())
+                .withResponseBuilderFactory(new Factory())
+                .withDispatcher(new Dispatcher(Executors.newFixedThreadPool(2)))
+                .useHttpClientThreadPool(true)
+                .withInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IOException(e);
+                        }
+                        return new Response.Builder()
+                                .request(chain.request())
+                                .code(200)
+                                .message("OK")
+                                .protocol(Protocol.HTTP_1_1)
+                                .body(ResponseBody.create(MediaType.parse("text/plain"), "azure rocks"))
+                                .build();
+                    }
+                })
+                .build();
+
+        final Service service = restClient.retrofit().create(Service.class);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Observable.range(1, 4)
+                .flatMap(new Func1<Integer, Observable<?>>() {
+                    @Override
+                    public Observable<?> call(Integer integer) {
+                        return service.getAsync().subscribeOn(Schedulers.io());
+                    }
+                })
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        latch.countDown();
+                    }
+                }).subscribe();
+
+        latch.await();
+        stopWatch.stop();
+        Assert.assertTrue(stopWatch.getTime() > 2000);
+    }
+
+    // Simulates a server with response latency of 1 second. A connection pool
+    // size 2 should only send requests on Rx scheduler.
+    @Test
+    public void canUseRxThreadPool() throws Exception {
+        RestClient restClient = new RestClient.Builder()
+                .withBaseUrl("https://microsoft.com")
+                .withSerializerAdapter(new JacksonAdapter())
+                .withResponseBuilderFactory(new Factory())
+                .withDispatcher(new Dispatcher(Executors.newFixedThreadPool(2)))
+                .useHttpClientThreadPool(false)
+                .withInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IOException(e);
+                        }
+                        return new Response.Builder()
+                                .request(chain.request())
+                                .code(200)
+                                .message("OK")
+                                .protocol(Protocol.HTTP_1_1)
+                                .body(ResponseBody.create(MediaType.parse("text/plain"), "azure rocks"))
+                                .build();
+                    }
+                })
+                .build();
+
+        final Service service = restClient.retrofit().create(Service.class);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        // Rx Scheduler with no concurrency control
+        Observable.range(1, 6)
+                .flatMap(new Func1<Integer, Observable<?>>() {
+                    @Override
+                    public Observable<?> call(Integer integer) {
+                        return service.getAsync().subscribeOn(Schedulers.io());
+                    }
+                })
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        latch.countDown();
+                    }
+                }).subscribe();
+
+        latch.await();
+        stopWatch.stop();
+        Assert.assertTrue(stopWatch.getTime() < 2000);
+
+        final CountDownLatch latch2 = new CountDownLatch(1);
+        stopWatch.reset();
+        stopWatch.start();
+
+        // Rx Scheduler with concurrency control
+        Observable.range(1, 4)
+                .flatMap(new Func1<Integer, Observable<?>>() {
+                    @Override
+                    public Observable<?> call(Integer integer) {
+                        return service.getAsync().subscribeOn(Schedulers.io());
+                    }
+                }, 2)
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        latch2.countDown();
+                    }
+                }).subscribe();
+
+        latch2.await();
+        stopWatch.stop();
+        Assert.assertTrue(stopWatch.getTime() > 2000);
+    }
+
+    private interface Service {
+        @GET("/")
+        Observable<retrofit2.Response<ResponseBody>> getAsync();
+    }
+}
