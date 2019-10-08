@@ -70,7 +70,7 @@ public class ChannelValidation {
             AuthenticationConstants.AllowedSigningAlgorithms);
 
         return tokenExtractor.getIdentity(authHeader, channelId)
-            .thenApply(identity -> {
+            .thenCompose(identity -> {
                 if (identity == null) {
                     // No valid identity. Not Authorized.
                     throw new AuthenticationException("Invalid Identity");
@@ -99,12 +99,14 @@ public class ChannelValidation {
                     throw new AuthenticationException("No Audience Claim");
                 }
 
-                if (!credentials.isValidAppId(appIdFromAudienceClaim).join()) {
-                    throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.",
-                        appIdFromAudienceClaim));
-                }
-
-                return identity;
+                return credentials.isValidAppId(appIdFromAudienceClaim)
+                    .thenApply(isValid -> {
+                        if (!isValid) {
+                            throw new AuthenticationException(String.format("Invalid AppId passed on token: '%s'.",
+                                appIdFromAudienceClaim));
+                        }
+                        return identity;
+                    });
             });
     }
 
