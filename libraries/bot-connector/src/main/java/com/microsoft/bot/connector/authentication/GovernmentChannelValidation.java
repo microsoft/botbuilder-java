@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.bot.connector.ExecutorFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -96,46 +95,51 @@ public class GovernmentChannelValidation {
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
 
-        return CompletableFuture.supplyAsync(() -> {
-            if (identity == null || !identity.isAuthenticated()) {
-                throw new AuthenticationException("Invalid Identity");
-            }
+        CompletableFuture<ClaimsIdentity> result = new CompletableFuture<>();
 
-            // Now check that the AppID in the claim set matches
-            // what we're looking for. Note that in a multi-tenant bot, this value
-            // comes from developer code that may be reaching out to a service, hence the
-            // Async validation.
+        if (identity == null || !identity.isAuthenticated()) {
+            result.completeExceptionally(new AuthenticationException("Invalid Identity"));
+            return result;
+        }
 
-            if (!StringUtils.equalsIgnoreCase(identity.getIssuer(), GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
-                throw new AuthenticationException("Wrong Issuer");
-            }
+        if (!StringUtils.equalsIgnoreCase(identity.getIssuer(), GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+            result.completeExceptionally(new AuthenticationException("Wrong Issuer"));
+            return result;
+        }
 
-            // The AppId from the claim in the token must match the AppId specified by the developer. Note that
-            // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-            String appIdFromAudienceClaim = identity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
-            if (StringUtils.isEmpty(appIdFromAudienceClaim)) {
-                // Claim is present, but doesn't have a value. Not Authorized.
-                throw new AuthenticationException("No Audience Claim");
-            }
+        // The AppId from the claim in the token must match the AppId specified by the developer. Note that
+        // the Bot Framework uses the Audience claim ("aud") to pass the AppID.
+        String appIdFromAudienceClaim = identity.claims().get(AuthenticationConstants.AUDIENCE_CLAIM);
+        if (StringUtils.isEmpty(appIdFromAudienceClaim)) {
+            // Claim is present, but doesn't have a value. Not Authorized.
+            result.completeExceptionally(new AuthenticationException("No Audience Claim"));
+            return result;
+        }
 
-            boolean isValid = credentials.isValidAppId(appIdFromAudienceClaim).join();
-            if (!isValid) {
-                throw new AuthenticationException(
-                    String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
-            }
+        // Now check that the AppID in the claim set matches
+        // what we're looking for. Note that in a multi-tenant bot, this value
+        // comes from developer code that may be reaching out to a service, hence the
+        // Async validation.
 
-            String serviceUrlClaim = identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
-            if (StringUtils.isEmpty(serviceUrl)) {
-                throw new AuthenticationException(
-                    String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
-            }
+        return credentials.isValidAppId(appIdFromAudienceClaim)
+             .thenApply(isValid -> {
+                if (!isValid) {
+                    throw new AuthenticationException(
+                        String.format("Invalid AppId passed on token: '%s'.", appIdFromAudienceClaim));
+                }
 
-            if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
-                throw new AuthenticationException(
-                    String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
-            }
+                String serviceUrlClaim = identity.claims().get(AuthenticationConstants.SERVICE_URL_CLAIM);
+                if (StringUtils.isEmpty(serviceUrl)) {
+                    throw new AuthenticationException(
+                        String.format("Invalid serviceurl passed on token: '%s'.", serviceUrlClaim));
+                }
 
-            return identity;
-        }, ExecutorFactory.getExecutor());
+                if (!StringUtils.equals(serviceUrl, serviceUrlClaim)) {
+                    throw new AuthenticationException(
+                        String.format("serviceurl doesn't match claim: '%s'.", serviceUrlClaim));
+                }
+
+                return identity;
+             });
     }
 }
