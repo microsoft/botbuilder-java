@@ -119,17 +119,23 @@ public class EmulatorValidation {
                                                                       ChannelProvider channelProvider,
                                                                       String channelId,
                                                                       AuthenticationConfiguration authConfig) {
-        String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment() ?
-            GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL :
-            AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
+        String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment()
+            ? GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
+            : AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
 
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             openIdMetadataUrl,
             AuthenticationConstants.AllowedSigningAlgorithms);
 
+        class AuthState {
+            private ClaimsIdentity identity;
+            private String appId;
+            private boolean isValid;
+        }
+
         return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
-            .thenApply(identity -> {
+            .thenCompose(identity -> {
                 if (identity == null) {
                     // No valid identity. Not Authorized.
                     throw new AuthenticationException("Invalid Identity");
@@ -149,8 +155,10 @@ public class EmulatorValidation {
                         AuthenticationConstants.VERSION_CLAIM));
                 }
 
+                AuthState state = new AuthState();
+                state.identity = identity;
+
                 String tokenVersion = identity.claims().get(AuthenticationConstants.VERSION_CLAIM);
-                String appId = "";
 
                 // The Emulator, depending on Version, sends the AppId via either the
                 // appid claim (Version 1) or the Authorized Party claim (Version 2).
@@ -164,7 +172,7 @@ public class EmulatorValidation {
                                 AuthenticationConstants.APPID_CLAIM));
                     }
 
-                    appId = identity.claims().get(AuthenticationConstants.APPID_CLAIM);
+                    state.appId = identity.claims().get(AuthenticationConstants.APPID_CLAIM);
                 } else if (tokenVersion.equalsIgnoreCase("2.0")) {
                     // Emulator, "2.0" puts the AppId in the "azp" claim.
                     if (!identity.claims().containsKey(AuthenticationConstants.AUTHORIZED_PARTY)) {
@@ -174,19 +182,25 @@ public class EmulatorValidation {
                                 AuthenticationConstants.AUTHORIZED_PARTY));
                     }
 
-                    appId = identity.claims().get(AuthenticationConstants.AUTHORIZED_PARTY);
+                    state.appId = identity.claims().get(AuthenticationConstants.AUTHORIZED_PARTY);
                 } else {
                     // Unknown Version. Not Authorized.
                     throw new AuthenticationException(
                         String.format("Unknown Emulator Token version '%s'.", tokenVersion));
                 }
 
-                if (!credentials.isValidAppId(appId).join()) {
+                return credentials.isValidAppId(state.appId).thenApply(isValid -> {
+                    state.isValid = isValid;
+                    return state;
+                });
+            })
+            .thenApply(state -> {
+                if (!state.isValid) {
                     throw new AuthenticationException(
-                        String.format("Invalid AppId passed on token: '%s'.", appId));
+                        String.format("Invalid AppId passed on token: '%s'.", state.appId));
                 }
 
-                return identity;
+                return state.identity;
             });
     }
 }
