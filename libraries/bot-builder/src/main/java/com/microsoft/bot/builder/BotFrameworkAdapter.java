@@ -5,6 +5,8 @@ package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.BaseEncoding;
 import com.microsoft.bot.builder.integration.AdapterIntegration;
 import com.microsoft.bot.connector.Channels;
@@ -610,15 +612,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             throw new IllegalArgumentException("credentials");
         }
 
-        CompletableFuture<ConversationsResult> result = new CompletableFuture<>();
-
-        try {
-            ConnectorClient connectorClient = getOrCreateConnectorClient(serviceUrl, credentials);
-            return connectorClient.getConversations().getConversations(continuationToken);
-        } catch (Throwable t) {
-            result.completeExceptionally(t);
-            return result;
-        }
+        return getOrCreateConnectorClient(serviceUrl, credentials)
+            .thenCompose(connectorClient -> connectorClient.getConversations().getConversations(continuationToken));
     }
 
     /**
@@ -896,45 +891,41 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                                                       MicrosoftAppCredentials credentials,
                                                       ConversationParameters conversationParameters,
                                                       BotCallbackHandler callback) {
-        return CompletableFuture.supplyAsync(() -> {
-            ConnectorClient connectorClient;
-            try {
-                connectorClient = getOrCreateConnectorClient(serviceUrl, credentials);
-            } catch (Throwable t) {
-                throw new CompletionException(String.format("Bad serviceUrl: %s", serviceUrl), t);
-            }
 
-            Conversations conversations = connectorClient.getConversations();
-            ConversationResourceResponse conversationResourceResponse =
-                conversations.createConversation(conversationParameters).join();
+        return getOrCreateConnectorClient(serviceUrl, credentials)
+            .thenCompose(connectorClient -> {
+                Conversations conversations = connectorClient.getConversations();
+                return conversations.createConversation(conversationParameters)
+                    .thenCompose(conversationResourceResponse -> {
+                        // Create a event activity to represent the result.
+                        Activity eventActivity = Activity.createEventActivity();
+                        eventActivity.setName("CreateConversation");
+                        eventActivity.setChannelId(channelId);
+                        eventActivity.setServiceUrl(serviceUrl);
+                        eventActivity.setId((conversationResourceResponse.getActivityId() != null)
+                            ? conversationResourceResponse.getActivityId()
+                            : UUID.randomUUID().toString());
+                        eventActivity.setConversation(new ConversationAccount(conversationResourceResponse.getId()) {{
+                            setTenantId(conversationParameters.getTenantId());
+                        }});
+                        eventActivity.setChannelData(conversationParameters.getChannelData());
+                        eventActivity.setRecipient(conversationParameters.getBot());
 
-            // Create a event activity to represent the result.
-            Activity eventActivity = Activity.createEventActivity();
-            eventActivity.setName("CreateConversation");
-            eventActivity.setChannelId(channelId);
-            eventActivity.setServiceUrl(serviceUrl);
-            eventActivity.setId((conversationResourceResponse.getActivityId() != null)
-                ? conversationResourceResponse.getActivityId()
-                : UUID.randomUUID().toString());
-            eventActivity.setConversation(new ConversationAccount(conversationResourceResponse.getId()) {{
-                setTenantId(conversationParameters.getTenantId());
-            }});
-            eventActivity.setRecipient(conversationParameters.getBot());
+                        TurnContextImpl context = new TurnContextImpl(this, eventActivity);
 
-            TurnContextImpl context = new TurnContextImpl(this, eventActivity);
+                        HashMap<String, String> claims = new HashMap<String, String>() {{
+                            put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
+                            put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
+                            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+                        }};
+                        ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
 
-            HashMap<String, String> claims = new HashMap<String, String>() {{
-                put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
-                put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
-                put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-            }};
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
+                        context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
+                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
 
-            context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
-            context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-
-            return runPipeline(context, callback).join();
-        }, ExecutorFactory.getExecutor());
+                        return runPipeline(context, callback);
+                    });
+            });
     }
 
     /**
@@ -970,13 +961,16 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             return CompletableFuture.completedFuture(null);
         }
 
-        if (!StringUtils.isEmpty(reference.getConversation().getTenantId())) {
+        String tenantId = reference.getConversation().getTenantId();
+        if (!StringUtils.isEmpty(tenantId)) {
             // Putting tenantId in channelData is a temporary solution while we wait for the Teams API to be updated
-            conversationParameters.setChannelData(new Object() {
-                private String tenantId;
-            }.tenantId = reference.getConversation().getTenantId());
+            ObjectNode channelData = JsonNodeFactory.instance.objectNode();
+            channelData.set("tenant", JsonNodeFactory.instance.objectNode()
+                .set("tenantId", JsonNodeFactory.instance.textNode(tenantId)));
 
-            conversationParameters.setTenantId(reference.getConversation().getTenantId());
+            conversationParameters.setChannelData(channelData);
+
+            conversationParameters.setTenantId(tenantId);
         }
 
         return createConversation(channelId, serviceUrl, credentials, conversationParameters, callback);
@@ -1026,75 +1020,70 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      * authentication is turned off.
      */
     private CompletableFuture<ConnectorClient> createConnectorClient(String serviceUrl, ClaimsIdentity claimsIdentity) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (claimsIdentity == null) {
-                throw new UnsupportedOperationException(
-                    "ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if authentication is turned off.");
-            }
+        if (claimsIdentity == null) {
+            throw new UnsupportedOperationException(
+                "ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if authentication is turned off.");
+        }
 
-            // For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim.
-            // For unauthenticated requests we have anonymous identity provided auth is disabled.
-            if (claimsIdentity.claims() == null) {
-                try {
-                    return getOrCreateConnectorClient(serviceUrl);
-                } catch (MalformedURLException | URISyntaxException e) {
-                    throw new IllegalArgumentException(String.format("Invalid Service URL: %s", serviceUrl), e);
-                }
-            }
+        // For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim.
+        // For unauthenticated requests we have anonymous identity provided auth is disabled.
+        if (claimsIdentity.claims() == null) {
+            return getOrCreateConnectorClient(serviceUrl);
+        }
 
-            // For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
-            // For anonymous requests (requests with no header) appId is not set in claims.
+        // For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
+        // For anonymous requests (requests with no header) appId is not set in claims.
 
-            Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.AUDIENCE_CLAIM))
+        Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims().entrySet().stream()
+            .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.AUDIENCE_CLAIM))
+            .findFirst()
+            .orElse(null);
+        if (botAppIdClaim == null) {
+            botAppIdClaim = claimsIdentity.claims().entrySet().stream()
+                .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.APPID_CLAIM))
                 .findFirst()
                 .orElse(null);
-            if (botAppIdClaim == null) {
-                botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                    .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.APPID_CLAIM))
-                    .findFirst()
-                    .orElse(null);
-            }
+        }
 
-            try {
-                if (botAppIdClaim != null) {
-                    String botId = botAppIdClaim.getValue();
-                    AppCredentials credentials = this.getAppCredentials(botId).join();
+        if (botAppIdClaim == null) {
+            return getOrCreateConnectorClient(serviceUrl);
+        }
 
-                    return getOrCreateConnectorClient(serviceUrl, credentials);
-                } else {
-                    return getOrCreateConnectorClient(serviceUrl);
-                }
-            } catch (MalformedURLException | URISyntaxException e) {
-                e.printStackTrace();
-                throw new CompletionException(String.format("Bad Service URL: %s", serviceUrl), e);
-            }
-        }, ExecutorFactory.getExecutor());
+        String botId = botAppIdClaim.getValue();
+        return getAppCredentials(botId)
+            .thenCompose(credentials -> getOrCreateConnectorClient(serviceUrl, credentials));
     }
 
-    private ConnectorClient getOrCreateConnectorClient(String serviceUrl)
-        throws MalformedURLException, URISyntaxException {
-
+    private CompletableFuture<ConnectorClient> getOrCreateConnectorClient(String serviceUrl) {
         return getOrCreateConnectorClient(serviceUrl, null);
     }
 
-    private ConnectorClient getOrCreateConnectorClient(String serviceUrl, AppCredentials usingAppCredentials)
-        throws MalformedURLException, URISyntaxException {
+    protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(String serviceUrl,
+                                                                          AppCredentials usingAppCredentials) {
 
-        RestConnectorClient connectorClient;
-        if (usingAppCredentials != null) {
-            connectorClient = new RestConnectorClient(
-                new URI(serviceUrl).toURL().toString(), usingAppCredentials);
-        } else  {
-            connectorClient = new RestConnectorClient(
-                new URI(serviceUrl).toURL().toString(), MicrosoftAppCredentials.empty());
+        CompletableFuture<ConnectorClient> result = new CompletableFuture<>();
+
+        try {
+            RestConnectorClient connectorClient;
+            if (usingAppCredentials != null) {
+                connectorClient = new RestConnectorClient(
+                    new URI(serviceUrl).toURL().toString(), usingAppCredentials);
+            } else {
+                connectorClient = new RestConnectorClient(
+                    new URI(serviceUrl).toURL().toString(), MicrosoftAppCredentials.empty());
+            }
+
+            if (this.connectorClientRetryStrategy != null) {
+                connectorClient.setRestRetryStrategy(this.connectorClientRetryStrategy);
+            }
+
+            result.complete(connectorClient);
+        } catch (Throwable t) {
+            result.completeExceptionally(
+                new IllegalArgumentException(String.format("Invalid Service URL: %s", serviceUrl), t));
         }
 
-        if (this.connectorClientRetryStrategy != null) {
-            connectorClient.setRestRetryStrategy(this.connectorClientRetryStrategy);
-        }
-
-        return connectorClient;
+        return result;
     }
 
     /**

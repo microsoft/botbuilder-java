@@ -19,6 +19,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Extracts relevant data from JWT Tokens.
+ */
 public class JwtTokenExtractor {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenIdMetadata.class);
 
@@ -28,6 +31,13 @@ public class JwtTokenExtractor {
     private List<String> allowedSigningAlgorithms;
     private OpenIdMetadata openIdMetadata;
 
+    /**
+     * Initializes a new instance of the JwtTokenExtractor class.
+     *
+     * @param tokenValidationParameters tokenValidationParameters.
+     * @param metadataUrl metadataUrl.
+     * @param allowedSigningAlgorithms allowedSigningAlgorithms.
+     */
     public JwtTokenExtractor(TokenValidationParameters tokenValidationParameters,
                              String metadataUrl,
                              List<String> allowedSigningAlgorithms) {
@@ -43,10 +53,10 @@ public class JwtTokenExtractor {
     }
 
     public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader,
-                                                              String channelId,
-                                                              List<String> requiredEndorsements) {
+                                                         String channelId,
+                                                         List<String> requiredEndorsements) {
         if (authorizationHeader == null) {
-            throw new IllegalArgumentException("authorizationHeader is required");
+            return CompletableFuture.completedFuture(null);
         }
 
         String[] parts = authorizationHeader.split(" ");
@@ -58,9 +68,9 @@ public class JwtTokenExtractor {
     }
 
     public CompletableFuture<ClaimsIdentity> getIdentity(String schema,
-                                                              String token,
-                                                              String channelId,
-                                                              List<String> requiredEndorsements) {
+                                                         String token,
+                                                         String channelId,
+                                                         List<String> requiredEndorsements) {
         // No header in correct scheme or no token
         if (!schema.equalsIgnoreCase("bearer") || token == null) {
             return CompletableFuture.completedFuture(null);
@@ -82,16 +92,15 @@ public class JwtTokenExtractor {
 
     @SuppressWarnings("unchecked")
     private CompletableFuture<ClaimsIdentity> validateToken(String token,
-                                                                 String channelId,
-                                                                 List<String> requiredEndorsements) {
-        DecodedJWT decodedJWT = JWT.decode(token);
-        OpenIdMetadataKey key = this.openIdMetadata.getKey(decodedJWT.getKeyId());
-
-        if (key == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-
+                                                            String channelId,
+                                                            List<String> requiredEndorsements) {
         return CompletableFuture.supplyAsync(() -> {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            OpenIdMetadataKey key = this.openIdMetadata.getKey(decodedJWT.getKeyId());
+            if (key == null) {
+                return null;
+            }
+
             Verification verification = JWT
                 .require(Algorithm.RSA256(key.key, null))
                 .acceptLeeway(tokenValidationParameters.clockSkew.getSeconds());
@@ -130,8 +139,7 @@ public class JwtTokenExtractor {
 
                 return new ClaimsIdentity(decodedJWT);
             } catch (JWTVerificationException ex) {
-                String errorDescription = ex.getMessage();
-                LOGGER.warn(errorDescription);
+                LOGGER.warn(ex.getMessage());
                 throw new AuthenticationException(ex);
             }
         }, ExecutorFactory.getExecutor());
