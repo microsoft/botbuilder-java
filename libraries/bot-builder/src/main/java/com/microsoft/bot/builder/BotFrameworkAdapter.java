@@ -34,7 +34,6 @@ import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
-import com.microsoft.bot.schema.ConversationResourceResponse;
 import com.microsoft.bot.schema.ConversationsResult;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.RoleTypes;
@@ -44,9 +43,7 @@ import com.microsoft.bot.schema.TokenStatus;
 import com.microsoft.bot.rest.retry.RetryStrategy;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
