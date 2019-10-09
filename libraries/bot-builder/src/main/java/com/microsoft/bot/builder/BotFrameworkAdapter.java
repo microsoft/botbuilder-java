@@ -116,6 +116,11 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     private Map<String, AppCredentials> appCredentialMap = new ConcurrentHashMap<>();
 
     /**
+     * ConnectorClient cache.
+     */
+    private Map<String, ConnectorClient> connectorClients = new ConcurrentHashMap<>();
+
+    /**
      * Initializes a new instance of the {@link BotFrameworkAdapter} class,
      * using a credential provider.
      *
@@ -313,9 +318,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                                                              BotCallbackHandler callback) {
         BotAssert.activityNotNull(activity);
 
-        return JwtTokenValidation.authenticateRequest(
-            activity, authHeader, credentialProvider, channelProvider, authConfiguration)
-
+        return JwtTokenValidation
+            .authenticateRequest(activity, authHeader, credentialProvider, channelProvider, authConfiguration)
             .thenCompose(claimsIdentity -> processActivity(claimsIdentity, activity, callback));
     }
 
@@ -976,6 +980,9 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Creates an OAuth client for the bot.
      *
+     * <p>Note: This is protected primarily so that unit tests can override to
+     * provide a mock OAuthClient.</p>
+     *
      * @param turnContext The context object for the current turn.
      * @return An OAuth client for the bot.
      */
@@ -1055,30 +1062,48 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         return getOrCreateConnectorClient(serviceUrl, null);
     }
 
+    /**
+     * Returns a ConnectorClient, either from a cache or newly created.
+     *
+     * <p>Note: This is protected primarily to allow unit tests to override this
+     * to provide a mock ConnectorClient</p>
+     *
+     * @param serviceUrl The service URL for the client.
+     * @param usingAppCredentials (Optional) The AppCredentials to use.
+     * @return A task that will return the ConnectorClient.
+     */
     protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(String serviceUrl,
                                                                           AppCredentials usingAppCredentials) {
 
         CompletableFuture<ConnectorClient> result = new CompletableFuture<>();
 
-        try {
-            RestConnectorClient connectorClient;
-            if (usingAppCredentials != null) {
-                connectorClient = new RestConnectorClient(
-                    new URI(serviceUrl).toURL().toString(), usingAppCredentials);
-            } else {
-                connectorClient = new RestConnectorClient(
-                    new URI(serviceUrl).toURL().toString(), MicrosoftAppCredentials.empty());
-            }
+        String clientKey = serviceUrl + (appCredentials != null ? appCredentials.getAppId() : "");
 
-            if (this.connectorClientRetryStrategy != null) {
-                connectorClient.setRestRetryStrategy(this.connectorClientRetryStrategy);
-            }
+        result.complete(connectorClients.computeIfAbsent(clientKey, key -> {
+            try {
+                RestConnectorClient connectorClient;
+                if (usingAppCredentials != null) {
+                    connectorClient = new RestConnectorClient(
+                        new URI(serviceUrl).toURL().toString(), usingAppCredentials);
+                } else {
+                    AppCredentials emptyCredentials = channelProvider != null && channelProvider.isGovernment()
+                        ? MicrosoftGovernmentAppCredentials.empty()
+                        : MicrosoftAppCredentials.empty();
+                    connectorClient = new RestConnectorClient(
+                        new URI(serviceUrl).toURL().toString(), emptyCredentials);
+                }
 
-            result.complete(connectorClient);
-        } catch (Throwable t) {
-            result.completeExceptionally(
-                new IllegalArgumentException(String.format("Invalid Service URL: %s", serviceUrl), t));
-        }
+                if (connectorClientRetryStrategy != null) {
+                    connectorClient.setRestRetryStrategy(connectorClientRetryStrategy);
+                }
+
+                return connectorClient;
+            } catch (Throwable t) {
+                result.completeExceptionally(
+                    new IllegalArgumentException(String.format("Invalid Service URL: %s", serviceUrl), t));
+                return null;
+            }
+        }));
 
         return result;
     }
