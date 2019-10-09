@@ -269,22 +269,28 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             throw new IllegalArgumentException("callback");
         }
 
-        TurnContextImpl context = new TurnContextImpl(this, reference.getContinuationActivity());
+        CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
 
-        // Hand craft Claims Identity.
-        HashMap<String, String> claims = new HashMap<String, String>() {{
-            put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
-            put(AuthenticationConstants.APPID_CLAIM, botAppId);
-        }};
-        ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
+        try (TurnContextImpl context = new TurnContextImpl(this, reference.getContinuationActivity())) {
+            // Hand craft Claims Identity.
+            HashMap<String, String> claims = new HashMap<String, String>() {{
+                put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+                put(AuthenticationConstants.APPID_CLAIM, botAppId);
+            }};
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
 
-        context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
+            context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
 
-        return createConnectorClient(reference.getServiceUrl(), claimsIdentity)
-            .thenCompose(connectorClient -> {
-                context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-                return runPipeline(context, callback);
-            });
+            pipelineResult = createConnectorClient(reference.getServiceUrl(), claimsIdentity)
+                .thenCompose(connectorClient -> {
+                    context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
+                    return runPipeline(context, callback);
+                });
+        } catch (Exception e) {
+            pipelineResult.completeExceptionally(e);
+        }
+
+        return pipelineResult;
     }
 
     /**
@@ -340,33 +346,40 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                                                              BotCallbackHandler callback) {
         BotAssert.activityNotNull(activity);
 
-        TurnContextImpl context = new TurnContextImpl(this, activity);
-        context.getTurnState().add(BOT_IDENTITY_KEY, identity);
+        CompletableFuture<InvokeResponse> pipelineResult = new CompletableFuture<>();
 
-        return createConnectorClient(activity.getServiceUrl(), identity)
+        try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
+            context.getTurnState().add(BOT_IDENTITY_KEY, identity);
 
-            // run pipeline
-            .thenCompose(connectorClient -> {
+            pipelineResult = createConnectorClient(activity.getServiceUrl(), identity)
+
+                // run pipeline
+                .thenCompose(connectorClient -> {
                     context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
                     return runPipeline(context, callback);
                 })
 
-            // Handle Invoke scenarios, which deviate from the request/response model in that
-            // the Bot will return a specific body and return code.
-            .thenCompose(result -> {
-                if (activity.isType(ActivityTypes.INVOKE)) {
-                    Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
-                    if (invokeResponse == null) {
-                        throw new IllegalStateException("Bot failed to return a valid 'invokeResponse' activity.");
-                    } else {
-                        return CompletableFuture.completedFuture((InvokeResponse) invokeResponse.getValue());
+                // Handle Invoke scenarios, which deviate from the request/response model in that
+                // the Bot will return a specific body and return code.
+                .thenCompose(result -> {
+                    if (activity.isType(ActivityTypes.INVOKE)) {
+                        Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
+                        if (invokeResponse == null) {
+                            throw new IllegalStateException("Bot failed to return a valid 'invokeResponse' activity.");
+                        } else {
+                            return CompletableFuture.completedFuture((InvokeResponse) invokeResponse.getValue());
+                        }
                     }
-                }
 
-                // For all non-invoke scenarios, the HTTP layers above don't have to mess
-                // with the Body and return codes.
-                return CompletableFuture.completedFuture(null);
-            });
+                    // For all non-invoke scenarios, the HTTP layers above don't have to mess
+                    // with the Body and return codes.
+                    return CompletableFuture.completedFuture(null);
+                });
+        } catch (Exception e) {
+            pipelineResult.completeExceptionally(e);
+        }
+
+        return pipelineResult;
     }
 
     /**
@@ -912,19 +925,24 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                         eventActivity.setChannelData(conversationParameters.getChannelData());
                         eventActivity.setRecipient(conversationParameters.getBot());
 
-                        TurnContextImpl context = new TurnContextImpl(this, eventActivity);
+                        // run pipeline
+                        CompletableFuture<Void> result = new CompletableFuture<>();
+                        try (TurnContextImpl context = new TurnContextImpl(this, eventActivity)) {
+                            HashMap<String, String> claims = new HashMap<String, String>() {{
+                                put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
+                                put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
+                                put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
+                            }};
+                            ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
 
-                        HashMap<String, String> claims = new HashMap<String, String>() {{
-                            put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
-                            put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
-                            put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-                        }};
-                        ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
+                            context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
+                            context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
 
-                        context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
-                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-
-                        return runPipeline(context, callback);
+                            result = runPipeline(context, callback);
+                        } catch (Exception e) {
+                            result.completeExceptionally(e);
+                        }
+                        return result;
                     });
             });
     }

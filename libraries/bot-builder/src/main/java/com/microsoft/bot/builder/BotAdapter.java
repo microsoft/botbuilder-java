@@ -174,7 +174,7 @@ public abstract class BotAdapter {
     /**
      * Sends a proactive message to a conversation.
      *
-     * @param botId     The application ID of the bot. This parameter is ignored in
+     * @param botAppId  The application ID of the bot. This parameter is ignored in
      *                  single tenant the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
      *                  which is multi-tenant aware.
      * @param reference A reference to the conversation to continue.
@@ -186,10 +186,18 @@ public abstract class BotAdapter {
      *
      * {@link #runPipeline(TurnContext, BotCallbackHandler)}
      */
-    public CompletableFuture<Void> continueConversation(String botId,
+    public CompletableFuture<Void> continueConversation(String botAppId,
                                                         ConversationReference reference,
                                                         BotCallbackHandler callback) {
 
-        return runPipeline(new TurnContextImpl(this, reference.getContinuationActivity()), callback);
+        CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
+
+        try (TurnContextImpl context = new TurnContextImpl(this, reference.getContinuationActivity())) {
+            pipelineResult = runPipeline(context, callback);
+        } catch (Exception e) {
+            pipelineResult.completeExceptionally(e);
+        }
+
+        return pipelineResult;
     }
 }

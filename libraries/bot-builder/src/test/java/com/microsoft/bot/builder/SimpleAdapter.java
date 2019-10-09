@@ -6,6 +6,7 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -70,9 +71,16 @@ public class SimpleAdapter extends BotAdapter {
         return CompletableFuture.completedFuture(null);
     }
 
-
     public CompletableFuture<Void> processRequest(Activity activity, BotCallbackHandler callback) {
-        return runPipeline(new TurnContextImpl(this, activity), callback);
+        CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
+
+        try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
+            pipelineResult = runPipeline(context, callback);
+        } catch (Exception e) {
+            pipelineResult.completeExceptionally(e);
+        }
+
+        return pipelineResult;
     }
 }
 
