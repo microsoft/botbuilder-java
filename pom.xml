@@ -360,7 +360,6 @@
     <module>libraries/bot-connector</module>
     <module>libraries/bot-builder</module>
     <module>libraries/bot-integration-core</module>
-    <module>libraries/bot-integration-spring</module>
     <module>libraries/bot-dialogs</module>
     <module>libraries/bot-configuration</module>
     <module>libraries/bot-ai-luis-v3</module>

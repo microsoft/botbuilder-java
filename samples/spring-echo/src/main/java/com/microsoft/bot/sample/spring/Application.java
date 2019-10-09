@@ -7,7 +7,6 @@ import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
-import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

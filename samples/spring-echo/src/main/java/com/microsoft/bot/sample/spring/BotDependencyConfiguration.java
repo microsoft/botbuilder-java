@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.integration.spring;
+package com.microsoft.bot.sample.spring;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
+import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.ClasspathPropertiesConfiguration;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.integration.ConfigurationCredentialProvider;
-import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
