@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -71,6 +68,9 @@ public class ConversationAccount {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private RoleTypes role;
 
+    /**
+     * Empty ConversationAccount.
+     */
     public ConversationAccount() {
 
     }
@@ -239,8 +239,13 @@ public class ConversationAccount {
      * properties in the object.  This allows extensibility
      * while maintaining the object.
      */
-    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+    private HashMap<String, JsonNode> properties = new HashMap<>();
 
+    /**
+     * Performs a deep copy of a ConversationAccount.
+     * @param conversationAccount The ConversationAccount to copy.
+     * @return The cloned ConversationAccount.
+     */
     public static ConversationAccount clone(ConversationAccount conversationAccount) {
         if (conversationAccount == null) {
             return null;

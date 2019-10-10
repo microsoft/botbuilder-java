@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -65,6 +62,11 @@ public class CardAction {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object channelData;
 
+    /**
+     * Perform a deep copy of a CardAction.
+     * @param cardAction The CardAction to clone.
+     * @return A cloned copy of the CardAction.
+     */
     public static CardAction clone(CardAction cardAction) {
         if (cardAction == null) {
             return null;
@@ -82,7 +84,7 @@ public class CardAction {
     }
 
     /**
-     * Default empty CardAction
+     * Default empty CardAction.
      */
     public CardAction() {
 
@@ -90,7 +92,7 @@ public class CardAction {
 
     /**
      * Simplify creation of CardActions with string values.
-     * @param input
+     * @param input The value for both Title and Value.
      */
     public CardAction(String input) {
         setTitle(input);
@@ -164,7 +166,6 @@ public class CardAction {
      * Set the text value.
      *
      * @param withText the text value to set
-     * @return the CardAction object itself.
      */
     public void setText(String withText) {
         this.text = withText;
@@ -208,6 +209,7 @@ public class CardAction {
 
     /**
      * Gets the channelData value.
+     * @return ChannelData as a JsonNode.
      */
     public Object getChannelData() {
         return this.channelData;

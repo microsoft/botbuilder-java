@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -13,62 +10,82 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * State object passed to the bot token service.
  */
 public class TokenExchangeState {
-    /**
-     * The bot's registered application ID
-     */
     @JsonProperty("msAppId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String msAppId;
 
-    /**
-     * The connection name that was used
-     */
     @JsonProperty(value = "connectionName")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String connectionName;
 
-    /**
-     * A reference to the conversation
-     */
     @JsonProperty(value = "conversation")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference conversation;
 
-    /**
-     * The URL of the bot messaging endpoint
-     */
     @JsonProperty("botUrl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String botUrl;
 
+    /**
+     * The connection name that was used.
+     * @return The connection name.
+     */
     public String getConnectionName() {
         return this.connectionName;
     }
 
+    /**
+     * The connection name that was used.
+     * @param withConnectionName The connection name.
+     */
     public void setConnectionName(String withConnectionName) {
         this.connectionName = withConnectionName;
     }
 
+    /**
+     * A reference to the conversation.
+     * @return The conversation reference.
+     */
     public ConversationReference getConversation() {
         return this.conversation;
     }
 
+    /**
+     * A reference to the conversation.
+     * @param withConversation The conversation reference.
+     */
     public void setConversation(ConversationReference withConversation) {
         this.conversation = withConversation;
     }
 
+    /**
+     * The URL of the bot messaging endpoint.
+     * @return The messaging endpoint.
+     */
     public String getBotUrl() {
         return this.botUrl;
     }
 
+    /**
+     * The URL of the bot messaging endpoint.
+     * @param withBotUrl The messaging endpoint.
+     */
     public void setBotUrl(String withBotUrl) {
         this.botUrl = withBotUrl;
     }
 
+    /**
+     * The bot's registered application ID.
+     * @return The app id.
+     */
     public String getMsAppId() {
         return this.msAppId;
     }
 
+    /**
+     * The bot's registered application ID.
+     * @param withMsAppId The app id.
+     */
     public void setMsAppId(String withMsAppId) {
         this.msAppId = withMsAppId;
     }

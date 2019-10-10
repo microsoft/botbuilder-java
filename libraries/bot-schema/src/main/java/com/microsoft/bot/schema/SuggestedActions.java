@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -34,6 +31,11 @@ public class SuggestedActions {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> actions;
 
+    /**
+     * Performs a deep copy of a SuggestedActions.
+     * @param suggestedActions The SuggestedActions to copy.
+     * @return A clone of the SuggestedActions.
+     */
     public static SuggestedActions clone(SuggestedActions suggestedActions) {
         if (suggestedActions == null) {
             return null;
@@ -49,15 +51,15 @@ public class SuggestedActions {
     }
 
     /**
-     * Default empty SuggestedActions
+     * Default empty SuggestedActions.
      */
     public SuggestedActions() {
 
     }
 
     /**
-     *
-     * @param withCardActions
+     * SuggestedActions with CardActions.
+     * @param withCardActions The array of CardActions.
      */
     public SuggestedActions(CardAction[] withCardActions) {
         this.setActions(Arrays.asList(withCardActions));

@@ -20,8 +20,7 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
         super(withConfiguration);
 
         setOnTurnError((turnContext, exception) ->
-            turnContext.sendActivity(
-                "Sorry, it looks like something went wrong.")
+            turnContext.sendActivity("Sorry, it looks like something went wrong.")
             .thenApply(resourceResponse -> null));
     }
 }

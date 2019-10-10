@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -12,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Page of members
+ * Page of members.
  */
 public class PagedMembersResult {
 
@@ -28,14 +25,16 @@ public class PagedMembersResult {
     private List<ChannelAccount> members;
 
     /**
-     * Gets paging token
+     * Gets paging token.
+     * @return The continuation token to be used in the next call.
      */
     public String getContinuationToken() {
         return this.continuationToken;
     }
 
-    /**s
-     * Sets paging token
+    /**
+     * Sets paging token.
+     * @param withContinuationToken The continuation token.
      */
     public void setContinuationToken(String withContinuationToken) {
         this.continuationToken = withContinuationToken;

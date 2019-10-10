@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -13,30 +10,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Object representing error information.
  */
 public class Error {
-    /**
-     * Error code.
-     */
     @JsonProperty(value = "code")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String code;
 
-    /**
-     * Error message.
-     */
     @JsonProperty(value = "message")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String message;
 
-    /**
-     * Error from inner http call
-     */
     @JsonProperty(value = "innerHttpError")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private InnerHttpError innerHttpError;
 
     /**
      * Get the code value.
-     *
      * @return the code value
      */
     public String getCode() {
@@ -45,7 +32,6 @@ public class Error {
 
     /**
      * Set the code value.
-     *
      * @param withCode the code value to set
      */
     public void setCode(String withCode) {
@@ -54,7 +40,6 @@ public class Error {
 
     /**
      * Get the message value.
-     *
      * @return the message value
      */
     public String getMessage() {
@@ -63,7 +48,6 @@ public class Error {
 
     /**
      * Set the message value.
-     *
      * @param withMessage the message value to set
      */
     public void setMessage(String withMessage) {
@@ -72,6 +56,7 @@ public class Error {
 
     /**
      * Gets error from inner http call.
+     * @return The InnerHttpError.
      */
     public InnerHttpError getInnerHttpError() {
         return this.innerHttpError;
@@ -79,6 +64,7 @@ public class Error {
 
     /**
      * Sets error from inner http call.
+     * @param withInnerHttpError The InnerHttpError.
      */
     public void setInnerHttpError(InnerHttpError withInnerHttpError) {
         this.innerHttpError = withInnerHttpError;

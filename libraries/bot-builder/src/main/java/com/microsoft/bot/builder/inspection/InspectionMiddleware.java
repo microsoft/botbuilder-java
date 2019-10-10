@@ -208,9 +208,7 @@ public class InspectionMiddleware extends InterceptionMiddleware {
             inspectionState.createProperty(InspectionSessionsByStatus.class.getName());
 
         return accessor.get(turnContext, InspectionSessionsByStatus::new)
-            .thenApply(result -> {
-                InspectionSessionsByStatus openSessions = (InspectionSessionsByStatus) result;
-
+            .thenApply(openSessions -> {
                 ConversationReference reference = openSessions.getAttachedSessions()
                     .get(turnContext.getActivity().getConversation().getId());
 

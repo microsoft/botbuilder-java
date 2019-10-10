@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -15,96 +12,56 @@ import java.util.List;
  * Video card.
  */
 public class VideoCard {
-    /**
-     * Title of this card.
-     */
     @JsonProperty(value = "title")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
-    /**
-     * Subtitle of this card.
-     */
     @JsonProperty(value = "subtitle")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
-    /**
-     * Text of this card.
-     */
     @JsonProperty(value = "text")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
-    /**
-     * Thumbnail placeholder.
-     */
     @JsonProperty(value = "image")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ThumbnailUrl image;
 
-    /**
-     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative format of the same content.
-     */
     @JsonProperty(value = "media")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MediaUrl> media;
 
-    /**
-     * Actions on this card.
-     */
     @JsonProperty(value = "buttons")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
-    /**
-     * This content may be shared with others (default:true).
-     */
     @JsonProperty(value = "shareable")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean shareable;
 
-    /**
-     * Should the client loop playback at end of content (default:true).
-     */
     @JsonProperty(value = "autoloop")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean autoloop;
 
-    /**
-     * Should the client automatically start playback of media in this card
-     * (default:true).
-     */
     @JsonProperty(value = "autostart")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean autostart;
 
-    /**
-     * Aspect ratio of thumbnail/media placeholder, allowed values are "16:9"
-     * and "4:3".
-     */
     @JsonProperty(value = "aspect")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aspect;
 
-    /**
-     * Describes the length of the media content without requiring a receiver to open the content.
-     * Formatted as an ISO 8601 Duration field.
-     */
     @JsonProperty(value = "duration")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String duration;
 
-    /**
-     * Supplementary parameter for this card.
-     */
     @JsonProperty(value = "value")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object value;
 
     /**
      * Get the title value.
-     *
      * @return the title value
      */
     public String getTitle() {
@@ -113,7 +70,6 @@ public class VideoCard {
 
     /**
      * Set the title value.
-     *
      * @param withTitle the title value to set
      */
     public void setTitle(String withTitle) {
@@ -122,7 +78,6 @@ public class VideoCard {
 
     /**
      * Get the subtitle value.
-     *
      * @return the subtitle value
      */
     public String getSubtitle() {
@@ -131,7 +86,6 @@ public class VideoCard {
 
     /**
      * Set the subtitle value.
-     *
      * @param withSubtitle the subtitle value to set
      */
     public void setSubtitle(String withSubtitle) {
@@ -140,7 +94,6 @@ public class VideoCard {
 
     /**
      * Get the text value.
-     *
      * @return the text value
      */
     public String getText() {
@@ -149,7 +102,6 @@ public class VideoCard {
 
     /**
      * Set the text value.
-     *
      * @param withText the text value to set
      */
     public void setText(String withText) {
@@ -158,7 +110,6 @@ public class VideoCard {
 
     /**
      * Get the image value.
-     *
      * @return the image value
      */
     public ThumbnailUrl getImage() {
@@ -167,7 +118,6 @@ public class VideoCard {
 
     /**
      * Set the image value.
-     *
      * @param withImage the image value to set
      */
     public void setImage(ThumbnailUrl withImage) {
@@ -175,8 +125,8 @@ public class VideoCard {
     }
 
     /**
-     * Get the media value.
-     *
+     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative
+     * format of the same content.
      * @return the media value
      */
     public List<MediaUrl> getMedia() {
@@ -184,8 +134,8 @@ public class VideoCard {
     }
 
     /**
-     * Set the media value.
-     *
+     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative
+     * format of the same content.
      * @param withMedia the media value to set
      */
     public void setMedia(List<MediaUrl> withMedia) {
@@ -194,7 +144,6 @@ public class VideoCard {
 
     /**
      * Get the buttons value.
-     *
      * @return the buttons value
      */
     public List<CardAction> getButtons() {
@@ -203,7 +152,6 @@ public class VideoCard {
 
     /**
      * Set the buttons value.
-     *
      * @param withButtons the buttons value to set
      */
     public void setButtons(List<CardAction> withButtons) {
@@ -212,7 +160,6 @@ public class VideoCard {
 
     /**
      * Get the shareable value.
-     *
      * @return the shareable value
      */
     public boolean getShareable() {
@@ -221,7 +168,6 @@ public class VideoCard {
 
     /**
      * Set the shareable value.
-     *
      * @param withShareable the shareable value to set
      */
     public void setShareable(boolean withShareable) {
@@ -229,8 +175,7 @@ public class VideoCard {
     }
 
     /**
-     * Get the autoloop value.
-     *
+     * Should the client loop playback at end of content.
      * @return the autoloop value
      */
     public boolean getAutoloop() {
@@ -238,8 +183,7 @@ public class VideoCard {
     }
 
     /**
-     * Set the autoloop value.
-     *
+     * Should the client loop playback at end of content.
      * @param withAutoloop the autoloop value to set
      */
     public void setAutoloop(boolean withAutoloop) {
@@ -247,8 +191,7 @@ public class VideoCard {
     }
 
     /**
-     * Get the autostart value.
-     *
+     * Should the client automatically start playback of media in this card.
      * @return the autostart value
      */
     public boolean getAutostart() {
@@ -256,8 +199,7 @@ public class VideoCard {
     }
 
     /**
-     * Set the autostart value.
-     *
+     * Should the client automatically start playback of media in this card.
      * @param withAutostart the autostart value to set
      */
     public void setAutostart(boolean withAutostart) {
@@ -265,8 +207,8 @@ public class VideoCard {
     }
 
     /**
-     * Get the aspect value.
-     *
+     * Aspect ratio of thumbnail/media placeholder, allowed values are "16:9"
+     * and "4:3".
      * @return the aspect value
      */
     public String getAspect() {
@@ -274,10 +216,9 @@ public class VideoCard {
     }
 
     /**
-     * Set the aspect value.
-     *
+     * Aspect ratio of thumbnail/media placeholder, allowed values are "16:9"
+     * and "4:3".
      * @param withAspect the aspect value to set
-     * @return the VideoCard object itself.
      */
     public void setAspect(String withAspect) {
         this.aspect = withAspect;
@@ -285,6 +226,7 @@ public class VideoCard {
 
     /**
      * Gets the duration value.
+     * @return Duration of the video.
      */
     public String getDuration() {
         return this.duration;
@@ -292,7 +234,6 @@ public class VideoCard {
 
     /**
      * Sets the duration value.
-     *
      * @param withDuration the duration value to set
      */
     public void setDuration(String withDuration) {
@@ -301,7 +242,6 @@ public class VideoCard {
 
     /**
      * Get the value value.
-     *
      * @return the value value
      */
     public Object getValue() {
@@ -310,7 +250,6 @@ public class VideoCard {
 
     /**
      * Set the value value.
-     *
      * @param withValue the value value to set
      */
     public void setValue(Object withValue) {

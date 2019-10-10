@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -34,6 +31,9 @@ public class Mention implements EntitySerialization {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
+    /**
+     * Mention of type "mention".
+     */
     public Mention() {
         this.type = "mention";
     }

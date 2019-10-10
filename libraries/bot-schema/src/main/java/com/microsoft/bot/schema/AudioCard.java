@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -188,7 +185,6 @@ public class AudioCard {
      * Set the media value.
      *
      * @param withMedia the media value to set
-     * @return the AudioCard object itself.
      */
     public void setMedia(List<MediaUrl> withMedia) {
         this.media = withMedia;
@@ -286,6 +282,7 @@ public class AudioCard {
 
     /**
      * Gets the duration value.
+     * @return The audio duration.
      */
     public String getDuration() {
         return this.duration;

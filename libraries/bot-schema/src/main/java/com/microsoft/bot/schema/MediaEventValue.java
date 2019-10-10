@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -13,20 +10,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Supplementary parameter for media events.
  */
 public class MediaEventValue {
-    /**
-     * Callback parameter specified in the Value field of the MediaCard that
-     * originated this event.
-     */
     @JsonProperty(value = "cardValue")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object cardValue;
 
+    /**
+     * MediaEventValue with card value.
+     * @param withCardValue The card value.
+     */
     public MediaEventValue(Object withCardValue) {
         this.cardValue = withCardValue;
     }
 
     /**
-     * Get the cardValue value.
+     * Callback parameter specified in the Value field of the MediaCard that
+     * originated this event.
      *
      * @return the cardValue value
      */
@@ -35,7 +33,8 @@ public class MediaEventValue {
     }
 
     /**
-     * Set the cardValue value.
+     * Callback parameter specified in the Value field of the MediaCard that
+     *  originated this event.
      *
      * @param withCardValue the cardValue value to set
      */

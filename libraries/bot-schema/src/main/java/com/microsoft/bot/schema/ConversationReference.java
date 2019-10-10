@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -16,49 +13,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * An object relating to a particular point in a conversation.
  */
 public class ConversationReference {
-    /**
-     * (Optional) ID of the activity to refer to.
-     */
     @JsonProperty(value = "activityId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String activityId;
 
-    /**
-     * (Optional) User participating in this conversation.
-     */
     @JsonProperty(value = "user")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount user;
 
-    /**
-     * Bot participating in this conversation.
-     */
     @JsonProperty(value = "bot")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount bot;
 
-    /**
-     * Conversation reference.
-     */
     @JsonProperty(value = "conversation")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationAccount conversation;
 
-    /**
-     * Channel ID.
-     */
     @JsonProperty(value = "channelId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
-    /**
-     * Service endpoint where operations concerning the referenced conversation
-     * may be performed.
-     */
     @JsonProperty(value = "serviceUrl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
 
+    /**
+     * Performs a deep copy of a ConversationReference.
+     * @param conversationReference The ConversationReference to copy.
+     * @return A clone of the ConversationReference.
+     */
     public static ConversationReference clone(ConversationReference conversationReference) {
         if (conversationReference == null) {
             return null;
@@ -76,6 +59,7 @@ public class ConversationReference {
 
     /**
      * Creates {@link Activity} from conversation reference as it is posted to bot.
+     * @return A continuation activity.
      */
     @JsonIgnore
     public Activity getContinuationActivity() {
@@ -91,7 +75,7 @@ public class ConversationReference {
     }
 
     /**
-     * Get the activityId value.
+     * (Optional) ID of the activity to refer to.
      *
      * @return the activityId value
      */
@@ -100,7 +84,7 @@ public class ConversationReference {
     }
 
     /**
-     * Set the activityId value.
+     * (Optional) ID of the activity to refer to.
      *
      * @param withActivityId the activityId value to set
      */
@@ -109,7 +93,7 @@ public class ConversationReference {
     }
 
     /**
-     * Get the user value.
+     * (Optional) User participating in this conversation.
      *
      * @return the user value
      */
@@ -118,7 +102,7 @@ public class ConversationReference {
     }
 
     /**
-     * Set the user value.
+     * (Optional) User participating in this conversation.
      *
      * @param withUser the user value to set
      */
@@ -127,7 +111,7 @@ public class ConversationReference {
     }
 
     /**
-     * Get the bot value.
+     * Bot participating in this conversation.
      *
      * @return the bot value
      */
@@ -136,7 +120,7 @@ public class ConversationReference {
     }
 
     /**
-     * Set the bot value.
+     * Bot participating in this conversation.
      *
      * @param withBot the bot value to set
      */
@@ -145,7 +129,7 @@ public class ConversationReference {
     }
 
     /**
-     * Get the conversation value.
+     * Conversation reference.
      *
      * @return the conversation value
      */
@@ -154,7 +138,7 @@ public class ConversationReference {
     }
 
     /**
-     * Set the conversation value.
+     * Conversation reference.
      *
      * @param withConversation the conversation value to set
      */
@@ -181,7 +165,8 @@ public class ConversationReference {
     }
 
     /**
-     * Get the serviceUrl value.
+     * Service endpoint where operations concerning the referenced conversation
+     * may be performed.
      *
      * @return the serviceUrl value
      */
@@ -190,7 +175,8 @@ public class ConversationReference {
     }
 
     /**
-     * Set the serviceUrl value.
+     * Service endpoint where operations concerning the referenced conversation
+     * may be performed.
      *
      * @param withServiceUrl the serviceUrl value to set
      */

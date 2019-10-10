@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -24,6 +21,11 @@ public class MessageReaction {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
+    /**
+     * Performs a deep copy of a MessageReaction.
+     * @param messageReaction The MessageReaction to copy.
+     * @return A clone of the MessageReaction.
+     */
     public static MessageReaction clone(MessageReaction messageReaction) {
         if (messageReaction == null) {
             return null;
@@ -34,6 +36,11 @@ public class MessageReaction {
         }};
     }
 
+    /**
+     * Performs a deep copy of a List of MessageReactions.
+     * @param messageReactions The List to clone.
+     * @return A clone of the List.
+     */
     public static List<MessageReaction> cloneList(List<MessageReaction> messageReactions) {
         if (messageReactions == null) {
             return null;
@@ -44,10 +51,17 @@ public class MessageReaction {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * Empty MessageReaction.
+     */
     public MessageReaction() {
 
     }
 
+    /**
+     * MessageReaction of a type.
+     * @param withType The type.
+     */
     public MessageReaction(String withType) {
         type = withType;
     }

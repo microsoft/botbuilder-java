@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -33,17 +30,17 @@ public class Entity {
         objectMapper.findAndRegisterModules();
     }
 
-    /**
-     */
     private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
 
-    /**
-     * Type of this entity (RFC 3987 IRI).
-     */
     @JsonProperty(value = "type")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
+    /**
+     * Performs a deep copy of an Entity.
+     * @param entity The Entity to clone.
+     * @return The cloned Entity.
+     */
     public static Entity clone(Entity entity) {
         if (entity == null) {
             return null;
@@ -58,6 +55,11 @@ public class Entity {
         }};
     }
 
+    /**
+     * Performs a deep copy of a List of Entities.
+     * @param entities The List of Entities to clone.
+     * @return A cloned List.
+     */
     public static List<Entity> cloneList(List<Entity> entities) {
         if (entities == null) {
             return null;
@@ -69,7 +71,7 @@ public class Entity {
     }
 
     /**
-     * Get the {@link #type} value.
+     * Type of this entity (RFC 3987 IRI).
      * @return the type value
      */
     public String getType() {
@@ -77,7 +79,7 @@ public class Entity {
     }
 
     /**
-     * Set the {@link #type} value.
+     * Type of this entity (RFC 3987 IRI).
      * @param withType the type value to set
      */
     public void setType(String withType) {
@@ -85,7 +87,8 @@ public class Entity {
     }
 
     /**
-     * @see #properties
+     * Additional properties not defined by this class.
+     * @return The Map of additional properties.
      */
     @JsonAnyGetter
     public Map<String, JsonNode> getProperties() {
@@ -93,7 +96,9 @@ public class Entity {
     }
 
     /**
-     * @see #properties
+     * Additional properties not defined by this class.
+     * @param key The key name of the property to set.
+     * @param value The value of the property.
      */
     @JsonAnySetter
     public void setProperties(String key, JsonNode value) {
@@ -104,6 +109,7 @@ public class Entity {
      * Converts Entity to other Entity types.
      *
      * @param classType Class extended EntitySerialization
+     * @param <T> The type of the return value.
      * @return Entity converted to type T
      */
     @JsonIgnore
@@ -139,7 +145,8 @@ public class Entity {
      * @see GeoCoordinates
      *
      * @param obj of type T
-     * @param obj
+     * @param <T> The type of the value.
+     * @return This Entity with the properties from the passed sub-Entity.
      */
     @JsonIgnore
     public <T extends EntitySerialization> Entity setAs(T obj) {

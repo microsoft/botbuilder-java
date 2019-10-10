@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -32,307 +29,171 @@ import java.util.stream.Collectors;
  * could contain. It is a superset type.
  */
 public class Activity {
-    /**
-     * Content-type for an Activity.
-     */
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /**
-     * The {@link ActivityTypes} of the activity.
-     */
     @JsonProperty(value = "type")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String type;
 
-    /**
-     * Contains an ID that uniquely identifies the activity on the channel.
-     */
     @JsonProperty(value = "id")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
-    /**
-     * Contains the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
-     */
     @JsonProperty(value = "timestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nX", timezone = "UTC")
     private OffsetDateTime timestamp;
 
-    /**
-     * Contains the local date and time of the message, expressed in ISO-8601 format.
-     * For example, 2016-09-23T13:07:49.4714686-07:00.
-     */
     @JsonProperty(value = "localTimestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     //2019-10-07T09:49:37-05:00
     private OffsetDateTime localTimestamp;
 
-    /**
-     * Contains the name of the local timezone of the message, expressed in IANA Time Zone database format.
-     * For example, America/Los_Angeles.
-     */
     @JsonProperty(value = "localTimezone")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String localTimezone;
 
-    /**
-     * A string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted
-     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
-     * that asserts the identity of the callers (e.g. tokens).
-     */
     @JsonProperty(value = "callerId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String callerId;
 
-    /**
-     * Contains the URL that specifies the channel's service endpoint. Set by the channel.
-     */
     @JsonProperty(value = "serviceUrl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
 
-    /**
-     * Contains an ID that uniquely identifies the channel. Set by the channel.
-     */
     @JsonProperty(value = "channelId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
-    /**
-     * Identifies the sender of the message.
-     */
     @JsonProperty(value = "from")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount from;
 
-    /**
-     * Identifies the conversation to which the activity belongs.
-     */
     @JsonProperty(value = "conversation")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationAccount conversation;
 
-    /**
-     * Identifies the recipient of the message.
-     */
     @JsonProperty(value = "recipient")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ChannelAccount recipient;
 
-    /**
-     * Format of text fields Default:markdown. Possible values include:
-     * 'markdown', 'plain', 'xml'.
-     */
     @JsonProperty(value = "textFormat")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TextFormatTypes textFormat;
 
-    /**
-     * The layout hint for multiple attachments. Default: list.
-     */
     @JsonProperty(value = "attachmentLayout")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private AttachmentLayoutTypes attachmentLayout;
 
-    /**
-     * The collection of members added to the conversation.
-     */
     @JsonProperty(value = "membersAdded")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> membersAdded;
 
-    /**
-     * The collection of members removed from the conversation.
-     */
     @JsonProperty(value = "membersRemoved")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChannelAccount> membersRemoved;
 
-    /**
-     * The collection of reactions added to the conversation.
-     */
     @JsonProperty(value = "reactionsAdded")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MessageReaction> reactionsAdded;
 
-    /**
-     * The collection of reactions removed from the conversation.
-     */
     @JsonProperty(value = "reactionsRemoved")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MessageReaction> reactionsRemoved;
 
-    /**
-     * The updated topic name of the conversation.
-     */
     @JsonProperty(value = "topicName")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String topicName;
 
-    /**
-     * Indicates whether the prior history of the channel is disclosed.
-     */
     @JsonProperty(value = "historyDisclosed")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private boolean historyDisclosed;
 
-    /**
-     * A locale name for the contents of the text field.
-     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
-     * and an ISO 3166 two-letter subculture code associated with a country or region.
-     * <p>
-     * The locale name can also correspond to a valid BCP-47 language tag.
-     */
     @JsonProperty(value = "locale")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String locale;
 
-    /**
-     * The text content of the message.
-     */
     @JsonProperty(value = "text")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
-    /**
-     * The text to speak.
-     */
     @JsonProperty(value = "speak")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String speak;
 
-    /**
-     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message
-     * is delivered to the client.
-     */
     @JsonProperty(value = "inputHint")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private InputHints inputHint;
-    /**
-     * The text to display if the channel cannot render cards.
-     */
+
     @JsonProperty(value = "summary")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String summary;
 
-    /**
-     * The suggested actions for the activity.
-     */
     @JsonProperty(value = "suggestedActions")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private SuggestedActions suggestedActions;
 
-    /**
-     * Attachments.
-     */
     @JsonProperty(value = "attachments")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Attachment> attachments;
 
-    /**
-     * Represents the entities that were mentioned in the message.
-     */
     @JsonProperty(value = "entities")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Entity> entities;
 
-    /**
-     * Contains channel-specific content.
-     */
     @JsonProperty(value = "channelData")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object channelData;
-    /**
-     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
-     */
+
     @JsonProperty(value = "action")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String action;
 
-    /**
-     * Contains the ID of the message to which this message is a reply.
-     */
     @JsonProperty(value = "replyToId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String replyToId;
 
-    /**
-     * A descriptive label for the activity.
-     */
     @JsonProperty(value = "label")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String label;
 
-    /**
-     * The type of the activity's value object.
-     */
     @JsonProperty(value = "valueType")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String valueType;
 
-    /**
-     * A value that is associated with the activity.
-     */
     @JsonProperty(value = "value")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object value;
 
-    /**
-     * The name of the operation associated with an invoke or event activity.
-     */
     @JsonProperty(value = "name")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
-    /**
-     * A reference to another conversation or activity.
-     */
     @JsonProperty(value = "relatesTo")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference relatesTo;
 
-    /**
-     * The a code for endOfConversation activities that indicates why the conversation ended.
-     */
     @JsonProperty(value = "code")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private EndOfConversationCodes code;
 
-    /**
-     * The time at which the activity should be considered to be expired and should not be presented to the recipient.
-     */
     @JsonProperty(value = "expiration")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private LocalDateTime expiration;
 
-    /**
-     * The importance of the activity.
-     */
     @JsonProperty(value = "importance")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String importance;
 
-    /**
-     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
-     * <p>
-     * The default delivery mode is \"default\".
-     */
     @JsonProperty(value = "deliveryMode")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String deliveryMode;
 
-    /**
-     * List of phrases and references that speech and language priming systems should listen for.
-     */
     @JsonProperty(value = "listenFor")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> listenFor;
 
-    /**
-     * The collection of text fragments to highlight when the activity contains a ReplyToId value.
-     */
     @JsonProperty(value = "textHighlights")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<TextHighlight> textHighlights;
@@ -364,11 +225,11 @@ public class Activity {
      * Create a TRACE type Activity.
      *
      * @param withName Name of the operation
+     * @return A Trace type Activity.
      */
     public static Activity createTraceActivity(String withName) {
         return createTraceActivity(withName, null, null, null);
     }
-
 
    /**
     * Create a TRACE type Activity.
@@ -377,6 +238,7 @@ public class Activity {
     * @param withValueType valueType if helpful to identify the value schema (default is value.GetType().Name)
     * @param withValue The content for this trace operation.
     * @param withLabel A descriptive label for this trace operation.
+    * @return A Trace type Activity.
     */
     public static Activity createTraceActivity(String withName,
                                                String withValueType,
@@ -520,312 +382,380 @@ public class Activity {
     }
 
     /**
-     * @see #type
+     * Gets the {@link ActivityTypes} of the activity.
+     * @return The Activity type.
      */
     public String getType() {
         return this.type;
     }
 
     /**
-     * @see #type
+     * Sets the {@link ActivityTypes} of the activity.
+     * @param withType The type of the Activity.
      */
     public void setType(String withType) {
         this.type = withType;
     }
 
+    /**
+     * Convenience method to return if the Activity is of the specified type.
+     * @param compareTo The type to compare to.
+     * @return True if the Activity is of the specified type.
+     */
     public boolean isType(String compareTo) {
         return StringUtils.equals(type, compareTo);
     }
 
     /**
-     * @see #id
+     * Returns the ID that uniquely identifies the activity on the channel.
+     * @return The activity id.
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * @see #id
+     * Sets the ID that uniquely identifies the activity on the channel.
+     * @param withId The activity ID.
      */
     public void setId(String withId) {
         this.id = withId;
     }
 
     /**
-     * @see #timestamp
+     * Gets the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
+     * @return The UTC timestamp of the activity.
      */
     public OffsetDateTime getTimestamp() {
         return this.timestamp;
     }
 
     /**
-     * @see #timestamp
+     * Sets the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
+     * @param withTimestamp The UTC timestamp of the activity.
      */
     public void setTimestamp(OffsetDateTime withTimestamp) {
         this.timestamp = withTimestamp;
     }
 
     /**
-     * @see #localTimestamp
+     * Gets the local date and time of the message, expressed in ISO-8601 format.
+     * For example, 2016-09-23T13:07:49.4714686-07:00.
+     * @return The local timestamp of the activity.
      */
     public OffsetDateTime getLocalTimestamp() {
         return this.localTimestamp;
     }
 
     /**
-     * @see #localTimestamp
+     * Contains the local date and time of the message, expressed in ISO-8601 format.
+     * For example, 2016-09-23T13:07:49.4714686-07:00.
+     * @param withLocalTimestamp The local timestamp of the activity.
      */
     public void setLocalTimestamp(OffsetDateTime withLocalTimestamp) {
         this.localTimestamp = withLocalTimestamp;
     }
 
     /**
-     * @see #localTimezone
+     * Gets the name of the local timezone of the message, expressed in IANA Time Zone database format.
+     * For example, America/Los_Angeles.
+     * @return The local timezone.
      */
     public String getLocalTimezone() {
         return this.localTimezone;
     }
 
     /**
-     * @see #localTimezone
+     * Sets the name of the local timezone of the message, expressed in IANA Time Zone database format.
+     * For example, America/Los_Angeles.
+     * @param withLocalTimezone The local timezone.
      */
     public void setLocalTimeZone(String withLocalTimezone) {
         this.localTimezone = withLocalTimezone;
     }
 
     /**
-     * @see #callerId
+     * Gets a string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted
+     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
+     * that asserts the identity of the callers (e.g. tokens).
+     * @return The caller IRI.
      */
     public String getCallerId() {
         return this.callerId;
     }
 
     /**
-     * @see #callerId
+     * Sets the IRI identifying the caller of a bot. This field is not intended to be transmitted
+     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
+     * that asserts the identity of the callers (e.g. tokens).
+     * @param withCallerId The caller id.
      */
     public void setCallerId(String withCallerId) {
         this.callerId = withCallerId;
     }
 
     /**
-     * @see #serviceUrl
+     * Sets the URL that specifies the channel's service endpoint. Set by the channel.
+     * @return The service URL.
      */
     public String getServiceUrl() {
         return this.serviceUrl;
     }
 
     /**
-     * @see #serviceUrl
+     * Sets the URL that specifies the channel's service endpoint. Set by the channel.
+     * @param withServiceUrl The service URL of the Activity.
      */
     public void setServiceUrl(String withServiceUrl) {
         this.serviceUrl = withServiceUrl;
     }
 
     /**
-     * @see #channelId
+     * Gets the ID that uniquely identifies the channel. Set by the channel.
+     * @return The channel ID.
      */
     public String getChannelId() {
         return this.channelId;
     }
 
     /**
-     * @see #channelId
+     * Sets the ID that uniquely identifies the channel. Set by the channel.
+     * @param withChannelId The channel ID.
      */
     public void setChannelId(String withChannelId) {
         this.channelId = withChannelId;
     }
 
     /**
-     * @see #from
+     * Identifies the sender of the message.
+     * @return The {@link ChannelAccount} of the sender.
      */
     public ChannelAccount getFrom() {
         return this.from;
     }
 
     /**
-     * @see #from
+     * Identifies the sender of the message.
+     * @param withFrom The {@link ChannelAccount} of the sender.
      */
     public void setFrom(ChannelAccount withFrom) {
         this.from = withFrom;
     }
 
     /**
-     * @see #conversation
+     * Identifies the conversation to which the activity belongs.
+     * @return The {@link ConversationAccount}.
      */
     public ConversationAccount getConversation() {
         return this.conversation;
     }
 
     /**
-     * @see #conversation
+     * Identifies the conversation to which the activity belongs.
+     * @param withConversation The {@link ConversationAccount}.
      */
     public void setConversation(ConversationAccount withConversation) {
         this.conversation = withConversation;
     }
 
     /**
-     * @see #recipient
+     * Identifies the recipient of the message.
+     * @return The {@link ChannelAccount} of the recipient.
      */
     public ChannelAccount getRecipient() {
         return this.recipient;
     }
 
     /**
-     * @see #recipient
+     * Identifies the recipient of the message.
+     * @param withRecipient The {@link ChannelAccount} of the recipient.
      */
     public void setRecipient(ChannelAccount withRecipient) {
         this.recipient = withRecipient;
     }
 
     /**
-     * @see #textFormat
+     * Format of text fields Default:markdown. Possible values include:
+     * 'markdown', 'plain', 'xml'.
+     * @return The TextFormatTypes type.
      */
     public TextFormatTypes getTextFormat() {
         return this.textFormat;
     }
 
     /**
-     * @see #textFormat
+     * Format of text fields.
+     * @param withTextFormat The TextFormatTypes type.
      */
     public void setTextFormat(TextFormatTypes withTextFormat) {
         this.textFormat = withTextFormat;
     }
 
     /**
-     * @see #attachmentLayout
+     * The layout hint for multiple attachments.
+     * @return The Attachment type.
      */
     public AttachmentLayoutTypes getAttachmentLayout() {
         return this.attachmentLayout;
     }
 
     /**
-     * @see #attachmentLayout
+     * Sets the layout hint for multiple attachments.
+     * @param withAttachmentLayout The attachment type.
      */
     public void setAttachmentLayout(AttachmentLayoutTypes withAttachmentLayout) {
         this.attachmentLayout = withAttachmentLayout;
     }
 
     /**
-     * @see #reactionsAdded
+     * Gets the collection of reactions added to the conversation.
+     * @return A List of {@link MessageReaction}.
      */
     public List<MessageReaction> getReactionsAdded() {
         return this.reactionsAdded;
     }
 
     /**
-     * @see #reactionsAdded
+     * Sets the collection of reactions added to the conversation.
+     * @param withReactionsAdded A List of {@link MessageReaction}.
      */
     public void setReactionsAdded(List<MessageReaction> withReactionsAdded) {
         this.reactionsAdded = withReactionsAdded;
     }
 
     /**
-     * @see #reactionsRemoved
+     * Gets the collection of reactions removed from the conversation.
+     * @return A List of {@link MessageReaction}.
      */
     public List<MessageReaction> getReactionsRemoved() {
         return this.reactionsRemoved;
     }
 
     /**
-     * @see #reactionsRemoved
+     * Sets the collection of reactions removed from the conversation.
+     * @param withReactionsRemoved A List of {@link MessageReaction}.
      */
     public void setReactionsRemoved(List<MessageReaction> withReactionsRemoved) {
         this.reactionsRemoved = withReactionsRemoved;
     }
 
     /**
-     * @see #locale
+     * A locale name for the contents of the text field.
+     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
+     * and an ISO 3166 two-letter subculture code associated with a country or region.
+     * <p>
+     * The locale name can also correspond to a valid BCP-47 language tag.
+     * @return The content locale.
      */
     public String getLocale() {
         return this.locale;
     }
 
     /**
-     * @see #locale
+     * A locale name for the contents of the text field.
+     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
+     * and an ISO 3166 two-letter subculture code associated with a country or region.
+     * <p>
+     * The locale name can also correspond to a valid BCP-47 language tag.
+     * @param withLocale The content locale.
      */
     public void setLocale(String withLocale) {
         this.locale = withLocale;
     }
 
     /**
-     * @see #text
+     * Gets the text content of the message.
+     * @return The text content.
      */
     public String getText() {
         return this.text;
     }
 
     /**
-     * @see #text
+     * Sets the text content of the message.
+     * @param withText The text content.
      */
     public void setText(String withText) {
         this.text = withText;
     }
 
     /**
-     * @see #speak
+     * The text to speak.
+     * @return The SSML text to speak.
      */
     public String getSpeak() {
         return this.speak;
     }
 
     /**
-     * @see #speak
+     * Sets the text to speak.
+     * @param withSpeak The SSML text to speak.
      */
     public void setSpeak(String withSpeak) {
         this.speak = withSpeak;
     }
 
     /**
-     * @see #inputHint
+     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message
+     * is delivered to the client.
+     * @return The input hint for the activity.
      */
     public InputHints getInputHint() {
         return this.inputHint;
     }
 
     /**
-     * @see #inputHint
+     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message
+     * is delivered to the client.
+     * @param withInputHint The input hint for the activity.
      */
     public void setInputHint(InputHints withInputHint) {
         this.inputHint = withInputHint;
     }
 
     /**
-     * @see #summary
+     * Gets the text to display if the channel cannot render cards.
+     * @return The summary text.
      */
     public String getSummary() {
         return this.summary;
     }
 
     /**
-     * @see #summary
+     * Sets the text to display if the channel cannot render cards.
+     * @param withSummary The summary text.
      */
     public void setSummary(String withSummary) {
         this.summary = withSummary;
     }
 
     /**
-     * @see #suggestedActions
+     * Gets the suggested actions for the activity.
+     * @return The SuggestedActions for the activity.
      */
     public SuggestedActions getSuggestedActions() {
         return this.suggestedActions;
     }
 
     /**
-     * @see #suggestedActions
+     * The suggested actions for the activity.
+     * @param withSuggestedActions The SuggestedActions for the Activity.
      */
     public void setSuggestedActions(SuggestedActions withSuggestedActions) {
         this.suggestedActions = withSuggestedActions;
     }
 
     /**
-     * @see #attachments
+     * Gets the attachments to the Activity.
+     * @return A List of {@link Attachment}.
      */
     public List<Attachment> getAttachments() {
         return this.attachments;
     }
 
     /**
-     * @see #attachments
+     * Sets the attachments to the Activity.
+     * @param withAttachments A List of {@link Attachment}.
      */
     public void setAttachments(List<Attachment> withAttachments) {
         this.attachments = withAttachments;
@@ -850,133 +780,160 @@ public class Activity {
      *             .collect(Collectors.toCollection(ArrayList::new));
      * }
      *
-     * @see #entities
+     * @return A List of {@link Entity}.
      */
     public List<Entity> getEntities() {
         return this.entities;
     }
 
     /**
-     * @see #entities
+     * Sets payload version of the Entities in an Activity.
+     * @param withEntities The payload entities.
+     * @see Entity
      */
     public void setEntities(List<Entity> withEntities) {
         this.entities = withEntities;
     }
 
     /**
-     * @see #channelData
+     * Gets channel-specific content.
+     * @return Channel specific data.
      */
     public Object getChannelData() {
         return this.channelData;
     }
 
     /**
-     * @see #channelData
+     * Sets channel-specific content.
+     * @param withChannelData Channel specific data as a JsonNode.
      */
     public void setChannelData(Object withChannelData) {
         this.channelData = withChannelData;
     }
 
     /**
-     * @see #replyToId
+     * Gets the ID of the message to which this message is a reply.
+     * @return The reply to ID.
      */
     public String getReplyToId() {
         return this.replyToId;
     }
 
     /**
-     * @see #replyToId
+     * Sets the ID of the message to which this message is a reply.
+     * @param withReplyToId The reply to ID.
      */
     public void setReplyToId(String withReplyToId) {
         this.replyToId = withReplyToId;
     }
 
     /**
-     * @see #code
+     * Gets the a code for endOfConversation activities that indicates why the conversation ended.
+     * @return The endOfConversation code.
      */
     public EndOfConversationCodes getCode() {
         return this.code;
     }
 
     /**
-     * @see #code
+     * Sets the a code for endOfConversation activities that indicates why the conversation ended.
+     * @param withCode The endOfConversation code.
      */
     public void setCode(EndOfConversationCodes withCode) {
         this.code = withCode;
     }
 
     /**
-     * @see #expiration
+     * Gets the time at which the activity should be considered to be expired and should not be
+     * presented to the recipient.
+     * @return the activity expiration.
      */
     public LocalDateTime getExpiration() {
         return this.expiration;
     }
 
     /**
-     * @see #expiration
+     * Sets the time at which the activity should be considered to be expired and should not be
+     * presented to the recipient.
+     * @param withExpiration The activity expiration.
      */
     public void setExpiration(LocalDateTime withExpiration) {
         this.expiration = withExpiration;
     }
 
     /**
-     * @see #importance
+     * Gets the importance of the activity.
+     * @return The activity importance.
      */
     public String getImportance() {
         return this.importance;
     }
 
     /**
-     * @see #importance
+     * Sets the importance of the activity.
+     * @param withImportance The activity importance.
      */
     public void setImportance(String withImportance) {
         this.importance = withImportance;
     }
 
     /**
-     * @see #deliveryMode
+     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
+     * <p>
+     * The default delivery mode is \"default\".
+     * @return The delivery mode hint.
      */
     public String getDeliveryMode() {
         return this.deliveryMode;
     }
 
     /**
-     * @see #deliveryMode
+     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
+     * <p>
+     * The default delivery mode is \"default\".
+     * @param withDeliveryMode The delivery mode hint.
      */
     public void setDeliveryMode(String withDeliveryMode) {
         this.deliveryMode = withDeliveryMode;
     }
 
     /**
-     * @see #listenFor
+     * Gets the list of phrases and references that speech and language priming systems should listen for.
+     * @return List of phrases to listen for.
      */
     public List<String> getListenFor() {
         return this.listenFor;
     }
 
     /**
-     * @see #listenFor
+     * Sets the list of phrases and references that speech and language priming systems should listen for.
+     * @param withListenFor List of phrases to listen for.
      */
     public void setListenFor(List<String> withListenFor) {
         this.listenFor = withListenFor;
     }
 
     /**
-     * @see #textHighlights
+     * Gets the collection of text fragments to highlight when the activity contains a ReplyToId value.
+     * @return List of {@link TextHighlight}.
      */
     public List<TextHighlight> getTextHighlights() {
         return this.textHighlights;
     }
 
     /**
-     * @see #textHighlights
+     * Sets the collection of text fragments to highlight when the activity contains a ReplyToId value.
+     * @param withTextHighlights List of {@link TextHighlight}.
      */
     public void setTextHighlights(List<TextHighlight> withTextHighlights) {
         this.textHighlights = withTextHighlights;
     }
 
     /**
-     * @see #properties
+     * Holds the overflow properties that aren't first class
+     * properties in the object.  This allows extensibility
+     * while maintaining the object.
+     * @return Map of additional properties.
      */
     @JsonAnyGetter
     public Map<String, JsonNode> getProperties() {
@@ -984,148 +941,172 @@ public class Activity {
     }
 
     /**
-     * @see #properties
+     * Holds the overflow properties that aren't first class
+     * properties in the object.  This allows extensibility
+     * while maintaining the object.
+     * @param key The key of the property to set.
+     * @param withValue The value for the property.
      */
     @JsonAnySetter
-    public void setProperties(String key, JsonNode value) {
-        this.properties.put(key, value);
+    public void setProperties(String key, JsonNode withValue) {
+        this.properties.put(key, withValue);
     }
 
     /**
-     * @see #topicName
+     * Gets the updated topic name of the conversation.
+     * @return The topic name.
      */
     public String getTopicName() {
         return this.topicName;
     }
 
     /**
-     * @see #topicName
+     * Sets the updated topic name of the conversation.
+     * @param withTopicName The topic name.
      */
     public void setTopicName(String withTopicName) {
         this.topicName = withTopicName;
     }
 
     /**
-     * @see #historyDisclosed
+     * Gets whether the prior history of the channel is disclosed.
+     * @return True if the history is disclosed.
      */
     public boolean getHistoryDisclosed() {
         return this.historyDisclosed;
     }
 
     /**
-     * @see #historyDisclosed
+     * Sets whether the prior history of the channel is disclosed.
+     * @param withHistoryDisclosed True if the history is disclosed.
      */
     public void setHistoryDisclosed(boolean withHistoryDisclosed) {
         this.historyDisclosed = withHistoryDisclosed;
     }
 
     /**
-     * @see #membersAdded
+     * Gets the collection of members added to the conversation.
+     * @return List of {@link ChannelAccount} of added members.
      */
     public List<ChannelAccount> getMembersAdded() {
         return this.membersAdded;
     }
 
     /**
-     * @see #membersAdded
+     * Sets the collection of members added to the conversation.
+     * @param withMembersAdded List of {@link ChannelAccount} of added members.
      */
     public void setMembersAdded(List<ChannelAccount> withMembersAdded) {
         this.membersAdded = withMembersAdded;
     }
 
     /**
-     * @see #membersRemoved
+     * Gets the collection of members removed from the conversation.
+     * @return List of {@link ChannelAccount} of removed members.
      */
     public List<ChannelAccount> getMembersRemoved() {
         return this.membersRemoved;
     }
 
     /**
-     * @see #membersRemoved
+     * Sets the collection of members removed from the conversation.
+     * @param withMembersRemoved List of {@link ChannelAccount} of removed members.
      */
     public void setMembersRemoved(List<ChannelAccount> withMembersRemoved) {
         this.membersRemoved = withMembersRemoved;
     }
 
     /**
-     * @see #label
+     * Gets the descriptive label for the activity.
+     * @return The activity label.
      */
     public String getLabel() {
         return this.label;
     }
 
     /**
-     * @see #label
+     * Sets the descriptive label for the activity.
+     * @param withLabel The activity label.
      */
     public void setLabel(String withLabel) {
         this.label = withLabel;
     }
 
     /**
-     * @see #valueType
+     * Gets the type of the activity's value object.
+     * @return The value type.
      */
     public String getValueType() {
         return this.valueType;
     }
 
     /**
-     * @see #valueType
+     * Sets the type of the activity's value object.
+     * @param withValueType The type of Activity value.
      */
     public void setValueType(String withValueType) {
         this.valueType = withValueType;
     }
 
     /**
-     * @see #value
+     * Gets the value that is associated with the activity.
+     * @return The Activity value.
      */
     public Object getValue() {
         return this.value;
     }
 
     /**
-     * @see #value
+     * Sets the value that is associated with the activity.
+     * @param withValue  The Activity value.
      */
     public void setValue(Object withValue) {
         this.value = withValue;
     }
 
     /**
-     * @see #name
+     * Gets the name of the operation associated with an invoke or event activity.
+     * @return The Activity name.
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * @see #name
+     * Sets the name of the operation associated with an invoke or event activity.
+     * @param withName The Activity name.
      */
     public void setName(String withName) {
         this.name = withName;
     }
 
     /**
-     * @see #relatesTo
+     * A reference to another conversation or activity.
+     * @return The conversation reference.
      */
     public ConversationReference getRelatesTo() {
         return this.relatesTo;
     }
 
     /**
-     * @see #relatesTo
+     * A reference to another conversation or activity.
+     * @param withRelatesTo The conversation reference.
      */
     public void setRelatesTo(ConversationReference withRelatesTo) {
         this.relatesTo = withRelatesTo;
     }
 
     /**
-     * @see #action
+     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
+     * @return Recipient action.
      */
     public String getAction() {
         return this.action;
     }
 
     /**
-     * @see #action
+     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
+     * @param withAction Recipient action.
      */
     public void setAction(String withAction) {
         this.action = withAction;
@@ -1256,14 +1237,17 @@ public class Activity {
      * @return Returns true, if this message has any content to send. False otherwise.
      */
     public boolean hasContent() {
-        if (!StringUtils.isBlank(this.getText()))
+        if (!StringUtils.isBlank(this.getText())) {
             return true;
+        }
 
-        if (!StringUtils.isBlank(this.getSummary()))
+        if (!StringUtils.isBlank(this.getSummary())) {
             return true;
+        }
 
-        if (this.getAttachments() != null && this.getAttachments().size() > 0)
+        if (this.getAttachments() != null && this.getAttachments().size() > 0) {
             return true;
+        }
 
         return this.getChannelData() != null;
     }
@@ -1289,14 +1273,17 @@ public class Activity {
     }
 
     /**
-     * Get channelData as typed structure
+     * Get channelData as typed structure.
      *
-     * @param classType type of TypeT to use
+     * @param classType Class of TypeT to use
+     * @param <TypeT> The type of the returned object.
      * @return typed Object or default(TypeT)
+     * @throws JsonProcessingException If the channel data can't be converted to TypeT.
      */
     public <TypeT> TypeT getChannelData(Class<TypeT> classType) throws JsonProcessingException {
-        if (this.getChannelData() == null)
+        if (this.getChannelData() == null) {
             return null;
+        }
 
         if (classType.isInstance(this.getChannelData())) {
             return (TypeT) this.getChannelData();
@@ -1306,15 +1293,17 @@ public class Activity {
     }
 
     /**
-     * Get channelData as typed structure
+     * Get channelData as typed structure.
      *
-     * @param clsType type of TypeT to use
-     * @return
+     * @param clsType Class of TypeT to use
+     * @param <TypeT> The type of the returned object.
+     * @return ChannelData as TypeT
      */
     public <TypeT> ResultPair<Boolean, TypeT> tryGetChannelData(Class<TypeT> clsType) {
         TypeT instance = null;
-        if (this.getChannelData() == null)
+        if (this.getChannelData() == null) {
             return new ResultPair<>(false, instance);
+        }
 
         try {
             instance = this.getChannelData(clsType);
@@ -1354,40 +1343,33 @@ public class Activity {
     }
 
     /**
-     * True if the Activity is of the specified activity type
+     * True if the Activity is of the specified activity type.
+     * @param activityType The type to compare to.
+     * @return true if the activity is of the specific type.
      */
     protected boolean isActivity(String activityType) {
-        /*
-         * NOTE: While it is possible to come up with a fancy looking "one-liner" to solve
-         * this problem, this code is purposefully more verbose due to optimizations.
-         *
-         * This main goal of the optimizations was to make zero allocations because it is called
-         * by all of the .AsXXXActivity methods which are used in a pattern heavily upstream to
-         * "pseudo-cast" the activity based on its type.
-         */
-
-        String type = this.getType();
+        String thisType = getType();
 
         // If there's no type set then we can't tell if it's the type they're looking for
-        if (type == null) {
+        if (thisType == null) {
             return false;
         }
 
         // Check if the full type value starts with the type they're looking for
-        boolean result = StringUtils.startsWith(type.toLowerCase(), activityType.toLowerCase());
+        boolean result = StringUtils.startsWith(thisType.toLowerCase(), activityType.toLowerCase());
 
         // If the full type value starts with the type they're looking for, then we need to check a little further
         // to check if it's definitely the right type
         if (result) {
             // If the lengths are equal, then it's the exact type they're looking for
-            result = type.length() == activityType.length();
+            result = thisType.length() == activityType.length();
 
             if (!result) {
                 // Finally, if the type is longer than the type they're looking for then we need to check if there's
                 // a / separator right after the type they're looking for
-                result = type.length() > activityType.length()
+                result = thisType.length() > activityType.length()
                     &&
-                    type.indexOf(activityType.length()) == '/';
+                    thisType.indexOf(activityType.length()) == '/';
             }
         }
 
@@ -1465,14 +1447,19 @@ public class Activity {
      * is expected that text is in Activity.Text and this method will remove that value from
      * Activity.Text.
      *
-     * @param id Mention id to match.
+     * @param withId Mention id to match.
      * @return new Activity.Text property value.
      */
-    public String removeMentionText(String id) {
-        setText(removeMentionTextImmutable(this, id));
+    public String removeMentionText(String withId) {
+        setText(removeMentionTextImmutable(this, withId));
         return getText();
     }
 
+    /**
+     * Removes recipient mention without modifying the Activity.
+     * @param activity The Activity to remove mentions from.
+     * @return The Activity.Text with mentions removed.
+     */
     public static String removeRecipientMentionImmutable(Activity activity) {
         if (activity.getRecipient() == null) {
             return activity.getText();
@@ -1481,6 +1468,12 @@ public class Activity {
         return removeMentionTextImmutable(activity, activity.getRecipient().getId());
     }
 
+    /**
+     * Removes the mention from the Activity.Text without modifying the Activity.
+     * @param activity The Activity to remove mention text on.
+     * @param id The ID of the recipient.
+     * @return The Activity.Text with the mention removed.
+     */
     public static String removeMentionTextImmutable(Activity activity, String id) {
         if (StringUtils.isEmpty(id)) {
             return activity.getText();

@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -44,7 +41,8 @@ public class MediaCard {
     private ThumbnailUrl image;
 
     /**
-     * Media URLs for this card. When this field contains more than one URL, each URL is an alternative format of the same content.
+     * Media URLs for this card. When this field contains more than one URL, each URL is an
+     * alternative format of the same content.
      */
     @JsonProperty(value = "media")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -281,6 +279,7 @@ public class MediaCard {
 
     /**
      * Gets the duration value.
+     * @return The duration of the media.
      */
     public String getDuration() {
         return this.duration;

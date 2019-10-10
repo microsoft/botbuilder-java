@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -15,44 +12,26 @@ import java.util.List;
  * A basic card.
  */
 public class BasicCard {
-    /**
-     * Title of the card.
-     */
     @JsonProperty(value = "title")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
 
-    /**
-     * Subtitle of the card.
-     */
     @JsonProperty(value = "subtitle")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
-    /**
-     * Text for the card.
-     */
     @JsonProperty(value = "text")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
-    /**
-     * Array of images for the card.
-     */
     @JsonProperty(value = "images")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardImage> images;
 
-    /**
-     * Set of actions applicable to the current card.
-     */
     @JsonProperty(value = "buttons")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CardAction> buttons;
 
-    /**
-     * This action will be activated when user taps on the card itself.
-     */
     @JsonProperty(value = "tap")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CardAction tap;

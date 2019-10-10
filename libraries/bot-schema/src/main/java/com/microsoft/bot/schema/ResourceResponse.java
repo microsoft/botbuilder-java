@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -20,10 +17,17 @@ public class ResourceResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
+    /**
+     * Empty ResourceResponse.
+     */
     public ResourceResponse() {
 
     }
 
+    /**
+     * ResourceResponse with ID.
+     * @param withId The id.
+     */
     public ResourceResponse(String withId) {
         this.id = withId;
     }

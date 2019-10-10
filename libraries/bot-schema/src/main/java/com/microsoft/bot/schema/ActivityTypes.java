@@ -1,8 +1,5 @@
-/**
- * Copyright  = c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -10,6 +7,10 @@ package com.microsoft.bot.schema;
  * Defines values for ActivityTypes.
  */
 public final class ActivityTypes {
+    private ActivityTypes() {
+
+    }
+
     /**
      * Enum value message.
      */

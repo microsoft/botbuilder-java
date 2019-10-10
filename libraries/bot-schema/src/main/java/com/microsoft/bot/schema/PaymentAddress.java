@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -185,7 +182,6 @@ public class PaymentAddress {
      * Set the dependentLocality value.
      *
      * @param withDependentLocality the dependentLocality value to set
-     * @return the PaymentAddress object itself.
      */
     public void setDependentLocality(String withDependentLocality) {
         this.dependentLocality = withDependentLocality;
@@ -204,7 +200,6 @@ public class PaymentAddress {
      * Set the postalCode value.
      *
      * @param withPostalCode the postalCode value to set
-     * @return the PaymentAddress object itself.
      */
     public void setPostalCode(String withPostalCode) {
         this.postalCode = withPostalCode;
@@ -241,7 +236,6 @@ public class PaymentAddress {
      * Set the languageCode value.
      *
      * @param withLanguageCode the languageCode value to set
-     * @return the PaymentAddress object itself.
      */
     public void setLanguageCode(String withLanguageCode) {
         this.languageCode = withLanguageCode;

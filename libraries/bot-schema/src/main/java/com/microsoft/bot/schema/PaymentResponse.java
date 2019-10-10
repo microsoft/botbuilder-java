@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -170,7 +167,6 @@ public class PaymentResponse {
      * Set the payerPhone value.
      *
      * @param withPayerPhone the payerPhone value to set
-     * @return the PaymentResponse object itself.
      */
     public void setPayerPhone(String withPayerPhone) {
         this.payerPhone = withPayerPhone;

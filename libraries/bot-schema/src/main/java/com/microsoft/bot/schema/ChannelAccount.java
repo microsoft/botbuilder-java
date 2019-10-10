@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -22,32 +19,18 @@ import java.util.stream.Collectors;
  * Channel account information needed to route a message.
  */
 public class ChannelAccount {
-    /**
-     * Channel id for the user or bot on this channel (Example: joe@smith.com,
-     * or @joesmith or 123456).
-     */
     @JsonProperty(value = "id")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
 
-    /**
-     * Display friendly name.
-     */
     @JsonProperty(value = "name")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
-    /**
-     * This account's object ID within Azure Active Directory (AAD).
-     */
     @JsonProperty(value = "aadObjectId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aadObjectId;
 
-    /**
-     * Role of the entity behind the account (Example: User, Bot, etc.).
-     * Possible values include: 'user', 'bot'.
-     */
     @JsonProperty(value = "role")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private RoleTypes role;
@@ -57,8 +40,13 @@ public class ChannelAccount {
      * properties in the object.  This allows extensibility
      * while maintaining the object.
      */
-    private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
+    private HashMap<String, JsonNode> properties = new HashMap<>();
 
+    /**
+     * Perform a deep copy of a ChannelAccount.
+     * @param channelAccount The ChannelAccount to copy.
+     * @return A cloned copy of the ChannelAccount.
+     */
     public static ChannelAccount clone(ChannelAccount channelAccount) {
         if (channelAccount == null) {
             return null;
@@ -76,6 +64,11 @@ public class ChannelAccount {
         }};
     }
 
+    /**
+     * Performs a deep copy of a List of ChannelAccounts.
+     * @param channelAccounts The List to clone.
+     * @return A cloned List of ChannelAccounts.
+     */
     public static List<ChannelAccount> cloneList(List<ChannelAccount> channelAccounts) {
         if (channelAccounts == null) {
             return null;
@@ -138,7 +131,8 @@ public class ChannelAccount {
     }
 
     /**
-     * Get the {@link #role} value.
+     * Channel id for the user or bot on this channel (Example: joe@smith.com,
+     * or @joesmith or 123456).
      * @return the id value.
      */
     public String getId() {
@@ -146,7 +140,8 @@ public class ChannelAccount {
     }
 
     /**
-     * Set the {@link #id} value.
+     * Channel id for the user or bot on this channel (Example: joe@smith.com,
+     * or @joesmith or 123456).
      * @param withId the id value to set.
      */
     public void setId(String withId) {
@@ -154,7 +149,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Get the {@link #name} value.
+     * Display friendly name.
      * @return the name value.
      */
     public String getName() {
@@ -162,7 +157,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Set the {@link #name} value.
+     * Display friendly name.
      * @param withName the name value to set.
      */
     public void setName(String withName) {
@@ -170,7 +165,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Get the {@link #role} value.
+     * Role of the entity behind the account (Example: User, Bot, etc.).
      * @return the role value.
      */
     public RoleTypes getRole() {
@@ -178,7 +173,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Set the {@link #role} value.
+     * Role of the entity behind the account (Example: User, Bot, etc.).
      * @param withRole the role value to set.
      */
     public void setRole(RoleTypes withRole) {
@@ -209,7 +204,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Gets the {@link #aadObjectId} value.
+     * This account's object ID within Azure Active Directory (AAD).
      * @return The aadObjectId value.
      */
     public String getAadObjectId() {
@@ -217,7 +212,7 @@ public class ChannelAccount {
     }
 
     /**
-     * Sets the {@link #aadObjectId} value.
+     * This account's object ID within Azure Active Directory (AAD).
      * @param withAadObjectId The aadObjectId value to set.
      */
     public void setAadObjectId(String withAadObjectId) {

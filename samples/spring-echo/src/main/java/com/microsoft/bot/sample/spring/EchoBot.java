@@ -21,7 +21,8 @@ import java.util.concurrent.CompletableFuture;
 public class EchoBot extends ActivityHandler {
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        return turnContext.sendActivity(MessageFactory.text("Echo: " + turnContext.getActivity().getText()))
+        return turnContext
+            .sendActivity(MessageFactory.text("Echo: " + turnContext.getActivity().getText()))
             .thenApply(sendResult -> null);
     }
 

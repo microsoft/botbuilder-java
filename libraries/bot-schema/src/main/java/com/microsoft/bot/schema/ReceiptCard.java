@@ -1,8 +1,5 @@
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for
- * license information.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.bot.schema;
 
@@ -174,7 +171,6 @@ public class ReceiptCard {
      * Set the tax value.
      *
      * @param withTax the tax value to set
-     * @return the ReceiptCard object itself.
      */
     public void setTax(String withTax) {
         this.tax = withTax;
@@ -211,7 +207,6 @@ public class ReceiptCard {
      * Set the buttons value.
      *
      * @param withButtons the buttons value to set
-     * @return the ReceipCard object itself.
      */
     public void setButtons(List<CardAction> withButtons) {
         this.buttons = withButtons;
