@@ -1,5 +1,8 @@
 package com.microsoft.bot.connector;
 
+/**
+ * OAuth client interface.
+ */
 public interface OAuthClient {
     /**
      * Gets the BotSignIns object to access its operations.

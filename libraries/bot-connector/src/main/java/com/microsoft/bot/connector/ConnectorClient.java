@@ -55,7 +55,6 @@ public interface ConnectorClient extends AutoCloseable {
      * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30..
      *
      * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
-     * @return the service client itself
      */
     void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout);
 
@@ -72,7 +71,6 @@ public interface ConnectorClient extends AutoCloseable {
      * Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.
-     * @return the service client itself
      */
     void setGenerateClientRequestId(boolean generateClientRequestId);
 
@@ -87,9 +85,4 @@ public interface ConnectorClient extends AutoCloseable {
      * @return the Conversations object.
      */
     Conversations getConversations();
-
-    @Override
-    default void close() throws Exception {
-
-    }
 }

@@ -17,12 +17,19 @@ import java.util.function.Consumer;
  * in the classpath.
  */
 public class ConnectorConfiguration {
+    /**
+     * Load and pass properties to a function.
+     * @param func The function to process the loaded properties.
+     */
     public void process(Consumer<Properties> func) {
         final Properties properties = new Properties();
-        try ( InputStream propStream = UserAgent.class.getClassLoader()
+        try (InputStream propStream = UserAgent.class.getClassLoader()
             .getResourceAsStream("connector.properties")) {
 
             properties.load(propStream);
+            if (!properties.containsKey("version")) {
+                properties.setProperty("version", "4.0.0");
+            }
             func.accept(properties);
         } catch (Throwable t) {
             Properties p = new Properties();

@@ -15,6 +15,7 @@ import com.microsoft.bot.schema.TokenStatus;
 import com.microsoft.bot.rest.ServiceResponse;
 import com.microsoft.bot.rest.Validator;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +54,7 @@ public class RestUserToken implements UserToken {
      * The interface defining all the services for UserTokens to be
      * used by Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings("checkstyle:linelength")
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface UserTokensService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getToken" })
         @GET("api/usertoken/GetToken")
@@ -66,6 +67,10 @@ public class RestUserToken implements UserToken {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
         @HTTP(path = "api/usertoken/SignOut", method = "DELETE", hasBody = true)
         CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId);
+
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
+        @HTTP(path = "api/usertoken/SignOut", method = "DELETE", hasBody = true)
+        CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getTokenStatus" })
         @GET("api/usertoken/GetTokenStatus")
@@ -139,8 +144,8 @@ public class RestUserToken implements UserToken {
         return this.client.restClient().responseBuilderFactory()
             .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(200, new TypeToken<TokenResponse>() { }.getType())
-                .register(404, new TypeToken<TokenResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_NOT_FOUND, new TypeToken<TokenResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -222,7 +227,7 @@ public class RestUserToken implements UserToken {
         return this.client.restClient().responseBuilderFactory()
             .<Map<String, TokenResponse>, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(200, new TypeToken<Map<String, TokenResponse>>() { }.getType())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<Map<String, TokenResponse>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -238,9 +243,8 @@ public class RestUserToken implements UserToken {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
-        final String connectionName = null;
-        final String channelId = null;
-        return service.signOut(userId, connectionName, channelId)
+
+        return service.signOut(userId)
             .thenApply(responseBodyResponse -> {
                 try {
                     return signOutDelegate(responseBodyResponse).body();
@@ -265,6 +269,13 @@ public class RestUserToken implements UserToken {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
+        if (connectionName == null) {
+            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+        }
+        if (channelId == null) {
+            throw new IllegalArgumentException("Parameter channelId is required and cannot be null.");
+        }
+
         return service.signOut(userId, connectionName, channelId)
             .thenApply(responseBodyResponse -> {
                 try {
@@ -283,8 +294,8 @@ public class RestUserToken implements UserToken {
         return this.client.restClient().responseBuilderFactory()
             .<Object, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(200, new TypeToken<Object>() { }.getType())
-                .register(204, new TypeToken<Void>() { }.getType())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<Object>() { }.getType())
+                .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -345,7 +356,7 @@ public class RestUserToken implements UserToken {
         return this.client.restClient().responseBuilderFactory()
             .<List<TokenStatus>, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(200, new TypeToken<List<TokenStatus>>() { }.getType())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<TokenStatus>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

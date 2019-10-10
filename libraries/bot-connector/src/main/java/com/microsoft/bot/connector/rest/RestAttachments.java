@@ -13,6 +13,7 @@ import com.microsoft.bot.schema.AttachmentInfo;
 import com.microsoft.bot.rest.ServiceResponse;
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
@@ -48,6 +49,7 @@ public class RestAttachments implements Attachments {
      * The interface defining all the services for Attachments to be
      * used by Retrofit to perform actually REST calls.
      */
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface AttachmentsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
         @GET("v3/attachments/{attachmentId}")
@@ -93,8 +95,9 @@ public class RestAttachments implements Attachments {
     private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(Response<ResponseBody> response)
         throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<AttachmentInfo, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<AttachmentInfo>() { }.getType())
+        return this.client.restClient()
+            .responseBuilderFactory().<AttachmentInfo, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<AttachmentInfo>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -130,10 +133,11 @@ public class RestAttachments implements Attachments {
     private ServiceResponse<InputStream> getAttachmentDelegate(Response<ResponseBody> response)
         throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<InputStream, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<InputStream>() { }.getType())
-                .register(301, new TypeToken<Void>() { }.getType())
-                .register(302, new TypeToken<Void>() { }.getType())
+        return this.client.restClient()
+            .responseBuilderFactory().<InputStream, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<InputStream>() { }.getType())
+                .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() { }.getType())
+                .register(HttpURLConnection.HTTP_MOVED_TEMP, new TypeToken<Void>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

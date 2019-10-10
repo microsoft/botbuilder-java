@@ -39,9 +39,6 @@ import retrofit2.Retrofit;
  * Authentication](/en-us/restapi/authentication) document.
  */
 public class RestConnectorClient extends AzureServiceClient implements ConnectorClient {
-//    /** the {@link AzureClient} used for long running operations. */
-//    private AzureClient azureClient;
-
     /**
      * Initializes an instance of ConnectorClient client.
      *
@@ -78,7 +75,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.generateClientRequestId = true;
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
-        this.user_agent_string = UserAgent.value();
+        this.userAgentString = UserAgent.value();
 
         //this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
     }
@@ -90,7 +87,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /** Gets or sets the preferred language for the response. */
     private String acceptLanguage;
-    private String user_agent_string;
+    private String userAgentString;
 
     /**
      * @see ConnectorClient#getAcceptLanguage()
@@ -112,8 +109,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * RetryStrategy as defined in Microsoft Rest Retry
      */
     private RetryStrategy retryStrategy = null;
-    public void setRestRetryStrategy(RetryStrategy retryStrategy) {
-        this.retryStrategy = retryStrategy;
+    public void setRestRetryStrategy(RetryStrategy strategy) {
+        this.retryStrategy = strategy;
     }
     public RetryStrategy getRestRetryStrategy() {
         return this.retryStrategy;
@@ -135,11 +132,11 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     /**
      * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
      *
-     * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
+     * @param timeout the longRunningOperationRetryTimeout value.
      */
     @Override
-    public void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
-        this.longRunningOperationRetryTimeout = longRunningOperationRetryTimeout;
+    public void setLongRunningOperationRetryTimeout(int timeout) {
+        this.longRunningOperationRetryTimeout = timeout;
     }
 
     /** When set to true a unique x-ms-client-request-id value is generated and included in each request. */
@@ -158,11 +155,11 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     /**
      * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
-     * @param generateClientRequestId the generateClientRequestId value.
+     * @param requestId the generateClientRequestId value.
      */
     @Override
-    public void setGenerateClientRequestId(boolean generateClientRequestId) {
-        this.generateClientRequestId = generateClientRequestId;
+    public void setGenerateClientRequestId(boolean requestId) {
+        this.generateClientRequestId = requestId;
     }
 
     /**
@@ -201,7 +198,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     @Override
     public String getUserAgent() {
-        return this.user_agent_string;
+        return this.userAgentString;
     }
 
     // this is to override the AzureServiceClient version
@@ -228,5 +225,14 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
                 .withCredentials(credentials)
                 .withSerializerAdapter(new AzureJacksonAdapter())
                 .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
+    }
+
+    /**
+     * AutoDisposable close.
+     * @throws Exception By nothing now.
+     */
+    @Override
+    public void close() throws Exception {
+
     }
 }

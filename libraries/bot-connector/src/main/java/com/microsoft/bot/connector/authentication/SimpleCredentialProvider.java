@@ -23,51 +23,67 @@ public class SimpleCredentialProvider implements CredentialProvider {
     /**
      * Initializes a new instance with the provided credentials.
      *
-     * @param appId    The app ID.
-     * @param password The app password.
+     * @param withAppId    The app ID.
+     * @param withPassword The app password.
      */
-    public SimpleCredentialProvider(String appId, String password) {
-        this.appId = appId;
-        this.password = password;
+    public SimpleCredentialProvider(String withAppId, String withPassword) {
+        appId = withAppId;
+        password = withPassword;
     }
 
+    /**
+     * Gets the app ID for this credential.
+     * @return The app id.
+     */
     public String getAppId() {
         return this.appId;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    /**
+     * Sets the app ID for this credential.
+     * @param witAppId The app id.
+     */
+    public void setAppId(String witAppId) {
+        appId = witAppId;
     }
 
+    /**
+     * Gets the app password for this credential.
+     * @return The password.
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    /**
+     * Sets the app password for this credential.
+     * @param withPassword The password.
+     */
+    public void setPassword(String withPassword) {
+        password = withPassword;
     }
 
     /**
      * Validates an app ID.
      *
-     * @param appId The app ID to validate.
+     * @param validateAppId The app ID to validate.
      * @return If the task is successful, the result is true if appId is valid for the controller; otherwise, false.
      */
     @Override
-    public CompletableFuture<Boolean> isValidAppId(String appId) {
-        return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId));
+    public CompletableFuture<Boolean> isValidAppId(String validateAppId) {
+        return CompletableFuture.completedFuture(StringUtils.equals(validateAppId, appId));
     }
 
     /**
      * Gets the app password for a given bot app ID.
      *
-     * @param appId The ID of the app to get the password for.
+     * @param validateAppId The ID of the app to get the password for.
      * @return If the task is successful and the app ID is valid, the result
      * contains the password; otherwise, null.
      */
     @Override
-    public CompletableFuture<String> getAppPassword(String appId) {
-        return CompletableFuture.completedFuture(StringUtils.equals(appId, this.appId) ? this.password : null);
+    public CompletableFuture<String> getAppPassword(String validateAppId) {
+        return CompletableFuture.completedFuture(StringUtils.equals(validateAppId, appId) ? password : null);
     }
 
     /**

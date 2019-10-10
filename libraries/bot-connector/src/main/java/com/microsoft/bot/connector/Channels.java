@@ -3,7 +3,14 @@
 
 package com.microsoft.bot.connector;
 
-public class Channels {
+/**
+ * Channel ID's.
+ */
+public final class Channels {
+    private Channels() {
+
+    }
+
     /**
      * Console channel.
      */

@@ -21,6 +21,7 @@ import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.rest.ServiceResponse;
 import com.microsoft.bot.rest.Validator;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -49,19 +50,19 @@ public class RestConversations implements Conversations {
     /**
      * Initializes an instance of ConversationsImpl.
      *
-     * @param retrofit the Retrofit instance built from a Retrofit Builder.
-     * @param client the instance of the service client containing this operation class.
+     * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
+     * @param withClient the instance of the service client containing this operation class.
      */
-    RestConversations(Retrofit retrofit, RestConnectorClient client) {
-        this.service = retrofit.create(ConversationsService.class);
-        this.client = client;
+    RestConversations(Retrofit withRetrofit, RestConnectorClient withClient) {
+        this.service = withRetrofit.create(ConversationsService.class);
+        client = withClient;
     }
 
     /**
      * The interface defining all the services for Conversations to be
      * used by Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings("checkstyle:linelength")
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface ConversationsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversations" })
         @GET("v3/conversations")
@@ -163,7 +164,7 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<ConversationsResult> getConversations(String continuationToken) {
-        return service.getConversations(continuationToken, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.getConversations(continuationToken, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationsDelegate(responseBodyResponse).body();
@@ -178,8 +179,9 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ConversationsResult> getConversationsDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException {
 
-        return this.client.restClient().responseBuilderFactory().<ConversationsResult, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ConversationsResult>() { }.getType())
+        return client.restClient().responseBuilderFactory()
+            .<ConversationsResult, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationsResult>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -196,7 +198,7 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(parameters);
 
-        return service.createConversation(parameters, this.client.getAcceptLanguage(), this.client.getUserAgent())
+        return service.createConversation(parameters, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return createConversationDelegate(responseBodyResponse).body();
@@ -211,10 +213,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ConversationResourceResponse> createConversationDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ConversationResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ConversationResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ConversationResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ConversationResourceResponse>() { }.getType())
+        return client.restClient().responseBuilderFactory()
+            .<ConversationResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ConversationResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ConversationResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -234,9 +237,7 @@ public class RestConversations implements Conversations {
         }
         Validator.validate(activity);
 
-        return service.sendToConversation(conversationId, activity,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.sendToConversation(conversationId, activity, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return sendToConversationDelegate(responseBodyResponse).body();
@@ -251,10 +252,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ResourceResponse> sendToConversationDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -280,7 +282,7 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.updateActivity(conversationId, activityId, activity,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
+            client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -296,10 +298,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ResourceResponse> updateActivityDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -311,8 +314,8 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<ResourceResponse> replyToActivity(String conversationId,
-                                                             String activityId,
-                                                             Activity activity) {
+                                                               String activityId,
+                                                               Activity activity) {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
@@ -325,7 +328,7 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.replyToActivity(conversationId, activityId, activity,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
+            client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -341,10 +344,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ResourceResponse> replyToActivityDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -363,9 +367,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
 
-        return service.deleteActivity(conversationId, activityId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.deleteActivity(conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return deleteActivityDelegate(responseBodyResponse).body();
@@ -380,9 +382,10 @@ public class RestConversations implements Conversations {
     private ServiceResponse<Void> deleteActivityDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<Void, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<Void>() { }.getType())
-                .register(202, new TypeToken<Void>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -397,9 +400,8 @@ public class RestConversations implements Conversations {
         if (conversationId == null) {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
-        return service.getConversationMembers(conversationId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
 
+        return service.getConversationMembers(conversationId, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationMembersDelegate(responseBodyResponse).body();
@@ -414,8 +416,9 @@ public class RestConversations implements Conversations {
     private ServiceResponse<List<ChannelAccount>> getConversationMembersDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<List<ChannelAccount>, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<List<ChannelAccount>>() { }.getType())
+        return client.restClient().responseBuilderFactory()
+            .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -435,7 +438,7 @@ public class RestConversations implements Conversations {
         }
 
         return service.deleteConversationMember(conversationId, memberId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
+            client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -452,9 +455,10 @@ public class RestConversations implements Conversations {
     private ServiceResponse<Void> deleteConversationMemberDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<Void, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<Void>() { }.getType())
-                .register(204, new TypeToken<Void>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() { }.getType())
+                .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -473,9 +477,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
         }
 
-        return service.getActivityMembers(conversationId, activityId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getActivityMembers(conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return getActivityMembersDelegate(responseBodyResponse).body();
@@ -490,8 +492,9 @@ public class RestConversations implements Conversations {
     private ServiceResponse<List<ChannelAccount>> getActivityMembersDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<List<ChannelAccount>, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<List<ChannelAccount>>() { }.getType())
+        return client.restClient().responseBuilderFactory()
+            .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -513,7 +516,7 @@ public class RestConversations implements Conversations {
         Validator.validate(attachmentUpload);
 
         return service.uploadAttachment(conversationId, attachmentUpload,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
+            client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -529,10 +532,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ResourceResponse> uploadAttachmentDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -554,7 +558,7 @@ public class RestConversations implements Conversations {
         Validator.validate(history);
 
         return service.sendConversationHistory(conversationId, history,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
+            client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -570,10 +574,11 @@ public class RestConversations implements Conversations {
     private ServiceResponse<ResourceResponse> sendConversationHistoryDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<ResourceResponse>() { }.getType())
-                .register(201, new TypeToken<ResourceResponse>() { }.getType())
-                .register(202, new TypeToken<ResourceResponse>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
+                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }
@@ -590,9 +595,7 @@ public class RestConversations implements Conversations {
             throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
         }
 
-        return service.getConversationPagedMembers(conversationId,
-            this.client.getAcceptLanguage(), this.client.getUserAgent())
-
+        return service.getConversationPagedMembers(conversationId, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationPagedMembersDelegate(responseBodyResponse).body();
@@ -607,8 +610,9 @@ public class RestConversations implements Conversations {
     private ServiceResponse<PagedMembersResult> getConversationPagedMembersDelegate(
         Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory().<PagedMembersResult, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<PagedMembersResult>() { }.getType())
+        return client.restClient().responseBuilderFactory()
+            .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

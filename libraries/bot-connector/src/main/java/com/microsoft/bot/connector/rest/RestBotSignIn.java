@@ -45,7 +45,7 @@ public class RestBotSignIn implements BotSignIn {
      * The interface defining all the services for BotSignIns to be
      * used by Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings("checkstyle:linelength")
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface BotSignInsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl" })
         @GET("api/botsignin/GetSignInUrl")

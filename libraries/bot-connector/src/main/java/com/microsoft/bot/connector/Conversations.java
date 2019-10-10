@@ -10,8 +10,15 @@
 
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.schema.*;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.AttachmentData;
+import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.ConversationParameters;
+import com.microsoft.bot.schema.ConversationResourceResponse;
+import com.microsoft.bot.schema.ConversationsResult;
+import com.microsoft.bot.schema.PagedMembersResult;
+import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.Transcript;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -168,7 +175,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param activityId activityId to delete
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if successful.
      */
     CompletableFuture<Void> deleteActivity(String conversationId, String activityId);
 
@@ -193,7 +200,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param memberId ID of the member to delete from this conversation
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceResponse} object if successful.
+     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if successful.
      */
     CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId);
 
