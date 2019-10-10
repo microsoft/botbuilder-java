@@ -17,12 +17,16 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
         super(appId, password);
     }
 
+    /**
+     * An empty set of credentials.
+     * @return An empty Gov credentials.
+     */
     public static MicrosoftGovernmentAppCredentials empty() {
         return new MicrosoftGovernmentAppCredentials(null, null);
     }
 
     /**
-     * Gets the OAuth endpoint to use.
+     * Gets the Gov OAuth endpoint to use.
      *
      * @return The OAuth endpoint to use.
      */
@@ -32,7 +36,7 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
     }
 
     /**
-     * Gets the OAuth scope to use.
+     * Gets the Gov OAuth scope to use.
      *
      * @return The OAuth scope to use.
      */

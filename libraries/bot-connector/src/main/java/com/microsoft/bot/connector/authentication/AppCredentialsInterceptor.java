@@ -28,12 +28,18 @@ public class AppCredentialsInterceptor implements Interceptor {
         this.credentials = credentials;
     }
 
+    /**
+     * Apply the credentials to the HTTP request.
+     * @param chain The Okhttp3 Interceptor Chain.
+     * @return The modified Response.
+     * @throws IOException via Chain or failure to get token.
+     */
     @Override
     public Response intercept(Chain chain) throws IOException {
-        if (MicrosoftAppCredentials.isTrustedServiceUrl(chain.request().url().url().toString())) {
+        if (credentials.shouldSetToken(chain.request().url().url().toString())) {
             String token;
             try {
-                token = this.credentials.getToken().get().accessToken();
+                token = credentials.getToken().get();
             } catch (Throwable t) {
                 throw new IOException(t);
             }

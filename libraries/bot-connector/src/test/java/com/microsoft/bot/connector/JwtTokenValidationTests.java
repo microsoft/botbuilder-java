@@ -20,11 +20,11 @@ public class JwtTokenValidationTests {
     private static final String APPPASSWORD = "2.30Vs3VQLKt974F";
 
     private static String getHeaderToken() {
-        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().join().accessToken());
+        return String.format("Bearer %s", new MicrosoftAppCredentials(APPID, APPPASSWORD).getToken().join());
     }
 
     private static String getGovHeaderToken() {
-        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join().accessToken());
+        return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join());
     }
 
     @Test

@@ -70,8 +70,7 @@ public class OAuthTestBase extends TestBase {
 
         if (this.clientId != null && this.clientSecret != null) {
             MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(this.clientId, this.clientSecret);
-
-            this.token = credentials.getToken().get().accessToken();
+            this.token = credentials.getToken().join();
         } else {
             this.token = null;
         }

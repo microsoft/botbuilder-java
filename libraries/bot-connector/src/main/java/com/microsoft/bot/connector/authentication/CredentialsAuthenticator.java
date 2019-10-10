@@ -9,15 +9,25 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * An Authenticator using app id and password.
+ */
 public class CredentialsAuthenticator implements Authenticator {
     private ConfidentialClientApplication app;
-    ClientCredentialParameters parameters;
+    private ClientCredentialParameters parameters;
 
-    public CredentialsAuthenticator(
-        MicrosoftAppCredentials credentials, OAuthConfiguration configuration) throws MalformedURLException {
+    /**
+     * Constructs an Authenticator using appId and appPassword.
+     * @param appId The app id.
+     * @param appPassword The app password.
+     * @param configuration The OAuthConfiguration.
+     * @throws MalformedURLException Invalid endpoint.
+     */
+    CredentialsAuthenticator(
+        String appId, String appPassword, OAuthConfiguration configuration) throws MalformedURLException {
 
         app = ConfidentialClientApplication.builder(
-            credentials.getAppId(), ClientCredentialFactory.create(credentials.getAppPassword()))
+            appId, ClientCredentialFactory.create(appPassword))
             .authority(configuration.getAuthority())
             .build();
 
@@ -26,6 +36,10 @@ public class CredentialsAuthenticator implements Authenticator {
             .build();
     }
 
+    /**
+     * Gets an auth result via MSAL.
+     * @return The auth result.
+     */
     @Override
     public CompletableFuture<IAuthenticationResult> acquireToken() {
         return app.acquireToken(parameters)
