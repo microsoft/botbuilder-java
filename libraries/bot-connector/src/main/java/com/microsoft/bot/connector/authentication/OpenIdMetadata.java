@@ -55,7 +55,7 @@ class OpenIdMetadata {
     public OpenIdMetadataKey getKey(String keyId) {
         synchronized (sync) {
             // If keys are more than 5 days old, refresh them
-            if (this.lastUpdated < Duration.ofDays(CACHE_DAYS).toMillis()) {
+            if (lastUpdated < System.currentTimeMillis() - Duration.ofDays(CACHE_DAYS).toMillis()) {
                 refreshCache();
             }
 
@@ -77,8 +77,10 @@ class OpenIdMetadata {
             keyCache = provider.getAll().stream().collect(Collectors.toMap(Jwk::getId, jwk -> jwk));
         } catch (IOException e) {
             LOGGER.error(String.format("Failed to load openID config: %s", e.getMessage()));
+            lastUpdated = 0;
         } catch (SigningKeyNotFoundException keyexception) {
             LOGGER.error("refreshCache", keyexception);
+            lastUpdated = 0;
         }
     }
 
