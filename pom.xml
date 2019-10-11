@@ -368,7 +368,7 @@
     <module>libraries/bot-azure</module>
 
     <module>samples/servlet-echo</module>
-    <module>samples/spring-echo</module>
+    <module>samples/02.echo-bot</module>
   </modules>
 
   <build>
@@ -422,8 +422,8 @@
             <configLocation>./etc/bot-checkstyle.xml</configLocation>
             <encoding>UTF-8</encoding>
             <consoleOutput>false</consoleOutput>
-            <failsOnError>false</failsOnError>
-            <failOnViolation>false</failOnViolation>
+            <failsOnError>true</failsOnError>
+            <failOnViolation>true</failOnViolation>
             <linkXRef>false</linkXRef>
           </configuration>
           <executions>

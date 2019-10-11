@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.bot.sample</groupId>
-    <artifactId>bot-spring-echo</artifactId>
+    <artifactId>bot-echo</artifactId>
     <version>sample</version>
     <packaging>jar</packaging>
 
@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <start-class>com.microsoft.bot.sample.spring.Application</start-class>
+        <start-class>com.microsoft.bot.sample.echo.Application</start-class>
         <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url>
     </properties>
 
@@ -157,7 +157,7 @@
                               <goal>repackage</goal>
                           </goals>
                           <configuration>
-                              <mainClass>com.microsoft.bot.sample.spring.Application</mainClass>
+                              <mainClass>com.microsoft.bot.sample.echo.Application</mainClass>
                           </configuration>
                       </execution>
                   </executions>

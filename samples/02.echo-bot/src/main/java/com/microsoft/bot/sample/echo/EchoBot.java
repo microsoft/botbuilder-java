@@ -1,4 +1,4 @@
-package com.microsoft.bot.sample.spring;
+package com.microsoft.bot.sample.echo;
 
 import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.microsoft.bot.builder.ActivityHandler;

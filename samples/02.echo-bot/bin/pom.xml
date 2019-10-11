@@ -23,7 +23,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    <start-class>com.microsoft.bot.sample.spring.Application</start-class>
+    <start-class>com.microsoft.bot.sample.echo.Application</start-class>
   </properties>
 
   <dependencies>
@@ -109,7 +109,7 @@
               <goal>repackage</goal>
             </goals>
             <configuration>
-              <mainClass>com.microsoft.bot.sample.spring.Application</mainClass>
+              <mainClass>com.microsoft.bot.sample.echo.Application</mainClass>
             </configuration>
           </execution>
         </executions>

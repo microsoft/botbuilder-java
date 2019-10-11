@@ -1,6 +1,8 @@
 # Spring Boot EchoBot
 
-This demonstrates how to create a Bot using the Bot Framework 4 SDK Preview for Java in Azure.
+Bot Framework v4 echo bot sample.
+
+This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a simple bot that accepts input from the user and echoes it back.
 
 This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven plugin to deploy to Azure.
 
