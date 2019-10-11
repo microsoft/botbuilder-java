@@ -31,35 +31,35 @@ public interface ConnectorClient extends AutoCloseable {
     String getUserAgent();
 
     /**
-     * Gets Gets or sets the preferred language for the response..
+     * Gets the preferred language for the response..
      *
      * @return the acceptLanguage value.
      */
     String getAcceptLanguage();
 
     /**
-     * Sets Gets or sets the preferred language for the response..
+     * Sets the preferred language for the response..
      *
      * @param acceptLanguage the acceptLanguage value.
      */
     void setAcceptLanguage(String acceptLanguage);
 
     /**
-     * Gets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30..
+     * Gets the retry timeout in seconds for Long Running Operations. Default value is 30..
      *
-     * @return the longRunningOperationRetryTimeout value.
+     * @return the timeout value.
      */
     int getLongRunningOperationRetryTimeout();
 
     /**
-     * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30..
+     * Sets the retry timeout in seconds for Long Running Operations. Default value is 30.
      *
-     * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
+     * @param timeout the longRunningOperationRetryTimeout value.
      */
-    void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout);
+    void setLongRunningOperationRetryTimeout(int timeout);
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
      * is true.
      *
      * @return the generateClientRequestId value.
@@ -67,7 +67,7 @@ public interface ConnectorClient extends AutoCloseable {
     boolean getGenerateClientRequestId();
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
      * Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.

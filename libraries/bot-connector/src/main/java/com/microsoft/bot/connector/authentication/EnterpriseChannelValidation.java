@@ -9,7 +9,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
-public class EnterpriseChannelValidation {
+/**
+ * Enterprise channel auth validation.
+ */
+public final class EnterpriseChannelValidation {
     private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
         this.validateIssuer = true;
         this.validIssuers = new ArrayList<String>() {{
@@ -17,17 +20,21 @@ public class EnterpriseChannelValidation {
         }};
         this.validateAudience = false;
         this.validateLifetime = true;
-        this.clockSkew = Duration.ofMinutes(5);
+        this.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
         this.requireSignedTokens = true;
     }};
 
+    private EnterpriseChannelValidation() {
+
+    }
+
     /**
      * Validate the incoming Auth Header as a token sent from a Bot Framework Channel Service.
-     * A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      *
      * @param authHeader      The raw HTTP header in the format: "Bearer [longString]".
      * @param credentials     The user defined set of valid credentials, such as the AppId.
      * @param channelProvider The channelService value that distinguishes public Azure from US Government Azure.
+     * @param serviceUrl      The service url from the request.
      * @param channelId       The ID of the channel to validate.
      * @return A valid ClaimsIdentity.
      *
@@ -46,11 +53,11 @@ public class EnterpriseChannelValidation {
 
     /**
      * Validate the incoming Auth Header as a token sent from a Bot Framework Channel Service.
-     * A token issued by the Bot Framework will FAIL this check. Only Emulator tokens will pass.
      *
      * @param authHeader      The raw HTTP header in the format: "Bearer [longString]".
      * @param credentials     The user defined set of valid credentials, such as the AppId.
      * @param channelProvider The channelService value that distinguishes public Azure from US Government Azure.
+     * @param serviceUrl      The service url from the request.
      * @param channelId       The ID of the channel to validate.
      * @param authConfig      The authentication configuration.
      * @return A valid ClaimsIdentity.
@@ -76,7 +83,7 @@ public class EnterpriseChannelValidation {
                     TOKENVALIDATIONPARAMETERS,
                     String.format(AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT,
                         channelService),
-                    AuthenticationConstants.AllowedSigningAlgorithms);
+                    AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
                 return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements());
             })
@@ -91,6 +98,18 @@ public class EnterpriseChannelValidation {
             });
     }
 
+    /**
+     * Validates a {@link ClaimsIdentity}.
+     *
+     * @param identity The ClaimsIdentity to validate.
+     * @param credentials     The user defined set of valid credentials, such as the AppId.
+     * @param serviceUrl      The service url from the request.
+     * @return A valid ClaimsIdentity.
+     *
+     * On join:
+     * @throws AuthenticationException A token issued by the Bot Framework will FAIL this check. Only Emulator tokens
+     * will pass.
+     */
     public static CompletableFuture<ClaimsIdentity> validateIdentity(ClaimsIdentity identity,
                                                                      CredentialProvider credentials,
                                                                      String serviceUrl) {
@@ -104,7 +123,10 @@ public class EnterpriseChannelValidation {
             return result;
         }
 
-        if (!StringUtils.equalsIgnoreCase(identity.getIssuer(), AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+        if (!StringUtils.equalsIgnoreCase(
+            identity.getIssuer(),
+            AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+
             result.completeExceptionally(new AuthenticationException("Wrong Issuer"));
             return result;
         }

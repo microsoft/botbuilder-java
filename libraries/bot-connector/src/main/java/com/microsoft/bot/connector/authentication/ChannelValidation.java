@@ -9,11 +9,18 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
-public class ChannelValidation {
+/**
+ * Channel auth validator.
+ */
+public final class ChannelValidation {
     private static String openIdMetaDataUrl = AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL;
 
+    private ChannelValidation() {
+
+    }
+
     /**
-     * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot
+     * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot.
      */
     public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
             this.validateIssuer = true;
@@ -22,14 +29,22 @@ public class ChannelValidation {
             }};
             this.validateAudience = false;
             this.validateLifetime = true;
-            this.clockSkew = Duration.ofMinutes(5);
+            this.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
             this.requireSignedTokens = true;
         }};
 
+    /**
+     * Gets the OpenID metadata URL.
+     * @return The url.
+     */
     public static String getOpenIdMetaDataUrl() {
         return openIdMetaDataUrl;
     }
 
+    /**
+     * Sets the OpenID metadata URL.
+     * @param withOpenIdMetaDataUrl The metadata url.
+     */
     public static void setOpenIdMetaDataUrl(String withOpenIdMetaDataUrl) {
         openIdMetaDataUrl = withOpenIdMetaDataUrl;
     }
@@ -67,7 +82,7 @@ public class ChannelValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             getOpenIdMetaDataUrl(),
-            AuthenticationConstants.AllowedSigningAlgorithms);
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
         return tokenExtractor.getIdentity(authHeader, channelId)
             .thenCompose(identity -> {

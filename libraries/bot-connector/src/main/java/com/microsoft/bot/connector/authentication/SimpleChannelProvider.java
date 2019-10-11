@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A ChannelProvider with in-memory values.
+ */
 public class SimpleChannelProvider implements ChannelProvider {
     private String channelService;
 
@@ -20,24 +23,36 @@ public class SimpleChannelProvider implements ChannelProvider {
     /**
      * Creates a SimpleChannelProvider with the specified ChannelService.
      *
-     * @param channelService The ChannelService to use. Null or empty strings represent Public Azure,
-     *                       the string 'https://botframework.us' represents US Government Azure, and
-     *                       other values are for private channels.
+     * @param withChannelService The ChannelService to use. Null or empty strings represent Public Azure,
+     *                           the string 'https://botframework.us' represents US Government Azure, and
+     *                           other values are for private channels.
      */
-    public SimpleChannelProvider(String channelService) {
-        this.channelService = channelService;
+    public SimpleChannelProvider(String withChannelService) {
+        this.channelService = withChannelService;
     }
 
+    /**
+     * Returns the channel service value.
+     * @return The channel service.
+     */
     @Override
     public CompletableFuture<String> getChannelService() {
         return CompletableFuture.completedFuture(channelService);
     }
 
+    /**
+     * Indicates whether this is a Gov channel provider.
+     * @return True if Gov.
+     */
     @Override
     public boolean isGovernment() {
         return GovernmentAuthenticationConstants.CHANNELSERVICE.equalsIgnoreCase(channelService);
     }
 
+    /**
+     * Indicates whether this is public Azure.
+     * @return True if pubic Azure.
+     */
     @Override
     public boolean isPublicAzure() {
         return StringUtils.isEmpty(channelService);

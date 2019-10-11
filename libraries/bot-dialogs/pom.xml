@@ -98,6 +98,26 @@
               <check/>
             </configuration>
           </plugin>
+
+          <!-- disable code checks until this package is more complete -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <configuration>
+              <analysisCache>true</analysisCache>
+              <excludes>
+                <exclude>com/microsoft/bot/dialogs/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <excludes>com/microsoft/bot/dialogs/**</excludes>
+            </configuration>
+          </plugin>
+
         </plugins>
       </build>
     </profile>

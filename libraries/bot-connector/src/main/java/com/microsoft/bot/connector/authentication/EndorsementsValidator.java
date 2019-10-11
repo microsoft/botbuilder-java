@@ -7,29 +7,39 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
+/**
+ * Verify that the specified endorsement exists on the JWT token.
+ */
 public abstract class EndorsementsValidator {
     /**
-     * Verify that the set of ChannelIds, which come from the incoming activities,
-     * all match the endorsements found on the JWT Token.
-     * For example, if an Activity comes from webchat, that channelId says
-     * says "webchat" and the jwt token endorsement MUST match that.
+     * Verify that the specified endorsement exists on the JWT token. Call this method multiple times
+     * to validate multiple endorsements.
      *
-     * @param channelId    The channel name, typically extracted from the activity.ChannelId field, that
-     *                     to which the Activity is affinitized.
-     * @param endorsements Whoever signed the JWT token is permitted to send activities only for
-     *                     some specific channels. That list is the endorsement list, and is validated here against
-     *                     the channelId.
-     * @return True is the channelId is found in the Endorsement set. False if the channelId is not found.
+     * <p>For example, if an {@link com.microsoft.bot.schema.Activity} comes from WebChat, that activity's
+     * {@link com.microsoft.bot.schema.Activity#getChannelId()} property is set to "webchat" and the signing party
+     * of the JWT token must have a corresponding endorsement of “Webchat”.</p>
+     *
+     * @param expectedEndorsement The expected endorsement. Generally the ID of the channel to validate, typically
+     *                            extracted from the activity's {@link com.microsoft.bot.schema.Activity#getChannelId()}
+     *                            property, that to which the Activity is affinitized. Alternatively, it could represent
+     *                            a compliance certification that is required.
+     * @param endorsements        The JWT token’s signing party is permitted to send activities only for specific
+     *                            channels. That list, the set of channels the service can sign for, is called the
+     *                            endorsement list. The activity’s Schema.Activity.ChannelId MUST be found in the
+     *                            endorsement list, or the incoming activity is not considered valid.
+     * @return True is the expected endorsement is found in the Endorsement set.
      */
-    public static boolean validate(String channelId, List<String> endorsements) {
+    public static boolean validate(String expectedEndorsement, List<String> endorsements) {
 
         // If the Activity came in and doesn't have a Channel ID then it's making no
         // assertions as to who endorses it. This means it should pass.
-        if (StringUtils.isEmpty(channelId))
+        if (StringUtils.isEmpty(expectedEndorsement)) {
             return true;
+        }
 
-        if (endorsements == null)
+        if (endorsements == null) {
             throw new IllegalArgumentException("endorsements must be present.");
+        }
 
         // The Call path to get here is:
         // JwtTokenValidation.authenticateRequest
@@ -40,7 +50,7 @@ public abstract class EndorsementsValidator {
         //       ->
         //          JwtTokenExtractor
 
-        // Does the set of endorsements match the channelId that was passed in?
-        return endorsements.contains(channelId);
+        // Does the set of endorsements match the expected endorsement that was passed in?
+        return endorsements.contains(expectedEndorsement);
     }
 }

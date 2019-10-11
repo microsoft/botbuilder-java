@@ -24,8 +24,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class JwtTokenExtractor {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenIdMetadata.class);
-
-    private static final ConcurrentMap<String, OpenIdMetadata> openIdMetadataCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, OpenIdMetadata> OPENID_METADATA_CACHE = new ConcurrentHashMap<>();
 
     private TokenValidationParameters tokenValidationParameters;
     private List<String> allowedSigningAlgorithms;
@@ -34,24 +33,38 @@ public class JwtTokenExtractor {
     /**
      * Initializes a new instance of the JwtTokenExtractor class.
      *
-     * @param tokenValidationParameters tokenValidationParameters.
-     * @param metadataUrl metadataUrl.
-     * @param allowedSigningAlgorithms allowedSigningAlgorithms.
+     * @param withTokenValidationParameters tokenValidationParameters.
+     * @param withMetadataUrl metadataUrl.
+     * @param withAllowedSigningAlgorithms allowedSigningAlgorithms.
      */
-    public JwtTokenExtractor(TokenValidationParameters tokenValidationParameters,
-                             String metadataUrl,
-                             List<String> allowedSigningAlgorithms) {
+    public JwtTokenExtractor(TokenValidationParameters withTokenValidationParameters,
+                             String withMetadataUrl,
+                             List<String> withAllowedSigningAlgorithms) {
 
-        this.tokenValidationParameters = new TokenValidationParameters(tokenValidationParameters);
+        this.tokenValidationParameters = new TokenValidationParameters(withTokenValidationParameters);
         this.tokenValidationParameters.requireSignedTokens = true;
-        this.allowedSigningAlgorithms = allowedSigningAlgorithms;
-        this.openIdMetadata = openIdMetadataCache.computeIfAbsent(metadataUrl, key -> new OpenIdMetadata(metadataUrl));
+        this.allowedSigningAlgorithms = withAllowedSigningAlgorithms;
+        this.openIdMetadata = OPENID_METADATA_CACHE.computeIfAbsent(withMetadataUrl,
+            key -> new OpenIdMetadata(withMetadataUrl));
     }
 
+    /**
+     * Get a ClaimsIdentity from an auth header and channel id.
+     * @param authorizationHeader The Authorization header value.
+     * @param channelId The channel id.
+     * @return A ClaimsIdentity if successful.
+     */
     public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader, String channelId) {
         return getIdentity(authorizationHeader, channelId, new ArrayList<>());
     }
 
+    /**
+     * Get a ClaimsIdentity from an auth header and channel id.
+     * @param authorizationHeader The Authorization header value.
+     * @param channelId The channel id.
+     * @param requiredEndorsements A list of endorsements that are required.
+     * @return A ClaimsIdentity if successful.
+     */
     public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader,
                                                          String channelId,
                                                          List<String> requiredEndorsements) {
@@ -67,6 +80,14 @@ public class JwtTokenExtractor {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Get a ClaimsIdentity from a schema, token and channel id.
+     * @param schema The schema.
+     * @param token The token.
+     * @param channelId The channel id.
+     * @param requiredEndorsements A list of endorsements that are required.
+     * @return A ClaimsIdentity if successful.
+     */
     public CompletableFuture<ClaimsIdentity> getIdentity(String schema,
                                                          String token,
                                                          String channelId,

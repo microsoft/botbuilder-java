@@ -11,14 +11,19 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Contains helper methods for authenticating incoming HTTP requests.
  */
-public class JwtTokenValidation {
+public final class JwtTokenValidation {
+    private JwtTokenValidation() {
+
+    }
 
     /**
-     * Validates the security tokens required by the Bot Framework Protocol. Throws on any exceptions.
+     * Authenticates the request and add's the activity's {@link Activity#getServiceUrl()}
+     * to the set of trusted URLs.
      *
      * @param activity    The incoming Activity from the Bot Framework or the Emulator
      * @param authHeader  The Bearer token included as part of the request
-     * @param credentials The set of valid credentials, such as the Bot Application ID
+     * @param credentials The bot's credential provider.
+     * @param channelProvider The bot's channel service provider.
      * @return A task that represents the work queued to execute.
      * @throws AuthenticationException Throws on auth failed.
      */
@@ -31,12 +36,14 @@ public class JwtTokenValidation {
     }
 
     /**
-     * Validates the security tokens required by the Bot Framework Protocol. Throws on any exceptions.
+     * Authenticates the request and add's the activity's {@link Activity#getServiceUrl()}
+     * to the set of trusted URLs.
      *
      * @param activity    The incoming Activity from the Bot Framework or the Emulator
      * @param authHeader  The Bearer token included as part of the request
-     * @param credentials The set of valid credentials, such as the Bot Application ID
-     * @param authConfig  The authentication configuration.
+     * @param credentials The bot's credential provider.
+     * @param channelProvider The bot's channel service provider.
+     * @param authConfig The optional authentication configuration.
      * @return A task that represents the work queued to execute.
      * @throws AuthenticationException Throws on auth failed.
      */

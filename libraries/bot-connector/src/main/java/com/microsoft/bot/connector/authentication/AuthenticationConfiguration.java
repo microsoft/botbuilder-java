@@ -10,6 +10,10 @@ import java.util.List;
  * General configuration settings for authentication.
  */
 public class AuthenticationConfiguration {
+    /**
+     * Required endorsements for auth.
+     * @return A List of endorsements.
+     */
     public List<String> requiredEndorsements() {
         return new ArrayList<String>();
     }

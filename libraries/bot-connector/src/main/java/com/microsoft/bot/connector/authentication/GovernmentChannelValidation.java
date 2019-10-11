@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting to a bot.
+ * Government Channel auth validation.
  */
-public class GovernmentChannelValidation {
+public final class GovernmentChannelValidation {
     private static String openIdMetaDataUrl = GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL;
 
+    /**
+     * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting to a bot.
+     */
     private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS = new TokenValidationParameters() {{
         this.validateIssuer = true;
         this.validIssuers = new ArrayList<String>() {{
@@ -22,14 +25,26 @@ public class GovernmentChannelValidation {
         }};
         this.validateAudience = false;
         this.validateLifetime = true;
-        this.clockSkew = Duration.ofMinutes(5);
+        this.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
         this.requireSignedTokens = true;
     }};
 
+    private GovernmentChannelValidation() {
+
+    }
+
+    /**
+     * Gets the OpenID metadata URL.
+     * @return The url.
+     */
     public static String getOpenIdMetaDataUrl() {
         return openIdMetaDataUrl;
     }
 
+    /**
+     * Sets the OpenID metadata URL.
+     * @param withOpenIdMetaDataUrl The metadata url.
+     */
     public static void setOpenIdMetaDataUrl(String withOpenIdMetaDataUrl) {
         openIdMetaDataUrl = withOpenIdMetaDataUrl;
     }
@@ -74,7 +89,7 @@ public class GovernmentChannelValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             getOpenIdMetaDataUrl(),
-            AuthenticationConstants.AllowedSigningAlgorithms);
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
         return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
             .thenCompose(identity -> validateIdentity(identity, credentials, serviceUrl));
@@ -102,7 +117,10 @@ public class GovernmentChannelValidation {
             return result;
         }
 
-        if (!StringUtils.equalsIgnoreCase(identity.getIssuer(), GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+        if (!StringUtils.equalsIgnoreCase(
+            identity.getIssuer(),
+            GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER)) {
+
             result.completeExceptionally(new AuthenticationException("Wrong Issuer"));
             return result;
         }

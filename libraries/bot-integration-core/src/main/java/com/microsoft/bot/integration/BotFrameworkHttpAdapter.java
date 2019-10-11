@@ -14,7 +14,18 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A BotFrameworkAdapter that receives incoming Activities via HTTP.
+ */
 public class BotFrameworkHttpAdapter extends BotFrameworkAdapter {
+    /**
+     * Construct with a Configuration.  This will create a CredentialProvider and
+     * ChannelProvider based on configuration values.
+     *
+     * @param withConfiguration The Configuration to use.
+     *
+     * @see ClasspathPropertiesConfiguration
+     */
     public BotFrameworkHttpAdapter(Configuration withConfiguration) {
         super(
             new ConfigurationCredentialProvider(withConfiguration),
@@ -31,6 +42,12 @@ public class BotFrameworkHttpAdapter extends BotFrameworkAdapter {
         }
     }
 
+    /**
+     * Constructs with CredentialProvider and ChannelProvider.
+     *
+     * @param withCredentialProvider The CredentialProvider to use.
+     * @param withChannelProvider The ChannelProvider to use.
+     */
     public BotFrameworkHttpAdapter(CredentialProvider withCredentialProvider,
                                    ChannelProvider withChannelProvider) {
         super(
@@ -41,8 +58,16 @@ public class BotFrameworkHttpAdapter extends BotFrameworkAdapter {
         );
     }
 
+    /**
+     * Processes an incoming Activity.
+     *
+     * @param authHeader The Authorization header from the http request.
+     * @param activity The received Activity.
+     * @param bot A Bot.
+     * @return A CompletableFuture.
+     */
     public CompletableFuture<Void> processIncomingActivity(String authHeader, Activity activity, Bot bot) {
-        return processActivity(authHeader, activity, turnContext -> bot.onTurn(turnContext))
+        return processActivity(authHeader, activity, bot::onTurn)
             .thenApply(invokeResponse -> null);
     }
 }

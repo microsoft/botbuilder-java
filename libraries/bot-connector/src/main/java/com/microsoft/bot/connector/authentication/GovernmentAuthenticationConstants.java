@@ -7,7 +7,11 @@ package com.microsoft.bot.connector.authentication;
  * Values and Constants used for Authentication and Authorization by the Bot Framework Protocol
  * to US Government DataCenters.
  */
-public class GovernmentAuthenticationConstants {
+public final class GovernmentAuthenticationConstants {
+    private GovernmentAuthenticationConstants() {
+
+    }
+
     public static final String CHANNELSERVICE = "https://botframework.azure.us";
 
     /**

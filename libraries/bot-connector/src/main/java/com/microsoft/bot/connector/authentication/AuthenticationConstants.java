@@ -6,7 +6,14 @@ package com.microsoft.bot.connector.authentication;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Values and Constants used for Authentication and Authorization by the Bot Framework Protocol.
+ */
 public final class AuthenticationConstants {
+    private AuthenticationConstants() {
+
+    }
+
     /**
      * TO CHANNEL FROM BOT: Login URL.
      */
@@ -52,7 +59,7 @@ public final class AuthenticationConstants {
      * Allowed token signing algorithms. Tokens come from channels to the bot. The code
      * that uses this also supports tokens coming from the emulator.
      */
-    public static final List<String> AllowedSigningAlgorithms = new ArrayList<>();
+    public static final List<String> ALLOWED_SIGNING_ALGORITHMS = new ArrayList<>();
 
     /**
      * Application Setting Key for the OAuthUrl value.
@@ -132,9 +139,14 @@ public final class AuthenticationConstants {
      */
     public static final String APPID_CLAIM = "appid";
 
+    /**
+     * The default clock skew in minutes.
+     */
+    public static final int DEFAULT_CLOCKSKEW_MINUTES = 5;
+
     static {
-        AllowedSigningAlgorithms.add("RS256");
-        AllowedSigningAlgorithms.add("RS384");
-        AllowedSigningAlgorithms.add("RS512");
+        ALLOWED_SIGNING_ALGORITHMS.add("RS256");
+        ALLOWED_SIGNING_ALGORITHMS.add("RS384");
+        ALLOWED_SIGNING_ALGORITHMS.add("RS512");
     }
 }

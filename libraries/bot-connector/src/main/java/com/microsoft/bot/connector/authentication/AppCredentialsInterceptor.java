@@ -22,10 +22,10 @@ public class AppCredentialsInterceptor implements Interceptor {
      * Initialize a TokenCredentialsFilter class with a
      * TokenCredentials credential.
      *
-     * @param credentials a TokenCredentials instance
+     * @param withCredentials a TokenCredentials instance
      */
-    public AppCredentialsInterceptor(AppCredentials credentials) {
-        this.credentials = credentials;
+    public AppCredentialsInterceptor(AppCredentials withCredentials) {
+        credentials = withCredentials;
     }
 
     /**

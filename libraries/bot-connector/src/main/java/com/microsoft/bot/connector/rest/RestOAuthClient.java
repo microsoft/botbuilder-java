@@ -7,6 +7,9 @@ import com.microsoft.bot.connector.UserToken;
 import com.microsoft.bot.rest.RestClient;
 import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 
+/**
+ * Rest OAuth client.
+ */
 public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
     /**
      * The BotSignIns object to access its operations.
@@ -57,6 +60,9 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
         return userToken;
     }
 
+    /**
+     * Post construction initialization.
+     */
     protected void initialize() {
         botSignIn = new RestBotSignIn(restClient().retrofit(), this);
         userToken = new RestUserToken(restClient().retrofit(), this);

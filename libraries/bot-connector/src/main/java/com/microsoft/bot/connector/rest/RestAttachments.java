@@ -37,12 +37,12 @@ public class RestAttachments implements Attachments {
     /**
      * Initializes an instance of AttachmentsImpl.
      *
-     * @param retrofit the Retrofit instance built from a Retrofit Builder.
-     * @param client the instance of the service client containing this operation class.
+     * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
+     * @param withClient the instance of the service client containing this operation class.
      */
-    RestAttachments(Retrofit retrofit, RestConnectorClient client) {
-        this.service = retrofit.create(AttachmentsService.class);
-        this.client = client;
+    RestAttachments(Retrofit withRetrofit, RestConnectorClient withClient) {
+        this.service = withRetrofit.create(AttachmentsService.class);
+        this.client = withClient;
     }
 
     /**

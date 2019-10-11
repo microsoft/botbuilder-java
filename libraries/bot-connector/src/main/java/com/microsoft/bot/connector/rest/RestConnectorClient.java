@@ -39,6 +39,8 @@ import retrofit2.Retrofit;
  * Authentication](/en-us/restapi/authentication) document.
  */
 public class RestConnectorClient extends AzureServiceClient implements ConnectorClient {
+    private static final int RETRY_TIMEOUT = 30;
+
     /**
      * Initializes an instance of ConnectorClient client.
      *
@@ -69,9 +71,12 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         initialize();
     }
 
+    /**
+     * Initialize the object post-construction.
+     */
     protected void initialize() {
         this.acceptLanguage = "en-US";
-        this.longRunningOperationRetryTimeout = 30;
+        this.longRunningOperationRetryTimeout = RETRY_TIMEOUT;
         this.generateClientRequestId = true;
         this.attachments = new RestAttachments(restClient().retrofit(), this);
         this.conversations = new RestConversations(restClient().retrofit(), this);
@@ -80,6 +85,10 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         //this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
     }
 
+    /**
+     * Gets the REST client.
+     * @return the {@link RestClient} object.
+     */
     @Override
     public RestClient getRestClient() {
         return super.restClient();
@@ -90,7 +99,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     private String userAgentString;
 
     /**
-     * @see ConnectorClient#getAcceptLanguage()
+     * Gets the preferred language for the response..
+     * @return the acceptLanguage value.
      */
     @Override
     public String getAcceptLanguage() {
@@ -98,20 +108,28 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * @see ConnectorClient#setAcceptLanguage(String)
+     * Sets the preferred language for the response..
+     * @param withAcceptLanguage the acceptLanguage value.
      */
     @Override
-    public void setAcceptLanguage(String acceptLanguage) {
-        this.acceptLanguage = acceptLanguage;
+    public void setAcceptLanguage(String withAcceptLanguage) {
+        this.acceptLanguage = withAcceptLanguage;
     }
 
-    /**
-     * RetryStrategy as defined in Microsoft Rest Retry
-     */
     private RetryStrategy retryStrategy = null;
+
+    /**
+     * Sets the Rest retry strategy.
+     * @param strategy The {@link RetryStrategy} to use.
+     */
     public void setRestRetryStrategy(RetryStrategy strategy) {
         this.retryStrategy = strategy;
     }
+
+    /**
+     * Gets the Rest retry strategy.
+     * @return The {@link RetryStrategy} being used.
+     */
     public RetryStrategy getRestRetryStrategy() {
         return this.retryStrategy;
     }
@@ -120,9 +138,9 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     private int longRunningOperationRetryTimeout;
 
     /**
-     * Gets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Gets the retry timeout in seconds for Long Running Operations. Default value is 30.
      *
-     * @return the longRunningOperationRetryTimeout value.
+     * @return the timeout value.
      */
     @Override
     public int getLongRunningOperationRetryTimeout() {
@@ -130,7 +148,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Sets the retry timeout in seconds for Long Running Operations. Default value is 30.
      *
      * @param timeout the longRunningOperationRetryTimeout value.
      */
@@ -143,7 +161,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     private boolean generateClientRequestId;
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @return the generateClientRequestId value.
      */
@@ -153,7 +171,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
      *
      * @param requestId the generateClientRequestId value.
      */
@@ -201,7 +219,10 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         return this.userAgentString;
     }
 
-    // this is to override the AzureServiceClient version
+    /**
+     * This is to override the AzureServiceClient version.
+     * @return The user agent.  Same as {@link #getUserAgent()}
+     */
     @Override
     public String userAgent() {
         return getUserAgent();
@@ -215,11 +236,11 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
      * One use case of this is for supplying a Proxy to the RestClient.  Though it is
      * recommended to set proxy information via the Java system properties.
      *
-     * @param baseUrl
-     * @param credentials
-     * @return
+     * @param baseUrl Service endpoint
+     * @param credentials auth credentials.
+     * @return A RestClient.Builder.
      */
-    public static RestClient.Builder getDefaultRestClientBuilder(String baseUrl, ServiceClientCredentials credentials){
+    public static RestClient.Builder getDefaultRestClientBuilder(String baseUrl, ServiceClientCredentials credentials) {
         return new RestClient.Builder(new OkHttpClient.Builder(), new Retrofit.Builder())
                 .withBaseUrl(baseUrl)
                 .withCredentials(credentials)
@@ -229,10 +250,9 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * AutoDisposable close.
-     * @throws Exception By nothing now.
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
 
     }
 }

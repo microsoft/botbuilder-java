@@ -42,12 +42,12 @@ public class RestUserToken implements UserToken {
     /**
      * Initializes an instance of UserTokensImpl.
      *
-     * @param retrofit the Retrofit instance built from a Retrofit Builder.
-     * @param client the instance of the service client containing this operation class.
+     * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
+     * @param withClient the instance of the service client containing this operation class.
      */
-    public RestUserToken(Retrofit retrofit, RestOAuthClient client) {
-        this.service = retrofit.create(UserTokensService.class);
-        this.client = client;
+    public RestUserToken(Retrofit withRetrofit, RestOAuthClient withClient) {
+        this.service = withRetrofit.create(UserTokensService.class);
+        this.client = withClient;
     }
 
     /**

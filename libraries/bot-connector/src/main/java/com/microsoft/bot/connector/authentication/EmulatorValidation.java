@@ -12,9 +12,13 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Validates and Examines JWT tokens from the Bot Framework Emulator
+ * Validates and Examines JWT tokens from the Bot Framework Emulator.
  */
-public class EmulatorValidation {
+public final class EmulatorValidation {
+    private EmulatorValidation() {
+
+    }
+
     /**
      * TO BOT FROM EMULATOR: Token validation parameters when connecting to a channel.
      */
@@ -30,12 +34,12 @@ public class EmulatorValidation {
         }};
         this.validateAudience = false;
         this.validateLifetime = true;
-        this.clockSkew = Duration.ofMinutes(5);
+        this.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
         this.requireSignedTokens = true;
     }};
 
     /**
-     * Determines if a given Auth header is from the Bot Framework Emulator
+     * Determines if a given Auth header is from the Bot Framework Emulator.
      *
      * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
      * @return True, if the token was issued by the Emulator. Otherwise, false.
@@ -96,7 +100,8 @@ public class EmulatorValidation {
      */
     public static CompletableFuture<ClaimsIdentity> authenticateToken(
         String authHeader, CredentialProvider credentials, ChannelProvider channelProvider, String channelId) {
-        return authenticateToken(authHeader, credentials, channelProvider, channelId, new AuthenticationConfiguration());
+        return authenticateToken(
+            authHeader, credentials, channelProvider, channelId, new AuthenticationConfiguration());
     }
 
     /**
@@ -126,13 +131,7 @@ public class EmulatorValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
             TOKENVALIDATIONPARAMETERS,
             openIdMetadataUrl,
-            AuthenticationConstants.AllowedSigningAlgorithms);
-
-        class AuthState {
-            private ClaimsIdentity identity;
-            private String appId;
-            private boolean isValid;
-        }
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
         return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
             .thenCompose(identity -> {
@@ -155,10 +154,8 @@ public class EmulatorValidation {
                         AuthenticationConstants.VERSION_CLAIM));
                 }
 
-                AuthState state = new AuthState();
-                state.identity = identity;
-
                 String tokenVersion = identity.claims().get(AuthenticationConstants.VERSION_CLAIM);
+                String appId;
 
                 // The Emulator, depending on Version, sends the AppId via either the
                 // appid claim (Version 1) or the Authorized Party claim (Version 2).
@@ -172,7 +169,7 @@ public class EmulatorValidation {
                                 AuthenticationConstants.APPID_CLAIM));
                     }
 
-                    state.appId = identity.claims().get(AuthenticationConstants.APPID_CLAIM);
+                    appId = identity.claims().get(AuthenticationConstants.APPID_CLAIM);
                 } else if (tokenVersion.equalsIgnoreCase("2.0")) {
                     // Emulator, "2.0" puts the AppId in the "azp" claim.
                     if (!identity.claims().containsKey(AuthenticationConstants.AUTHORIZED_PARTY)) {
@@ -182,25 +179,22 @@ public class EmulatorValidation {
                                 AuthenticationConstants.AUTHORIZED_PARTY));
                     }
 
-                    state.appId = identity.claims().get(AuthenticationConstants.AUTHORIZED_PARTY);
+                    appId = identity.claims().get(AuthenticationConstants.AUTHORIZED_PARTY);
                 } else {
                     // Unknown Version. Not Authorized.
                     throw new AuthenticationException(
                         String.format("Unknown Emulator Token version '%s'.", tokenVersion));
                 }
 
-                return credentials.isValidAppId(state.appId).thenApply(isValid -> {
-                    state.isValid = isValid;
-                    return state;
-                });
-            })
-            .thenApply(state -> {
-                if (!state.isValid) {
-                    throw new AuthenticationException(
-                        String.format("Invalid AppId passed on token: '%s'.", state.appId));
-                }
+                return credentials.isValidAppId(appId)
+                    .thenApply(isValid -> {
+                        if (!isValid) {
+                            throw new AuthenticationException(
+                                String.format("Invalid AppId passed on token: '%s'.", appId));
+                        }
 
-                return state.identity;
+                        return identity;
+                    });
             });
     }
 }

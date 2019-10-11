@@ -7,6 +7,13 @@ package com.microsoft.bot.connector.authentication;
 import com.microsoft.aad.msal4j.IAuthenticationResult;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A provider of tokens.
+ */
 public interface Authenticator {
+    /**
+     * Returns a token.
+     * @return The MSAL token result.
+     */
     CompletableFuture<IAuthenticationResult> acquireToken();
 }

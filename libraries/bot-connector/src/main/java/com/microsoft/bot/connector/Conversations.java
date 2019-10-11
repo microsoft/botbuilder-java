@@ -135,6 +135,16 @@ public interface Conversations {
      */
     CompletableFuture<ResourceResponse> updateActivity(String conversationId, String activityId, Activity activity);
 
+    /**
+     * UpdateActivity.
+     * Edit an existing activity.
+     * Some channels allow you to edit an existing activity to reflect the new state of a bot conversation.
+     * For example, you can remove buttons after someone has clicked "Approve" button.
+     *
+     * @param activity replacement Activity
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ResourceResponse object
+     */
     default CompletableFuture<ResourceResponse> updateActivity(Activity activity) {
         return updateActivity(activity.getConversation().getId(), activity.getId(), activity);
     }
@@ -143,7 +153,7 @@ public interface Conversations {
      * ReplyToActivity.
      * This method allows you to reply to an activity.
      * This is slightly different from SendToConversation().
-     * SendToConverstion(conversationId) - will append the activity to the end of the conversation according to the
+     * SendToConversation(conversationId) - will append the activity to the end of the conversation according to the
      * timestamp or semantics of the channel.
      * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel
      * supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
@@ -158,9 +168,24 @@ public interface Conversations {
      */
     CompletableFuture<ResourceResponse> replyToActivity(String conversationId, String activityId, Activity activity);
 
+    /**
+     * ReplyToActivity.
+     * This method allows you to reply to an activity.
+     * This is slightly different from SendToConversation().
+     * SendToConversation(conversationId) - will append the activity to the end of the conversation according to the
+     * timestamp or semantics of the channel.
+     * ReplyToActivity(conversationId,ActivityId) - adds the activity as a reply to another activity, if the channel
+     * supports it. If the channel does not support nested replies, ReplyToActivity falls back to SendToConversation.
+     * Use ReplyToActivity when replying to a specific activity in the conversation.
+     * Use SendToConversation in all other cases.
+     *
+     * @param activity Activity to send
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ResourceResponse object
+     */
     default CompletableFuture<ResourceResponse> replyToActivity(Activity activity) {
         if (StringUtils.isEmpty(activity.getReplyToId())) {
-            throw new IllegalArgumentException("ReplyToId cannot be emoty");
+            throw new IllegalArgumentException("ReplyToId cannot be empty");
         }
 
         return replyToActivity(activity.getConversation().getId(), activity.getReplyToId(), activity);

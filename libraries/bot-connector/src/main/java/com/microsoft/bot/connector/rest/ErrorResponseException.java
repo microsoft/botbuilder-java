@@ -6,7 +6,8 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.bot.rest.RestException;import com.microsoft.bot.schema.ErrorResponse;
+import com.microsoft.bot.rest.RestException;
+import com.microsoft.bot.schema.ErrorResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -31,10 +32,16 @@ public class ErrorResponseException extends RestException {
      * @param response the HTTP response
      * @param body the deserialized response body
      */
-    public ErrorResponseException(final String message, final Response<ResponseBody> response, final ErrorResponse body) {
+    public ErrorResponseException(final String message,
+                                  final Response<ResponseBody> response,
+                                  final ErrorResponse body) {
         super(message, response, body);
     }
 
+    /**
+     * The HTTP response body.
+     * @return the HTTP response body
+     */
     @Override
     public ErrorResponse body() {
         return (ErrorResponse) super.body();

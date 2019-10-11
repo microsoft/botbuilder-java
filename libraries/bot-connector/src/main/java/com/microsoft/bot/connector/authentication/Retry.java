@@ -12,7 +12,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class Retry {
+/**
+ * Will retry a call for a configurable number of times with backoff.
+ *
+ * @see RetryParams
+ */
+public final class Retry {
+    private Retry() {
+
+    }
+
+    /**
+     * Runs a task with retry.
+     * @param task The task to run.
+     * @param retryExceptionHandler Called when an exception happens.
+     * @param <TResult> The type of the result.
+     * @return A CompletableFuture that is complete when 'task' returns successfully.
+     * @throws RetryException If the task doesn't complete successfully.
+     */
     public static <TResult> CompletableFuture<TResult> run(
         Supplier<CompletableFuture<TResult>> task,
         BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler) {
@@ -48,8 +65,9 @@ public class Retry {
         return result;
     }
 
+    private static final double BACKOFF_MULTIPLIER = 1.1;
     private static long withBackoff(long delay, int retryCount) {
-        double result = delay * Math.pow(1.1, retryCount - 1);
+        double result = delay * Math.pow(BACKOFF_MULTIPLIER, retryCount - 1);
         return (long) Math.min(result, Long.MAX_VALUE);
     }
 }

@@ -12,6 +12,7 @@ import com.microsoft.bot.connector.BotSignIn;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.rest.ServiceResponse;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
@@ -33,12 +34,12 @@ public class RestBotSignIn implements BotSignIn {
     /**
      * Initializes an instance of BotSignInsImpl.
      *
-     * @param retrofit the Retrofit instance built from a Retrofit Builder.
-     * @param client the instance of the service client containing this operation class.
+     * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
+     * @param withClient the instance of the service client containing this operation class.
      */
-    public RestBotSignIn(Retrofit retrofit, RestOAuthClient client) {
-        this.service = retrofit.create(BotSignInsService.class);
-        this.client = client;
+    public RestBotSignIn(Retrofit withRetrofit, RestOAuthClient withClient) {
+        this.service = withRetrofit.create(BotSignInsService.class);
+        this.client = withClient;
     }
 
     /**
@@ -108,8 +109,9 @@ public class RestBotSignIn implements BotSignIn {
     private ServiceResponse<String> getSignInUrlDelegate(Response<ResponseBody> response)
         throws CloudException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory().<String, CloudException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<String>() { }.getType())
+        return client.restClient()
+            .responseBuilderFactory().<String, CloudException>newInstance(client.serializerAdapter())
+                .register(HttpURLConnection.HTTP_OK, new TypeToken<String>() { }.getType())
                 .registerError(CloudException.class)
                 .build(response);
     }
