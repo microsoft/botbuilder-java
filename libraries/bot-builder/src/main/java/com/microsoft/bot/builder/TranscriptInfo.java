@@ -9,19 +9,16 @@ import java.time.OffsetDateTime;
  * Represents a copy of a conversation.
  */
 public class TranscriptInfo {
-    /**
-     * channelId that the transcript was taken from.
-     */
     private String channelId;
-    /**
-     * Conversation id.
-     */
     private String id;
-    /**
-     * Date conversation was started.
-     */
     private OffsetDateTime created;
 
+    /**
+     * Constructor.
+     * @param withId The conversation id.
+     * @param withChannelId The channel id.
+     * @param withCreated Created timestamp.
+     */
     public TranscriptInfo(String withId, String withChannelId, OffsetDateTime withCreated) {
         id = withId;
         channelId = withChannelId;

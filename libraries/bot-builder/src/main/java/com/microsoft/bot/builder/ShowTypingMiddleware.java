@@ -20,6 +20,9 @@ import java.util.concurrent.CompletableFuture;
  * will continue to be sent until your bot sends another message back to the user.
  */
 public class ShowTypingMiddleware implements Middleware {
+    private static final int DEFAULT_DELAY = 500;
+    private static final int DEFAULT_PERIOD = 2000;
+
     /**
      * Initial delay before sending first typing indicator. Defaults to 500ms.
      */
@@ -30,8 +33,11 @@ public class ShowTypingMiddleware implements Middleware {
      */
     private long period;
 
+    /**
+     * Constructs with default delay and period.
+     */
     public ShowTypingMiddleware() {
-        this(500, 2000);
+        this(DEFAULT_DELAY, DEFAULT_PERIOD);
     }
 
     /**

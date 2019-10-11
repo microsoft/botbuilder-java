@@ -30,7 +30,7 @@ public class MentionTests {
         // Normalize the Skype mention so that it is in a format RemoveMentionText can handle.
         // If SkypeMentionNormalizeMiddleware is added to the adapters Middleware set, this
         // will be called on every Skype message.
-        SkypeMentionNormalizeMiddleware.normalizeSkypMentionText(activity);
+        SkypeMentionNormalizeMiddleware.normalizeSkypeMentionText(activity);
 
         // This will remove the Mention.Text from the activity.getText().  This should just leave before/after the
         // mention.

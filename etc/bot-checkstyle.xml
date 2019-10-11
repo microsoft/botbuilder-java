@@ -87,6 +87,7 @@
 
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder" />
+        <module name="SuppressionCommentFilter"/>
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html -->

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * A method that can participate in send activity events for the current turn.
+ */
 @FunctionalInterface
 public interface SendActivitiesHandler {
     /**

@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class UserState extends BotState {
     /**
-     * Creates a new {@link UserState{TState}} object.
+     * Creates a new {@link UserState} object.
      *
      * @param withStorage  The storage provider to use.
      */
@@ -19,6 +19,11 @@ public class UserState extends BotState {
         super(withStorage, UserState.class.getSimpleName());
     }
 
+    /**
+     * Gets the user key to use when reading and writing state to and from storage.
+     * @param turnContext The context object for this turn.
+     * @return The key for the channel and sender.
+     */
     @Override
     public String getStorageKey(TurnContext turnContext) {
         if (turnContext.getActivity() == null) {
@@ -34,7 +39,7 @@ public class UserState extends BotState {
             throw new IllegalArgumentException("invalid activity-missing From.Id");
         }
 
-        // {channelId}/users/{conversationId}
+        // {channelId}/users/{fromId}
         return turnContext.getActivity().getChannelId()
             + "/users/"
             + turnContext.getActivity().getFrom().getId();

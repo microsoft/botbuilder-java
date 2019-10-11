@@ -7,6 +7,9 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
+/**
+ * A no-op telemetry client.
+ */
 public class NullBotTelemetryClient implements BotTelemetryClient {
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Override

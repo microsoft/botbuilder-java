@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * OAuth provider.
+ */
 public interface UserTokenProvider {
     /**
      * Attempts to retrieve the token for a user that's in a login flow.

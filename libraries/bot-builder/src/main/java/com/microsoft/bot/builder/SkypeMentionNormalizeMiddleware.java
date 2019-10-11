@@ -24,7 +24,12 @@ import java.util.concurrent.CompletableFuture;
  * This will remove the &lt;at&gt; nodes, leaving just the name.
  */
 public class SkypeMentionNormalizeMiddleware implements Middleware {
-    public static void normalizeSkypMentionText(Activity activity) {
+    /**
+     * Fixes incorrect Skype mention text.  This will change the text
+     * value for all Skype mention entities.
+     * @param activity The Activity to correct.
+     */
+    public static void normalizeSkypeMentionText(Activity activity) {
         if (StringUtils.equals(activity.getChannelId(), Channels.SKYPE)
             && StringUtils.equals(activity.getType(), ActivityTypes.MESSAGE)) {
 
@@ -48,7 +53,7 @@ public class SkypeMentionNormalizeMiddleware implements Middleware {
     }
 
     /**
-     * Middleware implementation which corrects Enity.Mention.Text to a value RemoveMentionText can work with.
+     * Middleware implementation which corrects Entity.Mention.Text to a value RemoveMentionText can work with.
      *
      * @param context The context object for this turn.
      * @param next    The delegate to call to continue the bot middleware pipeline.
@@ -56,7 +61,7 @@ public class SkypeMentionNormalizeMiddleware implements Middleware {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
-        normalizeSkypMentionText(context.getActivity());
+        normalizeSkypeMentionText(context.getActivity());
         return next.next();
     }
 }

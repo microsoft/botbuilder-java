@@ -9,6 +9,9 @@ import com.microsoft.bot.schema.ResourceResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * A method that can participate in update activity events for the current turn.
+ */
 @FunctionalInterface
 public interface UpdateActivityHandler {
     /**

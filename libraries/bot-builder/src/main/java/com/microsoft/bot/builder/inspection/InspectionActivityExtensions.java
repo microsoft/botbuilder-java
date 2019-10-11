@@ -1,3 +1,4 @@
+// CHECKSTYLE:OFF
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
@@ -7,6 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
 
+/**
+ * Helper class for the inspection middleware.
+ */
 final class InspectionActivityExtensions {
     private InspectionActivityExtensions() {
 

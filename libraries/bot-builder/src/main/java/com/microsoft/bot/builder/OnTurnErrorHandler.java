@@ -2,10 +2,13 @@ package com.microsoft.bot.builder;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Error handler that can catch exceptions in the middleware or application.
+ */
 @FunctionalInterface
 public interface OnTurnErrorHandler {
     /**
-     * Gets or sets an error handler that can catch exceptions in the middleware or application.
+     * Error handler that can catch exceptions in the middleware or application.
      *
      * @param turnContext The context object for this turn.
      * @param exception   The exception thrown.
