@@ -1,6 +1,6 @@
-# Suggested actions
+# Spring Boot EchoBot
 
-This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to use suggested actions.  Suggested actions enable your bot to present buttons that the user can tap to provide input.
+This demonstrates how to create a Bot using the Bot Framework 4 SDK Preview for Java in Azure.
 
 This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven plugin to deploy to Azure.
 
@@ -13,7 +13,7 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 ## To try this sample locally
 - From the root of this project folder:
   - Build the sample using `mvn package`
-  - Run it by using `java -jar .\target\bot-sugestedactions-sample.jar`
+  - Run it by using `java -jar .\target\springechobot-sample.jar`
 
 - Test the bot using Bot Framework Emulator
 
