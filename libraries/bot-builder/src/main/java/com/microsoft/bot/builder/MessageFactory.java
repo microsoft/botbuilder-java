@@ -172,6 +172,16 @@ public final class MessageFactory {
      * Returns a message activity that contains an attachment.
      *
      * @param attachment Attachment to include in the message.
+     * @return A message activity containing the attachment.
+     */
+    public static Activity attachment(Attachment attachment) {
+        return attachment(attachment, null, null, null);
+    }
+
+    /**
+     * Returns a message activity that contains an attachment.
+     *
+     * @param attachment Attachment to include in the message.
      * @param text       Optional, the text of the message to send.
      * @return A message activity containing the attachment.
      */

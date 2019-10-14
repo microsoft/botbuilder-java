@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,9 @@ import java.util.List;
  * A thumbnail card (card with a single, small thumbnail image).
  */
 public class ThumbnailCard {
+    @JsonIgnore
+    public static final String CONTENTTYPE = "application/vnd.microsoft.card.thumbnail";
+
     @JsonProperty(value = "title")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
@@ -142,5 +146,16 @@ public class ThumbnailCard {
      */
     public void setTap(CardAction withTap) {
         this.tap = withTap;
+    }
+
+    /**
+     * Creates an @{link Attachment} for this card.
+     * @return An Attachment object containing the card.
+     */
+    public Attachment toAttachment() {
+        return new Attachment() {{
+            setContent(ThumbnailCard.this);
+            setContentType(CONTENTTYPE);
+        }};
     }
 }

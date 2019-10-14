@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,9 @@ import java.util.List;
  * Audio card.
  */
 public class AudioCard {
+    @JsonIgnore
+    public static final String CONTENTTYPE = "application/vnd.microsoft.card.audio";
+
     /**
      * Title of this card.
      */
@@ -313,5 +317,16 @@ public class AudioCard {
      */
     public void setValue(Object withValue) {
         this.value = withValue;
+    }
+
+    /**
+     * Creates an @{link Attachment} for this card.
+     * @return An Attachment object containing the card.
+     */
+    public Attachment toAttachment() {
+        return new Attachment() {{
+            setContent(AudioCard.this);
+            setContentType(CONTENTTYPE);
+        }};
     }
 }

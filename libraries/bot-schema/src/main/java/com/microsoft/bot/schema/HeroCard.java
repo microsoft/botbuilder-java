@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,9 @@ import java.util.List;
  * A Hero card (card with a single, large image).
  */
 public class HeroCard {
+    @JsonIgnore
+    public static final String CONTENTTYPE = "application/vnd.microsoft.card.hero";
+
     /**
      * Title of the card.
      */
@@ -160,5 +164,16 @@ public class HeroCard {
      */
     public void setTap(CardAction withTap) {
         this.tap = withTap;
+    }
+
+    /**
+     * Creates an @{link Attachment} for this card.
+     * @return An Attachment object containing the card.
+     */
+    public Attachment toAttachment() {
+        return new Attachment() {{
+           setContent(HeroCard.this);
+           setContentType(CONTENTTYPE);
+        }};
     }
 }

@@ -8,6 +8,7 @@ import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -152,6 +153,15 @@ public interface TurnContext {
      * @return A task that represents the work queued to execute.
      */
     CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities);
+
+    /**
+     * Helper method to send an array of Activities.  This calls {@link #sendActivities(List)}.
+     * @param activities The array of activities.
+     * @return A task that represents the work queued to execute.
+     */
+    default CompletableFuture<ResourceResponse[]> sendActivities(Activity... activities) {
+        return sendActivities(Arrays.asList(activities));
+    }
 
     /**
      * Replaces an existing activity.

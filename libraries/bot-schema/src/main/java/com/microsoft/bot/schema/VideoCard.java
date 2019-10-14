@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,9 @@ import java.util.List;
  * Video card.
  */
 public class VideoCard {
+    @JsonIgnore
+    public static final String CONTENTTYPE = "application/vnd.microsoft.card.video";
+
     @JsonProperty(value = "title")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String title;
@@ -254,5 +258,16 @@ public class VideoCard {
      */
     public void setValue(Object withValue) {
         this.value = withValue;
+    }
+
+    /**
+     * Creates an @{link Attachment} for this card.
+     * @return An Attachment object containing the card.
+     */
+    public Attachment toAttachment() {
+        return new Attachment() {{
+            setContent(VideoCard.this);
+            setContentType(CONTENTTYPE);
+        }};
     }
 }

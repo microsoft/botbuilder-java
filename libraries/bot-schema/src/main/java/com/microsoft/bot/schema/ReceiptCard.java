@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,9 @@ import java.util.List;
  * A receipt card.
  */
 public class ReceiptCard {
+    @JsonIgnore
+    public static final String CONTENTTYPE = "application/vnd.microsoft.card.receipt";
+
     /**
      * Title of the card.
      */
@@ -210,5 +214,16 @@ public class ReceiptCard {
      */
     public void setButtons(List<CardAction> withButtons) {
         this.buttons = withButtons;
+    }
+
+    /**
+     * Creates an @{link Attachment} for this card.
+     * @return An Attachment object containing the card.
+     */
+    public Attachment toAttachment() {
+        return new Attachment() {{
+            setContent(ReceiptCard.this);
+            setContentType(CONTENTTYPE);
+        }};
     }
 }
