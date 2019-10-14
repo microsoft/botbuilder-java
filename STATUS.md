@@ -27,11 +27,11 @@ The current release is **Preview 2**.
 | Package                         | Status        
 | -------------                   |:-------------
 | 02.echo-bot                     | Preview 3
-| 03.welcome-user                 |
+| 03.welcome-user                 | Preview 3
 | 05.multi-turn-prompt            |
 | 06.using-cards                  |
 | 07.using-adaptive-cards         |
-| 08.suggested-actions            |
+| 08.suggested-actions            | Preview 3
 | 11.qnamaker                     |
 | 13.core-bot                     |
 | 14.nlp-with-dispatch            |

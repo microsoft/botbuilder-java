@@ -370,6 +370,7 @@
     <module>samples/servlet-echo</module>
     <module>samples/02.echo-bot</module>
     <module>samples/03.welcome-user</module>
+    <module>samples/08.suggested-actions</module>
     <module>samples/45.state-management</module>
   </modules>
 
