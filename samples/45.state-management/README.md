@@ -1,6 +1,9 @@
-# EchoBot
+# Save user and conversation data
 
-This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a simple bot that accepts input from the user and echoes it back.
+This bot has been created using [Bot Framework](https://dev.botframework.com), 
+that demonstrates how to save user and conversation data in a bot.
+The bot maintains conversation state to track and direct the conversation and ask the user questions.
+The bot maintains user state to track the user's answers.
 
 This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven plugin to deploy to Azure.
 
@@ -13,7 +16,7 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 ## To try this sample locally
 - From the root of this project folder:
   - Build the sample using `mvn package`
-  - Run it by using `java -jar .\target\bot-echo-sample.jar`
+  - Run it by using `java -jar .\target\bot-statemanagement-sample.jar`
 
 - Test the bot using Bot Framework Emulator
 
@@ -54,10 +57,10 @@ Record the `appid` from the returned JSON
 Replace the values for `<appid>`, `<appsecret>`, `<botname>`, and `<groupname>` in the following commands:
 
 #### To a new Resource Group
-`az deployment create --name "echoBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters groupName="<groupname>" botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
+`az deployment create --name "stateBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters groupName="<groupname>" botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
 
 #### To an existing Resource Group
-`az group deployment create --name "echoBotDeploy" --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
+`az group deployment create --name "stateBotDeploy" --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
 
 ### 5. Update the pom.xml
 In pom.xml update the following nodes under azure-webapp-maven-plugin

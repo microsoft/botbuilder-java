@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.echo;
+package com.microsoft.bot.sample.statemanagement;
 
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * This class also provides overrides for dependency injections.  A class that extends the
  * {@link com.microsoft.bot.builder.Bot} interface should be annotated with @Component.
  *
- * @see EchoBot
+ * @see StateManagementBot
  */
 @SpringBootApplication
 public class Application extends BotDependencyConfiguration {
