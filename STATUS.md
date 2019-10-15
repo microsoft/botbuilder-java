@@ -36,7 +36,7 @@ The current release is **Preview 2**.
 | 13.core-bot                     |
 | 14.nlp-with-dispatch            |
 | 15.handling-attachments         |
-| 16.proactive-messages           |
+| 16.proactive-messages           | Preview 3
 | 17.multilingual-bot             |
 | 18.bot-authentication           |
 | 19.custom-dialogs               |
@@ -49,7 +49,7 @@ The current release is **Preview 2**.
 | 44.prompt-users-for-input       |
 | 45.state-management             | Preview 3
 | 46.teams-auth                   |
-| 47.inspection                   |
+| 47.inspection                   | Preview 3
 | 48.qnamaker-active-learning-bot |
 | servlet-echo                    | Preview 2
 

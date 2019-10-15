@@ -373,6 +373,7 @@
     <module>samples/08.suggested-actions</module>
     <module>samples/16.proactive-messages</module>
     <module>samples/45.state-management</module>
+    <module>samples/47.inspection</module>
   </modules>
 
   <build>

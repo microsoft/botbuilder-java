@@ -27,6 +27,20 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+## Linting rules
+
+This project uses linting rules to enforce code standardization. These rules are specified in the file [bot-checkstyle.xml](./etc/bot-checkstyle.xml) with [CheckStyle](https://checkstyle.org/) and are hooked to Maven's build cycle.
+
+**INFO**: Since the CheckStyle plugin is hook to the build cycle, this makes the build **fail** in case there are linting warnings in the project files so be sure to check that the code doesn't break any rule.
+
+CheckStyle is available in different flavours:
+- [Visual Studio Code plugin](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
+- [IntelliJ IDEA plugin](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea)
+- [Eclipse plugin](https://checkstyle.org/eclipse-cs)
+- [CLI Tool](https://checkstyle.org/cmdline.html)
+
+**INFO**: Be sure to configure your IDE to use the file [bot-checkstyle.xml](./etc/bot-checkstyle.xml) instead of the default rules.
+
 ## Reporting Security Issues
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security
