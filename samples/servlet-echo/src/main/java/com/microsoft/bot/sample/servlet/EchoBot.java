@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.sample.servlet;
 
 import com.codepoetics.protonpack.collectors.CompletableFutures;
@@ -17,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
  * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
  * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
  * to new conversation participants.</p>
+ *
+ * @see BotController
  */
 public class EchoBot extends ActivityHandler {
     @Override
