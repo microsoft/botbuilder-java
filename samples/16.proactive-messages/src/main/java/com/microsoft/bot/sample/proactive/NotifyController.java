@@ -18,6 +18,10 @@ import java.util.UUID;
 /**
  * This controller will receive GET requests at /api/notify and send a message
  * to all ConversationReferences.
+ *
+ * @see ConversationReferences
+ * @see ProactiveBot
+ * @see Application
  */
 @RestController
 public class NotifyController {
@@ -25,7 +29,7 @@ public class NotifyController {
      * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
      * injection via the constructor.
      *
-     * See DefaultDependencyConfiguration#getBotFrameworkHttpAdaptor(Configuration).
+     * @see com.microsoft.bot.integration.spring.BotDependencyConfiguration
      */
     private final BotFrameworkHttpAdapter adapter;
 

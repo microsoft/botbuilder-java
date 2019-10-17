@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Map of ConversationReference object the bot handling.
+ *
+ * @see NotifyController
+ * @see ProactiveBot
  */
 public class ConversationReferences extends ConcurrentHashMap<String, ConversationReference> {
 }

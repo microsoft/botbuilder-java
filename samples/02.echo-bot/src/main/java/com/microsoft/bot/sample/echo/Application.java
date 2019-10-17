@@ -6,8 +6,11 @@ package com.microsoft.bot.sample.echo;
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
+import com.microsoft.bot.integration.spring.BotController;
+import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
 
 /**
  * This is the starting point of the Sprint Boot Bot application.
@@ -18,6 +21,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @see EchoBot
  */
 @SpringBootApplication
+
+// Use the default BotController to receive incoming Channel messages. A custom controller
+// could be used by eliminating this import and creating a new RestController.  The default
+// controller is created by the Spring Boot container using dependency injection.  The
+// default route is /api/messages.
+@Import({BotController.class})
+
 public class Application extends BotDependencyConfiguration {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

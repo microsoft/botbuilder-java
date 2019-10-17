@@ -11,6 +11,7 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationReference;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,7 +28,10 @@ import java.util.concurrent.CompletableFuture;
  */
 @Component
 public class ProactiveBot extends ActivityHandler {
-    private static final String WELCOMEMESSAGE = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:{port}/api/notify to proactively message everyone who has previously messaged this bot.";
+    @Value("${server.port}")
+    private int port;
+
+    private static final String WELCOMEMESSAGE = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:%d/api/notify to proactively message everyone who has previously messaged this bot.";
 
     private ConversationReferences conversationReferences;
 
@@ -48,7 +52,7 @@ public class ProactiveBot extends ActivityHandler {
     protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
         return membersAdded.stream()
             .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(MessageFactory.text(WELCOMEMESSAGE)))
+            .map(channel -> turnContext.sendActivity(MessageFactory.text(String.format(WELCOMEMESSAGE, port))))
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);
     }

@@ -118,7 +118,7 @@ public class StateManagementBot extends ActivityHandler {
                 List<Activity> sendToUser = new ArrayList<>();
 
                 sendToUser.add(MessageFactory.text(
-                    userProfile.getName() + "sent: " + turnContext.getActivity().getText()));
+                    userProfile.getName() + " sent: " + turnContext.getActivity().getText()));
 
                 sendToUser.add(MessageFactory.text(
                     userProfile.getName() + " message received at: " + conversationData.getTimestamp()));

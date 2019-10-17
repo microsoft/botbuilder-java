@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.statemanagement;
+package com.microsoft.bot.integration.spring;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.connector.authentication.AuthenticationException;
@@ -9,7 +9,6 @@ import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,10 +20,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
- * This is the controller that will receive incoming Channel Activity messages.
+ * This is the default controller that will receive incoming Channel Activity messages.
  *
- * <p>This class provides a route for the "/api/messages" path.  Additional routes
- * could be supplied.  For example, to handle proactive messages.</p>
+ * <p>This controller is suitable in most cases.  Bots that want to use this controller
+ * should do so by using the @Import({BotController.class}) annotation.  See any of the
+ * samples Application class for an example.</p>
  */
 @RestController
 public class BotController {
@@ -38,29 +38,26 @@ public class BotController {
     /**
      * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
      * injection via the constructor.
-     *
-     * See DefaultDependencyConfiguration#getBotFrameworkHttpAdaptor(Configuration).
      */
     private final BotFrameworkHttpAdapter adapter;
 
     /**
      * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
      * injection via the constructor.
-     *
-     * See DefaultDependencyConfiguration#getBot.
      */
     private final Bot bot;
 
     /**
-     * Autowires Spring to use this constructor for creation.
+     * Spring will use this constructor for creation.
      *
-     * See DefaultDependencyConfiguration#getBotFrameworkHttpAdaptor(Configuration).
-     * See DefaultDependencyConfiguration#getBot.
+     * <p>The Bot application should define class that implements {@link Bot} and
+     * annotate it with @Component.</p>
+     *
+     * @see BotDependencyConfiguration
      *
      * @param withAdapter  The BotFrameworkHttpAdapter to use.
      * @param withBot The Bot to use.
      */
-    @Autowired
     public BotController(BotFrameworkHttpAdapter withAdapter, Bot withBot) {
         adapter = withAdapter;
         bot = withBot;

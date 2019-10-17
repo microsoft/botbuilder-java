@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.inspection;
+package com.microsoft.bot.integration.spring;
 
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.builder.inspection.InspectionState;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
@@ -14,7 +15,6 @@ import com.microsoft.bot.integration.ClasspathPropertiesConfiguration;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.integration.ConfigurationCredentialProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -46,9 +46,11 @@ public abstract class BotDependencyConfiguration {
      * By default, it uses the {@link ConfigurationCredentialProvider} class.
      * Default scope of Singleton.
      *
+     * @param configuration The Configuration object to read from.
      * @return A CredentialProvider object.
+     *
+     * @see #getConfiguration()
      */
-    @Autowired
     @Bean
     public CredentialProvider getCredentialProvider(Configuration configuration) {
         return new ConfigurationCredentialProvider(configuration);
@@ -60,9 +62,11 @@ public abstract class BotDependencyConfiguration {
      * By default, it uses the {@link ConfigurationChannelProvider} class.
      * Default scope of Singleton.
      *
+     * @param configuration The Configuration object to read from.
      * @return A ChannelProvider object.
+     *
+     * @see #getConfiguration()
      */
-    @Autowired
     @Bean
     public ChannelProvider getChannelProvider(Configuration configuration) {
         return new ConfigurationChannelProvider(configuration);
@@ -74,9 +78,11 @@ public abstract class BotDependencyConfiguration {
      * By default, it uses the {@link BotFrameworkHttpAdapter} class.
      * Default scope of Singleton.
      *
+     * @param configuration The Configuration object to read from.
      * @return A BotFrameworkHttpAdapter object.
+     *
+     * @see #getConfiguration()
      */
-    @Autowired
     @Bean
     public BotFrameworkHttpAdapter getBotFrameworkHttpAdaptor(Configuration configuration) {
         return new BotFrameworkHttpAdapter(configuration);
@@ -84,6 +90,8 @@ public abstract class BotDependencyConfiguration {
 
     /**
      * Returns a {@link Storage} object.
+     * Default scope of Singleton.
+     *
      * @return A Storage object.
      */
     @Bean
@@ -93,10 +101,11 @@ public abstract class BotDependencyConfiguration {
 
     /**
      * Returns a ConversationState object.
+     * Default scope of Singleton.
+     *
      * @param storage The Storage object to use.
      * @return A ConversationState object.
      */
-    @Autowired
     @Bean
     public ConversationState getConversationState(Storage storage) {
         return new ConversationState(storage);
@@ -104,12 +113,25 @@ public abstract class BotDependencyConfiguration {
 
     /**
      * Returns a UserState object.
+     * Default scope of Singleton.
+     *
      * @param storage The Storage object to use.
      * @return A UserState object.
      */
-    @Autowired
     @Bean
     public UserState getUserState(Storage storage) {
         return new UserState(storage);
+    }
+
+    /**
+     * Creates an InspectionState used by {@link com.microsoft.bot.builder.inspection.InspectionMiddleware}.
+     * Default scope of Singleton.
+     *
+     * @param storage The Storage to use. {@link BotDependencyConfiguration#getStorage()}
+     * @return An InspectionState object that uses the specified storage.
+     */
+    @Bean
+    public InspectionState getInspectionState(Storage storage) {
+        return new InspectionState(storage);
     }
 }

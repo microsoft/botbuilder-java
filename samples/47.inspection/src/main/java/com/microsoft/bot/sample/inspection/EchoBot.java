@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
  * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
  * to new conversation participants.</p>
  *
- * <p>See README.md for details on using the InspectionMiddleware output.</p>
+ * <p>See README.md for details on using the InspectionMiddleware.</p>
  */
 @Component
 public class EchoBot extends ActivityHandler {

@@ -366,6 +366,7 @@
     <module>libraries/bot-ai-qna</module>
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
+    <module>libraries/bot-integration-spring</module>
 
     <module>samples/servlet-echo</module>
     <module>samples/02.echo-bot</module>
