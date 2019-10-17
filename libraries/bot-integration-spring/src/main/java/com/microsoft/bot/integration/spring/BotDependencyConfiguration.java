@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.inspection.InspectionState;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
@@ -16,6 +17,8 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.integration.ConfigurationCredentialProvider;
 import org.springframework.context.annotation.Bean;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * This provides the default dependency creation for a Bot application.
@@ -27,6 +30,19 @@ import org.springframework.context.annotation.Bean;
  * constructor to use.</p>
  */
 public abstract class BotDependencyConfiguration {
+    /**
+     * Returns an ExecutorService.
+     *
+     * <p>For now, return the bot-connector ExecutorService.  This is an area of consideration.  The
+     * goal here is to have a common ExecutorService to avoid multiple thread pools.</p>
+     *
+     * @return An ExecutorService.
+     */
+    @Bean
+    public ExecutorService getExecutorService() {
+        return ExecutorFactory.getExecutor();
+    }
+
     /**
      * Returns the Configuration for the application.
      *
