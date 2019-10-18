@@ -6,13 +6,22 @@ package com.microsoft.bot.integration;
 import com.microsoft.bot.builder.ConversationState;
 
 import java.util.concurrent.CompletableFuture;
+
+import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Channels;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
 /**
  * An Adapter that provides exception handling.
  */
 public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
-    private static final String ERROR_MSG = "Bot Framework encountered an error";
+    private static final String ERROR_MSG_ONE = "The bot encountered an error or bug.";
+    private static final String ERROR_MSG_TWO = "To continue to run this bot, please fix the bot source code.";
 
     /**
      * Constructs an error handling BotFrameworkHttpAdapter by providing
@@ -28,8 +37,10 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
         setOnTurnError((turnContext, exception) -> {
                 LoggerFactory.getLogger(AdapterWithErrorHandler.class).error("onTurnError", exception);
-                return turnContext.sendActivity(ERROR_MSG + ": " + exception.getLocalizedMessage())
-                    .thenApply(resourceResponse -> null);
+
+                return turnContext
+                    .sendActivities(MessageFactory.text(ERROR_MSG_ONE), MessageFactory.text(ERROR_MSG_TWO))
+                    .thenCompose(resourceResponse -> sendTraceActivity(turnContext, exception));
             });
     }
 
@@ -48,7 +59,9 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
         setOnTurnError((turnContext, exception) -> {
             LoggerFactory.getLogger(AdapterWithErrorHandler.class).error("onTurnError", exception);
-            return turnContext.sendActivity(ERROR_MSG + ": " + exception.getLocalizedMessage())
+
+            return turnContext
+                .sendActivities(MessageFactory.text(ERROR_MSG_ONE), MessageFactory.text(ERROR_MSG_TWO))
                 .thenCompose(resourceResponse -> {
                     if (withConversationState != null) {
                         // Delete the conversationState for the current conversation to prevent the
@@ -62,7 +75,24 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
                             });
                     }
                     return CompletableFuture.completedFuture(null);
-                });
+                })
+                .thenCompose(stageResult -> sendTraceActivity(turnContext, exception));
         });
+    }
+
+    private CompletableFuture<Void> sendTraceActivity(TurnContext turnContext, Throwable exception) {
+        if (StringUtils.equals(turnContext.getActivity().getChannelId(), Channels.EMULATOR)) {
+            Activity traceActivity = new Activity(ActivityTypes.TRACE) {{
+                setLabel("TurnError");
+                setName("OnTurnError Trace");
+                setValue(ExceptionUtils.getStackTrace(exception));
+                setValueType("https://www.botframework.com/schemas/error");
+            }};
+
+            return turnContext.sendActivity(traceActivity)
+                .thenApply(resourceResponse -> null);
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 }
