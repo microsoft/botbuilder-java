@@ -62,7 +62,8 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
             return turnContext
                 .sendActivities(MessageFactory.text(ERROR_MSG_ONE), MessageFactory.text(ERROR_MSG_TWO))
-                .thenCompose(resourceResponse -> {
+                .thenCompose(resourceResponse -> sendTraceActivity(turnContext, exception))
+                .thenCompose(stageResult -> {
                     if (withConversationState != null) {
                         // Delete the conversationState for the current conversation to prevent the
                         // bot from getting stuck in a error-loop caused by being in a bad state.
@@ -75,8 +76,7 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
                             });
                     }
                     return CompletableFuture.completedFuture(null);
-                })
-                .thenCompose(stageResult -> sendTraceActivity(turnContext, exception));
+                });
         });
     }
 
