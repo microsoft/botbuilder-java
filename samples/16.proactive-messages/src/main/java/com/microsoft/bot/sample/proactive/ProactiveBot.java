@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Component
 public class ProactiveBot extends ActivityHandler {
-    @Value("${server.port}")
+    @Value("${server.port:8080}")
     private int port;
 
     private static final String WELCOMEMESSAGE = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:%d/api/notify to proactively message everyone who has previously messaged this bot.";
