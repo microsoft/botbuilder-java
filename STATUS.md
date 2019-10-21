@@ -1,6 +1,6 @@
 # Java Bot Framework
 
-The current release is **Preview 2**.
+The current release is **Preview 3**.
 
 ## Core Packages
 
