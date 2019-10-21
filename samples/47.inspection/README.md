@@ -47,7 +47,7 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 As described on [Deploy your bot](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-deploy-az-cli), you will perform the first 4 steps to setup the Azure app, then deploy the code using the azure-webapp Maven plugin.
 
 ### 1. Login to Azure
-From a command (or Powershell) prompt in the root of the bot folder, execute:  
+From a command (or PowerShell) prompt in the root of the bot folder, execute:  
 `az login`
   
 ### 2. Set the subscription
