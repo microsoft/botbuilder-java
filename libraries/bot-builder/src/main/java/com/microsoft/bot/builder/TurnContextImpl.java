@@ -361,7 +361,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(Activity withActivity) {
-        BotAssert.activityNotNull(activity);
+        BotAssert.activityNotNull(withActivity);
 
         ConversationReference conversationReference = activity.getConversationReference();
         withActivity.applyConversationReference(conversationReference);
