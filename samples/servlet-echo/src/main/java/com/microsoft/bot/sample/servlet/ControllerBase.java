@@ -82,22 +82,8 @@ public abstract class ControllerBase extends ServletWithBotConfiguration {
 
     // Creates an Activity object from the request
     private Activity getActivity(HttpServletRequest request) throws IOException {
-        String body = getRequestBody(request);
-        return objectMapper.readValue(body, Activity.class);
-    }
-
-    private String getRequestBody(HttpServletRequest request) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        try (InputStream stream = request.getInputStream()) {
-            int rByte;
-            while ((rByte = stream.read()) != -1) {
-                buffer.append((char) rByte);
-            }
-            stream.close();
-            if (buffer.length() > 0) {
-                return buffer.toString();
-            }
-            return "";
+        try(InputStream is = request.getInputStream()) {
+            return objectMapper.readValue(is, Activity.class);
         }
     }
 }
