@@ -82,25 +82,9 @@ public class App {
             }
         }
 
-        private String getRequestBody(HttpExchange httpExchange) throws IOException {
-            StringBuilder buffer = new StringBuilder();
-            InputStream stream = httpExchange.getRequestBody();
-            int rByte;
-            while ((rByte = stream.read()) != -1) {
-                buffer.append((char)rByte);
-            }
-            stream.close();
-            if (buffer.length() > 0) {
-                return URLDecoder.decode(buffer.toString(), "UTF-8");
-            }
-            return "";
-        }
-
         private Activity getActivity(HttpExchange httpExchange) {
-            try {
-                String body = getRequestBody(httpExchange);
-                LOGGER.log(Level.INFO, body);
-                return objectMapper.readValue(body, Activity.class);
+            try (InputStream is = httpExchange.getRequestBody()) {
+                return objectMapper.readValue(is, Activity.class);
             } catch (Exception ex) {
                 LOGGER.log(Level.WARNING, "Failed to get activity", ex);
                 return null;
