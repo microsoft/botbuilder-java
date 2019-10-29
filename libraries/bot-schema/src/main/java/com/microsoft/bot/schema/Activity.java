@@ -372,6 +372,12 @@ public class Activity {
             setExpiration(activity.getExpiration());
             setMembersAdded(ChannelAccount.cloneList(activity.getMembersAdded()));
             setMembersRemoved(ChannelAccount.cloneList(activity.getMembersRemoved()));
+            setTextFormat(activity.getTextFormat());
+            setAttachmentLayout(activity.getAttachmentLayout());
+            setTopicName(activity.getTopicName());
+            if (activity.getListenFor() != null) {
+                setListenFor(new ArrayList<>(activity.getListenFor()));
+            }
         }};
 
         for (Map.Entry<String, JsonNode> entry : activity.getProperties().entrySet()) {
