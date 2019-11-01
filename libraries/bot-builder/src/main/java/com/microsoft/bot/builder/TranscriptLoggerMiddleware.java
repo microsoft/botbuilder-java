@@ -4,8 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -22,17 +21,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * When added, this middleware will log incoming and outgoing activities to a TranscriptStore.
  */
 public class TranscriptLoggerMiddleware implements Middleware {
-    /**
-     * To/From JSON.
-     */
-    private static ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .findAndRegisterModules();
-    }
-
     /**
      * The TranscriptLogger to log to.
      */
@@ -78,7 +66,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             if (role == null || StringUtils.isBlank(role.asText())) {
-                context.getActivity().getFrom().getProperties().put("role", mapper.createObjectNode().with("user"));
+                context.getActivity().getFrom().getProperties().put("role", new TextNode("user"));
             }
 
             logActivity(Activity.clone(context.getActivity()));
