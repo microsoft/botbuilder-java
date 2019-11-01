@@ -4,8 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -23,25 +22,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TranscriptLoggerMiddleware implements Middleware {
     /**
-     * To/From JSON.
-     */
-    private static ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .findAndRegisterModules();
-    }
-
-    /**
      * The TranscriptLogger to log to.
      */
     private TranscriptLogger transcriptLogger;
-
-    /**
-     * Activity queue.
-     */
-    private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
     /**
      * Initializes a new instance of the <see cref="TranscriptLoggerMiddleware"/> class.
@@ -66,6 +49,8 @@ public class TranscriptLoggerMiddleware implements Middleware {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
+        Queue<Activity> transcript = new ConcurrentLinkedQueue<>();
+
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
             if (context.getActivity().getFrom() == null) {
@@ -78,10 +63,10 @@ public class TranscriptLoggerMiddleware implements Middleware {
             }
 
             if (role == null || StringUtils.isBlank(role.asText())) {
-                context.getActivity().getFrom().getProperties().put("role", mapper.createObjectNode().with("user"));
+                context.getActivity().getFrom().getProperties().put("role", new TextNode("user"));
             }
 
-            logActivity(Activity.clone(context.getActivity()));
+            logActivity(transcript, Activity.clone(context.getActivity()));
         }
 
         // hook up onSend pipeline
@@ -90,7 +75,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             return nextSend.get()
                 .thenApply(responses -> {
                     for (Activity activity : activities) {
-                        logActivity(Activity.clone(activity));
+                        logActivity(transcript, Activity.clone(activity));
                     }
 
                     return responses;
@@ -105,7 +90,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
                     // add Message Update activity
                     Activity updateActivity = Activity.clone(activity);
                     updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
-                    logActivity(updateActivity);
+                    logActivity(transcript, updateActivity);
 
                     return resourceResponse;
                 });
@@ -123,7 +108,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
                         applyConversationReference(reference, false);
                     }};
 
-                    logActivity(deleteActivity);
+                    logActivity(transcript, deleteActivity);
 
                     return null;
                 });
@@ -141,7 +126,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
             });
     }
 
-    private void logActivity(Activity activity) {
+    private void logActivity(Queue transcript, Activity activity) {
         if (activity.getTimestamp() == null) {
             activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
         }
