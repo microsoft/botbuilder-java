@@ -223,5 +223,34 @@ public class TranscriptMiddlewareTest {
         pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, OffsetDateTime.MAX).join();
         Assert.assertEquals(0, pagedResult.getItems().size());
     }
+
+    @Test
+    public final void Transcript_RolesAreFilled() {
+        MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
+        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
+        final String[] conversationId = {null};
+
+        new TestFlow(adapter, (context) -> {
+            // The next assert implicitly tests the immutability of the incoming
+            // message. As demonstrated by the asserts after this TestFlow block
+            // the role attribute is present on the activity as it is passed to
+            // the transcript, but still missing inside the flow
+            Assert.assertNull(context.getActivity().getFrom().getRole());
+            conversationId[0] = context.getActivity().getConversation().getId();
+            context.sendActivity("echo:" + context.getActivity().getText()).join();
+            return CompletableFuture.completedFuture(null);
+        })
+            .send("test")
+            .startTest().join();
+
+        PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
+        Assert.assertEquals(2, pagedResult.getItems().size());
+        Assert.assertNotNull(pagedResult.getItems().get(0).getFrom());
+        Assert.assertEquals(RoleTypes.USER, pagedResult.getItems().get(0).getFrom().getRole());
+        Assert.assertNotNull(pagedResult.getItems().get(1).getFrom());
+        Assert.assertEquals(RoleTypes.BOT, pagedResult.getItems().get(1).getFrom().getRole());
+
+        System.out.printf("Complete");
+    }
 }
 
