@@ -56,11 +56,6 @@ public enum ActionTypes {
     CALL("call"),
 
     /**
-     * Enum value payment.
-     */
-    PAYMENT("payment"),
-
-    /**
      * Enum value messageBack.
      */
     MESSAGE_BACK("messageBack");
