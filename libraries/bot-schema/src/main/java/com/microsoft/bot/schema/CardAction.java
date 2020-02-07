@@ -13,7 +13,7 @@ public class CardAction {
     /**
      * The type of action implemented by this button. Possible values include:
      * 'openUrl', 'imBack', 'postBack', 'playAudio', 'playVideo', 'showImage',
-     * 'downloadFile', 'signin', 'call', 'payment', 'messageBack'.
+     * 'downloadFile', 'signin', 'call', messageBack'.
      */
     @JsonProperty(value = "type")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
