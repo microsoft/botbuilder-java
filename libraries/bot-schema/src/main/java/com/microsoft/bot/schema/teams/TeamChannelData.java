@@ -188,4 +188,10 @@ public class TeamChannelData {
     this.tenant = withTenant;
   }
 
+  /**
+   * A new instance of TeamChannelData.
+   */
+  public TeamChannelData() {
+  }
+
 }

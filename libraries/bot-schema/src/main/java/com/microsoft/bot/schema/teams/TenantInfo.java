@@ -29,10 +29,16 @@ public class TenantInfo {
   }
 
   /**
-   * Set Unique identifier representing a tenant.
+   * New instance of TenantInfo.
    * @param withId Unique identifier representing a tenant.
    */
   public TenantInfo(String withId) {
     this.id = withId;
+  }
+
+  /**
+   * New instance of TenantInfo.
+   */
+  public TenantInfo() {
   }
 }

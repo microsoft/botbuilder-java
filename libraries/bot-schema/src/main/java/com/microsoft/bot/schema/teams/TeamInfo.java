@@ -86,4 +86,10 @@ public class TeamInfo {
     this.name = withName;
     this.aadGroupId = withAadGroupId;
   }
+
+  /**
+   * A new instance of TeamInfo.
+   */
+  public TeamInfo() {
+  }
 }

@@ -34,4 +34,10 @@ public class NotificationInfo {
   public NotificationInfo(Boolean withAlert) {
     alert = withAlert;
   }
+
+  /**
+   * A new instance of NotificationInfo.
+   */
+  public NotificationInfo() {
+  }
 }

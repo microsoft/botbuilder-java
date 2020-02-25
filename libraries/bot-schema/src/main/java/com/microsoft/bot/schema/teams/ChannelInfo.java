@@ -57,4 +57,10 @@ public class ChannelInfo {
     this.id = withId;
     this.name = withName;
   }
+
+  /**
+   * Initializes a new instance of the ChannelInfo class.
+   */
+  public ChannelInfo() {
+  }
 }
