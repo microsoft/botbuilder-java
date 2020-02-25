@@ -199,6 +199,7 @@ public class ActivityTest {
     }
 
     private static final String serializedActivityFromTeams = "{" +
+        " \"channelId\": \"msteams\"," +
         " \"channelData\": {" +
         "   \"teamsChannelId\": \"19:123cb42aa5a0a7e56f83@thread.skype\"," +
         "   \"teamsTeamId\": \"19:104f2cb42aa5a0a7e56f83@thread.skype\"," +
@@ -222,6 +223,7 @@ public class ActivityTest {
         "}";
 
     private static final String serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId = "{" +
+        " \"channelId\": \"msteams\"," +
         " \"channelData\": {" +
         "   \"channel\": {" +
         "     \"id\": \"channel_id\"," +
@@ -251,6 +253,7 @@ public class ActivityTest {
         Activity activity = objectMapper.readValue(ActivityTest.serializedActivityFromTeams, Activity.class);
         Assert.assertEquals("19:123cb42aa5a0a7e56f83@thread.skype", activity.teamsGetChannelId());
         Assert.assertEquals("19:104f2cb42aa5a0a7e56f83@thread.skype", activity.teamsGetTeamId());
+        Assert.assertEquals(true, activity.isTeamsActivity());
 
         activity = objectMapper.readValue(
             ActivityTest.serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId, Activity.class);
