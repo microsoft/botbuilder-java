@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.schema;
 
+import com.microsoft.bot.schema.teams.TeamChannelData;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -1503,5 +1505,45 @@ public class Activity {
         }
 
         return text;
+    }
+
+    /**
+     * Check if this actvity is from microsoft teams.
+     * @return true if the activity is from microsoft teams.
+     */
+    public boolean isTeamsActivity() {
+        return "msteams".equals(channelId);
+    }
+
+    /**
+     * Get unique identifier representing a channel.
+     *
+     * @throws JsonProcessingException when channel data can't be parsed to TeamChannelData
+     * @return Unique identifier representing a channel
+     */
+    public String teamsGetChannelId() throws JsonProcessingException {
+        TeamChannelData teamsChannelData = getChannelData(TeamChannelData.class);
+        String teamsChannelId = teamsChannelData.getTeamsChannelId();
+        if (teamsChannelId == null && teamsChannelData.getChannel() != null) {
+          teamsChannelId = teamsChannelData.getChannel().getId();
+        }
+
+        return teamsChannelId;
+    }
+
+    /**
+     * Get unique identifier representing a team.
+     *
+     * @throws JsonProcessingException when channel data can't be parsed to TeamChannelData
+     * @return Unique identifier representing a team.
+     */
+    public String teamsGetTeamId() throws JsonProcessingException {
+        TeamChannelData teamsChannelData = getChannelData(TeamChannelData.class);
+        String teamId = teamsChannelData.getTeamsTeamId();
+        if (teamId == null && teamsChannelData.getTeam() != null) {
+          teamId = teamsChannelData.getTeam().getId();
+        }
+
+        return teamId;
     }
 }
