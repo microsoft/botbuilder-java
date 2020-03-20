@@ -3,6 +3,8 @@ package com.microsoft.bot.schema;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.microsoft.bot.schema.teams.TeamChannelData;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -194,6 +196,80 @@ public class ActivityTest {
         Assert.assertNotNull(activity.getTimestamp());
         Assert.assertEquals("b18a1c99-7a29-4801-ac0c-579f2c36d52c", activity.getConversation().getId());
         Assert.assertNotNull(activity.getValue());
+    }
+
+    private static final String serializedActivityFromTeams = "{" +
+        " \"channelId\": \"msteams\"," +
+        " \"channelData\": {" +
+        "   \"teamsChannelId\": \"19:123cb42aa5a0a7e56f83@thread.skype\"," +
+        "   \"teamsTeamId\": \"19:104f2cb42aa5a0a7e56f83@thread.skype\"," +
+        "   \"channel\": {" +
+        "     \"id\": \"19:4104f2cb42aa5a0a7e56f83@thread.skype\"," +
+        "     \"name\": \"General\" " +
+        "   }," +
+        "   \"team\": {" +
+        "     \"id\": \"19:aab4104f2cb42aa5a0a7e56f83@thread.skype\"," +
+        "     \"name\": \"Kahoot\", " +
+        "     \"aadGroupId\": \"0ac65971-e8a0-49a1-8d41-26089125ea30\"" +
+        "   }," +
+        "   \"notification\": {" +
+        "     \"alert\": \"true\"" +
+        "   }," +
+        "   \"eventType\":\"teamMemberAdded\", " +
+        "   \"tenant\": {" +
+        "     \"id\": \"0-b827-4bb0-9df1-e02faba7ac20\"" +
+        "   }" +
+        " }" +
+        "}";
+
+    private static final String serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId = "{" +
+        " \"channelId\": \"msteams\"," +
+        " \"channelData\": {" +
+        "   \"channel\": {" +
+        "     \"id\": \"channel_id\"," +
+        "     \"name\": \"channel_name\" " +
+        "   }," +
+        "   \"team\": {" +
+        "     \"id\": \"team_id\"," +
+        "     \"name\": \"team_name\", " +
+        "     \"aadGroupId\": \"aad_groupid\"" +
+        "   }," +
+        "   \"notification\": {" +
+        "     \"alert\": \"true\"" +
+        "   }," +
+        "   \"eventType\":\"teamMemberAdded\", " +
+        "   \"tenant\": {" +
+        "     \"id\": \"tenant_id\"" +
+        "   }" +
+        " }" +
+        "}";
+
+
+
+    @Test
+    public void GetInformationForMicrosoftTeams() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(ActivityTest.serializedActivityFromTeams, Activity.class);
+        Assert.assertEquals("19:123cb42aa5a0a7e56f83@thread.skype", activity.teamsGetChannelId());
+        Assert.assertEquals("19:104f2cb42aa5a0a7e56f83@thread.skype", activity.teamsGetTeamId());
+        Assert.assertEquals(true, activity.isTeamsActivity());
+
+        activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId, Activity.class);
+
+        Assert.assertEquals("channel_id", activity.teamsGetChannelId());
+        Assert.assertEquals("team_id", activity.teamsGetTeamId());
+
+        TeamChannelData teamsChannelData = activity.getChannelData(TeamChannelData.class);
+        Assert.assertEquals("channel_id", teamsChannelData.getChannel().getId());
+        Assert.assertEquals("channel_name", teamsChannelData.getChannel().getName());
+        Assert.assertEquals("team_id", teamsChannelData.getTeam().getId());
+        Assert.assertEquals("team_name", teamsChannelData.getTeam().getName());
+        Assert.assertEquals("aad_groupid", teamsChannelData.getTeam().getAadGroupId());
+        Assert.assertEquals(true, teamsChannelData.getNotification().getAlert());
+        Assert.assertEquals("teamMemberAdded", teamsChannelData.getEventType());
+        Assert.assertEquals("tenant_id", teamsChannelData.getTenant().getId());
     }
 
 }
