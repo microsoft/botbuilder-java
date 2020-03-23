@@ -3,7 +3,7 @@
 
 package com.microsoft.bot.schema;
 
-import com.microsoft.bot.schema.teams.TeamChannelData;
+import com.microsoft.bot.schema.teams.TeamsChannelData;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -1522,7 +1522,7 @@ public class Activity {
      * @return Unique identifier representing a channel
      */
     public String teamsGetChannelId() throws JsonProcessingException {
-        TeamChannelData teamsChannelData = getChannelData(TeamChannelData.class);
+        TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
         String teamsChannelId = teamsChannelData.getTeamsChannelId();
         if (teamsChannelId == null && teamsChannelData.getChannel() != null) {
           teamsChannelId = teamsChannelData.getChannel().getId();
@@ -1538,7 +1538,7 @@ public class Activity {
      * @return Unique identifier representing a team.
      */
     public String teamsGetTeamId() throws JsonProcessingException {
-        TeamChannelData teamsChannelData = getChannelData(TeamChannelData.class);
+        TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
         String teamId = teamsChannelData.getTeamsTeamId();
         if (teamId == null && teamsChannelData.getTeam() != null) {
           teamId = teamsChannelData.getTeam().getId();

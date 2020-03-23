@@ -3,7 +3,7 @@ package com.microsoft.bot.schema;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.microsoft.bot.schema.teams.TeamChannelData;
+import com.microsoft.bot.schema.teams.TeamsChannelData;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -261,7 +261,7 @@ public class ActivityTest {
         Assert.assertEquals("channel_id", activity.teamsGetChannelId());
         Assert.assertEquals("team_id", activity.teamsGetTeamId());
 
-        TeamChannelData teamsChannelData = activity.getChannelData(TeamChannelData.class);
+        TeamsChannelData teamsChannelData = activity.getChannelData(TeamsChannelData.class);
         Assert.assertEquals("channel_id", teamsChannelData.getChannel().getId());
         Assert.assertEquals("channel_name", teamsChannelData.getChannel().getName());
         Assert.assertEquals("team_id", teamsChannelData.getTeam().getId());

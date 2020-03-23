@@ -58,7 +58,12 @@ public enum ActionTypes {
     /**
      * Enum value messageBack.
      */
-    MESSAGE_BACK("messageBack");
+    MESSAGE_BACK("messageBack"),
+
+    /**
+     * Enum value invoke
+     */
+    INVOKE("invoke");
 
     /**
      * The actual serialized value for a ActionTypes instance.
