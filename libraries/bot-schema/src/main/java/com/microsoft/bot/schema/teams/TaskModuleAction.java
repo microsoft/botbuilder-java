@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.CardAction;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 public class TaskModuleAction extends CardAction {
     public TaskModuleAction(String withTitle, Object withValue) {
@@ -23,7 +24,7 @@ public class TaskModuleAction extends CardAction {
         try {
             super.setValue(objectMapper.writeValueAsString(data));
         } catch (JsonProcessingException e) {
-            // TODO log it
+            LoggerFactory.getLogger(TaskModuleAction.class).error("TaskModuleAction", e);
         }
     }
 }
