@@ -3,19 +3,32 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.schema.CardAction;
 
 import java.util.List;
 
+/**
+ * Messaging extension Actions (Only when type is auth or config).
+ */
 public class MessagingExtensionSuggestedAction {
     @JsonProperty(value = "actions")
-    public List<CardAction> actions;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<CardAction> actions;
 
+    /**
+     * Gets the actions.
+     * @return The list of CardActions.
+     */
     public List<CardAction> getActions() {
         return actions;
     }
 
+    /**
+     * Sets the actions.
+     * @param withActions The list of CardActions.
+     */
     public void setActions(List<CardAction> withActions) {
         actions = withActions;
     }

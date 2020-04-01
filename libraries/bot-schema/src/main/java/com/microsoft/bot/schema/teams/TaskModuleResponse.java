@@ -5,15 +5,26 @@ package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Envelope for Task Module Response.
+ */
 public class TaskModuleResponse {
     @JsonProperty(value = "task")
-    private String task;
+    private TaskModuleResponseBase task;
 
-    public String getTask() {
+    /**
+     * Gets the response task.
+     * @return The response task.
+     */
+    public TaskModuleResponseBase getTask() {
         return task;
     }
 
-    public void setTask(String withTask) {
+    /**
+     * Sets the response task.
+     * @param withTask The response task.
+     */
+    public void setTask(TaskModuleResponseBase withTask) {
         task = withTask;
     }
 }

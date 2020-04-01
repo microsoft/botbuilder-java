@@ -61,7 +61,7 @@ public enum ActionTypes {
     MESSAGE_BACK("messageBack"),
 
     /**
-     * Enum value invoke
+     * Enum value invoke.
      */
     INVOKE("invoke");
 

@@ -5,6 +5,9 @@ package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * File download info attachment.
+ */
 public class FileDownloadInfo {
     /**
      * Content type to be used in the type property.
@@ -23,34 +26,66 @@ public class FileDownloadInfo {
     @JsonProperty(value = "etag")
     private Object etag;
 
+    /**
+     * Gets file download url.
+     * @return The download url.
+     */
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
+    /**
+     * Sets file download url.
+     * @param withDownloadUrl The new file download url.
+     */
     public void setDownloadUrl(String withDownloadUrl) {
         downloadUrl = withDownloadUrl;
     }
 
+    /**
+     * Gets unique Id for the file.
+     * @return The unique id of the download.
+     */
     public String getUniqueId() {
         return uniqueId;
     }
 
+    /**
+     * Sets unique Id for the file.
+     * @param withUniqueId The unique id of the download.
+     */
     public void setUniqueId(String withUniqueId) {
         uniqueId = withUniqueId;
     }
 
+    /**
+     * Gets type of file.
+     * @return The type of the file.
+     */
     public String getFileType() {
         return fileType;
     }
 
+    /**
+     * Sets type of file.
+     * @param withFileType The type of the file.
+     */
     public void setFileType(String withFileType) {
         fileType = withFileType;
     }
 
+    /**
+     * Gets eTag for the file.
+     * @return The eTag.
+     */
     public Object getEtag() {
         return etag;
     }
 
+    /**
+     * Sets eTag for the file.
+     * @param withEtag The eTag value.
+     */
     public void setEtag(Object withEtag) {
         etag = withEtag;
     }

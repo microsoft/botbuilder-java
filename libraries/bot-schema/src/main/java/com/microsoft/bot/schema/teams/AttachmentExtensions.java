@@ -5,7 +5,18 @@ package com.microsoft.bot.schema.teams;
 
 import com.microsoft.bot.schema.Attachment;
 
-public class AttachmentExtensions {
+/**
+ * Attachment extensions.
+ */
+public final class AttachmentExtensions {
+    private AttachmentExtensions() { }
+
+    /**
+     * Converts normal attachment into the messaging extension attachment.
+     * @param attachment The Attachment.
+     * @param previewAttachment The preview Attachment.
+     * @return Messaging extension attachment.
+     */
     public static MessagingExtensionAttachment toMessagingExtensionAttachment(
         Attachment attachment,
         Attachment previewAttachment) {
