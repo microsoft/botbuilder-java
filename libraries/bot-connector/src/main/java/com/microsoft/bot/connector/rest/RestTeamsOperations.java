@@ -1,0 +1,133 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
+package com.microsoft.bot.connector.rest;
+
+import com.google.common.reflect.TypeToken;
+import com.microsoft.bot.connector.teams.TeamsOperations;
+import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.schema.teams.ConversationList;
+import com.microsoft.bot.schema.teams.TeamDetails;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * msrest impl of TeamsOperations.
+ */
+public class RestTeamsOperations implements TeamsOperations {
+    /** The Retrofit service to perform REST calls. */
+    private TeamsService service;
+
+    /** The service client containing this operation class. */
+    private RestTeamsConnectorClient client;
+
+    /**
+     * Initializes an instance of ConversationsImpl.
+     *
+     * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
+     * @param withClient the instance of the service client containing this operation class.
+     */
+    RestTeamsOperations(Retrofit withRetrofit, RestTeamsConnectorClient withClient) {
+        service = withRetrofit.create(RestTeamsOperations.TeamsService.class);
+        client = withClient;
+    }
+
+
+    /**
+     * Implementation of fetchChannelList.
+     *
+     * @see TeamsOperations#fetchChannelList
+     */
+    @Override
+    public CompletableFuture<ConversationList> fetchChannelList(String teamId) {
+        if (teamId == null) {
+            throw new IllegalArgumentException("Parameter teamId is required and cannot be null.");
+        }
+
+        return service.fetchChannelList(teamId, client.getAcceptLanguage(), client.getUserAgent())
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return fetchChannelListDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("fetchChannelList", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<ConversationList> fetchChannelListDelegate(
+        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return client.restClient()
+            .responseBuilderFactory().<ConversationList, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationList>() { }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     * Implementation of fetchTeamDetails.
+     *
+     * @see TeamsOperations#fetchTeamDetails
+     */
+    @Override
+    public CompletableFuture<TeamDetails> fetchTeamDetails(String teamId) {
+        if (teamId == null) {
+            throw new IllegalArgumentException("Parameter teamId is required and cannot be null.");
+        }
+
+        return service.fetchTeamDetails(teamId, client.getAcceptLanguage(), client.getUserAgent())
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return fetchTeamDetailsDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("fetchTeamDetails", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<TeamDetails> fetchTeamDetailsDelegate(
+        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return client.restClient()
+            .responseBuilderFactory().<TeamDetails, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<TeamDetails>() { }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     * The interface defining all the services for TeamsOperations to be
+     * used by Retrofit to perform actually REST calls.
+     */
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    interface TeamsService {
+        @Headers({"Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchChannelList"})
+        @POST("v3/teams/{teamId}/conversations")
+        CompletableFuture<Response<ResponseBody>> fetchChannelList(@Path("teamId") String teamId,
+                                                                   @Header("accept-language") String acceptLanguage,
+                                                                   @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchTeamDetails"})
+        @POST("v3/teams/{teamId}")
+        CompletableFuture<Response<ResponseBody>> fetchTeamDetails(@Path("teamId") String teamId,
+                                                                   @Header("accept-language") String acceptLanguage,
+                                                                   @Header("User-Agent") String userAgent);
+    }
+
+}
