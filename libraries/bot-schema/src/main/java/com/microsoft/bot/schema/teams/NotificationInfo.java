@@ -16,6 +16,14 @@ public class NotificationInfo {
     private Boolean alert;
 
     /**
+     * Initialize new NotificationInfo.
+     * @param withAlert initial alert value.
+     */
+    public NotificationInfo(boolean withAlert) {
+        setAlert(withAlert);
+    }
+
+    /**
      * Getter for alert.
      *
      * @return return the alter value.

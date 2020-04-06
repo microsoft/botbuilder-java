@@ -3,7 +3,6 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.schema.*;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -280,17 +279,17 @@ public class ActivityHandlerTests {
     private static class NotImplementedAdapter extends BotAdapter {
         @Override
         public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
-            throw new NotImplementedException();
+            throw new RuntimeException();
         }
 
         @Override
         public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
-            throw new NotImplementedException();
+            throw new RuntimeException();
         }
 
         @Override
         public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
-            throw new NotImplementedException();
+            throw new RuntimeException();
         }
     }
 

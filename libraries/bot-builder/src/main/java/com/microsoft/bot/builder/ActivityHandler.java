@@ -7,8 +7,11 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.MessageReaction;
+import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.SignInConstants;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -59,6 +62,24 @@ public class ActivityHandler implements Bot {
                 return onMessageReactionActivity(turnContext);
             case ActivityTypes.EVENT:
                 return onEventActivity(turnContext);
+            case ActivityTypes.INVOKE:
+                return onInvokeActivity(turnContext)
+                    .thenCompose(invokeResponse -> {
+                        // If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
+                        if (invokeResponse != null
+                            && turnContext.getTurnState().get(BotFrameworkAdapter.INVOKE_RESPONSE_KEY) == null) {
+
+                            Activity activity = new Activity(ActivityTypes.INVOKE);
+                            activity.setValue(invokeResponse);
+
+                            return turnContext.sendActivity(activity);
+                        }
+
+                        CompletableFuture<ResourceResponse> noAction = new CompletableFuture<>();
+                        noAction.complete(null);
+                        return noAction;
+                    })
+                    .thenApply(response -> null);
 
             default:
                 return onUnrecognizedActivityType(turnContext);
@@ -268,6 +289,70 @@ public class ActivityHandler implements Bot {
     }
 
     /**
+     * Invoked when an invoke activity is received from the connector when the base behavior of
+     * onTurn is used.
+     *
+     * Invoke activities can be used to communicate many different things.
+     * By default, this method will call onSignInInvokeAsync if the
+     * activity's name is 'signin/verifyState' or 'signin/tokenExchange'.
+     *
+     * A 'signin/verifyState' or 'signin/tokenExchange' invoke can be triggered by an OAuthCard.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
+        if (StringUtils.equals(turnContext.getActivity().getName(), SignInConstants.VERIFY_STATE_OPERATION_NAME)
+            || StringUtils
+            .equals(turnContext.getActivity().getName(), SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME)) {
+
+            return onSignInInvoke(turnContext)
+                .thenApply(aVoid -> createInvokeResponse(null))
+                .exceptionally(ex -> {
+                    if (ex instanceof InvokeResponseExcetion) {
+                        InvokeResponseExcetion ire = (InvokeResponseExcetion) ex;
+                        return new InvokeResponse(ire.statusCode, ire.body);
+                    }
+                    return new InvokeResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, null);
+            });
+        }
+
+        CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
+        result.complete(new InvokeResponse(HttpURLConnection.HTTP_NOT_IMPLEMENTED, null));
+        return result;
+    }
+
+    /**
+     * Invoked when a 'signin/verifyState' or 'signin/tokenExchange' event is received when the base
+     * behavior of onInvokeActivity is used.
+     *
+     * If using an OAuthPrompt, override this method to forward this Activity to the current dialog.
+     * By default, this method does nothing.
+     *
+     * When the onInvokeActivity method receives an Invoke with a name of `tokens/response`,
+     * it calls this method.
+     *
+     * If your bot uses the OAuthPrompt, forward the incoming Activity to the current dialog.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onSignInInvoke(TurnContext turnContext) {
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        result.completeExceptionally(new InvokeResponseExcetion(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
+        return result;
+    }
+
+    /**
+     * Creates a success InvokeResponse with the specified body.
+     * @param body The body to return in the invoke response.
+     * @return The InvokeResponse object.
+     */
+    protected static InvokeResponse createInvokeResponse(Object body) {
+        return new InvokeResponse(HttpURLConnection.HTTP_OK, body);
+    }
+
+    /**
      * Invoked when a "tokens/response" event is received when the base behavior of
      * {@link #onEventActivity(TurnContext)} is used.
      *
@@ -322,5 +407,39 @@ public class ActivityHandler implements Bot {
      */
     protected CompletableFuture<Void> onUnrecognizedActivityType(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * InvokeResponse Exception.
+     */
+    protected class InvokeResponseExcetion extends Exception {
+        private int statusCode;
+        private Object body;
+
+        /**
+         * Initializes new instance with HTTP status code value.
+         * @param withStatusCode The HTTP status code.
+         */
+        public InvokeResponseExcetion(int withStatusCode) {
+            this(withStatusCode, null);
+        }
+
+        /**
+         * Initializes new instance with HTTP status code value.
+         * @param withStatusCode The HTTP status code.
+         * @param withBody The body.  Can be null.
+         */
+        public InvokeResponseExcetion(int withStatusCode, Object withBody) {
+            statusCode = withStatusCode;
+            body = withBody;
+        }
+
+        /**
+         * Returns an InvokeResponse based on this exception.
+         * @return The InvokeResponse value.
+         */
+        public InvokeResponse createInvokeResponse() {
+            return new InvokeResponse(statusCode, body);
+        }
     }
 }

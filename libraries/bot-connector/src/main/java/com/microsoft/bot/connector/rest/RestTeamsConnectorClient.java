@@ -63,7 +63,7 @@ public class RestTeamsConnectorClient extends AzureServiceClient implements Team
      * @param baseUrl the base URL of the host
      * @param credentials the management credentials for Azure
      */
-    protected RestTeamsConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
+    public RestTeamsConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
         super(baseUrl, credentials);
         initialize();
     }
@@ -98,6 +98,23 @@ public class RestTeamsConnectorClient extends AzureServiceClient implements Team
     @Override
     public RestClient getRestClient() {
         return super.restClient();
+    }
+
+    /**
+     * Returns the base url for this ConnectorClient.
+     * @return The base url.
+     */
+    @Override
+    public String baseUrl() {
+        return getRestClient().retrofit().baseUrl().toString();
+    }
+
+    /**
+     * Returns the credentials in use.
+     * @return The ServiceClientCredentials in use.
+     */
+    public ServiceClientCredentials credentials() {
+        return getRestClient().credentials();
     }
 
     /**

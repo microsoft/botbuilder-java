@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationAccount;
@@ -578,7 +579,7 @@ public class TurnContextTests {
         }
 
         @Override
-        public void setLongRunningOperationRetryTimeout(int longRunningOperationRetryTimeout) {
+        public void setLongRunningOperationRetryTimeout(int timeout) {
 
         }
 
@@ -591,6 +592,12 @@ public class TurnContextTests {
         public void setGenerateClientRequestId(boolean generateClientRequestId) {
 
         }
+
+        @Override
+        public String baseUrl() { return null; }
+
+        @Override
+        public ServiceClientCredentials credentials() { return null; }
 
         @Override
         public Attachments getAttachments() {

@@ -20,6 +20,7 @@ import com.microsoft.bot.connector.Conversations;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.rest.ServiceResponse;
 import com.microsoft.bot.rest.Validator;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -42,16 +43,20 @@ import retrofit2.Response;
  * in Conversations.
  */
 public class RestConversations implements Conversations {
-    /** The Retrofit service to perform REST calls. */
+    /**
+     * The Retrofit service to perform REST calls.
+     */
     private ConversationsService service;
-    /** The service client containing this operation class. */
+    /**
+     * The service client containing this operation class.
+     */
     private RestConnectorClient client;
 
     /**
      * Initializes an instance of ConversationsImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this operation class.
      */
     RestConversations(Retrofit withRetrofit, RestConnectorClient withClient) {
         this.service = withRetrofit.create(ConversationsService.class);
@@ -64,91 +69,123 @@ public class RestConversations implements Conversations {
      */
     @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface ConversationsService {
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversations" })
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversations"})
         @GET("v3/conversations")
         CompletableFuture<Response<ResponseBody>> getConversations(@Query("continuationToken") String continuationToken,
-                                                            @Header("accept-language") String acceptLanguage,
-                                                            @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations createConversation" })
-        @POST("v3/conversations")
-        CompletableFuture<Response<ResponseBody>> createConversation(@Body ConversationParameters parameters,
-                                                              @Header("accept-language") String acceptLanguage,
-                                                              @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendToConversation" })
-        @POST("v3/conversations/{conversationId}/activities")
-        CompletableFuture<Response<ResponseBody>> sendToConversation(@Path("conversationId") String conversationId,
-                                                              @Body Activity activity,
-                                                              @Header("accept-language") String acceptLanguage,
-                                                              @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations updateActivity" })
-        @PUT("v3/conversations/{conversationId}/activities/{activityId}")
-        CompletableFuture<Response<ResponseBody>> updateActivity(@Path("conversationId") String conversationId,
-                                                          @Path("activityId") String activityId,
-                                                          @Body Activity activity,
-                                                          @Header("accept-language") String acceptLanguage,
-                                                          @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity" })
-        @POST("v3/conversations/{conversationId}/activities/{activityId}")
-        CompletableFuture<Response<ResponseBody>> replyToActivity(@Path("conversationId") String conversationId,
-                                                           @Path("activityId") String activityId,
-                                                           @Body Activity activity,
-                                                           @Header("accept-language") String acceptLanguage,
-                                                           @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteActivity" })
-        @HTTP(path = "v3/conversations/{conversationId}/activities/{activityId}", method = "DELETE", hasBody = true)
-        CompletableFuture<Response<ResponseBody>> deleteActivity(@Path("conversationId") String conversationId,
-                                                          @Path("activityId") String activityId,
-                                                          @Header("accept-language") String acceptLanguage,
-                                                          @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers" })
-        @GET("v3/conversations/{conversationId}/members")
-        CompletableFuture<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId,
-                                                                  @Header("accept-language") String acceptLanguage,
-                                                                  @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteConversationMember" })
-        @HTTP(path = "v3/conversations/{conversationId}/members/{memberId}", method = "DELETE", hasBody = true)
-        CompletableFuture<Response<ResponseBody>> deleteConversationMember(@Path("conversationId") String conversationId,
-                                                                    @Path("memberId") String memberId,
-                                                                    @Header("accept-language") String acceptLanguage,
-                                                                    @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getActivityMembers" })
-        @GET("v3/conversations/{conversationId}/activities/{activityId}/members")
-        CompletableFuture<Response<ResponseBody>> getActivityMembers(@Path("conversationId") String conversationId,
-                                                              @Path("activityId") String activityId,
-                                                              @Header("accept-language") String acceptLanguage,
-                                                              @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment" })
-        @POST("v3/conversations/{conversationId}/attachments")
-        CompletableFuture<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId,
-                                                            @Body AttachmentData attachmentUpload,
-                                                            @Header("accept-language") String acceptLanguage,
-                                                            @Header("User-Agent") String userAgent);
-
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory" })
-        @POST("v3/conversations/{conversationId}/activities/history")
-        CompletableFuture<Response<ResponseBody>> sendConversationHistory(@Path("conversationId") String conversationId,
-                                                                   @Body Transcript history,
                                                                    @Header("accept-language") String acceptLanguage,
                                                                    @Header("User-Agent") String userAgent);
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers" })
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations createConversation"})
+        @POST("v3/conversations")
+        CompletableFuture<Response<ResponseBody>> createConversation(@Body ConversationParameters parameters,
+                                                                     @Header("accept-language") String acceptLanguage,
+                                                                     @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendToConversation"})
+        @POST("v3/conversations/{conversationId}/activities")
+        CompletableFuture<Response<ResponseBody>> sendToConversation(@Path("conversationId") String conversationId,
+                                                                     @Body Activity activity,
+                                                                     @Header("accept-language") String acceptLanguage,
+                                                                     @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations updateActivity"})
+        @PUT("v3/conversations/{conversationId}/activities/{activityId}")
+        CompletableFuture<Response<ResponseBody>> updateActivity(@Path("conversationId") String conversationId,
+                                                                 @Path("activityId") String activityId,
+                                                                 @Body Activity activity,
+                                                                 @Header("accept-language") String acceptLanguage,
+                                                                 @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity"})
+        @POST("v3/conversations/{conversationId}/activities/{activityId}")
+        CompletableFuture<Response<ResponseBody>> replyToActivity(@Path("conversationId") String conversationId,
+                                                                  @Path("activityId") String activityId,
+                                                                  @Body Activity activity,
+                                                                  @Header("accept-language") String acceptLanguage,
+                                                                  @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteActivity"})
+        @HTTP(path = "v3/conversations/{conversationId}/activities/{activityId}", method = "DELETE", hasBody = true)
+        CompletableFuture<Response<ResponseBody>> deleteActivity(@Path("conversationId") String conversationId,
+                                                                 @Path("activityId") String activityId,
+                                                                 @Header("accept-language") String acceptLanguage,
+                                                                 @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers"})
+        @GET("v3/conversations/{conversationId}/members")
+        CompletableFuture<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId,
+                                                                         @Header("accept-language") String acceptLanguage,
+                                                                         @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers"})
+        @GET("v3/conversations/{conversationId}/members/{userId}")
+        CompletableFuture<Response<ResponseBody>> getConversationMember(
+            @Path("userId") String userId,
+            @Path("conversationId") String conversationId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteConversationMember"})
+        @HTTP(path = "v3/conversations/{conversationId}/members/{memberId}", method = "DELETE", hasBody = true)
+        CompletableFuture<Response<ResponseBody>> deleteConversationMember(
+            @Path("conversationId") String conversationId,
+            @Path("memberId") String memberId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getActivityMembers"})
+        @GET("v3/conversations/{conversationId}/activities/{activityId}/members")
+        CompletableFuture<Response<ResponseBody>> getActivityMembers(@Path("conversationId") String conversationId,
+                                                                     @Path("activityId") String activityId,
+                                                                     @Header("accept-language") String acceptLanguage,
+                                                                     @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment"})
+        @POST("v3/conversations/{conversationId}/attachments")
+        CompletableFuture<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId,
+                                                                   @Body AttachmentData attachmentUpload,
+                                                                   @Header("accept-language") String acceptLanguage,
+                                                                   @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory"})
+        @POST("v3/conversations/{conversationId}/activities/history")
+        CompletableFuture<Response<ResponseBody>> sendConversationHistory(@Path("conversationId") String conversationId,
+                                                                          @Body Transcript history,
+                                                                          @Header("accept-language") String acceptLanguage,
+                                                                          @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers"})
         @GET("v3/conversations/{conversationId}/pagedmembers")
-        CompletableFuture<Response<ResponseBody>> getConversationPagedMembers(@Path("conversationId") String conversationId,
-                                                                       @Header("accept-language") String acceptLanguage,
-                                                                       @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getConversationPagedMembers(
+            @Path("conversationId") String conversationId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent);
+
+        @Headers({"Content-Type: application/json; charset=utf-8",
+                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers"})
+        @GET("v3/conversations/{conversationId}/pagedmembers?continuationToken={continuationToken}")
+        CompletableFuture<Response<ResponseBody>> getConversationPagedMembers(
+            @Path("conversationId") String conversationId,
+            @Path("continuationToken") String continuationToken,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent);
     }
 
     /**
-     * Implementation of getConversationsAsync.
+     * Implementation of getConversations.
      *
      * @see Conversations#getConversations
      */
@@ -158,7 +195,7 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * Implementation of getConversationsAsync.
+     * Implementation of getConversations.
      *
      * @see Conversations#getConversations
      */
@@ -181,13 +218,14 @@ public class RestConversations implements Conversations {
 
         return client.restClient().responseBuilderFactory()
             .<ConversationsResult, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationsResult>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationsResult>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of createConversationWithServiceResponseAsync.
+     * Implementation of createConversation.
      *
      * @see Conversations#createConversation
      */
@@ -215,15 +253,18 @@ public class RestConversations implements Conversations {
 
         return client.restClient().responseBuilderFactory()
             .<ConversationResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ConversationResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ConversationResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ConversationResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ConversationResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of sendToConversationAsync.
+     * Implementation of sendToConversation.
      *
      * @see Conversations#sendToConversation
      */
@@ -254,15 +295,18 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of updateActivityAsync.
+     * Implementation of updateActivity.
      *
      * @see Conversations#updateActivity
      */
@@ -282,7 +326,7 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.updateActivity(conversationId, activityId, activity,
-            client.getAcceptLanguage(), client.getUserAgent())
+                                      client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -300,15 +344,18 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of replyToActivityAsync.
+     * Implementation of replyToActivity.
      *
      * @see Conversations#replyToActivity
      */
@@ -328,7 +375,7 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.replyToActivity(conversationId, activityId, activity,
-            client.getAcceptLanguage(), client.getUserAgent())
+                                       client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -346,15 +393,18 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of deleteActivityWithServiceResponseAsync.
+     * Implementation of deleteActivity.
      *
      * @see Conversations#deleteActivity
      */
@@ -384,14 +434,16 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of getConversationMembersAsync.
+     * Implementation of getConversationMembers.
      *
      * @see Conversations#getConversationMembers
      */
@@ -418,13 +470,51 @@ public class RestConversations implements Conversations {
 
         return client.restClient().responseBuilderFactory()
             .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of deleteConversationMemberWithServiceResponseAsync.
+     * Implementation of getConversationMember.
+     *
+     * @see Conversations#getConversationMember
+     */
+    @Override
+    public CompletableFuture<ChannelAccount> getConversationMember(String userId, String conversationId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+        }
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+
+        return service.getConversationMember(userId, conversationId, client.getAcceptLanguage(), client.getUserAgent())
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return getConversationMemberDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("getConversationMembersAsync", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<ChannelAccount> getConversationMemberDelegate(
+        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return client.restClient().responseBuilderFactory()
+            .<ChannelAccount, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ChannelAccount>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     * Implementation of deleteConversationMember.
      *
      * @see Conversations#deleteConversationMember
      */
@@ -438,7 +528,7 @@ public class RestConversations implements Conversations {
         }
 
         return service.deleteConversationMember(conversationId, memberId,
-            client.getAcceptLanguage(), client.getUserAgent())
+                                                client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -457,14 +547,16 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() { }.getType())
-                .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of getActivityMembersAsync.
+     * Implementation of getActivityMembers.
      *
      * @see Conversations#getActivityMembers
      */
@@ -494,13 +586,14 @@ public class RestConversations implements Conversations {
 
         return client.restClient().responseBuilderFactory()
             .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * Implementation of uploadAttachmentAsync.
+     * Implementation of uploadAttachment.
      *
      * @see Conversations#uploadAttachment
      */
@@ -516,7 +609,7 @@ public class RestConversations implements Conversations {
         Validator.validate(attachmentUpload);
 
         return service.uploadAttachment(conversationId, attachmentUpload,
-            client.getAcceptLanguage(), client.getUserAgent())
+                                        client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -534,16 +627,19 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
 
     /**
-     * Implementation of sendConversationHistoryAsync.
+     * Implementation of sendConversationHistory.
      *
      * @see Conversations#sendConversationHistory
      */
@@ -558,7 +654,7 @@ public class RestConversations implements Conversations {
         Validator.validate(history);
 
         return service.sendConversationHistory(conversationId, history,
-            client.getAcceptLanguage(), client.getUserAgent())
+                                               client.getAcceptLanguage(), client.getUserAgent())
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -576,18 +672,21 @@ public class RestConversations implements Conversations {
 
         return client.restClient()
             .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ResourceResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
 
     /**
-     * Implementation of getConversationPagedMembersAsync.
+     * Implementation of getConversationPagedMembers.
      *
-     * @see Conversations#getConversationPagedMembers
+     * @see Conversations#getConversationPagedMembers(String conversationId)
      */
     @Override
     public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId) {
@@ -602,7 +701,7 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationPagedMembersAsync", responseBodyResponse);
+                    throw new ErrorResponseException("getConversationPagedMembers", responseBodyResponse);
                 }
             });
     }
@@ -612,8 +711,53 @@ public class RestConversations implements Conversations {
 
         return client.restClient().responseBuilderFactory()
             .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     * Implementation of getConversationPagedMembers.
+     *
+     * @see Conversations#getConversationPagedMembers(String conversationId, String continuationToken)
+     *
+     * @param conversationId Conversation ID
+     * @param continuationToken The continuationToken from a previous call.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId,
+                                                                             String continuationToken) {
+        if (conversationId == null) {
+            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+        }
+        if (continuationToken == null) {
+            throw new IllegalArgumentException("Parameter continuationToken is required and cannot be null.");
+        }
+
+        return service.getConversationPagedMembers(
+            conversationId, continuationToken, client.getAcceptLanguage(), client.getUserAgent())
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return getConversationPagedMembers2Delegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("getConversationPagedMembers", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<PagedMembersResult> getConversationPagedMembers2Delegate(
+        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return client.restClient().responseBuilderFactory()
+            .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 }

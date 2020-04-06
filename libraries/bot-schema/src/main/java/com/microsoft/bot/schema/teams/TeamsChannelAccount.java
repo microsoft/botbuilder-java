@@ -4,11 +4,12 @@
 package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microsoft.bot.schema.ChannelAccount;
 
 /**
  * Teams channel account detailing user Azure Active Directory details.
  */
-public class TeamsChannelAccount {
+public class TeamsChannelAccount extends ChannelAccount {
     @JsonProperty(value = "givenName")
     private String givenName;
 
@@ -20,9 +21,6 @@ public class TeamsChannelAccount {
 
     @JsonProperty(value = "userPrincipalName")
     private String userPrincipalName;
-
-    @JsonProperty(value = "objectId")
-    private String aadObjectId;
 
     /**
      * Gets given name part of the user name.
@@ -86,21 +84,5 @@ public class TeamsChannelAccount {
      */
     public void setUserPrincipalName(String withUserPrincipalName) {
         userPrincipalName = withUserPrincipalName;
-    }
-
-    /**
-     * Gets the AAD Object Id.
-     * @return The AAD object id.
-     */
-    public String getAadObjectId() {
-        return aadObjectId;
-    }
-
-    /**
-     * Sets the AAD Object Id.
-     * @param withAadObjectId The AAD object id.
-     */
-    public void setAadObjectId(String withAadObjectId) {
-        aadObjectId = withAadObjectId;
     }
 }

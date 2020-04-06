@@ -11,6 +11,7 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 
 /**
  * The interface for ConnectorClient class.
@@ -22,6 +23,18 @@ public interface ConnectorClient extends AutoCloseable {
      * @return the {@link RestClient} object.
      */
     RestClient getRestClient();
+
+    /**
+     * Returns the base url for this ConnectorClient.
+     * @return The base url.
+     */
+    String baseUrl();
+
+    /**
+     * Returns the credentials in use.
+     * @return The ServiceClientCredentials in use.
+     */
+    ServiceClientCredentials credentials();
 
     /**
      * Gets the User-Agent header for the client.

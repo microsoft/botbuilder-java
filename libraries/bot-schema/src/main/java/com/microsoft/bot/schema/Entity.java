@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Metadata object pertaining to an activity.
  */
-public class Entity {
+public class Entity implements EntitySerialization {
     private static ObjectMapper objectMapper;
 
     static {
@@ -60,7 +60,7 @@ public class Entity {
      * @param entities The List of Entities to clone.
      * @return A cloned List.
      */
-    public static List<Entity> cloneList(List<Entity> entities) {
+    public static List<Entity> cloneList(List<? extends Entity> entities) {
         if (entities == null) {
             return null;
         }
@@ -114,11 +114,21 @@ public class Entity {
      */
     @JsonIgnore
     public <T extends EntitySerialization> T getAs(Class<T> classType) {
+        return getAs(this, classType);
+    }
 
+    /**
+     * Converts Entity to other Entity types.
+     * @param entity The entity type object.
+     * @param classType Class extended EntitySerialization
+     * @param <T> The type of the return value.
+     * @return Entity converted to type T
+     */
+    public static <T extends EntitySerialization> T getAs(EntitySerialization entity, Class<T> classType) {
         // Serialize
         String tempJson;
         try {
-            tempJson = objectMapper.writeValueAsString(this);
+            tempJson = objectMapper.writeValueAsString(entity);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
