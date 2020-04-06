@@ -1,6 +1,7 @@
 package com.microsoft.bot.connector.teams;
 
 import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
 
 /**
  * Teams operations.
@@ -12,6 +13,18 @@ public interface TeamsConnectorClient extends AutoCloseable {
      * @return the {@link RestClient} object.
      */
     RestClient getRestClient();
+
+    /**
+     * Returns the base url for this ConnectorClient.
+     * @return The base url.
+     */
+    String baseUrl();
+
+    /**
+     * Returns the credentials in use.
+     * @return The ServiceClientCredentials in use.
+     */
+    ServiceClientCredentials credentials();
 
     /**
      * Gets the User-Agent header for the client.

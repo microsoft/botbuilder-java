@@ -22,6 +22,16 @@ public class InvokeResponse {
     private Object body;
 
     /**
+     * Initializes new instance of InvokeResponse.
+     * @param withStatus The invoke response status.
+     * @param withBody The invoke response body.
+     */
+    public InvokeResponse(int withStatus, Object withBody) {
+        status = withStatus;
+        body = withBody;
+    }
+
+    /**
      * Gets the HTTP status code for the response.
      * @return The HTTP status code.
      */

@@ -43,6 +43,7 @@ import com.microsoft.bot.schema.TokenStatus;
 import com.microsoft.bot.rest.retry.RetryStrategy;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -74,19 +75,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegration, UserTokenProvider {
     /**
-     * Key to store Activity to match .Net.
+     * Key to store InvokeResponse.
      */
-    private static final String INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse";
+    public static final String INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse";
 
     /**
-     * Key to store bot claims identity to match .Net.
+     * Key to store bot claims identity.
      */
     private static final String BOT_IDENTITY_KEY = "BotIdentity";
 
     /**
-     * Key to store ConnectorClient to match .Net.
+     * Key to store ConnectorClient.
      */
-    private static final String CONNECTOR_CLIENT_KEY = "ConnectorClient";
+    public static final String CONNECTOR_CLIENT_KEY = "ConnectorClient";
 
     private AppCredentials appCredentials;
 
@@ -365,7 +366,9 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                     if (activity.isType(ActivityTypes.INVOKE)) {
                         Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
                         if (invokeResponse == null) {
-                            throw new IllegalStateException("Bot failed to return a valid 'invokeResponse' activity.");
+                            return CompletableFuture.completedFuture(
+                                new InvokeResponse(HttpURLConnection.HTTP_NOT_IMPLEMENTED, null)
+                            );
                         } else {
                             return CompletableFuture.completedFuture((InvokeResponse) invokeResponse.getValue());
                         }

@@ -217,6 +217,14 @@ public interface Conversations {
     CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId);
 
     /**
+     * Retrieves a single member of a conversation by ID.
+     * @param userId The user id.
+     * @param conversationId The conversation id.
+     * @return The ChannelAccount for the user.
+     */
+    CompletableFuture<ChannelAccount> getConversationMember(String userId, String conversationId);
+
+    /**
      * DeleteConversationMember.
      * Deletes a member from a conversation.
      * This REST API takes a ConversationId and a memberId (of type string) and removes that member from the
@@ -279,9 +287,9 @@ public interface Conversations {
      * of the conversation and a continuation token that can be used to get more values.
      *
      * One page of ChannelAccounts records are returned with each call. The number of records in a page may
-     * vary between channels and calls. The pageSize parameter can be used as a suggestion. If there are no
-     * additional results the response will not contain a continuation token. If there are no members in the
-     * conversation the Members will be empty or not present in the response.
+     * vary between channels and calls. If there are no additional results the response will not contain a
+     * continuation token. If there are no members in the conversation the Members will be empty or not
+     * present in the response.
      *
      * A response to a request that has a continuation token from a prior request may rarely return members
      * from a previous request.
@@ -292,4 +300,27 @@ public interface Conversations {
      * @return the PagedMembersResult object if successful.
      */
     CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId);
+
+    /**
+     * Enumerate the members of a conversation one page at a time.
+     *
+     * This REST API takes a ConversationId. Optionally a pageSize and/or continuationToken can be provided.
+     * It returns a PagedMembersResult, which contains an array of ChannelAccounts representing the members
+     * of the conversation and a continuation token that can be used to get more values.
+     *
+     * One page of ChannelAccounts records are returned with each call. The number of records in a page may
+     * vary between channels and calls. If there are no additional results the response will not contain a
+     * continuation token. If there are no members in the conversation the Members will be empty or not
+     * present in the response.
+     *
+     * A response to a request that has a continuation token from a prior request may rarely return members
+     * from a previous request.
+     *
+     * @param conversationId Conversation ID
+     * @param continuationToken The continuationToken from a previous call.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedMembersResult object if successful.
+     */
+    CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId, String continuationToken);
 }

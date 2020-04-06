@@ -94,6 +94,23 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         return super.restClient();
     }
 
+    /**
+     * Returns the base url for this ConnectorClient.
+     * @return The base url.
+     */
+    @Override
+    public String baseUrl() {
+        return getRestClient().retrofit().baseUrl().toString();
+    }
+
+    /**
+     * Returns the credentials in use.
+     * @return The ServiceClientCredentials in use.
+     */
+    public ServiceClientCredentials credentials() {
+        return getRestClient().credentials();
+    }
+
     /** Gets or sets the preferred language for the response. */
     private String acceptLanguage;
     private String userAgentString;

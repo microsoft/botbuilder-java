@@ -375,6 +375,7 @@
     <module>samples/16.proactive-messages</module>
     <module>samples/45.state-management</module>
     <module>samples/47.inspection</module>
+    <module>samples/57.teams-conversation-bot</module>
   </modules>
 
   <build>

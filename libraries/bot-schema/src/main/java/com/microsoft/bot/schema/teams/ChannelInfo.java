@@ -71,4 +71,12 @@ public class ChannelInfo {
      */
     public ChannelInfo() {
     }
+
+    /**
+     * Initialzies a new instance of the ChannelInfo class with an id.
+     * @param withId The id.
+     */
+    public ChannelInfo(String withId) {
+        id = withId;
+    }
 }

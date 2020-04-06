@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.schema;
 
+import com.microsoft.bot.schema.teams.NotificationInfo;
+import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -804,6 +806,19 @@ public class Activity {
     }
 
     /**
+     * Sets payload version of the Mentions in an Activity.
+     * @param withMentions The payload entities.
+     * @see Entity
+     */
+    public void setMentions(List<Mention> withMentions) {
+        setEntities(withMentions.stream()
+            .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
+            .map(entity -> Entity.getAs(entity, Entity.class))
+            .collect(Collectors.toCollection(ArrayList::new))
+        );
+    }
+
+    /**
      * Gets channel-specific content.
      * @return Channel specific data.
      */
@@ -1307,7 +1322,7 @@ public class Activity {
      * @param <TypeT> The type of the returned object.
      * @return ChannelData as TypeT
      */
-    public <TypeT> ResultPair<Boolean, TypeT> tryGetChannelData(Class<TypeT> clsType) {
+    public <TypeT> ResultPair<TypeT> tryGetChannelData(Class<TypeT> clsType) {
         TypeT instance = null;
         if (this.getChannelData() == null) {
             return new ResultPair<>(false, instance);
@@ -1316,9 +1331,9 @@ public class Activity {
         try {
             instance = this.getChannelData(clsType);
         } catch (JsonProcessingException e) {
-            return new ResultPair<Boolean, TypeT>(false, instance);
+            return new ResultPair<TypeT>(false, instance);
         }
-        return new ResultPair<Boolean, TypeT>(true, instance);
+        return new ResultPair<TypeT>(true, instance);
     }
 
     /**
@@ -1517,15 +1532,19 @@ public class Activity {
 
     /**
      * Get unique identifier representing a channel.
-     *
-     * @throws JsonProcessingException when channel data can't be parsed to TeamChannelData
-     * @return Unique identifier representing a channel
+     * @return If this is a Teams Activity with valid data, the unique identifier representing a channel.
      */
-    public String teamsGetChannelId() throws JsonProcessingException {
-        TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
-        String teamsChannelId = teamsChannelData.getTeamsChannelId();
-        if (teamsChannelId == null && teamsChannelData.getChannel() != null) {
-          teamsChannelId = teamsChannelData.getChannel().getId();
+    public String teamsGetChannelId() {
+        String teamsChannelId;
+
+        try {
+            TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
+            teamsChannelId = teamsChannelData.getTeamsChannelId();
+            if (teamsChannelId == null && teamsChannelData.getChannel() != null) {
+                teamsChannelId = teamsChannelData.getChannel().getId();
+            }
+        } catch (JsonProcessingException jpe) {
+            teamsChannelId = null;
         }
 
         return teamsChannelId;
@@ -1533,17 +1552,57 @@ public class Activity {
 
     /**
      * Get unique identifier representing a team.
-     *
-     * @throws JsonProcessingException when channel data can't be parsed to TeamChannelData
-     * @return Unique identifier representing a team.
+     * @return If this is a Teams Activity with valid data, the unique identifier representing a team.
      */
-    public String teamsGetTeamId() throws JsonProcessingException {
-        TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
-        String teamId = teamsChannelData.getTeamsTeamId();
-        if (teamId == null && teamsChannelData.getTeam() != null) {
-          teamId = teamsChannelData.getTeam().getId();
+    public String teamsGetTeamId() {
+        String teamId;
+
+        try {
+            TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
+            teamId = teamsChannelData.getTeamsTeamId();
+            if (teamId == null && teamsChannelData.getTeam() != null) {
+                teamId = teamsChannelData.getTeam().getId();
+            }
+        } catch (JsonProcessingException jpe) {
+            teamId = null;
         }
 
         return teamId;
+    }
+
+    /**
+     * Get Teams TeamInfo data.
+     * @return If this is a Teams Activity with valid data, the TeamInfo object.
+     */
+    public TeamInfo teamsGetTeamInfo() {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        return teamsChannelData != null ? teamsChannelData.getTeam() : null;
+    }
+
+    /**
+     * Sets the notification value in the TeamsChannelData to true.
+     */
+    public void teamsNotifyUser() {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        if (teamsChannelData == null) {
+            teamsChannelData = new TeamsChannelData();
+            setChannelData(teamsChannelData);
+        }
+
+        teamsChannelData.setNotification(new NotificationInfo(true));
     }
 }
