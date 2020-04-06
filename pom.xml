@@ -375,6 +375,10 @@
     <module>samples/16.proactive-messages</module>
     <module>samples/45.state-management</module>
     <module>samples/47.inspection</module>
+    <module>samples/50.teams-messaging-extensions-search</module>
+    <module>samples/51.teams-messaging-extensions-action</module>
+    <module>samples/52.teams-messaging-extensions-search-auth-config</module>
+    <module>samples/53.teams-messaging-extensions-action-preview</module>
     <module>samples/57.teams-conversation-bot</module>
   </modules>
 
