@@ -1,10 +1,10 @@
 ﻿
 # Teams File Upload Bot
 
-Bot Framework v4 File Upload Bot sample for Teams.
+Bot Framework v4 file upload bot sample for Teams.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to
+upload files to Teams from a bot and how to receive a file sent to a bot as an attachment.
 
 ## Prerequisites
 
@@ -46,25 +46,13 @@ the Teams service needs to call into the bot.
     - Run it by using `java -jar .\target\bot-teams-file-upload-sample.jar`
 
 
-## Interacting with the bot
+## Interacting with the bot in Teams
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
+> Note this `manifest.json` specified that the bot will be installed in "personal" scope which is why you immediately entered a one on one chat conversation with the bot. Please refer to Teams documentation for more details.
 
-1. **Show Welcome**
-  - **Result:** The bot will send the welcome card for you to interact with
-  - **Valid Scopes:** personal, group chat, team chat
-2. **MentionMe**
-  - **Result:** The bot will respond to the message and mention the user
-  - **Valid Scopes:** personal, group chat, team chat
-3. **MessageAllMembers**
-  - **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
-  - **Valid Scopes:** personal, group chat, team chat
+Sending a message to the bot will cause it to respond with a card that will prompt you to upload a file. The file that's being uploaded is the `teams-logo.png` in the `Files` directory in this sample. The `Accept` and `Decline` events illustrated in this sample are specific to Teams. You can message the bot again to receive another prompt.
 
-You can select an option from the command list by typing ```@TeamsConversationBot``` into the compose message area and ```What can I do?``` text above the compose area.
-
-### Avoiding Permission-Related Errors
-
-You may encounter permission-related errors when sending a proactive message. This can often be mitigated by using `MicrosoftAppCredentials.TrustServiceUrl()`. See [the documentation](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=csharp#avoiding-401-unauthorized-errors) for more information.
+You can also send a file to the bot as an attachment in the message compose section in Teams. This will be delivered to the bot as a Message Activity and the code in this sample fetches and saves the file.
 
 ## Deploy the bot to Azure
 

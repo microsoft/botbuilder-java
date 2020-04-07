@@ -15,6 +15,7 @@ import com.microsoft.bot.schema.teams.FileConsentCard;
 import com.microsoft.bot.schema.teams.FileConsentCardResponse;
 import com.microsoft.bot.schema.teams.FileDownloadInfo;
 import com.microsoft.bot.schema.teams.FileInfoCard;
+import com.sun.corba.se.spi.orbutil.fsm.ActionBase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -46,10 +47,12 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         if (messageWithDownload(turnContext.getActivity())) {
-            return downloadAttachment(turnContext.getActivity().getAttachments().get(0))
+            Attachment attachment = turnContext.getActivity().getAttachments().get(0);
+            return downloadAttachment(attachment)
                 .thenCompose(result -> !result.result()
                                        ? fileDownloadFailed(turnContext, result.value())
-                                       : CompletableFuture.completedFuture(null));
+                                       : fileDownloadCompleted(turnContext, attachment)
+                );
         } else {
             File filePath = new File("files", "teams-logo.png");
             return sendFileCard(turnContext, filePath.getName(), filePath.length());
@@ -136,6 +139,16 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     private CompletableFuture<Void> fileUploadFailed(TurnContext turnContext, String error) {
         Activity reply = MessageFactory.text("<b>File upload failed.</b> Error: <pre>" + error + "</pre>");
         reply.setTextFormat(TextFormatTypes.XML);
+        return turnContext.sendActivityBlind(reply);
+    }
+
+    private CompletableFuture<Void> fileDownloadCompleted(TurnContext turnContext, Attachment attachment) {
+        Activity reply = MessageFactory.text(String.format(
+            "<b>%s</b> received and saved.",
+            attachment.getName()
+        ));
+        reply.setTextFormat(TextFormatTypes.XML);
+
         return turnContext.sendActivityBlind(reply);
     }
 
