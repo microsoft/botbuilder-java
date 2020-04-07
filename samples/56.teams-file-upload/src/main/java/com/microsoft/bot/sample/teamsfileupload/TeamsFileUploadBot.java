@@ -15,7 +15,6 @@ import com.microsoft.bot.schema.teams.FileConsentCard;
 import com.microsoft.bot.schema.teams.FileConsentCardResponse;
 import com.microsoft.bot.schema.teams.FileDownloadInfo;
 import com.microsoft.bot.schema.teams.FileInfoCard;
-import com.sun.corba.se.spi.orbutil.fsm.ActionBase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
