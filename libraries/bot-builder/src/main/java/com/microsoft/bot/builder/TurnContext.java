@@ -143,6 +143,17 @@ public interface TurnContext {
     CompletableFuture<ResourceResponse> sendActivity(Activity activity);
 
     /**
+     * Sends an Activity to the sender of the incoming Activity without
+     * returning a ResourceResponse.
+     *
+     * @param activity The activity to send.
+     * @return A task that represents the work queued to execute.
+     */
+    default CompletableFuture<Void> sendActivityBlind(Activity activity) {
+        return sendActivity(activity).thenApply(aVoid -> null);
+    }
+
+    /**
      * Sends a list of activities to the sender of the incoming activity.
      *
      * <p>If the activities are successfully sent, the task result contains
