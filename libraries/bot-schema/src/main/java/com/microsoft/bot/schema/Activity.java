@@ -772,6 +772,14 @@ public class Activity {
     }
 
     /**
+     * Sets a single attachment on the Activity.
+     * @param withAttachment The Attachment object.
+     */
+    public void setAttachment(Attachment withAttachment) {
+        setAttachments(Collections.singletonList(withAttachment));
+    }
+
+    /**
      * Returns payload version of the Entities in an Activity.
      *
      * Entities can vary in the number of fields.  The {@link Entity} class holds the additional
@@ -1192,6 +1200,14 @@ public class Activity {
         }
 
         return reply;
+    }
+
+    /**
+     * Creates a new message activity as a response to this activity.
+     * @return The new message activity.
+     */
+    public Activity createReply() {
+        return createReply(null, null);
     }
 
     /**

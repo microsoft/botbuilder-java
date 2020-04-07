@@ -69,7 +69,7 @@ public class ActivityHandler implements Bot {
                         if (invokeResponse != null
                             && turnContext.getTurnState().get(BotFrameworkAdapter.INVOKE_RESPONSE_KEY) == null) {
 
-                            Activity activity = new Activity(ActivityTypes.INVOKE);
+                            Activity activity = new Activity(ActivityTypes.INVOKE_RESPONSE);
                             activity.setValue(invokeResponse);
 
                             return turnContext.sendActivity(activity);
