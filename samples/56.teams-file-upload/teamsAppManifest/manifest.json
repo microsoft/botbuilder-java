@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.5",
+  "version": "1.0",
+  "id": "22e1d947-3a22-43b7-b665-3590b0f01af7",
+  "packageName": "com.microsoft.teams.fileupload",
+  "developer": {
+    "name": "Microsoft Corp",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "FileUpload",
+    "full": "FileUpload"
+  },
+  "description": {
+    "short": "Sample bot using V4 SDK to demo bot file features",
+    "full": "Sample bot using V4 Bot Builder SDK and V4 Microsoft Teams Extension SDK to demo bot file features"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#abcdef",
+  "bots": [
+    {
+      "botId": "22e1d947-3a22-43b7-b665-3590b0f01af7",
+      "scopes": [
+        "personal"
+      ],
+      "supportsFiles": true
+    }
+  ],
+  "validDomains": [
+    "*.azurewebsites.net"
+  ]
+}
