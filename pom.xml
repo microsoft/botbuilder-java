@@ -379,6 +379,7 @@
     <module>samples/51.teams-messaging-extensions-action</module>
     <module>samples/52.teams-messaging-extensions-search-auth-config</module>
     <module>samples/53.teams-messaging-extensions-action-preview</module>
+    <module>samples/55.teams-link-unfurling</module>
     <module>samples/57.teams-conversation-bot</module>
   </modules>
 
