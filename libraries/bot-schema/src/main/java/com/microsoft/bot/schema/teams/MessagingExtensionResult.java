@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.schema.Activity;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,10 +79,20 @@ public class MessagingExtensionResult {
 
     /**
      * Sets (Only when type is result) Attachments.
+     * This replaces all previous attachments on the object.
      * @param withAttachments The result attachments.
      */
     public void setAttachments(List<MessagingExtensionAttachment> withAttachments) {
         attachments = withAttachments;
+    }
+
+    /**
+     * Sets (Only when type is result) Attachments to the specific attachment.
+     * This replaces all previous attachments on the object.
+     * @param withAttachment The attachment.
+     */
+    public void setAttachment(MessagingExtensionAttachment withAttachment) {
+        setAttachments(Collections.singletonList(withAttachment));
     }
 
     /**

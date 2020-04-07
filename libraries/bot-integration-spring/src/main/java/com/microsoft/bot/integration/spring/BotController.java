@@ -79,6 +79,8 @@ public class BotController {
 
             .handle((result, exception) -> {
                 if (exception == null) {
+                    if (result != null)
+                        return new ResponseEntity<>(result.getBody(), HttpStatus.valueOf(result.getStatus()));
                     return new ResponseEntity<>(HttpStatus.ACCEPTED);
                 }
 

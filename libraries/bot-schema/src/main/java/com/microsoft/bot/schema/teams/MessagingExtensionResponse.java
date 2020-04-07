@@ -13,6 +13,14 @@ public class MessagingExtensionResponse {
     private MessagingExtensionResult composeExtension;
 
     /**
+     * Creates a new response with the specified result.
+     * @param withResult The result.
+     */
+    public MessagingExtensionResponse(MessagingExtensionResult withResult) {
+        composeExtension = withResult;
+    }
+
+    /**
      * Gets the response result.
      * @return The result.
      */
