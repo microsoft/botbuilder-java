@@ -32,6 +32,21 @@ public class CardImage {
     private CardAction tap;
 
     /**
+     * Creates a new CardImage.
+     */
+    public CardImage() {
+
+    }
+
+    /**
+     * Creates a new CardImage with an initial URL.
+     * @param withUrl The URL for the image.
+     */
+    public CardImage(String withUrl) {
+        setUrl(withUrl);
+    }
+
+    /**
      * Get the url value.
      *
      * @return the url value

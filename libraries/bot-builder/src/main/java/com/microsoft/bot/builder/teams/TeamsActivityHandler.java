@@ -504,13 +504,17 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
-    private <T> CompletableFuture<T> notImplemented() {
+    protected <T> CompletableFuture<T> notImplemented() {
+        return notImplemented(null);
+    }
+
+    protected <T> CompletableFuture<T> notImplemented(String body) {
         CompletableFuture<T> result = new CompletableFuture<>();
-        result.completeExceptionally(new InvokeResponseExcetion(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
+        result.completeExceptionally(new InvokeResponseExcetion(HttpURLConnection.HTTP_NOT_IMPLEMENTED, body));
         return result;
     }
 
-    private <T> CompletableFuture<T> withException(Throwable t) {
+    protected <T> CompletableFuture<T> withException(Throwable t) {
         CompletableFuture<T> result = new CompletableFuture<>();
         result.completeExceptionally(new CompletionException(t));
         return result;

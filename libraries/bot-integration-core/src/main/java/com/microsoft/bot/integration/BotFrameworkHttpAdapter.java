@@ -5,6 +5,7 @@ package com.microsoft.bot.integration;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.builder.BotFrameworkAdapter;
+import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.ChannelValidation;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
@@ -66,8 +67,7 @@ public class BotFrameworkHttpAdapter extends BotFrameworkAdapter {
      * @param bot A Bot.
      * @return A CompletableFuture.
      */
-    public CompletableFuture<Void> processIncomingActivity(String authHeader, Activity activity, Bot bot) {
-        return processActivity(authHeader, activity, bot::onTurn)
-            .thenApply(invokeResponse -> null);
+    public CompletableFuture<InvokeResponse> processIncomingActivity(String authHeader, Activity activity, Bot bot) {
+        return processActivity(authHeader, activity, bot::onTurn);
     }
 }
