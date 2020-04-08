@@ -98,8 +98,16 @@ public class TeamInfo {
     }
 
     /**
-     * A new instance of TeamInfo.
+     * A new empty instance of TeamInfo.
      */
     public TeamInfo() {
+    }
+
+    /**
+     * A new instance of TeamInfo with ID.
+     * @param withId The id of the team.
+     */
+    public TeamInfo(String withId) {
+        this(withId, null, null);
     }
 }

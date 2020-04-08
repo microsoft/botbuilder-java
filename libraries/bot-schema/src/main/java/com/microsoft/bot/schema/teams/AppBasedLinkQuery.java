@@ -13,6 +13,13 @@ public class AppBasedLinkQuery {
     private String url;
 
     /**
+     * Initializes a new empty instance of the AppBasedLinkQuery class.
+     */
+    public AppBasedLinkQuery() {
+
+    }
+
+    /**
      * Initializes a new instance of the AppBasedLinkQuery class.
      * @param withUrl The query url.
      */

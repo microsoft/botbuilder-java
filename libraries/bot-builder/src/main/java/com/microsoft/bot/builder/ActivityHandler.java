@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * An implementation of the {@link Bot} interface intended for further subclassing.
@@ -309,7 +310,10 @@ public class ActivityHandler implements Bot {
             return onSignInInvoke(turnContext)
                 .thenApply(aVoid -> createInvokeResponse(null))
                 .exceptionally(ex -> {
-                    if (ex instanceof InvokeResponseExcetion) {
+                    if (ex instanceof CompletionException && ex.getCause() instanceof InvokeResponseExcetion) {
+                        InvokeResponseExcetion ire = (InvokeResponseExcetion) ex.getCause();
+                        return new InvokeResponse(ire.statusCode, ire.body);
+                    } else if (ex instanceof InvokeResponseExcetion) {
                         InvokeResponseExcetion ire = (InvokeResponseExcetion) ex;
                         return new InvokeResponse(ire.statusCode, ire.body);
                     }

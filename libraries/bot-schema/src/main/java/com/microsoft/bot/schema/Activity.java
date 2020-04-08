@@ -1575,6 +1575,10 @@ public class Activity {
 
         try {
             TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
+            if (teamsChannelData == null) {
+                return null;
+            }
+
             teamId = teamsChannelData.getTeamsTeamId();
             if (teamId == null && teamsChannelData.getTeam() != null) {
                 teamId = teamsChannelData.getTeam().getId();

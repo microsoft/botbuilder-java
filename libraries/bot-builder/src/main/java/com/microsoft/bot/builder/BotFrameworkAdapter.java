@@ -89,6 +89,12 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      */
     public static final String CONNECTOR_CLIENT_KEY = "ConnectorClient";
 
+    /**
+     * Key to store TeamsConnectorClient.
+     * For testing only.
+     */
+    public static final String TEAMSCONNECTOR_CLIENT_KEY = "TeamsConnectorClient";
+
     private AppCredentials appCredentials;
 
     /**
