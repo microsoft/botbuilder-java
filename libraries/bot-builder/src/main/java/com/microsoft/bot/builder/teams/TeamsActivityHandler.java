@@ -153,7 +153,9 @@ public class TeamsActivityHandler extends ActivityHandler {
         }
 
         return result.exceptionally(e -> {
-            if (e instanceof InvokeResponseExcetion) {
+            if (e instanceof CompletionException && e.getCause() instanceof InvokeResponseExcetion) {
+                return ((InvokeResponseExcetion) e.getCause()).createInvokeResponse();
+            } else if (e instanceof InvokeResponseExcetion) {
                 return ((InvokeResponseExcetion) e).createInvokeResponse();
             }
             return new InvokeResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, e.getLocalizedMessage());
@@ -340,7 +342,7 @@ public class TeamsActivityHandler extends ActivityHandler {
 
             if (turnContext.getActivity().getMembersRemoved() != null) {
                 return onTeamsMembersRemovedDispatch(
-                    turnContext.getActivity().getMembersAdded(),
+                    turnContext.getActivity().getMembersRemoved(),
                     channelData.result() ? channelData.value().getTeam() : null,
                     turnContext
                 );

@@ -13,6 +13,13 @@ public class MessagingExtensionResponse {
     private MessagingExtensionResult composeExtension;
 
     /**
+     * Creates a new empty response with the specified result.
+     */
+    public MessagingExtensionResponse() {
+
+    }
+
+    /**
      * Creates a new response with the specified result.
      * @param withResult The result.
      */
