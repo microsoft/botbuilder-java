@@ -3,7 +3,9 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.microsoft.bot.schema.ChannelAccount;
 
 /**
@@ -84,5 +86,23 @@ public class TeamsChannelAccount extends ChannelAccount {
      */
     public void setUserPrincipalName(String withUserPrincipalName) {
         userPrincipalName = withUserPrincipalName;
+    }
+
+    /**
+     * Gets the AAD object id.
+     * @return The AAD object id.
+     */
+    @JsonGetter(value = "objectId")
+    public String getObjectId() {
+        return getAadObjectId();
+    }
+
+    /**
+     * Sets the AAD object id.
+     * @param withObjectId The AAD object Id.
+     */
+    @JsonSetter(value = "objectId")
+    public void setObjectId(String withObjectId) {
+        setAadObjectId(withObjectId);
     }
 }

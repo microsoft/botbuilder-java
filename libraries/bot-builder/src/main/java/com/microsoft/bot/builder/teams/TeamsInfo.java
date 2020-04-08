@@ -3,9 +3,6 @@
 
 package com.microsoft.bot.builder.teams;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.BotFrameworkAdapter;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.ConnectorClient;
@@ -17,6 +14,7 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.PagedMembersResult;
 import com.microsoft.bot.schema.Pair;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.teams.ChannelInfo;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.TeamDetails;
@@ -186,22 +184,8 @@ public final class TeamsInfo {
 
         return connectorClient.getConversations().getConversationMembers(conversationId)
             .thenApply(teamMembers -> {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.findAndRegisterModules();
-
                 List<TeamsChannelAccount> members = teamMembers.stream()
-                    .map(channelAccount -> {
-                        try {
-                            // convert fro ChannelAccount to TeamsChannelAccount by going to JSON then back
-                            // to TeamsChannelAccount.
-                            JsonNode node = objectMapper.valueToTree(channelAccount);
-                            return objectMapper.treeToValue(node, TeamsChannelAccount.class);
-                        } catch (JsonProcessingException jpe) {
-                            // this would be a conversion error.  for now, return null and filter the results
-                            // below.  there is probably a more elegant way to handle this.
-                            return null;
-                        }
-                    })
+                    .map(channelAccount -> Serialization.convert(channelAccount, TeamsChannelAccount.class))
                     .collect(Collectors.toCollection(ArrayList::new));
 
                 members.removeIf(Objects::isNull);
@@ -216,25 +200,7 @@ public final class TeamsInfo {
         }
 
         return connectorClient.getConversations().getConversationMember(userId, conversationId)
-            .thenApply(teamMember -> {
-                if (teamMember == null) {
-                    return null;
-                }
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.findAndRegisterModules();
-
-                try {
-                    // convert fro ChannelAccount to TeamsChannelAccount by going to JSON then back
-                    // to TeamsChannelAccount.
-                    JsonNode node = objectMapper.valueToTree(teamMember);
-                    return objectMapper.treeToValue(node, TeamsChannelAccount.class);
-                } catch (JsonProcessingException jpe) {
-                    // this would be a conversion error.
-                    return null;
-                }
-
-            });
+            .thenApply(teamMember -> Serialization.convert(teamMember, TeamsChannelAccount.class));
     }
 
     private static CompletableFuture<TeamsPagedMembersResult> getPagedMembers(ConnectorClient connectorClient,
@@ -265,6 +231,13 @@ public final class TeamsInfo {
     }
 
     private static TeamsConnectorClient getTeamsConnectorClient(TurnContext turnContext) {
+        // for testing to be able to provide a custom client.
+        TeamsConnectorClient teamsClient = turnContext.getTurnState()
+            .get(BotFrameworkAdapter.TEAMSCONNECTOR_CLIENT_KEY);
+        if (teamsClient != null) {
+            return teamsClient;
+        }
+
         ConnectorClient client = getConnectorClient(turnContext);
         return new RestTeamsConnectorClient(client.baseUrl(), client.credentials());
     }
