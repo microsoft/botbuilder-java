@@ -35,8 +35,9 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
     }
 
     @Override
-    protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(TurnContext turnContext,
-                                                                     MessagingExtensionQuery query) {
+    protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(
+        TurnContext turnContext,
+        MessagingExtensionQuery query) {
         List<MessagingExtensionParameter> queryParams = query.getParameters();
         String text = "";
         if (queryParams != null && !queryParams.isEmpty()) {
@@ -121,7 +122,8 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
     }
 
-    private CompletableFuture<List<String []>> FindPackages(String text) throws IOException {
+    private CompletableFuture<List<String []>> FindPackages(
+        String text) throws IOException {
         return CompletableFuture.supplyAsync(() -> {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
