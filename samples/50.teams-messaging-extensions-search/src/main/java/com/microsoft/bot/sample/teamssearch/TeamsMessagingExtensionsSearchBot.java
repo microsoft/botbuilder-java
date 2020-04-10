@@ -15,6 +15,7 @@ import org.json.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class implements the functionality of the Bot.
@@ -41,7 +42,14 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         if (queryParams != null && !queryParams.isEmpty()) {
             text = (String) queryParams.get(0).getValue();
         }
-        List<String []> packages = FindPackages(text);
+
+        List<String []> packages = null;
+
+        try {
+            packages = FindPackages(text).get();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            packages = new ArrayList<String[]>();
+        }
 
         List<MessagingExtensionAttachment> attachments = new ArrayList<>();
         for (String [] item: packages) {
@@ -113,32 +121,34 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
     }
 
-    private List<String []> FindPackages(String text) {
+    private CompletableFuture<List<String []>> FindPackages(String text) throws IOException {
+        return CompletableFuture.supplyAsync(() -> {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                .url(String.format("https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true", text))
+                .build();
 
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-            .url(String.format("https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true", text))
-            .build();
-
-        List<String []> filteredItems = new ArrayList<String []>();
-        try {
-            Response response = client.newCall(request).execute();
-            JSONObject obj = new JSONObject(response.body().string());
-            JSONArray dataArray = (JSONArray) obj.get("data");
-            dataArray.forEach(i -> {
-                JSONObject item = (JSONObject) i;
-                filteredItems.add(new String [] {
-                    item.getString("id"),
-                    item.getString("version"),
-                    item.getString("description"),
-                    item.has("projectUrl") ? item.getString("projectUrl") : "",
-                    item.has("iconUrl") ? item.getString("iconUrl") : ""
+            List<String []> filteredItems = new ArrayList<String []>();
+            try {
+                Response response = client.newCall(request).execute();
+                JSONObject obj = new JSONObject(response.body().string());
+                JSONArray dataArray = (JSONArray) obj.get("data");
+                dataArray.forEach(i -> {
+                    JSONObject item = (JSONObject) i;
+                    filteredItems.add(new String [] {
+                        item.getString("id"),
+                        item.getString("version"),
+                        item.getString("description"),
+                        item.has("projectUrl") ? item.getString("projectUrl") : "",
+                        item.has("iconUrl") ? item.getString("iconUrl") : ""
+                    });
                 });
-            });
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return filteredItems;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return filteredItems;
+        });
+
     }
 }
