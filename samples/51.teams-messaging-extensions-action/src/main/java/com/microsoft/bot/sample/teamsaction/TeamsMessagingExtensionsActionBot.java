@@ -6,6 +6,7 @@ package com.microsoft.bot.sample.teamsaction;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
 import com.microsoft.bot.integration.Configuration;
+import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,8 @@ import java.util.concurrent.CompletableFuture;
  * This class implements the functionality of the Bot.
  *
  * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * added.  There are two basic types of Messaging Extension in Teams: Search-based and Action-based.
+ * This sample illustrates how to build an Action-based Messaging Extension.</p>
  */
 @Component
 public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
@@ -58,8 +58,7 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
             setText((String) actionData.get("text"));
         }};
 
-        List<MessagingExtensionAttachment> attachments = new ArrayList<MessagingExtensionAttachment>();
-        attachments.add(new MessagingExtensionAttachment(){{
+        List<MessagingExtensionAttachment> attachments = Arrays.asList(new MessagingExtensionAttachment(){{
             setContent(card);
             setContentType(HeroCard.CONTENTTYPE);
             setPreview(card.toAttachment());
@@ -67,9 +66,9 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
 
         return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
             setComposeExtension(new MessagingExtensionResult(){{
+                setAttachments(attachments);
                 setAttachmentLayout("list");
                 setType("result");
-                setAttachments(attachments);
             }});
         }});
     }
@@ -79,13 +78,23 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
         MessagingExtensionAction action
     ) {
 
+        LinkedHashMap actionData = (LinkedHashMap) action.getData();
+
         HeroCard card = new HeroCard() {{
-            setTitle("Test");
-            setText("Test");
+            setTitle(action.getMessagePayload().getFrom().getUser().getDisplayName());
+            setText(action.getMessagePayload().getBody().getContent());
         }};
 
         if (action.getMessagePayload().getAttachments() != null && !action.getMessagePayload().getAttachments().isEmpty()) {
-            card.setSubtitle("Test");
+            card.setSubtitle("Attachments not included)");
+        }
+
+        boolean includeImage = actionData.get("includeImage") != null ? (Boolean.valueOf((String) actionData.get("includeImage"))) : false;
+        if (includeImage)
+        {
+            card.setImages(Arrays.asList(new CardImage(){{
+                setUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
+            }}));
         }
 
         return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
