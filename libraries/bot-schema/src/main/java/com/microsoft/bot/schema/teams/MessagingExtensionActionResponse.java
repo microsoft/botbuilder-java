@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class MessagingExtensionActionResponse {
     @JsonProperty(value = "task")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TaskModuleResponseBase task;
 
     @JsonProperty(value = "composeExtension")
