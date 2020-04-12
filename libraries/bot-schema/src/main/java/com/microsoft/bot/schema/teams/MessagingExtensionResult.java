@@ -25,12 +25,15 @@ public class MessagingExtensionResult {
     private List<MessagingExtensionAttachment> attachments;
 
     @JsonProperty(value = "suggestedActions")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private MessagingExtensionSuggestedAction suggestedActions;
 
     @JsonProperty(value = "text")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String text;
 
     @JsonProperty(value = "activityPreview")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Activity activityPreview;
 
     /**
