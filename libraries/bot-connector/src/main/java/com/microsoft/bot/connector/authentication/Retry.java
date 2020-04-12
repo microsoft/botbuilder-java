@@ -24,15 +24,18 @@ public final class Retry {
 
     /**
      * Runs a task with retry.
-     * @param task The task to run.
+     * 
+     * @param task                  The task to run.
      * @param retryExceptionHandler Called when an exception happens.
-     * @param <TResult> The type of the result.
-     * @return A CompletableFuture that is complete when 'task' returns successfully.
+     * @param <TResult>             The type of the result.
+     * @return A CompletableFuture that is complete when 'task' returns
+     *         successfully.
      * @throws RetryException If the task doesn't complete successfully.
      */
     public static <TResult> CompletableFuture<TResult> run(
         Supplier<CompletableFuture<TResult>> task,
-        BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler) {
+        BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler
+    ) {
 
         CompletableFuture<TResult> result = new CompletableFuture<>();
 
@@ -66,6 +69,7 @@ public final class Retry {
     }
 
     private static final double BACKOFF_MULTIPLIER = 1.1;
+
     private static long withBackoff(long delay, int retryCount) {
         double result = delay * Math.pow(BACKOFF_MULTIPLIER, retryCount - 1);
         return (long) Math.min(result, Long.MAX_VALUE);

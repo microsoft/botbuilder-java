@@ -6,7 +6,8 @@ package com.microsoft.bot.builder;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Handles persistence of a conversation state object using the conversation.Id and from.Id part of an activity.
+ * Handles persistence of a conversation state object using the conversation.Id
+ * and from.Id part of an activity.
  */
 public class PrivateConversationState extends BotState {
     /**
@@ -34,21 +35,23 @@ public class PrivateConversationState extends BotState {
             throw new IllegalArgumentException("invalid activity-missing channelId");
         }
 
-        if (turnContext.getActivity().getConversation() == null
-            || StringUtils.isEmpty(turnContext.getActivity().getConversation().getId())) {
+        if (
+            turnContext.getActivity().getConversation() == null
+                || StringUtils.isEmpty(turnContext.getActivity().getConversation().getId())
+        ) {
             throw new IllegalArgumentException("invalid activity-missing Conversation.Id");
         }
 
-        if (turnContext.getActivity().getFrom() == null
-            || StringUtils.isEmpty(turnContext.getActivity().getFrom().getId())) {
+        if (
+            turnContext.getActivity().getFrom() == null
+                || StringUtils.isEmpty(turnContext.getActivity().getFrom().getId())
+        ) {
             throw new IllegalArgumentException("invalid activity-missing From.Id");
         }
 
         // {channelId}/conversations/{conversationId}/users/{userId}
-        return turnContext.getActivity().getChannelId()
-            + "/conversations/"
-            + turnContext.getActivity().getConversation().getId()
-            + "/users/"
+        return turnContext.getActivity().getChannelId() + "/conversations/"
+            + turnContext.getActivity().getConversation().getId() + "/users/"
             + turnContext.getActivity().getFrom().getId();
     }
 }

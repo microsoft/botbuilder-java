@@ -14,6 +14,7 @@ public class TaskModuleResponse {
 
     /**
      * Gets the response task.
+     * 
      * @return The response task.
      */
     public TaskModuleResponseBase getTask() {
@@ -22,6 +23,7 @@ public class TaskModuleResponse {
 
     /**
      * Sets the response task.
+     * 
      * @param withTask The response task.
      */
     public void setTask(TaskModuleResponseBase withTask) {

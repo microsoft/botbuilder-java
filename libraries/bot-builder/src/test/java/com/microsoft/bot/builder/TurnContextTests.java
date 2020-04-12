@@ -46,10 +46,17 @@ public class TurnContextTests {
         new TestFlow(adapter, (turnContext -> {
             switch (turnContext.getActivity().getText()) {
                 case "count":
-                    return turnContext.sendActivity(turnContext.getActivity().createReply("one"))
-                        .thenCompose(resourceResponse -> turnContext.sendActivity(turnContext.getActivity().createReply("two")))
-                        .thenCompose(resourceResponse -> turnContext.sendActivity(turnContext.getActivity().createReply("two")))
-                        .thenApply(resourceResponse -> null);
+                    return turnContext.sendActivity(
+                        turnContext.getActivity().createReply("one")
+                    ).thenCompose(
+                        resourceResponse -> turnContext.sendActivity(
+                            turnContext.getActivity().createReply("two")
+                        )
+                    ).thenCompose(
+                        resourceResponse -> turnContext.sendActivity(
+                            turnContext.getActivity().createReply("two")
+                        )
+                    ).thenApply(resourceResponse -> null);
 
                 case "ignore":
                     break;
@@ -59,48 +66,62 @@ public class TurnContextTests {
                         throw new RuntimeException("Responded is true");
                     }
 
-                    return turnContext.sendActivity(turnContext.getActivity().createReply("one"))
-                        .thenApply(resourceResponse -> {
-                            if (!turnContext.getResponded()) {
-                                throw new RuntimeException("Responded is false");
-                            }
-                            return null;
-                        });
+                    return turnContext.sendActivity(
+                        turnContext.getActivity().createReply("one")
+                    ).thenApply(resourceResponse -> {
+                        if (!turnContext.getResponded()) {
+                            throw new RuntimeException("Responded is false");
+                        }
+                        return null;
+                    });
 
                 default:
-                    return turnContext.sendActivity(turnContext.getActivity().createReply("echo:" + turnContext.getActivity().getText()))
-                        .thenApply(resourceResponse -> null);
+                    return turnContext.sendActivity(
+                        turnContext.getActivity().createReply(
+                            "echo:" + turnContext.getActivity().getText()
+                        )
+                    ).thenApply(resourceResponse -> null);
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("TestResponded")
-            .startTest().join();
+        })).send("TestResponded").startTest().join();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void GetThrowsOnNullKey() {
-        TurnContext c = new TurnContextImpl(new SimpleAdapter(), new Activity(ActivityTypes.MESSAGE));
-        Object o = c.getTurnState().get((String)null);
+        TurnContext c = new TurnContextImpl(
+            new SimpleAdapter(),
+            new Activity(ActivityTypes.MESSAGE)
+        );
+        Object o = c.getTurnState().get((String) null);
     }
 
     @Test
     public void GetReturnsNullOnEmptyKey() {
-        TurnContext c = new TurnContextImpl(new SimpleAdapter(), new Activity(ActivityTypes.MESSAGE));
+        TurnContext c = new TurnContextImpl(
+            new SimpleAdapter(),
+            new Activity(ActivityTypes.MESSAGE)
+        );
         Object service = c.getTurnState().get("");
         Assert.assertNull("Should not have found a service under an empty key", service);
     }
 
     @Test
     public void GetReturnsNullWithUnknownKey() {
-        TurnContext c = new TurnContextImpl(new SimpleAdapter(), new Activity(ActivityTypes.MESSAGE));
+        TurnContext c = new TurnContextImpl(
+            new SimpleAdapter(),
+            new Activity(ActivityTypes.MESSAGE)
+        );
         Object service = c.getTurnState().get("test");
         Assert.assertNull("Should not have found a service with unknown key", service);
     }
 
     @Test
     public void CacheValueUsingGetAndSet() {
-        TurnContext c = new TurnContextImpl(new SimpleAdapter(), new Activity(ActivityTypes.MESSAGE));
+        TurnContext c = new TurnContextImpl(
+            new SimpleAdapter(),
+            new Activity(ActivityTypes.MESSAGE)
+        );
 
         c.getTurnState().add("bar", "foo");
         String result = c.getTurnState().get("bar");
@@ -110,7 +131,10 @@ public class TurnContextTests {
 
     @Test
     public void CacheValueUsingGetAndSetGenericWithTypeAsKeyName() {
-        TurnContext c = new TurnContextImpl(new SimpleAdapter(), new Activity(ActivityTypes.MESSAGE));
+        TurnContext c = new TurnContextImpl(
+            new SimpleAdapter(),
+            new Activity(ActivityTypes.MESSAGE)
+        );
 
         c.getTurnState().add("foo");
         String result = c.getTurnState().get(String.class);
@@ -183,7 +207,7 @@ public class TurnContextTests {
 
     @Test
     public void SendOneActivityToAdapter() {
-        boolean[] foundActivity = new boolean[]{ false };
+        boolean[] foundActivity = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter((activities) -> {
             Assert.assertTrue("Incorrect Count", activities.size() == 1);
@@ -201,7 +225,7 @@ public class TurnContextTests {
         SimpleAdapter a = new SimpleAdapter();
         TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
-        int[] count = new int[] {0};
+        int[] count = new int[] { 0 };
         c.onSendActivities(((context, activities, next) -> {
             Assert.assertNotNull(activities);
             count[0] = activities.size();
@@ -215,7 +239,7 @@ public class TurnContextTests {
 
     @Test
     public void AllowInterceptionOfDeliveryOnSend() {
-        boolean[] responsesSent = new boolean[]{ false };
+        boolean[] responsesSent = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter((activities) -> {
             responsesSent[0] = true;
@@ -224,7 +248,7 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
-        int[] count = new int[] {0};
+        int[] count = new int[] { 0 };
         c.onSendActivities(((context, activities, next) -> {
             Assert.assertNotNull(activities);
             count[0] = activities.size();
@@ -240,7 +264,7 @@ public class TurnContextTests {
 
     @Test
     public void InterceptAndMutateOnSend() {
-        boolean[] foundIt = new boolean[]{ false };
+        boolean[] foundIt = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter((activities) -> {
             Assert.assertNotNull(activities);
@@ -265,7 +289,7 @@ public class TurnContextTests {
 
     @Test
     public void UpdateOneActivityToAdapter() {
-        boolean[] foundActivity = new boolean[]{ false };
+        boolean[] foundActivity = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, (activity) -> {
             Assert.assertNotNull(activity);
@@ -285,7 +309,7 @@ public class TurnContextTests {
         final String ACTIVITY_ID = "activity ID";
         final String CONVERSATION_ID = "conversation ID";
 
-        boolean[] foundActivity = new boolean[]{ false };
+        boolean[] foundActivity = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, (activity) -> {
             Assert.assertNotNull(activity);
@@ -294,9 +318,11 @@ public class TurnContextTests {
             foundActivity[0] = true;
         });
 
-        TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE) {{
-            setConversation(new ConversationAccount(CONVERSATION_ID));
-        }});
+        TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE) {
+            {
+                setConversation(new ConversationAccount(CONVERSATION_ID));
+            }
+        });
 
         Activity message = MessageFactory.text("test text");
         message.setId(ACTIVITY_ID);
@@ -309,7 +335,7 @@ public class TurnContextTests {
 
     @Test
     public void CallOnUpdateBeforeDelivery() {
-        boolean[] activityDelivered = new boolean[]{ false };
+        boolean[] activityDelivered = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, (activity) -> {
             Assert.assertNotNull(activity);
@@ -319,7 +345,7 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
-        boolean[] wasCalled = new boolean[]{ false };
+        boolean[] wasCalled = new boolean[] { false };
         c.onUpdateActivity(((context, activity, next) -> {
             Assert.assertNotNull(activity);
             Assert.assertFalse(activityDelivered[0]);
@@ -335,7 +361,7 @@ public class TurnContextTests {
 
     @Test
     public void InterceptOnUpdate() {
-        boolean[] activityDelivered = new boolean[]{ false };
+        boolean[] activityDelivered = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, (activity) -> {
             activityDelivered[0] = true;
@@ -344,7 +370,7 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
-        boolean[] wasCalled = new boolean[]{ false };
+        boolean[] wasCalled = new boolean[] { false };
         c.onUpdateActivity(((context, activity, next) -> {
             Assert.assertNotNull(activity);
             wasCalled[0] = true;
@@ -361,7 +387,7 @@ public class TurnContextTests {
 
     @Test
     public void InterceptAndMutateOnUpdate() {
-        boolean[] activityDelivered = new boolean[]{ false };
+        boolean[] activityDelivered = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, (activity) -> {
             Assert.assertEquals("mutated", activity.getId());
@@ -384,7 +410,7 @@ public class TurnContextTests {
 
     @Test
     public void DeleteOneActivityToAdapter() {
-        boolean[] activityDeleted = new boolean[]{ false };
+        boolean[] activityDeleted = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, null, (reference) -> {
             Assert.assertEquals("12345", reference.getActivityId());
@@ -399,7 +425,7 @@ public class TurnContextTests {
 
     @Test
     public void DeleteConversationReferenceToAdapter() {
-        boolean[] activityDeleted = new boolean[]{ false };
+        boolean[] activityDeleted = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, null, (reference) -> {
             Assert.assertEquals("12345", reference.getActivityId());
@@ -408,9 +434,11 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, TestMessage.Message());
 
-        ConversationReference reference = new ConversationReference() {{
-            setActivityId("12345");
-        }};
+        ConversationReference reference = new ConversationReference() {
+            {
+                setActivityId("12345");
+            }
+        };
 
         c.deleteActivity(reference);
         Assert.assertTrue(activityDeleted[0]);
@@ -418,7 +446,7 @@ public class TurnContextTests {
 
     @Test
     public void InterceptOnDelete() {
-        boolean[] activityDeleted = new boolean[]{ false };
+        boolean[] activityDeleted = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, null, (reference) -> {
             activityDeleted[0] = true;
@@ -427,7 +455,7 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
 
-        boolean[] wasCalled = new boolean[]{ false };
+        boolean[] wasCalled = new boolean[] { false };
         c.onDeleteActivity(((context, activity, next) -> {
             Assert.assertNotNull(activity);
             wasCalled[0] = true;
@@ -444,7 +472,7 @@ public class TurnContextTests {
 
     @Test
     public void DeleteWithNoOnDeleteHandlers() {
-        boolean[] activityDeleted = new boolean[]{ false };
+        boolean[] activityDeleted = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, null, (activity) -> {
             activityDeleted[0] = true;
@@ -459,7 +487,7 @@ public class TurnContextTests {
 
     @Test
     public void InterceptAndMutateOnDelete() {
-        boolean[] activityDeleted = new boolean[]{ false };
+        boolean[] activityDeleted = new boolean[] { false };
 
         SimpleAdapter a = new SimpleAdapter(null, null, (reference) -> {
             Assert.assertEquals("mutated", reference.getActivityId());
@@ -494,7 +522,7 @@ public class TurnContextTests {
         try {
             c.sendActivity(TestMessage.Message()).join();
             Assert.fail("ThrowExceptionInOnSend have thrown");
-        } catch(CompletionException e) {
+        } catch (CompletionException e) {
             Assert.assertEquals("test", e.getCause().getMessage());
         }
     }
@@ -509,7 +537,7 @@ public class TurnContextTests {
 
         try {
             stateCollection.close();
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             Assert.fail("Should not have thrown");
         }
     }
@@ -533,7 +561,7 @@ public class TurnContextTests {
 
         try {
             stateCollection.close();
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             Assert.fail("Should not have thrown");
         }
 
@@ -594,10 +622,14 @@ public class TurnContextTests {
         }
 
         @Override
-        public String baseUrl() { return null; }
+        public String baseUrl() {
+            return null;
+        }
 
         @Override
-        public ServiceClientCredentials credentials() { return null; }
+        public ServiceClientCredentials credentials() {
+            return null;
+        }
 
         @Override
         public Attachments getAttachments() {
@@ -615,4 +647,3 @@ public class TurnContextTests {
         }
     }
 }
-

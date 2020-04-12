@@ -28,8 +28,9 @@ public class O365ConnectorCardMultichoiceInput {
     private Boolean isMultiSelect;
 
     /**
-     * Gets list of choices whose each item can be in any subtype
-     * of O365ConnectorCardMultichoiceInputChoice.
+     * Gets list of choices whose each item can be in any subtype of
+     * O365ConnectorCardMultichoiceInputChoice.
+     * 
      * @return List of choices.
      */
     public List<O365ConnectorCardMultichoiceInputChoice> getChoices() {
@@ -37,8 +38,9 @@ public class O365ConnectorCardMultichoiceInput {
     }
 
     /**
-     * Sets list of choices whose each item can be in any subtype
-     * of O365ConnectorCardMultichoiceInputChoice.
+     * Sets list of choices whose each item can be in any subtype of
+     * O365ConnectorCardMultichoiceInputChoice.
+     * 
      * @param withChoices List of choices.
      */
     public void setChoices(List<O365ConnectorCardMultichoiceInputChoice> withChoices) {
@@ -46,8 +48,9 @@ public class O365ConnectorCardMultichoiceInput {
     }
 
     /**
-     * Gets choice item rendering style. Default value is
-     * 'compact'. Possible values include: 'compact', 'expanded'
+     * Gets choice item rendering style. Default value is 'compact'. Possible values
+     * include: 'compact', 'expanded'
+     * 
      * @return The choice style.
      */
     public String getStyle() {
@@ -55,8 +58,9 @@ public class O365ConnectorCardMultichoiceInput {
     }
 
     /**
-     * Sets choice item rendering style. Default value is
-     * 'compact'. Possible values include: 'compact', 'expanded'
+     * Sets choice item rendering style. Default value is 'compact'. Possible values
+     * include: 'compact', 'expanded'
+     * 
      * @param withStyle The choice style.
      */
     public void setStyle(String withStyle) {
@@ -64,8 +68,9 @@ public class O365ConnectorCardMultichoiceInput {
     }
 
     /**
-     * Defines if this input field allows multiple selections.
-     * Default value is false.
+     * Defines if this input field allows multiple selections. Default value is
+     * false.
+     * 
      * @return True if the choice allows multiple selections.
      */
     public Boolean getMultiSelect() {
@@ -74,6 +79,7 @@ public class O365ConnectorCardMultichoiceInput {
 
     /**
      * Sets if this input field allows multiple selections.
+     * 
      * @param withMultiSelect True if the choice allows multiple selections.
      */
     public void setMultiSelect(Boolean withMultiSelect) {

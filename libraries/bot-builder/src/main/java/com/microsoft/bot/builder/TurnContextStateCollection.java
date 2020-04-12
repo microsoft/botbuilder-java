@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents a set of collection of services associated with the {@link TurnContext}.
+ * Represents a set of collection of services associated with the
+ * {@link TurnContext}.
  */
 public class TurnContextStateCollection implements AutoCloseable {
     /**
@@ -41,8 +42,8 @@ public class TurnContextStateCollection implements AutoCloseable {
     /**
      * Get a service by type using its full type name as the key.
      *
-     * @param type The type of service to be retrieved.  This will use the value returned
-     *             by Class.getSimpleName as the key.
+     * @param type The type of service to be retrieved. This will use the value
+     *             returned by Class.getSimpleName as the key.
      * @param <T>  The type of the value.
      * @return The service stored under the specified key.
      */
@@ -52,9 +53,10 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Adds a value to the turn's context.
-     * @param key The name of the value.
+     * 
+     * @param key   The name of the value.
      * @param value The value to add.
-     * @param <T> The type of the value.
+     * @param <T>   The type of the value.
      * @throws IllegalArgumentException For null key or value.
      */
     public <T> void add(String key, T value) {
@@ -77,7 +79,7 @@ public class TurnContextStateCollection implements AutoCloseable {
      * Add a service using its type name ({@link Class#getSimpleName()} as the key.
      *
      * @param value The service to add.
-     * @param <T> The type of the value.
+     * @param <T>   The type of the value.
      * @throws IllegalArgumentException For null value.
      */
     public <T> void add(T value) {
@@ -90,6 +92,7 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Removes a value.
+     * 
      * @param key The name of the value to remove.
      */
     public void remove(String key) {
@@ -98,7 +101,8 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Replaces a value.
-     * @param key The name of the value to replace.
+     * 
+     * @param key   The name of the value to replace.
      * @param value The new value.
      */
     public void replace(String key, Object value) {
@@ -120,6 +124,7 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Close all contained {@link AutoCloseable} values.
+     * 
      * @throws Exception Exceptions encountered by children during close.
      */
     @Override
@@ -134,6 +139,3 @@ public class TurnContextStateCollection implements AutoCloseable {
         }
     }
 }
-
-
-

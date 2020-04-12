@@ -18,7 +18,8 @@ public class O365ConnectorCardDateInput extends O365ConnectorCardInputBase {
     private Boolean includeTime;
 
     /**
-     * Gets include time input field. Default value  is false (date only).
+     * Gets include time input field. Default value is false (date only).
+     * 
      * @return True to include time.
      */
     public Boolean getIncludeTime() {
@@ -26,7 +27,8 @@ public class O365ConnectorCardDateInput extends O365ConnectorCardInputBase {
     }
 
     /**
-     * Sets include time input field. Default value  is false (date only).
+     * Sets include time input field. Default value is false (date only).
+     * 
      * @param withIncludeTime True to include time.
      */
     public void setIncludeTime(Boolean withIncludeTime) {

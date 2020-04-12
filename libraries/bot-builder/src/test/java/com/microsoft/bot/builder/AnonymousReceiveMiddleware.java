@@ -17,11 +17,11 @@ public class AnonymousReceiveMiddleware implements Middleware {
     }
 
     /**
-     * Creates a middleware object that uses the provided method as its
-     * process request handler.
+     * Creates a middleware object that uses the provided method as its process
+     * request handler.
      *
-     * @param anonymousMethod The method to use as the middleware's process
-     *                        request handler.
+     * @param anonymousMethod The method to use as the middleware's process request
+     *                        handler.
      */
     public AnonymousReceiveMiddleware(MiddlewareCall anonymousMethod) {
         if (anonymousMethod == null)
@@ -31,8 +31,8 @@ public class AnonymousReceiveMiddleware implements Middleware {
     }
 
     /**
-     * Uses the method provided in the {@link AnonymousReceiveMiddleware} to
-     * process an incoming activity.
+     * Uses the method provided in the {@link AnonymousReceiveMiddleware} to process
+     * an incoming activity.
      *
      * @param context The context object for this turn.
      * @param next    The delegate to call to continue the bot middleware pipeline.

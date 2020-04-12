@@ -17,6 +17,7 @@ public class TaskModuleRequest {
 
     /**
      * Gets user input data. Free payload with key-value pairs.
+     * 
      * @return The input data.
      */
     public Object getData() {
@@ -25,6 +26,7 @@ public class TaskModuleRequest {
 
     /**
      * Sets user input data. Free payload with key-value pairs.
+     * 
      * @param withData The input data.
      */
     public void setData(Object withData) {
@@ -33,6 +35,7 @@ public class TaskModuleRequest {
 
     /**
      * Gets current user context, i.e., the current theme.
+     * 
      * @return The user context.
      */
     public TaskModuleRequestContext getContext() {
@@ -41,6 +44,7 @@ public class TaskModuleRequest {
 
     /**
      * Sets current user context, i.e., the current theme.
+     * 
      * @param withContext The user context.
      */
     public void setContext(TaskModuleRequestContext withContext) {

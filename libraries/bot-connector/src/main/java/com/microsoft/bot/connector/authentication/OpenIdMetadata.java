@@ -37,6 +37,7 @@ class OpenIdMetadata {
 
     /**
      * Constructs a OpenIdMetaData cache for a url.
+     * 
      * @param withUrl The url.
      */
     OpenIdMetadata(String withUrl) {
@@ -47,7 +48,9 @@ class OpenIdMetadata {
     /**
      * Gets a openid key.
      *
-     * <p>Note: This could trigger a cache refresh, which will incur network calls.</p>
+     * <p>
+     * Note: This could trigger a cache refresh, which will incur network calls.
+     * </p>
      *
      * @param keyId The JWT key.
      * @return The cached key.
@@ -69,8 +72,9 @@ class OpenIdMetadata {
 
         try {
             URL openIdUrl = new URL(this.url);
-            HashMap<String, String> openIdConf = this.mapper.readValue(
-                openIdUrl, new TypeReference<HashMap<String, Object>>() { });
+            HashMap<String, String> openIdConf =
+                this.mapper.readValue(openIdUrl, new TypeReference<HashMap<String, Object>>() {
+                });
             URL keysUrl = new URL(openIdConf.get("jwks_uri"));
             lastUpdated = System.currentTimeMillis();
             UrlJwkProvider provider = new UrlJwkProvider(keysUrl);

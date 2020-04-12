@@ -57,23 +57,23 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A bot adapter that can connect a bot to a service endpoint.
  *
- * The bot adapter encapsulates authentication processes and sends
- * activities to and receives activities from the Bot Connector Service. When your
- * bot receives an activity, the adapter creates a context object, passes it to your
+ * The bot adapter encapsulates authentication processes and sends activities to
+ * and receives activities from the Bot Connector Service. When your bot
+ * receives an activity, the adapter creates a context object, passes it to your
  * bot's application logic, and sends responses back to the user's channel.
- * <p>Use {@link #use(Middleware)} to add {@link Middleware} objects
- * to your adapter’s middleware collection. The adapter processes and directs
- * incoming activities in through the bot middleware pipeline to your bot’s logic
- * and then back out again. As each activity flows in and out of the bot, each piece
- * of middleware can inspect or act upon the activity, both before and after the bot
- * logic runs.</p>
  * <p>
- * {@link TurnContext}
- * {@link Activity}
- * {@link Bot}
- * {@link Middleware}
+ * Use {@link #use(Middleware)} to add {@link Middleware} objects to your
+ * adapter’s middleware collection. The adapter processes and directs incoming
+ * activities in through the bot middleware pipeline to your bot’s logic and
+ * then back out again. As each activity flows in and out of the bot, each piece
+ * of middleware can inspect or act upon the activity, both before and after the
+ * bot logic runs.
+ * </p>
+ * <p>
+ * {@link TurnContext} {@link Activity} {@link Bot} {@link Middleware}
  */
-public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegration, UserTokenProvider {
+public class BotFrameworkAdapter extends BotAdapter
+    implements AdapterIntegration, UserTokenProvider {
     /**
      * Key to store InvokeResponse.
      */
@@ -90,8 +90,7 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     public static final String CONNECTOR_CLIENT_KEY = "ConnectorClient";
 
     /**
-     * Key to store TeamsConnectorClient.
-     * For testing only.
+     * Key to store TeamsConnectorClient. For testing only.
      */
     public static final String TEAMSCONNECTOR_CLIENT_KEY = "TeamsConnectorClient";
 
@@ -128,8 +127,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     private Map<String, ConnectorClient> connectorClients = new ConcurrentHashMap<>();
 
     /**
-     * Initializes a new instance of the {@link BotFrameworkAdapter} class,
-     * using a credential provider.
+     * Initializes a new instance of the {@link BotFrameworkAdapter} class, using a
+     * credential provider.
      *
      * @param withCredentialProvider The credential provider.
      */
@@ -138,41 +137,47 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Initializes a new instance of the {@link BotFrameworkAdapter} class,
-     * using a credential provider.
+     * Initializes a new instance of the {@link BotFrameworkAdapter} class, using a
+     * credential provider.
      *
      * @param withCredentialProvider The credential provider.
-     * @param withChannelProvider The channel provider.
-     * @param withRetryStrategy Retry policy for retrying HTTP operations.
-     * @param withMiddleware The middleware to initially add to the adapter.
+     * @param withChannelProvider    The channel provider.
+     * @param withRetryStrategy      Retry policy for retrying HTTP operations.
+     * @param withMiddleware         The middleware to initially add to the adapter.
      */
-    public BotFrameworkAdapter(CredentialProvider withCredentialProvider,
-                               ChannelProvider withChannelProvider,
-                               RetryStrategy withRetryStrategy,
-                               Middleware withMiddleware) {
+    public BotFrameworkAdapter(
+        CredentialProvider withCredentialProvider,
+        ChannelProvider withChannelProvider,
+        RetryStrategy withRetryStrategy,
+        Middleware withMiddleware
+    ) {
 
-        this(withCredentialProvider,
-             new AuthenticationConfiguration(),
-             withChannelProvider,
-             withRetryStrategy,
-             withMiddleware);
+        this(
+            withCredentialProvider,
+            new AuthenticationConfiguration(),
+            withChannelProvider,
+            withRetryStrategy,
+            withMiddleware
+        );
     }
 
     /**
-     * Initializes a new instance of the {@link BotFrameworkAdapter} class,
-     * using a credential provider.
+     * Initializes a new instance of the {@link BotFrameworkAdapter} class, using a
+     * credential provider.
      *
      * @param withCredentialProvider The credential provider.
-     * @param withAuthConfig The authentication configuration.
-     * @param withChannelProvider The channel provider.
-     * @param withRetryStrategy Retry policy for retrying HTTP operations.
-     * @param withMiddleware The middleware to initially add to the adapter.
+     * @param withAuthConfig         The authentication configuration.
+     * @param withChannelProvider    The channel provider.
+     * @param withRetryStrategy      Retry policy for retrying HTTP operations.
+     * @param withMiddleware         The middleware to initially add to the adapter.
      */
-    public BotFrameworkAdapter(CredentialProvider withCredentialProvider,
-                               AuthenticationConfiguration withAuthConfig,
-                               ChannelProvider withChannelProvider,
-                               RetryStrategy withRetryStrategy,
-                               Middleware withMiddleware) {
+    public BotFrameworkAdapter(
+        CredentialProvider withCredentialProvider,
+        AuthenticationConfiguration withAuthConfig,
+        ChannelProvider withChannelProvider,
+        RetryStrategy withRetryStrategy,
+        Middleware withMiddleware
+    ) {
 
         if (withCredentialProvider == null) {
             throw new IllegalArgumentException("CredentialProvider cannot be null");
@@ -187,9 +192,12 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         connectorClientRetryStrategy = withRetryStrategy;
         authConfiguration = withAuthConfig;
 
-        // Relocate the tenantId field used by MS Teams to a new location (from channelData to conversation)
-        // This will only occur on activities from teams that include tenant info in channelData but NOT in
-        // conversation, thus should be future friendly.  However, once the transition is complete. we can
+        // Relocate the tenantId field used by MS Teams to a new location (from
+        // channelData to conversation)
+        // This will only occur on activities from teams that include tenant info in
+        // channelData but NOT in
+        // conversation, thus should be future friendly. However, once the transition is
+        // complete. we can
         // remove this.
         use(new TenantIdWorkaroundForTeamsMiddleware());
 
@@ -199,21 +207,22 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Initializes a new instance of the {@link BotFrameworkAdapter} class,
-     * using a credential provider.
+     * Initializes a new instance of the {@link BotFrameworkAdapter} class, using a
+     * credential provider.
      *
-     * @param withCredentials The credentials to use.
-     * @param withAuthConfig The authentication configuration.
+     * @param withCredentials     The credentials to use.
+     * @param withAuthConfig      The authentication configuration.
      * @param withChannelProvider The channel provider.
-     * @param withRetryStrategy Retry policy for retrying HTTP operations.
-     * @param withMiddleware The middleware to initially add to the adapter.
+     * @param withRetryStrategy   Retry policy for retrying HTTP operations.
+     * @param withMiddleware      The middleware to initially add to the adapter.
      */
     public BotFrameworkAdapter(
         AppCredentials withCredentials,
         AuthenticationConfiguration withAuthConfig,
         ChannelProvider withChannelProvider,
         RetryStrategy withRetryStrategy,
-        Middleware withMiddleware) {
+        Middleware withMiddleware
+    ) {
 
         if (withCredentials == null) {
             throw new IllegalArgumentException("credentials");
@@ -229,9 +238,12 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         }
         authConfiguration = withAuthConfig;
 
-        // Relocate the tenantId field used by MS Teams to a new location (from channelData to conversation)
-        // This will only occur on activities from teams that include tenant info in channelData but NOT in
-        // conversation, thus should be future friendly.  However, once the transition is complete. we can
+        // Relocate the tenantId field used by MS Teams to a new location (from
+        // channelData to conversation)
+        // This will only occur on activities from teams that include tenant info in
+        // channelData but NOT in
+        // conversation, thus should be future friendly. However, once the transition is
+        // complete. we can
         // remove this.
         use(new TenantIdWorkaroundForTeamsMiddleware());
 
@@ -243,27 +255,34 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Sends a proactive message from the bot to a conversation.
      *
-     * <p>Call this method to proactively send a message to a conversation.
-     * Most channels require a user to initiate a conversation with a bot
-     * before the bot can send activities to the user.</p>
-     * <p>This overload differers from the Node implementation by requiring the BotId to be
-     * passed in. The .Net code allows multiple bots to be hosted in a single adapter which
-     * isn't something supported by Node.</p>
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     * <p>
+     * This overload differers from the Node implementation by requiring the BotId
+     * to be passed in. The .Net code allows multiple bots to be hosted in a single
+     * adapter which isn't something supported by Node.
+     * </p>
      *
      * {@link #processActivity(String, Activity, BotCallbackHandler)}
      * {@link BotAdapter#runPipeline(TurnContext, BotCallbackHandler)}
      *
-     * @param botAppId  The application ID of the bot. This is the appId returned by Portal registration, and is
-     *                  generally found in the "MicrosoftAppId" parameter in appSettings.json.
+     * @param botAppId  The application ID of the bot. This is the appId returned by
+     *                  Portal registration, and is generally found in the
+     *                  "MicrosoftAppId" parameter in appSettings.json.
      * @param reference A reference to the conversation to continue.
      * @param callback  The method to call for the resulting bot turn.
      * @return A task that represents the work queued to execute.
      * @throws IllegalArgumentException botAppId, reference, or callback is null.
      */
     @Override
-    public CompletableFuture<Void> continueConversation(String botAppId,
-                                                        ConversationReference reference,
-                                                        BotCallbackHandler callback) {
+    public CompletableFuture<Void> continueConversation(
+        String botAppId,
+        ConversationReference reference,
+        BotCallbackHandler callback
+    ) {
         if (StringUtils.isEmpty(botAppId)) {
             throw new IllegalArgumentException("botAppId");
         }
@@ -278,12 +297,17 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
 
         CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
 
-        try (TurnContextImpl context = new TurnContextImpl(this, reference.getContinuationActivity())) {
+        try (TurnContextImpl context = new TurnContextImpl(
+            this,
+            reference.getContinuationActivity()
+        )) {
             // Hand craft Claims Identity.
-            HashMap<String, String> claims = new HashMap<String, String>() {{
-                put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
-                put(AuthenticationConstants.APPID_CLAIM, botAppId);
-            }};
+            HashMap<String, String> claims = new HashMap<String, String>() {
+                {
+                    put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+                    put(AuthenticationConstants.APPID_CLAIM, botAppId);
+                }
+            };
             ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
 
             context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
@@ -303,8 +327,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Adds middleware to the adapter's pipeline.
      *
-     * Middleware is added to the adapter at initialization time.
-     * For each turn, the adapter calls middleware in the order in which you added it.
+     * Middleware is added to the adapter at initialization time. For each turn, the
+     * adapter calls middleware in the order in which you added it.
      *
      * @param middleware The middleware to add.
      * @return The updated adapter object.
@@ -315,42 +339,50 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Creates a turn context and runs the middleware pipeline for an incoming activity.
+     * Creates a turn context and runs the middleware pipeline for an incoming
+     * activity.
      *
      * @param authHeader The HTTP authentication header of the request.
      * @param activity   The incoming activity.
      * @param callback   The code to run at the end of the adapter's middleware
      *                   pipeline.
-     * @return A task that represents the work queued to execute. If the activity type
-     * was 'Invoke' and the corresponding key (channelId + activityId) was found
-     * then an InvokeResponse is returned, otherwise null is returned.
+     * @return A task that represents the work queued to execute. If the activity
+     *         type was 'Invoke' and the corresponding key (channelId + activityId)
+     *         was found then an InvokeResponse is returned, otherwise null is
+     *         returned.
      * @throws IllegalArgumentException Activity is null.
      */
-    public CompletableFuture<InvokeResponse> processActivity(String authHeader,
-                                                             Activity activity,
-                                                             BotCallbackHandler callback) {
+    public CompletableFuture<InvokeResponse> processActivity(
+        String authHeader,
+        Activity activity,
+        BotCallbackHandler callback
+    ) {
         BotAssert.activityNotNull(activity);
 
-        return JwtTokenValidation
-            .authenticateRequest(activity, authHeader, credentialProvider, channelProvider, authConfiguration)
-            .thenCompose(claimsIdentity -> processActivity(claimsIdentity, activity, callback));
+        return JwtTokenValidation.authenticateRequest(
+            activity, authHeader, credentialProvider, channelProvider, authConfiguration
+        ).thenCompose(claimsIdentity -> processActivity(claimsIdentity, activity, callback));
     }
 
     /**
-     * Creates a turn context and runs the middleware pipeline for an incoming activity.
+     * Creates a turn context and runs the middleware pipeline for an incoming
+     * activity.
      *
      * @param identity A {@link ClaimsIdentity} for the request.
      * @param activity The incoming activity.
      * @param callback The code to run at the end of the adapter's middleware
      *                 pipeline.
-     * @return A task that represents the work queued to execute. If the activity type
-     * was 'Invoke' and the corresponding key (channelId + activityId) was found
-     * then an InvokeResponse is returned, otherwise null is returned.
+     * @return A task that represents the work queued to execute. If the activity
+     *         type was 'Invoke' and the corresponding key (channelId + activityId)
+     *         was found then an InvokeResponse is returned, otherwise null is
+     *         returned.
      * @throws IllegalArgumentException Activity is null.
      */
-    public CompletableFuture<InvokeResponse> processActivity(ClaimsIdentity identity,
-                                                             Activity activity,
-                                                             BotCallbackHandler callback) {
+    public CompletableFuture<InvokeResponse> processActivity(
+        ClaimsIdentity identity,
+        Activity activity,
+        BotCallbackHandler callback
+    ) {
         BotAssert.activityNotNull(activity);
 
         CompletableFuture<InvokeResponse> pipelineResult = new CompletableFuture<>();
@@ -366,7 +398,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                     return runPipeline(context, callback);
                 })
 
-                // Handle Invoke scenarios, which deviate from the request/response model in that
+                // Handle Invoke scenarios, which deviate from the request/response model in
+                // that
                 // the Bot will return a specific body and return code.
                 .thenCompose(result -> {
                     if (activity.isType(ActivityTypes.INVOKE)) {
@@ -376,7 +409,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                                 new InvokeResponse(HttpURLConnection.HTTP_NOT_IMPLEMENTED, null)
                             );
                         } else {
-                            return CompletableFuture.completedFuture((InvokeResponse) invokeResponse.getValue());
+                            return CompletableFuture
+                                .completedFuture((InvokeResponse) invokeResponse.getValue());
                         }
                     }
 
@@ -396,16 +430,19 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      *
      * @param context    The context object for the turn.
      * @param activities The activities to send.
-     * @return A task that represents the work queued to execute.
-     * If the activities are successfully sent, the task result contains
-     * an array of {@link ResourceResponse} objects containing the IDs that
-     * the receiving channel assigned to the activities.
+     * @return A task that represents the work queued to execute. If the activities
+     *         are successfully sent, the task result contains an array of
+     *         {@link ResourceResponse} objects containing the IDs that the
+     *         receiving channel assigned to the activities.
      *
-     * {@link TurnContext#onSendActivities(SendActivitiesHandler)}
+     *         {@link TurnContext#onSendActivities(SendActivitiesHandler)}
      */
     @SuppressWarnings("checkstyle:EmptyBlock")
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(
+        TurnContext context,
+        List<Activity> activities
+    ) {
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
@@ -415,16 +452,19 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         }
 
         if (activities.size() == 0) {
-            throw new IllegalArgumentException("Expecting one or more activities, but the array was empty.");
+            throw new IllegalArgumentException(
+                "Expecting one or more activities, but the array was empty."
+            );
         }
 
         return CompletableFuture.supplyAsync(() -> {
             ResourceResponse[] responses = new ResourceResponse[activities.size()];
 
             /*
-             * NOTE: we're using for here (vs. foreach) because we want to simultaneously index into the
-             * activities array to get the activity to process as well as use that index to assign
-             * the response to the responses array and this is the most cost effective way to do that.
+             * NOTE: we're using for here (vs. foreach) because we want to simultaneously
+             * index into the activities array to get the activity to process as well as use
+             * that index to assign the response to the responses array and this is the most
+             * cost effective way to do that.
              */
             for (int index = 0; index < activities.size(); index++) {
                 Activity activity = activities.get(index);
@@ -445,29 +485,42 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                     context.getTurnState().add(INVOKE_RESPONSE_KEY, activity);
                     // No need to create a response. One will be created below.
                     response = null;
-                } else if (activity.isType(ActivityTypes.TRACE)
-                    && !StringUtils.equals(activity.getChannelId(), Channels.EMULATOR)) {
+                } else if (
+                    activity.isType(ActivityTypes.TRACE)
+                        && !StringUtils.equals(activity.getChannelId(), Channels.EMULATOR)
+                ) {
                     // if it is a Trace activity we only send to the channel if it's the emulator.
                     response = null;
                 } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
-                    ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
+                    ConnectorClient connectorClient = context.getTurnState()
+                        .get(CONNECTOR_CLIENT_KEY);
                     response = connectorClient.getConversations().replyToActivity(activity).join();
                 } else {
-                    ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
-                    response = connectorClient.getConversations().sendToConversation(activity).join();
+                    ConnectorClient connectorClient = context.getTurnState()
+                        .get(CONNECTOR_CLIENT_KEY);
+                    response = connectorClient.getConversations()
+                        .sendToConversation(activity)
+                        .join();
                 }
 
-                // If No response is set, then default to a "simple" response. This can't really be done
-                // above, as there are cases where the ReplyTo/SendTo methods will also return null
+                // If No response is set, then default to a "simple" response. This can't really
+                // be done
+                // above, as there are cases where the ReplyTo/SendTo methods will also return
+                // null
                 // (See below) so the check has to happen here.
 
-                // Note: In addition to the Invoke / Delay / Activity cases, this code also applies
-                // with Skype and Teams with regards to typing events.  When sending a typing event in
-                // these channels they do not return a RequestResponse which causes the bot to blow up.
+                // Note: In addition to the Invoke / Delay / Activity cases, this code also
+                // applies
+                // with Skype and Teams with regards to typing events. When sending a typing
+                // event in
+                // these channels they do not return a RequestResponse which causes the bot to
+                // blow up.
                 // https://github.com/Microsoft/botbuilder-dotnet/issues/460
                 // bug report : https://github.com/Microsoft/botbuilder-dotnet/issues/465
                 if (response == null) {
-                    response = new ResourceResponse((activity.getId() == null) ? "" : activity.getId());
+                    response = new ResourceResponse(
+                        (activity.getId() == null) ? "" : activity.getId()
+                    );
                 }
 
                 responses[index] = response;
@@ -482,16 +535,21 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      *
      * @param context  The context object for the turn.
      * @param activity New replacement activity.
-     * @return A task that represents the work queued to execute.
-     * If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving
-     * channel assigned to the activity.
-     * <p>Before calling this, set the ID of the replacement activity to the ID
-     * of the activity to replace.</p>
-     * {@link TurnContext#onUpdateActivity(UpdateActivityHandler)}
+     * @return A task that represents the work queued to execute. If the activity is
+     *         successfully sent, the task result contains a
+     *         {@link ResourceResponse} object containing the ID that the receiving
+     *         channel assigned to the activity.
+     *         <p>
+     *         Before calling this, set the ID of the replacement activity to the ID
+     *         of the activity to replace.
+     *         </p>
+     *         {@link TurnContext#onUpdateActivity(UpdateActivityHandler)}
      */
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(
+        TurnContext context,
+        Activity activity
+    ) {
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
         return connectorClient.getConversations().updateActivity(activity);
     }
@@ -502,13 +560,16 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      * @param context   The context object for the turn.
      * @param reference Conversation reference for the activity to delete.
      * @return A task that represents the work queued to execute.
-     * {@link TurnContext#onDeleteActivity(DeleteActivityHandler)}
+     *         {@link TurnContext#onDeleteActivity(DeleteActivityHandler)}
      */
     @Override
-    public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
+    public CompletableFuture<Void> deleteActivity(
+        TurnContext context,
+        ConversationReference reference
+    ) {
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
-        return connectorClient.getConversations().deleteActivity(
-            reference.getConversation().getId(), reference.getActivityId());
+        return connectorClient.getConversations()
+            .deleteActivity(reference.getConversation().getId(), reference.getActivityId());
     }
 
     /**
@@ -518,20 +579,26 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      * @param memberId ID of the member to delete from the conversation
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> deleteConversationMember(TurnContextImpl context, String memberId) {
+    public CompletableFuture<Void> deleteConversationMember(
+        TurnContextImpl context,
+        String memberId
+    ) {
         if (context.getActivity().getConversation() == null) {
             throw new IllegalArgumentException(
-                "BotFrameworkAdapter.deleteConversationMember(): missing conversation");
+                "BotFrameworkAdapter.deleteConversationMember(): missing conversation"
+            );
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
             throw new IllegalArgumentException(
-                "BotFrameworkAdapter.deleteConversationMember(): missing conversation.id");
+                "BotFrameworkAdapter.deleteConversationMember(): missing conversation.id"
+            );
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
         String conversationId = context.getActivity().getConversation().getId();
-        return connectorClient.getConversations().deleteConversationMember(conversationId, memberId);
+        return connectorClient.getConversations()
+            .deleteConversationMember(conversationId, memberId);
     }
 
     /**
@@ -547,22 +614,30 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Lists the members of a given activity.
      *
-     * @param context The context object for the turn.
-     * @param activityId (Optional) Activity ID to enumerate. If not specified the current activities ID will be used.
+     * @param context    The context object for the turn.
+     * @param activityId (Optional) Activity ID to enumerate. If not specified the
+     *                   current activities ID will be used.
      * @return List of Members of the activity
      */
-    public CompletableFuture<List<ChannelAccount>> getActivityMembers(TurnContextImpl context, String activityId) {
+    public CompletableFuture<List<ChannelAccount>> getActivityMembers(
+        TurnContextImpl context,
+        String activityId
+    ) {
         // If no activity was passed in, use the current activity.
         if (activityId == null) {
             activityId = context.getActivity().getId();
         }
 
         if (context.getActivity().getConversation() == null) {
-            throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation");
+            throw new IllegalArgumentException(
+                "BotFrameworkAdapter.GetActivityMembers(): missing conversation"
+            );
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
-            throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation.id");
+            throw new IllegalArgumentException(
+                "BotFrameworkAdapter.GetActivityMembers(): missing conversation.id"
+            );
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
@@ -579,11 +654,15 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      */
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(TurnContextImpl context) {
         if (context.getActivity().getConversation() == null) {
-            throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation");
+            throw new IllegalArgumentException(
+                "BotFrameworkAdapter.GetActivityMembers(): missing conversation"
+            );
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
-            throw new IllegalArgumentException("BotFrameworkAdapter.GetActivityMembers(): missing conversation.id");
+            throw new IllegalArgumentException(
+                "BotFrameworkAdapter.GetActivityMembers(): missing conversation.id"
+            );
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
@@ -593,40 +672,50 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Lists the Conversations in which this bot has participated for a given channel server. The
-     * channel server returns results in pages and each page will include a `continuationToken`
-     * that can be used to fetch the next page of results from the server.
+     * Lists the Conversations in which this bot has participated for a given
+     * channel server. The channel server returns results in pages and each page
+     * will include a `continuationToken` that can be used to fetch the next page of
+     * results from the server.
      *
-     * @param serviceUrl  The URL of the channel server to query.  This can be retrieved
-     *                    from `context.activity.serviceUrl`.
-     * @param credentials The credentials needed for the Bot to connect to the.services().
+     * @param serviceUrl  The URL of the channel server to query. This can be
+     *                    retrieved from `context.activity.serviceUrl`.
+     * @param credentials The credentials needed for the Bot to connect to
+     *                    the.services().
      * @return List of Members of the current conversation
-     * <p>
-     * This overload may be called from outside the context of a conversation, as only the
-     * Bot's ServiceUrl and credentials are required.
+     *         <p>
+     *         This overload may be called from outside the context of a
+     *         conversation, as only the Bot's ServiceUrl and credentials are
+     *         required.
      */
-    public CompletableFuture<ConversationsResult> getConversations(String serviceUrl,
-                                                                   MicrosoftAppCredentials credentials) {
+    public CompletableFuture<ConversationsResult> getConversations(
+        String serviceUrl,
+        MicrosoftAppCredentials credentials
+    ) {
         return getConversations(serviceUrl, credentials, null);
     }
 
     /**
-     * Lists the Conversations in which this bot has participated for a given channel server. The
-     * channel server returns results in pages and each page will include a `continuationToken`
-     * that can be used to fetch the next page of results from the server.
+     * Lists the Conversations in which this bot has participated for a given
+     * channel server. The channel server returns results in pages and each page
+     * will include a `continuationToken` that can be used to fetch the next page of
+     * results from the server.
      *
-     * This overload may be called from outside the context of a conversation, as only the
-     * Bot's ServiceUrl and credentials are required.
+     * This overload may be called from outside the context of a conversation, as
+     * only the Bot's ServiceUrl and credentials are required.
      *
-     * @param serviceUrl  The URL of the channel server to query.  This can be retrieved
-     *                    from `context.activity.serviceUrl`.
-     * @param credentials The credentials needed for the Bot to connect to the.services().
-     * @param continuationToken The continuation token from the previous page of results.
+     * @param serviceUrl        The URL of the channel server to query. This can be
+     *                          retrieved from `context.activity.serviceUrl`.
+     * @param credentials       The credentials needed for the Bot to connect to
+     *                          the.services().
+     * @param continuationToken The continuation token from the previous page of
+     *                          results.
      * @return List of Members of the current conversation
      */
-    public CompletableFuture<ConversationsResult> getConversations(String serviceUrl,
-                                                                   MicrosoftAppCredentials credentials,
-                                                                   String continuationToken) {
+    public CompletableFuture<ConversationsResult> getConversations(
+        String serviceUrl,
+        MicrosoftAppCredentials credentials,
+        String continuationToken
+    ) {
         if (StringUtils.isEmpty(serviceUrl)) {
             throw new IllegalArgumentException("serviceUrl");
         }
@@ -636,17 +725,21 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         }
 
         return getOrCreateConnectorClient(serviceUrl, credentials)
-            .thenCompose(connectorClient -> connectorClient.getConversations().getConversations(continuationToken));
+            .thenCompose(
+                connectorClient -> connectorClient.getConversations()
+                    .getConversations(continuationToken)
+            );
     }
 
     /**
-     * Lists the Conversations in which this bot has participated for a given channel server. The
-     * channel server returns results in pages and each page will include a `continuationToken`
-     * that can be used to fetch the next page of results from the server.
+     * Lists the Conversations in which this bot has participated for a given
+     * channel server. The channel server returns results in pages and each page
+     * will include a `continuationToken` that can be used to fetch the next page of
+     * results from the server.
      *
-     * This overload may be called during standard Activity processing, at which point the Bot's
-     * service URL and credentials that are part of the current activity processing pipeline
-     * will be used.
+     * This overload may be called during standard Activity processing, at which
+     * point the Bot's service URL and credentials that are part of the current
+     * activity processing pipeline will be used.
      *
      * @param context The context object for the turn.
      * @return List of Members of the current conversation
@@ -657,19 +750,24 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Lists the Conversations in which this bot has participated for a given channel server. The
-     * channel server returns results in pages and each page will include a `continuationToken`
-     * that can be used to fetch the next page of results from the server.
+     * Lists the Conversations in which this bot has participated for a given
+     * channel server. The channel server returns results in pages and each page
+     * will include a `continuationToken` that can be used to fetch the next page of
+     * results from the server.
      *
-     * This overload may be called during standard Activity processing, at which point the Bot's
-     * service URL and credentials that are part of the current activity processing pipeline
-     * will be used.
+     * This overload may be called during standard Activity processing, at which
+     * point the Bot's service URL and credentials that are part of the current
+     * activity processing pipeline will be used.
      *
-     * @param context The context object for the turn.
-     * @param continuationToken The continuation token from the previous page of results.
+     * @param context           The context object for the turn.
+     * @param continuationToken The continuation token from the previous page of
+     *                          results.
      * @return List of Members of the current conversation
      */
-    public CompletableFuture<ConversationsResult> getConversations(TurnContextImpl context, String continuationToken) {
+    public CompletableFuture<ConversationsResult> getConversations(
+        TurnContextImpl context,
+        String continuationToken
+    ) {
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
         return connectorClient.getConversations().getConversations(continuationToken);
     }
@@ -677,90 +775,111 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Attempts to retrieve the token for a user that's in a login flow.
      *
-     * @param context        Context for the current turn of conversation with the user.
+     * @param context        Context for the current turn of conversation with the
+     *                       user.
      * @param connectionName Name of the auth connection to use.
      * @param magicCode      (Optional) Optional user entered code to validate.
      * @return Token Response
      */
     @Override
-    public CompletableFuture<TokenResponse> getUserToken(TurnContext context, String connectionName, String magicCode) {
+    public CompletableFuture<TokenResponse> getUserToken(
+        TurnContext context,
+        String connectionName,
+        String magicCode
+    ) {
         BotAssert.contextNotNull(context);
 
-        if (context.getActivity().getFrom() == null || StringUtils.isEmpty(context.getActivity().getFrom().getId())) {
-            throw new IllegalArgumentException("BotFrameworkAdapter.GetuserToken(): missing from or from.id");
+        if (
+            context.getActivity().getFrom() == null
+                || StringUtils.isEmpty(context.getActivity().getFrom().getId())
+        ) {
+            throw new IllegalArgumentException(
+                "BotFrameworkAdapter.GetuserToken(): missing from or from.id"
+            );
         }
 
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                return oAuthClient.getUserToken().getToken(
-                    context.getActivity().getFrom().getId(),
-                    connectionName,
-                    context.getActivity().getChannelId(),
-                    magicCode);
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            return oAuthClient.getUserToken()
+                .getToken(
+                    context.getActivity().getFrom().getId(), connectionName,
+                    context.getActivity().getChannelId(), magicCode
+                );
         });
     }
 
     /**
-     * Get the raw signin link to be sent to the user for signin for a connection name.
+     * Get the raw signin link to be sent to the user for signin for a connection
+     * name.
      *
-     * @param context        Context for the current turn of conversation with the user.
+     * @param context        Context for the current turn of conversation with the
+     *                       user.
      * @param connectionName Name of the auth connection to use.
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context, String connectionName) {
+    public CompletableFuture<String> getOauthSignInLink(
+        TurnContext context,
+        String connectionName
+    ) {
         BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                try {
-                    Activity activity = context.getActivity();
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            try {
+                Activity activity = context.getActivity();
 
-                    TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
+                TokenExchangeState tokenExchangeState = new TokenExchangeState() {
+                    {
                         setConnectionName(connectionName);
-                        setConversation(new ConversationReference() {{
-                            setActivityId(activity.getId());
-                            setBot(activity.getRecipient());
-                            setChannelId(activity.getChannelId());
-                            setConversation(activity.getConversation());
-                            setServiceUrl(activity.getServiceUrl());
-                            setUser(activity.getFrom());
-                        }});
-                    }};
+                        setConversation(new ConversationReference() {
+                            {
+                                setActivityId(activity.getId());
+                                setBot(activity.getRecipient());
+                                setChannelId(activity.getChannelId());
+                                setConversation(activity.getConversation());
+                                setServiceUrl(activity.getServiceUrl());
+                                setUser(activity.getFrom());
+                            }
+                        });
+                    }
+                };
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                    byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                    String state = BaseEncoding.base64().encode(encodedState);
+                ObjectMapper mapper = new ObjectMapper();
+                String serializedState = mapper.writeValueAsString(tokenExchangeState);
+                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
+                String state = BaseEncoding.base64().encode(encodedState);
 
-                    return oAuthClient.getBotSignIn().getSignInUrl(state);
-                } catch (Throwable t) {
-                    throw new CompletionException(t);
-                }
-            });
+                return oAuthClient.getBotSignIn().getSignInUrl(state);
+            } catch (Throwable t) {
+                throw new CompletionException(t);
+            }
+        });
     }
 
     /**
-     * Get the raw signin link to be sent to the user for signin for a connection name.
+     * Get the raw signin link to be sent to the user for signin for a connection
+     * name.
      *
-     * @param context        Context for the current turn of conversation with the user.
+     * @param context        Context for the current turn of conversation with the
+     *                       user.
      * @param connectionName Name of the auth connection to use.
-     * @param userId The user id that will be associated with the token.
-     * @param finalRedirect The final URL that the OAuth flow will redirect to.
+     * @param userId         The user id that will be associated with the token.
+     * @param finalRedirect  The final URL that the OAuth flow will redirect to.
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context,
-                                                        String connectionName,
-                                                        String userId,
-                                                        String finalRedirect) {
+    public CompletableFuture<String> getOauthSignInLink(
+        TurnContext context,
+        String connectionName,
+        String userId,
+        String finalRedirect
+    ) {
 
         BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName)) {
@@ -770,100 +889,122 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             throw new IllegalArgumentException("userId");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                try {
-                    TokenExchangeState tokenExchangeState = new TokenExchangeState() {{
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            try {
+                TokenExchangeState tokenExchangeState = new TokenExchangeState() {
+                    {
                         setConnectionName(connectionName);
-                        setConversation(new ConversationReference() {{
-                            setActivityId(null);
-                            setBot(new ChannelAccount() {{
-                                setRole(RoleTypes.BOT);
-                            }});
-                            setChannelId(Channels.DIRECTLINE);
-                            setConversation(new ConversationAccount());
-                            setServiceUrl(null);
-                            setUser(new ChannelAccount() {{
-                                setRole(RoleTypes.USER);
-                                setId(userId);
-                            }});
-                        }});
-                    }};
+                        setConversation(new ConversationReference() {
+                            {
+                                setActivityId(null);
+                                setBot(new ChannelAccount() {
+                                    {
+                                        setRole(RoleTypes.BOT);
+                                    }
+                                });
+                                setChannelId(Channels.DIRECTLINE);
+                                setConversation(new ConversationAccount());
+                                setServiceUrl(null);
+                                setUser(new ChannelAccount() {
+                                    {
+                                        setRole(RoleTypes.USER);
+                                        setId(userId);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                };
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                    byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                    String state = BaseEncoding.base64().encode(encodedState);
+                ObjectMapper mapper = new ObjectMapper();
+                String serializedState = mapper.writeValueAsString(tokenExchangeState);
+                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
+                String state = BaseEncoding.base64().encode(encodedState);
 
-                    return oAuthClient.getBotSignIn().getSignInUrl(state);
-                } catch (Throwable t) {
-                    throw new CompletionException(t);
-                }
-            });
+                return oAuthClient.getBotSignIn().getSignInUrl(state);
+            } catch (Throwable t) {
+                throw new CompletionException(t);
+            }
+        });
     }
 
     /**
      * Signs the user out with the token server.
      *
-     * @param context        Context for the current turn of conversation with the user.
+     * @param context        Context for the current turn of conversation with the
+     *                       user.
      * @param connectionName Name of the auth connection to use.
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<Void> signOutUser(TurnContext context, String connectionName, String userId) {
+    public CompletableFuture<Void> signOutUser(
+        TurnContext context,
+        String connectionName,
+        String userId
+    ) {
         BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                return oAuthClient.getUserToken().signOut(
-                    context.getActivity().getFrom().getId(), connectionName, context.getActivity().getChannelId());
-            })
-            .thenApply(signOutResult -> null);
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            return oAuthClient.getUserToken()
+                .signOut(
+                    context.getActivity().getFrom().getId(), connectionName,
+                    context.getActivity().getChannelId()
+                );
+        }).thenApply(signOutResult -> null);
     }
 
     /**
      * Retrieves the token status for each configured connection for the given user.
      *
-     * @param context Context for the current turn of conversation with the user.
-     * @param userId The user Id for which token status is retrieved.
-     * @param includeFilter Optional comma separated list of connection's to include.
-     *                      Blank will return token status for all configured connections.
+     * @param context       Context for the current turn of conversation with the
+     *                      user.
+     * @param userId        The user Id for which token status is retrieved.
+     * @param includeFilter Optional comma separated list of connection's to
+     *                      include. Blank will return token status for all
+     *                      configured connections.
      * @return Array of {@link TokenStatus}.
      */
     @Override
-    public CompletableFuture<List<TokenStatus>> getTokenStatus(TurnContext context,
-                                                               String userId,
-                                                               String includeFilter) {
+    public CompletableFuture<List<TokenStatus>> getTokenStatus(
+        TurnContext context,
+        String userId,
+        String includeFilter
+    ) {
         BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(userId)) {
             throw new IllegalArgumentException("userId");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                return oAuthClient.getUserToken().getTokenStatus(
-                    userId, context.getActivity().getChannelId(), includeFilter);
-            });
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            return oAuthClient.getUserToken()
+                .getTokenStatus(userId, context.getActivity().getChannelId(), includeFilter);
+        });
     }
 
     /**
-     * Retrieves Azure Active Directory tokens for particular resources on a configured connection.
+     * Retrieves Azure Active Directory tokens for particular resources on a
+     * configured connection.
      *
-     * @param context Context for the current turn of conversation with the user.
-     * @param connectionName The name of the Azure Active Directory connection configured with this bot.
-     * @param resourceUrls The list of resource URLs to retrieve tokens for.
-     * @param userId The user Id for which tokens are retrieved. If passing in null the userId is taken
-     *               from the Activity in the TurnContext.
+     * @param context        Context for the current turn of conversation with the
+     *                       user.
+     * @param connectionName The name of the Azure Active Directory connection
+     *                       configured with this bot.
+     * @param resourceUrls   The list of resource URLs to retrieve tokens for.
+     * @param userId         The user Id for which tokens are retrieved. If passing
+     *                       in null the userId is taken from the Activity in the
+     *                       TurnContext.
      * @return Map of resourceUrl to the corresponding {@link TokenResponse}.
      */
     @Override
-    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext context,
-                                                                      String connectionName,
-                                                                      String[] resourceUrls,
-                                                                      String userId) {
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(
+        TurnContext context,
+        String connectionName,
+        String[] resourceUrls,
+        String userId
+    ) {
         BotAssert.contextNotNull(context);
         if (StringUtils.isEmpty(connectionName)) {
             throw new IllegalArgumentException("connectionName");
@@ -873,150 +1014,180 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             throw new IllegalArgumentException("resourceUrls");
         }
 
-        return createOAuthClient(context)
-            .thenCompose(oAuthClient -> {
-                String effectiveUserId = userId;
-                if (StringUtils.isEmpty(effectiveUserId)
-                    && context.getActivity() != null
-                    && context.getActivity().getFrom() != null) {
+        return createOAuthClient(context).thenCompose(oAuthClient -> {
+            String effectiveUserId = userId;
+            if (
+                StringUtils.isEmpty(effectiveUserId) && context.getActivity() != null
+                    && context.getActivity().getFrom() != null
+            ) {
 
-                    effectiveUserId = context.getActivity().getFrom().getId();
-                }
+                effectiveUserId = context.getActivity().getFrom().getId();
+            }
 
-                return oAuthClient.getUserToken().getAadTokens(
-                    effectiveUserId, connectionName, new AadResourceUrls(resourceUrls));
-            });
+            return oAuthClient.getUserToken()
+                .getAadTokens(effectiveUserId, connectionName, new AadResourceUrls(resourceUrls));
+        });
     }
 
     /**
      * Creates a conversation on the specified channel.
      *
-     * To start a conversation, your bot must know its account information
-     * and the user's account information on that channel.
-     * Most channels only support initiating a direct message (non-group) conversation.
-     * <p>The adapter attempts to create a new conversation on the channel, and
-     * then sends a {@code conversationUpdate} activity through its middleware pipeline
-     * to the {@code callback} method.</p>
-     * <p>If the conversation is established with the
-     * specified users, the ID of the activity's {@link Activity#getConversation}
-     * will contain the ID of the new conversation.</p>
+     * To start a conversation, your bot must know its account information and the
+     * user's account information on that channel. Most channels only support
+     * initiating a direct message (non-group) conversation.
+     * <p>
+     * The adapter attempts to create a new conversation on the channel, and then
+     * sends a {@code conversationUpdate} activity through its middleware pipeline
+     * to the {@code callback} method.
+     * </p>
+     * <p>
+     * If the conversation is established with the specified users, the ID of the
+     * activity's {@link Activity#getConversation} will contain the ID of the new
+     * conversation.
+     * </p>
      *
      * @param channelId              The ID for the channel.
      * @param serviceUrl             The channel's service URL endpoint.
      * @param credentials            The application credentials for the bot.
-     * @param conversationParameters The conversation information to use to
-     *                               create the conversation.
+     * @param conversationParameters The conversation information to use to create
+     *                               the conversation.
      * @param callback               The method to call for the resulting bot turn.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> createConversation(String channelId,
-                                                      String serviceUrl,
-                                                      MicrosoftAppCredentials credentials,
-                                                      ConversationParameters conversationParameters,
-                                                      BotCallbackHandler callback) {
-
-        return getOrCreateConnectorClient(serviceUrl, credentials)
-            .thenCompose(connectorClient -> {
-                Conversations conversations = connectorClient.getConversations();
-                return conversations.createConversation(conversationParameters)
-                    .thenCompose(conversationResourceResponse -> {
-                        // Create a event activity to represent the result.
-                        Activity eventActivity = Activity.createEventActivity();
-                        eventActivity.setName("CreateConversation");
-                        eventActivity.setChannelId(channelId);
-                        eventActivity.setServiceUrl(serviceUrl);
-                        eventActivity.setId((conversationResourceResponse.getActivityId() != null)
+    public CompletableFuture<Void> createConversation(
+        String channelId,
+        String serviceUrl,
+        MicrosoftAppCredentials credentials,
+        ConversationParameters conversationParameters,
+        BotCallbackHandler callback
+    ) {
+        return getOrCreateConnectorClient(serviceUrl, credentials).thenCompose(connectorClient -> {
+            Conversations conversations = connectorClient.getConversations();
+            return conversations.createConversation(conversationParameters)
+                .thenCompose(conversationResourceResponse -> {
+                    // Create a event activity to represent the result.
+                    Activity eventActivity = Activity.createEventActivity();
+                    eventActivity.setName("CreateConversation");
+                    eventActivity.setChannelId(channelId);
+                    eventActivity.setServiceUrl(serviceUrl);
+                    eventActivity.setId(
+                        (conversationResourceResponse.getActivityId() != null)
                             ? conversationResourceResponse.getActivityId()
-                            : UUID.randomUUID().toString());
-                        eventActivity.setConversation(new ConversationAccount(conversationResourceResponse.getId()) {{
-                            setTenantId(conversationParameters.getTenantId());
-                        }});
-                        eventActivity.setChannelData(conversationParameters.getChannelData());
-                        eventActivity.setRecipient(conversationParameters.getBot());
+                            : UUID.randomUUID().toString()
+                    );
+                    eventActivity.setConversation(
+                        new ConversationAccount(conversationResourceResponse.getId()) {
+                            {
+                                setTenantId(conversationParameters.getTenantId());
+                            }
+                        }
+                    );
+                    eventActivity.setChannelData(conversationParameters.getChannelData());
+                    eventActivity.setRecipient(conversationParameters.getBot());
 
-                        // run pipeline
-                        CompletableFuture<Void> result = new CompletableFuture<>();
-                        try (TurnContextImpl context = new TurnContextImpl(this, eventActivity)) {
-                            HashMap<String, String> claims = new HashMap<String, String>() {{
+                    // run pipeline
+                    CompletableFuture<Void> result = new CompletableFuture<>();
+                    try (TurnContextImpl context = new TurnContextImpl(this, eventActivity)) {
+                        HashMap<String, String> claims = new HashMap<String, String>() {
+                            {
                                 put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
                                 put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
                                 put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-                            }};
-                            ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
+                            }
+                        };
+                        ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
 
-                            context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
-                            context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
+                        context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
+                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
 
-                            result = runPipeline(context, callback);
-                        } catch (Exception e) {
-                            result.completeExceptionally(e);
-                        }
-                        return result;
-                    });
-            });
+                        result = runPipeline(context, callback);
+                    } catch (Exception e) {
+                        result.completeExceptionally(e);
+                    }
+                    return result;
+                });
+        });
     }
 
     /**
      * Creates a conversation on the specified channel.
      *
-     * To start a conversation, your bot must know its account information
-     * and the user's account information on that channel.
-     * Most channels only support initiating a direct message (non-group) conversation.
-     * <p>The adapter attempts to create a new conversation on the channel, and
-     * then sends a {@code conversationUpdate} activity through its middleware pipeline
-     * to the {@code callback} method.</p>
-     * <p>If the conversation is established with the
-     * specified users, the ID of the activity's {@link Activity#getConversation}
-     * will contain the ID of the new conversation.</p>
+     * To start a conversation, your bot must know its account information and the
+     * user's account information on that channel. Most channels only support
+     * initiating a direct message (non-group) conversation.
+     * <p>
+     * The adapter attempts to create a new conversation on the channel, and then
+     * sends a {@code conversationUpdate} activity through its middleware pipeline
+     * to the {@code callback} method.
+     * </p>
+     * <p>
+     * If the conversation is established with the specified users, the ID of the
+     * activity's {@link Activity#getConversation} will contain the ID of the new
+     * conversation.
+     * </p>
      *
      * @param channelId              The ID for the channel.
      * @param serviceUrl             The channel's service URL endpoint.
      * @param credentials            The application credentials for the bot.
-     * @param conversationParameters The conversation information to use to
-     *                               create the conversation.
+     * @param conversationParameters The conversation information to use to create
+     *                               the conversation.
      * @param callback               The method to call for the resulting bot turn.
-     * @param reference              A conversation reference that contains the tenant.
+     * @param reference              A conversation reference that contains the
+     *                               tenant.
      * @return A task that represents the work queued to execute.
      */
     @SuppressWarnings("checkstyle:InnerAssignment")
-    public CompletableFuture<Void> createConversation(String channelId,
-                                                      String serviceUrl,
-                                                      MicrosoftAppCredentials credentials,
-                                                      ConversationParameters conversationParameters,
-                                                      BotCallbackHandler callback,
-                                                      ConversationReference reference) {
+    public CompletableFuture<Void> createConversation(
+        String channelId,
+        String serviceUrl,
+        MicrosoftAppCredentials credentials,
+        ConversationParameters conversationParameters,
+        BotCallbackHandler callback,
+        ConversationReference reference
+    ) {
         if (reference.getConversation() == null) {
             return CompletableFuture.completedFuture(null);
         }
 
         String tenantId = reference.getConversation().getTenantId();
         if (!StringUtils.isEmpty(tenantId)) {
-            // Putting tenantId in channelData is a temporary solution while we wait for the Teams API to be updated
+            // Putting tenantId in channelData is a temporary solution while we wait for the
+            // Teams API to be updated
             ObjectNode channelData = JsonNodeFactory.instance.objectNode();
-            channelData.set("tenant", JsonNodeFactory.instance.objectNode()
-                .set("tenantId", JsonNodeFactory.instance.textNode(tenantId)));
+            channelData.set(
+                "tenant",
+                JsonNodeFactory.instance.objectNode()
+                    .set("tenantId", JsonNodeFactory.instance.textNode(tenantId))
+            );
 
             conversationParameters.setChannelData(channelData);
 
             conversationParameters.setTenantId(tenantId);
         }
 
-        return createConversation(channelId, serviceUrl, credentials, conversationParameters, callback);
+        return createConversation(
+            channelId, serviceUrl, credentials, conversationParameters, callback
+        );
     }
 
     /**
      * Creates an OAuth client for the bot.
      *
-     * <p>Note: This is protected primarily so that unit tests can override to
-     * provide a mock OAuthClient.</p>
+     * <p>
+     * Note: This is protected primarily so that unit tests can override to provide
+     * a mock OAuthClient.
+     * </p>
      *
      * @param turnContext The context object for the current turn.
      * @return An OAuth client for the bot.
      */
     protected CompletableFuture<OAuthClient> createOAuthClient(TurnContext turnContext) {
-        if (!OAuthClientConfig.emulateOAuthCards
-            && StringUtils.equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.EMULATOR)
-            && credentialProvider.isAuthenticationDisabled().join()) {
+        if (
+            !OAuthClientConfig.emulateOAuthCards
+                && StringUtils
+                    .equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.EMULATOR)
+                && credentialProvider.isAuthenticationDisabled().join()
+        ) {
 
             OAuthClientConfig.emulateOAuthCards = true;
         }
@@ -1025,20 +1196,30 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         if (connectorClient == null) {
             CompletableFuture<OAuthClient> result = new CompletableFuture<>();
             result.completeExceptionally(
-                new RuntimeException("An ConnectorClient is required in TurnState for this operation."));
+                new RuntimeException(
+                    "An ConnectorClient is required in TurnState for this operation."
+                )
+            );
             return result;
         }
 
         if (OAuthClientConfig.emulateOAuthCards) {
             // do not join task - we want this to run in the background.
             OAuthClient oAuthClient = new RestOAuthClient(
-                turnContext.getActivity().getServiceUrl(), connectorClient.getRestClient().credentials());
-            return OAuthClientConfig.sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards)
+                turnContext.getActivity().getServiceUrl(),
+                connectorClient.getRestClient().credentials()
+            );
+            return OAuthClientConfig
+                .sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards)
                 .thenApply(result -> oAuthClient);
         }
 
         return CompletableFuture.completedFuture(
-            new RestOAuthClient(OAuthClientConfig.OAUTHENDPOINT, connectorClient.getRestClient().credentials()));
+            new RestOAuthClient(
+                OAuthClientConfig.OAUTHENDPOINT,
+                connectorClient.getRestClient().credentials()
+            )
+        );
     }
 
     /**
@@ -1047,17 +1228,24 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
      * @param serviceUrl     The service URL.
      * @param claimsIdentity The claims identity.
      * @return ConnectorClient instance.
-     * @throws UnsupportedOperationException ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if
-     * authentication is turned off.
+     * @throws UnsupportedOperationException ClaimsIdentity cannot be null. Pass
+     *                                       Anonymous ClaimsIdentity if
+     *                                       authentication is turned off.
      */
-    private CompletableFuture<ConnectorClient> createConnectorClient(String serviceUrl, ClaimsIdentity claimsIdentity) {
+    private CompletableFuture<ConnectorClient> createConnectorClient(
+        String serviceUrl,
+        ClaimsIdentity claimsIdentity
+    ) {
         if (claimsIdentity == null) {
             throw new UnsupportedOperationException(
-                "ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if authentication is turned off.");
+                "ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if authentication is turned off."
+            );
         }
 
-        // For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim.
-        // For unauthenticated requests we have anonymous identity provided auth is disabled.
+        // For requests from channel App Id is in Audience claim of JWT token. For
+        // emulator it is in AppId claim.
+        // For unauthenticated requests we have anonymous identity provided auth is
+        // disabled.
         if (claimsIdentity.claims() == null) {
             return getOrCreateConnectorClient(serviceUrl);
         }
@@ -1065,13 +1253,21 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
         // For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
         // For anonymous requests (requests with no header) appId is not set in claims.
 
-        Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-            .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.AUDIENCE_CLAIM))
+        Map.Entry<String, String> botAppIdClaim = claimsIdentity.claims()
+            .entrySet()
+            .stream()
+            .filter(
+                claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.AUDIENCE_CLAIM)
+            )
             .findFirst()
             .orElse(null);
         if (botAppIdClaim == null) {
-            botAppIdClaim = claimsIdentity.claims().entrySet().stream()
-                .filter(claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.APPID_CLAIM))
+            botAppIdClaim = claimsIdentity.claims()
+                .entrySet()
+                .stream()
+                .filter(
+                    claim -> StringUtils.equals(claim.getKey(), AuthenticationConstants.APPID_CLAIM)
+                )
                 .findFirst()
                 .orElse(null);
         }
@@ -1092,16 +1288,19 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     /**
      * Returns a ConnectorClient, either from a cache or newly created.
      *
-     * <p>Note: This is protected primarily to allow unit tests to override this
-     * to provide a mock ConnectorClient</p>
+     * <p>
+     * Note: This is protected primarily to allow unit tests to override this to
+     * provide a mock ConnectorClient
+     * </p>
      *
-     * @param serviceUrl The service URL for the client.
+     * @param serviceUrl          The service URL for the client.
      * @param usingAppCredentials (Optional) The AppCredentials to use.
      * @return A task that will return the ConnectorClient.
      */
-    protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(String serviceUrl,
-                                                                          AppCredentials usingAppCredentials) {
-
+    protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(
+        String serviceUrl,
+        AppCredentials usingAppCredentials
+    ) {
         CompletableFuture<ConnectorClient> result = new CompletableFuture<>();
 
         String clientKey = serviceUrl + (appCredentials != null ? appCredentials.getAppId() : "");
@@ -1111,13 +1310,18 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
                 RestConnectorClient connectorClient;
                 if (usingAppCredentials != null) {
                     connectorClient = new RestConnectorClient(
-                        new URI(serviceUrl).toURL().toString(), usingAppCredentials);
+                        new URI(serviceUrl).toURL().toString(),
+                        usingAppCredentials
+                    );
                 } else {
-                    AppCredentials emptyCredentials = channelProvider != null && channelProvider.isGovernment()
-                        ? MicrosoftGovernmentAppCredentials.empty()
-                        : MicrosoftAppCredentials.empty();
+                    AppCredentials emptyCredentials = channelProvider != null
+                        && channelProvider.isGovernment()
+                            ? MicrosoftGovernmentAppCredentials.empty()
+                            : MicrosoftAppCredentials.empty();
                     connectorClient = new RestConnectorClient(
-                        new URI(serviceUrl).toURL().toString(), emptyCredentials);
+                        new URI(serviceUrl).toURL().toString(),
+                        emptyCredentials
+                    );
                 }
 
                 if (connectorClientRetryStrategy != null) {
@@ -1126,8 +1330,13 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
 
                 return connectorClient;
             } catch (Throwable t) {
-                result.completeExceptionally(
-                    new IllegalArgumentException(String.format("Invalid Service URL: %s", serviceUrl), t));
+                result
+                    .completeExceptionally(
+                        new IllegalArgumentException(
+                            String.format("Invalid Service URL: %s", serviceUrl),
+                            t
+                        )
+                    );
                 return null;
             }
         }));
@@ -1136,8 +1345,8 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
     }
 
     /**
-     * Gets the application credentials. App Credentials are cached so as to ensure we are not refreshing
-     * token every time.
+     * Gets the application credentials. App Credentials are cached so as to ensure
+     * we are not refreshing token every time.
      *
      * @param appId The application identifier (AAD Id for the bot).
      * @return App credentials.
@@ -1151,44 +1360,51 @@ public class BotFrameworkAdapter extends BotAdapter implements AdapterIntegratio
             return CompletableFuture.completedFuture(appCredentialMap.get(appId));
         }
 
-        // If app credentials were provided, use them as they are the preferred choice moving forward
+        // If app credentials were provided, use them as they are the preferred choice
+        // moving forward
         if (appCredentials != null) {
             appCredentialMap.put(appId, appCredentials);
         }
 
-        return credentialProvider.getAppPassword(appId)
-            .thenApply(appPassword -> {
-                AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
-                    ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
-                    : new MicrosoftAppCredentials(appId, appPassword);
-                appCredentialMap.put(appId, credentials);
-                return credentials;
-            });
+        return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
+            AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
+                ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
+                : new MicrosoftAppCredentials(appId, appPassword);
+            appCredentialMap.put(appId, credentials);
+            return credentials;
+        });
     }
 
     /**
      * Middleware to assign tenantId from channelData to Conversation.TenantId.
      *
-     * MS Teams currently sends the tenant ID in channelData and the correct behavior is to expose this
-     * value in Activity.Conversation.TenantId.
+     * MS Teams currently sends the tenant ID in channelData and the correct
+     * behavior is to expose this value in Activity.Conversation.TenantId.
      *
-     * This code copies the tenant ID from channelData to Activity.Conversation.TenantId.
-     * Once MS Teams sends the tenantId in the Conversation property, this middleware can be removed.
+     * This code copies the tenant ID from channelData to
+     * Activity.Conversation.TenantId. Once MS Teams sends the tenantId in the
+     * Conversation property, this middleware can be removed.
      */
     private static class TenantIdWorkaroundForTeamsMiddleware implements Middleware {
         @Override
         public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
-            if (StringUtils.equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.MSTEAMS)
-                && turnContext.getActivity().getConversation() != null
-                && StringUtils.isEmpty(turnContext.getActivity().getConversation().getTenantId())) {
+            if (
+                StringUtils
+                    .equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.MSTEAMS)
+                    && turnContext.getActivity().getConversation() != null
+                    && StringUtils.isEmpty(turnContext.getActivity().getConversation().getTenantId())
+            ) {
 
-                JsonNode teamsChannelData = new ObjectMapper().valueToTree(turnContext.getActivity().getChannelData());
-                if (teamsChannelData != null
-                    && teamsChannelData.has("tenant")
-                    && teamsChannelData.get("tenant").has("id")) {
+                JsonNode teamsChannelData = new ObjectMapper()
+                    .valueToTree(turnContext.getActivity().getChannelData());
+                if (
+                    teamsChannelData != null && teamsChannelData.has("tenant")
+                        && teamsChannelData.get("tenant").has("id")
+                ) {
 
-                    turnContext.getActivity().getConversation().setTenantId(
-                        teamsChannelData.get("tenant").get("id").asText());
+                    turnContext.getActivity()
+                        .getConversation()
+                        .setTenantId(teamsChannelData.get("tenant").get("id").asText());
                 }
             }
 

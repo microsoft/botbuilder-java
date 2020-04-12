@@ -16,18 +16,20 @@ import org.springframework.context.annotation.Import;
 /**
  * This is the starting point of the Sprint Boot Bot application.
  *
- * This class also provides overrides for dependency injections.  A class that extends the
- * {@link com.microsoft.bot.builder.Bot} interface should be annotated with @Component.
+ * This class also provides overrides for dependency injections. A class that
+ * extends the {@link com.microsoft.bot.builder.Bot} interface should be
+ * annotated with @Component.
  *
  * @see ProactiveBot
  */
 @SpringBootApplication
 
-// Use the default BotController to receive incoming Channel messages. A custom controller
-// could be used by eliminating this import and creating a new RestController.  The default
-// controller is created by the Spring Boot container using dependency injection.  The
-// default route is /api/messages.
-@Import({BotController.class})
+// Use the default BotController to receive incoming Channel messages. A custom
+// controller could be used by eliminating this import and creating a new
+// RestController.
+// The default controller is created by the Spring Boot container using
+// dependency injection. The default route is /api/messages.
+@Import({ BotController.class })
 
 public class Application extends BotDependencyConfiguration {
     public static void main(String[] args) {
@@ -46,7 +48,9 @@ public class Application extends BotDependencyConfiguration {
     }
 
     /**
-     * The shared ConversationReference Map. This hold a list of conversations for the bot.
+     * The shared ConversationReference Map. This hold a list of conversations for
+     * the bot.
+     * 
      * @return A ConversationReferences object.
      */
     @Bean

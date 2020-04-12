@@ -15,7 +15,8 @@ public interface Storage {
      *
      * @param keys keys of the items to read
      * @return A task that represents the work queued to execute. If the activities
-     * are successfully sent, the task result contains the items read, indexed by key.
+     *         are successfully sent, the task result contains the items read,
+     *         indexed by key.
      */
     CompletableFuture<Map<String, Object>> read(String[] keys);
 
@@ -35,6 +36,3 @@ public interface Storage {
      */
     CompletableFuture<Void> delete(String[] keys);
 }
-
-
-

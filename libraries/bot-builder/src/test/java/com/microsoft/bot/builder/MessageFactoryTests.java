@@ -28,7 +28,10 @@ public class MessageFactoryTests {
     @Test
     public void NullText() {
         Activity message = MessageFactory.text(null);
-        Assert.assertNull("Message Text is not null. Null must have been passed through.", message.getText());
+        Assert.assertNull(
+            "Message Text is not null. Null must have been passed through.",
+            message.getText()
+        );
         Assert.assertEquals("Incorrect Activity Type", ActivityTypes.MESSAGE, message.getType());
     }
 
@@ -47,7 +50,11 @@ public class MessageFactoryTests {
         Activity message = MessageFactory.text(messageText, ssml, null);
         Assert.assertEquals("Message Text is not an empty String", messageText, message.getText());
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
-        Assert.assertEquals("InputHint is not AcceptingInput", InputHints.ACCEPTING_INPUT, message.getInputHint());
+        Assert.assertEquals(
+            "InputHint is not AcceptingInput",
+            InputHints.ACCEPTING_INPUT,
+            message.getInputHint()
+        );
         Assert.assertEquals("Incorrect Activity Type", ActivityTypes.MESSAGE, message.getType());
     }
 
@@ -68,10 +75,15 @@ public class MessageFactoryTests {
         Assert.assertTrue(message.getSuggestedActions().getActions().size() == 2);
         Assert.assertEquals("one", message.getSuggestedActions().getActions().get(0).getValue());
         Assert.assertEquals("one", message.getSuggestedActions().getActions().get(0).getTitle());
-        Assert.assertEquals(message.getSuggestedActions().getActions().get(0).getType(), ActionTypes.IM_BACK);
+        Assert.assertEquals(
+            message.getSuggestedActions().getActions().get(0).getType(),
+            ActionTypes.IM_BACK
+        );
         Assert.assertEquals("two", message.getSuggestedActions().getActions().get(1).getValue());
         Assert.assertEquals("two", message.getSuggestedActions().getActions().get(1).getTitle());
-        Assert.assertTrue(message.getSuggestedActions().getActions().get(1).getType() == ActionTypes.IM_BACK);
+        Assert.assertTrue(
+            message.getSuggestedActions().getActions().get(1).getType() == ActionTypes.IM_BACK
+        );
     }
 
     @Test
@@ -81,19 +93,36 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
         Set<String> textActions = new HashSet<>(Arrays.asList("one", "two", "three"));
 
-        Activity message = MessageFactory.suggestedActions(new ArrayList<>(textActions), text, ssml, inputHint);
+        Activity message = MessageFactory.suggestedActions(
+            new ArrayList<>(textActions),
+            text,
+            ssml,
+            inputHint
+        );
         Assert.assertEquals("Message Text does not match", text, message.getText());
         Assert.assertEquals("Incorrect Activity Type", ActivityTypes.MESSAGE, message.getType());
         Assert.assertEquals("InputHint does not match", inputHint, message.getInputHint());
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertNotNull(message.getSuggestedActions());
         Assert.assertNotNull(message.getSuggestedActions().getActions());
-        Assert.assertTrue("The message's suggested actions have the wrong set of values.",
-            textActions.containsAll(message.getSuggestedActions().getActions().stream().map(CardAction::getValue).collect(Collectors.toList())));
-        Assert.assertTrue("The message's suggested actions have the wrong set of titles.",
-            textActions.containsAll(message.getSuggestedActions().getActions().stream().map(CardAction::getTitle).collect(Collectors.toList())));
-        Assert.assertTrue("The message's suggested actions are of the wrong action type.",
-            message.getSuggestedActions().getActions().stream().allMatch(action -> action.getType() == ActionTypes.IM_BACK));
+        Assert.assertTrue(
+            "The message's suggested actions have the wrong set of values.",
+            textActions.containsAll(
+                message.getSuggestedActions().getActions().stream().map(CardAction::getValue).collect(Collectors.toList())
+            )
+        );
+        Assert.assertTrue(
+            "The message's suggested actions have the wrong set of titles.",
+            textActions.containsAll(
+                message.getSuggestedActions().getActions().stream().map(CardAction::getTitle).collect(Collectors.toList())
+            )
+        );
+        Assert.assertTrue(
+            "The message's suggested actions are of the wrong action type.",
+            message.getSuggestedActions().getActions().stream().allMatch(
+                action -> action.getType() == ActionTypes.IM_BACK
+            )
+        );
     }
 
     @Test
@@ -105,11 +134,13 @@ public class MessageFactoryTests {
         String cardActionValue = UUID.randomUUID().toString();
         String cardActionTitle = UUID.randomUUID().toString();
 
-        CardAction ca = new CardAction() {{
-            setType(ActionTypes.IM_BACK);
-            setValue(cardActionValue);
-            setTitle(cardActionTitle);
-        }};
+        CardAction ca = new CardAction() {
+            {
+                setType(ActionTypes.IM_BACK);
+                setValue(cardActionValue);
+                setTitle(cardActionTitle);
+            }
+        };
 
         List<CardAction> cardActions = Collections.singletonList(ca);
 
@@ -122,9 +153,17 @@ public class MessageFactoryTests {
         Assert.assertNotNull(message.getSuggestedActions());
         Assert.assertNotNull(message.getSuggestedActions().getActions());
         Assert.assertTrue(message.getSuggestedActions().getActions().size() == 1);
-        Assert.assertEquals(cardActionValue, message.getSuggestedActions().getActions().get(0).getValue());
-        Assert.assertEquals(cardActionTitle, message.getSuggestedActions().getActions().get(0).getTitle());
-        Assert.assertTrue(message.getSuggestedActions().getActions().get(0).getType() == ActionTypes.IM_BACK);
+        Assert.assertEquals(
+            cardActionValue,
+            message.getSuggestedActions().getActions().get(0).getValue()
+        );
+        Assert.assertEquals(
+            cardActionTitle,
+            message.getSuggestedActions().getActions().get(0).getTitle()
+        );
+        Assert.assertTrue(
+            message.getSuggestedActions().getActions().get(0).getType() == ActionTypes.IM_BACK
+        );
     }
 
     @Test
@@ -136,20 +175,24 @@ public class MessageFactoryTests {
         String cardValue1 = UUID.randomUUID().toString();
         String cardTitle1 = UUID.randomUUID().toString();
 
-        CardAction cardAction1 = new CardAction() {{
-            setType(ActionTypes.IM_BACK);
-            setValue(cardValue1);
-            setTitle(cardTitle1);
-        }};
+        CardAction cardAction1 = new CardAction() {
+            {
+                setType(ActionTypes.IM_BACK);
+                setValue(cardValue1);
+                setTitle(cardTitle1);
+            }
+        };
 
         String cardValue2 = UUID.randomUUID().toString();
         String cardTitle2 = UUID.randomUUID().toString();
 
-        CardAction cardAction2 = new CardAction() {{
-            setType(ActionTypes.IM_BACK);
-            setValue(cardValue2);
-            setTitle(cardTitle2);
-        }};
+        CardAction cardAction2 = new CardAction() {
+            {
+                setType(ActionTypes.IM_BACK);
+                setValue(cardValue2);
+                setTitle(cardTitle2);
+            }
+        };
 
         List<CardAction> cardActions = Arrays.asList(cardAction1, cardAction2);
         Set<String> values = new HashSet<>(Arrays.asList(cardValue1, cardValue2));
@@ -164,12 +207,24 @@ public class MessageFactoryTests {
         Assert.assertNotNull(message.getSuggestedActions());
         Assert.assertNotNull(message.getSuggestedActions().getActions());
         Assert.assertTrue(message.getSuggestedActions().getActions().size() == 2);
-        Assert.assertTrue("The message's suggested actions have the wrong set of values.",
-            values.containsAll(message.getSuggestedActions().getActions().stream().map(CardAction::getValue).collect(Collectors.toList())));
-        Assert.assertTrue("The message's suggested actions have the wrong set of titles.",
-            titles.containsAll(message.getSuggestedActions().getActions().stream().map(CardAction::getTitle).collect(Collectors.toList())));
-        Assert.assertTrue("The message's suggested actions are of the wrong action type.",
-            message.getSuggestedActions().getActions().stream().allMatch(action -> action.getType() == ActionTypes.IM_BACK));
+        Assert.assertTrue(
+            "The message's suggested actions have the wrong set of values.",
+            values.containsAll(
+                message.getSuggestedActions().getActions().stream().map(CardAction::getValue).collect(Collectors.toList())
+            )
+        );
+        Assert.assertTrue(
+            "The message's suggested actions have the wrong set of titles.",
+            titles.containsAll(
+                message.getSuggestedActions().getActions().stream().map(CardAction::getTitle).collect(Collectors.toList())
+            )
+        );
+        Assert.assertTrue(
+            "The message's suggested actions are of the wrong action type.",
+            message.getSuggestedActions().getActions().stream().allMatch(
+                action -> action.getType() == ActionTypes.IM_BACK
+            )
+        );
 
     }
 
@@ -180,9 +235,11 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment a = new Attachment() {{
-            setName(attachmentName);
-        }};
+        Attachment a = new Attachment() {
+            {
+                setName(attachmentName);
+            }
+        };
 
         Activity message = MessageFactory.attachment(a, text, ssml, inputHint);
 
@@ -191,7 +248,11 @@ public class MessageFactoryTests {
         Assert.assertEquals("InputHint does not match", inputHint, message.getInputHint());
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertTrue("Incorrect Attachment Count", message.getAttachments().size() == 1);
-        Assert.assertEquals("Incorrect Attachment Name", message.getAttachments().get(0).getName(), attachmentName);
+        Assert.assertEquals(
+            "Incorrect Attachment Name",
+            message.getAttachments().get(0).getName(),
+            attachmentName
+        );
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -202,7 +263,7 @@ public class MessageFactoryTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void AttachmentMultipleNull() {
-        Activity message = MessageFactory.attachment((List<Attachment>)null, null, null, null);
+        Activity message = MessageFactory.attachment((List<Attachment>) null, null, null, null);
         Assert.fail("Exception not thrown");
     }
 
@@ -219,14 +280,18 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {{
-            setName(attachmentName);
-        }};
+        Attachment attachment1 = new Attachment() {
+            {
+                setName(attachmentName);
+            }
+        };
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {{
-            setName(attachmentName2);
-        }};
+        Attachment attachment2 = new Attachment() {
+            {
+                setName(attachmentName2);
+            }
+        };
 
         List<Attachment> multipleAttachments = Arrays.asList(attachment1, attachment2);
         Activity message = MessageFactory.carousel(multipleAttachments, text, ssml, inputHint);
@@ -237,8 +302,16 @@ public class MessageFactoryTests {
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertTrue(message.getAttachmentLayout() == AttachmentLayoutTypes.CAROUSEL);
         Assert.assertTrue("Incorrect Attachment Count", message.getAttachments().size() == 2);
-        Assert.assertEquals("Incorrect Attachment1 Name", message.getAttachments().get(0).getName(), attachmentName);
-        Assert.assertEquals("Incorrect Attachment2 Name", message.getAttachments().get(1).getName(), attachmentName2);
+        Assert.assertEquals(
+            "Incorrect Attachment1 Name",
+            message.getAttachments().get(0).getName(),
+            attachmentName
+        );
+        Assert.assertEquals(
+            "Incorrect Attachment2 Name",
+            message.getAttachments().get(1).getName(),
+            attachmentName2
+        );
     }
 
     @Test
@@ -248,17 +321,28 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName1 = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {{
-            setName(attachmentName1);
-        }};
+        Attachment attachment1 = new Attachment() {
+            {
+                setName(attachmentName1);
+            }
+        };
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {{
-            setName(attachmentName2);
-        }};
+        Attachment attachment2 = new Attachment() {
+            {
+                setName(attachmentName2);
+            }
+        };
 
-        Set<Attachment> multipleAttachments = new HashSet<>(Arrays.asList(attachment1, attachment2));
-        Activity message = MessageFactory.carousel(new ArrayList<>(multipleAttachments), text, ssml, inputHint);
+        Set<Attachment> multipleAttachments = new HashSet<>(
+            Arrays.asList(attachment1, attachment2)
+        );
+        Activity message = MessageFactory.carousel(
+            new ArrayList<>(multipleAttachments),
+            text,
+            ssml,
+            inputHint
+        );
 
         Set<String> names = new HashSet<>(Arrays.asList(attachmentName1, attachmentName2));
 
@@ -268,8 +352,10 @@ public class MessageFactoryTests {
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertTrue(message.getAttachmentLayout() == AttachmentLayoutTypes.CAROUSEL);
         Assert.assertTrue("Incorrect Attachment Count", message.getAttachments().size() == 2);
-        Assert.assertTrue("Incorrect set of attachment names.",
-            names.containsAll(message.getAttachments().stream().map(Attachment::getName).collect(Collectors.toList())));
+        Assert.assertTrue(
+            "Incorrect set of attachment names.",
+            names.containsAll(message.getAttachments().stream().map(Attachment::getName).collect(Collectors.toList()))
+        );
     }
 
     @Test
@@ -279,14 +365,18 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment a = new Attachment() {{
-            setName(attachmentName);
-        }};
+        Attachment a = new Attachment() {
+            {
+                setName(attachmentName);
+            }
+        };
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment a2 = new Attachment() {{
-            setName(attachmentName2);
-        }};
+        Attachment a2 = new Attachment() {
+            {
+                setName(attachmentName2);
+            }
+        };
 
         List<Attachment> multipleAttachments = Arrays.asList(a, a2);
         Activity message = MessageFactory.attachment(multipleAttachments, text, ssml, inputHint);
@@ -297,8 +387,16 @@ public class MessageFactoryTests {
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertTrue(message.getAttachmentLayout() == AttachmentLayoutTypes.LIST);
         Assert.assertTrue("Incorrect Attachment Count", message.getAttachments().size() == 2);
-        Assert.assertEquals("Incorrect Attachment1 Name", message.getAttachments().get(0).getName(), attachmentName);
-        Assert.assertEquals("Incorrect Attachment2 Name", message.getAttachments().get(1).getName(), attachmentName2);
+        Assert.assertEquals(
+            "Incorrect Attachment1 Name",
+            message.getAttachments().get(0).getName(),
+            attachmentName
+        );
+        Assert.assertEquals(
+            "Incorrect Attachment2 Name",
+            message.getAttachments().get(1).getName(),
+            attachmentName2
+        );
     }
 
     @Test
@@ -308,17 +406,28 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName1 = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {{
-            setName(attachmentName1);
-        }};
+        Attachment attachment1 = new Attachment() {
+            {
+                setName(attachmentName1);
+            }
+        };
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {{
-            setName(attachmentName2);
-        }};
+        Attachment attachment2 = new Attachment() {
+            {
+                setName(attachmentName2);
+            }
+        };
 
-        Set<Attachment> multipleAttachments = new HashSet<>(Arrays.asList(attachment1, attachment2));
-        Activity message = MessageFactory.attachment(new ArrayList<>(multipleAttachments), text, ssml, inputHint);
+        Set<Attachment> multipleAttachments = new HashSet<>(
+            Arrays.asList(attachment1, attachment2)
+        );
+        Activity message = MessageFactory.attachment(
+            new ArrayList<>(multipleAttachments),
+            text,
+            ssml,
+            inputHint
+        );
 
         Set<String> names = new HashSet<>(Arrays.asList(attachmentName1, attachmentName2));
 
@@ -328,8 +437,10 @@ public class MessageFactoryTests {
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertSame(message.getAttachmentLayout(), AttachmentLayoutTypes.LIST);
         Assert.assertEquals("Incorrect Attachment Count", 2, message.getAttachments().size());
-        Assert.assertTrue("Incorrect set of attachment names.",
-            names.containsAll(message.getAttachments().stream().map(Attachment::getName).collect(Collectors.toList())));
+        Assert.assertTrue(
+            "Incorrect set of attachment names.",
+            names.containsAll(message.getAttachments().stream().map(Attachment::getName).collect(Collectors.toList()))
+        );
     }
 
     @Test
@@ -348,8 +459,16 @@ public class MessageFactoryTests {
         Assert.assertEquals("InputHint does not match", inputHint, message.getInputHint());
         Assert.assertEquals("ssml text is incorrect", ssml, message.getSpeak());
         Assert.assertEquals(1, message.getAttachments().size());
-        Assert.assertEquals("Incorrect Attachment1 Name", message.getAttachments().get(0).getName(), name);
-        Assert.assertSame("Incorrect contentType", message.getAttachments().get(0).getContentType(), contentType);
+        Assert.assertEquals(
+            "Incorrect Attachment1 Name",
+            message.getAttachments().get(0).getName(),
+            name
+        );
+        Assert.assertSame(
+            "Incorrect contentType",
+            message.getAttachments().get(0).getContentType(),
+            contentType
+        );
         Assert.assertEquals("Incorrect Uri", message.getAttachments().get(0).getContentUrl(), uri);
     }
 
@@ -360,11 +479,15 @@ public class MessageFactoryTests {
         BotCallbackHandler replyWithimBackBack = turnContext -> {
             if (StringUtils.equals(turnContext.getActivity().getText(), "test")) {
                 Activity activity = MessageFactory.suggestedCardActions(
-                    Collections.singletonList(new CardAction() {{
-                        setType(ActionTypes.IM_BACK);
-                        setText("red");
-                        setTitle("redTitle");
-                    }}), "Select color");
+                    Collections.singletonList(new CardAction() {
+                        {
+                            setType(ActionTypes.IM_BACK);
+                            setText("red");
+                            setTitle("redTitle");
+                        }
+                    }),
+                    "Select color"
+                );
 
                 turnContext.sendActivity(activity).join();
             }
@@ -374,16 +497,32 @@ public class MessageFactoryTests {
         Consumer<Activity> validateIMBack = activity -> {
             Assert.assertTrue(activity.isType(ActivityTypes.MESSAGE));
             Assert.assertEquals("Select color", activity.getText());
-            Assert.assertEquals("Incorrect Count", 1, activity.getSuggestedActions().getActions().size());
-            Assert.assertSame("Incorrect Action Type", activity.getSuggestedActions().getActions().get(0).getType(), ActionTypes.IM_BACK);
-            Assert.assertEquals("incorrect text", activity.getSuggestedActions().getActions().get(0).getText(), "red");
-            Assert.assertEquals("incorrect text", activity.getSuggestedActions().getActions().get(0).getTitle(), "redTitle");
+            Assert.assertEquals(
+                "Incorrect Count",
+                1,
+                activity.getSuggestedActions().getActions().size()
+            );
+            Assert.assertSame(
+                "Incorrect Action Type",
+                activity.getSuggestedActions().getActions().get(0).getType(),
+                ActionTypes.IM_BACK
+            );
+            Assert.assertEquals(
+                "incorrect text",
+                activity.getSuggestedActions().getActions().get(0).getText(),
+                "red"
+            );
+            Assert.assertEquals(
+                "incorrect text",
+                activity.getSuggestedActions().getActions().get(0).getTitle(),
+                "redTitle"
+            );
         };
 
-        new TestFlow(adapter, replyWithimBackBack)
-            .send("test")
-            .assertReply(validateIMBack, "IMBack Did not validate")
-            .startTest().join();
+        new TestFlow(adapter, replyWithimBackBack).send("test").assertReply(
+            validateIMBack,
+            "IMBack Did not validate"
+        ).startTest().join();
     }
 
     @Test
@@ -393,12 +532,15 @@ public class MessageFactoryTests {
         BotCallbackHandler replyWithimBackBack = turnContext -> {
             if (StringUtils.equals(turnContext.getActivity().getText(), "test")) {
                 Activity activity = MessageFactory.suggestedCardActions(
-                    Collections.singletonList(
-                        new CardAction() {{
+                    Collections.singletonList(new CardAction() {
+                        {
                             setType(ActionTypes.IM_BACK);
                             setText("red");
                             setTitle("redTitle");
-                    }}), null);
+                        }
+                    }),
+                    null
+                );
 
                 turnContext.sendActivity(activity);
             }
@@ -408,15 +550,31 @@ public class MessageFactoryTests {
         Consumer<Activity> validateIMBack = activity -> {
             Assert.assertTrue(activity.isType(ActivityTypes.MESSAGE));
             Assert.assertNull(activity.getText());
-            Assert.assertEquals("Incorrect Count", 1, activity.getSuggestedActions().getActions().size());
-            Assert.assertSame("Incorrect Action Type", activity.getSuggestedActions().getActions().get(0).getType(), ActionTypes.IM_BACK);
-            Assert.assertEquals("incorrect text", activity.getSuggestedActions().getActions().get(0).getText(), "red");
-            Assert.assertEquals("incorrect text", activity.getSuggestedActions().getActions().get(0).getTitle(), "redTitle");
+            Assert.assertEquals(
+                "Incorrect Count",
+                1,
+                activity.getSuggestedActions().getActions().size()
+            );
+            Assert.assertSame(
+                "Incorrect Action Type",
+                activity.getSuggestedActions().getActions().get(0).getType(),
+                ActionTypes.IM_BACK
+            );
+            Assert.assertEquals(
+                "incorrect text",
+                activity.getSuggestedActions().getActions().get(0).getText(),
+                "red"
+            );
+            Assert.assertEquals(
+                "incorrect text",
+                activity.getSuggestedActions().getActions().get(0).getTitle(),
+                "redTitle"
+            );
         };
 
-        new TestFlow(adapter, replyWithimBackBack)
-            .send("test")
-            .assertReply(validateIMBack, "IMBack Did not validate")
-            .startTest().join();
+        new TestFlow(adapter, replyWithimBackBack).send("test").assertReply(
+            validateIMBack,
+            "IMBack Did not validate"
+        ).startTest().join();
     }
 }

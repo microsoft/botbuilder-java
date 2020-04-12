@@ -13,11 +13,13 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * When added, this middleware will send typing activities back to the user when a Message activity
- * is received to let them know that the bot has received the message and is working on the response.
- * You can specify a delay in milliseconds before the first typing activity is sent and then a frequency,
- * also in milliseconds which determines how often another typing activity is sent. Typing activities
- * will continue to be sent until your bot sends another message back to the user.
+ * When added, this middleware will send typing activities back to the user when
+ * a Message activity is received to let them know that the bot has received the
+ * message and is working on the response. You can specify a delay in
+ * milliseconds before the first typing activity is sent and then a frequency,
+ * also in milliseconds which determines how often another typing activity is
+ * sent. Typing activities will continue to be sent until your bot sends another
+ * message back to the user.
  */
 public class ShowTypingMiddleware implements Middleware {
     private static final int DEFAULT_DELAY = 500;
@@ -29,7 +31,8 @@ public class ShowTypingMiddleware implements Middleware {
     private long delay;
 
     /**
-     * Rate at which additional typing indicators will be sent. Defaults to every 2000ms.
+     * Rate at which additional typing indicators will be sent. Defaults to every
+     * 2000ms.
      */
     private long period;
 
@@ -43,7 +46,7 @@ public class ShowTypingMiddleware implements Middleware {
     /**
      * Initializes a new instance of the ShowTypingMiddleware class.
      *
-     * @param withDelay Initial delay before sending first typing indicator.
+     * @param withDelay  Initial delay before sending first typing indicator.
      * @param withPeriod Rate at which additional typing indicators will be sent.
      */
     public ShowTypingMiddleware(long withDelay, long withPeriod) {
@@ -63,7 +66,8 @@ public class ShowTypingMiddleware implements Middleware {
      * Processes an incoming activity.
      *
      * @param turnContext The context object for this turn.
-     * @param next        The delegate to call to continue the bot middleware pipeline.
+     * @param next        The delegate to call to continue the bot middleware
+     *                    pipeline.
      * @return A task that represents the work queued to execute.
      */
     @Override
@@ -72,39 +76,53 @@ public class ShowTypingMiddleware implements Middleware {
             return next.next();
         }
 
-        // do not await task - we want this to run in the background and we will cancel it when its done
+        // do not await task - we want this to run in the background and we will cancel
+        // it when its done
         CompletableFuture sendFuture = sendTyping(turnContext, delay, period);
-        return next.next()
-            .thenAccept(result -> sendFuture.cancel(true));
+        return next.next().thenAccept(result -> sendFuture.cancel(true));
     }
 
-    private static CompletableFuture<Void> sendTyping(TurnContext turnContext, long delay, long period) {
+    private static CompletableFuture<Void> sendTyping(
+        TurnContext turnContext,
+        long delay,
+        long period
+    ) {
         return CompletableFuture.runAsync(() -> {
-           try {
-               Thread.sleep(delay);
+            try {
+                Thread.sleep(delay);
 
-               while (!Thread.currentThread().isInterrupted()) {
-                   sendTypingActivity(turnContext).join();
-                   Thread.sleep(period);
-               }
-           } catch (InterruptedException e) {
-               // do nothing
-           }
+                while (!Thread.currentThread().isInterrupted()) {
+                    sendTypingActivity(turnContext).join();
+                    Thread.sleep(period);
+                }
+            } catch (InterruptedException e) {
+                // do nothing
+            }
         }, ExecutorFactory.getExecutor());
     }
 
-    private static CompletableFuture<ResourceResponse[]> sendTypingActivity(TurnContext turnContext) {
-        // create a TypingActivity, associate it with the conversation and send immediately
-        Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
-           setRelatesTo(turnContext.getActivity().getRelatesTo());
-        }};
+    private static CompletableFuture<ResourceResponse[]> sendTypingActivity(
+        TurnContext turnContext
+    ) {
+        // create a TypingActivity, associate it with the conversation and send
+        // immediately
+        Activity typingActivity = new Activity(ActivityTypes.TYPING) {
+            {
+                setRelatesTo(turnContext.getActivity().getRelatesTo());
+            }
+        };
 
-        // sending the Activity directly on the Adapter avoids other Middleware and avoids setting the Responded
-        // flag, however, this also requires that the conversation reference details are explicitly added.
-        ConversationReference conversationReference = turnContext.getActivity().getConversationReference();
+        // sending the Activity directly on the Adapter avoids other Middleware and
+        // avoids setting the Responded
+        // flag, however, this also requires that the conversation reference details are
+        // explicitly added.
+        ConversationReference conversationReference = turnContext.getActivity()
+            .getConversationReference();
         typingActivity.applyConversationReference(conversationReference);
 
-        // make sure to send the Activity directly on the Adapter rather than via the TurnContext
-        return turnContext.getAdapter().sendActivities(turnContext, Collections.singletonList(typingActivity));
+        // make sure to send the Activity directly on the Adapter rather than via the
+        // TurnContext
+        return turnContext.getAdapter()
+            .sendActivities(turnContext, Collections.singletonList(typingActivity));
     }
 }

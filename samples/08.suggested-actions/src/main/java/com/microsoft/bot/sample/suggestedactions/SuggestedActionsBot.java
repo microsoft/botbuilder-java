@@ -22,18 +22,24 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} displays a list
- * of SuggestedActions to the user.  The {@link #onMembersAdded(List, TurnContext)} will
- * send a greeting to new conversation participants.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. For this sample, the {@link #onMessageActivity(TurnContext)}
+ * displays a list of SuggestedActions to the user. The
+ * {@link #onMembersAdded(List, TurnContext)} will send a greeting to new
+ * conversation participants.
+ * </p>
  */
 @Component
 public class SuggestedActionsBot extends ActivityHandler {
-    public static final String WELCOMETEXT = "This bot will introduce you to suggestedActions."
-     + " Please answer the question:";
+    public static final String WELCOMETEXT =
+        "This bot will introduce you to suggestedActions." + " Please answer the question:";
 
     @Override
-    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(
+        List<ChannelAccount> membersAdded,
+        TurnContext turnContext
+    ) {
         return sendWelcomeMessage(turnContext);
     }
 
@@ -46,22 +52,24 @@ public class SuggestedActionsBot extends ActivityHandler {
         String responseText = processInput(text);
 
         // Respond to the user.
-        return turnContext
-            .sendActivities(
-                MessageFactory.text(responseText),
-                createSuggestedActions())
-            .thenApply(responses -> null);
+        return turnContext.sendActivities(
+            MessageFactory.text(responseText), createSuggestedActions()
+        ).thenApply(responses -> null);
     }
 
     private CompletableFuture<Void> sendWelcomeMessage(TurnContext turnContext) {
         return turnContext.getActivity().getMembersAdded().stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivities(
-                MessageFactory.text("Welcome to SuggestedActionsBot " + channel.getName() + ". " + WELCOMETEXT),
-                createSuggestedActions()
-            ))
-            .collect(CompletableFutures.toFutureList())
-            .thenApply(resourceResponses -> null);
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
+            .map(
+                channel -> turnContext.sendActivities(
+                    MessageFactory.text(
+                        "Welcome to SuggestedActionsBot " + channel.getName() + ". " + WELCOMETEXT
+                    ), createSuggestedActions()
+                )
+            ).collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
     }
 
     private String processInput(String text) {
@@ -84,25 +92,29 @@ public class SuggestedActionsBot extends ActivityHandler {
     private Activity createSuggestedActions() {
         Activity reply = MessageFactory.text("What is your favorite color?");
 
-        reply.setSuggestedActions(new SuggestedActions() {{
-            setActions(Arrays.asList(
-                new CardAction() {{
-                    setTitle("Red");
-                    setType(ActionTypes.IM_BACK);
-                    setValue("Red");
-                }},
-                new CardAction() {{
-                    setTitle("Yellow");
-                    setType(ActionTypes.IM_BACK);
-                    setValue("Yellow");
-                }},
-                new CardAction() {{
-                    setTitle("Blue");
-                    setType(ActionTypes.IM_BACK);
-                    setValue("Blue");
-                }}
-            ));
-        }});
+        reply.setSuggestedActions(new SuggestedActions() {
+            {
+                setActions(Arrays.asList(new CardAction() {
+                    {
+                        setTitle("Red");
+                        setType(ActionTypes.IM_BACK);
+                        setValue("Red");
+                    }
+                }, new CardAction() {
+                    {
+                        setTitle("Yellow");
+                        setType(ActionTypes.IM_BACK);
+                        setValue("Yellow");
+                    }
+                }, new CardAction() {
+                    {
+                        setTitle("Blue");
+                        setType(ActionTypes.IM_BACK);
+                        setValue("Blue");
+                    }
+                }));
+            }
+        });
 
         return reply;
     }

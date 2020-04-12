@@ -35,65 +35,79 @@ public class TranscriptBaseTests {
         try {
             store.logActivity(null).join();
             Assert.fail("logActivity Should have thrown on null");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             Assert.fail("logActivity Should have thrown ArgumentNull exception on null");
         }
 
         try {
             store.getTranscriptActivities(null, null).join();
             Assert.fail("getTranscriptActivities Should have thrown on null");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
-            Assert.fail("getTranscriptActivities Should have thrown ArgumentNull exception on null");
+        } catch (Throwable t) {
+            Assert.fail(
+                "getTranscriptActivities Should have thrown ArgumentNull exception on null"
+            );
         }
 
         try {
             store.getTranscriptActivities("asdfds", null).join();
             Assert.fail("getTranscriptActivities Should have thrown on null");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
-            Assert.fail("getTranscriptActivities Should have thrown ArgumentNull exception on null");
+        } catch (Throwable t) {
+            Assert.fail(
+                "getTranscriptActivities Should have thrown ArgumentNull exception on null"
+            );
         }
 
         try {
             store.listTranscripts(null).join();
             Assert.fail("listTranscripts Should have thrown on null");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             Assert.fail("listTranscripts Should have thrown ArgumentNull exception on null");
         }
 
         try {
             store.deleteTranscript(null, null).join();
             Assert.fail("deleteTranscript Should have thrown on null channelId");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
-            Assert.fail("deleteTranscript Should have thrown ArgumentNull exception on null channelId");
+        } catch (Throwable t) {
+            Assert.fail(
+                "deleteTranscript Should have thrown ArgumentNull exception on null channelId"
+            );
         }
 
         try {
             store.deleteTranscript("test", null).join();
             Assert.fail("deleteTranscript Should have thrown on null conversationId");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
-        } catch(Throwable t) {
-            Assert.fail("deleteTranscript Should have thrown ArgumentNull exception on null conversationId");
+        } catch (Throwable t) {
+            Assert.fail(
+                "deleteTranscript Should have thrown ArgumentNull exception on null conversationId"
+            );
         }
     }
 
     protected void LogActivity() {
         String conversationId = "_LogActivity";
-        List<Activity> activities = createActivities(conversationId, OffsetDateTime.now(ZoneId.of("UTC")));
+        List<Activity> activities = createActivities(
+            conversationId,
+            OffsetDateTime.now(ZoneId.of("UTC"))
+        );
         Activity activity = activities.get(0);
         store.logActivity(activity).join();
 
-        PagedResult<Activity> results = store.getTranscriptActivities("test", conversationId).join();
+        PagedResult<Activity> results = store.getTranscriptActivities(
+            "test",
+            conversationId
+        ).join();
         Assert.assertEquals(1, results.getItems().size());
 
         String src;
@@ -114,12 +128,15 @@ public class TranscriptBaseTests {
         OffsetDateTime start = OffsetDateTime.now(ZoneId.of("UTC"));
         List<Activity> activities = createActivities(conversationId, start);
 
-        for(Activity activity : activities) {
+        for (Activity activity : activities) {
             store.logActivity(activity).join();
         }
 
         // make sure other channels and conversations don't return results
-        PagedResult<Activity> pagedResult = store.getTranscriptActivities("bogus", conversationId).join();
+        PagedResult<Activity> pagedResult = store.getTranscriptActivities(
+            "bogus",
+            conversationId
+        ).join();
         Assert.assertNull(pagedResult.getContinuationToken());
         Assert.assertEquals(0, pagedResult.getItems().size());
 
@@ -130,7 +147,9 @@ public class TranscriptBaseTests {
 
         // make sure the original and transcript result activities are the same
         int indexActivity = 0;
-        for (Activity result : pagedResult.getItems().stream().sorted(Comparator.comparing(Activity::getTimestamp)).collect(Collectors.toList())) {
+        for (Activity result : pagedResult.getItems().stream().sorted(
+            Comparator.comparing(Activity::getTimestamp)
+        ).collect(Collectors.toList())) {
             String src;
             String transcript;
             try {
@@ -144,12 +163,19 @@ public class TranscriptBaseTests {
             Assert.assertEquals(src, transcript);
         }
 
-        pagedResult = store.getTranscriptActivities("test", conversationId, null, start.plusMinutes(5)).join();
+        pagedResult = store.getTranscriptActivities(
+            "test",
+            conversationId,
+            null,
+            start.plusMinutes(5)
+        ).join();
         Assert.assertEquals(activities.size() / 2, pagedResult.getItems().size());
 
         // make sure the original and transcript result activities are the same
         indexActivity = 5;
-        for (Activity result : pagedResult.getItems().stream().sorted(Comparator.comparing(Activity::getTimestamp)).collect(Collectors.toList())) {
+        for (Activity result : pagedResult.getItems().stream().sorted(
+            Comparator.comparing(Activity::getTimestamp)
+        ).collect(Collectors.toList())) {
             String src;
             String transcript;
             try {
@@ -175,8 +201,14 @@ public class TranscriptBaseTests {
         List<Activity> activities2 = createActivities(conversationId2, start);
         activities2.forEach(a -> store.logActivity(a).join());
 
-        PagedResult<Activity> pagedResult = store.getTranscriptActivities("test", conversationId).join();
-        PagedResult<Activity> pagedResult2 = store.getTranscriptActivities("test", conversationId2).join();
+        PagedResult<Activity> pagedResult = store.getTranscriptActivities(
+            "test",
+            conversationId
+        ).join();
+        PagedResult<Activity> pagedResult2 = store.getTranscriptActivities(
+            "test",
+            conversationId2
+        ).join();
 
         Assert.assertEquals(activities.size(), pagedResult.getItems().size());
         Assert.assertEquals(activities2.size(), pagedResult2.getItems().size());
@@ -196,23 +228,31 @@ public class TranscriptBaseTests {
         List<Activity> activities = createActivities(conversationId, start, 50);
 
         // log in parallel batches of 10
-        int[] pos = new int[]{0};
-        for (List<Activity> group : activities.stream().collect(Collectors.groupingBy(a -> pos[0]++ / 10 )).values()) {
-            group.stream().map(a -> store.logActivity(a)).collect(CompletableFutures.toFutureList()).join();
+        int[] pos = new int[] { 0 };
+        for (List<Activity> group : activities.stream().collect(
+            Collectors.groupingBy(a -> pos[0]++ / 10)
+        ).values()) {
+            group.stream().map(a -> store.logActivity(a)).collect(
+                CompletableFutures.toFutureList()
+            ).join();
         }
 
         Set<String> seen = new HashSet<>();
         PagedResult<Activity> pagedResult = null;
         int pageSize = 0;
         do {
-            pagedResult = store.getTranscriptActivities("test", conversationId, pagedResult != null ? pagedResult.getContinuationToken() : null).join();
+            pagedResult = store.getTranscriptActivities(
+                "test",
+                conversationId,
+                pagedResult != null ? pagedResult.getContinuationToken() : null
+            ).join();
             Assert.assertNotNull(pagedResult);
             Assert.assertNotNull(pagedResult.getItems());
 
             // NOTE: Assumes page size is consistent
             if (pageSize == 0) {
                 pageSize = pagedResult.getItems().size();
-            } else if (pageSize == pagedResult.getItems().size()){
+            } else if (pageSize == pagedResult.getItems().size()) {
                 Assert.assertTrue(!StringUtils.isEmpty(pagedResult.getContinuationToken()));
             }
 
@@ -231,9 +271,13 @@ public class TranscriptBaseTests {
         List<Activity> activities = createActivities(conversationId, start, 50);
 
         // log in parallel batches of 10
-        int[] pos = new int[]{0};
-        for (List<Activity> group : activities.stream().collect(Collectors.groupingBy(a -> pos[0]++ / 10 )).values()) {
-            group.stream().map(a -> store.logActivity(a)).collect(CompletableFutures.toFutureList()).join();
+        int[] pos = new int[] { 0 };
+        for (List<Activity> group : activities.stream().collect(
+            Collectors.groupingBy(a -> pos[0]++ / 10)
+        ).values()) {
+            group.stream().map(a -> store.logActivity(a)).collect(
+                CompletableFutures.toFutureList()
+            ).join();
         }
 
         Set<String> seen = new HashSet<>();
@@ -241,14 +285,19 @@ public class TranscriptBaseTests {
         PagedResult<Activity> pagedResult = null;
         int pageSize = 0;
         do {
-            pagedResult = store.getTranscriptActivities("test", conversationId, pagedResult != null ? pagedResult.getContinuationToken() : null, startDate).join();
+            pagedResult = store.getTranscriptActivities(
+                "test",
+                conversationId,
+                pagedResult != null ? pagedResult.getContinuationToken() : null,
+                startDate
+            ).join();
             Assert.assertNotNull(pagedResult);
             Assert.assertNotNull(pagedResult.getItems());
 
             // NOTE: Assumes page size is consistent
             if (pageSize == 0) {
                 pageSize = pagedResult.getItems().size();
-            } else if (pageSize == pagedResult.getItems().size()){
+            } else if (pageSize == pagedResult.getItems().size()) {
                 Assert.assertTrue(!StringUtils.isEmpty(pagedResult.getContinuationToken()));
             }
 
@@ -260,11 +309,15 @@ public class TranscriptBaseTests {
 
         Assert.assertEquals(activities.size() / 2, seen.size());
 
-        for (Activity a : activities.stream().filter(a -> a.getTimestamp().compareTo(startDate) >= 0).collect(Collectors.toList())) {
+        for (Activity a : activities.stream().filter(
+            a -> a.getTimestamp().compareTo(startDate) >= 0
+        ).collect(Collectors.toList())) {
             Assert.assertTrue(seen.contains(a.getId()));
         }
 
-        for (Activity a : activities.stream().filter(a -> a.getTimestamp().compareTo(startDate) < 0).collect(Collectors.toList())) {
+        for (Activity a : activities.stream().filter(
+            a -> a.getTimestamp().compareTo(startDate) < 0
+        ).collect(Collectors.toList())) {
             Assert.assertFalse(seen.contains(a.getId()));
         }
     }
@@ -283,23 +336,30 @@ public class TranscriptBaseTests {
         }
 
         // log in parallel batches of 10
-        int[] pos = new int[]{0};
-        for (List<Activity> group : activities.stream().collect(Collectors.groupingBy(a -> pos[0]++ / 10 )).values()) {
-            group.stream().map(a -> store.logActivity(a)).collect(CompletableFutures.toFutureList()).join();
+        int[] pos = new int[] { 0 };
+        for (List<Activity> group : activities.stream().collect(
+            Collectors.groupingBy(a -> pos[0]++ / 10)
+        ).values()) {
+            group.stream().map(a -> store.logActivity(a)).collect(
+                CompletableFutures.toFutureList()
+            ).join();
         }
 
         Set<String> seen = new HashSet<>();
         PagedResult<TranscriptInfo> pagedResult = null;
         int pageSize = 0;
         do {
-            pagedResult = store.listTranscripts("test", pagedResult != null ? pagedResult.getContinuationToken() : null).join();
+            pagedResult = store.listTranscripts(
+                "test",
+                pagedResult != null ? pagedResult.getContinuationToken() : null
+            ).join();
             Assert.assertNotNull(pagedResult);
             Assert.assertNotNull(pagedResult.getItems());
 
             // NOTE: Assumes page size is consistent
             if (pageSize == 0) {
                 pageSize = pagedResult.getItems().size();
-            } else if (pageSize == pagedResult.getItems().size()){
+            } else if (pageSize == pagedResult.getItems().size()) {
                 Assert.assertTrue(!StringUtils.isEmpty(pagedResult.getContinuationToken()));
             }
 
@@ -343,7 +403,8 @@ public class TranscriptBaseTests {
             activity.setServiceUrl("http://foo.com/api/messages");
             activities.add(activity);
             ts = ts.plusMinutes(1);
-        };
+        }
+        ;
 
         return activities;
     }

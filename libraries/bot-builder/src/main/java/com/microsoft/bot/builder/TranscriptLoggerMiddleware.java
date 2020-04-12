@@ -14,9 +14,9 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
 /**
- * When added, this middleware will log incoming and outgoing activities to a TranscriptStore.
+ * When added, this middleware will log incoming and outgoing activities to a
+ * TranscriptStore.
  */
 public class TranscriptLoggerMiddleware implements Middleware {
 
@@ -31,14 +31,16 @@ public class TranscriptLoggerMiddleware implements Middleware {
     private Queue<Activity> transcript = new ConcurrentLinkedQueue<Activity>();
 
     /**
-     * Initializes a new instance of the <see cref="TranscriptLoggerMiddleware"/> class.
+     * Initializes a new instance of the <see cref="TranscriptLoggerMiddleware"/>
+     * class.
      *
      * @param withTranscriptLogger The transcript logger to use.
      */
     public TranscriptLoggerMiddleware(TranscriptLogger withTranscriptLogger) {
         if (withTranscriptLogger == null) {
             throw new IllegalArgumentException(
-                "TranscriptLoggerMiddleware requires a ITranscriptLogger implementation.");
+                "TranscriptLoggerMiddleware requires a ITranscriptLogger implementation."
+            );
         }
 
         transcriptLogger = withTranscriptLogger;
@@ -48,7 +50,7 @@ public class TranscriptLoggerMiddleware implements Middleware {
      * Records incoming and outgoing activities to the conversation store.
      *
      * @param context The context object for this turn.
-     * @param next The delegate to call to continue the bot middleware pipeline.
+     * @param next    The delegate to call to continue the bot middleware pipeline.
      * @return A task that represents the work queued to execute.
      */
     @Override
@@ -59,23 +61,24 @@ public class TranscriptLoggerMiddleware implements Middleware {
         }
 
         // hook up onSend pipeline
-        context.onSendActivities((ctx, activities, nextSend) -> {
-            // run full pipeline
-            return nextSend.get()
-                .thenApply(responses -> {
+        context.onSendActivities(
+            (ctx, activities, nextSend) -> {
+                // run full pipeline
+                return nextSend.get().thenApply(responses -> {
                     for (Activity activity : activities) {
                         logActivity(Activity.clone(activity), false);
                     }
 
                     return responses;
                 });
-        });
+            }
+        );
 
         // hook up update activity pipeline
-        context.onUpdateActivity((ctx, activity, nextUpdate) -> {
-            // run full pipeline
-            return nextUpdate.get()
-                .thenApply(resourceResponse -> {
+        context.onUpdateActivity(
+            (ctx, activity, nextUpdate) -> {
+                // run full pipeline
+                return nextUpdate.get().thenApply(resourceResponse -> {
                     // add Message Update activity
                     Activity updateActivity = Activity.clone(activity);
                     updateActivity.setType(ActivityTypes.MESSAGE_UPDATE);
@@ -83,36 +86,41 @@ public class TranscriptLoggerMiddleware implements Middleware {
 
                     return resourceResponse;
                 });
-        });
+            }
+        );
 
         // hook up delete activity pipeline
-        context.onDeleteActivity((ctx, reference, nextDel) -> {
-            // run full pipeline
-            return nextDel.get()
-                .thenApply(nextDelResult -> {
+        context.onDeleteActivity(
+            (ctx, reference, nextDel) -> {
+                // run full pipeline
+                return nextDel.get().thenApply(nextDelResult -> {
                     // add MessageDelete activity
                     // log as MessageDelete activity
-                    Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {{
-                        setId(reference.getActivityId());
-                        applyConversationReference(reference, false);
-                    }};
+                    Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {
+                        {
+                            setId(reference.getActivityId());
+                            applyConversationReference(reference, false);
+                        }
+                    };
 
                     logActivity(deleteActivity, false);
 
                     return null;
                 });
-        });
-
+            }
+        );
 
         // process bot logic
         return next.next()
-            .thenAccept(nextResult -> {
-                // flush transcript at end of turn
-                while (!transcript.isEmpty()) {
-                    Activity activity = transcript.poll();
-                    transcriptLogger.logActivity(activity);
+            .thenAccept(
+                nextResult -> {
+                    // flush transcript at end of turn
+                    while (!transcript.isEmpty()) {
+                        Activity activity = transcript.poll();
+                        transcriptLogger.logActivity(activity);
+                    }
                 }
-            });
+            );
     }
 
     private void logActivity(Activity activity, boolean incoming) {
@@ -131,6 +139,3 @@ public class TranscriptLoggerMiddleware implements Middleware {
         transcript.offer(activity);
     }
 }
-
-
-
