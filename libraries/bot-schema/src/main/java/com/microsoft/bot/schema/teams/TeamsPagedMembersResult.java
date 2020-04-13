@@ -29,6 +29,7 @@ public class TeamsPagedMembersResult {
 
     /**
      * Converts a PagedMembersResult to a TeamsPagedMembersResult.
+     * 
      * @param pagedMembersResult The PagedMembersResult value.
      */
     public TeamsPagedMembersResult(PagedMembersResult pagedMembersResult) {
@@ -37,27 +38,26 @@ public class TeamsPagedMembersResult {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
 
-        members = pagedMembersResult.getMembers().stream()
-            .map(channelAccount -> {
-                try {
-                    // convert fro ChannelAccount to TeamsChannelAccount by going to JSON then back
-                    // to TeamsChannelAccount.
-                    // Is this really the most efficient way to handle this?
-                    JsonNode node = objectMapper.valueToTree(channelAccount);
-                    return objectMapper.treeToValue(node, TeamsChannelAccount.class);
-                } catch (JsonProcessingException jpe) {
-                    // this would be a conversion error.  for now, return null and filter the results
-                    // below.  there is probably a more elegant way to handle this.
-                    return null;
-                }
-            })
-            .collect(Collectors.toCollection(ArrayList::new));
+        members = pagedMembersResult.getMembers().stream().map(channelAccount -> {
+            try {
+                // convert fro ChannelAccount to TeamsChannelAccount by going to JSON then back
+                // to TeamsChannelAccount.
+                // Is this really the most efficient way to handle this?
+                JsonNode node = objectMapper.valueToTree(channelAccount);
+                return objectMapper.treeToValue(node, TeamsChannelAccount.class);
+            } catch (JsonProcessingException jpe) {
+                // this would be a conversion error. for now, return null and filter the results
+                // below. there is probably a more elegant way to handle this.
+                return null;
+            }
+        }).collect(Collectors.toCollection(ArrayList::new));
 
         members.removeIf(Objects::isNull);
     }
 
     /**
      * Gets paging token.
+     * 
      * @return The continuation token to be used in the next call.
      */
     public String getContinuationToken() {
@@ -66,6 +66,7 @@ public class TeamsPagedMembersResult {
 
     /**
      * Sets paging token.
+     * 
      * @param withContinuationToken The continuation token.
      */
     public void setContinuationToken(String withContinuationToken) {

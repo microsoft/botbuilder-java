@@ -19,9 +19,9 @@ public class MessageActionsPayloadUser {
     private String displayName;
 
     /**
-     * Gets the identity type of the user. Possible values
-     * include: 'aadUser', 'onPremiseAadUser', 'anonymousGuest',
-     * 'federatedUser'
+     * Gets the identity type of the user. Possible values include: 'aadUser',
+     * 'onPremiseAadUser', 'anonymousGuest', 'federatedUser'
+     * 
      * @return The user type.
      */
     public String getUserIdentityType() {
@@ -29,9 +29,9 @@ public class MessageActionsPayloadUser {
     }
 
     /**
-     * Sets the identity type of the user. Possible values
-     * include: 'aadUser', 'onPremiseAadUser', 'anonymousGuest',
-     * 'federatedUser'
+     * Sets the identity type of the user. Possible values include: 'aadUser',
+     * 'onPremiseAadUser', 'anonymousGuest', 'federatedUser'
+     * 
      * @param withUserIdentityType The user type.
      */
     public void setUserIdentityType(String withUserIdentityType) {
@@ -40,6 +40,7 @@ public class MessageActionsPayloadUser {
 
     /**
      * Gets the id of the user.
+     * 
      * @return The user id.
      */
     public String getId() {
@@ -48,6 +49,7 @@ public class MessageActionsPayloadUser {
 
     /**
      * Sets the id of the user.
+     * 
      * @param withId The user id.
      */
     public void setId(String withId) {
@@ -56,6 +58,7 @@ public class MessageActionsPayloadUser {
 
     /**
      * Gets the plaintext display name of the user.
+     * 
      * @return The plaintext display name.
      */
     public String getDisplayName() {
@@ -64,6 +67,7 @@ public class MessageActionsPayloadUser {
 
     /**
      * Sets the plaintext display name of the user.
+     * 
      * @param withDisplayName The plaintext display name.
      */
     public void setDisplayName(String withDisplayName) {

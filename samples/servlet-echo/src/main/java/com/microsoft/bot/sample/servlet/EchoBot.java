@@ -16,24 +16,33 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. For this sample, the {@link #onMessageActivity(TurnContext)} echos
+ * the text back to the user. The {@link #onMembersAdded(List, TurnContext)}
+ * will send a greeting to new conversation participants.
+ * </p>
  *
  * @see BotController
  */
 public class EchoBot extends ActivityHandler {
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        return turnContext.sendActivity(MessageFactory.text("Echo: " + turnContext.getActivity().getText()))
+        return turnContext
+            .sendActivity(MessageFactory.text("Echo: " + turnContext.getActivity().getText()))
             .thenApply(sendResult -> null);
     }
 
     @Override
-    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(
+        List<ChannelAccount> membersAdded,
+        TurnContext turnContext
+    ) {
         return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
             .map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);

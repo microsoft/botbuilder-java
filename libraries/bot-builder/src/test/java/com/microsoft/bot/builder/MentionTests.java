@@ -15,9 +15,9 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_Skype() throws IOException
-    {
-        // A Skype mention contains the user mention enclosed in <at> tags.  But the activity.getText() (as below)
+    public void Mention_Skype() throws IOException {
+        // A Skype mention contains the user mention enclosed in <at> tags. But the
+        // activity.getText() (as below)
         // does not.
         String mentionJson = "{\"mentioned\": {\"id\": \"recipientid\"},\"text\": \"<at id='28: 841caffa-9e92-425d-8d84-b503b3ded285'>botname</at>\"}";
         Entity mention = mapper.readValue(mentionJson, Entity.class);
@@ -27,12 +27,15 @@ public class MentionTests {
         activity.setChannelId("skype");
         activity.getEntities().add(mention);
 
-        // Normalize the Skype mention so that it is in a format RemoveMentionText can handle.
-        // If SkypeMentionNormalizeMiddleware is added to the adapters Middleware set, this
+        // Normalize the Skype mention so that it is in a format RemoveMentionText can
+        // handle.
+        // If SkypeMentionNormalizeMiddleware is added to the adapters Middleware set,
+        // this
         // will be called on every Skype message.
         SkypeMentionNormalizeMiddleware.normalizeSkypeMentionText(activity);
 
-        // This will remove the Mention.Text from the activity.getText().  This should just leave before/after the
+        // This will remove the Mention.Text from the activity.getText(). This should
+        // just leave before/after the
         // mention.
         activity.removeMentionText("recipientid");
 
@@ -40,8 +43,7 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_Teams() throws IOException
-    {
+    public void Mention_Teams() throws IOException {
         String mentionJson = "{\"mentioned\": {\"id\": \"recipientid\"},\"text\": \"<at>botname</at>\"}";
         Entity mention = mapper.readValue(mentionJson, Entity.class);
         mention.setType("mention");
@@ -55,8 +57,7 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_slack() throws IOException
-    {
+    public void Mention_slack() throws IOException {
         String mentionJson = "{\"mentioned\": {\"id\": \"recipientid\"},\"text\": \"@botname\"}";
         Entity mention = mapper.readValue(mentionJson, Entity.class);
         mention.setType("mention");
@@ -70,8 +71,7 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_GroupMe() throws IOException
-    {
+    public void Mention_GroupMe() throws IOException {
         String mentionJson = "{\"mentioned\": {\"id\": \"recipientid\"},\"text\": \"@bot name\"}";
         Entity mention = mapper.readValue(mentionJson, Entity.class);
         mention.setType("mention");
@@ -85,8 +85,7 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_Telegram() throws IOException
-    {
+    public void Mention_Telegram() throws IOException {
         String mentionJson = "{\"mentioned\": {\"id\": \"recipientid\"},\"text\": \"botname\"}";
         Entity mention = mapper.readValue(mentionJson, Entity.class);
         mention.setType("mention");
@@ -100,32 +99,29 @@ public class MentionTests {
     }
 
     @Test
-    public void Mention_Facebook()
-    {
+    public void Mention_Facebook() {
         // no-op for now: Facebook mentions unknown at this time
     }
 
     @Test
-    public void Mention_Email()
-    {
+    public void Mention_Email() {
         // no-op for now: EMail mentions not included in activity.getText()?
     }
 
     @Test
-    public void Mention_Cortana()
-    {
+    public void Mention_Cortana() {
         // no-op for now: Cortana mentions unknown at this time
     }
 
     @Test
-    public void Mention_Kik()
-    {
-        // no-op for now: bot mentions in Kik don't get Entity info and not included in activity.getText()
+    public void Mention_Kik() {
+        // no-op for now: bot mentions in Kik don't get Entity info and not included in
+        // activity.getText()
     }
 
     @Test
-    public void Mention_Twilio()
-    {
-        // no-op for now: Twilio mentions unknown at this time.  Could not determine if they are supported.
+    public void Mention_Twilio() {
+        // no-op for now: Twilio mentions unknown at this time. Could not determine if
+        // they are supported.
     }
 }

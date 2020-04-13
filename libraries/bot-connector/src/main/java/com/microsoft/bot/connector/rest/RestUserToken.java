@@ -30,8 +30,8 @@ import retrofit2.http.Query;
 import retrofit2.Response;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in UserTokens.
+ * An instance of this class provides access to all the operations defined in
+ * UserTokens.
  */
 public class RestUserToken implements UserToken {
     /** The Retrofit service to perform REST calls. */
@@ -43,7 +43,8 @@ public class RestUserToken implements UserToken {
      * Initializes an instance of UserTokensImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this
+     *                     operation class.
      */
     public RestUserToken(Retrofit withRetrofit, RestOAuthClient withClient) {
         this.service = withRetrofit.create(UserTokensService.class);
@@ -51,35 +52,58 @@ public class RestUserToken implements UserToken {
     }
 
     /**
-     * The interface defining all the services for UserTokens to be
-     * used by Retrofit to perform actually REST calls.
+     * The interface defining all the services for UserTokens to be used by Retrofit
+     * to perform actually REST calls.
      */
-    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
     interface UserTokensService {
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getToken" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getToken" })
         @GET("api/usertoken/GetToken")
-        CompletableFuture<Response<ResponseBody>> getToken(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId, @Query("code") String code);
+        CompletableFuture<Response<ResponseBody>> getToken(
+            @Query("userId") String userId,
+            @Query("connectionName") String connectionName,
+            @Query("channelId") String channelId,
+            @Query("code") String code
+        );
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getAadTokens" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getAadTokens" })
         @POST("api/usertoken/GetAadTokens")
-        CompletableFuture<Response<ResponseBody>> getAadTokens(@Query("userId") String userId, @Query("connectionName") String connectionName, @Body AadResourceUrls aadResourceUrls, @Query("channelId") String channelId);
+        CompletableFuture<Response<ResponseBody>> getAadTokens(
+            @Query("userId") String userId,
+            @Query("connectionName") String connectionName,
+            @Body AadResourceUrls aadResourceUrls,
+            @Query("channelId") String channelId
+        );
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
         @HTTP(path = "api/usertoken/SignOut", method = "DELETE", hasBody = true)
-        CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId, @Query("connectionName") String connectionName, @Query("channelId") String channelId);
+        CompletableFuture<Response<ResponseBody>> signOut(
+            @Query("userId") String userId,
+            @Query("connectionName") String connectionName,
+            @Query("channelId") String channelId
+        );
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens signOut" })
         @HTTP(path = "api/usertoken/SignOut", method = "DELETE", hasBody = true)
         CompletableFuture<Response<ResponseBody>> signOut(@Query("userId") String userId);
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getTokenStatus" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getTokenStatus" })
         @GET("api/usertoken/GetTokenStatus")
-        CompletableFuture<Response<ResponseBody>> getTokenStatus(@Query("userId") String userId, @Query("channelId") String channelId, @Query("include") String include);
+        CompletableFuture<Response<ResponseBody>> getTokenStatus(
+            @Query("userId") String userId,
+            @Query("channelId") String channelId,
+            @Query("include") String include
+        );
     }
 
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the TokenResponse object
@@ -90,7 +114,9 @@ public class RestUserToken implements UserToken {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            );
         }
         final String channelId = null;
         final String code = null;
@@ -108,23 +134,27 @@ public class RestUserToken implements UserToken {
 
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
-     * @param channelId the String value
-     * @param code the String value
+     * @param channelId      the String value
+     * @param code           the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the TokenResponse object
      */
     @Override
-    public CompletableFuture<TokenResponse> getToken(String userId,
-                                                     String connectionName,
-                                                     String channelId,
-                                                     String code) {
+    public CompletableFuture<TokenResponse> getToken(
+        String userId,
+        String connectionName,
+        String channelId,
+        String code
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            );
         }
         return service.getToken(userId, connectionName, channelId, code)
             .thenApply(responseBodyResponse -> {
@@ -138,38 +168,48 @@ public class RestUserToken implements UserToken {
             });
     }
 
-    private ServiceResponse<TokenResponse> getTokenDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<TokenResponse> getTokenDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory()
+        return this.client.restClient()
+            .responseBuilderFactory()
             .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() { }.getType())
-                .register(HttpURLConnection.HTTP_NOT_FOUND, new TypeToken<TokenResponse>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_NOT_FOUND, new TypeToken<TokenResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
      *
-     * @param userId the String value
-     * @param connectionName the String value
+     * @param userId          the String value
+     * @param connectionName  the String value
      * @param aadResourceUrls the AadResourceUrls value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Map&lt;String, TokenResponse&gt; object
      */
     @Override
-    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(String userId,
-                                                                      String connectionName,
-                                                                      AadResourceUrls aadResourceUrls) {
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(
+        String userId,
+        String connectionName,
+        AadResourceUrls aadResourceUrls
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            );
         }
         if (aadResourceUrls == null) {
-            throw new IllegalArgumentException("Parameter aadResourceUrls is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter aadResourceUrls is required and cannot be null."
+            );
         }
         Validator.validate(aadResourceUrls);
         final String channelId = null;
@@ -187,26 +227,32 @@ public class RestUserToken implements UserToken {
 
     /**
      *
-     * @param userId the String value
-     * @param connectionName the String value
+     * @param userId          the String value
+     * @param connectionName  the String value
      * @param aadResourceUrls the AadResourceUrls value
-     * @param channelId the String value
+     * @param channelId       the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Map&lt;String, TokenResponse&gt; object
      */
     @Override
-    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(String userId,
-                                                                      String connectionName,
-                                                                      AadResourceUrls aadResourceUrls,
-                                                                      String channelId) {
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(
+        String userId,
+        String connectionName,
+        AadResourceUrls aadResourceUrls,
+        String channelId
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            );
         }
         if (aadResourceUrls == null) {
-            throw new IllegalArgumentException("Parameter aadResourceUrls is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter aadResourceUrls is required and cannot be null."
+            );
         }
         Validator.validate(aadResourceUrls);
         return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
@@ -221,15 +267,20 @@ public class RestUserToken implements UserToken {
             });
     }
 
-    private ServiceResponse<Map<String, TokenResponse>> getAadTokensDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<Map<String, TokenResponse>> getAadTokensDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory()
-            .<Map<String, TokenResponse>, ErrorResponseException>newInstance(this.client.serializerAdapter())
+        return this.client.restClient()
+            .responseBuilderFactory()
+            .<Map<String, TokenResponse>, ErrorResponseException>newInstance(
+                this.client.serializerAdapter()
+            )
 
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<Map<String, TokenResponse>>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<Map<String, TokenResponse>>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
@@ -244,36 +295,43 @@ public class RestUserToken implements UserToken {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
 
-        return service.signOut(userId)
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return signOutDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("signOut", responseBodyResponse);
-                }
-            });
+        return service.signOut(userId).thenApply(responseBodyResponse -> {
+            try {
+                return signOutDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("signOut", responseBodyResponse);
+            }
+        });
     }
 
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
-     * @param channelId the String value
+     * @param channelId      the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Object object
      */
     @Override
-    public CompletableFuture<Object> signOut(String userId, String connectionName, String channelId) {
+    public CompletableFuture<Object> signOut(
+        String userId,
+        String connectionName,
+        String channelId
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException("Parameter connectionName is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            );
         }
         if (channelId == null) {
-            throw new IllegalArgumentException("Parameter channelId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter channelId is required and cannot be null."
+            );
         }
 
         return service.signOut(userId, connectionName, channelId)
@@ -288,16 +346,20 @@ public class RestUserToken implements UserToken {
             });
     }
 
-    private ServiceResponse<Object> signOutDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<Object> signOutDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory()
+        return this.client.restClient()
+            .responseBuilderFactory()
             .<Object, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<Object>() { }.getType())
-                .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<Object>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
@@ -327,14 +389,18 @@ public class RestUserToken implements UserToken {
 
     /**
      *
-     * @param userId the String value
+     * @param userId    the String value
      * @param channelId the String value
-     * @param include the String value
+     * @param include   the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;TokenStatus&gt; object
      */
     @Override
-    public CompletableFuture<List<TokenStatus>> getTokenStatus(String userId, String channelId, String include) {
+    public CompletableFuture<List<TokenStatus>> getTokenStatus(
+        String userId,
+        String channelId,
+        String include
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
@@ -350,14 +416,17 @@ public class RestUserToken implements UserToken {
             });
     }
 
-    private ServiceResponse<List<TokenStatus>> getTokenStatusDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<List<TokenStatus>> getTokenStatusDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient().responseBuilderFactory()
+        return this.client.restClient()
+            .responseBuilderFactory()
             .<List<TokenStatus>, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<List<TokenStatus>>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<List<TokenStatus>>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 }

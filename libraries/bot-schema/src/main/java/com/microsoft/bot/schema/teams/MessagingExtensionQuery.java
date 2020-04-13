@@ -27,6 +27,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Gets id of the command assigned by Bot.
+     * 
      * @return The command id.
      */
     public String getCommandId() {
@@ -35,6 +36,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Sets id of the command assigned by Bot.
+     * 
      * @param withCommandId The command id.
      */
     public void setCommandId(String withCommandId) {
@@ -43,6 +45,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Gets parameters for the query.
+     * 
      * @return The query parameters.
      */
     public List<MessagingExtensionParameter> getParameters() {
@@ -51,6 +54,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Sets parameters for the query.
+     * 
      * @param withParameters The query parameters.
      */
     public void setParameters(List<MessagingExtensionParameter> withParameters) {
@@ -59,6 +63,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Gets the query options.
+     * 
      * @return The query options.
      */
     public MessagingExtensionQueryOptions getQueryOptions() {
@@ -67,6 +72,7 @@ public class MessagingExtensionQuery {
 
     /**
      * Sets the query options.
+     * 
      * @param withQueryOptions The query options.
      */
     public void setQueryOptions(MessagingExtensionQueryOptions withQueryOptions) {
@@ -74,7 +80,9 @@ public class MessagingExtensionQuery {
     }
 
     /**
-     * Gets state parameter passed back to the bot after authentication/configuration flow.
+     * Gets state parameter passed back to the bot after
+     * authentication/configuration flow.
+     * 
      * @return The state parameter.
      */
     public String getState() {
@@ -82,7 +90,9 @@ public class MessagingExtensionQuery {
     }
 
     /**
-     * Sets state parameter passed back to the bot after authentication/configuration flow.
+     * Sets state parameter passed back to the bot after
+     * authentication/configuration flow.
+     * 
      * @param withState The state parameter.
      */
     public void setState(String withState) {

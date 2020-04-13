@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class PagedResult<T> {
 
     /**
      * Gets the page of items.
+     * 
      * @return The List of items.
      */
     public List<T> getItems() {
@@ -33,6 +33,7 @@ public class PagedResult<T> {
 
     /**
      * Sets the page of items.
+     * 
      * @param value The List of items.
      */
     public void setItems(List<T> value) {
@@ -41,6 +42,7 @@ public class PagedResult<T> {
 
     /**
      * Gets the token for retrieving the next page of results.
+     * 
      * @return The Continuation Token to pass to get the next page of results.
      */
     public String getContinuationToken() {
@@ -49,7 +51,9 @@ public class PagedResult<T> {
 
     /**
      * Sets the token for retrieving the next page of results.
-     * @param withValue The Continuation Token to pass to get the next page of results.
+     * 
+     * @param withValue The Continuation Token to pass to get the next page of
+     *                  results.
      */
     public void setContinuationToken(String withValue) {
         continuationToken = withValue;

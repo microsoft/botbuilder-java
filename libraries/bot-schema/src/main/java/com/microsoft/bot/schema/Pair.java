@@ -4,8 +4,9 @@
 package com.microsoft.bot.schema;
 
 /**
- * A simple 2 Tuple-like class since Java doesn't natively support them.
- * This is an immutable object.
+ * A simple 2 Tuple-like class since Java doesn't natively support them. This is
+ * an immutable object.
+ * 
  * @param <L> The type of the left tuple value.
  * @param <R> The type of the right tuple value.
  */
@@ -15,7 +16,8 @@ public class Pair<L, R> {
 
     /**
      * Creates a new Pair.
-     * @param withLeft The left value.
+     * 
+     * @param withLeft  The left value.
      * @param withRight The right value.
      */
     public Pair(L withLeft, R withRight) {
@@ -25,6 +27,7 @@ public class Pair<L, R> {
 
     /**
      * Gets the left value.
+     * 
      * @return The left vale of type L.
      */
     public L getLeft() {
@@ -33,6 +36,7 @@ public class Pair<L, R> {
 
     /**
      * Gets the right value.
+     * 
      * @return The right value of type R.
      */
     public R getRight() {

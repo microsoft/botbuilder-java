@@ -15,7 +15,8 @@ public class RetryException extends RuntimeException {
 
     /**
      * A RetryException with description and list of exceptions.
-     * @param message The message.
+     * 
+     * @param message        The message.
      * @param withExceptions The list of exceptions collected by {@link Retry}.
      */
     public RetryException(String message, List<Throwable> withExceptions) {
@@ -25,6 +26,7 @@ public class RetryException extends RuntimeException {
 
     /**
      * A Retry failure caused by an unexpected failure.
+     * 
      * @param cause The caught exception.
      */
     public RetryException(Throwable cause) {
@@ -33,6 +35,7 @@ public class RetryException extends RuntimeException {
 
     /**
      * A List of exceptions encountered when executing the Retry task.
+     * 
      * @return The List of exceptions.
      */
     public List<Throwable> getExceptions() {

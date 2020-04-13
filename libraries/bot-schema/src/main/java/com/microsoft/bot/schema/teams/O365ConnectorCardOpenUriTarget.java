@@ -16,8 +16,9 @@ public class O365ConnectorCardOpenUriTarget {
     private String uri;
 
     /**
-     * Gets target operating system. Possible values include:
-     * 'default', 'iOS', 'android', 'windows'
+     * Gets target operating system. Possible values include: 'default', 'iOS',
+     * 'android', 'windows'
+     * 
      * @return The target os.
      */
     public String getOs() {
@@ -25,8 +26,9 @@ public class O365ConnectorCardOpenUriTarget {
     }
 
     /**
-     * Sets target operating system. Possible values include:
-     * 'default', 'iOS', 'android', 'windows'
+     * Sets target operating system. Possible values include: 'default', 'iOS',
+     * 'android', 'windows'
+     * 
      * @param withOs The target os.
      */
     public void setOs(String withOs) {
@@ -35,6 +37,7 @@ public class O365ConnectorCardOpenUriTarget {
 
     /**
      * Gets the target uri.
+     * 
      * @return The target uri.
      */
     public String getUri() {
@@ -43,6 +46,7 @@ public class O365ConnectorCardOpenUriTarget {
 
     /**
      * Sets the target uri.
+     * 
      * @param withUri The target uri.
      */
     public void setUri(String withUri) {

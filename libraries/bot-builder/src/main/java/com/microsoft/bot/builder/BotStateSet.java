@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Manages a collection of botState and provides ability to load and save in parallel.
+ * Manages a collection of botState and provides ability to load and save in
+ * parallel.
  */
 public class BotStateSet {
     /**
@@ -57,7 +58,8 @@ public class BotStateSet {
      * Adds a bot state object to the set.
      *
      * @param botState The bot state object to add.
-     * @return The updated BotStateSet, so you can fluently call add(BotState) multiple times.
+     * @return The updated BotStateSet, so you can fluently call add(BotState)
+     *         multiple times.
      */
     public BotStateSet add(BotState botState) {
         if (botState == null) {
@@ -86,8 +88,9 @@ public class BotStateSet {
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> loadAll(TurnContext turnContext, boolean force) {
-        return CompletableFuture.allOf(botStates.stream()
-            .map(future -> future.load(turnContext, force)).toArray(CompletableFuture[]::new));
+        return CompletableFuture.allOf(
+            botStates.stream().map(future -> future.load(turnContext, force)).toArray(CompletableFuture[]::new)
+        );
     }
 
     /**
@@ -104,11 +107,14 @@ public class BotStateSet {
      * Save All BotState changes in parallel.
      *
      * @param turnContext The TurnContext.
-     * @param force       should data be forced to save even if no change were detected.
+     * @param force       should data be forced to save even if no change were
+     *                    detected.
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> saveAllChanges(TurnContext turnContext, boolean force) {
-        return CompletableFuture.allOf(botStates.stream()
-            .map(botState -> botState.saveChanges(turnContext, force)).toArray(CompletableFuture[]::new));
+        CompletableFuture<?>[] allSaves = botStates.stream()
+            .map(botState -> botState.saveChanges(turnContext, force))
+            .toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(allSaves);
     }
 }

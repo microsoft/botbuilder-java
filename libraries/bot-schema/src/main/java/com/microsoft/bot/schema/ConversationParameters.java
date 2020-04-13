@@ -47,8 +47,8 @@ public class ConversationParameters {
     private String tenantId;
 
     /**
-     * (Optional) When creating a new conversation, use this activity as the
-     * intial message to the conversation.
+     * (Optional) When creating a new conversation, use this activity as the intial
+     * message to the conversation.
      */
     @JsonProperty(value = "activity")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -63,6 +63,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link #isGroup} value.
+     * 
      * @return The isGroup value.
      */
     public boolean isGroup() {
@@ -71,6 +72,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link #isGroup} value.
+     * 
      * @param withIsGroup the isGroup value to set
      */
     public void setIsGroup(boolean withIsGroup) {
@@ -79,6 +81,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link #bot} value.
+     * 
      * @return The bot value.
      */
     public ChannelAccount getBot() {
@@ -87,6 +90,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link #bot} value.
+     * 
      * @param withBot the bot value to set
      */
     public void setBot(ChannelAccount withBot) {
@@ -95,6 +99,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link #members} value.
+     * 
      * @return The members value.
      */
     public List<ChannelAccount> getMembers() {
@@ -103,6 +108,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link #members} value.
+     * 
      * @param withMembers the members value to set
      */
     public void setMembers(List<ChannelAccount> withMembers) {
@@ -111,6 +117,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link #topicName} value.
+     * 
      * @return The topicname value.
      */
     public String getTopicName() {
@@ -119,6 +126,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link #topicName} value.
+     * 
      * @param withTopicName the topicName value to set
      */
     public void setTopicName(String withTopicName) {
@@ -127,6 +135,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link Activity} value.
+     * 
      * @return The Activity value.
      */
     public Activity getActivity() {
@@ -135,6 +144,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link Activity} value.
+     * 
      * @param withActivity the activity value to set.
      */
     public void setActivity(Activity withActivity) {
@@ -143,6 +153,7 @@ public class ConversationParameters {
 
     /**
      * Get the {@link #channelData} value.
+     * 
      * @return the channelData value.
      */
     public Object getChannelData() {
@@ -151,6 +162,7 @@ public class ConversationParameters {
 
     /**
      * Set the {@link #channelData} value.
+     * 
      * @param withChannelData the channelData value to set
      */
     public void setChannelData(Object withChannelData) {
@@ -159,6 +171,7 @@ public class ConversationParameters {
 
     /**
      * Gets {@link #tenantId}.
+     * 
      * @return The tenantId value.
      */
     public String getTenantId() {
@@ -167,6 +180,7 @@ public class ConversationParameters {
 
     /**
      * Sets {@link #tenantId} value.
+     * 
      * @param withTenantId The tenantId value to set.
      */
     public void setTenantId(String withTenantId) {

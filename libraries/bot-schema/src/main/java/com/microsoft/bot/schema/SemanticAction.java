@@ -22,6 +22,7 @@ public class SemanticAction {
 
     /**
      * Gets ID of this action.
+     * 
      * @return The id.
      */
     public String getId() {

@@ -19,6 +19,7 @@ public class MessagingExtensionActionResponse {
 
     /**
      * Gets the Adaptive card to appear in the task module.
+     * 
      * @return The task card.
      */
     public TaskModuleResponseBase getTask() {
@@ -27,6 +28,7 @@ public class MessagingExtensionActionResponse {
 
     /**
      * Sets the Adaptive card to appear in the task module.
+     * 
      * @param withTask The task card.
      */
     public void setTask(TaskModuleResponseBase withTask) {
@@ -35,6 +37,7 @@ public class MessagingExtensionActionResponse {
 
     /**
      * Gets the extension result.
+     * 
      * @return The extension result.
      */
     public MessagingExtensionResult getComposeExtension() {
@@ -43,6 +46,7 @@ public class MessagingExtensionActionResponse {
 
     /**
      * Sets the extension result.
+     * 
      * @param withComposeExtension The extension result.
      */
     public void setComposeExtension(MessagingExtensionResult withComposeExtension) {

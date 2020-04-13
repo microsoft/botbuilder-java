@@ -19,16 +19,15 @@ public class Place implements EntitySerialization {
     private Object address;
 
     /**
-     * Geo coordinates of the place (may be complex object of type
-     * `GeoCoordinates` or `GeoShape`).
+     * Geo coordinates of the place (may be complex object of type `GeoCoordinates`
+     * or `GeoShape`).
      */
     @JsonProperty(value = "geo")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object geo;
 
     /**
-     * Map to the place (may be `string` (URL) or complex object of type
-     * `Map`).
+     * Map to the place (may be `string` (URL) or complex object of type `Map`).
      */
     @JsonProperty(value = "hasMap")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

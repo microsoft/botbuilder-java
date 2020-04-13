@@ -21,7 +21,8 @@ final class InspectionActivityExtensions {
             "Command",
             "https://www.botframework.com/schemas/command",
             command,
-            "Command");
+            "Command"
+        );
     }
 
     static Activity traceActivity(JsonNode state) {
@@ -29,7 +30,8 @@ final class InspectionActivityExtensions {
             "BotState",
             "https://www.botframework.com/schemas/botState",
             state,
-            "Bot State");
+            "Bot State"
+        );
     }
 
     static Activity traceActivity(Activity activity, String name, String label) {
@@ -37,7 +39,8 @@ final class InspectionActivityExtensions {
             name,
             "https://www.botframework.com/schemas/activity",
             activity,
-            label);
+            label
+        );
     }
 
     static Activity traceActivity(ConversationReference conversationReference) {
@@ -45,7 +48,8 @@ final class InspectionActivityExtensions {
             "MessageDelete",
             "https://www.botframework.com/schemas/conversationReference",
             conversationReference,
-            "Deleted Message");
+            "Deleted Message"
+        );
     }
 
     static Activity traceActivity(Throwable exception) {
@@ -53,6 +57,7 @@ final class InspectionActivityExtensions {
             "TurnError",
             "https://www.botframework.com/schemas/error",
             exception.getMessage(),
-            "Turn Error");
+            "Turn Error"
+        );
     }
 }

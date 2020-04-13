@@ -21,6 +21,7 @@ public class MessagingExtensionResponse {
 
     /**
      * Creates a new response with the specified result.
+     * 
      * @param withResult The result.
      */
     public MessagingExtensionResponse(MessagingExtensionResult withResult) {
@@ -29,6 +30,7 @@ public class MessagingExtensionResponse {
 
     /**
      * Gets the response result.
+     * 
      * @return The result.
      */
     public MessagingExtensionResult getComposeExtension() {
@@ -37,6 +39,7 @@ public class MessagingExtensionResponse {
 
     /**
      * Sets the response result.
+     * 
      * @param withComposeExtension The result.
      */
     public void setComposeExtension(MessagingExtensionResult withComposeExtension) {

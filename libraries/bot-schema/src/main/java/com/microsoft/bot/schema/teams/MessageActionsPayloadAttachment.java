@@ -29,6 +29,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Gets the id of the attachment.
+     * 
      * @return The attachment id.
      */
     public String getId() {
@@ -37,6 +38,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Sets the id of the attachment.
+     * 
      * @param withId The attachment id.
      */
     public void setId(String withId) {
@@ -45,6 +47,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Gets the type of the attachment.
+     * 
      * @return The content type of the attachment.
      */
     public String getContentType() {
@@ -53,6 +56,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Sets the type of the attachment.
+     * 
      * @param withContentType The content type of the attachment.
      */
     public void setContentType(String withContentType) {
@@ -61,6 +65,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Gets the url of the attachment, in case of a external link.
+     * 
      * @return The URL of the attachment.
      */
     public String getContentUrl() {
@@ -69,6 +74,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Sets the url of the attachment, in case of a external link.
+     * 
      * @param withContentUrl The URL of the attachment.
      */
     public void setContentUrl(String withContentUrl) {
@@ -77,6 +83,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Gets the content of the attachment, in case of a code.
+     * 
      * @return The attachment content.
      */
     public Object getContent() {
@@ -85,6 +92,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Sets the content of the attachment, in case of a code.
+     * 
      * @param withContent The attachment content.
      */
     public void setContent(Object withContent) {
@@ -93,6 +101,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Gets the plaintext display name of the attachment.
+     * 
      * @return The attachment plaintext name.
      */
     public String getName() {
@@ -101,6 +110,7 @@ public class MessageActionsPayloadAttachment {
 
     /**
      * Sets the plaintext display name of the attachment.
+     * 
      * @param withName The attachment plaintext name.
      */
     public void setName(String withName) {
@@ -108,8 +118,9 @@ public class MessageActionsPayloadAttachment {
     }
 
     /**
-     * Gets the url of a thumbnail image that might be embedded in
-     * the attachment, in case of a card.
+     * Gets the url of a thumbnail image that might be embedded in the attachment,
+     * in case of a card.
+     * 
      * @return The thumbnail URL.
      */
     public String getThumbnailUrl() {
@@ -117,8 +128,9 @@ public class MessageActionsPayloadAttachment {
     }
 
     /**
-     * Sets the url of a thumbnail image that might be embedded in
-     * the attachment, in case of a card.
+     * Sets the url of a thumbnail image that might be embedded in the attachment,
+     * in case of a card.
+     * 
      * @param withThumbnailUrl The thumbnail URL.
      */
     public void setThumbnailUrl(String withThumbnailUrl) {

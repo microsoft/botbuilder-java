@@ -36,6 +36,7 @@ public enum Severity {
 
     /**
      * Constructs with an in value.
+     * 
      * @param witValue Severity level.
      */
     Severity(int witValue) {
@@ -44,6 +45,7 @@ public enum Severity {
 
     /**
      * For conversion to int.
+     * 
      * @return The int value of this enum.
      */
     public int getSeverity() {
