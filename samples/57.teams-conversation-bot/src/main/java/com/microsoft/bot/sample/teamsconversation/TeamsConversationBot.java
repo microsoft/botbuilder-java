@@ -158,8 +158,8 @@ public class TeamsConversationBot extends TeamsActivityHandler {
                     ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
                         teamsChannelId, serviceUrl, credentials, conversationParameters,
                         (context) -> {
-                            ConversationReference reference = context.getActivity()
-                                .getConversationReference();
+                            ConversationReference reference =
+                                context.getActivity().getConversationReference();
                             return context.getAdapter()
                                 .continueConversation(
                                     appId, reference, (inner_context) -> inner_context

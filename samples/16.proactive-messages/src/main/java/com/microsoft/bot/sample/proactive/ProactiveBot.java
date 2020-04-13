@@ -47,9 +47,9 @@ public class ProactiveBot extends ActivityHandler {
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         addConversationReference(turnContext.getActivity());
 
-        return turnContext.sendActivity(
-            MessageFactory.text("Echo: " + turnContext.getActivity().getText())
-        ).thenApply(sendResult -> null);
+        return turnContext
+            .sendActivity(MessageFactory.text("Echo: " + turnContext.getActivity().getText()))
+            .thenApply(sendResult -> null);
     }
 
     @Override
@@ -65,7 +65,9 @@ public class ProactiveBot extends ActivityHandler {
             .map(
                 channel -> turnContext
                     .sendActivity(MessageFactory.text(String.format(WELCOMEMESSAGE, port)))
-            ).collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
+            )
+            .collect(CompletableFutures.toFutureList())
+            .thenApply(resourceResponses -> null);
     }
 
     @Override

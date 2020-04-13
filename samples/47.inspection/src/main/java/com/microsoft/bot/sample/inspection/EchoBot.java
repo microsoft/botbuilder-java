@@ -46,9 +46,9 @@ public class EchoBot extends ActivityHandler {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
-        return super.onTurn(turnContext).thenCompose(
-            turnResult -> conversationState.saveChanges(turnContext)
-        ).thenCompose(saveResult -> userState.saveChanges(turnContext));
+        return super.onTurn(turnContext)
+            .thenCompose(turnResult -> conversationState.saveChanges(turnContext))
+            .thenCompose(saveResult -> userState.saveChanges(turnContext));
     }
 
     @Override
@@ -90,7 +90,9 @@ public class EchoBot extends ActivityHandler {
             .filter(
                 member -> !StringUtils
                     .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
-            ).map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
-            .collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
+            )
+            .map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
+            .collect(CompletableFutures.toFutureList())
+            .thenApply(resourceResponses -> null);
     }
 }

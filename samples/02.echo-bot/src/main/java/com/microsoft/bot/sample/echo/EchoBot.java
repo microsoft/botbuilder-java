@@ -18,14 +18,14 @@ import java.util.concurrent.CompletableFuture;
  * This class implements the functionality of the Bot.
  *
  * <p>
- * This is where application specific logic for interacting with the users would
- * be added. For this sample, the {@link #onMessageActivity(TurnContext)} echos
- * the text back to the user. The {@link #onMembersAdded(List, TurnContext)}
- * will send a greeting to new conversation participants.
+ * This is where application specific logic for interacting with the users would be added. For this
+ * sample, the {@link #onMessageActivity(TurnContext)} echos the text back to the user. The {@link
+ * #onMembersAdded(List, TurnContext)} will send a greeting to new conversation participants.
  * </p>
  */
 @Component
 public class EchoBot extends ActivityHandler {
+
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         return turnContext.sendActivity(

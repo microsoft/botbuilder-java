@@ -41,7 +41,7 @@ import org.springframework.context.annotation.Primary;
 // RestController.
 // The default controller is created by the Spring Boot container using
 // dependency injection. The default route is /api/messages.
-@Import({ BotController.class })
+@Import({BotController.class})
 
 public class Application extends BotDependencyConfiguration {
     public static void main(String[] args) {

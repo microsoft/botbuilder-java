@@ -111,7 +111,9 @@ public class WelcomeUserBot extends ActivityHandler {
                             "Hi there - " + channel.getName() + ". " + WELCOMEMESSAGE
                         ), MessageFactory.text(INFOMESSAGE), MessageFactory.text(PATTERNMESSAGE)
                     )
-            ).collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
+            )
+            .collect(CompletableFutures.toFutureList())
+            .thenApply(resourceResponses -> null);
     }
 
     /**

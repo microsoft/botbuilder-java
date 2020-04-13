@@ -52,13 +52,15 @@ public class SuggestedActionsBot extends ActivityHandler {
         String responseText = processInput(text);
 
         // Respond to the user.
-        return turnContext.sendActivities(
-            MessageFactory.text(responseText), createSuggestedActions()
-        ).thenApply(responses -> null);
+        return turnContext
+            .sendActivities(MessageFactory.text(responseText), createSuggestedActions())
+            .thenApply(responses -> null);
     }
 
     private CompletableFuture<Void> sendWelcomeMessage(TurnContext turnContext) {
-        return turnContext.getActivity().getMembersAdded().stream()
+        return turnContext.getActivity()
+            .getMembersAdded()
+            .stream()
             .filter(
                 member -> !StringUtils
                     .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
@@ -69,7 +71,9 @@ public class SuggestedActionsBot extends ActivityHandler {
                         "Welcome to SuggestedActionsBot " + channel.getName() + ". " + WELCOMETEXT
                     ), createSuggestedActions()
                 )
-            ).collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
+            )
+            .collect(CompletableFutures.toFutureList())
+            .thenApply(resourceResponses -> null);
     }
 
     private String processInput(String text) {
