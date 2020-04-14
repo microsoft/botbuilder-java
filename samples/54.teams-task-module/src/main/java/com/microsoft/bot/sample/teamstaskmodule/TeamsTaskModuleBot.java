@@ -3,34 +3,27 @@
 
 package com.microsoft.bot.sample.teamstaskmodule;
 
-import com.codepoetics.protonpack.collectors.CompletableFutures;
-import com.microsoft.bot.builder.BotFrameworkAdapter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.builder.teams.TeamsInfo;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.integration.Configuration;
-import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.Activity;
-import com.microsoft.bot.schema.CardAction;
-import com.microsoft.bot.schema.teams.TaskModuleAction;
-import com.microsoft.bot.schema.ConversationParameters;
-import com.microsoft.bot.schema.ConversationReference;
-import com.microsoft.bot.schema.HeroCard;
-import com.microsoft.bot.schema.Mention;
-import com.microsoft.bot.schema.teams.TeamInfo;
-import com.microsoft.bot.schema.teams.TeamsChannelAccount;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 import com.microsoft.bot.schema.Attachment;
+import com.microsoft.bot.schema.HeroCard;
+import com.microsoft.bot.schema.teams.*;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.json.*;
 
 /**
  * This class implements the functionality of the Bot.
@@ -51,7 +44,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     }
 
     @Override
-    public CompletableFuture<Void> onTeamsMembersAdded(
+    protected CompletableFuture<Void> onTeamsMembersAdded(
         List<TeamsChannelAccount> membersAdded,
         TeamInfo teamInfo,
         TurnContext turnContext
@@ -61,9 +54,55 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     }
 
     @Override
-    protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        return turnContext.sendActivity(MessageFactory.attachment(getTaskModuleHeroCard()))
+    protected CompletableFuture<Void> onMessageActivity(
+        TurnContext turnContext) {
+        Attachment attachment = getTaskModuleHeroCard();
+        return turnContext.sendActivity(MessageFactory.attachment(attachment))
             .thenApply(resourceResponse -> null);
+    }
+
+    @Override
+    protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleFetch(
+        TurnContext turnContext,
+        TaskModuleRequest taskModuleRequest) {
+
+        Activity reply = MessageFactory.text("onTeamsTaskModuleFetch TaskModuleRequest: " );
+
+        turnContext.sendActivity(reply)
+            .thenApply(resourceResponse -> null);
+
+        Attachment adaptiveCard = getTaskModuleAdaptiveCard();
+
+        return CompletableFuture.completedFuture(new TaskModuleResponse(){{
+            setTask(new TaskModuleContinueResponse(){{
+                setType("continue");
+                setValue(new TaskModuleTaskInfo(){{
+                    setCard(adaptiveCard);
+                    setHeight(200);
+                    setWidth(400);
+                    setTitle("Adaptive Card: Inputs");
+                }});
+            }});
+        }});
+    }
+
+    @Override
+    protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleSubmit(
+        TurnContext turnContext,
+        TaskModuleRequest taskModuleRequest){
+
+        Activity reply = MessageFactory.text("onTeamsTaskModuleSubmit TaskModuleRequest: " );
+
+        turnContext.sendActivity(reply)
+            .thenApply(resourceResponse -> null);
+
+        return CompletableFuture.completedFuture(new TaskModuleResponse(){{
+            setTask(new TaskModuleMessageResponse(){{
+                setType("message");
+                setValue("Thanks!");
+            }});
+        }});
+
     }
 
     private Attachment getTaskModuleHeroCard()
@@ -72,9 +111,26 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         setTitle("");
         setSubtitle("Click the buttons below to update this card");
         setButtons(Arrays.asList(
-            new TaskModuleAction("Adaptive Card", "adaptivecard")
+            new TaskModuleAction("Adaptive Card", new JSONObject().put("data", "adaptivecard").toString())
             ));
         }};
         return card.toAttachment();
+    }
+
+    private Attachment getTaskModuleAdaptiveCard(){
+        try {
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("adaptivecard.json");
+            String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+
+            return new Attachment(){{
+                setContentType("application/vnd.microsoft.card.adaptive");
+                setContent(new ObjectMapper().readValue((String) result, ObjectNode.class));
+            }};
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Attachment();
     }
 }

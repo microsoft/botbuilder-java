@@ -1,66 +1,42 @@
 {
-  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
-  "manifestVersion": "1.5",
-  "version": "1.0.0",
-  "id": "<<YOUR-MICROSOFT-APP-ID>>",
-  "packageName": "com.teams.sample.teamsconversationbot",
-  "developer": {
-    "name": "teamsConversationBot",
-    "websiteUrl": "https://www.microsoft.com",
-    "privacyUrl": "https://www.teams.com/privacy",
-    "termsOfUseUrl": "https://www.teams.com/termsofuser"
-  },
-  "icons": {
-    "outline": "icon-outline.png",
-    "color": "icon-color.png"
-  },
-  "name": {
-    "short": "TeamsConversationBot",
-    "full": "TeamsConversationBot"
-  },
-  "description": {
-    "short": "TeamsConversationBot",
-    "full": "TeamsConversationBot"
-  },
-  "accentColor": "#FFFFFF",
-  "bots": [
-    {
-      "botId": "<<YOUR-MICROSOFT-APP-ID>>",
-      "scopes": [
-        "personal",
-        "groupchat",
-        "team"
-      ],
-      "supportsFiles": false,
-      "isNotificationOnly": false,
-      "commandLists": [
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.5",
+    "version": "1.0.0",
+    "id": "<<YOUR-MICROSOFT-APP-ID>>",
+    "packageName": "com.microsoft.teams.samples",
+    "developer": {
+        "name": "Microsoft",
+        "websiteUrl": "https://example.azurewebsites.net",
+        "privacyUrl": "https://example.azurewebsites.net/privacy",
+        "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+    },
+    "icons": {
+        "color": "icon-color.png",
+        "outline": "icon-outline.png"
+    },
+    "name": {
+        "short": "Task Module",
+        "full": "Simple Task Module"
+    },
+    "description": {
+        "short": "Test Task Module Scenario",
+        "full": "Simple Task Module Scenario Test"
+    },
+    "accentColor": "#FFFFFF",
+    "bots": [
         {
-          "scopes": [
-            "personal",
-            "groupchat",
-            "team"
-          ],
-          "commands": [
-            {
-              "title": "MentionMe",
-              "description": "Sends message with @mention of the sender"
-            },
-            {
-              "title": "Show Welcome",
-              "description": "Shows the welcome card"
-            },
-            {
-              "title": "MessageAllMembers",
-              "description": "Send 1 to 1 message to all members of the current conversation"
-            }
-          ]
+            "botId": "<<YOUR-MICROSOFT-APP-ID>>",
+            "scopes": [
+                "personal",
+                "team",
+                "groupchat"
+            ],
+            "supportsFiles": false,
+            "isNotificationOnly": false
         }
-      ]
-    }
-  ],
-  "permissions": [
-    "identity",
-    "messageTeamMembers"
-  ],
-  "validDomains": []
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ]
 }
