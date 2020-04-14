@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.schema.Attachment;
 
@@ -20,15 +21,18 @@ public class TaskModuleTaskInfo {
     private Object width;
 
     @JsonProperty(value = "url")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String url;
 
     @JsonProperty(value = "card")
     private Attachment card;
 
     @JsonProperty(value = "fallbackUrl")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String fallbackUrl;
 
     @JsonProperty(value = "completionBotId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String completionBotId;
 
     /**
