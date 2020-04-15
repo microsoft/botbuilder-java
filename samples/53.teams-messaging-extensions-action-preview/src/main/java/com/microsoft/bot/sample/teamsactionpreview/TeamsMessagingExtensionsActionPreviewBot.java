@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.sample.teamsactionpreview;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -45,11 +47,16 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         TurnContext turnContext) {
         if (turnContext.getActivity().getValue() != null) {
             // This was a message from the card.
-            ObjectNode obj = (ObjectNode) turnContext.getActivity().getValue();
-            String answer = obj.has("Answer") ? obj.get("Answer").textValue() : "";
-            String choices = obj.has("Choices") ? obj.get("Choices").textValue() : "";
-         return turnContext.sendActivity(MessageFactory.text("{turnContext.Activity.From.Name} answered '{answer}' and chose '{choices}'."))
-                .thenApply(resourceResponse -> null);
+            LinkedHashMap obj = (LinkedHashMap) turnContext.getActivity().getValue();
+            String answer = (String) obj.get("Answer");
+            String choices = (String) obj.get("Choices");
+         return turnContext.sendActivity(
+             MessageFactory.text(
+                 String.format("%1$s answered '%2$s' and chose '%3$s",
+                     turnContext.getActivity().getFrom().getName(),
+                     answer,
+                     choices)))
+             .thenApply(resourceResponse -> null);
         }
 
         // This is a regular text message.
@@ -82,11 +89,9 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         TurnContext turnContext,
         MessagingExtensionAction action) {
 
-        LinkedHashMap data = (LinkedHashMap) action.getData();
-
         Attachment adaptiveCard = getAdaptiveCardAttachment("submitCard.json");
 
-
+        updateAttachmentAdaptiveCard(adaptiveCard, action);
 
         return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
             setComposeExtension(new MessagingExtensionResult(){{
@@ -102,7 +107,11 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         MessagingExtensionAction action) {
 
         // This is a preview edit call and so this time we want to re-create the adaptive card editor.
-        Attachment adaptiveCard = getAdaptiveCardAttachment("submitCard.json");
+        Attachment adaptiveCard = getAdaptiveCardAttachment("adaptiveCardEditor.json");
+
+        Activity preview = action.getBotActivityPreview().get(0);
+        Attachment previewCard = preview.getAttachments().get(0);
+        updateAttachmentAdaptiveCardEdit(adaptiveCard, previewCard);
 
         return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
             setTask(new TaskModuleContinueResponse(){{
@@ -112,6 +121,7 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
                     setWidth(500);
                     setTitle("Task Module Fetch Example");
                 }});
+                setType("continue");
             }});
         }});
     }
@@ -121,9 +131,11 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         TurnContext turnContext,
         MessagingExtensionAction action) {
         // The data has been returned to the bot in the action structure.
-        Attachment adaptiveCard = getAdaptiveCardAttachment("submitCard.json");
 
-        Activity message = MessageFactory.attachment(adaptiveCard);
+        Activity preview = action.getBotActivityPreview().get(0);
+        Attachment previewCard = preview.getAttachments().get(0);
+
+        Activity message = MessageFactory.attachment(previewCard);
 
         // THIS WILL WORK IF THE BOT IS INSTALLED. (SendActivityAsync will throw if the bot is not installed.)
         turnContext.sendActivity(message)
@@ -156,5 +168,56 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
             e.printStackTrace();
         }
         return new Attachment();
+    }
+
+    private void updateAttachmentAdaptiveCard(
+        Attachment attachment,
+        MessagingExtensionAction action
+    ){
+        LinkedHashMap data = (LinkedHashMap) action.getData();
+        ObjectNode content = (ObjectNode) attachment.getContent();
+        JsonNode body = content.get("body");
+        for (JsonNode arrayItem : body) {
+            if (arrayItem.has("choices")){
+                JsonNode choices = arrayItem.get("choices");
+                for (int index = 0 ; index < 3 ; index++) {
+                    ObjectNode choice = (ObjectNode) choices.get(index);
+                    choice.put("title", (String) data.get("Option" + (index + 1)));
+                    choice.put("value", (String) data.get("Option" + (index + 1)));
+                }
+            }
+
+            if(arrayItem.has("id") && arrayItem.get("id").asText().equals("Question")){
+                ObjectNode question = (ObjectNode) arrayItem;
+                question.put("text", (String) data.get("Question"));
+            }
+        }
+    }
+
+    private void updateAttachmentAdaptiveCardEdit(
+        Attachment attachment,
+        Attachment preview
+    ){
+        LinkedHashMap data = (LinkedHashMap)preview.getContent();
+        List bodyPreview = (ArrayList<LinkedHashMap>) data.get("body");
+        ObjectNode content = (ObjectNode) attachment.getContent();
+        JsonNode body = content.get("body");
+        for (JsonNode arrayItem : body) {
+
+            if(arrayItem.has("id") && arrayItem.get("id").asText().equals("Question")){
+                ObjectNode question = (ObjectNode) arrayItem;
+                LinkedHashMap previewQuestion = (LinkedHashMap) bodyPreview.get(1);
+                question.put("value", (String) previewQuestion.get("text"));
+            }
+
+            if(arrayItem.has("id") && arrayItem.get("id").asText().startsWith("Option")){
+                ObjectNode option = (ObjectNode) arrayItem;
+                int responseIndex = Integer.parseInt(arrayItem.get("id").asText().charAt(6) + "");
+                LinkedHashMap previewOptions = (LinkedHashMap) bodyPreview.get(3);
+                List choices = (ArrayList) previewOptions.get("choices");
+                LinkedHashMap previewOption = (LinkedHashMap) choices.get(responseIndex - 1);
+                option.put("value", (String) previewOption.get("value"));
+            }
+        }
     }
 }
