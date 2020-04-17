@@ -37,20 +37,21 @@ import java.util.concurrent.atomic.AtomicReference;
  * This class implements the functionality of the Bot.
  *
  * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text back to the
+ * user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting to new conversation
+ * participants.</p>
  */
 @Component
 public class TeamsFileUploadBot extends TeamsActivityHandler {
+
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         if (messageWithDownload(turnContext.getActivity())) {
             Attachment attachment = turnContext.getActivity().getAttachments().get(0);
             return downloadAttachment(attachment)
                 .thenCompose(result -> !result.result()
-                                       ? fileDownloadFailed(turnContext, result.value())
-                                       : fileDownloadCompleted(turnContext, attachment)
+                    ? fileDownloadFailed(turnContext, result.value())
+                    : fileDownloadCompleted(turnContext, attachment)
                 );
         } else {
             File filePath = new File("files", "teams-logo.png");
@@ -65,8 +66,8 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     ) {
         return upload(fileConsentCardResponse)
             .thenCompose(result -> !result.result()
-                                   ? fileUploadFailed(turnContext, result.value())
-                                   : fileUploadCompleted(turnContext, fileConsentCardResponse)
+                ? fileUploadFailed(turnContext, result.value())
+                : fileUploadCompleted(turnContext, fileConsentCardResponse)
             );
     }
 
@@ -85,7 +86,9 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
         return turnContext.sendActivityBlind(reply);
     }
 
-    private CompletableFuture<Void> sendFileCard(TurnContext turnContext, String filename, long filesize) {
+    private CompletableFuture<Void> sendFileCard(
+        TurnContext turnContext, String filename, long filesize
+    ) {
         Map<String, String> consentContext = new HashMap<>();
         consentContext.put("filename", filename);
 
@@ -136,12 +139,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     }
 
     private CompletableFuture<Void> fileUploadFailed(TurnContext turnContext, String error) {
-        Activity reply = MessageFactory.text("<b>File upload failed.</b> Error: <pre>" + error + "</pre>");
+        Activity reply = MessageFactory
+            .text("<b>File upload failed.</b> Error: <pre>" + error + "</pre>");
         reply.setTextFormat(TextFormatTypes.XML);
         return turnContext.sendActivityBlind(reply);
     }
 
-    private CompletableFuture<Void> fileDownloadCompleted(TurnContext turnContext, Attachment attachment) {
+    private CompletableFuture<Void> fileDownloadCompleted(
+        TurnContext turnContext, Attachment attachment
+    ) {
         Activity reply = MessageFactory.text(String.format(
             "<b>%s</b> received and saved.",
             attachment.getName()
@@ -152,7 +158,8 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     }
 
     private CompletableFuture<Void> fileDownloadFailed(TurnContext turnContext, String error) {
-        Activity reply = MessageFactory.text("<b>File download failed.</b> Error: <pre>" + error + "</pre>");
+        Activity reply = MessageFactory
+            .text("<b>File download failed.</b> Error: <pre>" + error + "</pre>");
         reply.setTextFormat(TextFormatTypes.XML);
         return turnContext.sendActivityBlind(reply);
     }
@@ -170,11 +177,14 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
         return messageWithFileDownloadInfo;
     }
 
-    private CompletableFuture<ResultPair<String>> upload(FileConsentCardResponse fileConsentCardResponse) {
+    private CompletableFuture<ResultPair<String>> upload(
+        FileConsentCardResponse fileConsentCardResponse
+    ) {
         AtomicReference<ResultPair<String>> result = new AtomicReference<>();
 
         return CompletableFuture.runAsync(() -> {
-            Map<String, String> context = (Map<String, String>) fileConsentCardResponse.getContext();
+            Map<String, String> context = (Map<String, String>) fileConsentCardResponse
+                .getContext();
             File filePath = new File("files", context.get("filename"));
             HttpURLConnection connection = null;
             FileInputStream fileStream = null;
@@ -202,8 +212,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
             } catch (Throwable t) {
                 result.set(new ResultPair<String>(false, t.getLocalizedMessage()));
             } finally {
-                if (connection != null) { connection.disconnect(); }
-                if (fileStream != null) { try { fileStream.close(); } catch (Throwable ignored) { } }
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (fileStream != null) {
+                    try {
+                        fileStream.close();
+                    } catch (Throwable ignored) {
+                    }
+                }
             }
         })
             .thenApply(aVoid -> result.get());
@@ -213,7 +230,8 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
         AtomicReference<ResultPair<String>> result = new AtomicReference<>();
 
         return CompletableFuture.runAsync(() -> {
-            FileDownloadInfo fileDownload = Serialization.getAs(attachment.getContent(), FileDownloadInfo.class);
+            FileDownloadInfo fileDownload = Serialization
+                .getAs(attachment.getContent(), FileDownloadInfo.class);
             String filePath = "files/" + attachment.getName();
 
             FileOutputStream fileStream = null;
@@ -236,8 +254,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
             } catch (Throwable t) {
                 result.set(new ResultPair<>(false, t.getLocalizedMessage()));
             } finally {
-                if (connection != null) { connection.disconnect(); }
-                if (fileStream != null) { try { fileStream.close(); } catch (Throwable ignored) { } }
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (fileStream != null) {
+                    try {
+                        fileStream.close();
+                    } catch (Throwable ignored) {
+                    }
+                }
             }
         })
             .thenApply(aVoid -> result.get());
