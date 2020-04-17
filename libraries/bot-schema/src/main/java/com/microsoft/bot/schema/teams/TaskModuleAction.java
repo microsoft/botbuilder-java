@@ -11,14 +11,16 @@ import com.microsoft.bot.schema.CardAction;
 import org.slf4j.LoggerFactory;
 
 /**
- * Adapter class to represent BotBuilder card action as adaptive card action (in type of Action.Submit).
+ * Adapter class to represent BotBuilder card action as adaptive card action (in
+ * type of Action.Submit).
  */
 public class TaskModuleAction extends CardAction {
     /**
      * Initializes a new instance.
+     * 
      * @param withTitle Button title.
-     * @param withValue Free hidden value binding with button. The value will be sent out with
-     *                  "task/fetch" invoke event.
+     * @param withValue Free hidden value binding with button. The value will be
+     *                  sent out with "task/fetch" invoke event.
      */
     public TaskModuleAction(String withTitle, Object withValue) {
         super.setType(ActionTypes.INVOKE);

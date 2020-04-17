@@ -27,7 +27,8 @@ public enum ContactRelationUpdateActionTypes {
 
     /**
      * Creates a ContactRelationUpdateActionTypes enum from a string.
-     * @param withValue The string value.  Should be a valid enum value.
+     * 
+     * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */
     ContactRelationUpdateActionTypes(String withValue) {
@@ -38,7 +39,8 @@ public enum ContactRelationUpdateActionTypes {
      * Parses a serialized value to a ContactRelationUpdateActionTypes instance.
      *
      * @param value the serialized value to parse.
-     * @return the parsed ContactRelationUpdateActionTypes object, or null if unable to parse.
+     * @return the parsed ContactRelationUpdateActionTypes object, or null if unable
+     *         to parse.
      */
     @JsonCreator
     public static ContactRelationUpdateActionTypes fromString(String value) {

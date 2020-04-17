@@ -19,27 +19,32 @@ import java.util.List;
 /**
  * Contains utility methods for various message types a bot can return.
  * <p>
- * Create and send a message.
- * <code>
+ * Create and send a message. <code>
  * Activity message = MessageFactory.text("Hello World");
  * conext.sendActivity(message);
  * </code>
  *
- * <p>The following apply to message actions in general.
- * See the channel's documentation for limits imposed upon the contents of
- * the text of the message to send.</p>
+ * <p>
+ * The following apply to message actions in general. See the channel's
+ * documentation for limits imposed upon the contents of the text of the message
+ * to send.
+ * </p>
  *
- * <p>To control various characteristics of your bot's speech such as voice,
- * rate, volume, pronunciation, and pitch, specify test to speak in
- * Speech Synthesis Markup Language (SSML) format.</p>
+ * <p>
+ * To control various characteristics of your bot's speech such as voice, rate,
+ * volume, pronunciation, and pitch, specify test to speak in Speech Synthesis
+ * Markup Language (SSML) format.
+ * </p>
  *
- * <p>Channels decide how each card action manifests in their user experience.
- * In most cases, the cards are clickable. In others, they may be selected by speech
- * input. In cases where the channel does not offer an interactive activation
- * experience (e.g., when interacting over SMS), the channel may not support
- * activation whatsoever. The decision about how to render actions is controlled by
- * normative requirements elsewhere in this document (e.g. within the card format,
- * or within the suggested actions definition).</p>
+ * <p>
+ * Channels decide how each card action manifests in their user experience. In
+ * most cases, the cards are clickable. In others, they may be selected by
+ * speech input. In cases where the channel does not offer an interactive
+ * activation experience (e.g., when interacting over SMS), the channel may not
+ * support activation whatsoever. The decision about how to render actions is
+ * controlled by normative requirements elsewhere in this document (e.g. within
+ * the card format, or within the suggested actions definition).
+ * </p>
  */
 public final class MessageFactory {
     private MessageFactory() {
@@ -60,9 +65,12 @@ public final class MessageFactory {
      * Returns a simple text message.
      *
      * @param text      The text of the message to send.
-     * @param ssml      Optional, text to be spoken by your bot on a speech-enabled channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enabled
+     *                  channel.
+     * @param inputHint Optional, indicates whether your bot is accepting,
+     *                  expecting, or ignoring user input after the message is
+     *                  delivered to the client. Default is
+     *                  {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the text.
      */
     public static Activity text(String text, String ssml, InputHints inputHint) {
@@ -85,7 +93,7 @@ public final class MessageFactory {
      * </code>
      *
      * @param actions The text of the actions to create.
-     * @param text    Optional.  The text of the message to send.
+     * @param text    Optional. The text of the message to send.
      * @return A message activity containing the suggested actions.
      */
     public static Activity suggestedActions(List<String> actions, String text) {
@@ -106,24 +114,34 @@ public final class MessageFactory {
      * </code>
      *
      * @param actions   The text of the actions to create.
-     * @param text      Optional.  The text of the message to send.
-     * @param ssml      Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param text      Optional. The text of the message to send.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enable
+     *                  channel.
+     * @param inputHint Optional, indicates whether your bot is accepting,
+     *                  expecting, or ignoring user input after the message is
+     *                  delivered to the client. Default is
+     *                  {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the suggested actions.
      */
-    public static Activity suggestedActions(List<String> actions, String text, String ssml, InputHints inputHint) {
+    public static Activity suggestedActions(
+        List<String> actions,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (actions == null) {
             throw new IllegalArgumentException("actions cannot be null");
         }
 
         List<CardAction> cardActions = new ArrayList<>();
         for (String action : actions) {
-            CardAction cardAction = new CardAction() {{
-                setType(ActionTypes.IM_BACK);
-                setValue(action);
-                setTitle(action);
-            }};
+            CardAction cardAction = new CardAction() {
+                {
+                    setType(ActionTypes.IM_BACK);
+                    setValue(action);
+                    setTitle(action);
+                }
+            };
 
             cardActions.add(cardAction);
         }
@@ -147,15 +165,20 @@ public final class MessageFactory {
      *
      * @param actions   The card actions to include.
      * @param text      Optional, the text of the message to send.
-     * @param ssml      Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                  after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml      Optional, text to be spoken by your bot on a speech-enable
+     *                  channel.
+     * @param inputHint Optional, indicates whether your bot is accepting,
+     *                  expecting, or ignoring user input after the message is
+     *                  delivered to the client. Default is
+     *                  {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity that contains the suggested actions.
      */
-    public static Activity suggestedCardActions(List<CardAction> actions,
-                                                String text,
-                                                String ssml,
-                                                InputHints inputHint) {
+    public static Activity suggestedCardActions(
+        List<CardAction> actions,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (actions == null) {
             throw new IllegalArgumentException("actions cannot be null");
         }
@@ -194,12 +217,20 @@ public final class MessageFactory {
      *
      * @param attachment Attachment to include in the message.
      * @param text       Optional, the text of the message to send.
-     * @param ssml       Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint  Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                   after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml       Optional, text to be spoken by your bot on a speech-enable
+     *                   channel.
+     * @param inputHint  Optional, indicates whether your bot is accepting,
+     *                   expecting, or ignoring user input after the message is
+     *                   delivered to the client. Default is
+     *                   {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
-    public static Activity attachment(Attachment attachment, String text, String ssml, InputHints inputHint) {
+    public static Activity attachment(
+        Attachment attachment,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (attachment == null) {
             throw new IllegalArgumentException("attachment cannot be null");
         }
@@ -212,12 +243,20 @@ public final class MessageFactory {
      *
      * @param attachments Attachments to include in the message.
      * @param text        Optional, the text of the message to send.
-     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable
+     *                    channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting,
+     *                    expecting, or ignoring user input after the message is
+     *                    delivered to the client. Default is
+     *                    {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
-    public static Activity attachment(List<Attachment> attachments, String text, String ssml, InputHints inputHint) {
+    public static Activity attachment(
+        List<Attachment> attachments,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (attachments == null) {
             throw new IllegalArgumentException("attachments cannot be null");
         }
@@ -226,7 +265,8 @@ public final class MessageFactory {
     }
 
     /**
-     * Returns a message activity that contains a collection of attachments, in a list.
+     * Returns a message activity that contains a collection of attachments, in a
+     * list.
      *
      * @param attachments Attachments to include in the message.
      * @param text        Optional, the text of the message to send.
@@ -237,21 +277,32 @@ public final class MessageFactory {
     }
 
     /**
-     * Returns a message activity that contains a collection of attachments, in a list.
+     * Returns a message activity that contains a collection of attachments, in a
+     * list.
      *
      * @param attachments Attachments to include in the message.
      * @param text        Optional, the text of the message to send.
-     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable
+     *                    channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting,
+     *                    expecting, or ignoring user input after the message is
+     *                    delivered to the client. Default is
+     *                    {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
-    public static Activity carousel(List<Attachment> attachments, String text, String ssml, InputHints inputHint) {
+    public static Activity carousel(
+        List<Attachment> attachments,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (attachments == null) {
             throw new IllegalArgumentException("attachments cannot be null");
         }
 
-        return attachmentActivity(AttachmentLayoutTypes.CAROUSEL, attachments, text, ssml, inputHint);
+        return attachmentActivity(
+            AttachmentLayoutTypes.CAROUSEL, attachments, text, ssml, inputHint
+        );
     }
 
     /**
@@ -272,17 +323,22 @@ public final class MessageFactory {
      * @param contentType The MIME type of the image or video.
      * @param name        Optional, the name of the image or video file.
      * @param text        Optional, the text of the message to send.
-     * @param ssml        Optional, text to be spoken by your bot on a speech-enable channel.
-     * @param inputHint   Optional, indicates whether your bot is accepting, expecting, or ignoring user input
-     *                    after the message is delivered to the client.  Default is {@link InputHints#ACCEPTING_INPUT}.
+     * @param ssml        Optional, text to be spoken by your bot on a speech-enable
+     *                    channel.
+     * @param inputHint   Optional, indicates whether your bot is accepting,
+     *                    expecting, or ignoring user input after the message is
+     *                    delivered to the client. Default is
+     *                    {@link InputHints#ACCEPTING_INPUT}.
      * @return A message activity containing the attachment.
      */
-    public static Activity contentUrl(String url,
-                                      String contentType,
-                                      String name,
-                                      String text,
-                                      String ssml,
-                                      InputHints inputHint) {
+    public static Activity contentUrl(
+        String url,
+        String contentType,
+        String name,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         if (StringUtils.isEmpty(url)) {
             throw new IllegalArgumentException("url cannot be null or empty");
         }
@@ -291,21 +347,26 @@ public final class MessageFactory {
             throw new IllegalArgumentException("contentType cannot be null or empty");
         }
 
-        Attachment attachment = new Attachment() {{
-            setContentType(contentType);
-            setContentUrl(url);
-            setName(StringUtils.isEmpty(name) ? null : name);
-        }};
+        Attachment attachment = new Attachment() {
+            {
+                setContentType(contentType);
+                setContentUrl(url);
+                setName(StringUtils.isEmpty(name) ? null : name);
+            }
+        };
 
-        return attachmentActivity(AttachmentLayoutTypes.LIST, Collections.singletonList(attachment),
-            text, ssml, inputHint);
+        return attachmentActivity(
+            AttachmentLayoutTypes.LIST, Collections.singletonList(attachment), text, ssml, inputHint
+        );
     }
 
-    private static Activity attachmentActivity(AttachmentLayoutTypes attachmentLayout,
-                                               List<Attachment> attachments,
-                                               String text,
-                                               String ssml,
-                                               InputHints inputHint) {
+    private static Activity attachmentActivity(
+        AttachmentLayoutTypes attachmentLayout,
+        List<Attachment> attachments,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         Activity activity = Activity.createMessageActivity();
         activity.setAttachmentLayout(attachmentLayout);
         activity.setAttachments(attachments);
@@ -313,10 +374,14 @@ public final class MessageFactory {
         return activity;
     }
 
-    private static void setTextAndSpeech(Activity activity, String text, String ssml, InputHints inputHint) {
+    private static void setTextAndSpeech(
+        Activity activity,
+        String text,
+        String ssml,
+        InputHints inputHint
+    ) {
         activity.setText(StringUtils.isEmpty(text) ? null : text);
         activity.setSpeak(StringUtils.isEmpty(ssml) ? null : ssml);
-        activity.setInputHint(
-            inputHint == null ? InputHints.ACCEPTING_INPUT : inputHint);
+        activity.setInputHint(inputHint == null ? InputHints.ACCEPTING_INPUT : inputHint);
     }
 }

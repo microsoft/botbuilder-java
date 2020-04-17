@@ -50,6 +50,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets title of the section.
+     * 
      * @return The section title.
      */
     public String getTitle() {
@@ -58,6 +59,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets title of the section.
+     * 
      * @param withTitle The section title.
      */
     public void setTitle(String withTitle) {
@@ -66,6 +68,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets text for the section.
+     * 
      * @return The section text.
      */
     public String getText() {
@@ -74,6 +77,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets text for the section.
+     * 
      * @param withText The section text.
      */
     public void setText(String withText) {
@@ -82,6 +86,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets the activity title.
+     * 
      * @return The activity title.
      */
     public String getActivityTitle() {
@@ -90,6 +95,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Set the activity title.
+     * 
      * @param withActivityTitle The activity title.
      */
     public void setActivityTitle(String withActivityTitle) {
@@ -98,6 +104,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets the activity subtitle.
+     * 
      * @return The activity subtitle.
      */
     public String getActivitySubtitle() {
@@ -106,6 +113,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets the activity subtitle.
+     * 
      * @param withActivitySubtitle The activity subtitle.
      */
     public void setActivitySubtitle(String withActivitySubtitle) {
@@ -114,6 +122,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets the activity text.
+     * 
      * @return The activity text.
      */
     public String getActivityText() {
@@ -122,6 +131,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets the activity text.
+     * 
      * @param withActivityText The activity text.
      */
     public void setActivityText(String withActivityText) {
@@ -130,6 +140,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Gets the activity image.
+     * 
      * @return The activity image.
      */
     public String getActivityImage() {
@@ -138,6 +149,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets the activity image.
+     * 
      * @param withActivityImage The activity image.
      */
     public void setActivityImage(String withActivityImage) {
@@ -145,8 +157,9 @@ public class O365ConnectorCardSection {
     }
 
     /**
-     * Describes how Activity image is rendered. Possible
-     * values include: 'avatar', 'article'
+     * Describes how Activity image is rendered. Possible values include: 'avatar',
+     * 'article'
+     * 
      * @return The activity image type.
      */
     public String getActivityImageType() {
@@ -154,8 +167,9 @@ public class O365ConnectorCardSection {
     }
 
     /**
-     * Sets how Activity image is rendered. Possible
-     * values include: 'avatar', 'article'
+     * Sets how Activity image is rendered. Possible values include: 'avatar',
+     * 'article'
+     * 
      * @param withActivityImageType The activity image type.
      */
     public void setActivityImageType(String withActivityImageType) {
@@ -164,6 +178,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Indicates markdown for all text contents. Default value is true.
+     * 
      * @return True if text is markdown.
      */
     public Boolean getMarkdown() {
@@ -172,6 +187,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets markdown for all text contents.
+     * 
      * @param withMarkdown True to use markdown for text content.
      */
     public void setMarkdown(Boolean withMarkdown) {
@@ -180,6 +196,7 @@ public class O365ConnectorCardSection {
 
     /**
      * List of facts for the current section.
+     * 
      * @return Facts for the section.
      */
     public List<O365ConnectorCardFact> getFacts() {
@@ -188,6 +205,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Set list of facts for the current section.
+     * 
      * @param withFacts Facts for the section.
      */
     public void setFacts(List<O365ConnectorCardFact> withFacts) {
@@ -196,6 +214,7 @@ public class O365ConnectorCardSection {
 
     /**
      * List of images for the current section.
+     * 
      * @return Images for the section.
      */
     public List<O365ConnectorCardImage> getImages() {
@@ -204,6 +223,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Set list of images for the current section.
+     * 
      * @param withImages Images for the section.
      */
     public void setImages(List<O365ConnectorCardImage> withImages) {
@@ -212,6 +232,7 @@ public class O365ConnectorCardSection {
 
     /**
      * List of actions for the current section.
+     * 
      * @return Actions for the section.
      */
     public List<O365ConnectorCardActionBase> getPotentialAction() {
@@ -220,6 +241,7 @@ public class O365ConnectorCardSection {
 
     /**
      * Sets list of actions for the current section.
+     * 
      * @param withPotentialAction Actions for the section.
      */
     public void setPotentialAction(List<O365ConnectorCardActionBase> withPotentialAction) {

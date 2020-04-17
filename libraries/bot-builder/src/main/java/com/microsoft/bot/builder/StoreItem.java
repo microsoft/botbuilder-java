@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public interface StoreItem {
     /**
      * Get eTag for concurrency.
+     * 
      * @return The eTag value.
      */
     @JsonProperty(value = "eTag")
@@ -18,6 +19,7 @@ public interface StoreItem {
 
     /**
      * Set eTag for concurrency.
+     * 
      * @param withETag The eTag value.
      */
     @JsonProperty(value = "eTag")

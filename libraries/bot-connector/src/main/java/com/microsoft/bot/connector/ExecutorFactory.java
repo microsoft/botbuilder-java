@@ -20,20 +20,19 @@ public final class ExecutorFactory {
     private static ForkJoinWorkerThreadFactory factory = new ForkJoinWorkerThreadFactory() {
         @Override
         public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
-            ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            ForkJoinWorkerThread worker =
+                ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
             worker.setName("Bot-" + worker.getPoolIndex());
             return worker;
         }
     };
 
-    private static ExecutorService executor = new ForkJoinPool(
-        Runtime.getRuntime().availableProcessors() * 2,
-        factory,
-        null,
-        false);
+    private static ExecutorService executor =
+        new ForkJoinPool(Runtime.getRuntime().availableProcessors() * 2, factory, null, false);
 
     /**
      * Provides an SDK wide ExecutorService for async calls.
+     * 
      * @return An ExecutorService.
      */
     public static ExecutorService getExecutor() {

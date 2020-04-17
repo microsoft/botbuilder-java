@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Set of key-value pairs. Advantage of this section is that key and value
- * properties will be
- * rendered with default style information with some delimiter between them. So
- * there is no need for developer to specify style information.
+ * properties will be rendered with default style information with some
+ * delimiter between them. So there is no need for developer to specify style
+ * information.
  */
 public class Fact {
     /**

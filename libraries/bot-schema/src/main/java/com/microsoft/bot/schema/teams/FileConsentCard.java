@@ -28,6 +28,7 @@ public class FileConsentCard {
 
     /**
      * Gets file description.
+     * 
      * @return The file description.
      */
     public String getDescription() {
@@ -36,6 +37,7 @@ public class FileConsentCard {
 
     /**
      * Sets file description.
+     * 
      * @param withDescription The new file description.
      */
     public void setDescription(String withDescription) {
@@ -44,6 +46,7 @@ public class FileConsentCard {
 
     /**
      * Gets size of the file to be uploaded in Bytes.
+     * 
      * @return The size in bytes.
      */
     public long getSizeInBytes() {
@@ -52,6 +55,7 @@ public class FileConsentCard {
 
     /**
      * Sets size of the file to be uploaded in Bytes.
+     * 
      * @param withSizeInBytes The new size in bytes.
      */
     public void setSizeInBytes(long withSizeInBytes) {
@@ -59,9 +63,9 @@ public class FileConsentCard {
     }
 
     /**
-     * Gets context sent back to the Bot if user consented to
-     * upload. This is free flow schema and is sent back in Value field of
-     * Activity.
+     * Gets context sent back to the Bot if user consented to upload. This is free
+     * flow schema and is sent back in Value field of Activity.
+     * 
      * @return The accept context.
      */
     public Object getAcceptContext() {
@@ -69,9 +73,9 @@ public class FileConsentCard {
     }
 
     /**
-     * Sets context sent back to the Bot if user consented to
-     * upload. This is free flow schema and is sent back in Value field of
-     * Activity.
+     * Sets context sent back to the Bot if user consented to upload. This is free
+     * flow schema and is sent back in Value field of Activity.
+     * 
      * @param withAcceptContext The new context.
      */
     public void setAcceptContext(Object withAcceptContext) {
@@ -79,8 +83,9 @@ public class FileConsentCard {
     }
 
     /**
-     * Gets context sent back to the Bot if user declined. This is
-     * free flow schema and is sent back in Value field of Activity.
+     * Gets context sent back to the Bot if user declined. This is free flow schema
+     * and is sent back in Value field of Activity.
+     * 
      * @return The decline context.
      */
     public Object getDeclineContext() {
@@ -88,8 +93,9 @@ public class FileConsentCard {
     }
 
     /**
-     * Sets context sent back to the Bot if user declined. This is
-     * free flow schema and is sent back in Value field of Activity.
+     * Sets context sent back to the Bot if user declined. This is free flow schema
+     * and is sent back in Value field of Activity.
+     * 
      * @param withDeclineContext The decline context.
      */
     public void setDeclineContext(Object withDeclineContext) {

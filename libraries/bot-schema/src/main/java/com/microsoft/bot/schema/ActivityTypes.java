@@ -89,18 +89,20 @@ public final class ActivityTypes {
     /**
      * The type value for delay activities.
      *
-     * As an outgoing activity type, causes the adapter to pause for {@link Activity#getValue} milliseconds.
-     * The activity's {@link Activity#getValue} should be an integer value.
+     * As an outgoing activity type, causes the adapter to pause for
+     * {@link Activity#getValue} milliseconds. The activity's
+     * {@link Activity#getValue} should be an integer value.
      */
     public static final String DELAY = "delay";
 
     /**
      * The type value for invoke response activities.
      *
-     * This is used for a return payload in response to an invoke activity.
-     * Invoke activities communicate programmatic information from a client or channel to a bot, and
-     * have a corresponding return payload for use within the channel. The meaning of an invoke activity
-     * is defined by the {@link Activity#getName} property, which is meaningful within the scope of a channel.
+     * This is used for a return payload in response to an invoke activity. Invoke
+     * activities communicate programmatic information from a client or channel to a
+     * bot, and have a corresponding return payload for use within the channel. The
+     * meaning of an invoke activity is defined by the {@link Activity#getName}
+     * property, which is meaningful within the scope of a channel.
      */
     public static final String INVOKE_RESPONSE = "invokeResponse";
 }

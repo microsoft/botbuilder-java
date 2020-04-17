@@ -16,6 +16,7 @@ public class MediaEventValue {
 
     /**
      * MediaEventValue with card value.
+     * 
      * @param withCardValue The card value.
      */
     public MediaEventValue(Object withCardValue) {
@@ -34,7 +35,7 @@ public class MediaEventValue {
 
     /**
      * Callback parameter specified in the Value field of the MediaCard that
-     *  originated this event.
+     * originated this event.
      *
      * @param withCardValue the cardValue value to set
      */

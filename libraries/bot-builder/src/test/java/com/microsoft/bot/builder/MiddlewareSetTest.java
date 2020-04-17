@@ -24,7 +24,6 @@ public class MiddlewareSetTest {
         }
     }
 
-
     @Test
     public void NestedSet_OnReceive() {
         wasCalled = false;
@@ -123,7 +122,7 @@ public class MiddlewareSetTest {
         WasCalledMiddleware one = new WasCalledMiddleware();
         WasCalledMiddleware two = new WasCalledMiddleware();
 
-        final int[] called = {0};
+        final int[] called = { 0 };
         BotCallbackHandler cb = (context) -> {
             called[0]++;
             return CompletableFuture.completedFuture(null);
@@ -141,8 +140,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void TwoMiddlewareItemsInOrder() {
-        final boolean[] called1 = {false};
-        final boolean[] called2 = {false};
+        final boolean[] called1 = { false };
+        final boolean[] called2 = { false };
 
         CallMeMiddleware one = new CallMeMiddleware(() -> {
             Assert.assertFalse("Second Middleware was called", called2[0]);
@@ -166,15 +165,16 @@ public class MiddlewareSetTest {
 
     @Test
     public void Status_OneMiddlewareRan() {
-        final boolean[] called1 = {false};
+        final boolean[] called1 = { false };
 
         CallMeMiddleware one = new CallMeMiddleware(() -> called1[0] = true);
 
         MiddlewareSet m = new MiddlewareSet();
         m.use(one);
 
-        // The middleware in this pipeline calls next(), so the delegate should be called
-        final boolean[] didAllRun = {false};
+        // The middleware in this pipeline calls next(), so the delegate should be
+        // called
+        final boolean[] didAllRun = { false };
         BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return CompletableFuture.completedFuture(null);
@@ -188,7 +188,7 @@ public class MiddlewareSetTest {
     @Test
     public void Status_RunAtEndEmptyPipeline() {
         MiddlewareSet m = new MiddlewareSet();
-        final boolean[] didAllRun = {false};
+        final boolean[] didAllRun = { false };
         BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return CompletableFuture.completedFuture(null);
@@ -204,8 +204,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void Status_TwoItemsOneDoesNotCallNext() {
-        final boolean[] called1 = {false};
-        final boolean[] called2 = {false};
+        final boolean[] called1 = { false };
+        final boolean[] called2 = { false };
 
         CallMeMiddleware one = new CallMeMiddleware(() -> {
             Assert.assertFalse("Second Middleware was called", called2[0]);
@@ -221,7 +221,7 @@ public class MiddlewareSetTest {
         m.use(one);
         m.use(two);
 
-        boolean[] didAllRun = {false};
+        boolean[] didAllRun = { false };
         BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return CompletableFuture.completedFuture(null);
@@ -232,21 +232,23 @@ public class MiddlewareSetTest {
         Assert.assertTrue(called1[0]);
         Assert.assertTrue(called2[0]);
 
-        // The 2nd middleware did not call next, so the "final" action should not have run.
+        // The 2nd middleware did not call next, so the "final" action should not have
+        // run.
         Assert.assertFalse(didAllRun[0]);
     }
 
     @Test
     public void Status_OneEntryThatDoesNotCallNext() {
-        final boolean[] called1 = {false};
+        final boolean[] called1 = { false };
 
         DoNotCallNextMiddleware one = new DoNotCallNextMiddleware(() -> called1[0] = true);
 
         MiddlewareSet m = new MiddlewareSet();
         m.use(one);
 
-        // The middleware in this pipeline DOES NOT call next(), so this must not be called
-        boolean[] didAllRun = {false};
+        // The middleware in this pipeline DOES NOT call next(), so this must not be
+        // called
+        boolean[] didAllRun = { false };
         BotCallbackHandler cb = (context) -> {
             didAllRun[0] = true;
             return CompletableFuture.completedFuture(null);
@@ -262,7 +264,7 @@ public class MiddlewareSetTest {
 
     @Test
     public void AnonymousMiddleware() {
-        final boolean[] didRun = {false};
+        final boolean[] didRun = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -278,8 +280,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void TwoAnonymousMiddleware() {
-        final boolean[] didRun1 = {false};
-        final boolean[] didRun2 = {false};
+        final boolean[] didRun1 = { false };
+        final boolean[] didRun2 = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -301,8 +303,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void TwoAnonymousMiddlewareInOrder() {
-        final boolean[] didRun1 = {false};
-        final boolean[] didRun2 = {false};
+        final boolean[] didRun1 = { false };
+        final boolean[] didRun2 = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -326,8 +328,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void MixedMiddlewareInOrderAnonymousFirst() {
-        final boolean[] didRun1 = {false};
-        final boolean[] didRun2 = {false};
+        final boolean[] didRun1 = { false };
+        final boolean[] didRun2 = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -354,8 +356,8 @@ public class MiddlewareSetTest {
 
     @Test
     public void MixedMiddlewareInOrderAnonymousLast() {
-        final boolean[] didRun1 = {false};
-        final boolean[] didRun2 = {false};
+        final boolean[] didRun1 = { false };
+        final boolean[] didRun2 = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -380,9 +382,9 @@ public class MiddlewareSetTest {
 
     @Test
     public void RunCodeBeforeAndAfter() {
-        final boolean[] didRun1 = {false};
-        final boolean[] codeafter2run = {false};
-        final boolean[] didRun2 = {false};
+        final boolean[] didRun1 = { false };
+        final boolean[] codeafter2run = { false };
+        final boolean[] didRun2 = { false };
 
         MiddlewareSet m = new MiddlewareSet();
 
@@ -397,7 +399,10 @@ public class MiddlewareSetTest {
 
         m.use(new AnonymousReceiveMiddleware((tc, nd) -> {
             Assert.assertTrue("Looks like the 1st middleware has not been run", didRun1[0]);
-            Assert.assertFalse("The code that runs after middleware 2 is complete has already run.", codeafter2run[0]);
+            Assert.assertFalse(
+                "The code that runs after middleware 2 is complete has already run.",
+                codeafter2run[0]
+            );
             didRun2[0] = true;
             return nd.next();
         }));
@@ -411,32 +416,28 @@ public class MiddlewareSetTest {
     @Test
     public void CatchAnExceptionViaMiddleware() {
         MiddlewareSet m = new MiddlewareSet();
-        final boolean[] caughtException = {false};
+        final boolean[] caughtException = { false };
 
         m.use(new AnonymousReceiveMiddleware((tc, nd) -> CompletableFuture.supplyAsync(() -> {
-                System.out.println("First Middleware");
-                return null;
-            })
-            .thenCompose((result) -> nd.next())
-            .exceptionally(ex -> {
-                Assert.assertTrue(ex instanceof CompletionException);
-                Assert.assertTrue(ex.getCause() instanceof InterruptedException);
-                System.out.println("First Middleware caught");
-                caughtException[0] = true;
-                return null;
-            })));
+            System.out.println("First Middleware");
+            return null;
+        }).thenCompose((result) -> nd.next()).exceptionally(ex -> {
+            Assert.assertTrue(ex instanceof CompletionException);
+            Assert.assertTrue(ex.getCause() instanceof InterruptedException);
+            System.out.println("First Middleware caught");
+            caughtException[0] = true;
+            return null;
+        })));
 
         m.use(new AnonymousReceiveMiddleware((tc, nd) -> CompletableFuture.supplyAsync(() -> {
             System.out.println("Second Middleware");
             return null;
-        })
-            .thenCompose(result -> nd.next())));
+        }).thenCompose(result -> nd.next())));
 
         m.use(new AnonymousReceiveMiddleware((tc, nd) -> CompletableFuture.supplyAsync(() -> {
             System.out.println("Third Middleware will throw");
             throw new CompletionException(new InterruptedException("test"));
-        })
-            .thenCompose(result -> nd.next())));
+        }).thenCompose(result -> nd.next())));
 
         m.receiveActivityWithStatus(null, null).join();
 

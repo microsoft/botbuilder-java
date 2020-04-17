@@ -14,7 +14,8 @@ public class SimpleChannelProvider implements ChannelProvider {
     private String channelService;
 
     /**
-     * Creates a SimpleChannelProvider with no ChannelService which will use Public Azure.
+     * Creates a SimpleChannelProvider with no ChannelService which will use Public
+     * Azure.
      */
     public SimpleChannelProvider() {
 
@@ -23,9 +24,10 @@ public class SimpleChannelProvider implements ChannelProvider {
     /**
      * Creates a SimpleChannelProvider with the specified ChannelService.
      *
-     * @param withChannelService The ChannelService to use. Null or empty strings represent Public Azure,
-     *                           the string 'https://botframework.us' represents US Government Azure, and
-     *                           other values are for private channels.
+     * @param withChannelService The ChannelService to use. Null or empty strings
+     *                           represent Public Azure, the string
+     *                           'https://botframework.us' represents US Government
+     *                           Azure, and other values are for private channels.
      */
     public SimpleChannelProvider(String withChannelService) {
         this.channelService = withChannelService;
@@ -33,6 +35,7 @@ public class SimpleChannelProvider implements ChannelProvider {
 
     /**
      * Returns the channel service value.
+     * 
      * @return The channel service.
      */
     @Override
@@ -42,6 +45,7 @@ public class SimpleChannelProvider implements ChannelProvider {
 
     /**
      * Indicates whether this is a Gov channel provider.
+     * 
      * @return True if Gov.
      */
     @Override
@@ -51,6 +55,7 @@ public class SimpleChannelProvider implements ChannelProvider {
 
     /**
      * Indicates whether this is public Azure.
+     * 
      * @return True if pubic Azure.
      */
     @Override
