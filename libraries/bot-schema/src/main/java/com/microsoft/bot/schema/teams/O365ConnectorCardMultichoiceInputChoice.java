@@ -17,6 +17,7 @@ public class O365ConnectorCardMultichoiceInputChoice {
 
     /**
      * Gets the text rendered on ActionCard.
+     * 
      * @return The ActionCard text.
      */
     public String getDisplay() {
@@ -25,6 +26,7 @@ public class O365ConnectorCardMultichoiceInputChoice {
 
     /**
      * Sets the text rendered on ActionCard.
+     * 
      * @param withDisplay The ActionCard text.
      */
     public void setDisplay(String withDisplay) {
@@ -33,6 +35,7 @@ public class O365ConnectorCardMultichoiceInputChoice {
 
     /**
      * Gets the value received as results.
+     * 
      * @return The result value.
      */
     public String getValue() {
@@ -41,6 +44,7 @@ public class O365ConnectorCardMultichoiceInputChoice {
 
     /**
      * Sets the value received as results.
+     * 
      * @param withValue The result value.
      */
     public void setValue(String withValue) {

@@ -20,29 +20,32 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
- * This is the default controller that will receive incoming Channel Activity messages.
+ * This is the default controller that will receive incoming Channel Activity
+ * messages.
  *
- * <p>This controller is suitable in most cases.  Bots that want to use this controller
- * should do so by using the @Import({BotController.class}) annotation.  See any of the
- * samples Application class for an example.</p>
+ * <p>
+ * This controller is suitable in most cases. Bots that want to use this
+ * controller should do so by using the @Import({BotController.class})
+ * annotation. See any of the samples Application class for an example.
+ * </p>
  */
 @RestController
 public class BotController {
     /**
-     * The slf4j Logger to use.  Note that slf4j is configured by providing
-     * Log4j dependencies in the POM, and corresponding Log4j configuration in
-     * the 'resources' folder.
+     * The slf4j Logger to use. Note that slf4j is configured by providing Log4j
+     * dependencies in the POM, and corresponding Log4j configuration in the
+     * 'resources' folder.
      */
     private Logger logger = LoggerFactory.getLogger(BotController.class);
 
     /**
-     * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
+     * The BotFrameworkHttpAdapter to use. Note is is provided by dependency
      * injection via the constructor.
      */
     private final BotFrameworkHttpAdapter adapter;
 
     /**
-     * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
+     * The BotFrameworkHttpAdapter to use. Note is is provided by dependency
      * injection via the constructor.
      */
     private final Bot bot;
@@ -50,13 +53,15 @@ public class BotController {
     /**
      * Spring will use this constructor for creation.
      *
-     * <p>The Bot application should define class that implements {@link Bot} and
-     * annotate it with @Component.</p>
+     * <p>
+     * The Bot application should define class that implements {@link Bot} and
+     * annotate it with @Component.
+     * </p>
      *
      * @see BotDependencyConfiguration
      *
-     * @param withAdapter  The BotFrameworkHttpAdapter to use.
-     * @param withBot The Bot to use.
+     * @param withAdapter The BotFrameworkHttpAdapter to use.
+     * @param withBot     The Bot to use.
      */
     public BotController(BotFrameworkHttpAdapter withAdapter, Bot withBot) {
         adapter = withAdapter;
@@ -66,19 +71,26 @@ public class BotController {
     /**
      * This will receive incoming Channel Activities.
      *
-     * @param activity The incoming Activity.
+     * @param activity   The incoming Activity.
      * @param authHeader The incoming Authorization header.
      * @return The request response.
      */
     @PostMapping("/api/messages")
     public CompletableFuture<ResponseEntity<Object>> incoming(
         @RequestBody Activity activity,
-        @RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
+        @RequestHeader(value = "Authorization", defaultValue = "") String authHeader
+    ) {
 
         return adapter.processIncomingActivity(authHeader, activity, bot)
 
             .handle((result, exception) -> {
                 if (exception == null) {
+                    if (result != null) {
+                        return new ResponseEntity<>(
+                            result.getBody(),
+                            HttpStatus.valueOf(result.getStatus())
+                        );
+                    }
                     return new ResponseEntity<>(HttpStatus.ACCEPTED);
                 }
 

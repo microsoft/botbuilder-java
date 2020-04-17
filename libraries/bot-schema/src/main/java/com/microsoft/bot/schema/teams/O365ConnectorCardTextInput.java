@@ -21,8 +21,9 @@ public class O365ConnectorCardTextInput extends O365ConnectorCardInputBase {
     private double maxLength;
 
     /**
-     * Indicates if text input is allowed for multiple lines.
-     * Default value is false.
+     * Indicates if text input is allowed for multiple lines. Default value is
+     * false.
+     * 
      * @return True if multiline input is allowed.
      */
     public Boolean getMultiline() {
@@ -31,6 +32,7 @@ public class O365ConnectorCardTextInput extends O365ConnectorCardInputBase {
 
     /**
      * Sets if text input is allowed for multiple lines.
+     * 
      * @param withMultiline True if multiline input is allowed.
      */
     public void setMultiline(Boolean withMultiline) {
@@ -39,6 +41,7 @@ public class O365ConnectorCardTextInput extends O365ConnectorCardInputBase {
 
     /**
      * Gets maximum length of text input. Default value is unlimited.
+     * 
      * @return Max line length.
      */
     public double getMaxLength() {
@@ -47,6 +50,7 @@ public class O365ConnectorCardTextInput extends O365ConnectorCardInputBase {
 
     /**
      * Sets maximum length of text input. Default value is unlimited.
+     * 
      * @param withMaxLength Max line length.
      */
     public void setMaxLength(double withMaxLength) {

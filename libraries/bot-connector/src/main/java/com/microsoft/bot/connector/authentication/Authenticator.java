@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 public interface Authenticator {
     /**
      * Returns a token.
+     * 
      * @return The MSAL token result.
      */
     CompletableFuture<IAuthenticationResult> acquireToken();

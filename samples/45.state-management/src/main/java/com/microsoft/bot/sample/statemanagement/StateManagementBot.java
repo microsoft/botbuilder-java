@@ -25,9 +25,11 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  This class tracks the conversation state through POJO's saved in
- * {@link ConversationState} and {@link UserState}.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. This class tracks the conversation state through POJO's saved in
+ * {@link ConversationState} and {@link UserState}.
+ * </p>
  *
  * @see ConversationData
  * @see UserProfile
@@ -46,8 +48,9 @@ public class StateManagementBot extends ActivityHandler {
     /**
      * Normal onTurn processing, with saving of state after each turn.
      *
-     * @param turnContext The context object for this turn. Provides information about the
-     *                    incoming activity, and other data needed to process the activity.
+     * @param turnContext The context object for this turn. Provides information
+     *                    about the incoming activity, and other data needed to
+     *                    process the activity.
      * @return A future task.
      */
     @Override
@@ -60,24 +63,35 @@ public class StateManagementBot extends ActivityHandler {
     /**
      * Send a welcome message to new members.
      *
-     * @param membersAdded A list of all the members added to the conversation, as described by
-     *                     the conversation update activity.
+     * @param membersAdded A list of all the members added to the conversation, as
+     *                     described by the conversation update activity.
      * @param turnContext  The context object for this turn.
      * @return A future task.
      */
     @Override
-    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(
+        List<ChannelAccount> membersAdded,
+        TurnContext turnContext
+    ) {
         return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(
-                MessageFactory.text("Welcome to State Bot Sample. Type anything to get started.")))
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
+            .map(
+                channel -> turnContext
+                    .sendActivity(
+                        MessageFactory
+                            .text("Welcome to State Bot Sample. Type anything to get started.")
+                    )
+            )
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);
     }
 
     /**
-     * This will prompt for a user name, after which it will send info about the conversation.  After sending
-     * information, the cycle restarts.
+     * This will prompt for a user name, after which it will send info about the
+     * conversation. After sending information, the cycle restarts.
      *
      * @param turnContext The context object for this turn.
      * @return A future task.
@@ -85,12 +99,15 @@ public class StateManagementBot extends ActivityHandler {
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         // Get state data from ConversationState.
-        StatePropertyAccessor<ConversationData> dataAccessor = conversationState.createProperty("data");
-        CompletableFuture<ConversationData> dataFuture = dataAccessor.get(turnContext, ConversationData::new);
+        StatePropertyAccessor<ConversationData> dataAccessor =
+            conversationState.createProperty("data");
+        CompletableFuture<ConversationData> dataFuture =
+            dataAccessor.get(turnContext, ConversationData::new);
 
         // Get profile from UserState.
         StatePropertyAccessor<UserProfile> profileAccessor = userState.createProperty("profile");
-        CompletableFuture<UserProfile> profileFuture = profileAccessor.get(turnContext, UserProfile::new);
+        CompletableFuture<UserProfile> profileFuture =
+            profileAccessor.get(turnContext, UserProfile::new);
 
         return dataFuture.thenCombine(profileFuture, (conversationData, userProfile) -> {
             if (StringUtils.isEmpty(userProfile.getName())) {
@@ -100,13 +117,17 @@ public class StateManagementBot extends ActivityHandler {
 
                     // Set the name to what the user provided and reply.
                     userProfile.setName(turnContext.getActivity().getText());
-                    return turnContext.sendActivity(MessageFactory.text(
-                        "Thanks " + userProfile.getName() + ".  To see conversation data, type anything."));
-                } else  {
+                    return turnContext.sendActivity(
+                        MessageFactory.text(
+                            "Thanks " + userProfile.getName()
+                                + ".  To see conversation data, type anything."
+                        )
+                    );
+                } else {
                     conversationData.setPromptedUserForName(true);
                     return turnContext.sendActivity(MessageFactory.text("What is your name?"));
                 }
-            } else  {
+            } else {
                 // Set the flag to true, so we don't prompt in the next turn.
                 conversationData.setPromptedUserForName(true);
 
@@ -117,14 +138,25 @@ public class StateManagementBot extends ActivityHandler {
 
                 List<Activity> sendToUser = new ArrayList<>();
 
-                sendToUser.add(MessageFactory.text(
-                    userProfile.getName() + " sent: " + turnContext.getActivity().getText()));
+                sendToUser.add(
+                    MessageFactory.text(
+                        userProfile.getName() + " sent: " + turnContext.getActivity().getText()
+                    )
+                );
 
-                sendToUser.add(MessageFactory.text(
-                    userProfile.getName() + " message received at: " + conversationData.getTimestamp()));
+                sendToUser.add(
+                    MessageFactory.text(
+                        userProfile.getName() + " message received at: "
+                            + conversationData.getTimestamp()
+                    )
+                );
 
-                sendToUser.add(MessageFactory.text(
-                    userProfile.getName() + " message received from: " + conversationData.getChannelId()));
+                sendToUser.add(
+                    MessageFactory.text(
+                        userProfile.getName() + " message received from: "
+                            + conversationData.getChannelId()
+                    )
+                );
 
                 return turnContext.sendActivities(sendToUser);
             }

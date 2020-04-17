@@ -19,6 +19,7 @@ public class AadResourceUrls {
 
     /**
      * Construct with var args or String[].
+     * 
      * @param withResourceUrl Array of urls.
      */
     public AadResourceUrls(String... withResourceUrl) {
@@ -27,6 +28,7 @@ public class AadResourceUrls {
 
     /**
      * Construct with List of urls.
+     * 
      * @param withResourceUrls List of urls.
      */
     public AadResourceUrls(List<String> withResourceUrls) {

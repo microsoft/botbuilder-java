@@ -19,6 +19,7 @@ public class O365ConnectorCardHttpPOST extends O365ConnectorCardActionBase {
 
     /**
      * Gets the content to be posted back to bots via invoke.
+     * 
      * @return The post content.
      */
     public String getBody() {
@@ -27,6 +28,7 @@ public class O365ConnectorCardHttpPOST extends O365ConnectorCardActionBase {
 
     /**
      * Set the content to be posted back to bots via invoke.
+     * 
      * @param withBody The post content.
      */
     public void setBody(String withBody) {

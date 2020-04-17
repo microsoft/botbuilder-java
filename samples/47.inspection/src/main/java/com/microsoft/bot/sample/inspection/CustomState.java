@@ -6,11 +6,16 @@ package com.microsoft.bot.sample.inspection;
 /**
  * Custom application state.
  *
- * <p>Any POJO can be used to store bot state.</p>
+ * <p>
+ * Any POJO can be used to store bot state.
+ * </p>
  *
- * <p>NOTE: Standard Java getters/setters must be used for properties.  Alternatively,
- * the Jackson JSON annotations could be used instead.  If any methods start with "get"
- * but aren't a property, the Jackson JSON 'JsonIgnore' annotation must be used.</p>
+ * <p>
+ * NOTE: Standard Java getters/setters must be used for properties.
+ * Alternatively, the Jackson JSON annotations could be used instead. If any
+ * methods start with "get" but aren't a property, the Jackson JSON 'JsonIgnore'
+ * annotation must be used.
+ * </p>
  *
  * @see EchoBot
  */

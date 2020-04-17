@@ -36,14 +36,14 @@ public class ChannelAccount {
     private RoleTypes role;
 
     /**
-     * Holds the overflow properties that aren't first class
-     * properties in the object.  This allows extensibility
-     * while maintaining the object.
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
      */
     private HashMap<String, JsonNode> properties = new HashMap<>();
 
     /**
      * Perform a deep copy of a ChannelAccount.
+     *
      * @param channelAccount The ChannelAccount to copy.
      * @return A cloned copy of the ChannelAccount.
      */
@@ -52,20 +52,23 @@ public class ChannelAccount {
             return null;
         }
 
-        return new ChannelAccount() {{
-            setId(channelAccount.getId());
-            setRole(channelAccount.getRole());
-            setName(channelAccount.getName());
-            setAadObjectId(channelAccount.getAadObjectId());
+        return new ChannelAccount() {
+            {
+                setId(channelAccount.getId());
+                setRole(channelAccount.getRole());
+                setName(channelAccount.getName());
+                setAadObjectId(channelAccount.getAadObjectId());
 
-            for (String key : channelAccount.getProperties().keySet()) {
-                this.setProperties(key, channelAccount.getProperties().get(key));
+                for (String key : channelAccount.getProperties().keySet()) {
+                    this.setProperties(key, channelAccount.getProperties().get(key));
+                }
             }
-        }};
+        };
     }
 
     /**
      * Performs a deep copy of a List of ChannelAccounts.
+     *
      * @param channelAccounts The List to clone.
      * @return A cloned List of ChannelAccounts.
      */
@@ -79,7 +82,6 @@ public class ChannelAccount {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
-
     /**
      * Initializes a new instance of the ChannelAccount class.
      */
@@ -89,7 +91,9 @@ public class ChannelAccount {
 
     /**
      * Initializes a new instance of the ChannelAccount class.
-     * @param withId Channel id for the user or bot on this channel (Example: joe@smith.com, or @joesmith or 123456).
+     *
+     * @param withId Channel id for the user or bot on this channel (Example:
+     *               joe@smith.com, or @joesmith or 123456).
      */
     public ChannelAccount(String withId) {
         this(withId, null, null, null);
@@ -97,7 +101,9 @@ public class ChannelAccount {
 
     /**
      * Initializes a new instance of the ChannelAccount class.
-     * @param withId Channel id for the user or bot on this channel (Example: joe@smith.com, or @joesmith or 123456).
+     *
+     * @param withId   Channel id for the user or bot on this channel (Example:
+     *                 joe@smith.com, or @joesmith or 123456).
      * @param withName Display friendly name.
      */
     public ChannelAccount(String withId, String withName) {
@@ -106,10 +112,12 @@ public class ChannelAccount {
 
     /**
      * Initializes a new instance of the ChannelAccount class.
-     * @param withId Channel id for the user or bot on this channel (Example: joe@smith.com, or @joesmith or 123456).
+     *
+     * @param withId   Channel id for the user or bot on this channel (Example:
+     *                 joe@smith.com, or @joesmith or 123456).
      * @param withName Display friendly name.
-     * @param withRole Role of the entity behind the account (Example User, Bot, etc.). Possible values
-     *                 include: 'user', 'bot'
+     * @param withRole Role of the entity behind the account (Example User, Bot,
+     *                 etc.). Possible values include: 'user', 'bot'
      */
     public ChannelAccount(String withId, String withName, RoleTypes withRole) {
         this(withId, withName, withRole, null);
@@ -117,13 +125,21 @@ public class ChannelAccount {
 
     /**
      * Initializes a new instance of the ChannelAccount class.
-     * @param withId Channel id for the user or bot on this channel (Example: joe@smith.com, or @joesmith or 123456).
-     * @param withName Display friendly name.
-     * @param withRole Role of the entity behind the account (Example User, Bot, etc.). Possible values
-     *                 include: 'user', 'bot'
-     * @param withAadObjectId This account's object ID within Azure Active Directory (AAD).
+     *
+     * @param withId          Channel id for the user or bot on this channel
+     *                        (Example: joe@smith.com, or @joesmith or 123456).
+     * @param withName        Display friendly name.
+     * @param withRole        Role of the entity behind the account (Example User,
+     *                        Bot, etc.). Possible values include: 'user', 'bot'
+     * @param withAadObjectId This account's object ID within Azure Active Directory
+     *                        (AAD).
      */
-    public ChannelAccount(String withId, String withName, RoleTypes withRole, String withAadObjectId) {
+    public ChannelAccount(
+        String withId,
+        String withName,
+        RoleTypes withRole,
+        String withAadObjectId
+    ) {
         this.id = withId;
         this.name = withName;
         this.role = withRole;
@@ -133,6 +149,7 @@ public class ChannelAccount {
     /**
      * Channel id for the user or bot on this channel (Example: joe@smith.com,
      * or @joesmith or 123456).
+     *
      * @return the id value.
      */
     public String getId() {
@@ -142,6 +159,7 @@ public class ChannelAccount {
     /**
      * Channel id for the user or bot on this channel (Example: joe@smith.com,
      * or @joesmith or 123456).
+     *
      * @param withId the id value to set.
      */
     public void setId(String withId) {
@@ -150,6 +168,7 @@ public class ChannelAccount {
 
     /**
      * Display friendly name.
+     *
      * @return the name value.
      */
     public String getName() {
@@ -158,6 +177,7 @@ public class ChannelAccount {
 
     /**
      * Display friendly name.
+     *
      * @param withName the name value to set.
      */
     public void setName(String withName) {
@@ -166,6 +186,7 @@ public class ChannelAccount {
 
     /**
      * Role of the entity behind the account (Example: User, Bot, etc.).
+     *
      * @return the role value.
      */
     public RoleTypes getRole() {
@@ -174,6 +195,7 @@ public class ChannelAccount {
 
     /**
      * Role of the entity behind the account (Example: User, Bot, etc.).
+     *
      * @param withRole the role value to set.
      */
     public void setRole(RoleTypes withRole) {
@@ -181,9 +203,9 @@ public class ChannelAccount {
     }
 
     /**
-     * Overflow properties.
-     * Properties that are not modelled as first class properties in the object are accessible here.
-     * Note: A property value can be be nested.
+     * Overflow properties. Properties that are not modelled as first class
+     * properties in the object are accessible here. Note: A property value can be
+     * be nested.
      *
      * @return A Key-Value map of the properties
      */
@@ -205,6 +227,7 @@ public class ChannelAccount {
 
     /**
      * This account's object ID within Azure Active Directory (AAD).
+     *
      * @return The aadObjectId value.
      */
     public String getAadObjectId() {
@@ -213,6 +236,7 @@ public class ChannelAccount {
 
     /**
      * This account's object ID within Azure Active Directory (AAD).
+     *
      * @param withAadObjectId The aadObjectId value to set.
      */
     public void setAadObjectId(String withAadObjectId) {

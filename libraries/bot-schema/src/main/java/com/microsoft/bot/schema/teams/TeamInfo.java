@@ -24,8 +24,7 @@ public class TeamInfo {
     /**
      * Azure Active Directory (AAD) Group Id for the team.
      * <p>
-     * We don't see this C#, but Teams
-     * definitely sends this to the bot.
+     * We don't see this C#, but Teams definitely sends this to the bot.
      */
     @JsonProperty(value = "aadGroupId")
     private String aadGroupId;
@@ -98,8 +97,17 @@ public class TeamInfo {
     }
 
     /**
-     * A new instance of TeamInfo.
+     * A new empty instance of TeamInfo.
      */
     public TeamInfo() {
+    }
+
+    /**
+     * A new instance of TeamInfo with ID.
+     * 
+     * @param withId The id of the team.
+     */
+    public TeamInfo(String withId) {
+        this(withId, null, null);
     }
 }

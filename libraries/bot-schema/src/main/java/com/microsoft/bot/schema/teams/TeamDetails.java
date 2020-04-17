@@ -26,6 +26,7 @@ public class TeamDetails {
 
     /**
      * Gets unique identifier representing a team.
+     * 
      * @return The teams id.
      */
     public String getId() {
@@ -34,6 +35,7 @@ public class TeamDetails {
 
     /**
      * Sets unique identifier representing a team.
+     * 
      * @param withId The teams id.
      */
     public void setId(String withId) {
@@ -42,6 +44,7 @@ public class TeamDetails {
 
     /**
      * Gets name of team.
+     * 
      * @return The team name.
      */
     public String getName() {
@@ -50,6 +53,7 @@ public class TeamDetails {
 
     /**
      * Sets name of team.
+     * 
      * @param withName The team name.
      */
     public void setName(String withName) {
@@ -58,6 +62,7 @@ public class TeamDetails {
 
     /**
      * Gets Azure Active Directory (AAD) Group Id for the team.
+     * 
      * @return The Azure group id.
      */
     public String getAadGroupId() {
@@ -66,6 +71,7 @@ public class TeamDetails {
 
     /**
      * Sets Azure Active Directory (AAD) Group Id for the team.
+     * 
      * @param withAadGroupId The Azure group id.
      */
     public void setAadGroupId(String withAadGroupId) {
@@ -74,6 +80,7 @@ public class TeamDetails {
 
     /**
      * Gets the number of channels in the team.
+     * 
      * @return The number of channels.
      */
     public int getChannelCount() {
@@ -82,6 +89,7 @@ public class TeamDetails {
 
     /**
      * Sets the number of channels in the team.
+     * 
      * @param withChannelCount The number of channels.
      */
     public void setChannelCount(int withChannelCount) {
@@ -90,6 +98,7 @@ public class TeamDetails {
 
     /**
      * Gets the number of members in the team.
+     * 
      * @return The number of memebers.
      */
     public int getMemberCount() {
@@ -98,6 +107,7 @@ public class TeamDetails {
 
     /**
      * Sets the number of members in the team.
+     * 
      * @param withMemberCount The number of members.
      */
     public void setMemberCount(int withMemberCount) {

@@ -48,8 +48,8 @@ public class CardAction {
     private String displayText;
 
     /**
-     * Supplementary parameter for action. Content of this property depends on
-     * the ActionType.
+     * Supplementary parameter for action. Content of this property depends on the
+     * ActionType.
      */
     @JsonProperty(value = "value")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -64,6 +64,7 @@ public class CardAction {
 
     /**
      * Perform a deep copy of a CardAction.
+     * 
      * @param cardAction The CardAction to clone.
      * @return A cloned copy of the CardAction.
      */
@@ -72,15 +73,17 @@ public class CardAction {
             return null;
         }
 
-        return new CardAction() {{
-           setValue(cardAction.getValue());
-           setTitle(cardAction.getTitle());
-           setDisplayText(cardAction.getDisplayText());
-           setImage(cardAction.getImage());
-           setType(cardAction.getType());
-           setText(cardAction.getText());
-           setChannelData(cardAction.getChannelData());
-        }};
+        return new CardAction() {
+            {
+                setValue(cardAction.getValue());
+                setTitle(cardAction.getTitle());
+                setDisplayText(cardAction.getDisplayText());
+                setImage(cardAction.getImage());
+                setType(cardAction.getType());
+                setText(cardAction.getText());
+                setChannelData(cardAction.getChannelData());
+            }
+        };
     }
 
     /**
@@ -92,6 +95,7 @@ public class CardAction {
 
     /**
      * Simplify creation of CardActions with string values.
+     * 
      * @param input The value for both Title and Value.
      */
     public CardAction(String input) {
@@ -209,6 +213,7 @@ public class CardAction {
 
     /**
      * Gets the channelData value.
+     * 
      * @return ChannelData as a JsonNode.
      */
     public Object getChannelData() {

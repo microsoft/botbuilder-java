@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * The Activity class contains all properties that individual, more specific activities
- * could contain. It is a superset type.
+ * The Activity class contains all properties that individual, more specific
+ * activities could contain. It is a superset type.
  */
 public class Activity {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -50,8 +50,9 @@ public class Activity {
 
     @JsonProperty(value = "localTimestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    //2019-10-07T09:49:37-05:00
+    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern =
+    // "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    // 2019-10-07T09:49:37-05:00
     private OffsetDateTime localTimestamp;
 
     @JsonProperty(value = "localTimezone")
@@ -203,14 +204,14 @@ public class Activity {
     private List<TextHighlight> textHighlights;
 
     /**
-     * Holds the overflow properties that aren't first class
-     * properties in the object.  This allows extensibility
-     * while maintaining the object.
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
      */
     private HashMap<String, JsonNode> properties = new HashMap<>();
 
     /**
-     * Default constructor.  Normally this wouldn't be used as the ActivityType is normally required.
+     * Default constructor. Normally this wouldn't be used as the ActivityType is
+     * normally required.
      */
     protected Activity() {
         setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
@@ -218,6 +219,7 @@ public class Activity {
 
     /**
      * Construct an Activity of the specified type.
+     *
      * @param withType The activity type.
      */
     public Activity(String withType) {
@@ -235,44 +237,55 @@ public class Activity {
         return createTraceActivity(withName, null, null, null);
     }
 
-   /**
-    * Create a TRACE type Activity.
-    *
-    * @param withName      Name of the operation
-    * @param withValueType valueType if helpful to identify the value schema (default is value.GetType().Name)
-    * @param withValue The content for this trace operation.
-    * @param withLabel A descriptive label for this trace operation.
-    * @return A Trace type Activity.
-    */
-    public static Activity createTraceActivity(String withName,
-                                               String withValueType,
-                                               Object withValue,
-                                               String withLabel) {
-        return new Activity(ActivityTypes.TRACE) {{
-            setName(withName);
-            setLabel(withLabel);
-            if (withValue != null) {
-                setValueType((withValueType == null) ? withValue.getClass().getTypeName() : withValueType);
-            } else {
-                setValueType(withValueType);
+    /**
+     * Create a TRACE type Activity.
+     *
+     * @param withName      Name of the operation
+     * @param withValueType valueType if helpful to identify the value schema
+     *                      (default is value.GetType().Name)
+     * @param withValue     The content for this trace operation.
+     * @param withLabel     A descriptive label for this trace operation.
+     * @return A Trace type Activity.
+     */
+    public static Activity createTraceActivity(
+        String withName,
+        String withValueType,
+        Object withValue,
+        String withLabel
+    ) {
+        return new Activity(ActivityTypes.TRACE) {
+            {
+                setName(withName);
+                setLabel(withLabel);
+                if (withValue != null) {
+                    setValueType(
+                        (withValueType == null) ? withValue.getClass().getTypeName() : withValueType
+                    );
+                } else {
+                    setValueType(withValueType);
+                }
+                setValue(withValue);
             }
-            setValue(withValue);
-        }};
+        };
     }
 
     /**
      * Create a MESSAGE type Activity.
+     *
      * @return A message Activity type.
      */
     public static Activity createMessageActivity() {
-        return new Activity(ActivityTypes.MESSAGE) {{
-            setAttachments(new ArrayList<>());
-            setEntities(new ArrayList<>());
-        }};
+        return new Activity(ActivityTypes.MESSAGE) {
+            {
+                setAttachments(new ArrayList<>());
+                setEntities(new ArrayList<>());
+            }
+        };
     }
 
     /**
      * Create a CONTACT_RELATION_UPDATE type Activity.
+     *
      * @return A contact relation update type Activity.
      */
     public static Activity createContactRelationUpdateActivity() {
@@ -281,17 +294,21 @@ public class Activity {
 
     /**
      * Create a CONVERSATION_UPDATE type Activity.
+     *
      * @return A conversation update type Activity.
      */
     public static Activity createConversationUpdateActivity() {
-        return new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setMembersAdded(new ArrayList<>());
-            setMembersRemoved(new ArrayList<>());
-        }};
+        return new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersAdded(new ArrayList<>());
+                setMembersRemoved(new ArrayList<>());
+            }
+        };
     }
 
     /**
      * Creates a TYPING type Activity.
+     *
      * @return The new typing activity.
      */
     public static Activity createTypingActivity() {
@@ -300,6 +317,7 @@ public class Activity {
 
     /**
      * Creates a HANDOFF type Activity.
+     *
      * @return The new handoff activity.
      */
     public static Activity createHandoffActivity() {
@@ -308,6 +326,7 @@ public class Activity {
 
     /**
      * Creates a END_OF_CONVERSATION type of Activity.
+     *
      * @return The new end of conversation activity.
      */
     public static Activity createEndOfConversationActivity() {
@@ -316,6 +335,7 @@ public class Activity {
 
     /**
      * Creates a EVENT type of Activity.
+     *
      * @return The new event activity.
      */
     public static Activity createEventActivity() {
@@ -324,6 +344,7 @@ public class Activity {
 
     /**
      * Creates a INVOKE type of Activity.
+     *
      * @return The new invoke activity.
      */
     public static Activity createInvokeActivity() {
@@ -337,52 +358,54 @@ public class Activity {
      * @return new cloned activity
      */
     public static Activity clone(Activity activity) {
-        Activity clone = new Activity(activity.getType()) {{
-            setId(activity.getId());
-            setTimestamp(activity.getTimestamp());
-            setLocalTimestamp(activity.getLocalTimestamp());
-            setLocalTimeZone(activity.getLocalTimezone());
-            setChannelData(activity.getChannelData());
-            setFrom(ChannelAccount.clone(activity.getFrom()));
-            setRecipient(ChannelAccount.clone(activity.getRecipient()));
-            setConversation(ConversationAccount.clone(activity.getConversation()));
-            setChannelId(activity.getChannelId());
-            setServiceUrl(activity.getServiceUrl());
-            setChannelId(activity.getChannelId());
-            setEntities(Entity.cloneList(activity.getEntities()));
-            setReplyToId(activity.getReplyToId());
-            setSpeak(activity.getSpeak());
-            setText(activity.getText());
-            setInputHint(activity.getInputHint());
-            setSummary(activity.getSummary());
-            setSuggestedActions(SuggestedActions.clone(activity.getSuggestedActions()));
-            setAttachments(Attachment.cloneList(activity.getAttachments()));
-            setAction(activity.getAction());
-            setLabel(activity.getLabel());
-            setValueType(activity.getValueType());
-            setValue(activity.getValue());
-            setName(activity.getName());
-            setRelatesTo(ConversationReference.clone(activity.getRelatesTo()));
-            setCode(activity.getCode());
-            setExpiration(activity.getExpiration());
-            setImportance(activity.getImportance());
-            setDeliveryMode(activity.getDeliveryMode());
-            setTextHighlights(activity.getTextHighlights());
-            setCallerId(activity.getCallerId());
-            setHistoryDisclosed(activity.getHistoryDisclosed());
-            setLocale(activity.getLocale());
-            setReactionsAdded(MessageReaction.cloneList(activity.getReactionsAdded()));
-            setReactionsRemoved(MessageReaction.cloneList(activity.getReactionsRemoved()));
-            setExpiration(activity.getExpiration());
-            setMembersAdded(ChannelAccount.cloneList(activity.getMembersAdded()));
-            setMembersRemoved(ChannelAccount.cloneList(activity.getMembersRemoved()));
-            setTextFormat(activity.getTextFormat());
-            setAttachmentLayout(activity.getAttachmentLayout());
-            setTopicName(activity.getTopicName());
-            if (activity.getListenFor() != null) {
-                setListenFor(new ArrayList<>(activity.getListenFor()));
+        Activity clone = new Activity(activity.getType()) {
+            {
+                setId(activity.getId());
+                setTimestamp(activity.getTimestamp());
+                setLocalTimestamp(activity.getLocalTimestamp());
+                setLocalTimeZone(activity.getLocalTimezone());
+                setChannelData(activity.getChannelData());
+                setFrom(ChannelAccount.clone(activity.getFrom()));
+                setRecipient(ChannelAccount.clone(activity.getRecipient()));
+                setConversation(ConversationAccount.clone(activity.getConversation()));
+                setChannelId(activity.getChannelId());
+                setServiceUrl(activity.getServiceUrl());
+                setChannelId(activity.getChannelId());
+                setEntities(Entity.cloneList(activity.getEntities()));
+                setReplyToId(activity.getReplyToId());
+                setSpeak(activity.getSpeak());
+                setText(activity.getText());
+                setInputHint(activity.getInputHint());
+                setSummary(activity.getSummary());
+                setSuggestedActions(SuggestedActions.clone(activity.getSuggestedActions()));
+                setAttachments(Attachment.cloneList(activity.getAttachments()));
+                setAction(activity.getAction());
+                setLabel(activity.getLabel());
+                setValueType(activity.getValueType());
+                setValue(activity.getValue());
+                setName(activity.getName());
+                setRelatesTo(ConversationReference.clone(activity.getRelatesTo()));
+                setCode(activity.getCode());
+                setExpiration(activity.getExpiration());
+                setImportance(activity.getImportance());
+                setDeliveryMode(activity.getDeliveryMode());
+                setTextHighlights(activity.getTextHighlights());
+                setCallerId(activity.getCallerId());
+                setHistoryDisclosed(activity.getHistoryDisclosed());
+                setLocale(activity.getLocale());
+                setReactionsAdded(MessageReaction.cloneList(activity.getReactionsAdded()));
+                setReactionsRemoved(MessageReaction.cloneList(activity.getReactionsRemoved()));
+                setExpiration(activity.getExpiration());
+                setMembersAdded(ChannelAccount.cloneList(activity.getMembersAdded()));
+                setMembersRemoved(ChannelAccount.cloneList(activity.getMembersRemoved()));
+                setTextFormat(activity.getTextFormat());
+                setAttachmentLayout(activity.getAttachmentLayout());
+                setTopicName(activity.getTopicName());
+                if (activity.getListenFor() != null) {
+                    setListenFor(new ArrayList<>(activity.getListenFor()));
+                }
             }
-        }};
+        };
 
         for (Map.Entry<String, JsonNode> entry : activity.getProperties().entrySet()) {
             clone.setProperties(entry.getKey(), entry.getValue());
@@ -393,6 +416,7 @@ public class Activity {
 
     /**
      * Gets the {@link ActivityTypes} of the activity.
+     *
      * @return The Activity type.
      */
     public String getType() {
@@ -401,6 +425,7 @@ public class Activity {
 
     /**
      * Sets the {@link ActivityTypes} of the activity.
+     *
      * @param withType The type of the Activity.
      */
     public void setType(String withType) {
@@ -409,6 +434,7 @@ public class Activity {
 
     /**
      * Convenience method to return if the Activity is of the specified type.
+     *
      * @param compareTo The type to compare to.
      * @return True if the Activity is of the specified type.
      */
@@ -418,6 +444,7 @@ public class Activity {
 
     /**
      * Returns the ID that uniquely identifies the activity on the channel.
+     *
      * @return The activity id.
      */
     public String getId() {
@@ -426,6 +453,7 @@ public class Activity {
 
     /**
      * Sets the ID that uniquely identifies the activity on the channel.
+     *
      * @param withId The activity ID.
      */
     public void setId(String withId) {
@@ -433,7 +461,9 @@ public class Activity {
     }
 
     /**
-     * Gets the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
+     * Gets the date and time that the message was sent, in UTC, expressed in
+     * ISO-8601 format.
+     *
      * @return The UTC timestamp of the activity.
      */
     public OffsetDateTime getTimestamp() {
@@ -441,7 +471,9 @@ public class Activity {
     }
 
     /**
-     * Sets the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
+     * Sets the date and time that the message was sent, in UTC, expressed in
+     * ISO-8601 format.
+     *
      * @param withTimestamp The UTC timestamp of the activity.
      */
     public void setTimestamp(OffsetDateTime withTimestamp) {
@@ -451,6 +483,7 @@ public class Activity {
     /**
      * Gets the local date and time of the message, expressed in ISO-8601 format.
      * For example, 2016-09-23T13:07:49.4714686-07:00.
+     *
      * @return The local timestamp of the activity.
      */
     public OffsetDateTime getLocalTimestamp() {
@@ -458,8 +491,9 @@ public class Activity {
     }
 
     /**
-     * Contains the local date and time of the message, expressed in ISO-8601 format.
-     * For example, 2016-09-23T13:07:49.4714686-07:00.
+     * Contains the local date and time of the message, expressed in ISO-8601
+     * format. For example, 2016-09-23T13:07:49.4714686-07:00.
+     *
      * @param withLocalTimestamp The local timestamp of the activity.
      */
     public void setLocalTimestamp(OffsetDateTime withLocalTimestamp) {
@@ -467,8 +501,9 @@ public class Activity {
     }
 
     /**
-     * Gets the name of the local timezone of the message, expressed in IANA Time Zone database format.
-     * For example, America/Los_Angeles.
+     * Gets the name of the local timezone of the message, expressed in IANA Time
+     * Zone database format. For example, America/Los_Angeles.
+     *
      * @return The local timezone.
      */
     public String getLocalTimezone() {
@@ -476,8 +511,9 @@ public class Activity {
     }
 
     /**
-     * Sets the name of the local timezone of the message, expressed in IANA Time Zone database format.
-     * For example, America/Los_Angeles.
+     * Sets the name of the local timezone of the message, expressed in IANA Time
+     * Zone database format. For example, America/Los_Angeles.
+     *
      * @param withLocalTimezone The local timezone.
      */
     public void setLocalTimeZone(String withLocalTimezone) {
@@ -485,9 +521,11 @@ public class Activity {
     }
 
     /**
-     * Gets a string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted
-     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
-     * that asserts the identity of the callers (e.g. tokens).
+     * Gets a string containing an IRI identifying the caller of a bot. This field
+     * is not intended to be transmitted over the wire, but is instead populated by
+     * bots and clients based on cryptographically verifiable data that asserts the
+     * identity of the callers (e.g. tokens).
+     *
      * @return The caller IRI.
      */
     public String getCallerId() {
@@ -495,9 +533,11 @@ public class Activity {
     }
 
     /**
-     * Sets the IRI identifying the caller of a bot. This field is not intended to be transmitted
-     * over the wire, but is instead populated by bots and clients based on cryptographically verifiable data
-     * that asserts the identity of the callers (e.g. tokens).
+     * Sets the IRI identifying the caller of a bot. This field is not intended to
+     * be transmitted over the wire, but is instead populated by bots and clients
+     * based on cryptographically verifiable data that asserts the identity of the
+     * callers (e.g. tokens).
+     *
      * @param withCallerId The caller id.
      */
     public void setCallerId(String withCallerId) {
@@ -505,7 +545,9 @@ public class Activity {
     }
 
     /**
-     * Sets the URL that specifies the channel's service endpoint. Set by the channel.
+     * Sets the URL that specifies the channel's service endpoint. Set by the
+     * channel.
+     *
      * @return The service URL.
      */
     public String getServiceUrl() {
@@ -513,7 +555,9 @@ public class Activity {
     }
 
     /**
-     * Sets the URL that specifies the channel's service endpoint. Set by the channel.
+     * Sets the URL that specifies the channel's service endpoint. Set by the
+     * channel.
+     *
      * @param withServiceUrl The service URL of the Activity.
      */
     public void setServiceUrl(String withServiceUrl) {
@@ -522,6 +566,7 @@ public class Activity {
 
     /**
      * Gets the ID that uniquely identifies the channel. Set by the channel.
+     *
      * @return The channel ID.
      */
     public String getChannelId() {
@@ -530,6 +575,7 @@ public class Activity {
 
     /**
      * Sets the ID that uniquely identifies the channel. Set by the channel.
+     *
      * @param withChannelId The channel ID.
      */
     public void setChannelId(String withChannelId) {
@@ -538,6 +584,7 @@ public class Activity {
 
     /**
      * Identifies the sender of the message.
+     *
      * @return The {@link ChannelAccount} of the sender.
      */
     public ChannelAccount getFrom() {
@@ -546,6 +593,7 @@ public class Activity {
 
     /**
      * Identifies the sender of the message.
+     *
      * @param withFrom The {@link ChannelAccount} of the sender.
      */
     public void setFrom(ChannelAccount withFrom) {
@@ -554,6 +602,7 @@ public class Activity {
 
     /**
      * Identifies the conversation to which the activity belongs.
+     *
      * @return The {@link ConversationAccount}.
      */
     public ConversationAccount getConversation() {
@@ -562,6 +611,7 @@ public class Activity {
 
     /**
      * Identifies the conversation to which the activity belongs.
+     *
      * @param withConversation The {@link ConversationAccount}.
      */
     public void setConversation(ConversationAccount withConversation) {
@@ -570,6 +620,7 @@ public class Activity {
 
     /**
      * Identifies the recipient of the message.
+     *
      * @return The {@link ChannelAccount} of the recipient.
      */
     public ChannelAccount getRecipient() {
@@ -578,6 +629,7 @@ public class Activity {
 
     /**
      * Identifies the recipient of the message.
+     *
      * @param withRecipient The {@link ChannelAccount} of the recipient.
      */
     public void setRecipient(ChannelAccount withRecipient) {
@@ -585,8 +637,9 @@ public class Activity {
     }
 
     /**
-     * Format of text fields Default:markdown. Possible values include:
-     * 'markdown', 'plain', 'xml'.
+     * Format of text fields Default:markdown. Possible values include: 'markdown',
+     * 'plain', 'xml'.
+     *
      * @return The TextFormatTypes type.
      */
     public TextFormatTypes getTextFormat() {
@@ -595,6 +648,7 @@ public class Activity {
 
     /**
      * Format of text fields.
+     *
      * @param withTextFormat The TextFormatTypes type.
      */
     public void setTextFormat(TextFormatTypes withTextFormat) {
@@ -603,6 +657,7 @@ public class Activity {
 
     /**
      * The layout hint for multiple attachments.
+     *
      * @return The Attachment type.
      */
     public AttachmentLayoutTypes getAttachmentLayout() {
@@ -611,6 +666,7 @@ public class Activity {
 
     /**
      * Sets the layout hint for multiple attachments.
+     *
      * @param withAttachmentLayout The attachment type.
      */
     public void setAttachmentLayout(AttachmentLayoutTypes withAttachmentLayout) {
@@ -619,6 +675,7 @@ public class Activity {
 
     /**
      * Gets the collection of reactions added to the conversation.
+     *
      * @return A List of {@link MessageReaction}.
      */
     public List<MessageReaction> getReactionsAdded() {
@@ -627,6 +684,7 @@ public class Activity {
 
     /**
      * Sets the collection of reactions added to the conversation.
+     *
      * @param withReactionsAdded A List of {@link MessageReaction}.
      */
     public void setReactionsAdded(List<MessageReaction> withReactionsAdded) {
@@ -635,6 +693,7 @@ public class Activity {
 
     /**
      * Gets the collection of reactions removed from the conversation.
+     *
      * @return A List of {@link MessageReaction}.
      */
     public List<MessageReaction> getReactionsRemoved() {
@@ -643,6 +702,7 @@ public class Activity {
 
     /**
      * Sets the collection of reactions removed from the conversation.
+     *
      * @param withReactionsRemoved A List of {@link MessageReaction}.
      */
     public void setReactionsRemoved(List<MessageReaction> withReactionsRemoved) {
@@ -650,11 +710,13 @@ public class Activity {
     }
 
     /**
-     * A locale name for the contents of the text field.
-     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
-     * and an ISO 3166 two-letter subculture code associated with a country or region.
+     * A locale name for the contents of the text field. The locale name is a
+     * combination of an ISO 639 two- or three-letter culture code associated with a
+     * language and an ISO 3166 two-letter subculture code associated with a country
+     * or region.
      * <p>
      * The locale name can also correspond to a valid BCP-47 language tag.
+     *
      * @return The content locale.
      */
     public String getLocale() {
@@ -662,11 +724,13 @@ public class Activity {
     }
 
     /**
-     * A locale name for the contents of the text field.
-     * The locale name is a combination of an ISO 639 two- or three-letter culture code associated with a language
-     * and an ISO 3166 two-letter subculture code associated with a country or region.
+     * A locale name for the contents of the text field. The locale name is a
+     * combination of an ISO 639 two- or three-letter culture code associated with a
+     * language and an ISO 3166 two-letter subculture code associated with a country
+     * or region.
      * <p>
      * The locale name can also correspond to a valid BCP-47 language tag.
+     *
      * @param withLocale The content locale.
      */
     public void setLocale(String withLocale) {
@@ -675,6 +739,7 @@ public class Activity {
 
     /**
      * Gets the text content of the message.
+     *
      * @return The text content.
      */
     public String getText() {
@@ -683,6 +748,7 @@ public class Activity {
 
     /**
      * Sets the text content of the message.
+     *
      * @param withText The text content.
      */
     public void setText(String withText) {
@@ -691,6 +757,7 @@ public class Activity {
 
     /**
      * The text to speak.
+     *
      * @return The SSML text to speak.
      */
     public String getSpeak() {
@@ -699,6 +766,7 @@ public class Activity {
 
     /**
      * Sets the text to speak.
+     *
      * @param withSpeak The SSML text to speak.
      */
     public void setSpeak(String withSpeak) {
@@ -706,8 +774,9 @@ public class Activity {
     }
 
     /**
-     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message
-     * is delivered to the client.
+     * Indicates whether your bot is accepting, expecting, or ignoring user input
+     * after the message is delivered to the client.
+     *
      * @return The input hint for the activity.
      */
     public InputHints getInputHint() {
@@ -715,8 +784,9 @@ public class Activity {
     }
 
     /**
-     * Indicates whether your bot is accepting, expecting, or ignoring user input after the message
-     * is delivered to the client.
+     * Indicates whether your bot is accepting, expecting, or ignoring user input
+     * after the message is delivered to the client.
+     *
      * @param withInputHint The input hint for the activity.
      */
     public void setInputHint(InputHints withInputHint) {
@@ -725,6 +795,7 @@ public class Activity {
 
     /**
      * Gets the text to display if the channel cannot render cards.
+     *
      * @return The summary text.
      */
     public String getSummary() {
@@ -733,6 +804,7 @@ public class Activity {
 
     /**
      * Sets the text to display if the channel cannot render cards.
+     *
      * @param withSummary The summary text.
      */
     public void setSummary(String withSummary) {
@@ -741,6 +813,7 @@ public class Activity {
 
     /**
      * Gets the suggested actions for the activity.
+     *
      * @return The SuggestedActions for the activity.
      */
     public SuggestedActions getSuggestedActions() {
@@ -749,6 +822,7 @@ public class Activity {
 
     /**
      * The suggested actions for the activity.
+     *
      * @param withSuggestedActions The SuggestedActions for the Activity.
      */
     public void setSuggestedActions(SuggestedActions withSuggestedActions) {
@@ -757,6 +831,7 @@ public class Activity {
 
     /**
      * Gets the attachments to the Activity.
+     *
      * @return A List of {@link Attachment}.
      */
     public List<Attachment> getAttachments() {
@@ -765,6 +840,7 @@ public class Activity {
 
     /**
      * Sets the attachments to the Activity.
+     *
      * @param withAttachments A List of {@link Attachment}.
      */
     public void setAttachments(List<Attachment> withAttachments) {
@@ -773,6 +849,7 @@ public class Activity {
 
     /**
      * Sets a single attachment on the Activity.
+     *
      * @param withAttachment The Attachment object.
      */
     public void setAttachment(Attachment withAttachment) {
@@ -782,16 +859,17 @@ public class Activity {
     /**
      * Returns payload version of the Entities in an Activity.
      *
-     * Entities can vary in the number of fields.  The {@link Entity} class holds the additional
-     * fields in {@link Entity#getProperties()}.
+     * Entities can vary in the number of fields. The {@link Entity} class holds the
+     * additional fields in {@link Entity#getProperties()}.
      *
      * To convert to other entity types, use {@link Entity#getAs(Class)}.
+     *
      * @see Mention
      * @see Place
      * @see GeoCoordinates
      * @see Activity#getMentions()
      *
-     * {@code
+     *      {@code
      * getEntities().stream()
      *             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
      *             .map(entity -> entity.getAs(Mention.class))
@@ -806,6 +884,7 @@ public class Activity {
 
     /**
      * Sets payload version of the Entities in an Activity.
+     *
      * @param withEntities The payload entities.
      * @see Entity
      */
@@ -815,19 +894,21 @@ public class Activity {
 
     /**
      * Sets payload version of the Mentions in an Activity.
+     *
      * @param withMentions The payload entities.
      * @see Entity
      */
     public void setMentions(List<Mention> withMentions) {
-        setEntities(withMentions.stream()
+        List<Entity> converted = withMentions.stream()
             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
             .map(entity -> Entity.getAs(entity, Entity.class))
-            .collect(Collectors.toCollection(ArrayList::new))
-        );
+            .collect(Collectors.toCollection(ArrayList::new));
+        setEntities(converted);
     }
 
     /**
      * Gets channel-specific content.
+     *
      * @return Channel specific data.
      */
     public Object getChannelData() {
@@ -836,6 +917,7 @@ public class Activity {
 
     /**
      * Sets channel-specific content.
+     *
      * @param withChannelData Channel specific data as a JsonNode.
      */
     public void setChannelData(Object withChannelData) {
@@ -844,6 +926,7 @@ public class Activity {
 
     /**
      * Gets the ID of the message to which this message is a reply.
+     *
      * @return The reply to ID.
      */
     public String getReplyToId() {
@@ -852,6 +935,7 @@ public class Activity {
 
     /**
      * Sets the ID of the message to which this message is a reply.
+     *
      * @param withReplyToId The reply to ID.
      */
     public void setReplyToId(String withReplyToId) {
@@ -859,7 +943,9 @@ public class Activity {
     }
 
     /**
-     * Gets the a code for endOfConversation activities that indicates why the conversation ended.
+     * Gets the a code for endOfConversation activities that indicates why the
+     * conversation ended.
+     *
      * @return The endOfConversation code.
      */
     public EndOfConversationCodes getCode() {
@@ -867,7 +953,9 @@ public class Activity {
     }
 
     /**
-     * Sets the a code for endOfConversation activities that indicates why the conversation ended.
+     * Sets the a code for endOfConversation activities that indicates why the
+     * conversation ended.
+     *
      * @param withCode The endOfConversation code.
      */
     public void setCode(EndOfConversationCodes withCode) {
@@ -875,8 +963,9 @@ public class Activity {
     }
 
     /**
-     * Gets the time at which the activity should be considered to be expired and should not be
-     * presented to the recipient.
+     * Gets the time at which the activity should be considered to be expired and
+     * should not be presented to the recipient.
+     *
      * @return the activity expiration.
      */
     public LocalDateTime getExpiration() {
@@ -884,8 +973,9 @@ public class Activity {
     }
 
     /**
-     * Sets the time at which the activity should be considered to be expired and should not be
-     * presented to the recipient.
+     * Sets the time at which the activity should be considered to be expired and
+     * should not be presented to the recipient.
+     *
      * @param withExpiration The activity expiration.
      */
     public void setExpiration(LocalDateTime withExpiration) {
@@ -894,6 +984,7 @@ public class Activity {
 
     /**
      * Gets the importance of the activity.
+     *
      * @return The activity importance.
      */
     public String getImportance() {
@@ -902,6 +993,7 @@ public class Activity {
 
     /**
      * Sets the importance of the activity.
+     *
      * @param withImportance The activity importance.
      */
     public void setImportance(String withImportance) {
@@ -909,9 +1001,11 @@ public class Activity {
     }
 
     /**
-     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
+     * A delivery hint to signal to the recipient alternate delivery paths for the
+     * activity.
      * <p>
      * The default delivery mode is \"default\".
+     *
      * @return The delivery mode hint.
      */
     public String getDeliveryMode() {
@@ -919,9 +1013,11 @@ public class Activity {
     }
 
     /**
-     * A delivery hint to signal to the recipient alternate delivery paths for the activity.
+     * A delivery hint to signal to the recipient alternate delivery paths for the
+     * activity.
      * <p>
      * The default delivery mode is \"default\".
+     *
      * @param withDeliveryMode The delivery mode hint.
      */
     public void setDeliveryMode(String withDeliveryMode) {
@@ -929,7 +1025,9 @@ public class Activity {
     }
 
     /**
-     * Gets the list of phrases and references that speech and language priming systems should listen for.
+     * Gets the list of phrases and references that speech and language priming
+     * systems should listen for.
+     *
      * @return List of phrases to listen for.
      */
     public List<String> getListenFor() {
@@ -937,7 +1035,9 @@ public class Activity {
     }
 
     /**
-     * Sets the list of phrases and references that speech and language priming systems should listen for.
+     * Sets the list of phrases and references that speech and language priming
+     * systems should listen for.
+     *
      * @param withListenFor List of phrases to listen for.
      */
     public void setListenFor(List<String> withListenFor) {
@@ -945,7 +1045,9 @@ public class Activity {
     }
 
     /**
-     * Gets the collection of text fragments to highlight when the activity contains a ReplyToId value.
+     * Gets the collection of text fragments to highlight when the activity contains
+     * a ReplyToId value.
+     *
      * @return List of {@link TextHighlight}.
      */
     public List<TextHighlight> getTextHighlights() {
@@ -953,7 +1055,9 @@ public class Activity {
     }
 
     /**
-     * Sets the collection of text fragments to highlight when the activity contains a ReplyToId value.
+     * Sets the collection of text fragments to highlight when the activity contains
+     * a ReplyToId value.
+     *
      * @param withTextHighlights List of {@link TextHighlight}.
      */
     public void setTextHighlights(List<TextHighlight> withTextHighlights) {
@@ -961,9 +1065,9 @@ public class Activity {
     }
 
     /**
-     * Holds the overflow properties that aren't first class
-     * properties in the object.  This allows extensibility
-     * while maintaining the object.
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
+     *
      * @return Map of additional properties.
      */
     @JsonAnyGetter
@@ -972,10 +1076,10 @@ public class Activity {
     }
 
     /**
-     * Holds the overflow properties that aren't first class
-     * properties in the object.  This allows extensibility
-     * while maintaining the object.
-     * @param key The key of the property to set.
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
+     *
+     * @param key       The key of the property to set.
      * @param withValue The value for the property.
      */
     @JsonAnySetter
@@ -985,6 +1089,7 @@ public class Activity {
 
     /**
      * Gets the updated topic name of the conversation.
+     *
      * @return The topic name.
      */
     public String getTopicName() {
@@ -993,6 +1098,7 @@ public class Activity {
 
     /**
      * Sets the updated topic name of the conversation.
+     *
      * @param withTopicName The topic name.
      */
     public void setTopicName(String withTopicName) {
@@ -1001,6 +1107,7 @@ public class Activity {
 
     /**
      * Gets whether the prior history of the channel is disclosed.
+     *
      * @return True if the history is disclosed.
      */
     public boolean getHistoryDisclosed() {
@@ -1009,6 +1116,7 @@ public class Activity {
 
     /**
      * Sets whether the prior history of the channel is disclosed.
+     *
      * @param withHistoryDisclosed True if the history is disclosed.
      */
     public void setHistoryDisclosed(boolean withHistoryDisclosed) {
@@ -1017,6 +1125,7 @@ public class Activity {
 
     /**
      * Gets the collection of members added to the conversation.
+     *
      * @return List of {@link ChannelAccount} of added members.
      */
     public List<ChannelAccount> getMembersAdded() {
@@ -1025,6 +1134,7 @@ public class Activity {
 
     /**
      * Sets the collection of members added to the conversation.
+     *
      * @param withMembersAdded List of {@link ChannelAccount} of added members.
      */
     public void setMembersAdded(List<ChannelAccount> withMembersAdded) {
@@ -1033,6 +1143,7 @@ public class Activity {
 
     /**
      * Gets the collection of members removed from the conversation.
+     *
      * @return List of {@link ChannelAccount} of removed members.
      */
     public List<ChannelAccount> getMembersRemoved() {
@@ -1041,6 +1152,7 @@ public class Activity {
 
     /**
      * Sets the collection of members removed from the conversation.
+     *
      * @param withMembersRemoved List of {@link ChannelAccount} of removed members.
      */
     public void setMembersRemoved(List<ChannelAccount> withMembersRemoved) {
@@ -1049,6 +1161,7 @@ public class Activity {
 
     /**
      * Gets the descriptive label for the activity.
+     *
      * @return The activity label.
      */
     public String getLabel() {
@@ -1057,6 +1170,7 @@ public class Activity {
 
     /**
      * Sets the descriptive label for the activity.
+     *
      * @param withLabel The activity label.
      */
     public void setLabel(String withLabel) {
@@ -1065,6 +1179,7 @@ public class Activity {
 
     /**
      * Gets the type of the activity's value object.
+     *
      * @return The value type.
      */
     public String getValueType() {
@@ -1073,6 +1188,7 @@ public class Activity {
 
     /**
      * Sets the type of the activity's value object.
+     *
      * @param withValueType The type of Activity value.
      */
     public void setValueType(String withValueType) {
@@ -1081,6 +1197,7 @@ public class Activity {
 
     /**
      * Gets the value that is associated with the activity.
+     *
      * @return The Activity value.
      */
     public Object getValue() {
@@ -1089,7 +1206,8 @@ public class Activity {
 
     /**
      * Sets the value that is associated with the activity.
-     * @param withValue  The Activity value.
+     *
+     * @param withValue The Activity value.
      */
     public void setValue(Object withValue) {
         this.value = withValue;
@@ -1097,6 +1215,7 @@ public class Activity {
 
     /**
      * Gets the name of the operation associated with an invoke or event activity.
+     *
      * @return The Activity name.
      */
     public String getName() {
@@ -1105,6 +1224,7 @@ public class Activity {
 
     /**
      * Sets the name of the operation associated with an invoke or event activity.
+     *
      * @param withName The Activity name.
      */
     public void setName(String withName) {
@@ -1113,6 +1233,7 @@ public class Activity {
 
     /**
      * A reference to another conversation or activity.
+     *
      * @return The conversation reference.
      */
     public ConversationReference getRelatesTo() {
@@ -1121,6 +1242,7 @@ public class Activity {
 
     /**
      * A reference to another conversation or activity.
+     *
      * @param withRelatesTo The conversation reference.
      */
     public void setRelatesTo(ConversationReference withRelatesTo) {
@@ -1128,7 +1250,9 @@ public class Activity {
     }
 
     /**
-     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
+     * Indicates whether the recipient of a contactRelationUpdate was added or
+     * removed from the sender's contact list.
+     *
      * @return Recipient action.
      */
     public String getAction() {
@@ -1136,7 +1260,9 @@ public class Activity {
     }
 
     /**
-     * Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
+     * Indicates whether the recipient of a contactRelationUpdate was added or
+     * removed from the sender's contact list.
+     *
      * @param withAction Recipient action.
      */
     public void setAction(String withAction) {
@@ -1144,7 +1270,8 @@ public class Activity {
     }
 
     /**
-     * Creates an instance of the Activity class as type {@link ActivityTypes#TRACE}.
+     * Creates an instance of the Activity class as type
+     * {@link ActivityTypes#TRACE}.
      *
      * @param withName The name of the trace operation to create.
      * @return >The new trace activity.
@@ -1154,16 +1281,22 @@ public class Activity {
     }
 
     /**
-     * Creates an instance of the Activity class as type {@link ActivityTypes#TRACE}.
+     * Creates an instance of the Activity class as type
+     * {@link ActivityTypes#TRACE}.
      *
-     * @param withName The name of the trace operation to create.
-     * @param withValue Optional, the content for this trace operation.
-     * @param withValueType Optional, identifier for the format of withValue. Default is the name of type of
-     *                      the withValue.
-     * @param withLabel Optional, a descriptive label for this trace operation.
+     * @param withName      The name of the trace operation to create.
+     * @param withValue     Optional, the content for this trace operation.
+     * @param withValueType Optional, identifier for the format of withValue.
+     *                      Default is the name of type of the withValue.
+     * @param withLabel     Optional, a descriptive label for this trace operation.
      * @return >The new trace activity.
      */
-    public Activity createTrace(String withName, Object withValue, String withValueType, String withLabel) {
+    public Activity createTrace(
+        String withName,
+        Object withValue,
+        String withValueType,
+        String withLabel
+    ) {
         Activity reply = new Activity(ActivityTypes.TRACE);
 
         reply.setName(withName);
@@ -1179,13 +1312,16 @@ public class Activity {
         if (this.getRecipient() == null) {
             reply.setFrom(new ChannelAccount());
         } else {
-            reply.setFrom(new ChannelAccount(this.getRecipient().getId(), this.getRecipient().getName()));
+            reply.setFrom(
+                new ChannelAccount(this.getRecipient().getId(), this.getRecipient().getName())
+            );
         }
 
         if (this.getFrom() == null) {
             reply.setRecipient(new ChannelAccount());
         } else {
-            reply.setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
+            reply
+                .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
         reply.setReplyToId(this.getId());
@@ -1193,10 +1329,13 @@ public class Activity {
         reply.setChannelId(this.getChannelId());
 
         if (this.getConversation() != null) {
-            reply.setConversation(new ConversationAccount(
-                this.getConversation().isGroup(),
-                this.getConversation().getId(),
-                this.getConversation().getName()));
+            reply.setConversation(
+                new ConversationAccount(
+                    this.getConversation().isGroup(),
+                    this.getConversation().getId(),
+                    this.getConversation().getName()
+                )
+            );
         }
 
         return reply;
@@ -1204,6 +1343,7 @@ public class Activity {
 
     /**
      * Creates a new message activity as a response to this activity.
+     *
      * @return The new message activity.
      */
     public Activity createReply() {
@@ -1215,7 +1355,7 @@ public class Activity {
      *
      * This overload uses this Activity's Locale.
      *
-     * @param withText   The text of the reply.
+     * @param withText The text of the reply.
      * @return The new message activity.
      */
     public Activity createReply(String withText) {
@@ -1238,17 +1378,16 @@ public class Activity {
         if (this.getRecipient() == null) {
             result.setFrom(new ChannelAccount());
         } else {
-            result.setFrom(new ChannelAccount(
-                this.getRecipient().getId(),
-                this.getRecipient().getName()));
+            result.setFrom(
+                new ChannelAccount(this.getRecipient().getId(), this.getRecipient().getName())
+            );
         }
 
         if (this.getFrom() == null) {
             result.setRecipient(new ChannelAccount());
         } else {
-            result.setRecipient(new ChannelAccount(
-                this.getFrom().getId(),
-                this.getFrom().getName()));
+            result
+                .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
         result.setReplyToId(this.getId());
@@ -1258,10 +1397,13 @@ public class Activity {
         if (this.getConversation() == null) {
             result.setConversation(new ConversationAccount());
         } else {
-            result.setConversation(new ConversationAccount(
-                this.getConversation().isGroup(),
-                this.getConversation().getId(),
-                this.getConversation().getName()));
+            result.setConversation(
+                new ConversationAccount(
+                    this.getConversation().isGroup(),
+                    this.getConversation().getId(),
+                    this.getConversation().getName()
+                )
+            );
         }
 
         result.setAttachments(new ArrayList<>());
@@ -1273,7 +1415,8 @@ public class Activity {
     /**
      * Checks if this (message) activity has content.
      *
-     * @return Returns true, if this message has any content to send. False otherwise.
+     * @return Returns true, if this message has any content to send. False
+     *         otherwise.
      */
     public boolean hasContent() {
         if (!StringUtils.isBlank(this.getText())) {
@@ -1294,8 +1437,9 @@ public class Activity {
     /**
      * Resolves the mentions from the entities of this activity.
      *
-     * This method is defined on the <see cref="Activity"/> class, but is only intended for use with a
-     * message activity, where the activity {@link Activity#type} is set to {@link ActivityTypes#MESSAGE}.
+     * This method is defined on the <see cref="Activity"/> class, but is only
+     * intended for use with a message activity, where the activity
+     * {@link Activity#type} is set to {@link ActivityTypes#MESSAGE}.
      *
      * @return The array of mentions; or an empty array, if none are found.
      */
@@ -1305,7 +1449,8 @@ public class Activity {
             return Collections.emptyList();
         }
 
-        return this.getEntities().stream()
+        return this.getEntities()
+            .stream()
             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
             .map(entity -> entity.getAs(Mention.class))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -1315,9 +1460,10 @@ public class Activity {
      * Get channelData as typed structure.
      *
      * @param classType Class of TypeT to use
-     * @param <TypeT> The type of the returned object.
+     * @param <TypeT>   The type of the returned object.
      * @return typed Object or default(TypeT)
-     * @throws JsonProcessingException If the channel data can't be converted to TypeT.
+     * @throws JsonProcessingException If the channel data can't be converted to
+     *                                 TypeT.
      */
     public <TypeT> TypeT getChannelData(Class<TypeT> classType) throws JsonProcessingException {
         if (this.getChannelData() == null) {
@@ -1354,42 +1500,50 @@ public class Activity {
 
     /**
      * Creates a {@link ConversationReference} based on this activity.
-     * @return A conversation reference for the conversation that contains this activity.
+     *
+     * @return A conversation reference for the conversation that contains this
+     *         activity.
      */
     @JsonIgnore
     public ConversationReference getConversationReference() {
-        return new ConversationReference() {{
-            setActivityId(Activity.this.getId());
-            setUser(Activity.this.getFrom());
-            setBot(Activity.this.getRecipient());
-            setConversation(Activity.this.getConversation());
-            setChannelId(Activity.this.getChannelId());
-            setServiceUrl(Activity.this.getServiceUrl());
-        }};
+        return new ConversationReference() {
+            {
+                setActivityId(Activity.this.getId());
+                setUser(Activity.this.getFrom());
+                setBot(Activity.this.getRecipient());
+                setConversation(Activity.this.getConversation());
+                setChannelId(Activity.this.getChannelId());
+                setServiceUrl(Activity.this.getServiceUrl());
+            }
+        };
     }
 
     /**
-     * Create a ConversationReference based on this Activity's Conversation info and the ResourceResponse
-     * from sending an activity.
+     * Create a ConversationReference based on this Activity's Conversation info and
+     * the ResourceResponse from sending an activity.
+     *
      * @param reply ResourceResponse returned from sendActivity.
-     * @return A ConversationReference that can be stored and used later to delete or update the activity.
+     * @return A ConversationReference that can be stored and used later to delete
+     *         or update the activity.
      */
     @JsonIgnore
     public ConversationReference getReplyConversationReference(ResourceResponse reply) {
         ConversationReference reference = getConversationReference();
         reference.setActivityId(reply.getId());
-        return  reference;
+        return reference;
     }
 
     /**
      * True if the Activity is of the specified activity type.
+     *
      * @param activityType The type to compare to.
      * @return true if the activity is of the specific type.
      */
     protected boolean isActivity(String activityType) {
         String thisType = getType();
 
-        // If there's no type set then we can't tell if it's the type they're looking for
+        // If there's no type set then we can't tell if it's the type they're looking
+        // for
         if (thisType == null) {
             return false;
         }
@@ -1397,18 +1551,19 @@ public class Activity {
         // Check if the full type value starts with the type they're looking for
         boolean result = StringUtils.startsWith(thisType.toLowerCase(), activityType.toLowerCase());
 
-        // If the full type value starts with the type they're looking for, then we need to check a little further
+        // If the full type value starts with the type they're looking for, then we need
+        // to check a little further
         // to check if it's definitely the right type
         if (result) {
             // If the lengths are equal, then it's the exact type they're looking for
             result = thisType.length() == activityType.length();
 
             if (!result) {
-                // Finally, if the type is longer than the type they're looking for then we need to check if there's
+                // Finally, if the type is longer than the type they're looking for then we need
+                // to check if there's
                 // a / separator right after the type they're looking for
                 result = thisType.length() > activityType.length()
-                    &&
-                    thisType.indexOf(activityType.length()) == '/';
+                    && thisType.indexOf(activityType.length()) == '/';
             }
         }
 
@@ -1416,7 +1571,8 @@ public class Activity {
     }
 
     /**
-     * Updates this activity with the outgoing delivery information from an existing {@link ConversationReference}.
+     * Updates this activity with the outgoing delivery information from an existing
+     * {@link ConversationReference}.
      *
      * @param reference The existing conversation reference.
      * @return This activity, updated with the delivery information.
@@ -1426,17 +1582,22 @@ public class Activity {
     }
 
     /**
-     * Updates this activity with the delivery information from an existing {@link ConversationReference}.
+     * Updates this activity with the delivery information from an existing
+     * {@link ConversationReference}.
      *
-     * Call {@link #getConversationReference} on an incoming activity to get a conversation reference that you
-     * can then use to update an outgoing activity with the correct delivery information.
+     * Call {@link #getConversationReference} on an incoming activity to get a
+     * conversation reference that you can then use to update an outgoing activity
+     * with the correct delivery information.
      *
-     * @param reference The existing conversation reference.
-     * @param isIncoming true to treat the activity as an incoming activity, where the bot is the recipient;
-     *                   otherwise, false.
+     * @param reference  The existing conversation reference.
+     * @param isIncoming true to treat the activity as an incoming activity, where
+     *                   the bot is the recipient; otherwise, false.
      * @return This activity, updated with the delivery information.
      */
-    public final Activity applyConversationReference(ConversationReference reference, boolean isIncoming) {
+    public final Activity applyConversationReference(
+        ConversationReference reference,
+        boolean isIncoming
+    ) {
         this.setChannelId(reference.getChannelId());
         this.setServiceUrl(reference.getServiceUrl());
         this.setConversation(reference.getConversation());
@@ -1459,8 +1620,8 @@ public class Activity {
     }
 
     /**
-     * Remove recipient mention text from Text property.
-     * Use with caution because this function is altering the text on the Activity.
+     * Remove recipient mention text from Text property. Use with caution because
+     * this function is altering the text on the Activity.
      *
      * @return new .Text property value.
      */
@@ -1473,17 +1634,19 @@ public class Activity {
     }
 
     /**
-     * Remove any mention text for given id from the Activity.Text property.  For example, given the message
-     * "@echoBot Hi Bot", this will remove "@echoBot", leaving "Hi Bot".
+     * Remove any mention text for given id from the Activity.Text property. For
+     * example, given the message "@echoBot Hi Bot", this will remove "@echoBot",
+     * leaving "Hi Bot".
      *
-     * Typically this would be used to remove the mention text for the target recipient (the bot usually), though
-     * it could be called for each member.  For example:
-     *     turnContext.Activity.RemoveMentionText(turnContext.Activity.Recipient.Id);
-     * The format of a mention Activity.Entity is dependent on the Channel.  But in all cases we
-     * expect the Mention.Text to contain the exact text for the user as it appears in
-     * Activity.Text.
-     * For example, Teams uses &lt;at&gt;username&lt;/at&gt;, whereas slack use @username. It
-     * is expected that text is in Activity.Text and this method will remove that value from
+     * Typically this would be used to remove the mention text for the target
+     * recipient (the bot usually), though it could be called for each member. For
+     * example:
+     * turnContext.Activity.RemoveMentionText(turnContext.Activity.Recipient.Id);
+     * The format of a mention Activity.Entity is dependent on the Channel. But in
+     * all cases we expect the Mention.Text to contain the exact text for the user
+     * as it appears in Activity.Text. For example, Teams uses
+     * &lt;at&gt;username&lt;/at&gt;, whereas slack use @username. It is expected
+     * that text is in Activity.Text and this method will remove that value from
      * Activity.Text.
      *
      * @param withId Mention id to match.
@@ -1496,6 +1659,7 @@ public class Activity {
 
     /**
      * Removes recipient mention without modifying the Activity.
+     *
      * @param activity The Activity to remove mentions from.
      * @return The Activity.Text with mentions removed.
      */
@@ -1509,8 +1673,9 @@ public class Activity {
 
     /**
      * Removes the mention from the Activity.Text without modifying the Activity.
+     *
      * @param activity The Activity to remove mention text on.
-     * @param id The ID of the recipient.
+     * @param id       The ID of the recipient.
      * @return The Activity.Text with the mention removed.
      */
     public static String removeMentionTextImmutable(Activity activity, String id) {
@@ -1540,6 +1705,7 @@ public class Activity {
 
     /**
      * Check if this actvity is from microsoft teams.
+     *
      * @return true if the activity is from microsoft teams.
      */
     public boolean isTeamsActivity() {
@@ -1548,7 +1714,9 @@ public class Activity {
 
     /**
      * Get unique identifier representing a channel.
-     * @return If this is a Teams Activity with valid data, the unique identifier representing a channel.
+     *
+     * @return If this is a Teams Activity with valid data, the unique identifier
+     *         representing a channel.
      */
     public String teamsGetChannelId() {
         String teamsChannelId;
@@ -1568,13 +1736,19 @@ public class Activity {
 
     /**
      * Get unique identifier representing a team.
-     * @return If this is a Teams Activity with valid data, the unique identifier representing a team.
+     *
+     * @return If this is a Teams Activity with valid data, the unique identifier
+     *         representing a team.
      */
     public String teamsGetTeamId() {
         String teamId;
 
         try {
             TeamsChannelData teamsChannelData = getChannelData(TeamsChannelData.class);
+            if (teamsChannelData == null) {
+                return null;
+            }
+
             teamId = teamsChannelData.getTeamsTeamId();
             if (teamId == null && teamsChannelData.getTeam() != null) {
                 teamId = teamsChannelData.getTeam().getId();
@@ -1588,6 +1762,7 @@ public class Activity {
 
     /**
      * Get Teams TeamInfo data.
+     *
      * @return If this is a Teams Activity with valid data, the TeamInfo object.
      */
     public TeamInfo teamsGetTeamInfo() {

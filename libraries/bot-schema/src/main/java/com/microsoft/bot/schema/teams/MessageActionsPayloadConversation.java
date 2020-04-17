@@ -19,8 +19,9 @@ public class MessageActionsPayloadConversation {
     private String displayName;
 
     /**
-     * Gets the type of conversation, whether a team or channel.
-     * Possible values include: 'team', 'channel'
+     * Gets the type of conversation, whether a team or channel. Possible values
+     * include: 'team', 'channel'
+     * 
      * @return The type of conversation.
      */
     public String getConversationIdentityType() {
@@ -28,8 +29,9 @@ public class MessageActionsPayloadConversation {
     }
 
     /**
-     * Sets the type of conversation, whether a team or channel.
-     * Possible values include: 'team', 'channel'
+     * Sets the type of conversation, whether a team or channel. Possible values
+     * include: 'team', 'channel'
+     * 
      * @param withConversationIdentityType The type of the conversation.
      */
     public void setConversationIdentityType(String withConversationIdentityType) {
@@ -38,6 +40,7 @@ public class MessageActionsPayloadConversation {
 
     /**
      * Gets the id of the team or channel.
+     * 
      * @return The id of the team or channel.
      */
     public String getId() {
@@ -46,6 +49,7 @@ public class MessageActionsPayloadConversation {
 
     /**
      * Sets the id of the team or channel.
+     * 
      * @param withId The id of the team or channel.
      */
     public void setId(String withId) {
@@ -54,6 +58,7 @@ public class MessageActionsPayloadConversation {
 
     /**
      * Gets the plaintext display name of the team or channel entity.
+     * 
      * @return The display name.
      */
     public String getDisplayName() {
@@ -62,6 +67,7 @@ public class MessageActionsPayloadConversation {
 
     /**
      * Sets the plaintext display name of the team or channel entity.
+     * 
      * @param withDisplayName The display name.
      */
     public void setDisplayName(String withDisplayName) {

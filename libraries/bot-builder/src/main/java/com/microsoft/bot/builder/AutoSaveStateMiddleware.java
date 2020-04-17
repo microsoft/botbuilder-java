@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Middleware to automatically call .SaveChanges() at the end of the turn for all BotState class it is managing.
+ * Middleware to automatically call .SaveChanges() at the end of the turn for
+ * all BotState class it is managing.
  */
 public class AutoSaveStateMiddleware implements Middleware {
     /**
@@ -67,15 +68,16 @@ public class AutoSaveStateMiddleware implements Middleware {
     }
 
     /**
-     * Middleware implementation which calls savesChanges automatically at the end of the turn.
+     * Middleware implementation which calls savesChanges automatically at the end
+     * of the turn.
      *
      * @param turnContext The context object for this turn.
-     * @param next        The delegate to call to continue the bot middleware pipeline.
+     * @param next        The delegate to call to continue the bot middleware
+     *                    pipeline.
      * @return A task representing the asynchronous operation.
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
-        return next.next()
-            .thenCompose(result -> botStateSet.saveAllChanges(turnContext));
+        return next.next().thenCompose(result -> botStateSet.saveAllChanges(turnContext));
     }
 }

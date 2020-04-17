@@ -21,20 +21,25 @@ public class TestFlow {
     final TestAdapter adapter;
     CompletableFuture<Void> testTask;
     BotCallbackHandler callback;
-    //ArrayList<Supplier<String>> tasks = new ArrayList<Supplier<String>>();
+    // ArrayList<Supplier<String>> tasks = new ArrayList<Supplier<String>>();
 
     public TestFlow(TestAdapter adapter) {
         this(adapter, null);
     }
 
-    public TestFlow(TestAdapter adapter, BotCallbackHandler callback) {
+    public TestFlow(
+        TestAdapter adapter,
+        BotCallbackHandler callback
+    ) {
         this.adapter = adapter;
         this.callback = callback;
         this.testTask = CompletableFuture.completedFuture(null);
     }
 
-
-    public TestFlow(CompletableFuture<Void> testTask, TestFlow flow) {
+    public TestFlow(
+        CompletableFuture<Void> testTask,
+        TestFlow flow
+    ) {
         this.testTask = testTask == null ? CompletableFuture.completedFuture(null) : testTask;
         this.callback = flow.callback;
         this.adapter = flow.adapter;
@@ -59,12 +64,12 @@ public class TestFlow {
         if (userSays == null)
             throw new IllegalArgumentException("You have to pass a userSays parameter");
 
-        return new TestFlow(
-            testTask
-            .thenCompose(result -> {
-                System.out.print(String.format("USER SAYS: %s (tid: %s)\n", userSays, Thread.currentThread().getId()));
-                return this.adapter.sendTextToBot(userSays, this.callback);
-            }), this);
+        return new TestFlow(testTask.thenCompose(result -> {
+            System.out.print(
+                String.format("USER SAYS: %s (tid: %s)\n", userSays, Thread.currentThread().getId())
+            );
+            return this.adapter.sendTextToBot(userSays, this.callback);
+        }), this);
     }
 
     /**
@@ -77,12 +82,14 @@ public class TestFlow {
         if (userActivity == null)
             throw new IllegalArgumentException("You have to pass an Activity");
 
-        return new TestFlow(
-            testTask.thenCompose(result -> {
-                System.out.printf("TestFlow: Send with User Activity! %s (tid:%s)", userActivity.getText(), Thread.currentThread().getId());
-                return this.adapter.processActivity(userActivity, this.callback);
-            }
-        ), this);
+        return new TestFlow(testTask.thenCompose(result -> {
+            System.out.printf(
+                "TestFlow: Send with User Activity! %s (tid:%s)",
+                userActivity.getText(),
+                Thread.currentThread().getId()
+            );
+            return this.adapter.processActivity(userActivity, this.callback);
+        }), this);
     }
 
     /**
@@ -92,18 +99,20 @@ public class TestFlow {
      * @return
      */
     public TestFlow delay(int ms) {
-        return new TestFlow(
-            testTask
-            .thenCompose(result -> {
-                System.out.printf("TestFlow: Delay(%s ms) called. (tid:%s)\n", ms, Thread.currentThread().getId());
-                System.out.flush();
-                try {
-                    Thread.sleep(ms);
-                } catch (InterruptedException e) {
+        return new TestFlow(testTask.thenCompose(result -> {
+            System.out.printf(
+                "TestFlow: Delay(%s ms) called. (tid:%s)\n",
+                ms,
+                Thread.currentThread().getId()
+            );
+            System.out.flush();
+            try {
+                Thread.sleep(ms);
+            } catch (InterruptedException e) {
 
-                }
-                return CompletableFuture.completedFuture(null);
-            }), this);
+            }
+            return CompletableFuture.completedFuture(null);
+        }), this);
     }
 
     /**
@@ -144,9 +153,21 @@ public class TestFlow {
             description = Thread.currentThread().getStackTrace()[1].getMethodName();
         return this.assertReply((reply) -> {
             if (!StringUtils.equals(expected.getType(), reply.getType()))
-                throw new RuntimeException(String.format("Type: '%s' should match expected '%s'", reply.getType(), expected.getType()));
+                throw new RuntimeException(
+                    String.format(
+                        "Type: '%s' should match expected '%s'",
+                        reply.getType(),
+                        expected.getType()
+                    )
+                );
             if (!expected.getText().equals(reply.getText())) {
-                throw new RuntimeException(String.format("Text '%s' should match expected '%s'", reply.getText(), expected.getText()));
+                throw new RuntimeException(
+                    String.format(
+                        "Text '%s' should match expected '%s'",
+                        reply.getText(),
+                        expected.getText()
+                    )
+                );
             }
         }, description, timeout);
     }
@@ -157,65 +178,88 @@ public class TestFlow {
      * @param validateActivity
      * @return
      */
-    public TestFlow assertReply(Consumer<Activity>  validateActivity) {
+    public TestFlow assertReply(Consumer<Activity> validateActivity) {
         String description = Thread.currentThread().getStackTrace()[1].getMethodName();
         return assertReply(validateActivity, description, 3000);
     }
 
-    public TestFlow assertReply(Consumer<Activity>  validateActivity, String description) {
+    public TestFlow assertReply(Consumer<Activity> validateActivity, String description) {
         return assertReply(validateActivity, description, 3000);
     }
 
-    public TestFlow assertReply(Consumer<Activity> validateActivity, String description, int timeout) {
-        return new TestFlow(testTask
-            .thenApply(result -> {
-                System.out.println(String.format("AssertReply: Starting loop : %s (tid:%s)", description, Thread.currentThread().getId()));
-                System.out.flush();
+    public TestFlow assertReply(
+        Consumer<Activity> validateActivity,
+        String description,
+        int timeout
+    ) {
+        return new TestFlow(testTask.thenApply(result -> {
+            System.out.println(
+                String.format(
+                    "AssertReply: Starting loop : %s (tid:%s)",
+                    description,
+                    Thread.currentThread().getId()
+                )
+            );
+            System.out.flush();
 
-                int finalTimeout = Integer.MAX_VALUE;
-                if (isDebug())
-                    finalTimeout = Integer.MAX_VALUE;
+            int finalTimeout = Integer.MAX_VALUE;
+            if (isDebug())
+                finalTimeout = Integer.MAX_VALUE;
 
-                long start = System.currentTimeMillis();
-                while (true) {
-                    long current = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
+            while (true) {
+                long current = System.currentTimeMillis();
 
-                    if ((current - start) > (long) finalTimeout) {
-                        System.out.println("AssertReply: Timeout!\n");
-                        System.out.flush();
-                        throw new RuntimeException(String.format("%d ms Timed out waiting for:'%s'", finalTimeout, description));
-                    }
+                if ((current - start) > (long) finalTimeout) {
+                    System.out.println("AssertReply: Timeout!\n");
+                    System.out.flush();
+                    throw new RuntimeException(
+                        String.format("%d ms Timed out waiting for:'%s'", finalTimeout, description)
+                    );
+                }
 
-                    //                System.out.println("Before GetNextReply\n");
-                    //                System.out.flush();
+                // System.out.println("Before GetNextReply\n");
+                // System.out.flush();
 
-                    Activity replyActivity = this.adapter.getNextReply();
-                    //                System.out.println("After GetNextReply\n");
-                    //                System.out.flush();
+                Activity replyActivity = this.adapter.getNextReply();
+                // System.out.println("After GetNextReply\n");
+                // System.out.flush();
 
-                    if (replyActivity != null) {
-                        System.out.printf("AssertReply: Received Reply (tid:%s)", Thread.currentThread().getId());
-                        System.out.flush();
-                        System.out.printf("\n =============\n From: %s\n To:%s\n Text:%s\n ==========\n",
-                            (replyActivity.getFrom() == null) ? "No from set" : replyActivity.getFrom().getName(),
-                            (replyActivity.getRecipient() == null) ? "No recipient set" : replyActivity.getRecipient().getName(),
-                            (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText());
-                        System.out.flush();
+                if (replyActivity != null) {
+                    System.out.printf(
+                        "AssertReply: Received Reply (tid:%s)",
+                        Thread.currentThread().getId()
+                    );
+                    System.out.flush();
+                    System.out.printf(
+                        "\n =============\n From: %s\n To:%s\n Text:%s\n ==========\n",
+                        (replyActivity.getFrom() == null)
+                            ? "No from set"
+                            : replyActivity.getFrom().getName(),
+                        (replyActivity.getRecipient() == null)
+                            ? "No recipient set"
+                            : replyActivity.getRecipient().getName(),
+                        (replyActivity.getText() == null) ? "No Text set" : replyActivity.getText()
+                    );
+                    System.out.flush();
 
-                        // if we have a reply
-                        validateActivity.accept(replyActivity);
-                        return null;
-                    } else {
-                        System.out.printf("AssertReply(tid:%s): Waiting..\n", Thread.currentThread().getId());
-                        System.out.flush();
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    // if we have a reply
+                    validateActivity.accept(replyActivity);
+                    return null;
+                } else {
+                    System.out.printf(
+                        "AssertReply(tid:%s): Waiting..\n",
+                        Thread.currentThread().getId()
+                    );
+                    System.out.flush();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
-            }), this);
+            }
+        }), this);
     }
 
     // Hack to determine if debugger attached..
@@ -228,7 +272,6 @@ public class TestFlow {
         return false;
     }
 
-
     /**
      * @param userSays
      * @param expected
@@ -238,12 +281,18 @@ public class TestFlow {
         String result = null;
         try {
 
-            result = CompletableFuture.supplyAsync(() -> {  // Send the message
+            result = CompletableFuture.supplyAsync(() -> { // Send the message
 
                 if (userSays == null)
                     throw new IllegalArgumentException("You have to pass a userSays parameter");
 
-                System.out.print(String.format("TestTurn(%s): USER SAYS: %s \n", Thread.currentThread().getId(), userSays));
+                System.out.print(
+                    String.format(
+                        "TestTurn(%s): USER SAYS: %s \n",
+                        Thread.currentThread().getId(),
+                        userSays
+                    )
+                );
                 System.out.flush();
 
                 try {
@@ -253,59 +302,93 @@ public class TestFlow {
                     return e.getMessage();
                 }
 
-            }, ExecutorFactory.getExecutor())
-                .thenApply(arg -> { // Assert Reply
-                    int finalTimeout = Integer.MAX_VALUE;
-                    if (isDebug())
-                        finalTimeout = Integer.MAX_VALUE;
-                    Function<Activity, String> validateActivity = activity -> {
-                        if (activity.getText().equals(expected)) {
-                            System.out.println(String.format("TestTurn(tid:%s): Validated text is: %s", Thread.currentThread().getId(), expected));
-                            System.out.flush();
-
-                            return "SUCCESS";
-                        }
-                        System.out.println(String.format("TestTurn(tid:%s): Failed validate text is: %s", Thread.currentThread().getId(), expected));
+            }, ExecutorFactory.getExecutor()).thenApply(arg -> { // Assert Reply
+                int finalTimeout = Integer.MAX_VALUE;
+                if (isDebug())
+                    finalTimeout = Integer.MAX_VALUE;
+                Function<Activity, String> validateActivity = activity -> {
+                    if (activity.getText().equals(expected)) {
+                        System.out.println(
+                            String.format(
+                                "TestTurn(tid:%s): Validated text is: %s",
+                                Thread.currentThread().getId(),
+                                expected
+                            )
+                        );
                         System.out.flush();
 
-                        return String.format("FAIL: %s received in Activity.text (%s expected)", activity.getText(), expected);
-                    };
-
-
-                    System.out.println(String.format("TestTurn(tid:%s): Started receive loop: %s", Thread.currentThread().getId(), description));
-                    System.out.flush();
-                    long start = System.currentTimeMillis();
-                    while (true) {
-                        long current = System.currentTimeMillis();
-
-                        if ((current - start) > (long) finalTimeout)
-                            return String.format("TestTurn: %d ms Timed out waiting for:'%s'", finalTimeout, description);
-
-
-                        Activity replyActivity = this.adapter.getNextReply();
-
-
-                        if (replyActivity != null) {
-                            // if we have a reply
-                            System.out.println(String.format("TestTurn(tid:%s): Received Reply: %s",
-                                Thread.currentThread().getId(),
-                                String.format("\n========\n To:%s\n From:%s\n Msg:%s\n=======", replyActivity.getRecipient().getName(), replyActivity.getFrom().getName(), replyActivity.getText())
-                            ));
-                            System.out.flush();
-                            return validateActivity.apply(replyActivity);
-                        } else {
-                            System.out.println(String.format("TestTurn(tid:%s): No reply..", Thread.currentThread().getId()));
-                            System.out.flush();
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
+                        return "SUCCESS";
                     }
-                })
-                .get(timeout, TimeUnit.MILLISECONDS);
+                    System.out.println(
+                        String.format(
+                            "TestTurn(tid:%s): Failed validate text is: %s",
+                            Thread.currentThread().getId(),
+                            expected
+                        )
+                    );
+                    System.out.flush();
+
+                    return String.format(
+                        "FAIL: %s received in Activity.text (%s expected)",
+                        activity.getText(),
+                        expected
+                    );
+                };
+
+                System.out.println(
+                    String.format(
+                        "TestTurn(tid:%s): Started receive loop: %s",
+                        Thread.currentThread().getId(),
+                        description
+                    )
+                );
+                System.out.flush();
+                long start = System.currentTimeMillis();
+                while (true) {
+                    long current = System.currentTimeMillis();
+
+                    if ((current - start) > (long) finalTimeout)
+                        return String.format(
+                            "TestTurn: %d ms Timed out waiting for:'%s'",
+                            finalTimeout,
+                            description
+                        );
+
+                    Activity replyActivity = this.adapter.getNextReply();
+
+                    if (replyActivity != null) {
+                        // if we have a reply
+                        System.out.println(
+                            String.format(
+                                "TestTurn(tid:%s): Received Reply: %s",
+                                Thread.currentThread().getId(),
+                                String.format(
+                                    "\n========\n To:%s\n From:%s\n Msg:%s\n=======",
+                                    replyActivity.getRecipient().getName(),
+                                    replyActivity.getFrom().getName(),
+                                    replyActivity.getText()
+                                )
+                            )
+                        );
+                        System.out.flush();
+                        return validateActivity.apply(replyActivity);
+                    } else {
+                        System.out.println(
+                            String.format(
+                                "TestTurn(tid:%s): No reply..",
+                                Thread.currentThread().getId()
+                            )
+                        );
+                        System.out.flush();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -336,8 +419,7 @@ public class TestFlow {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.send(userSays)
-            .assertReply(expected, description, timeout);
+        return this.send(userSays).assertReply(expected, description, timeout);
     }
 
     /**
@@ -359,8 +441,7 @@ public class TestFlow {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.send(userSays)
-            .assertReply(expected, description, timeout);
+        return this.send(userSays).assertReply(expected, description, timeout);
     }
 
     /**
@@ -378,12 +459,16 @@ public class TestFlow {
         return test(userSays, expected, description, 3000);
     }
 
-    public TestFlow test(String userSays, Consumer<Activity> expected, String description, int timeout) {
+    public TestFlow test(
+        String userSays,
+        Consumer<Activity> expected,
+        String description,
+        int timeout
+    ) {
         if (expected == null)
             throw new IllegalArgumentException("expected");
 
-        return this.send(userSays)
-            .assertReply(expected, description, timeout);
+        return this.send(userSays).assertReply(expected, description, timeout);
     }
 
     /**
@@ -409,7 +494,13 @@ public class TestFlow {
                 if (StringUtils.equals(reply.getText(), candidate))
                     return;
             }
-            throw new RuntimeException(String.format("%s: Not one of candidates: %s", description, String.join("\n ", candidates)));
+            throw new RuntimeException(
+                String.format(
+                    "%s: Not one of candidates: %s",
+                    description,
+                    String.join("\n ", candidates)
+                )
+            );
         }, description, timeout);
     }
 }

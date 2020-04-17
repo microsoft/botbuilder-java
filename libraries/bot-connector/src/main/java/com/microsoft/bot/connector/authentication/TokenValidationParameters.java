@@ -49,33 +49,43 @@ public class TokenValidationParameters {
 
     /**
      * Copy constructor.
+     * 
      * @param other The TokenValidationParameters to copy.
      */
     public TokenValidationParameters(TokenValidationParameters other) {
-        this(other.validateIssuer,
+        this(
+            other.validateIssuer,
             other.validIssuers,
             other.validateAudience,
             other.validateLifetime,
             other.clockSkew,
-            other.requireSignedTokens);
+            other.requireSignedTokens
+        );
     }
 
     /**
      *
-     * @param validateIssuer Control if the issuer will be validated during token validation.
-     * @param validIssuers Contains valid issuers that will be used to check against the token's issuer.
-     * @param validateAudience Control if the audience will be validated during token validation.
-     * @param validateLifetime Control if the lifetime will be validated during token validation.
-     * @param clockSkew Clock skew to apply when validating a time.
-     * @param requireSignedTokens Value indicating whether a token can be considered valid if not signed.
+     * @param validateIssuer      Control if the issuer will be validated during
+     *                            token validation.
+     * @param validIssuers        Contains valid issuers that will be used to check
+     *                            against the token's issuer.
+     * @param validateAudience    Control if the audience will be validated during
+     *                            token validation.
+     * @param validateLifetime    Control if the lifetime will be validated during
+     *                            token validation.
+     * @param clockSkew           Clock skew to apply when validating a time.
+     * @param requireSignedTokens Value indicating whether a token can be considered
+     *                            valid if not signed.
      */
     @SuppressWarnings("checkstyle:HiddenField")
-    public TokenValidationParameters(boolean validateIssuer,
-                                     List<String> validIssuers,
-                                     boolean validateAudience,
-                                     boolean validateLifetime,
-                                     Duration clockSkew,
-                                     boolean requireSignedTokens) {
+    public TokenValidationParameters(
+        boolean validateIssuer,
+        List<String> validIssuers,
+        boolean validateAudience,
+        boolean validateLifetime,
+        Duration clockSkew,
+        boolean requireSignedTokens
+    ) {
         this.validateIssuer = validateIssuer;
         this.validIssuers = validIssuers;
         this.validateAudience = validateAudience;

@@ -28,6 +28,7 @@ public class FileDownloadInfo {
 
     /**
      * Gets file download url.
+     * 
      * @return The download url.
      */
     public String getDownloadUrl() {
@@ -36,6 +37,7 @@ public class FileDownloadInfo {
 
     /**
      * Sets file download url.
+     * 
      * @param withDownloadUrl The new file download url.
      */
     public void setDownloadUrl(String withDownloadUrl) {
@@ -44,6 +46,7 @@ public class FileDownloadInfo {
 
     /**
      * Gets unique Id for the file.
+     * 
      * @return The unique id of the download.
      */
     public String getUniqueId() {
@@ -52,6 +55,7 @@ public class FileDownloadInfo {
 
     /**
      * Sets unique Id for the file.
+     * 
      * @param withUniqueId The unique id of the download.
      */
     public void setUniqueId(String withUniqueId) {
@@ -60,6 +64,7 @@ public class FileDownloadInfo {
 
     /**
      * Gets type of file.
+     * 
      * @return The type of the file.
      */
     public String getFileType() {
@@ -68,6 +73,7 @@ public class FileDownloadInfo {
 
     /**
      * Sets type of file.
+     * 
      * @param withFileType The type of the file.
      */
     public void setFileType(String withFileType) {
@@ -76,6 +82,7 @@ public class FileDownloadInfo {
 
     /**
      * Gets eTag for the file.
+     * 
      * @return The eTag.
      */
     public Object getEtag() {
@@ -84,6 +91,7 @@ public class FileDownloadInfo {
 
     /**
      * Sets eTag for the file.
+     * 
      * @param withEtag The eTag value.
      */
     public void setEtag(Object withEtag) {

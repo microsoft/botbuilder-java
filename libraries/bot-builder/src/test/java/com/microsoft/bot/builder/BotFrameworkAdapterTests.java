@@ -25,7 +25,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class BotFrameworkAdapterTests {
     @Test
@@ -61,13 +60,19 @@ public class BotFrameworkAdapterTests {
             }
 
             @Override
-            protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(String serviceUrl,
-                                                                                    AppCredentials usingAppCredentials) {
+            protected CompletableFuture<ConnectorClient> getOrCreateConnectorClient(
+                String serviceUrl,
+                AppCredentials usingAppCredentials
+            ) {
                 Conversations conv = mock(Conversations.class);
-                when(conv.createConversation(any())).thenReturn(CompletableFuture.completedFuture(new ConversationResourceResponse() {{
-                    setActivityId(ActivityIdValue);
-                    setId(ConversationIdValue);
-                }}));
+                when(conv.createConversation(any())).thenReturn(
+                    CompletableFuture.completedFuture(new ConversationResourceResponse() {
+                        {
+                            setActivityId(ActivityIdValue);
+                            setId(ConversationIdValue);
+                        }
+                    })
+                );
 
                 ConnectorClient client = mock(ConnectorClient.class);
                 when(client.getConversations()).thenReturn(conv);
@@ -80,22 +85,36 @@ public class BotFrameworkAdapterTests {
         BotFrameworkAdapter adapter = new TestBotFrameworkAdapter(mockCredentialProvider);
 
         ObjectNode channelData = JsonNodeFactory.instance.objectNode();
-        channelData.set("tenant", JsonNodeFactory.instance.objectNode().set("id", JsonNodeFactory.instance.textNode(TenantIdValue)));
+        channelData.set(
+            "tenant",
+            JsonNodeFactory.instance.objectNode().set(
+                "id",
+                JsonNodeFactory.instance.textNode(TenantIdValue)
+            )
+        );
 
-        Activity activity = new Activity("Test") {{
-            setChannelId(Channels.MSTEAMS);
-            setServiceUrl("https://fake.service.url");
-            setChannelData(channelData);
-            setConversation(new ConversationAccount() {{
-                setTenantId(TenantIdValue);
-            }});
-        }};
+        Activity activity = new Activity("Test") {
+            {
+                setChannelId(Channels.MSTEAMS);
+                setServiceUrl("https://fake.service.url");
+                setChannelData(channelData);
+                setConversation(new ConversationAccount() {
+                    {
+                        setTenantId(TenantIdValue);
+                    }
+                });
+            }
+        };
 
-        ConversationParameters parameters = new ConversationParameters() {{
-           setActivity(new Activity() {{
-               setChannelData(activity.getChannelData());
-           }});
-        }};
+        ConversationParameters parameters = new ConversationParameters() {
+            {
+                setActivity(new Activity() {
+                    {
+                        setChannelData(activity.getChannelData());
+                    }
+                });
+            }
+        };
 
         ConversationReference reference = activity.getConversationReference();
         MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(null, null);
@@ -106,16 +125,30 @@ public class BotFrameworkAdapterTests {
             return CompletableFuture.completedFuture(null);
         });
 
-        adapter.createConversation(activity.getChannelId(), activity.getServiceUrl(), credentials, parameters, updateParameters, reference).join();
+        adapter.createConversation(
+            activity.getChannelId(),
+            activity.getServiceUrl(),
+            credentials,
+            parameters,
+            updateParameters,
+            reference
+        ).join();
 
-        Assert.assertEquals(TenantIdValue, ((JsonNode) newActivity[0].getChannelData()).get("tenant").get("tenantId").textValue());
+        Assert.assertEquals(
+            TenantIdValue,
+            ((JsonNode) newActivity[0].getChannelData()).get("tenant").get("tenantId").textValue()
+        );
         Assert.assertEquals(ActivityIdValue, newActivity[0].getId());
         Assert.assertEquals(ConversationIdValue, newActivity[0].getConversation().getId());
         Assert.assertEquals(TenantIdValue, newActivity[0].getConversation().getTenantId());
         Assert.assertEquals(EventActivityName, newActivity[0].getName());
     }
 
-    private Activity processActivity(String channelId, String channelDataTenantId, String conversationTenantId) {
+    private Activity processActivity(
+        String channelId,
+        String channelDataTenantId,
+        String conversationTenantId
+    ) {
         ClaimsIdentity mockClaims = new ClaimsIdentity("anonymous");
         CredentialProvider mockCredentials = new SimpleCredentialProvider();
 
@@ -127,20 +160,21 @@ public class BotFrameworkAdapterTests {
         channelData.set("tenant", tenantId);
 
         Activity[] activity = new Activity[] { null };
-        sut.processActivity(
-            mockClaims,
-            new Activity("test") {{
+        sut.processActivity(mockClaims, new Activity("test") {
+            {
                 setChannelId(channelId);
                 setServiceUrl("https://smba.trafficmanager.net/amer/");
                 setChannelData(channelData);
-                setConversation(new ConversationAccount() {{
-                    setTenantId(conversationTenantId);
-                }});
-            }},
-            (context) -> {
-                activity[0] = context.getActivity();
-                return CompletableFuture.completedFuture(null);
-            }).join();
+                setConversation(new ConversationAccount() {
+                    {
+                        setTenantId(conversationTenantId);
+                    }
+                });
+            }
+        }, (context) -> {
+            activity[0] = context.getActivity();
+            return CompletableFuture.completedFuture(null);
+        }).join();
 
         return activity[0];
     }
