@@ -27,28 +27,30 @@ import java.util.concurrent.CompletableFuture;
  */
 @Component
 public class LinkUnfurlingBot extends TeamsActivityHandler {
+
     @Override
     protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(
         TurnContext turnContext,
         AppBasedLinkQuery query
     ) {
         ThumbnailCard card = new ThumbnailCard() {{
-           setTitle("Thumbnail Card");
-           setText(query.getUrl());
-           setImages(Collections.singletonList(
-               new CardImage("https://raw.githubusercontent.com/microsoft/botframework-sdk/master/icon.png")
-           ));
+            setTitle("Thumbnail Card");
+            setText(query.getUrl());
+            setImages(Collections.singletonList(
+                new CardImage(
+                    "https://raw.githubusercontent.com/microsoft/botframework-sdk/master/icon.png")
+            ));
         }};
 
         MessagingExtensionAttachment attachments = new MessagingExtensionAttachment() {{
-           setContentType(HeroCard.CONTENTTYPE);
-           setContent(card);
+            setContentType(HeroCard.CONTENTTYPE);
+            setContent(card);
         }};
 
         MessagingExtensionResult result = new MessagingExtensionResult() {{
-           setAttachmentLayout("list");
-           setType("result");
-           setAttachments(Collections.singletonList(attachments));
+            setAttachmentLayout("list");
+            setType("result");
+            setAttachments(Collections.singletonList(attachments));
         }};
 
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(result));
@@ -58,7 +60,8 @@ public class LinkUnfurlingBot extends TeamsActivityHandler {
         TurnContext turnContext,
         MessagingExtensionQuery query
     ) {
-        //Note: The Teams manifest.json for this sample also includes a Search Query, in order to enable installing from App Studio.
+        // Note: The Teams manifest.json for this sample also includes a Search Query, in
+        // order to enable installing from App Studio.
 
         // These commandIds are defined in the Teams App Manifest.
         if (StringUtils.equalsIgnoreCase("searchQuery", query.getCommandId())) {
@@ -66,7 +69,7 @@ public class LinkUnfurlingBot extends TeamsActivityHandler {
                 setTitle("This is a Link Unfurling Sample");
                 setSubtitle("It will unfurl links from *.BotFramework.com");
                 setText("This sample demonstrates how to handle link unfurling in Teams.  "
-                            + "Please review the readme for more information.");
+                    + "Please review the readme for more information.");
             }};
 
             return CompletableFuture.completedFuture(new MessagingExtensionResponse(
