@@ -52,7 +52,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
             text = (String) queryParams.get(0).getValue();
         }
 
-        List<String []> packages = null;
+        List<String[]> packages = null;
 
         try {
             packages = FindPackages(text).get();
@@ -61,25 +61,25 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         }
 
         List<MessagingExtensionAttachment> attachments = new ArrayList<>();
-        for (String [] item: packages) {
-            ThumbnailCard previewCard = new ThumbnailCard(){{
+        for (String[] item : packages) {
+            ThumbnailCard previewCard = new ThumbnailCard() {{
                 setTitle(item[0]);
-                setTap(new CardAction(){{
+                setTap(new CardAction() {{
                     setType(ActionTypes.INVOKE);
                     setValue(new JSONObject().put("data", item).toString());
                 }});
             }};
 
             if (!StringUtils.isEmpty(item[4])) {
-                previewCard.setImages(Collections.singletonList(new CardImage(){{
+                previewCard.setImages(Collections.singletonList(new CardImage() {{
                     setUrl(item[4]);
                     setAlt("Icon");
                 }}));
             }
 
-            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment(){{
+            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
                 setContentType(HeroCard.CONTENTTYPE);
-                setContent(new HeroCard(){{
+                setContent(new HeroCard() {{
                     setTitle(item[0]);
                 }});
                 setPreview(previewCard.toAttachment());
@@ -89,7 +89,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         }
 
 
-        MessagingExtensionResult composeExtension = new MessagingExtensionResult(){{
+        MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
             setType("result");
             setAttachmentLayout("list");
             setAttachments(attachments);
@@ -105,10 +105,10 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
 
         LinkedHashMap cardValue = ((LinkedHashMap) query);
         List<String> data = (ArrayList) cardValue.get("data");
-        ThumbnailCard card  = new ThumbnailCard(){{
+        ThumbnailCard card = new ThumbnailCard() {{
             setTitle(data.get(0));
             setSubtitle(data.get(2));
-            setButtons(Arrays.asList(new CardAction(){{
+            setButtons(Arrays.asList(new CardAction() {{
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Project");
                 setValue(data.get(3));
@@ -116,18 +116,18 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         }};
 
         if (!StringUtils.isEmpty(data.get(4))) {
-            card.setImages(Collections.singletonList(new CardImage(){{
+            card.setImages(Collections.singletonList(new CardImage() {{
                 setUrl(data.get(4));
                 setAlt("Icon");
             }}));
         }
 
-        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment(){{
+        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
             setContentType(ThumbnailCard.CONTENTTYPE);
             setContent(card);
         }};
 
-        MessagingExtensionResult composeExtension = new MessagingExtensionResult(){{
+        MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
             setType("result");
             setAttachmentLayout("list");
             setAttachments(Collections.singletonList(attachment));
@@ -135,7 +135,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
     }
 
-    private CompletableFuture<List<String []>> FindPackages(
+    private CompletableFuture<List<String[]>> FindPackages(
         String text) throws IOException {
         return CompletableFuture.supplyAsync(() -> {
             OkHttpClient client = new OkHttpClient();
@@ -143,7 +143,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
                 .url(String.format("https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true", text))
                 .build();
 
-            List<String []> filteredItems = new ArrayList<String []>();
+            List<String[]> filteredItems = new ArrayList<String[]>();
             try {
                 Response response = client.newCall(request).execute();
                 JSONObject obj = new JSONObject(response.body().string());
@@ -151,7 +151,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
 
                 dataArray.forEach(i -> {
                     JSONObject item = (JSONObject) i;
-                    filteredItems.add(new String [] {
+                    filteredItems.add(new String[]{
                         item.getString("id"),
                         item.getString("version"),
                         item.getString("description"),

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * This is the starting point of the Sprint Boot Bot application.
- *
+ * <p>
  * This class also provides overrides for dependency injections.  A class that extends the
  * {@link com.microsoft.bot.builder.Bot} interface should be annotated with @Component.
  *
