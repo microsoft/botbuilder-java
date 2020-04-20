@@ -3,7 +3,9 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.microsoft.bot.schema.ChannelAccount;
 
 /**
@@ -24,6 +26,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets given name part of the user name.
+     * 
      * @return The users given name.
      */
     public String getGivenName() {
@@ -32,6 +35,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets given name part of the user name.
+     * 
      * @param withGivenName The users given name.
      */
     public void setGivenName(String withGivenName) {
@@ -40,6 +44,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets surname part of the user name.
+     * 
      * @return The users surname.
      */
     public String getSurname() {
@@ -48,6 +53,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets surname part of the user name.
+     * 
      * @param withSurname The users surname.
      */
     public void setSurname(String withSurname) {
@@ -56,6 +62,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets email Id of the user.
+     * 
      * @return The users email address.
      */
     public String getEmail() {
@@ -64,6 +71,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets email Id of the user.
+     * 
      * @param withEmail The users email address.
      */
     public void setEmail(String withEmail) {
@@ -72,6 +80,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets unique user principal name.
+     * 
      * @return The users principal name.
      */
     public String getUserPrincipalName() {
@@ -80,9 +89,30 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets unique user principal name.
+     * 
      * @param withUserPrincipalName The users principal name.
      */
     public void setUserPrincipalName(String withUserPrincipalName) {
         userPrincipalName = withUserPrincipalName;
+    }
+
+    /**
+     * Gets the AAD object id.
+     * 
+     * @return The AAD object id.
+     */
+    @JsonGetter(value = "objectId")
+    public String getObjectId() {
+        return getAadObjectId();
+    }
+
+    /**
+     * Sets the AAD object id.
+     * 
+     * @param withObjectId The AAD object Id.
+     */
+    @JsonSetter(value = "objectId")
+    public void setObjectId(String withObjectId) {
+        setAadObjectId(withObjectId);
     }
 }

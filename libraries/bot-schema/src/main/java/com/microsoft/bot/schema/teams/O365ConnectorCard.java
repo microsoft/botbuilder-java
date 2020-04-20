@@ -39,6 +39,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the title of the card.
+     * 
      * @return The card title.
      */
     public String getTitle() {
@@ -47,6 +48,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the title of the card.
+     * 
      * @param withTitle The card title.
      */
     public void setTitle(String withTitle) {
@@ -55,6 +57,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the text for the card.
+     * 
      * @return The card text.
      */
     public String getText() {
@@ -63,6 +66,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the text for the card.
+     * 
      * @param withText The card text.
      */
     public void setText(String withText) {
@@ -71,6 +75,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the summary for the card.
+     * 
      * @return The card summary.
      */
     public String getSummary() {
@@ -79,6 +84,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the summary for the card.
+     * 
      * @param withSummary The card summary.
      */
     public void setSummary(String withSummary) {
@@ -87,6 +93,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the theme color for the card.
+     * 
      * @return The card color.
      */
     public String getThemeColor() {
@@ -95,6 +102,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the theme color for the card.
+     * 
      * @param withThemeColor The card color.
      */
     public void setThemeColor(String withThemeColor) {
@@ -103,6 +111,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the list of sections for the current card.
+     * 
      * @return The card sections.
      */
     public List<O365ConnectorCardSection> getSections() {
@@ -111,6 +120,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the of sections for the current card.
+     * 
      * @param withSections The card sections.
      */
     public void setSections(List<O365ConnectorCardSection> withSections) {
@@ -119,6 +129,7 @@ public class O365ConnectorCard {
 
     /**
      * Gets the of actions for the current card.
+     * 
      * @return The card actions.
      */
     public List<O365ConnectorCardActionBase> getPotentialAction() {
@@ -127,6 +138,7 @@ public class O365ConnectorCard {
 
     /**
      * Sets the of actions for the current card.
+     * 
      * @param withPotentialAction The card actions.
      */
     public void setPotentialAction(List<O365ConnectorCardActionBase> withPotentialAction) {

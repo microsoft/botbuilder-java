@@ -19,9 +19,9 @@ public class MessageActionsPayloadReaction {
     private MessageActionsPayloadFrom user;
 
     /**
-     * Gets or sets the type of reaction given to the message. Possible
-     * values include: 'like', 'heart', 'laugh', 'surprised', 'sad',
-     * 'angry'
+     * Gets or sets the type of reaction given to the message. Possible values
+     * include: 'like', 'heart', 'laugh', 'surprised', 'sad', 'angry'
+     * 
      * @return The reaction type.
      */
     public String getReactionType() {
@@ -29,9 +29,9 @@ public class MessageActionsPayloadReaction {
     }
 
     /**
-     * Sets Gets or sets the type of reaction given to the message. Possible
-     * values include: 'like', 'heart', 'laugh', 'surprised', 'sad',
-     * 'angry'
+     * Sets Gets or sets the type of reaction given to the message. Possible values
+     * include: 'like', 'heart', 'laugh', 'surprised', 'sad', 'angry'
+     * 
      * @param withReactionType The reaction type.
      */
     public void setReactionType(String withReactionType) {
@@ -40,6 +40,7 @@ public class MessageActionsPayloadReaction {
 
     /**
      * Gets timestamp of when the user reacted to the message.
+     * 
      * @return The created timestamp.
      */
     public String getCreatedDateTime() {
@@ -48,6 +49,7 @@ public class MessageActionsPayloadReaction {
 
     /**
      * Sets timestamp of when the user reacted to the message.
+     * 
      * @param withCreatedDateTime The created timestamp.
      */
     public void setCreatedDateTime(String withCreatedDateTime) {
@@ -56,6 +58,7 @@ public class MessageActionsPayloadReaction {
 
     /**
      * Gets the user with which the reaction is associated.
+     * 
      * @return The From user.
      */
     public MessageActionsPayloadFrom getUser() {
@@ -64,6 +67,7 @@ public class MessageActionsPayloadReaction {
 
     /**
      * Sets the user with which the reaction is associated.
+     * 
      * @param withUser The From user.
      */
     public void setUser(MessageActionsPayloadFrom withUser) {

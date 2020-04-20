@@ -11,7 +11,7 @@ public interface PropertyManager {
      * Creates a managed state property accessor for a property.
      *
      * @param name The name of the property accessor.
-     * @param <T> The property value type.
+     * @param <T>  The property value type.
      * @return A state property accessor for the property.
      */
     <T> StatePropertyAccessor<T> createProperty(String name);

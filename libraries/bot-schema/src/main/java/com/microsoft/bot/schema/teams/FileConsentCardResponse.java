@@ -6,8 +6,8 @@ package com.microsoft.bot.schema.teams;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the value of the invoke activity sent when the user acts on
- * a file consent card.
+ * Represents the value of the invoke activity sent when the user acts on a file
+ * consent card.
  */
 public class FileConsentCardResponse {
     @JsonProperty(value = "action")
@@ -21,6 +21,7 @@ public class FileConsentCardResponse {
 
     /**
      * Gets the action the user took.
+     * 
      * @return Possible values include 'accept', 'decline'
      */
     public String getAction() {
@@ -29,6 +30,7 @@ public class FileConsentCardResponse {
 
     /**
      * Sets the action the user took.
+     * 
      * @param withAction Possible values include 'accept', 'decline'
      */
     public void setAction(String withAction) {
@@ -37,6 +39,7 @@ public class FileConsentCardResponse {
 
     /**
      * Gets the context associated with the action.
+     * 
      * @return The context value.
      */
     public Object getContext() {
@@ -45,6 +48,7 @@ public class FileConsentCardResponse {
 
     /**
      * Sets the context associated with the action.
+     * 
      * @param withContext The new context.
      */
     public void setContext(Object withContext) {
@@ -52,8 +56,9 @@ public class FileConsentCardResponse {
     }
 
     /**
-     * Gets if the user accepted the file, contains information
-     * about the file to be uploaded.
+     * Gets if the user accepted the file, contains information about the file to be
+     * uploaded.
+     * 
      * @return The file upload info.
      */
     public FileUploadInfo getUploadInfo() {
@@ -61,9 +66,10 @@ public class FileConsentCardResponse {
     }
 
     /**
-     * Sets if the user accepted the file, contains information
-     * about the file to be uploaded.
-     * @param withUploadInfo  The file upload info.
+     * Sets if the user accepted the file, contains information about the file to be
+     * uploaded.
+     * 
+     * @param withUploadInfo The file upload info.
      */
     public void setUploadInfo(FileUploadInfo withUploadInfo) {
         uploadInfo = withUploadInfo;

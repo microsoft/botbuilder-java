@@ -26,12 +26,14 @@ public interface ConnectorClient extends AutoCloseable {
 
     /**
      * Returns the base url for this ConnectorClient.
+     * 
      * @return The base url.
      */
     String baseUrl();
 
     /**
      * Returns the credentials in use.
+     * 
      * @return The ServiceClientCredentials in use.
      */
     ServiceClientCredentials credentials();
@@ -58,30 +60,32 @@ public interface ConnectorClient extends AutoCloseable {
     void setAcceptLanguage(String acceptLanguage);
 
     /**
-     * Gets the retry timeout in seconds for Long Running Operations. Default value is 30..
+     * Gets the retry timeout in seconds for Long Running Operations. Default value
+     * is 30..
      *
      * @return the timeout value.
      */
     int getLongRunningOperationRetryTimeout();
 
     /**
-     * Sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Sets the retry timeout in seconds for Long Running Operations. Default value
+     * is 30.
      *
      * @param timeout the longRunningOperationRetryTimeout value.
      */
     void setLongRunningOperationRetryTimeout(int timeout);
 
     /**
-     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
-     * is true.
+     * When set to true a unique x-ms-client-request-id value is generated and
+     * included in each request. is true.
      *
      * @return the generateClientRequestId value.
      */
     boolean getGenerateClientRequestId();
 
     /**
-     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
-     * Default is true.
+     * When set to true a unique x-ms-client-request-id value is generated and
+     * included in each request. Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.
      */
@@ -89,12 +93,14 @@ public interface ConnectorClient extends AutoCloseable {
 
     /**
      * Gets the Attachments object to access its operations.
+     * 
      * @return the Attachments object.
      */
     Attachments getAttachments();
 
     /**
      * Gets the Conversations object to access its operations.
+     * 
      * @return the Conversations object.
      */
     Conversations getConversations();

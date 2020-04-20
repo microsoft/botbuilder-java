@@ -40,6 +40,7 @@ public class TokenStatus {
 
     /**
      * Gets the channelId.
+     * 
      * @return The channelId.
      */
     public String getChannelId() {
@@ -48,6 +49,7 @@ public class TokenStatus {
 
     /**
      * Sets the channelId.
+     * 
      * @param withChannelId The channelId.
      */
     public void setChannelId(String withChannelId) {
@@ -56,6 +58,7 @@ public class TokenStatus {
 
     /**
      * Gets the connectionName.
+     * 
      * @return The connection name.
      */
     public String getConnectionName() {
@@ -64,6 +67,7 @@ public class TokenStatus {
 
     /**
      * Sets the connectionName.
+     * 
      * @param withConnectionName The connection name.
      */
     public void setConnectionName(String withConnectionName) {
@@ -72,6 +76,7 @@ public class TokenStatus {
 
     /**
      * Gets the hasToken value.
+     * 
      * @return The hasToken value.
      */
     public boolean hasToken() {
@@ -80,6 +85,7 @@ public class TokenStatus {
 
     /**
      * Sets the hasToken value.
+     * 
      * @param withHasToken The hasToken value.
      */
     public void setHasToken(boolean withHasToken) {
@@ -88,6 +94,7 @@ public class TokenStatus {
 
     /**
      * Gets the serviceProviderDisplayName field.
+     * 
      * @return The service provider display name.
      */
     public String getServiceProviderDisplayName() {
@@ -96,6 +103,7 @@ public class TokenStatus {
 
     /**
      * Sets the serviceProviderDisplayName field.
+     * 
      * @param withServiceProviderDisplayName The service provider display name.
      */
     public void setServiceProviderDisplayName(String withServiceProviderDisplayName) {

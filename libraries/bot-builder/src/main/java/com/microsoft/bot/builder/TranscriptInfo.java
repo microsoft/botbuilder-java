@@ -15,9 +15,10 @@ public class TranscriptInfo {
 
     /**
      * Constructor.
-     * @param withId The conversation id.
+     * 
+     * @param withId        The conversation id.
      * @param withChannelId The channel id.
-     * @param withCreated Created timestamp.
+     * @param withCreated   Created timestamp.
      */
     public TranscriptInfo(String withId, String withChannelId, OffsetDateTime withCreated) {
         id = withId;
@@ -27,6 +28,7 @@ public class TranscriptInfo {
 
     /**
      * Gets the ID of the channel in which the conversation occurred.
+     * 
      * @return The ID of the channel in which the conversation occurred.
      */
     public String channelId() {
@@ -35,7 +37,9 @@ public class TranscriptInfo {
 
     /**
      * Sets the ID of the channel in which the conversation occurred.
-     * @param withChannelId The ID of the channel in which the conversation occurred.
+     * 
+     * @param withChannelId The ID of the channel in which the conversation
+     *                      occurred.
      */
     public void setChannelId(String withChannelId) {
         channelId = withChannelId;
@@ -43,6 +47,7 @@ public class TranscriptInfo {
 
     /**
      * Gets the ID of the conversation.
+     * 
      * @return The ID of the conversation.
      */
     public String getId() {
@@ -51,6 +56,7 @@ public class TranscriptInfo {
 
     /**
      * Sets the ID of the conversation.
+     * 
      * @param withId The ID of the conversation.
      */
     public void setId(String withId) {
@@ -59,6 +65,7 @@ public class TranscriptInfo {
 
     /**
      * Gets the date the conversation began.
+     * 
      * @return The date then conversation began.
      */
     public OffsetDateTime getCreated() {
@@ -67,6 +74,7 @@ public class TranscriptInfo {
 
     /**
      * Sets the date the conversation began.
+     * 
      * @param withCreated The date then conversation began.
      */
     public void setCreated(OffsetDateTime withCreated) {

@@ -31,7 +31,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 This project uses linting rules to enforce code standardization. These rules are specified in the file [bot-checkstyle.xml](./etc/bot-checkstyle.xml) with [CheckStyle](https://checkstyle.org/) and are hooked to Maven's build cycle.
 
-**INFO**: Since the CheckStyle plugin is hook to the build cycle, this makes the build **fail** in case there are linting warnings in the project files so be sure to check that the code doesn't break any rule.
+**INFO**: Since the CheckStyle and PMD plugins are hooked into the build cycle, this makes the build **fail** in cases where there are linting warnings in the project files.  Errors will be in the file ./target/checkstyle-result.xml and ./target/pmd.xml.
 
 CheckStyle is available in different flavours:
 - [Visual Studio Code plugin](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
@@ -40,6 +40,32 @@ CheckStyle is available in different flavours:
 - [CLI Tool](https://checkstyle.org/cmdline.html)
 
 **INFO**: Be sure to configure your IDE to use the file [bot-checkstyle.xml](./etc/bot-checkstyle.xml) instead of the default rules.
+
+## Build and IDE
+
+Any IDE that can import and work with Maven projects should work.  As a matter of practice we use the command line to perform Maven builds.  If your IDE can be configured to defer build and run to Maven it should also work.
+- Java
+  - We use the [Azul JDK 8](https://www.azul.com/downloads/azure-only/zulu/?version=java-8-lts&architecture=x86-64-bit&package=jdk) to build and test with.  While not a requirement to develop the SDK with, it is recommended as this is what Azure is using for Java 1.8.  If you do install this JDK, make sure your IDE is targeting that JVM, and your path (from command line) and JAVA_HOME point to that.
+  
+- Visual Studio Code
+  - Extensions
+    - Java Extension Pack by Microsoft
+    - Checkstyle for Java by ShengChen (Optional)
+    - EditorConfig for VS Code by EditorConfig (Recommended)
+  - Recommended setup
+    - Open the settings for "Language Support for Java by RedHat" and set:
+      - Java > Format > Settings: Profile = "BotFramework"
+      - Java > Format > Settings: Url = "etc/botframework-java-formatter.xml"
+      - This will format the code (on command) to BotFramework style.
+    
+- IntelliJ
+  - Extensions
+    - Checkstyle by IDEA
+    - Eclipse Code Formatter by Vojtech-Krasa (Recommended)
+  - Recommended setup
+    - When importing the SDK for the first time, make sure "Auto import" is checked.
+    - If the Eclipse Code Formatter was installed:
+      - Got to Settings > Other Settings -> Eclipse Code Formatter, and set the formatter config file to etc/botframework-java-formatter.xml
 
 ## Reporting Security Issues
 

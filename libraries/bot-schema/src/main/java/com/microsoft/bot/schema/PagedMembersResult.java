@@ -26,6 +26,7 @@ public class PagedMembersResult {
 
     /**
      * Gets paging token.
+     * 
      * @return The continuation token to be used in the next call.
      */
     public String getContinuationToken() {
@@ -34,6 +35,7 @@ public class PagedMembersResult {
 
     /**
      * Sets paging token.
+     * 
      * @param withContinuationToken The continuation token.
      */
     public void setContinuationToken(String withContinuationToken) {

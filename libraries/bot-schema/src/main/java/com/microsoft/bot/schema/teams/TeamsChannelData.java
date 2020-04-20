@@ -5,7 +5,6 @@ package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * Channel data specific to messages received in Microsoft Teams.
  */
@@ -74,19 +73,16 @@ public class TeamsChannelData {
     }
 
     /**
-     * Gets information about the channel in which the message was
-     * sent.
+     * Gets information about the channel in which the message was sent.
      *
-     * @return information about the channel in which the message was
-     * sent.
+     * @return information about the channel in which the message was sent.
      */
     public ChannelInfo getChannel() {
         return channel;
     }
 
     /**
-     * Sets information about the channel in which the message was
-     * sent.
+     * Sets information about the channel in which the message was sent.
      *
      * @param withChannel information about the channel in which the message was
      *                    sent.
@@ -114,22 +110,18 @@ public class TeamsChannelData {
     }
 
     /**
-     * Gets information about the team in which the message was
-     * sent.
+     * Gets information about the team in which the message was sent.
      *
-     * @return information about the team in which the message was
-     * sent.
+     * @return information about the team in which the message was sent.
      */
     public TeamInfo getTeam() {
         return team;
     }
 
     /**
-     * Sets information about the team in which the message was
-     * sent.
+     * Sets information about the team in which the message was sent.
      *
-     * @param withTeam information about the team in which the message was
-     *                 sent.
+     * @param withTeam information about the team in which the message was sent.
      */
     public void setTeam(TeamInfo withTeam) {
         this.team = withTeam;
@@ -176,20 +168,24 @@ public class TeamsChannelData {
      *
      * @param withTeamsChannelId the channelId in Teams
      * @param withTeamsTeamId    the teamId in Teams
-     * @param withChannel        information about the channel in which the message was sent.
+     * @param withChannel        information about the channel in which the message
+     *                           was sent.
      * @param withEventType      type of event.
      * @param withTeam           information about the team in which the message was
      *                           sent.
      * @param withNotification   Notification settings for the message.
-     * @param withTenant         Information about the tenant in which the message was.
+     * @param withTenant         Information about the tenant in which the message
+     *                           was.
      */
-    public TeamsChannelData(String withTeamsChannelId,
-                            String withTeamsTeamId,
-                            ChannelInfo withChannel,
-                            String withEventType,
-                            TeamInfo withTeam,
-                            NotificationInfo withNotification,
-                            TenantInfo withTenant) {
+    public TeamsChannelData(
+        String withTeamsChannelId,
+        String withTeamsTeamId,
+        ChannelInfo withChannel,
+        String withEventType,
+        TeamInfo withTeam,
+        NotificationInfo withNotification,
+        TenantInfo withTenant
+    ) {
         this.teamsChannelId = withTeamsChannelId;
         this.teamsTeamId = withTeamsTeamId;
         this.channel = withChannel;

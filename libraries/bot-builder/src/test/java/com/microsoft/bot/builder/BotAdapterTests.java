@@ -41,7 +41,10 @@ public class BotAdapterTests {
         activity.setId(activityId);
 
         ResourceResponse resourceResponse = c.sendActivity(activity).join();
-        Assert.assertTrue("Incorrect response Id returned", StringUtils.equals(resourceResponse.getId(), activityId));
+        Assert.assertTrue(
+            "Incorrect response Id returned",
+            StringUtils.equals(resourceResponse.getId(), activityId)
+        );
     }
 
     @Test
@@ -49,28 +52,36 @@ public class BotAdapterTests {
         boolean[] callbackInvoked = new boolean[] { false };
 
         TestAdapter adapter = new TestAdapter();
-        ConversationReference cr = new ConversationReference(){{
-            setActivityId("activityId");
-            setBot(new ChannelAccount(){{
-                setId("channelId");
-                setName("testChannelAccount");
-                setRole(RoleTypes.BOT);
-            }});
-            setChannelId("testChannel");
-            setServiceUrl("testUrl");
-            setConversation(new ConversationAccount() {{
-                setConversationType("");
-                setId("testConversationId");
-                setIsGroup(false);
-                setName("testConversationName");
-                setRole(RoleTypes.USER);
-            }});
-            setUser(new ChannelAccount() {{
-                setId("channelId");
-                setName("testChannelAccount");
-                setRole(RoleTypes.BOT);
-            }});
-        }};
+        ConversationReference cr = new ConversationReference() {
+            {
+                setActivityId("activityId");
+                setBot(new ChannelAccount() {
+                    {
+                        setId("channelId");
+                        setName("testChannelAccount");
+                        setRole(RoleTypes.BOT);
+                    }
+                });
+                setChannelId("testChannel");
+                setServiceUrl("testUrl");
+                setConversation(new ConversationAccount() {
+                    {
+                        setConversationType("");
+                        setId("testConversationId");
+                        setIsGroup(false);
+                        setName("testConversationName");
+                        setRole(RoleTypes.USER);
+                    }
+                });
+                setUser(new ChannelAccount() {
+                    {
+                        setId("channelId");
+                        setName("testChannelAccount");
+                        setRole(RoleTypes.BOT);
+                    }
+                });
+            }
+        };
 
         BotCallbackHandler callback = (turnContext) -> {
             callbackInvoked[0] = true;

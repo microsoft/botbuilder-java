@@ -27,7 +27,8 @@ public enum AttachmentLayoutTypes {
 
     /**
      * Creates a AttachmentLayoutTypes enum from a string.
-     * @param withValue The string value.  Should be a valid enum value.
+     * 
+     * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */
     AttachmentLayoutTypes(String withValue) {

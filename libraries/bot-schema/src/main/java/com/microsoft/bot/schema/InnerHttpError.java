@@ -38,6 +38,7 @@ public class InnerHttpError {
 
     /**
      * Gets Body from failed request.
+     * 
      * @return the body of the error.
      */
     public Object getBody() {
@@ -46,6 +47,7 @@ public class InnerHttpError {
 
     /**
      * Sets Body from failed request.
+     * 
      * @param withBody The body of the error.
      */
     public void setBody(Object withBody) {

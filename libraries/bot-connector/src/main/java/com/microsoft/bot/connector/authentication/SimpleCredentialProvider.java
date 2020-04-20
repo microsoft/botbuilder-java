@@ -33,6 +33,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
 
     /**
      * Gets the app ID for this credential.
+     * 
      * @return The app id.
      */
     public String getAppId() {
@@ -41,6 +42,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
 
     /**
      * Sets the app ID for this credential.
+     * 
      * @param witAppId The app id.
      */
     public void setAppId(String witAppId) {
@@ -49,6 +51,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
 
     /**
      * Gets the app password for this credential.
+     * 
      * @return The password.
      */
     public String getPassword() {
@@ -57,6 +60,7 @@ public class SimpleCredentialProvider implements CredentialProvider {
 
     /**
      * Sets the app password for this credential.
+     * 
      * @param withPassword The password.
      */
     public void setPassword(String withPassword) {
@@ -67,7 +71,8 @@ public class SimpleCredentialProvider implements CredentialProvider {
      * Validates an app ID.
      *
      * @param validateAppId The app ID to validate.
-     * @return If the task is successful, the result is true if appId is valid for the controller; otherwise, false.
+     * @return If the task is successful, the result is true if appId is valid for
+     *         the controller; otherwise, false.
      */
     @Override
     public CompletableFuture<Boolean> isValidAppId(String validateAppId) {
@@ -79,18 +84,20 @@ public class SimpleCredentialProvider implements CredentialProvider {
      *
      * @param validateAppId The ID of the app to get the password for.
      * @return If the task is successful and the app ID is valid, the result
-     * contains the password; otherwise, null.
+     *         contains the password; otherwise, null.
      */
     @Override
     public CompletableFuture<String> getAppPassword(String validateAppId) {
-        return CompletableFuture.completedFuture(StringUtils.equals(validateAppId, appId) ? password : null);
+        return CompletableFuture
+            .completedFuture(StringUtils.equals(validateAppId, appId) ? password : null);
     }
 
     /**
      * Checks whether bot authentication is disabled.
      *
-     * @return A task that represents the work queued to execute If the task is successful and bot authentication
-     * is disabled, the result is true; otherwise, false.
+     * @return A task that represents the work queued to execute If the task is
+     *         successful and bot authentication is disabled, the result is true;
+     *         otherwise, false.
      */
     @Override
     public CompletableFuture<Boolean> isAuthenticationDisabled() {

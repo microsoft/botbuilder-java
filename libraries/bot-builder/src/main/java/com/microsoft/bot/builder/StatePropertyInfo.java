@@ -9,6 +9,7 @@ package com.microsoft.bot.builder;
 public interface StatePropertyInfo {
     /**
      * Gets the name of the property.
+     * 
      * @return The name of the property.
      */
     String getName();

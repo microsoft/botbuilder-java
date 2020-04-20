@@ -38,6 +38,7 @@ public class Entity implements EntitySerialization {
 
     /**
      * Performs a deep copy of an Entity.
+     *
      * @param entity The Entity to clone.
      * @return The cloned Entity.
      */
@@ -46,17 +47,20 @@ public class Entity implements EntitySerialization {
             return null;
         }
 
-        return new Entity() {{
-            setType(entity.getType());
+        return new Entity() {
+            {
+                setType(entity.getType());
 
-            for (String key : entity.getProperties().keySet()) {
-                setProperties(key, entity.getProperties().get(key));
+                for (String key : entity.getProperties().keySet()) {
+                    setProperties(key, entity.getProperties().get(key));
+                }
             }
-        }};
+        };
     }
 
     /**
      * Performs a deep copy of a List of Entities.
+     *
      * @param entities The List of Entities to clone.
      * @return A cloned List.
      */
@@ -72,6 +76,7 @@ public class Entity implements EntitySerialization {
 
     /**
      * Type of this entity (RFC 3987 IRI).
+     *
      * @return the type value
      */
     public String getType() {
@@ -80,6 +85,7 @@ public class Entity implements EntitySerialization {
 
     /**
      * Type of this entity (RFC 3987 IRI).
+     *
      * @param withType the type value to set
      */
     public void setType(String withType) {
@@ -88,6 +94,7 @@ public class Entity implements EntitySerialization {
 
     /**
      * Additional properties not defined by this class.
+     *
      * @return The Map of additional properties.
      */
     @JsonAnyGetter
@@ -97,7 +104,8 @@ public class Entity implements EntitySerialization {
 
     /**
      * Additional properties not defined by this class.
-     * @param key The key name of the property to set.
+     *
+     * @param key   The key name of the property to set.
      * @param value The value of the property.
      */
     @JsonAnySetter
@@ -109,7 +117,7 @@ public class Entity implements EntitySerialization {
      * Converts Entity to other Entity types.
      *
      * @param classType Class extended EntitySerialization
-     * @param <T> The type of the return value.
+     * @param <T>       The type of the return value.
      * @return Entity converted to type T
      */
     @JsonIgnore
@@ -119,12 +127,16 @@ public class Entity implements EntitySerialization {
 
     /**
      * Converts Entity to other Entity types.
-     * @param entity The entity type object.
+     *
+     * @param entity    The entity type object.
      * @param classType Class extended EntitySerialization
-     * @param <T> The type of the return value.
+     * @param <T>       The type of the return value.
      * @return Entity converted to type T
      */
-    public static <T extends EntitySerialization> T getAs(EntitySerialization entity, Class<T> classType) {
+    public static <T extends EntitySerialization> T getAs(
+        EntitySerialization entity,
+        Class<T> classType
+    ) {
         // Serialize
         String tempJson;
         try {
@@ -150,6 +162,7 @@ public class Entity implements EntitySerialization {
      * Converts other Entity types to Entity.
      *
      * This is only intended to be used with other Entity classes:
+     *
      * @see Mention
      * @see Place
      * @see GeoCoordinates

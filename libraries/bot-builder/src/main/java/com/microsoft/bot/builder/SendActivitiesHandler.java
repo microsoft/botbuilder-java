@@ -23,7 +23,9 @@ public interface SendActivitiesHandler {
      * @param next       The delegate to call to continue event processing.
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<ResourceResponse[]> invoke(TurnContext context,
-                                                 List<Activity> activities,
-                                                 Supplier<CompletableFuture<ResourceResponse[]>> next);
+    CompletableFuture<ResourceResponse[]> invoke(
+        TurnContext context,
+        List<Activity> activities,
+        Supplier<CompletableFuture<ResourceResponse[]>> next
+    );
 }

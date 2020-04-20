@@ -19,16 +19,23 @@ public class SimpleAdapter extends BotAdapter {
     private Consumer<Activity> callOnUpdate = null;
     private Consumer<ConversationReference> callOnDelete = null;
 
-    // Callback Function but doesn't need to be.  Avoid java legacy type erasure
+    // Callback Function but doesn't need to be. Avoid java legacy type erasure
     public SimpleAdapter(Consumer<List<Activity>> callOnSend) {
         this(callOnSend, null, null);
     }
 
-    public SimpleAdapter(Consumer<List<Activity>> callOnSend, Consumer<Activity> callOnUpdate) {
+    public SimpleAdapter(
+        Consumer<List<Activity>> callOnSend,
+        Consumer<Activity> callOnUpdate
+    ) {
         this(callOnSend, callOnUpdate, null);
     }
 
-    public SimpleAdapter(Consumer<List<Activity>> callOnSend, Consumer<Activity> callOnUpdate, Consumer<ConversationReference> callOnDelete) {
+    public SimpleAdapter(
+        Consumer<List<Activity>> callOnSend,
+        Consumer<Activity> callOnUpdate,
+        Consumer<ConversationReference> callOnDelete
+    ) {
         this.callOnSend = callOnSend;
         this.callOnUpdate = callOnUpdate;
         this.callOnDelete = callOnDelete;
@@ -38,11 +45,16 @@ public class SimpleAdapter extends BotAdapter {
 
     }
 
-
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(
+        TurnContext context,
+        List<Activity> activities
+    ) {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", activities);
-        Assert.assertTrue("SimpleAdapter.sendActivities: empty activities array.", activities.size() > 0);
+        Assert.assertTrue(
+            "SimpleAdapter.sendActivities: empty activities array.",
+            activities.size() > 0
+        );
 
         if (this.callOnSend != null)
             this.callOnSend.accept(activities);
@@ -56,7 +68,10 @@ public class SimpleAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(
+        TurnContext context,
+        Activity activity
+    ) {
         Assert.assertNotNull("SimpleAdapter.updateActivity: missing activity", activity);
         if (this.callOnUpdate != null)
             this.callOnUpdate.accept(activity);
@@ -64,7 +79,10 @@ public class SimpleAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
+    public CompletableFuture<Void> deleteActivity(
+        TurnContext context,
+        ConversationReference reference
+    ) {
         Assert.assertNotNull("SimpleAdapter.deleteActivity: missing reference", reference);
         if (callOnDelete != null)
             this.callOnDelete.accept(reference);
@@ -83,4 +101,3 @@ public class SimpleAdapter extends BotAdapter {
         return pipelineResult;
     }
 }
-

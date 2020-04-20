@@ -40,6 +40,7 @@ public class TokenResponse {
 
     /**
      * Gets the channelId value.
+     * 
      * @return THe channel id.
      */
     public String getChannelId() {

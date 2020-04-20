@@ -19,11 +19,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Provides context for a turn of a bot.
- * Context provides information needed to process an incoming activity.
- * The context object is created by a {@link BotAdapter} and persists for the
- * length of the turn.
- * {@link Bot}
+ * Provides context for a turn of a bot. Context provides information needed to
+ * process an incoming activity. The context object is created by a
+ * {@link BotAdapter} and persists for the length of the turn. {@link Bot}
  * {@link Middleware}
  */
 public class TurnContextImpl implements TurnContext, AutoCloseable {
@@ -33,7 +31,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     private final BotAdapter adapter;
 
     /**
-     * The activity associated with this turn; or null when processing a proactive message.
+     * The activity associated with this turn; or null when processing a proactive
+     * message.
      */
     private final Activity activity;
 
@@ -66,11 +65,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Creates a context object.
      *
      * @param withAdapter  The adapter creating the context.
-     * @param withActivity The incoming activity for the turn;
-     *                 or {@code null} for a turn for a proactive message.
-     * @throws IllegalArgumentException {@code activity} or
-     *                                  {@code adapter} is {@code null}.
-     *                                  For use by bot adapter implementations only.
+     * @param withActivity The incoming activity for the turn; or {@code null} for a
+     *                     turn for a proactive message.
+     * @throws IllegalArgumentException {@code activity} or {@code adapter} is
+     *                                  {@code null}. For use by bot adapter
+     *                                  implementations only.
      */
     public TurnContextImpl(BotAdapter withAdapter, Activity withActivity) {
         if (withAdapter == null) {
@@ -91,10 +90,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #sendActivity(Activity)}
-     *                                  or {@link #sendActivities(List)} methods are called,
-     *                                  the adapter calls the registered handlers in the order in which they were
+     * @throws IllegalArgumentException {@code handler} is {@code null}. When the
+     *                                  context's {@link #sendActivity(Activity)} or
+     *                                  {@link #sendActivities(List)} methods are
+     *                                  called, the adapter calls the registered
+     *                                  handlers in the order in which they were
      *                                  added to the context object.
      */
     @Override
@@ -112,9 +112,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #updateActivity(Activity)} is called,
-     *                                  the adapter calls the registered handlers in the order in which they were
+     * @throws IllegalArgumentException {@code handler} is {@code null}. When the
+     *                                  context's {@link #updateActivity(Activity)}
+     *                                  is called, the adapter calls the registered
+     *                                  handlers in the order in which they were
      *                                  added to the context object.
      */
     @Override
@@ -132,9 +133,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param handler The handler to add to the context object.
      * @return The updated context object.
-     * @throws IllegalArgumentException {@code handler} is {@code null}.
-     *                                  When the context's {@link #deleteActivity(String)} is called,
-     *                                  the adapter calls the registered handlers in the order in which they were
+     * @throws IllegalArgumentException {@code handler} is {@code null}. When the
+     *                                  context's {@link #deleteActivity(String)} is
+     *                                  called, the adapter calls the registered
+     *                                  handlers in the order in which they were
      *                                  added to the context object.
      */
     @Override
@@ -149,6 +151,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     /**
      * Gets the bot adapter that created this context object.
+     *
      * @return The BotAdaptor for this turn.
      */
     public BotAdapter getAdapter() {
@@ -157,6 +160,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     /**
      * Gets the services registered on this context object.
+     *
      * @return the TurnContextStateCollection for this turn.
      */
     public TurnContextStateCollection getTurnState() {
@@ -185,16 +189,21 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /**
      * Sends a message activity to the sender of the incoming activity.
      *
-     * <p>If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving
-     * channel assigned to the activity.</p>
+     * <p>
+     * If the activity is successfully sent, the task result contains a
+     * {@link ResourceResponse} object containing the ID that the receiving channel
+     * assigned to the activity.
+     * </p>
      *
-     * <p>See the channel's documentation for limits imposed upon the contents of
-     * {@code textReplyToSend}.</p>
+     * <p>
+     * See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.
+     * </p>
      *
      * @param textReplyToSend The text of the message to send.
      * @return A task that represents the work queued to execute.
-     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
+     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or
+     *                                  whitespace.
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend) {
@@ -204,19 +213,25 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /**
      * Sends a message activity to the sender of the incoming activity.
      *
-     * <p>If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving
-     * channel assigned to the activity.</p>
+     * <p>
+     * If the activity is successfully sent, the task result contains a
+     * {@link ResourceResponse} object containing the ID that the receiving channel
+     * assigned to the activity.
+     * </p>
      *
-     * <p>See the channel's documentation for limits imposed upon the contents of
-     * {@code textReplyToSend}.</p>
+     * <p>
+     * See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.
+     * </p>
      *
      * @param textReplyToSend The text of the message to send.
-     * @param speak To control various characteristics of your bot's speech such as voice
-     *              rate, volume, pronunciation, and pitch, specify Speech Synthesis Markup
-     *              Language (SSML) format.
+     * @param speak           To control various characteristics of your bot's
+     *                        speech such as voice rate, volume, pronunciation, and
+     *                        pitch, specify Speech Synthesis Markup Language (SSML)
+     *                        format.
      * @return A task that represents the work queued to execute.
-     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
+     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or
+     *                                  whitespace.
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend, String speak) {
@@ -226,32 +241,42 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     /**
      * Sends a message activity to the sender of the incoming activity.
      *
-     * <p>If the activity is successfully sent, the task result contains
-     * a {@link ResourceResponse} object containing the ID that the receiving
-     * channel assigned to the activity.</p>
+     * <p>
+     * If the activity is successfully sent, the task result contains a
+     * {@link ResourceResponse} object containing the ID that the receiving channel
+     * assigned to the activity.
+     * </p>
      *
-     * <p>See the channel's documentation for limits imposed upon the contents of
-     * {@code textReplyToSend}.</p>
+     * <p>
+     * See the channel's documentation for limits imposed upon the contents of
+     * {@code textReplyToSend}.
+     * </p>
      *
      * @param textReplyToSend The text of the message to send.
-     * @param speak To control various characteristics of your bot's speech such as voice
-     *              rate, volume, pronunciation, and pitch, specify Speech Synthesis Markup
-     *              Language (SSML) format.
-     * @param inputHint (Optional) Input hint.
+     * @param speak           To control various characteristics of your bot's
+     *                        speech such as voice rate, volume, pronunciation, and
+     *                        pitch, specify Speech Synthesis Markup Language (SSML)
+     *                        format.
+     * @param inputHint       (Optional) Input hint.
      * @return A task that represents the work queued to execute.
-     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or whitespace.
+     * @throws IllegalArgumentException {@code textReplyToSend} is {@code null} or
+     *                                  whitespace.
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend,
-                                                            String speak,
-                                                            InputHints inputHint) {
+    public CompletableFuture<ResourceResponse> sendActivity(
+        String textReplyToSend,
+        String speak,
+        InputHints inputHint
+    ) {
         if (StringUtils.isEmpty(textReplyToSend)) {
             throw new IllegalArgumentException("textReplyToSend");
         }
 
-        Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {{
-            setText(textReplyToSend);
-        }};
+        Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {
+            {
+                setText(textReplyToSend);
+            }
+        };
 
         if (StringUtils.isNotEmpty(speak)) {
             activityToSend.setSpeak(speak);
@@ -269,9 +294,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param activityToSend The activity to send.
      * @return A task that represents the work queued to execute.
-     * @throws IllegalArgumentException {@code activity} is {@code null}.
-     *                                  If the activity is successfully sent, the task result contains
-     *                                  a {@link ResourceResponse} object containing the ID that the receiving
+     * @throws IllegalArgumentException {@code activity} is {@code null}. If the
+     *                                  activity is successfully sent, the task
+     *                                  result contains a {@link ResourceResponse}
+     *                                  object containing the ID that the receiving
      *                                  channel assigned to the activity.
      */
     @Override
@@ -293,10 +319,10 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Sends a set of activities to the sender of the incoming activity.
      *
      * @param activities The activities to send.
-     * @return A task that represents the work queued to execute.
-     * If the activities are successfully sent, the task result contains
-     * an array of {@link ResourceResponse} objects containing the IDs that
-     * the receiving channel assigned to the activities.
+     * @return A task that represents the work queued to execute. If the activities
+     *         are successfully sent, the task result contains an array of
+     *         {@link ResourceResponse} objects containing the IDs that the
+     *         receiving channel assigned to the activities.
      */
     @Override
     public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
@@ -308,11 +334,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         // ChannelId's, to the activities we're about to send.
         ConversationReference cr = activity.getConversationReference();
 
-        // Buffer the incoming activities into a List<T> since we allow the set to be manipulated by the callbacks
+        // Buffer the incoming activities into a List<T> since we allow the set to be
+        // manipulated by the callbacks
         // Bind the relevant Conversation Reference properties, such as URLs and
         // ChannelId's, to the activity we're about to send
         List<Activity> bufferedActivities = activities.stream()
-            .map(a -> a.applyConversationReference(cr)).collect(Collectors.toList());
+            .map(a -> a.applyConversationReference(cr))
+            .collect(Collectors.toList());
 
         if (onSendActivities.size() == 0) {
             return sendActivitiesThroughAdapter(bufferedActivities);
@@ -321,34 +349,40 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         return sendActivitiesThroughCallbackPipeline(bufferedActivities, 0);
     }
 
-    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughAdapter(List<Activity> activities) {
-        return adapter.sendActivities(this, activities)
-            .thenApply(responses -> {
-                boolean sentNonTraceActivity = false;
+    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughAdapter(
+        List<Activity> activities
+    ) {
+        return adapter.sendActivities(this, activities).thenApply(responses -> {
+            boolean sentNonTraceActivity = false;
 
-                for (int index = 0; index < responses.length; index++) {
-                    Activity sendActivity = activities.get(index);
-                    sendActivity.setId(responses[index].getId());
-                    sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
-                }
+            for (int index = 0; index < responses.length; index++) {
+                Activity sendActivity = activities.get(index);
+                sendActivity.setId(responses[index].getId());
+                sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
+            }
 
-                if (sentNonTraceActivity) {
-                    responded = true;
-                }
+            if (sentNonTraceActivity) {
+                responded = true;
+            }
 
-                return responses;
-            });
+            return responses;
+        });
     }
 
-    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughCallbackPipeline(List<Activity> activities,
-                                                                                        int nextCallbackIndex) {
+    private CompletableFuture<ResourceResponse[]> sendActivitiesThroughCallbackPipeline(
+        List<Activity> activities,
+        int nextCallbackIndex
+    ) {
 
         if (nextCallbackIndex == onSendActivities.size()) {
             return sendActivitiesThroughAdapter(activities);
         }
 
-        return onSendActivities.get(nextCallbackIndex).invoke(this,
-            activities, () -> sendActivitiesThroughCallbackPipeline(activities, nextCallbackIndex + 1));
+        return onSendActivities.get(nextCallbackIndex)
+            .invoke(
+                this, activities,
+                () -> sendActivitiesThroughCallbackPipeline(activities, nextCallbackIndex + 1)
+            );
     }
 
     /**
@@ -356,8 +390,13 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      *
      * @param withActivity New replacement activity.
      * @return A task that represents the work queued to execute.
-     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP operation failed and the
-     * response contained additional information.
+     * @throws com.microsoft.bot.connector.rest.ErrorResponseException The HTTP
+     *                                                                 operation
+     *                                                                 failed and
+     *                                                                 the response
+     *                                                                 contained
+     *                                                                 additional
+     *                                                                 information.
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(Activity withActivity) {
@@ -366,16 +405,19 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         ConversationReference conversationReference = activity.getConversationReference();
         withActivity.applyConversationReference(conversationReference);
 
-        Supplier<CompletableFuture<ResourceResponse>> actuallyUpdateStuff =
-            () -> getAdapter().updateActivity(this, withActivity);
+        Supplier<CompletableFuture<ResourceResponse>> actuallyUpdateStuff = () -> getAdapter()
+            .updateActivity(this, withActivity);
 
-        return updateActivityInternal(withActivity, onUpdateActivity.iterator(), actuallyUpdateStuff);
+        return updateActivityInternal(
+            withActivity, onUpdateActivity.iterator(), actuallyUpdateStuff
+        );
     }
 
     private CompletableFuture<ResourceResponse> updateActivityInternal(
         Activity updateActivity,
         Iterator<UpdateActivityHandler> updateHandlers,
-        Supplier<CompletableFuture<ResourceResponse>> callAtBottom) {
+        Supplier<CompletableFuture<ResourceResponse>> callAtBottom
+    ) {
 
         BotAssert.activityNotNull(updateActivity);
         if (updateHandlers == null) {
@@ -405,7 +447,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 });
         };
 
-        // Grab the current middleware, which is the 1st element in the array, and execute it
+        // Grab the current middleware, which is the 1st element in the array, and
+        // execute it
         UpdateActivityHandler toCall = updateHandlers.next();
         return toCall.invoke(this, updateActivity, next);
     }
@@ -424,8 +467,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         ConversationReference cr = activity.getConversationReference();
         cr.setActivityId(activityId);
 
-        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () ->
-            getAdapter().deleteActivity(this, cr);
+        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () -> getAdapter()
+            .deleteActivity(this, cr);
 
         return deleteActivityInternal(cr, onDeleteActivity.iterator(), actuallyDeleteStuff);
     }
@@ -436,7 +479,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * The conversation reference's {@link ConversationReference#getActivityId}
      * indicates the activity in the conversation to delete.
      *
-     * @param conversationReference The conversation containing the activity to delete.
+     * @param conversationReference The conversation containing the activity to
+     *                              delete.
      * @return A task that represents the work queued to execute.
      */
     @Override
@@ -445,15 +489,19 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             throw new IllegalArgumentException("conversationReference");
         }
 
-        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () ->
-            getAdapter().deleteActivity(this, conversationReference);
+        Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () -> getAdapter()
+            .deleteActivity(this, conversationReference);
 
-        return deleteActivityInternal(conversationReference, onDeleteActivity.iterator(), actuallyDeleteStuff);
+        return deleteActivityInternal(
+            conversationReference, onDeleteActivity.iterator(), actuallyDeleteStuff
+        );
     }
 
-    private CompletableFuture<Void> deleteActivityInternal(ConversationReference cr,
-                                                           Iterator<DeleteActivityHandler> deleteHandlers,
-                                                           Supplier<CompletableFuture<Void>> callAtBottom) {
+    private CompletableFuture<Void> deleteActivityInternal(
+        ConversationReference cr,
+        Iterator<DeleteActivityHandler> deleteHandlers,
+        Supplier<CompletableFuture<Void>> callAtBottom
+    ) {
         BotAssert.conversationReferenceNotNull(cr);
         if (deleteHandlers == null) {
             throw new IllegalArgumentException("deleteHandlers");
@@ -478,7 +526,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             return deleteActivityInternal(cr, deleteHandlers, callAtBottom);
         };
 
-        // Grab the current middleware, which is the 1st element in the array, and execute it.
+        // Grab the current middleware, which is the 1st element in the array, and
+        // execute it.
         DeleteActivityHandler toCall = deleteHandlers.next();
         return toCall.invoke(this, cr, next);
     }
@@ -497,6 +546,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
 
     /**
      * AutoClosable#close.
+     *
      * @throws Exception If the TurnContextStateCollection.
      */
     @Override

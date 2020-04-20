@@ -20,23 +20,20 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
 /**
- * The Bot Connector REST API allows your bot to send and receive messages
- * to channels configured in the
- * [Bot Framework Developer Portal](https://dev.botframework.com). The
- * Connector service uses industry-standard REST
- * and JSON over HTTPS.
+ * The Bot Connector REST API allows your bot to send and receive messages to
+ * channels configured in the [Bot Framework Developer
+ * Portal](https://dev.botframework.com). The Connector service uses
+ * industry-standard REST and JSON over HTTPS.
  *
  * Client libraries for this REST API are available. See below for a list.
  *
- * Many bots will use both the Bot Connector REST API and the associated
- * [Bot State REST API](/en-us/restapi/state). The
- * Bot State REST API allows a bot to store and retrieve state associated
- * with users and conversations.
+ * Many bots will use both the Bot Connector REST API and the associated [Bot
+ * State REST API](/en-us/restapi/state). The Bot State REST API allows a bot to
+ * store and retrieve state associated with users and conversations.
  *
  * Authentication for both the Bot Connector and Bot State REST APIs is
- * accomplished with JWT Bearer tokens, and is
- * described in detail in the [Connector
- * Authentication](/en-us/restapi/authentication) document.
+ * accomplished with JWT Bearer tokens, and is described in detail in the
+ * [Connector Authentication](/en-us/restapi/authentication) document.
  */
 public class RestConnectorClient extends AzureServiceClient implements ConnectorClient {
     private static final int RETRY_TIMEOUT = 30;
@@ -53,7 +50,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     /**
      * Initializes an instance of ConnectorClient client.
      *
-     * @param baseUrl the base URL of the host
+     * @param baseUrl     the base URL of the host
      * @param credentials the management credentials for Azure
      */
     public RestConnectorClient(String baseUrl, ServiceClientCredentials credentials) {
@@ -82,11 +79,12 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.conversations = new RestConversations(restClient().retrofit(), this);
         this.userAgentString = UserAgent.value();
 
-        //this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
+        // this.restClient().withLogLevel(LogLevel.BODY_AND_HEADERS);
     }
 
     /**
      * Gets the REST client.
+     *
      * @return the {@link RestClient} object.
      */
     @Override
@@ -96,6 +94,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Returns the base url for this ConnectorClient.
+     *
      * @return The base url.
      */
     @Override
@@ -105,6 +104,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Returns the credentials in use.
+     *
      * @return The ServiceClientCredentials in use.
      */
     public ServiceClientCredentials credentials() {
@@ -117,6 +117,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Gets the preferred language for the response..
+     *
      * @return the acceptLanguage value.
      */
     @Override
@@ -126,6 +127,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Sets the preferred language for the response..
+     *
      * @param withAcceptLanguage the acceptLanguage value.
      */
     @Override
@@ -137,6 +139,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Sets the Rest retry strategy.
+     *
      * @param strategy The {@link RetryStrategy} to use.
      */
     public void setRestRetryStrategy(RetryStrategy strategy) {
@@ -145,17 +148,22 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Gets the Rest retry strategy.
+     *
      * @return The {@link RetryStrategy} being used.
      */
     public RetryStrategy getRestRetryStrategy() {
         return this.retryStrategy;
     }
 
-    /** Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30. */
+    /**
+     * Gets or sets the retry timeout in seconds for Long Running Operations.
+     * Default value is 30.
+     */
     private int longRunningOperationRetryTimeout;
 
     /**
-     * Gets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Gets the retry timeout in seconds for Long Running Operations. Default value
+     * is 30.
      *
      * @return the timeout value.
      */
@@ -165,7 +173,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * Sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Sets the retry timeout in seconds for Long Running Operations. Default value
+     * is 30.
      *
      * @param timeout the longRunningOperationRetryTimeout value.
      */
@@ -174,11 +183,15 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         this.longRunningOperationRetryTimeout = timeout;
     }
 
-    /** When set to true a unique x-ms-client-request-id value is generated and included in each request. */
+    /**
+     * When set to true a unique x-ms-client-request-id value is generated and
+     * included in each request.
+     */
     private boolean generateClientRequestId;
 
     /**
-     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and
+     * included in each request.
      *
      * @return the generateClientRequestId value.
      */
@@ -188,7 +201,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * When set to true a unique x-ms-client-request-id value is generated and included in each request.
+     * When set to true a unique x-ms-client-request-id value is generated and
+     * included in each request.
      *
      * @param requestId the generateClientRequestId value.
      */
@@ -204,6 +218,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Gets the Attachments object to access its operations.
+     *
      * @return the Attachments object.
      */
     @Override
@@ -218,6 +233,7 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * Gets the Conversations object to access its operations.
+     *
      * @return the Conversations object.
      */
     @Override
@@ -238,7 +254,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
 
     /**
      * This is to override the AzureServiceClient version.
-     * @return The user agent.  Same as {@link #getUserAgent()}
+     *
+     * @return The user agent. Same as {@link #getUserAgent()}
      */
     @Override
     public String userAgent() {
@@ -246,23 +263,26 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
     }
 
     /**
-     * This is a copy of what the Azure Client does to create a RestClient.  This returns
-     * a RestClient.Builder so that the app can create a custom RestClient, and supply
-     * it to ConnectorClient during construction.
+     * This is a copy of what the Azure Client does to create a RestClient. This
+     * returns a RestClient.Builder so that the app can create a custom RestClient,
+     * and supply it to ConnectorClient during construction.
      *
-     * One use case of this is for supplying a Proxy to the RestClient.  Though it is
+     * One use case of this is for supplying a Proxy to the RestClient. Though it is
      * recommended to set proxy information via the Java system properties.
      *
-     * @param baseUrl Service endpoint
+     * @param baseUrl     Service endpoint
      * @param credentials auth credentials.
      * @return A RestClient.Builder.
      */
-    public static RestClient.Builder getDefaultRestClientBuilder(String baseUrl, ServiceClientCredentials credentials) {
+    public static RestClient.Builder getDefaultRestClientBuilder(
+        String baseUrl,
+        ServiceClientCredentials credentials
+    ) {
         return new RestClient.Builder(new OkHttpClient.Builder(), new Retrofit.Builder())
-                .withBaseUrl(baseUrl)
-                .withCredentials(credentials)
-                .withSerializerAdapter(new AzureJacksonAdapter())
-                .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
+            .withBaseUrl(baseUrl)
+            .withCredentials(credentials)
+            .withSerializerAdapter(new AzureJacksonAdapter())
+            .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
     }
 
     /**

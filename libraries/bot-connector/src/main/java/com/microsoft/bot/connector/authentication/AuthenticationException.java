@@ -8,6 +8,7 @@ public class AuthenticationException extends RuntimeException {
 
     /**
      * Construct with exception.
+     * 
      * @param t The cause.
      */
     public AuthenticationException(Throwable t) {
@@ -16,6 +17,7 @@ public class AuthenticationException extends RuntimeException {
 
     /**
      * Construct with message.
+     * 
      * @param message The exception message.
      */
     public AuthenticationException(String message) {
@@ -24,8 +26,9 @@ public class AuthenticationException extends RuntimeException {
 
     /**
      * Construct with caught exception and message.
+     * 
      * @param message The message.
-     * @param t The caught exception.
+     * @param t       The caught exception.
      */
     public AuthenticationException(String message, Throwable t) {
         super(message, t);
