@@ -30,6 +30,7 @@ import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.AadResourceUrls;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.CallerIdConstants;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
@@ -297,10 +298,8 @@ public class BotFrameworkAdapter extends BotAdapter
 
         CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
 
-        try (TurnContextImpl context = new TurnContextImpl(
-            this,
-            reference.getContinuationActivity()
-        )) {
+        try (TurnContextImpl context =
+            new TurnContextImpl(this, reference.getContinuationActivity())) {
             // Hand craft Claims Identity.
             HashMap<String, String> claims = new HashMap<String, String>() {
                 {
@@ -388,6 +387,7 @@ public class BotFrameworkAdapter extends BotAdapter
         CompletableFuture<InvokeResponse> pipelineResult = new CompletableFuture<>();
 
         try (TurnContextImpl context = new TurnContextImpl(this, activity)) {
+            activity.setCallerId(generateCallerId(identity).join());
             context.getTurnState().add(BOT_IDENTITY_KEY, identity);
 
             pipelineResult = createConnectorClient(activity.getServiceUrl(), identity)
@@ -423,6 +423,32 @@ public class BotFrameworkAdapter extends BotAdapter
         }
 
         return pipelineResult;
+    }
+
+    @SuppressWarnings({"PMD"})
+    private CompletableFuture<String> generateCallerId(ClaimsIdentity claimsIdentity) {
+        return credentialProvider.isAuthenticationDisabled()
+            .thenApply(
+                is_auth_enabled -> {
+                    // Is the bot accepting all incoming messages?
+                    if (!is_auth_enabled) {
+                        return null;
+                    }
+
+                    // Is the activity from Public Azure?
+                    if (channelProvider == null || channelProvider.isPublicAzure()) {
+                        return CallerIdConstants.PUBLIC_AZURE_CHANNEL;
+                    }
+
+                    // Is the activity from Azure Gov?
+                    if (channelProvider != null && channelProvider.isGovernment()) {
+                        return CallerIdConstants.US_GOV_CHANNEL;
+                    }
+
+                    // Return null so that the callerId is cleared.
+                    return null;
+                }
+            );
     }
 
     /**
@@ -492,15 +518,14 @@ public class BotFrameworkAdapter extends BotAdapter
                     // if it is a Trace activity we only send to the channel if it's the emulator.
                     response = null;
                 } else if (!StringUtils.isEmpty(activity.getReplyToId())) {
-                    ConnectorClient connectorClient = context.getTurnState()
-                        .get(CONNECTOR_CLIENT_KEY);
+                    ConnectorClient connectorClient =
+                        context.getTurnState().get(CONNECTOR_CLIENT_KEY);
                     response = connectorClient.getConversations().replyToActivity(activity).join();
                 } else {
-                    ConnectorClient connectorClient = context.getTurnState()
-                        .get(CONNECTOR_CLIENT_KEY);
-                    response = connectorClient.getConversations()
-                        .sendToConversation(activity)
-                        .join();
+                    ConnectorClient connectorClient =
+                        context.getTurnState().get(CONNECTOR_CLIENT_KEY);
+                    response =
+                        connectorClient.getConversations().sendToConversation(activity).join();
                 }
 
                 // If No response is set, then default to a "simple" response. This can't really
@@ -518,9 +543,8 @@ public class BotFrameworkAdapter extends BotAdapter
                 // https://github.com/Microsoft/botbuilder-dotnet/issues/460
                 // bug report : https://github.com/Microsoft/botbuilder-dotnet/issues/465
                 if (response == null) {
-                    response = new ResourceResponse(
-                        (activity.getId() == null) ? "" : activity.getId()
-                    );
+                    response =
+                        new ResourceResponse((activity.getId() == null) ? "" : activity.getId());
                 }
 
                 responses[index] = response;
@@ -1314,8 +1338,8 @@ public class BotFrameworkAdapter extends BotAdapter
                         usingAppCredentials
                     );
                 } else {
-                    AppCredentials emptyCredentials = channelProvider != null
-                        && channelProvider.isGovernment()
+                    AppCredentials emptyCredentials =
+                        channelProvider != null && channelProvider.isGovernment()
                             ? MicrosoftGovernmentAppCredentials.empty()
                             : MicrosoftAppCredentials.empty();
                     connectorClient = new RestConnectorClient(
@@ -1395,8 +1419,8 @@ public class BotFrameworkAdapter extends BotAdapter
                     && StringUtils.isEmpty(turnContext.getActivity().getConversation().getTenantId())
             ) {
 
-                JsonNode teamsChannelData = new ObjectMapper()
-                    .valueToTree(turnContext.getActivity().getChannelData());
+                JsonNode teamsChannelData =
+                    new ObjectMapper().valueToTree(turnContext.getActivity().getChannelData());
                 if (
                     teamsChannelData != null && teamsChannelData.has("tenant")
                         && teamsChannelData.get("tenant").has("id")
