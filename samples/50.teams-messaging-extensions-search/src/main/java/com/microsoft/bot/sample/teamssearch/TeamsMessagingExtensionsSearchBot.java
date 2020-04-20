@@ -103,7 +103,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         TurnContext turnContext,
         Object query) {
 
-        LinkedHashMap cardValue = ((LinkedHashMap) query);
+        Map cardValue = (Map) query;
         List<String> data = (ArrayList) cardValue.get("data");
         ThumbnailCard card = new ThumbnailCard() {{
             setTitle(data.get(0));
