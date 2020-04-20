@@ -8,10 +8,17 @@ import com.microsoft.bot.builder.teams.TeamsActivityHandler;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.*;
 import com.microsoft.bot.schema.teams.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
-import okhttp3.*;
-import org.json.*;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
     private String appId;
     private String appPassword;
+    private static final Logger botLogger = LogManager.getLogger();
 
     public TeamsMessagingExtensionsSearchBot(Configuration configuration) {
         appId = configuration.getProperty("MicrosoftAppId");
@@ -100,6 +108,11 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         ThumbnailCard card  = new ThumbnailCard(){{
             setTitle(data.get(0));
             setSubtitle(data.get(2));
+            setButtons(Arrays.asList(new CardAction(){{
+                setType(ActionTypes.OPEN_URL);
+                setTitle("Project");
+                setValue(data.get(3));
+            }}));
         }};
 
         if (!StringUtils.isEmpty(data.get(4))) {
@@ -135,6 +148,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
                 Response response = client.newCall(request).execute();
                 JSONObject obj = new JSONObject(response.body().string());
                 JSONArray dataArray = (JSONArray) obj.get("data");
+
                 dataArray.forEach(i -> {
                     JSONObject item = (JSONObject) i;
                     filteredItems.add(new String [] {
@@ -147,7 +161,7 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
                 });
 
             } catch (IOException e) {
-                e.printStackTrace();
+                botLogger.log(Level.ERROR, e.getStackTrace());
             }
             return filteredItems;
         });
