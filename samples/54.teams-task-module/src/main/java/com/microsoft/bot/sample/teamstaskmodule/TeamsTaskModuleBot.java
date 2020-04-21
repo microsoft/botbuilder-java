@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.sample.teamstaskmodule;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
@@ -14,6 +15,9 @@ import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 public class TeamsTaskModuleBot extends TeamsActivityHandler {
     private String appId;
     private String appPassword;
+    private static final Logger botLogger = LogManager.getLogger(TeamsTaskModuleBot.class);
 
     public TeamsTaskModuleBot(Configuration configuration) {
         appId = configuration.getProperty("MicrosoftAppId");
@@ -66,7 +71,14 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest) {
 
-        Activity reply = MessageFactory.text("onTeamsTaskModuleFetch TaskModuleRequest: " );
+        Activity reply = null;
+        try {
+            reply = MessageFactory.text(
+                "onTeamsTaskModuleFetch TaskModuleRequest: " +
+                new ObjectMapper().writeValueAsString(taskModuleRequest));
+        } catch (JsonProcessingException e) {
+            botLogger.log(Level.ERROR, e.getStackTrace());
+        }
 
         turnContext.sendActivity(reply)
             .thenApply(resourceResponse -> null);
@@ -91,7 +103,14 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest){
 
-        Activity reply = MessageFactory.text("onTeamsTaskModuleSubmit TaskModuleRequest: " );
+        Activity reply = null;
+        try {
+            reply = MessageFactory.text(
+                "onTeamsTaskModuleSubmit TaskModuleRequest: " +
+                    new ObjectMapper().writeValueAsString(taskModuleRequest));
+        } catch (JsonProcessingException e) {
+            botLogger.log(Level.ERROR, e.getStackTrace());
+        }
 
         turnContext.sendActivity(reply)
             .thenApply(resourceResponse -> null);
@@ -108,10 +127,15 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     private Attachment getTaskModuleHeroCard()
     {
         HeroCard card =  new HeroCard() {{
-        setTitle("");
-        setSubtitle("Click the buttons below to update this card");
+        setTitle("Task Module Invocation from Hero Card");
+        setSubtitle("This is a hero card with a Task Module Action button.  Click the button to show an Adaptive Card within a Task Module.");
         setButtons(Arrays.asList(
-            new TaskModuleAction("Adaptive Card", new JSONObject().put("data", "adaptivecard").toString())
+            new TaskModuleAction(
+                "Adaptive Card",
+                new JSONObject().put(
+                    "data",
+                    "adaptivecard"
+                ).toString())
             ));
         }};
         return card.toAttachment();
@@ -124,12 +148,12 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
 
             return new Attachment(){{
                 setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(new ObjectMapper().readValue((String) result, ObjectNode.class));
+                setContent(new ObjectMapper().readValue(result, ObjectNode.class));
             }};
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            botLogger.log(Level.ERROR, e.getStackTrace());
         } catch (IOException e) {
-            e.printStackTrace();
+            botLogger.log(Level.ERROR, e.getStackTrace());
         }
         return new Attachment();
     }

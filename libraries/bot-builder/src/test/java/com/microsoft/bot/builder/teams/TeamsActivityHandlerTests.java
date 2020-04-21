@@ -878,7 +878,7 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsTaskModuleSubmit(TurnContext turnContext,
+        protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleSubmit(TurnContext turnContext,
                                                                   TaskModuleRequest taskModuleRequest
         ) {
             record.add("onTeamsTaskModuleSubmit");
