@@ -21,6 +21,7 @@ public class ClaimsIdentity {
 
     /**
      * Manually construct with auth issuer.
+     * 
      * @param withAuthIssuer The auth issuer.
      */
     public ClaimsIdentity(String withAuthIssuer) {
@@ -29,8 +30,9 @@ public class ClaimsIdentity {
 
     /**
      * Manually construct with issuer and claims.
+     * 
      * @param withAuthIssuer The auth issuer.
-     * @param withClaims A Map of claims.
+     * @param withClaims     A Map of claims.
      */
     public ClaimsIdentity(String withAuthIssuer, Map<String, String> withClaims) {
         this.issuer = withAuthIssuer;
@@ -39,6 +41,7 @@ public class ClaimsIdentity {
 
     /**
      * Extract data from an auth0 JWT.
+     * 
      * @param jwt The decoded JWT.
      */
     public ClaimsIdentity(DecodedJWT jwt) {
@@ -51,6 +54,7 @@ public class ClaimsIdentity {
 
     /**
      * Gets whether the claim is authenticated.
+     * 
      * @return true if authenticated.
      */
     public boolean isAuthenticated() {
@@ -59,6 +63,7 @@ public class ClaimsIdentity {
 
     /**
      * The claims for this identity.
+     * 
      * @return A Map of claims.
      */
     public Map<String, String> claims() {
@@ -67,6 +72,7 @@ public class ClaimsIdentity {
 
     /**
      * The issuer.
+     * 
      * @return The issuer.
      */
     public String getIssuer() {

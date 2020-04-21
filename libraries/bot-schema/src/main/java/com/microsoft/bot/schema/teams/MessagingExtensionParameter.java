@@ -17,6 +17,7 @@ public class MessagingExtensionParameter {
 
     /**
      * Gets name of the parameter.
+     * 
      * @return The parameter name.
      */
     public String getName() {
@@ -25,6 +26,7 @@ public class MessagingExtensionParameter {
 
     /**
      * Sets name of the parameter.
+     * 
      * @param withName The parameter name.
      */
     public void setName(String withName) {
@@ -33,6 +35,7 @@ public class MessagingExtensionParameter {
 
     /**
      * Gets value of the parameter.
+     * 
      * @return The parameter value.
      */
     public Object getValue() {
@@ -41,6 +44,7 @@ public class MessagingExtensionParameter {
 
     /**
      * Sets value of the parameter.
+     * 
      * @param withValue The parameter value.
      */
     public void setValue(Object withValue) {

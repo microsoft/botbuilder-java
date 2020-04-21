@@ -34,10 +34,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. For this sample, the {@link #onMessageActivity(TurnContext)} echos
+ * the text back to the user. The {@link #onMembersAdded(List, TurnContext)}
+ * will send a greeting to new conversation participants.
+ * </p>
  */
 @Component
 public class TeamsConversationBot extends TeamsActivityHandler {
@@ -72,23 +74,26 @@ public class TeamsConversationBot extends TeamsActivityHandler {
                     int count = 0;
                 };
 
-                HeroCard card = new HeroCard() {{
-                    setTitle("Welcome Card");
-                    setText("Click the buttons below to update this card");
-                    setButtons(Arrays.asList(
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Update Card");
-                            setText("UpdateCardAction");
-                            setValue(value);
-                        }},
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Message All Members");
-                            setText("MessageAllMembers");
-                        }}
-                    ));
-                }};
+                HeroCard card = new HeroCard() {
+                    {
+                        setTitle("Welcome Card");
+                        setText("Click the buttons below to update this card");
+                        setButtons(Arrays.asList(new CardAction() {
+                            {
+                                setType(ActionTypes.MESSAGE_BACK);
+                                setTitle("Update Card");
+                                setText("UpdateCardAction");
+                                setValue(value);
+                            }
+                        }, new CardAction() {
+                            {
+                                setType(ActionTypes.MESSAGE_BACK);
+                                setTitle("Message All Members");
+                                setText("MessageAllMembers");
+                            }
+                        }));
+                    }
+                };
 
                 return turnContext.sendActivity(MessageFactory.attachment(card.toAttachment()))
                     .thenApply(resourceResponse -> null);
@@ -102,9 +107,18 @@ public class TeamsConversationBot extends TeamsActivityHandler {
         TurnContext turnContext
     ) {
         return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(
-                MessageFactory.text("Welcome to the team " + channel.getGivenName() + " " + channel.getSurname() + ".")))
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
+            .map(
+                channel -> turnContext.sendActivity(
+                    MessageFactory.text(
+                        "Welcome to the team " + channel.getGivenName() + " " + channel.getSurname()
+                            + "."
+                    )
+                )
+            )
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);
     }
@@ -120,47 +134,50 @@ public class TeamsConversationBot extends TeamsActivityHandler {
         String serviceUrl = turnContext.getActivity().getServiceUrl();
         MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
 
-        return TeamsInfo.getMembers(turnContext)
-            .thenCompose(members -> {
-                List<CompletableFuture<Void>> conversations = new ArrayList<>();
+        return TeamsInfo.getMembers(turnContext).thenCompose(members -> {
+            List<CompletableFuture<Void>> conversations = new ArrayList<>();
 
-                // Send a message to each member.  These will all go out
-                // at the same time.
-                for (TeamsChannelAccount member : members) {
-                    Activity proactiveMessage = MessageFactory.text(
-                        "Hello " + member.getGivenName() + " " + member.getSurname()
-                            + ". I'm a Teams conversation bot.");
+            // Send a message to each member. These will all go out
+            // at the same time.
+            for (TeamsChannelAccount member : members) {
+                Activity proactiveMessage = MessageFactory.text(
+                    "Hello " + member.getGivenName() + " " + member.getSurname()
+                        + ". I'm a Teams conversation bot."
+                );
 
-                    ConversationParameters conversationParameters = new ConversationParameters() {{
-                       setIsGroup(false);
-                       setBot(turnContext.getActivity().getRecipient());
-                       setMembers(Collections.singletonList(member));
-                       setTenantId(turnContext.getActivity().getConversation().getTenantId());
-                    }};
+                ConversationParameters conversationParameters = new ConversationParameters() {
+                    {
+                        setIsGroup(false);
+                        setBot(turnContext.getActivity().getRecipient());
+                        setMembers(Collections.singletonList(member));
+                        setTenantId(turnContext.getActivity().getConversation().getTenantId());
+                    }
+                };
 
-                    conversations.add(
-                        ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
-                            teamsChannelId,
-                            serviceUrl,
-                            credentials,
-                            conversationParameters,
-                            (context) -> {
-                                ConversationReference reference = context.getActivity().getConversationReference();
-                                return context.getAdapter().continueConversation(
-                                    appId,
-                                    reference,
-                                    (inner_context) -> inner_context.sendActivity(proactiveMessage)
+                conversations.add(
+                    ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
+                        teamsChannelId, serviceUrl, credentials, conversationParameters,
+                        (context) -> {
+                            ConversationReference reference =
+                                context.getActivity().getConversationReference();
+                            return context.getAdapter()
+                                .continueConversation(
+                                    appId, reference, (inner_context) -> inner_context
+                                        .sendActivity(proactiveMessage)
                                         .thenApply(resourceResponse -> null)
                                 );
-                            }
-                        )
-                    );
-                }
+                        }
+                    )
+                );
+            }
 
-                return CompletableFuture.allOf(conversations.toArray(new CompletableFuture[0]));
-            })
+            return CompletableFuture.allOf(conversations.toArray(new CompletableFuture[0]));
+        })
             // After all member messages are sent, send confirmation to the user.
-            .thenApply(conversations -> turnContext.sendActivity(MessageFactory.text("All messages have been sent.")))
+            .thenApply(
+                conversations -> turnContext
+                    .sendActivity(MessageFactory.text("All messages have been sent."))
+            )
             .thenApply(allSent -> null);
     }
 
@@ -168,45 +185,49 @@ public class TeamsConversationBot extends TeamsActivityHandler {
         Map data = (Map) turnContext.getActivity().getValue();
         data.put("count", (int) data.get("count") + 1);
 
-        HeroCard card = new HeroCard() {{
-            setTitle("Welcome Card");
-            setText("Update count - " + data.get("count"));
-            setButtons(Arrays.asList(
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Update Card");
-                    setText("UpdateCardAction");
-                    setValue(data);
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Message All Members");
-                    setText("MessageAllMembers");
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Delete card");
-                    setText("Delete");
-                }}
-            ));
-        }};
+        HeroCard card = new HeroCard() {
+            {
+                setTitle("Welcome Card");
+                setText("Update count - " + data.get("count"));
+                setButtons(Arrays.asList(new CardAction() {
+                    {
+                        setType(ActionTypes.MESSAGE_BACK);
+                        setTitle("Update Card");
+                        setText("UpdateCardAction");
+                        setValue(data);
+                    }
+                }, new CardAction() {
+                    {
+                        setType(ActionTypes.MESSAGE_BACK);
+                        setTitle("Message All Members");
+                        setText("MessageAllMembers");
+                    }
+                }, new CardAction() {
+                    {
+                        setType(ActionTypes.MESSAGE_BACK);
+                        setTitle("Delete card");
+                        setText("Delete");
+                    }
+                }));
+            }
+        };
 
         Activity updatedActivity = MessageFactory.attachment(card.toAttachment());
         updatedActivity.setId(turnContext.getActivity().getReplyToId());
 
-        return turnContext.updateActivity(updatedActivity)
-            .thenApply(resourceResponse -> null);
+        return turnContext.updateActivity(updatedActivity).thenApply(resourceResponse -> null);
     }
 
     private CompletableFuture<Void> mentionActivity(TurnContext turnContext) {
         Mention mention = new Mention();
         mention.setMentioned(turnContext.getActivity().getFrom());
-        mention.setText("<at>" + URLEncoder.encode(turnContext.getActivity().getFrom().getName()) + "</at>");
+        mention.setText(
+            "<at>" + URLEncoder.encode(turnContext.getActivity().getFrom().getName()) + "</at>"
+        );
 
         Activity replyActivity = MessageFactory.text("Hello " + mention.getText() + ".'");
         replyActivity.setMentions(Collections.singletonList(mention));
 
-        return turnContext.sendActivity(replyActivity)
-            .thenApply(resourceResponse -> null);
+        return turnContext.sendActivity(replyActivity).thenApply(resourceResponse -> null);
     }
 }

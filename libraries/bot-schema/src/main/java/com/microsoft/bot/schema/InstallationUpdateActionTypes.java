@@ -27,7 +27,8 @@ public enum InstallationUpdateActionTypes {
 
     /**
      * Creates a ActionTypes enum from a string.
-     * @param withValue The string value.  Should be a valid enum value.
+     * 
+     * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */
     InstallationUpdateActionTypes(String withValue) {
@@ -38,7 +39,8 @@ public enum InstallationUpdateActionTypes {
      * Parses a serialized value to a InstallationUpdateActionTypes instance.
      *
      * @param value the serialized value to parse.
-     * @return the parsed InstallationUpdateActionTypes object, or null if unable to parse.
+     * @return the parsed InstallationUpdateActionTypes object, or null if unable to
+     *         parse.
      */
     @JsonCreator
     public static InstallationUpdateActionTypes fromString(String value) {

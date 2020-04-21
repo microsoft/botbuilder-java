@@ -26,8 +26,9 @@ public class O365ConnectorCardActionCard extends O365ConnectorCardActionBase {
     private List<O365ConnectorCardActionBase> actions;
 
     /**
-     * Gets list of inputs contained in this ActionCard whose each
-     * item can be in any subtype of O365ConnectorCardInputBase.
+     * Gets list of inputs contained in this ActionCard whose each item can be in
+     * any subtype of O365ConnectorCardInputBase.
+     * 
      * @return The card inputs.
      */
     public List<O365ConnectorCardInputBase> getInputs() {
@@ -35,8 +36,9 @@ public class O365ConnectorCardActionCard extends O365ConnectorCardActionBase {
     }
 
     /**
-     * Sets list of inputs contained in this ActionCard whose each
-     * item can be in any subtype of O365ConnectorCardInputBase.
+     * Sets list of inputs contained in this ActionCard whose each item can be in
+     * any subtype of O365ConnectorCardInputBase.
+     * 
      * @param withInputs The card inputs.
      */
     public void setInputs(List<O365ConnectorCardInputBase> withInputs) {
@@ -44,9 +46,10 @@ public class O365ConnectorCardActionCard extends O365ConnectorCardActionBase {
     }
 
     /**
-     * Gets list of actions contained in this ActionCard whose each
-     * item can be in any subtype of O365ConnectorCardActionBase except
+     * Gets list of actions contained in this ActionCard whose each item can be in
+     * any subtype of O365ConnectorCardActionBase except
      * O365ConnectorCardActionCard, as nested ActionCard is forbidden.
+     * 
      * @return The card actions.
      */
     public List<O365ConnectorCardActionBase> getActions() {
@@ -54,9 +57,10 @@ public class O365ConnectorCardActionCard extends O365ConnectorCardActionBase {
     }
 
     /**
-     * Sets list of actions contained in this ActionCard whose each
-     * item can be in any subtype of O365ConnectorCardActionBase except
+     * Sets list of actions contained in this ActionCard whose each item can be in
+     * any subtype of O365ConnectorCardActionBase except
      * O365ConnectorCardActionCard, as nested ActionCard is forbidden.
+     * 
      * @param withActions The card actions.
      */
     public void setActions(List<O365ConnectorCardActionBase> withActions) {

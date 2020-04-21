@@ -23,10 +23,16 @@ public class TestAdapterTests {
                 turnContext.sendActivity(turnContext.getActivity().createReply("two")).join();
                 turnContext.sendActivity(turnContext.getActivity().createReply("three")).join();
                 break;
+
             case "ignore":
                 break;
+
             default:
-                turnContext.sendActivity(turnContext.getActivity().createReply("echo:" + turnContext.getActivity().getText())).join();
+                turnContext.sendActivity(
+                    turnContext.getActivity().createReply(
+                        "echo:" + turnContext.getActivity().getText()
+                    )
+                ).join();
                 break;
         }
 
@@ -43,11 +49,9 @@ public class TestAdapterTests {
             new TestFlow(adapter, turnContext -> {
                 turnContext.sendActivity(turnContext.getActivity().createReply("one")).join();
                 return CompletableFuture.completedFuture(null);
-            })
-                .test("foo", activity -> {
-                    throw new RuntimeException(uniqueExceptionId);
-                })
-                .startTest().join();
+            }).test("foo", activity -> {
+                throw new RuntimeException(uniqueExceptionId);
+            }).startTest().join();
 
             Assert.fail("An exception should have been thrown");
         } catch (Throwable t) {
@@ -64,11 +68,9 @@ public class TestAdapterTests {
 
             new TestFlow(adapter, turnContext -> {
                 throw new RuntimeException(uniqueExceptionId);
-            })
-                .test("foo", activity -> {
-                    Assert.assertNull(activity);
-                })
-                .startTest().join();
+            }).test("foo", activity -> {
+                Assert.assertNull(activity);
+            }).startTest().join();
 
             Assert.fail("An exception should have been thrown");
         } catch (Throwable t) {
@@ -86,12 +88,9 @@ public class TestAdapterTests {
             new TestFlow(adapter, turnContext -> {
                 turnContext.sendActivity(turnContext.getActivity().createReply("one")).join();
                 return CompletableFuture.completedFuture(null);
-            })
-                .send("foo")
-                .assertReply(activity -> {
-                    throw new RuntimeException(uniqueExceptionId);
-                })
-                .startTest().join();
+            }).send("foo").assertReply(activity -> {
+                throw new RuntimeException(uniqueExceptionId);
+            }).startTest().join();
 
             Assert.fail("An exception should have been thrown");
         } catch (Throwable t) {
@@ -102,55 +101,63 @@ public class TestAdapterTests {
     @Test
     public void TestAdapter_SaySimple() {
         TestAdapter adapter = new TestAdapter();
-        new TestFlow(adapter, this::myBotLogic)
-            .test("foo", "echo:foo", "say with string works")
-            .startTest().join();
+        new TestFlow(adapter, this::myBotLogic).test(
+            "foo",
+            "echo:foo",
+            "say with string works"
+        ).startTest().join();
     }
 
     @Test
     public void TestAdapter_Say() {
         TestAdapter adapter = new TestAdapter();
-        new TestFlow(adapter, this::myBotLogic)
-            .test("foo", "echo:foo", "say with string works")
-            .test("foo", new Activity() {{ setType(ActivityTypes.MESSAGE); setText("echo:foo");}}, "say with activity works")
-            .test("foo", activity -> {
-                Assert.assertEquals("echo:foo", activity.getText());
-            }, "say with validator works")
-            .startTest().join();
+        new TestFlow(adapter, this::myBotLogic).test(
+            "foo",
+            "echo:foo",
+            "say with string works"
+        ).test("foo", new Activity() {
+            {
+                setType(ActivityTypes.MESSAGE);
+                setText("echo:foo");
+            }
+        }, "say with activity works").test("foo", activity -> {
+            Assert.assertEquals("echo:foo", activity.getText());
+        }, "say with validator works").startTest().join();
     }
 
     @Test
     public void TestAdapter_SendReply() {
         TestAdapter adapter = new TestAdapter();
-        new TestFlow(adapter, this::myBotLogic)
-            .send("foo").assertReply("echo:foo", "say with string works")
-            .send("foo").assertReply(new Activity() {{ setType(ActivityTypes.MESSAGE); setText("echo:foo");}}, "say with activity works")
-            .send("foo").assertReply(activity -> {
-                Assert.assertEquals("echo:foo", activity.getText());
-            }, "say with validator works")
-            .startTest().join();
+        new TestFlow(adapter, this::myBotLogic).send("foo").assertReply(
+            "echo:foo",
+            "say with string works"
+        ).send("foo").assertReply(new Activity() {
+            {
+                setType(ActivityTypes.MESSAGE);
+                setText("echo:foo");
+            }
+        }, "say with activity works").send("foo").assertReply(activity -> {
+            Assert.assertEquals("echo:foo", activity.getText());
+        }, "say with validator works").startTest().join();
     }
 
     @Test
     public void TestAdapter_ReplyOneOf() {
         TestAdapter adapter = new TestAdapter();
-        new TestFlow(adapter, this::myBotLogic)
-            .send("foo").assertReplyOneOf(new String[]{"echo:bar", "echo:foo", "echo:blat"}, "say with string works")
-            .startTest().join();
+        new TestFlow(adapter, this::myBotLogic).send("foo").assertReplyOneOf(
+            new String[] { "echo:bar", "echo:foo", "echo:blat" },
+            "say with string works"
+        ).startTest().join();
     }
 
     @Test
     public void TestAdapter_MultipleReplies() {
         TestAdapter adapter = new TestAdapter();
-        new TestFlow(adapter, this::myBotLogic)
-            .send("foo").assertReply("echo:foo")
-            .send("bar").assertReply("echo:bar")
-            .send("ignore")
-            .send("count")
-            .assertReply("one")
-            .assertReply("two")
-            .assertReply("three")
-            .startTest().join();
+        new TestFlow(adapter, this::myBotLogic).send("foo").assertReply("echo:foo").send(
+            "bar"
+        ).assertReply("echo:bar").send("ignore").send("count").assertReply("one").assertReply(
+            "two"
+        ).assertReply("three").startTest().join();
     }
 
     @Test
@@ -162,26 +169,28 @@ public class TestAdapterTests {
             CompletableFuture<Void> result = new CompletableFuture<>();
             result.completeExceptionally(new Exception());
             return result;
-        })
-            .send("foo");
+        }).send("foo");
 
-        testFlow.startTest()
-            .exceptionally(exception -> {
-                Assert.assertTrue(exception instanceof CompletionException);
-                Assert.assertNotNull(exception.getCause());
-                return null;
-            }).join();
+        testFlow.startTest().exceptionally(exception -> {
+            Assert.assertTrue(exception instanceof CompletionException);
+            Assert.assertNotNull(exception.getCause());
+            return null;
+        }).join();
     }
 
     @Test
     public void TestAdapter_GetUserTokenAsyncReturnsNull() {
         TestAdapter adapter = new TestAdapter();
-        Activity activity = new Activity() {{
-           setChannelId("directline");
-           setFrom(new ChannelAccount() {{
-               setId("testuser");
-           }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId("directline");
+                setFrom(new ChannelAccount() {
+                    {
+                        setId("testuser");
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         TokenResponse token = adapter.getUserToken(turnContext, "myconnection", null).join();
@@ -191,12 +200,16 @@ public class TestAdapterTests {
     @Test
     public void TestAdapter_GetUserTokenAsyncReturnsNullWithCode() {
         TestAdapter adapter = new TestAdapter();
-        Activity activity = new Activity() {{
-            setChannelId("directline");
-            setFrom(new ChannelAccount() {{
-                setId("testuser");
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId("directline");
+                setFrom(new ChannelAccount() {
+                    {
+                        setId("testuser");
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         TokenResponse token = adapter.getUserToken(turnContext, "myconnection", "abc123").join();
@@ -210,17 +223,25 @@ public class TestAdapterTests {
         String channelId = "directline";
         String userId = "testUser";
         String token = "abc123";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken(connectionName, channelId, userId, token, null);
 
-        TokenResponse tokenResponse = adapter.getUserToken(turnContext, connectionName, null).join();
+        TokenResponse tokenResponse = adapter.getUserToken(
+            turnContext,
+            connectionName,
+            null
+        ).join();
         Assert.assertNotNull(tokenResponse);
         Assert.assertEquals(token, tokenResponse.getToken());
         Assert.assertEquals(connectionName, tokenResponse.getConnectionName());
@@ -234,17 +255,25 @@ public class TestAdapterTests {
         String userId = "testUser";
         String token = "abc123";
         String magicCode = "888999";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken(connectionName, channelId, userId, token, magicCode);
 
-        TokenResponse tokenResponse = adapter.getUserToken(turnContext, connectionName, null).join();
+        TokenResponse tokenResponse = adapter.getUserToken(
+            turnContext,
+            connectionName,
+            null
+        ).join();
         Assert.assertNull(tokenResponse);
 
         tokenResponse = adapter.getUserToken(turnContext, connectionName, magicCode).join();
@@ -259,12 +288,16 @@ public class TestAdapterTests {
         String connectionName = "myConnection";
         String channelId = "directline";
         String userId = "testUser";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         String link = adapter.getOAuthSignInLink(turnContext, connectionName, userId, null).join();
@@ -278,12 +311,16 @@ public class TestAdapterTests {
         String connectionName = "myConnection";
         String channelId = "directline";
         String userId = "testUser";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         String link = adapter.getOAuthSignInLink(turnContext, connectionName).join();
@@ -297,12 +334,16 @@ public class TestAdapterTests {
         String connectionName = "myConnection";
         String channelId = "directline";
         String userId = "testUser";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.signOutUser(turnContext, null, null).join();
@@ -318,17 +359,25 @@ public class TestAdapterTests {
         String channelId = "directline";
         String userId = "testUser";
         String token = "abc123";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken(connectionName, channelId, userId, token, null);
 
-        TokenResponse tokenResponse = adapter.getUserToken(turnContext, connectionName, null).join();
+        TokenResponse tokenResponse = adapter.getUserToken(
+            turnContext,
+            connectionName,
+            null
+        ).join();
         Assert.assertNotNull(tokenResponse);
         Assert.assertEquals(token, tokenResponse.getToken());
         Assert.assertEquals(connectionName, tokenResponse.getConnectionName());
@@ -345,12 +394,16 @@ public class TestAdapterTests {
         String channelId = "directline";
         String userId = "testUser";
         String token = "abc123";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken("ABC", channelId, userId, token, null);
@@ -380,12 +433,16 @@ public class TestAdapterTests {
         String channelId = "directline";
         String userId = "testUser";
         String token = "abc123";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken("ABC", channelId, userId, token, null);
@@ -403,12 +460,16 @@ public class TestAdapterTests {
         String channelId = "directline";
         String userId = "testUser";
         String token = "abc123";
-        Activity activity = new Activity() {{
-            setChannelId(channelId);
-            setFrom(new ChannelAccount() {{
-                setId(userId);
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setChannelId(channelId);
+                setFrom(new ChannelAccount() {
+                    {
+                        setId(userId);
+                    }
+                });
+            }
+        };
         TurnContext turnContext = new TurnContextImpl(adapter, activity);
 
         adapter.addUserToken("ABC", channelId, userId, token, null);

@@ -13,8 +13,9 @@ public class OAuthConfiguration {
 
     /**
      * Construct with authority and scope.
+     * 
      * @param withAuthority The auth authority.
-     * @param withScope The auth scope.
+     * @param withScope     The auth scope.
      */
     public OAuthConfiguration(String withAuthority, String withScope) {
         this.authority = withAuthority;

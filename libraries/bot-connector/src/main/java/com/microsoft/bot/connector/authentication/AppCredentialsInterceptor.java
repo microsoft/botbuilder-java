@@ -19,8 +19,7 @@ public class AppCredentialsInterceptor implements Interceptor {
     private AppCredentials credentials;
 
     /**
-     * Initialize a TokenCredentialsFilter class with a
-     * TokenCredentials credential.
+     * Initialize a TokenCredentialsFilter class with a TokenCredentials credential.
      *
      * @param withCredentials a TokenCredentials instance
      */
@@ -30,6 +29,7 @@ public class AppCredentialsInterceptor implements Interceptor {
 
     /**
      * Apply the credentials to the HTTP request.
+     *
      * @param chain The Okhttp3 Interceptor Chain.
      * @return The modified Response.
      * @throws IOException via Chain or failure to get token.
@@ -44,9 +44,8 @@ public class AppCredentialsInterceptor implements Interceptor {
                 throw new IOException(t);
             }
 
-            Request newRequest = chain.request().newBuilder()
-                .header("Authorization", "Bearer " + token)
-                .build();
+            Request newRequest =
+                chain.request().newBuilder().header("Authorization", "Bearer " + token).build();
             return chain.proceed(newRequest);
         }
         return chain.proceed(chain.request());

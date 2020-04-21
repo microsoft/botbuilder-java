@@ -26,6 +26,7 @@ public class ErrorResponse {
 
     /**
      * ErrorResponse with contained Error.
+     * 
      * @param withError The Error.
      */
     public ErrorResponse(Error withError) {

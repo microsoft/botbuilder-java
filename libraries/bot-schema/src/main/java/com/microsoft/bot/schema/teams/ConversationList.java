@@ -16,6 +16,7 @@ public class ConversationList {
 
     /**
      * Gets the list of conversations.
+     * 
      * @return The list of conversations.
      */
     public List<ChannelInfo> getConversations() {
@@ -24,6 +25,7 @@ public class ConversationList {
 
     /**
      * Sets the list of conversations.
+     * 
      * @param withConversations The new list of conversations.
      */
     public void setConversations(List<ChannelInfo> withConversations) {

@@ -13,9 +13,10 @@ public class SigninStateVerificationQuery {
     private String state;
 
     /**
-     * The state string originally received when the signin
-     * web flow is finished with a state posted back to client via tab SDK
+     * The state string originally received when the signin web flow is finished
+     * with a state posted back to client via tab SDK
      * microsoftTeams.authentication.notifySuccess(state).
+     * 
      * @return The sign-in state.
      */
     public String getState() {
@@ -23,9 +24,10 @@ public class SigninStateVerificationQuery {
     }
 
     /**
-     * The state string originally received when the signin
-     * web flow is finished with a state posted back to client via tab SDK
+     * The state string originally received when the signin web flow is finished
+     * with a state posted back to client via tab SDK
      * microsoftTeams.authentication.notifySuccess(state).
+     * 
      * @param withState The sign-in state.
      */
     public void setState(String withState) {

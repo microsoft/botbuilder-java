@@ -10,7 +10,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Recognizer {
     /**
-     * Runs an utterance through a recognizer and returns a generic recognizer result.
+     * Runs an utterance through a recognizer and returns a generic recognizer
+     * result.
      *
      * @param turnContext Turn context.
      * @return Analysis of utterance.

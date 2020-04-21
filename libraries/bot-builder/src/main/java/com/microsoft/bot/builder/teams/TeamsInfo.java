@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * Teams helper methods.
  */
-@SuppressWarnings({"checkstyle:JavadocMethod"})
+@SuppressWarnings({ "checkstyle:JavadocMethod" })
 public final class TeamsInfo {
     private TeamsInfo() {
     }
@@ -45,8 +45,13 @@ public final class TeamsInfo {
      * @param teamId      The team id.
      * @return A TeamDetails object.
      */
-    public static CompletableFuture<TeamDetails> getTeamDetails(TurnContext turnContext, String teamId) {
-        String effectiveTeamId = teamId != null ? teamId : turnContext.getActivity().teamsGetTeamId();
+    public static CompletableFuture<TeamDetails> getTeamDetails(
+        TurnContext turnContext,
+        String teamId
+    ) {
+        String effectiveTeamId = teamId != null
+            ? teamId
+            : turnContext.getActivity().teamsGetTeamId();
         if (effectiveTeamId == null) {
             return illegalArgument("This method is only valid within the scope of MS Teams Team.");
         }
@@ -61,14 +66,20 @@ public final class TeamsInfo {
      * @param teamId      The team id.
      * @return A list of ChannelInfo objects.
      */
-    public static CompletableFuture<List<ChannelInfo>> getTeamChannels(TurnContext turnContext, String teamId) {
-        String effectiveTeamId = teamId != null ? teamId : turnContext.getActivity().teamsGetTeamId();
+    public static CompletableFuture<List<ChannelInfo>> getTeamChannels(
+        TurnContext turnContext,
+        String teamId
+    ) {
+        String effectiveTeamId = teamId != null
+            ? teamId
+            : turnContext.getActivity().teamsGetTeamId();
         if (effectiveTeamId == null) {
             return illegalArgument("This method is only valid within the scope of MS Teams Team.");
         }
 
-        return getTeamsConnectorClient(turnContext).getTeams().fetchChannelList(effectiveTeamId)
-            .thenApply(ConversationList::getConversations);
+        return getTeamsConnectorClient(turnContext).getTeams().fetchChannelList(
+            effectiveTeamId
+        ).thenApply(ConversationList::getConversations);
     }
 
     /**
@@ -78,8 +89,13 @@ public final class TeamsInfo {
      * @param teamId      The team id.
      * @return A list of TeamChannelAccount objects.
      */
-    public static CompletableFuture<List<TeamsChannelAccount>> getTeamMembers(TurnContext turnContext, String teamId) {
-        String effectiveTeamId = teamId != null ? teamId : turnContext.getActivity().teamsGetTeamId();
+    public static CompletableFuture<List<TeamsChannelAccount>> getTeamMembers(
+        TurnContext turnContext,
+        String teamId
+    ) {
+        String effectiveTeamId = teamId != null
+            ? teamId
+            : turnContext.getActivity().teamsGetTeamId();
         if (effectiveTeamId == null) {
             return illegalArgument("This method is only valid within the scope of MS Teams Team.");
         }
@@ -95,9 +111,14 @@ public final class TeamsInfo {
      * @param teamId      The team id for the user.
      * @return A TeamsChannelAccount for the user, or null if not found.
      */
-    public static CompletableFuture<TeamsChannelAccount> getTeamMember(TurnContext turnContext, String userId,
-                                                                       String teamId) {
-        String effectiveTeamId = teamId != null ? teamId : turnContext.getActivity().teamsGetTeamId();
+    public static CompletableFuture<TeamsChannelAccount> getTeamMember(
+        TurnContext turnContext,
+        String userId,
+        String teamId
+    ) {
+        String effectiveTeamId = teamId != null
+            ? teamId
+            : turnContext.getActivity().teamsGetTeamId();
         if (effectiveTeamId == null) {
             return illegalArgument("This method is only valid within the scope of MS Teams Team.");
         }
@@ -109,8 +130,9 @@ public final class TeamsInfo {
      * Returns a list of members for the current conversation.
      *
      * @param turnContext The current TurnContext.
-     * @return A list of TeamsChannelAccount for each member.  If this isn't a Teams conversation, a list
-     * of ChannelAccounts is converted to TeamsChannelAccount.
+     * @return A list of TeamsChannelAccount for each member. If this isn't a Teams
+     *         conversation, a list of ChannelAccounts is converted to
+     *         TeamsChannelAccount.
      */
     public static CompletableFuture<List<TeamsChannelAccount>> getMembers(TurnContext turnContext) {
         String teamId = turnContext.getActivity().teamsGetTeamId();
@@ -119,20 +141,23 @@ public final class TeamsInfo {
         }
 
         String conversationId = turnContext.getActivity().getConversation() != null
-                                ? turnContext.getActivity().getConversation().getId()
-                                : null;
+            ? turnContext.getActivity().getConversation().getId()
+            : null;
         return getMembers(getConnectorClient(turnContext), conversationId);
     }
 
-    public static CompletableFuture<TeamsChannelAccount> getMember(TurnContext turnContext, String userId) {
+    public static CompletableFuture<TeamsChannelAccount> getMember(
+        TurnContext turnContext,
+        String userId
+    ) {
         String teamId = turnContext.getActivity().teamsGetTeamId();
         if (!StringUtils.isEmpty(teamId)) {
             return getTeamMember(turnContext, userId, teamId);
         }
 
         String conversationId = turnContext.getActivity().getConversation() != null
-                                ? turnContext.getActivity().getConversation().getId()
-                                : null;
+            ? turnContext.getActivity().getConversation().getId()
+            : null;
         return getMember(getConnectorClient(turnContext), userId, conversationId);
     }
 
@@ -141,13 +166,18 @@ public final class TeamsInfo {
      *
      * @param turnContext       The current TurnContext.
      * @param teamId            The team id.
-     * @param continuationToken The continuationToken from a previous call, or null the first call.
+     * @param continuationToken The continuationToken from a previous call, or null
+     *                          the first call.
      * @return A TeamsPageMembersResult.
      */
-    public static CompletableFuture<TeamsPagedMembersResult> getPagedTeamMembers(TurnContext turnContext,
-                                                                                 String teamId,
-                                                                                 String continuationToken) {
-        String effectiveTeamId = teamId != null ? teamId : turnContext.getActivity().teamsGetTeamId();
+    public static CompletableFuture<TeamsPagedMembersResult> getPagedTeamMembers(
+        TurnContext turnContext,
+        String teamId,
+        String continuationToken
+    ) {
+        String effectiveTeamId = teamId != null
+            ? teamId
+            : turnContext.getActivity().teamsGetTeamId();
         if (effectiveTeamId == null) {
             return illegalArgument("This method is only valid within the scope of MS Teams Team.");
         }
@@ -156,66 +186,88 @@ public final class TeamsInfo {
     }
 
     /**
-     * Returns paged Team member list.  If the Activity is not from a Teams channel, a PagedMembersResult
-     * is converted to TeamsPagedMembersResult.
+     * Returns paged Team member list. If the Activity is not from a Teams channel,
+     * a PagedMembersResult is converted to TeamsPagedMembersResult.
      *
      * @param turnContext       The current TurnContext.
-     * @param continuationToken The continuationToken from a previous call, or null the first call.
+     * @param continuationToken The continuationToken from a previous call, or null
+     *                          the first call.
      * @return A TeamsPageMembersResult.
      */
-    public static CompletableFuture<TeamsPagedMembersResult> getPagedMembers(TurnContext turnContext,
-                                                                             String continuationToken) {
+    public static CompletableFuture<TeamsPagedMembersResult> getPagedMembers(
+        TurnContext turnContext,
+        String continuationToken
+    ) {
         String teamId = turnContext.getActivity().teamsGetTeamId();
         if (!StringUtils.isEmpty(teamId)) {
             return getPagedTeamMembers(turnContext, teamId, continuationToken);
         }
 
         String conversationId = turnContext.getActivity().getConversation() != null
-                                ? turnContext.getActivity().getConversation().getId()
-                                : null;
+            ? turnContext.getActivity().getConversation().getId()
+            : null;
         return getPagedMembers(getConnectorClient(turnContext), conversationId, continuationToken);
     }
 
-    private static CompletableFuture<List<TeamsChannelAccount>> getMembers(ConnectorClient connectorClient,
-                                                                           String conversationId) {
+    private static CompletableFuture<List<TeamsChannelAccount>> getMembers(
+        ConnectorClient connectorClient,
+        String conversationId
+    ) {
         if (StringUtils.isEmpty(conversationId)) {
             return illegalArgument("The getMembers operation needs a valid conversation Id.");
         }
 
-        return connectorClient.getConversations().getConversationMembers(conversationId)
-            .thenApply(teamMembers -> {
-                List<TeamsChannelAccount> members = teamMembers.stream()
-                    .map(channelAccount -> Serialization.convert(channelAccount, TeamsChannelAccount.class))
-                    .collect(Collectors.toCollection(ArrayList::new));
+        return connectorClient.getConversations().getConversationMembers(conversationId).thenApply(
+            teamMembers -> {
+                List<TeamsChannelAccount> members = teamMembers.stream().map(
+                    channelAccount -> Serialization.convert(
+                        channelAccount,
+                        TeamsChannelAccount.class
+                    )
+                ).collect(Collectors.toCollection(ArrayList::new));
 
                 members.removeIf(Objects::isNull);
                 return members;
-            });
+            }
+        );
     }
 
-    private static CompletableFuture<TeamsChannelAccount> getMember(ConnectorClient connectorClient, String userId,
-                                                                    String conversationId) {
+    private static CompletableFuture<TeamsChannelAccount> getMember(
+        ConnectorClient connectorClient,
+        String userId,
+        String conversationId
+    ) {
         if (StringUtils.isEmpty(conversationId) || StringUtils.isEmpty(userId)) {
-            return illegalArgument("The getMember operation needs a valid userId and conversationId.");
+            return illegalArgument(
+                "The getMember operation needs a valid userId and conversationId."
+            );
         }
 
-        return connectorClient.getConversations().getConversationMember(userId, conversationId)
-            .thenApply(teamMember -> Serialization.convert(teamMember, TeamsChannelAccount.class));
+        return connectorClient.getConversations().getConversationMember(
+            userId,
+            conversationId
+        ).thenApply(teamMember -> Serialization.convert(teamMember, TeamsChannelAccount.class));
     }
 
-    private static CompletableFuture<TeamsPagedMembersResult> getPagedMembers(ConnectorClient connectorClient,
-                                                                              String conversationId,
-                                                                              String continuationToken) {
+    private static CompletableFuture<TeamsPagedMembersResult> getPagedMembers(
+        ConnectorClient connectorClient,
+        String conversationId,
+        String continuationToken
+    ) {
         if (StringUtils.isEmpty(conversationId)) {
             return illegalArgument("The getPagedMembers operation needs a valid conversation Id.");
         }
 
         CompletableFuture<PagedMembersResult> pagedResult;
         if (StringUtils.isEmpty(continuationToken)) {
-            pagedResult = connectorClient.getConversations().getConversationPagedMembers(conversationId);
+            pagedResult = connectorClient.getConversations().getConversationPagedMembers(
+                conversationId
+            );
         } else {
-            pagedResult =
-                connectorClient.getConversations().getConversationPagedMembers(conversationId, continuationToken);
+            pagedResult = connectorClient.getConversations().getConversationPagedMembers(
+                conversationId,
+                continuationToken
+            );
         }
 
         // return a converted TeamsPagedMembersResult
@@ -223,7 +275,9 @@ public final class TeamsInfo {
     }
 
     private static ConnectorClient getConnectorClient(TurnContext turnContext) {
-        ConnectorClient client = turnContext.getTurnState().get(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY);
+        ConnectorClient client = turnContext.getTurnState().get(
+            BotFrameworkAdapter.CONNECTOR_CLIENT_KEY
+        );
         if (client == null) {
             throw new IllegalStateException("This method requires a connector client.");
         }
@@ -232,8 +286,9 @@ public final class TeamsInfo {
 
     private static TeamsConnectorClient getTeamsConnectorClient(TurnContext turnContext) {
         // for testing to be able to provide a custom client.
-        TeamsConnectorClient teamsClient = turnContext.getTurnState()
-            .get(BotFrameworkAdapter.TEAMSCONNECTOR_CLIENT_KEY);
+        TeamsConnectorClient teamsClient = turnContext.getTurnState().get(
+            BotFrameworkAdapter.TEAMSCONNECTOR_CLIENT_KEY
+        );
         if (teamsClient != null) {
             return teamsClient;
         }
@@ -269,11 +324,11 @@ public final class TeamsInfo {
 
         ConversationParameters conversationParameters = new ConversationParameters();
         conversationParameters.setIsGroup(true);
-//        conversationParameters.setChannelData(new Object() {
-//            Object channel = new Object() {
-//                String id = teamsChannelId;
-//            };
-//        });
+        // conversationParameters.setChannelData(new Object() {
+        // Object channel = new Object() {
+        // String id = teamsChannelId;
+        // };
+        // });
         conversationParameters.setChannelData(teamsChannelData);
         conversationParameters.setActivity(activity);
 
@@ -287,8 +342,7 @@ public final class TeamsInfo {
                 newActivityId.set(context.getActivity().getId());
                 return CompletableFuture.completedFuture(null);
             }
-        )
-            .thenApply(aVoid -> new Pair<>(conversationReference.get(), newActivityId.get()));
+        ).thenApply(aVoid -> new Pair<>(conversationReference.get(), newActivityId.get()));
     }
 
     private static <T> CompletableFuture<T> illegalArgument(String message) {

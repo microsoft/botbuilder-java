@@ -41,8 +41,8 @@ public class MediaCard {
     private ThumbnailUrl image;
 
     /**
-     * Media URLs for this card. When this field contains more than one URL, each URL is an
-     * alternative format of the same content.
+     * Media URLs for this card. When this field contains more than one URL, each
+     * URL is an alternative format of the same content.
      */
     @JsonProperty(value = "media")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -75,16 +75,16 @@ public class MediaCard {
     private boolean autostart;
 
     /**
-     * Aspect ratio of thumbnail/media placeholder, allowed values are "16:9"
-     * and "4:3".
+     * Aspect ratio of thumbnail/media placeholder, allowed values are "16:9" and
+     * "4:3".
      */
     @JsonProperty(value = "aspect")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String aspect;
 
     /**
-     * Describes the length of the media content without requiring a receiver to open the content.
-     * Formatted as an ISO 8601 Duration field.
+     * Describes the length of the media content without requiring a receiver to
+     * open the content. Formatted as an ISO 8601 Duration field.
      */
     @JsonProperty(value = "duration")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -279,6 +279,7 @@ public class MediaCard {
 
     /**
      * Gets the duration value.
+     * 
      * @return The duration of the media.
      */
     public String getDuration() {

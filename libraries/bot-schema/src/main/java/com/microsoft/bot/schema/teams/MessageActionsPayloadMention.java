@@ -20,6 +20,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Gets the id of the mentioned entity.
+     * 
      * @return The id of the mention.
      */
     public int getId() {
@@ -28,6 +29,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Sets the id of the mentioned entity.
+     * 
      * @param withId The id of the mention.
      */
     public void setId(int withId) {
@@ -36,6 +38,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Gets the plaintext display name of the mentioned entity.
+     * 
      * @return The plaintext display name.
      */
     public String getMentionText() {
@@ -44,6 +47,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Sets the plaintext display name of the mentioned entity.
+     * 
      * @param withMentionText The plaintext display name.
      */
     public void setMentionText(String withMentionText) {
@@ -52,6 +56,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Gets details on the mentioned entity.
+     * 
      * @return From details.
      */
     public MessageActionsPayloadFrom getMentioned() {
@@ -60,6 +65,7 @@ public class MessageActionsPayloadMention {
 
     /**
      * Sets details on the mentioned entity.
+     * 
      * @param withMentioned From details.
      */
     public void setMentioned(MessageActionsPayloadFrom withMentioned) {

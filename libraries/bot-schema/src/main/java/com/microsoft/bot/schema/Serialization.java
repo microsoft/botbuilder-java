@@ -29,9 +29,10 @@ public final class Serialization {
 
     /**
      * Deserialize a value.
-     * @param obj The object to deserialize.
+     * 
+     * @param obj       The object to deserialize.
      * @param classType The class type to convert to.
-     * @param <T> The type of the return value.
+     * @param <T>       The type of the return value.
      * @return A deserialized POJO, or null for error.
      */
     public static <T> T getAs(Object obj, Class<T> classType) {
@@ -44,9 +45,10 @@ public final class Serialization {
 
     /**
      * Deserialize a value.
-     * @param obj The object to deserialize.
+     * 
+     * @param obj       The object to deserialize.
      * @param classType The class type to convert to.
-     * @param <T> The type of the return value.
+     * @param <T>       The type of the return value.
      * @return A deserialized POJO, or null.
      * @throws JsonProcessingException The JSON processing exception.
      */
@@ -60,10 +62,12 @@ public final class Serialization {
     }
 
     /**
-     * Deserializes an object to a type as a future to ease CompletableFuture chaining.
-     * @param obj The object to deserialize.
+     * Deserializes an object to a type as a future to ease CompletableFuture
+     * chaining.
+     * 
+     * @param obj       The object to deserialize.
      * @param classType Class information to convert to.
-     * @param <R> The return Type.
+     * @param <R>       The return Type.
      * @return A CompletableFuture containing the value or exception for an error.
      */
     public static <R> CompletableFuture<R> futureGetAs(Object obj, Class<R> classType) {
@@ -72,7 +76,8 @@ public final class Serialization {
         try {
             futureResult.complete(Serialization.safeGetAs(obj, classType));
         } catch (JsonProcessingException jpe) {
-            futureResult.completeExceptionally(new CompletionException("Unable to deserialize", jpe));
+            futureResult
+                .completeExceptionally(new CompletionException("Unable to deserialize", jpe));
         }
 
         return futureResult;
@@ -80,9 +85,10 @@ public final class Serialization {
 
     /**
      * Converts an input object to another type.
-     * @param source The object to convert.
+     * 
+     * @param source  The object to convert.
      * @param toClass The class to convert to.
-     * @param <T> Type of return value.
+     * @param <T>     Type of return value.
      * @return The converted object, or null.
      */
     public static <T> T convert(Object source, Class<T> toClass) {

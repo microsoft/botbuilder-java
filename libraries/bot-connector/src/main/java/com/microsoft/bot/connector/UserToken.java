@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in UserTokens.
+ * An instance of this class provides access to all the operations defined in
+ * UserTokens.
  */
 public interface UserToken {
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the TokenResponse object
@@ -29,40 +29,49 @@ public interface UserToken {
 
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
-     * @param channelId the String value
-     * @param code the String value
+     * @param channelId      the String value
+     * @param code           the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the TokenResponse object
      */
-    CompletableFuture<TokenResponse> getToken(String userId, String connectionName, String channelId, String code);
+    CompletableFuture<TokenResponse> getToken(
+        String userId,
+        String connectionName,
+        String channelId,
+        String code
+    );
 
     /**
      *
-     * @param userId the String value
-     * @param connectionName the String value
+     * @param userId          the String value
+     * @param connectionName  the String value
      * @param aadResourceUrls the AadResourceUrls value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Map&lt;String, TokenResponse&gt; object
      */
-    CompletableFuture<Map<String, TokenResponse>> getAadTokens(String userId,
-                                                               String connectionName,
-                                                               AadResourceUrls aadResourceUrls);
+    CompletableFuture<Map<String, TokenResponse>> getAadTokens(
+        String userId,
+        String connectionName,
+        AadResourceUrls aadResourceUrls
+    );
 
     /**
      *
-     * @param userId the String value
-     * @param connectionName the String value
+     * @param userId          the String value
+     * @param connectionName  the String value
      * @param aadResourceUrls the AadResourceUrls value
-     * @param channelId the String value
+     * @param channelId       the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Map&lt;String, TokenResponse&gt; object
      */
-    CompletableFuture<Map<String, TokenResponse>> getAadTokens(String userId,
-                                                               String connectionName,
-                                                               AadResourceUrls aadResourceUrls,
-                                                               String channelId);
+    CompletableFuture<Map<String, TokenResponse>> getAadTokens(
+        String userId,
+        String connectionName,
+        AadResourceUrls aadResourceUrls,
+        String channelId
+    );
 
     /**
      *
@@ -74,9 +83,9 @@ public interface UserToken {
 
     /**
      *
-     * @param userId the String value
+     * @param userId         the String value
      * @param connectionName the String value
-     * @param channelId the String value
+     * @param channelId      the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the Object object
      */
@@ -92,11 +101,15 @@ public interface UserToken {
 
     /**
      *
-     * @param userId the String value
+     * @param userId    the String value
      * @param channelId the String value
-     * @param include the String value
+     * @param include   the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;TokenStatus&gt; object
      */
-    CompletableFuture<List<TokenStatus>> getTokenStatus(String userId, String channelId, String include);
+    CompletableFuture<List<TokenStatus>> getTokenStatus(
+        String userId,
+        String channelId,
+        String include
+    );
 }

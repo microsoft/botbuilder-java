@@ -24,7 +24,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class JwtTokenExtractor {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenIdMetadata.class);
-    private static final ConcurrentMap<String, OpenIdMetadata> OPENID_METADATA_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, OpenIdMetadata> OPENID_METADATA_CACHE =
+        new ConcurrentHashMap<>();
 
     private TokenValidationParameters tokenValidationParameters;
     private List<String> allowedSigningAlgorithms;
@@ -34,40 +35,50 @@ public class JwtTokenExtractor {
      * Initializes a new instance of the JwtTokenExtractor class.
      *
      * @param withTokenValidationParameters tokenValidationParameters.
-     * @param withMetadataUrl metadataUrl.
-     * @param withAllowedSigningAlgorithms allowedSigningAlgorithms.
+     * @param withMetadataUrl               metadataUrl.
+     * @param withAllowedSigningAlgorithms  allowedSigningAlgorithms.
      */
-    public JwtTokenExtractor(TokenValidationParameters withTokenValidationParameters,
-                             String withMetadataUrl,
-                             List<String> withAllowedSigningAlgorithms) {
+    public JwtTokenExtractor(
+        TokenValidationParameters withTokenValidationParameters,
+        String withMetadataUrl,
+        List<String> withAllowedSigningAlgorithms
+    ) {
 
-        this.tokenValidationParameters = new TokenValidationParameters(withTokenValidationParameters);
+        this.tokenValidationParameters =
+            new TokenValidationParameters(withTokenValidationParameters);
         this.tokenValidationParameters.requireSignedTokens = true;
         this.allowedSigningAlgorithms = withAllowedSigningAlgorithms;
-        this.openIdMetadata = OPENID_METADATA_CACHE.computeIfAbsent(withMetadataUrl,
-            key -> new OpenIdMetadata(withMetadataUrl));
+        this.openIdMetadata = OPENID_METADATA_CACHE
+            .computeIfAbsent(withMetadataUrl, key -> new OpenIdMetadata(withMetadataUrl));
     }
 
     /**
      * Get a ClaimsIdentity from an auth header and channel id.
+     *
      * @param authorizationHeader The Authorization header value.
-     * @param channelId The channel id.
+     * @param channelId           The channel id.
      * @return A ClaimsIdentity if successful.
      */
-    public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader, String channelId) {
+    public CompletableFuture<ClaimsIdentity> getIdentity(
+        String authorizationHeader,
+        String channelId
+    ) {
         return getIdentity(authorizationHeader, channelId, new ArrayList<>());
     }
 
     /**
      * Get a ClaimsIdentity from an auth header and channel id.
-     * @param authorizationHeader The Authorization header value.
-     * @param channelId The channel id.
+     *
+     * @param authorizationHeader  The Authorization header value.
+     * @param channelId            The channel id.
      * @param requiredEndorsements A list of endorsements that are required.
      * @return A ClaimsIdentity if successful.
      */
-    public CompletableFuture<ClaimsIdentity> getIdentity(String authorizationHeader,
-                                                         String channelId,
-                                                         List<String> requiredEndorsements) {
+    public CompletableFuture<ClaimsIdentity> getIdentity(
+        String authorizationHeader,
+        String channelId,
+        List<String> requiredEndorsements
+    ) {
         if (authorizationHeader == null) {
             return CompletableFuture.completedFuture(null);
         }
@@ -82,16 +93,19 @@ public class JwtTokenExtractor {
 
     /**
      * Get a ClaimsIdentity from a schema, token and channel id.
-     * @param schema The schema.
-     * @param token The token.
-     * @param channelId The channel id.
+     *
+     * @param schema               The schema.
+     * @param token                The token.
+     * @param channelId            The channel id.
      * @param requiredEndorsements A list of endorsements that are required.
      * @return A ClaimsIdentity if successful.
      */
-    public CompletableFuture<ClaimsIdentity> getIdentity(String schema,
-                                                         String token,
-                                                         String channelId,
-                                                         List<String> requiredEndorsements) {
+    public CompletableFuture<ClaimsIdentity> getIdentity(
+        String schema,
+        String token,
+        String channelId,
+        List<String> requiredEndorsements
+    ) {
         // No header in correct scheme or no token
         if (!schema.equalsIgnoreCase("bearer") || token == null) {
             return CompletableFuture.completedFuture(null);
@@ -112,9 +126,11 @@ public class JwtTokenExtractor {
     }
 
     @SuppressWarnings("unchecked")
-    private CompletableFuture<ClaimsIdentity> validateToken(String token,
-                                                            String channelId,
-                                                            List<String> requiredEndorsements) {
+    private CompletableFuture<ClaimsIdentity> validateToken(
+        String token,
+        String channelId,
+        List<String> requiredEndorsements
+    ) {
         return CompletableFuture.supplyAsync(() -> {
             DecodedJWT decodedJWT = JWT.decode(token);
             OpenIdMetadataKey key = this.openIdMetadata.getKey(decodedJWT.getKeyId());
@@ -122,40 +138,54 @@ public class JwtTokenExtractor {
                 return null;
             }
 
-            Verification verification = JWT
-                .require(Algorithm.RSA256(key.key, null))
+            Verification verification = JWT.require(Algorithm.RSA256(key.key, null))
                 .acceptLeeway(tokenValidationParameters.clockSkew.getSeconds());
             try {
                 verification.build().verify(token);
 
-                // Note: On the Emulator Code Path, the endorsements collection is null so the validation code
+                // Note: On the Emulator Code Path, the endorsements collection is null so the
+                // validation code
                 // below won't run. This is normal.
                 if (key.endorsements != null) {
-                    // Validate Channel / Token Endorsements. For this, the channelID present on the Activity
+                    // Validate Channel / Token Endorsements. For this, the channelID present on the
+                    // Activity
                     // needs to be matched by an endorsement.
-                    boolean isEndorsed = EndorsementsValidator.validate(channelId, key.endorsements);
+                    boolean isEndorsed =
+                        EndorsementsValidator.validate(channelId, key.endorsements);
                     if (!isEndorsed) {
                         throw new AuthenticationException(
-                            String.format("Could not validate endorsement for key: %s with endorsements: %s",
-                                key.key.toString(), StringUtils.join(key.endorsements)));
+                            String.format(
+                                "Could not validate endorsement for key: %s with endorsements: %s",
+                                key.key.toString(), StringUtils.join(key.endorsements)
+                            )
+                        );
                     }
 
-                    // Verify that additional endorsements are satisfied. If no additional endorsements are expected,
+                    // Verify that additional endorsements are satisfied. If no additional
+                    // endorsements are expected,
                     // the requirement is satisfied as well
-                    boolean additionalEndorsementsSatisfied =
-                        requiredEndorsements.stream().
-                            allMatch((endorsement) -> EndorsementsValidator.validate(endorsement, key.endorsements));
+                    boolean additionalEndorsementsSatisfied = requiredEndorsements.stream()
+                        .allMatch(
+                            (endorsement) -> EndorsementsValidator
+                                .validate(endorsement, key.endorsements)
+                        );
                     if (!additionalEndorsementsSatisfied) {
                         throw new AuthenticationException(
-                            String.format("Could not validate additional endorsement for key: %s with endorsements: %s",
-                                key.key.toString(), StringUtils.join(requiredEndorsements)));
+                            String.format(
+                                "Could not validate additional endorsement for key: %s with endorsements: %s",
+                                key.key.toString(), StringUtils.join(requiredEndorsements)
+                            )
+                        );
                     }
                 }
 
                 if (!this.allowedSigningAlgorithms.contains(decodedJWT.getAlgorithm())) {
                     throw new AuthenticationException(
-                        String.format("Could not validate algorithm for key: %s with algorithms: %s",
-                            decodedJWT.getAlgorithm(), StringUtils.join(allowedSigningAlgorithms)));
+                        String.format(
+                            "Could not validate algorithm for key: %s with algorithms: %s",
+                            decodedJWT.getAlgorithm(), StringUtils.join(allowedSigningAlgorithms)
+                        )
+                    );
                 }
 
                 return new ClaimsIdentity(decodedJWT);

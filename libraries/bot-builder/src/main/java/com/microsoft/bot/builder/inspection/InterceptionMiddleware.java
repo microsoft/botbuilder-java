@@ -20,14 +20,17 @@ public abstract class InterceptionMiddleware implements Middleware {
     private Logger logger;
 
     static class Intercept {
-        Intercept(boolean forward, boolean intercept) {
+        Intercept(
+            boolean forward,
+            boolean intercept
+        ) {
             shouldForwardToApplication = forward;
             shouldIntercept = intercept;
         }
 
-        @SuppressWarnings({"checkstyle:JavadocVariable", "checkstyle:VisibilityModifier"})
+        @SuppressWarnings({ "checkstyle:JavadocVariable", "checkstyle:VisibilityModifier" })
         boolean shouldForwardToApplication;
-        @SuppressWarnings({"checkstyle:JavadocVariable", "checkstyle:VisibilityModifier"})
+        @SuppressWarnings({ "checkstyle:JavadocVariable", "checkstyle:VisibilityModifier" })
         boolean shouldIntercept;
     }
 
@@ -41,48 +44,61 @@ public abstract class InterceptionMiddleware implements Middleware {
 
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
-        return invokeInbound(turnContext, InspectionActivityExtensions
-            .traceActivity(turnContext.getActivity(),"ReceivedActivity","Received Activity"))
+        return invokeInbound(
+            turnContext,
+            InspectionActivityExtensions.traceActivity(
+                turnContext.getActivity(),
+                "ReceivedActivity",
+                "Received Activity"
+            )
+        )
 
             .thenCompose(intercept -> {
                 if (intercept.shouldIntercept) {
                     turnContext.onSendActivities((sendContext, sendActivities, sendNext) -> {
-                        List<Activity> traceActivities = sendActivities.stream()
-                            .map(a ->
-                                InspectionActivityExtensions.traceActivity(a,
-                                    "SentActivity", "Sent Activity"))
-                            .collect(Collectors.toList());
-                        return invokeOutbound(sendContext, traceActivities)
-                            .thenCompose(response -> {
+                        List<Activity> traceActivities = sendActivities.stream().map(
+                            a -> InspectionActivityExtensions.traceActivity(
+                                a,
+                                "SentActivity",
+                                "Sent Activity"
+                            )
+                        ).collect(Collectors.toList());
+                        return invokeOutbound(sendContext, traceActivities).thenCompose(
+                            response -> {
                                 return sendNext.get();
-                            });
+                            }
+                        );
                     });
 
                     turnContext.onUpdateActivity((updateContext, updateActivity, updateNext) -> {
-                        Activity traceActivity = InspectionActivityExtensions.traceActivity(updateActivity,
-                            "MessageUpdate", "Message Update");
-                        return invokeOutbound(turnContext, traceActivity)
-                            .thenCompose(response -> {
-                                return updateNext.get();
-                            });
+                        Activity traceActivity = InspectionActivityExtensions.traceActivity(
+                            updateActivity,
+                            "MessageUpdate",
+                            "Message Update"
+                        );
+                        return invokeOutbound(turnContext, traceActivity).thenCompose(
+                            response -> updateNext.get()
+                        );
                     });
 
                     turnContext.onDeleteActivity((deleteContext, deleteReference, deleteNext) -> {
-                        Activity traceActivity = InspectionActivityExtensions.traceActivity(deleteReference);
-                        return invokeOutbound(turnContext, traceActivity)
-                            .thenCompose(response -> {
-                                return deleteNext.get();
-                            });
+                        Activity traceActivity = InspectionActivityExtensions.traceActivity(
+                            deleteReference
+                        );
+                        return invokeOutbound(turnContext, traceActivity).thenCompose(
+                            response -> deleteNext.get()
+                        );
                     });
                 }
 
                 if (intercept.shouldForwardToApplication) {
-                    next.next()
-                        .exceptionally(exception -> {
-                            Activity traceActivity = InspectionActivityExtensions.traceActivity(exception);
-                            invokeTraceException(turnContext, traceActivity).join();
-                            throw new CompletionException(exception);
-                        }).join();
+                    next.next().exceptionally(exception -> {
+                        Activity traceActivity = InspectionActivityExtensions.traceActivity(
+                            exception
+                        );
+                        invokeTraceException(turnContext, traceActivity).join();
+                        throw new CompletionException(exception);
+                    }).join();
                 }
 
                 if (intercept.shouldIntercept) {
@@ -93,26 +109,36 @@ public abstract class InterceptionMiddleware implements Middleware {
             });
     }
 
-    protected abstract CompletableFuture<Intercept> inbound(TurnContext turnContext, Activity activity);
+    protected abstract CompletableFuture<Intercept> inbound(
+        TurnContext turnContext,
+        Activity activity
+    );
 
-    protected abstract CompletableFuture<Void> outbound(TurnContext turnContext, List<Activity> clonedActivities);
+    protected abstract CompletableFuture<Void> outbound(
+        TurnContext turnContext,
+        List<Activity> clonedActivities
+    );
 
     protected abstract CompletableFuture<Void> traceState(TurnContext turnContext);
 
-    private CompletableFuture<Intercept> invokeInbound(TurnContext turnContext, Activity traceActivity) {
-        return inbound(turnContext, traceActivity)
-            .exceptionally(exception -> {
-                logger.warn("Exception in inbound interception {}", exception.getMessage());
-                return new Intercept(true, false);
-            });
+    private CompletableFuture<Intercept> invokeInbound(
+        TurnContext turnContext,
+        Activity traceActivity
+    ) {
+        return inbound(turnContext, traceActivity).exceptionally(exception -> {
+            logger.warn("Exception in inbound interception {}", exception.getMessage());
+            return new Intercept(true, false);
+        });
     }
 
-    private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, List<Activity> traceActivities) {
-        return outbound(turnContext, traceActivities)
-            .exceptionally(exception -> {
-                logger.warn("Exception in outbound interception {}", exception.getMessage());
-                return null;
-            });
+    private CompletableFuture<Void> invokeOutbound(
+        TurnContext turnContext,
+        List<Activity> traceActivities
+    ) {
+        return outbound(turnContext, traceActivities).exceptionally(exception -> {
+            logger.warn("Exception in outbound interception {}", exception.getMessage());
+            return null;
+        });
     }
 
     private CompletableFuture<Void> invokeOutbound(TurnContext turnContext, Activity activity) {
@@ -120,18 +146,21 @@ public abstract class InterceptionMiddleware implements Middleware {
     }
 
     private CompletableFuture<Void> invokeTraceState(TurnContext turnContext) {
-        return traceState(turnContext)
-            .exceptionally(exception -> {
-                logger.warn("Exception in state interception {}", exception.getMessage());
-                return null;
-            });
+        return traceState(turnContext).exceptionally(exception -> {
+            logger.warn("Exception in state interception {}", exception.getMessage());
+            return null;
+        });
     }
 
-    private CompletableFuture<Void> invokeTraceException(TurnContext turnContext, Activity traceActivity) {
-        return outbound(turnContext, Collections.singletonList(traceActivity))
-            .exceptionally(exception -> {
+    private CompletableFuture<Void> invokeTraceException(
+        TurnContext turnContext,
+        Activity traceActivity
+    ) {
+        return outbound(turnContext, Collections.singletonList(traceActivity)).exceptionally(
+            exception -> {
                 logger.warn("Exception in exception interception {}", exception.getMessage());
                 return null;
-            });
+            }
+        );
     }
 }

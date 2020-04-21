@@ -20,8 +20,10 @@ import java.io.InputStream;
 /**
  * The super class for a Servlet based Bot controller.
  *
- * <p>Subclasses must implement {@link #getBot()}.  Other default Bot dependencies
- * are created by {@link ServletWithBotConfiguration}</p>
+ * <p>
+ * Subclasses must implement {@link #getBot()}. Other default Bot dependencies
+ * are created by {@link ServletWithBotConfiguration}
+ * </p>
  */
 public abstract class ControllerBase extends ServletWithBotConfiguration {
     private ObjectMapper objectMapper;
@@ -40,8 +42,8 @@ public abstract class ControllerBase extends ServletWithBotConfiguration {
     }
 
     /**
-     * This class needs a {@link BotFrameworkHttpAdapter} and {@link Bot}.  Subclasses could
-     * override to provide different creation behavior.
+     * This class needs a {@link BotFrameworkHttpAdapter} and {@link Bot}.
+     * Subclasses could override to provide different creation behavior.
      */
     protected void createControllerDependencies() {
         Configuration configuration = getConfiguration();
@@ -51,7 +53,8 @@ public abstract class ControllerBase extends ServletWithBotConfiguration {
 
     /**
      * Receives the incoming Channel message.
-     * @param request The incoming http request.
+     *
+     * @param request  The incoming http request.
      * @param response The http response.
      */
     @Override
@@ -60,21 +63,22 @@ public abstract class ControllerBase extends ServletWithBotConfiguration {
             Activity activity = getActivity(request);
             String authHeader = request.getHeader("Authorization");
 
-            adapter.processIncomingActivity(authHeader, activity, turnContext -> bot.onTurn(turnContext))
-                .handle((result, exception) -> {
-                    if (exception == null) {
-                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        return null;
-                    }
-
-                    if (exception.getCause() instanceof AuthenticationException) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    }
-
+            adapter.processIncomingActivity(
+                authHeader, activity, turnContext -> bot.onTurn(turnContext)
+            ).handle((result, exception) -> {
+                if (exception == null) {
+                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
                     return null;
-                });
+                }
+
+                if (exception.getCause() instanceof AuthenticationException) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
+
+                return null;
+            });
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -82,7 +86,7 @@ public abstract class ControllerBase extends ServletWithBotConfiguration {
 
     // Creates an Activity object from the request
     private Activity getActivity(HttpServletRequest request) throws IOException {
-        try(InputStream is = request.getInputStream()) {
+        try (InputStream is = request.getInputStream()) {
             return objectMapper.readValue(is, Activity.class);
         }
     }
