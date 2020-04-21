@@ -4,6 +4,7 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.bot.schema.Activity;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -169,5 +170,37 @@ public final class JwtTokenValidation {
                 authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig
             );
         }
+    }
+
+    /**
+     * Gets the AppId from claims.
+     *
+     * <p>
+     * In v1 tokens the AppId is in the the AppIdClaim claim. In v2 tokens the AppId
+     * is in the AuthorizedParty claim.
+     * </p>
+     *
+     * @param claims The map of claims.
+     * @return The value of the appId claim if found (null if it can't find a
+     *         suitable claim).
+     */
+    public static String getAppIdFromClaims(Map<String, String> claims) {
+        if (claims == null) {
+            throw new IllegalArgumentException("claims");
+        }
+
+        String appId = null;
+
+        String tokenVersion = claims.get(AuthenticationConstants.VERSION_CLAIM);
+        if (StringUtils.isEmpty(tokenVersion) || tokenVersion.equalsIgnoreCase("1.0")) {
+            // either no Version or a version of "1.0" means we should look for the claim in
+            // the "appid" claim.
+            appId = claims.get(AuthenticationConstants.APPID_CLAIM);
+        } else {
+            // "2.0" puts the AppId in the "azp" claim.
+            appId = claims.get(AuthenticationConstants.AUTHORIZED_PARTY);
+        }
+
+        return appId;
     }
 }

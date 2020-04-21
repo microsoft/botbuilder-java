@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
@@ -10,6 +11,7 @@ import com.microsoft.bot.schema.ResourceResponse;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Represents a bot adapter that can connect a bot to a service endpoint. This
@@ -32,6 +34,16 @@ import java.util.concurrent.CompletionException;
  * {@link TurnContext} {@link Activity} {@link Bot} {@link Middleware}
  */
 public abstract class BotAdapter {
+    /**
+     * Key to store bot claims identity.
+     */
+    public static final String BOT_IDENTITY_KEY = "BotIdentity";
+
+    /**
+     * Key to store bot oauth scope.
+     */
+    public static final String OAUTH_SCOPE_KEY = "Microsoft.Bot.Builder.BotAdapter.OAuthScope";
+
     /**
      * The collection of middleware in the adapter's pipeline.
      */
@@ -213,18 +225,66 @@ public abstract class BotAdapter {
         ConversationReference reference,
         BotCallbackHandler callback
     ) {
-
         CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
 
-        try (TurnContextImpl context = new TurnContextImpl(
-            this,
-            reference.getContinuationActivity()
-        )) {
+        try (TurnContextImpl context =
+            new TurnContextImpl(this, reference.getContinuationActivity())) {
             pipelineResult = runPipeline(context, callback);
         } catch (Exception e) {
             pipelineResult.completeExceptionally(e);
         }
 
         return pipelineResult;
+    }
+
+    /**
+     * Sends a proactive message to a conversation.
+     *
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     *
+     * @param claimsIdentity A ClaimsIdentity reference for the conversation.
+     * @param reference      A reference to the conversation to continue.
+     * @param callback       The method to call for the result bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> continueConversation(
+        ClaimsIdentity claimsIdentity,
+        ConversationReference reference,
+        BotCallbackHandler callback
+    ) {
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        result.completeExceptionally(new NotImplementedException("continueConversation"));
+        return result;
+    }
+
+    /**
+     * Sends a proactive message to a conversation.
+     *
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     *
+     * @param claimsIdentity A ClaimsIdentity reference for the conversation.
+     * @param reference      A reference to the conversation to continue.
+     * @param audience       A value signifying the recipient of the proactive
+     *                       message.
+     * @param callback       The method to call for the result bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> continueConversation(
+        ClaimsIdentity claimsIdentity,
+        ConversationReference reference,
+        String audience,
+        BotCallbackHandler callback
+    ) {
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        result.completeExceptionally(new NotImplementedException("continueConversation"));
+        return result;
     }
 }
