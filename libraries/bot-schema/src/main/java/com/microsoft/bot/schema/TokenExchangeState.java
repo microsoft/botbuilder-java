@@ -26,9 +26,13 @@ public class TokenExchangeState {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String botUrl;
 
+    @JsonProperty("relatesTo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private ConversationReference relatesTo;
+
     /**
      * The connection name that was used.
-     * 
+     *
      * @return The connection name.
      */
     public String getConnectionName() {
@@ -37,7 +41,7 @@ public class TokenExchangeState {
 
     /**
      * The connection name that was used.
-     * 
+     *
      * @param withConnectionName The connection name.
      */
     public void setConnectionName(String withConnectionName) {
@@ -46,7 +50,7 @@ public class TokenExchangeState {
 
     /**
      * A reference to the conversation.
-     * 
+     *
      * @return The conversation reference.
      */
     public ConversationReference getConversation() {
@@ -55,7 +59,7 @@ public class TokenExchangeState {
 
     /**
      * A reference to the conversation.
-     * 
+     *
      * @param withConversation The conversation reference.
      */
     public void setConversation(ConversationReference withConversation) {
@@ -64,7 +68,7 @@ public class TokenExchangeState {
 
     /**
      * The URL of the bot messaging endpoint.
-     * 
+     *
      * @return The messaging endpoint.
      */
     public String getBotUrl() {
@@ -73,7 +77,7 @@ public class TokenExchangeState {
 
     /**
      * The URL of the bot messaging endpoint.
-     * 
+     *
      * @param withBotUrl The messaging endpoint.
      */
     public void setBotUrl(String withBotUrl) {
@@ -82,7 +86,7 @@ public class TokenExchangeState {
 
     /**
      * The bot's registered application ID.
-     * 
+     *
      * @return The app id.
      */
     public String getMsAppId() {
@@ -91,10 +95,28 @@ public class TokenExchangeState {
 
     /**
      * The bot's registered application ID.
-     * 
+     *
      * @param withMsAppId The app id.
      */
     public void setMsAppId(String withMsAppId) {
         this.msAppId = withMsAppId;
+    }
+
+    /**
+     * Gets the reference to a related parent conversation for this token exchange.
+     *
+     * @return A reference to a related parent conversation.
+     */
+    public ConversationReference getRelatesTo() {
+        return relatesTo;
+    }
+
+    /**
+     * Sets the reference to a related parent conversation for this token exchange.
+     *
+     * @param withRelatesTo A reference to a related parent conversation.
+     */
+    public void setRelatesTo(ConversationReference withRelatesTo) {
+        relatesTo = withRelatesTo;
     }
 }
