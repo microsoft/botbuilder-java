@@ -5,24 +5,21 @@ package com.microsoft.bot.sample.teamssearch;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.*;
 import com.microsoft.bot.schema.teams.*;
+import java.util.concurrent.CompletionException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This class implements the functionality of the Bot.
@@ -33,75 +30,63 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
-    private String appId;
-    private String appPassword;
-    private static final Logger botLogger = LogManager.getLogger();
-
-    public TeamsMessagingExtensionsSearchBot(Configuration configuration) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
-    }
 
     @Override
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(
         TurnContext turnContext,
-        MessagingExtensionQuery query) {
+        MessagingExtensionQuery query
+    ) {
         List<MessagingExtensionParameter> queryParams = query.getParameters();
         String text = "";
         if (queryParams != null && !queryParams.isEmpty()) {
             text = (String) queryParams.get(0).getValue();
         }
 
-        List<String[]> packages = null;
+        return findPackages(text)
+            .thenApply(packages -> {
+                List<MessagingExtensionAttachment> attachments = new ArrayList<>();
+                for (String[] item : packages) {
+                    ThumbnailCard previewCard = new ThumbnailCard() {{
+                        setTitle(item[0]);
+                        setTap(new CardAction() {{
+                            setType(ActionTypes.INVOKE);
+                            setValue(new JSONObject().put("data", item).toString());
+                        }});
+                    }};
 
-        try {
-            packages = FindPackages(text).get();
-        } catch (IOException | InterruptedException | ExecutionException e) {
-            packages = new ArrayList<String[]>();
-        }
+                    if (!StringUtils.isEmpty(item[4])) {
+                        previewCard.setImages(Collections.singletonList(new CardImage() {{
+                            setUrl(item[4]);
+                            setAlt("Icon");
+                        }}));
+                    }
 
-        List<MessagingExtensionAttachment> attachments = new ArrayList<>();
-        for (String[] item : packages) {
-            ThumbnailCard previewCard = new ThumbnailCard() {{
-                setTitle(item[0]);
-                setTap(new CardAction() {{
-                    setType(ActionTypes.INVOKE);
-                    setValue(new JSONObject().put("data", item).toString());
-                }});
-            }};
+                    MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
+                        setContentType(HeroCard.CONTENTTYPE);
+                        setContent(new HeroCard() {{
+                            setTitle(item[0]);
+                        }});
+                        setPreview(previewCard.toAttachment());
+                    }};
 
-            if (!StringUtils.isEmpty(item[4])) {
-                previewCard.setImages(Collections.singletonList(new CardImage() {{
-                    setUrl(item[4]);
-                    setAlt("Icon");
-                }}));
-            }
+                    attachments.add(attachment);
+                }
 
-            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
-                setContentType(HeroCard.CONTENTTYPE);
-                setContent(new HeroCard() {{
-                    setTitle(item[0]);
-                }});
-                setPreview(previewCard.toAttachment());
-            }};
+                MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
+                    setType("result");
+                    setAttachmentLayout("list");
+                    setAttachments(attachments);
+                }};
 
-            attachments.add(attachment);
-        }
-
-
-        MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
-            setType("result");
-            setAttachmentLayout("list");
-            setAttachments(attachments);
-        }};
-
-        return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
+                return new MessagingExtensionResponse(composeExtension);
+            });
     }
 
     @Override
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionSelectItem(
         TurnContext turnContext,
-        Object query) {
+        Object query
+    ) {
 
         Map cardValue = (Map) query;
         List<String> data = (ArrayList) cardValue.get("data");
@@ -135,12 +120,15 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
     }
 
-    private CompletableFuture<List<String[]>> FindPackages(
-        String text) throws IOException {
+    private CompletableFuture<List<String[]>> findPackages(String text) {
         return CompletableFuture.supplyAsync(() -> {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
-                .url(String.format("https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true", text))
+                .url(String
+                    .format(
+                        "https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true",
+                        text
+                    ))
                 .build();
 
             List<String[]> filteredItems = new ArrayList<String[]>();
@@ -161,10 +149,11 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
                 });
 
             } catch (IOException e) {
-                botLogger.log(Level.ERROR, e.getStackTrace());
+                LoggerFactory.getLogger(TeamsMessagingExtensionsSearchBot.class)
+                    .error("findPackages", e);
+                throw new CompletionException(e);
             }
             return filteredItems;
         });
-
     }
 }
