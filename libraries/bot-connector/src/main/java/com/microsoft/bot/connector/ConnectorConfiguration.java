@@ -13,18 +13,19 @@ import java.util.function.Consumer;
 /**
  * Loads configuration properties for bot-connector.
  *
- * Properties are located in an optional connector.properties file
- * in the classpath.
+ * Properties are located in an optional connector.properties file in the
+ * classpath.
  */
 public class ConnectorConfiguration {
     /**
      * Load and pass properties to a function.
+     * 
      * @param func The function to process the loaded properties.
      */
     public void process(Consumer<Properties> func) {
         final Properties properties = new Properties();
-        try (InputStream propStream = UserAgent.class.getClassLoader()
-            .getResourceAsStream("connector.properties")) {
+        try (InputStream propStream =
+            UserAgent.class.getClassLoader().getResourceAsStream("connector.properties")) {
 
             properties.load(propStream);
             if (!properties.containsKey("version")) {

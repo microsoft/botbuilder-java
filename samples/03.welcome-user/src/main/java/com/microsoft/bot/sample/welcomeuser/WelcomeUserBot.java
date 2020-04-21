@@ -28,32 +28,36 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  This class tracks the conversation state through a POJO saved in
- * {@link UserState} and demonstrates welcome messages and state.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. This class tracks the conversation state through a POJO saved in
+ * {@link UserState} and demonstrates welcome messages and state.
+ * </p>
  *
  * @see WelcomeUserState
  */
 @Component
 public class WelcomeUserBot extends ActivityHandler {
     // Messages sent to the user.
-    private static final String WELCOMEMESSAGE = "This is a simple Welcome Bot sample. This bot will introduce you "
-        + "to welcoming and greeting users. You can say 'intro' to see the "
-        + "introduction card. If you are running this bot in the Bot Framework "
-        + "Emulator, press the 'Start Over' button to simulate user joining "
-        + "a bot or a channel";
+    private static final String WELCOMEMESSAGE =
+        "This is a simple Welcome Bot sample. This bot will introduce you "
+            + "to welcoming and greeting users. You can say 'intro' to see the "
+            + "introduction card. If you are running this bot in the Bot Framework "
+            + "Emulator, press the 'Start Over' button to simulate user joining "
+            + "a bot or a channel";
 
-    private static final String INFOMESSAGE = "You are seeing this message because the bot received at least one "
-        + "'ConversationUpdate' event, indicating you (and possibly others) "
-        + "joined the conversation. If you are using the emulator, pressing "
-        + "the 'Start Over' button to trigger this event again. The specifics "
-        + "of the 'ConversationUpdate' event depends on the channel. You can "
-        + "read more information at: "
-        + "https://aka.ms/about-botframework-welcome-user";
+    private static final String INFOMESSAGE =
+        "You are seeing this message because the bot received at least one "
+            + "'ConversationUpdate' event, indicating you (and possibly others) "
+            + "joined the conversation. If you are using the emulator, pressing "
+            + "the 'Start Over' button to trigger this event again. The specifics "
+            + "of the 'ConversationUpdate' event depends on the channel. You can "
+            + "read more information at: " + "https://aka.ms/about-botframework-welcome-user";
 
-    private static final String PATTERNMESSAGE = "It is a good pattern to use this event to send general greeting"
-        + "to user, explaining what your bot can do. In this example, the bot "
-        + "handles 'hello', 'hi', 'help' and 'intro'. Try it now, type 'hi'";
+    private static final String PATTERNMESSAGE =
+        "It is a good pattern to use this event to send general greeting"
+            + "to user, explaining what your bot can do. In this example, the bot "
+            + "handles 'hello', 'hi', 'help' and 'intro'. Try it now, type 'hi'";
 
     private static final String FIRST_WELCOME_ONE =
         "You are seeing this message because this was your first message ever to this bot.";
@@ -71,8 +75,9 @@ public class WelcomeUserBot extends ActivityHandler {
     /**
      * Normal onTurn processing, with saving of state after each turn.
      *
-     * @param turnContext The context object for this turn. Provides information about the
-     *                    incoming activity, and other data needed to process the activity.
+     * @param turnContext The context object for this turn. Provides information
+     *                    about the incoming activity, and other data needed to
+     *                    process the activity.
      * @return A future task.
      */
     @Override
@@ -84,26 +89,36 @@ public class WelcomeUserBot extends ActivityHandler {
     /**
      * Send a welcome message to new members.
      *
-     * @param membersAdded A list of all the members added to the conversation, as described by
-     *                     the conversation update activity.
+     * @param membersAdded A list of all the members added to the conversation, as
+     *                     described by the conversation update activity.
      * @param turnContext  The context object for this turn.
      * @return A future task.
      */
     @Override
-    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(
+        List<ChannelAccount> membersAdded,
+        TurnContext turnContext
+    ) {
         return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivities(
-                MessageFactory.text("Hi there - " + channel.getName() + ". " + WELCOMEMESSAGE),
-                MessageFactory.text(INFOMESSAGE),
-                MessageFactory.text(PATTERNMESSAGE)))
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
+            .map(
+                channel -> turnContext
+                    .sendActivities(
+                        MessageFactory.text(
+                            "Hi there - " + channel.getName() + ". " + WELCOMEMESSAGE
+                        ), MessageFactory.text(INFOMESSAGE), MessageFactory.text(PATTERNMESSAGE)
+                    )
+            )
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);
     }
 
     /**
-     * This will prompt for a user name, after which it will send info about the conversation.  After sending
-     * information, the cycle restarts.
+     * This will prompt for a user name, after which it will send info about the
+     * conversation. After sending information, the cycle restarts.
      *
      * @param turnContext The context object for this turn.
      * @return A future task.
@@ -111,18 +126,18 @@ public class WelcomeUserBot extends ActivityHandler {
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         // Get state data from UserState.
-        StatePropertyAccessor<WelcomeUserState> stateAccessor = userState.createProperty("WelcomeUserState");
-        CompletableFuture<WelcomeUserState> stateFuture = stateAccessor.get(turnContext, WelcomeUserState::new);
+        StatePropertyAccessor<WelcomeUserState> stateAccessor =
+            userState.createProperty("WelcomeUserState");
+        CompletableFuture<WelcomeUserState> stateFuture =
+            stateAccessor.get(turnContext, WelcomeUserState::new);
 
         return stateFuture.thenApply(thisUserState -> {
             if (!thisUserState.getDidBotWelcomeUser()) {
                 thisUserState.setDidBotWelcomeUser(true);
 
                 String userName = turnContext.getActivity().getFrom().getName();
-                return turnContext.sendActivities(
-                    MessageFactory.text(FIRST_WELCOME_ONE),
-                    MessageFactory.text(String.format(FIRST_WELCOME_TWO, userName))
-                );
+                return turnContext
+                    .sendActivities(MessageFactory.text(FIRST_WELCOME_ONE), MessageFactory.text(String.format(FIRST_WELCOME_TWO, userName)));
             } else {
                 String text = turnContext.getActivity().getText().toLowerCase();
                 switch (text) {
@@ -146,35 +161,46 @@ public class WelcomeUserBot extends ActivityHandler {
     private CompletableFuture<ResourceResponse> sendIntroCard(TurnContext turnContext) {
         HeroCard card = new HeroCard();
         card.setTitle("Welcome to Bot Framework!");
-        card.setText("Welcome to Welcome Users bot sample! This Introduction card "
-            + "is a great way to introduce your Bot to the user and suggest "
-            + "some things to get them started. We use this opportunity to "
-            + "recommend a few next steps for learning more creating and deploying bots.");
-        card.setImages(Collections.singletonList(new CardImage() {{
-            setUrl("https://aka.ms/bf-welcome-card-image");
-        }}));
-        card.setButtons(Arrays.asList(
-            new CardAction() {{
+        card.setText(
+            "Welcome to Welcome Users bot sample! This Introduction card "
+                + "is a great way to introduce your Bot to the user and suggest "
+                + "some things to get them started. We use this opportunity to "
+                + "recommend a few next steps for learning more creating and deploying bots."
+        );
+        card.setImages(Collections.singletonList(new CardImage() {
+            {
+                setUrl("https://aka.ms/bf-welcome-card-image");
+            }
+        }));
+        card.setButtons(Arrays.asList(new CardAction() {
+            {
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Get an overview");
                 setText("Get an overview");
                 setDisplayText("Get an overview");
-                setValue("https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0");
-            }},
-            new CardAction() {{
+                setValue(
+                    "https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0"
+                );
+            }
+        }, new CardAction() {
+            {
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Ask a question");
                 setText("Ask a question");
                 setDisplayText("Ask a question");
                 setValue("https://stackoverflow.com/questions/tagged/botframework");
-            }},
-            new CardAction() {{
+            }
+        }, new CardAction() {
+            {
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Learn how to deploy");
                 setText("Learn how to deploy");
                 setDisplayText("Learn how to deploy");
-                setValue("https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-deploy-azure?view=azure-bot-service-4.0");
-            }}));
+                setValue(
+                    "https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-deploy-azure?view=azure-bot-service-4.0"
+                );
+            }
+        }));
 
         Activity response = MessageFactory.attachment(card.toAttachment());
         return turnContext.sendActivity(response);

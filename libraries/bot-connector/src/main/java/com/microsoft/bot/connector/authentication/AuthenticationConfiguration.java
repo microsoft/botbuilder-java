@@ -12,6 +12,7 @@ import java.util.List;
 public class AuthenticationConfiguration {
     /**
      * Required endorsements for auth.
+     * 
      * @return A List of endorsements.
      */
     public List<String> requiredEndorsements() {

@@ -26,6 +26,7 @@ public class ResourceResponse {
 
     /**
      * ResourceResponse with ID.
+     * 
      * @param withId The id.
      */
     public ResourceResponse(String withId) {

@@ -22,8 +22,8 @@ import retrofit2.http.Query;
 import retrofit2.Response;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in BotSignIns.
+ * An instance of this class provides access to all the operations defined in
+ * BotSignIns.
  */
 public class RestBotSignIn implements BotSignIn {
     /** The Retrofit service to perform REST calls. */
@@ -35,7 +35,8 @@ public class RestBotSignIn implements BotSignIn {
      * Initializes an instance of BotSignInsImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this
+     *                     operation class.
      */
     public RestBotSignIn(Retrofit withRetrofit, RestOAuthClient withClient) {
         this.service = withRetrofit.create(BotSignInsService.class);
@@ -43,14 +44,20 @@ public class RestBotSignIn implements BotSignIn {
     }
 
     /**
-     * The interface defining all the services for BotSignIns to be
-     * used by Retrofit to perform actually REST calls.
+     * The interface defining all the services for BotSignIns to be used by Retrofit
+     * to perform actually REST calls.
      */
-    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
     interface BotSignInsService {
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl" })
         @GET("api/botsignin/GetSignInUrl")
-        CompletableFuture<Response<ResponseBody>> getSignInUrl(@Query("state") String state, @Query("code_challenge") String codeChallenge, @Query("emulatorUrl") String emulatorUrl, @Query("finalRedirect") String finalRedirect);
+        CompletableFuture<Response<ResponseBody>> getSignInUrl(
+            @Query("state") String state,
+            @Query("code_challenge") String codeChallenge,
+            @Query("emulatorUrl") String emulatorUrl,
+            @Query("finalRedirect") String finalRedirect
+        );
     }
 
     /**
@@ -69,7 +76,7 @@ public class RestBotSignIn implements BotSignIn {
         return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect)
             .thenApply(responseBodyResponse -> {
                 try {
-                   return getSignInUrlDelegate(responseBodyResponse).body();
+                    return getSignInUrlDelegate(responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -80,17 +87,19 @@ public class RestBotSignIn implements BotSignIn {
 
     /**
      *
-     * @param state the String value
+     * @param state         the String value
      * @param codeChallenge the String value
-     * @param emulatorUrl the String value
+     * @param emulatorUrl   the String value
      * @param finalRedirect the String value
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the String object
      */
-    public CompletableFuture<String> getSignInUrl(String state,
-                                                  String codeChallenge,
-                                                  String emulatorUrl,
-                                                  String finalRedirect) {
+    public CompletableFuture<String> getSignInUrl(
+        String state,
+        String codeChallenge,
+        String emulatorUrl,
+        String finalRedirect
+    ) {
         if (state == null) {
             throw new IllegalArgumentException("Parameter state is required and cannot be null.");
         }
@@ -106,13 +115,16 @@ public class RestBotSignIn implements BotSignIn {
             });
     }
 
-    private ServiceResponse<String> getSignInUrlDelegate(Response<ResponseBody> response)
-        throws CloudException, IOException, IllegalArgumentException {
+    private ServiceResponse<String> getSignInUrlDelegate(
+        Response<ResponseBody> response
+    ) throws CloudException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<String, CloudException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<String>() { }.getType())
-                .registerError(CloudException.class)
-                .build(response);
+            .responseBuilderFactory()
+            .<String, CloudException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<String>() {
+            }.getType())
+            .registerError(CloudException.class)
+            .build(response);
     }
 }

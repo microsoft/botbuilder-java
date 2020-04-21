@@ -23,13 +23,17 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberAdded1() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersAdded(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("b"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("b"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -42,14 +46,18 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberAdded2() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersAdded(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("a"));
-                add(new ChannelAccount("b"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("a"));
+                        add(new ChannelAccount("b"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -63,15 +71,19 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberAdded3() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersAdded(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("a"));
-                add(new ChannelAccount("b"));
-                add(new ChannelAccount("c"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("a"));
+                        add(new ChannelAccount("b"));
+                        add(new ChannelAccount("c"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -85,13 +97,17 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberRemoved1() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersRemoved(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("c"));
-            }});
-            setRecipient(new ChannelAccount("c"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersRemoved(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("c"));
+                    }
+                });
+                setRecipient(new ChannelAccount("c"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -104,14 +120,18 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberRemoved2() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersRemoved(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("a"));
-                add(new ChannelAccount("c"));
-            }});
-            setRecipient(new ChannelAccount("c"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersRemoved(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("a"));
+                        add(new ChannelAccount("c"));
+                    }
+                });
+                setRecipient(new ChannelAccount("c"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -125,15 +145,19 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberRemoved3() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersRemoved(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("a"));
-                add(new ChannelAccount("b"));
-                add(new ChannelAccount("c"));
-            }});
-            setRecipient(new ChannelAccount("c"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersRemoved(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("a"));
+                        add(new ChannelAccount("b"));
+                        add(new ChannelAccount("c"));
+                    }
+                });
+                setRecipient(new ChannelAccount("c"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -147,13 +171,17 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberAddedJustTheBot() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersAdded(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("b"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("b"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -166,13 +194,17 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestMemberRemovedJustTheBot() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.CONVERSATION_UPDATE);
-            setMembersRemoved(new ArrayList<ChannelAccount>(){{
-                add(new ChannelAccount("c"));
-            }});
-            setRecipient(new ChannelAccount("c"));
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.CONVERSATION_UPDATE);
+                setMembersRemoved(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("c"));
+                    }
+                });
+                setRecipient(new ChannelAccount("c"));
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -190,15 +222,21 @@ public class ActivityHandlerTests {
         // sends separate activities each with a single add and a single remove.
 
         // Arrange
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.MESSAGE_REACTION);
-            setReactionsAdded(new ArrayList<MessageReaction>() {{
-                add(new MessageReaction("sad"));
-            }});
-            setReactionsRemoved(new ArrayList<MessageReaction>() {{
-                add(new MessageReaction("angry"));
-            }});
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.MESSAGE_REACTION);
+                setReactionsAdded(new ArrayList<MessageReaction>() {
+                    {
+                        add(new MessageReaction("sad"));
+                    }
+                });
+                setReactionsRemoved(new ArrayList<MessageReaction>() {
+                    {
+                        add(new MessageReaction("angry"));
+                    }
+                });
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -213,10 +251,12 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestTokenResponseEventAsync() {
-        Activity activity = new Activity() {{
-           setType(ActivityTypes.EVENT);
-           setName("tokens/response");
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.EVENT);
+                setName("tokens/response");
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -230,10 +270,12 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestEventAsync() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.EVENT);
-            setName("some.random.event");
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.EVENT);
+                setName("some.random.event");
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -247,9 +289,11 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestEventNullNameAsync() {
-        Activity activity = new Activity() {{
-            setType(ActivityTypes.EVENT);
-        }};
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.EVENT);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -263,9 +307,11 @@ public class ActivityHandlerTests {
 
     @Test
     public void TestUnrecognizedActivityType() {
-        Activity activity = new Activity() {{
-            setType("shall.not.pass");
-        }};
+        Activity activity = new Activity() {
+            {
+                setType("shall.not.pass");
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -278,17 +324,26 @@ public class ActivityHandlerTests {
 
     private static class NotImplementedAdapter extends BotAdapter {
         @Override
-        public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
+        public CompletableFuture<ResourceResponse[]> sendActivities(
+            TurnContext context,
+            List<Activity> activities
+        ) {
             throw new RuntimeException();
         }
 
         @Override
-        public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
+        public CompletableFuture<ResourceResponse> updateActivity(
+            TurnContext context,
+            Activity activity
+        ) {
             throw new RuntimeException();
         }
 
         @Override
-        public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
+        public CompletableFuture<Void> deleteActivity(
+            TurnContext context,
+            ConversationReference reference
+        ) {
             throw new RuntimeException();
         }
     }
@@ -317,13 +372,19 @@ public class ActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+        protected CompletableFuture<Void> onMembersAdded(
+            List<ChannelAccount> membersAdded,
+            TurnContext turnContext
+        ) {
             record.add("onMembersAdded");
             return super.onMembersAdded(membersAdded, turnContext);
         }
 
         @Override
-        protected CompletableFuture<Void> onMembersRemoved(List<ChannelAccount> membersRemoved, TurnContext turnContext) {
+        protected CompletableFuture<Void> onMembersRemoved(
+            List<ChannelAccount> membersRemoved,
+            TurnContext turnContext
+        ) {
             record.add("onMembersRemoved");
             return super.onMembersRemoved(membersRemoved, turnContext);
         }
@@ -335,13 +396,19 @@ public class ActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture onReactionsAdded(List<MessageReaction> messageReactions, TurnContext turnContext) {
+        protected CompletableFuture onReactionsAdded(
+            List<MessageReaction> messageReactions,
+            TurnContext turnContext
+        ) {
             record.add("onReactionsAdded");
             return super.onReactionsAdded(messageReactions, turnContext);
         }
 
         @Override
-        protected CompletableFuture onReactionsRemoved(List<MessageReaction> messageReactions, TurnContext turnContext) {
+        protected CompletableFuture onReactionsRemoved(
+            List<MessageReaction> messageReactions,
+            TurnContext turnContext
+        ) {
             record.add("onReactionsRemoved");
             return super.onReactionsRemoved(messageReactions, turnContext);
         }

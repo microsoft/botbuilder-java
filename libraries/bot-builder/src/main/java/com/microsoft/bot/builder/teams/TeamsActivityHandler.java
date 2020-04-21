@@ -38,14 +38,14 @@ import java.util.stream.Collectors;
 /**
  * A Teams implementation of the Bot interface intended for further subclassing.
  * Derive from this class to plug in code to handle particular Activity types.
- * Pre and post processing of Activities can be plugged in by deriving and calling
- * the base class implementation.
+ * Pre and post processing of Activities can be plugged in by deriving and
+ * calling the base class implementation.
  */
-@SuppressWarnings({"checkstyle:JavadocMethod", "checkstyle:DesignForExtension"})
+@SuppressWarnings({ "checkstyle:JavadocMethod", "checkstyle:DesignForExtension" })
 public class TeamsActivityHandler extends ActivityHandler {
     /**
-     * Invoked when an invoke activity is received from the connector when the base behavior of
-     * onTurn is used.
+     * Invoked when an invoke activity is received from the connector when the base
+     * behavior of onTurn is used.
      *
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
@@ -55,91 +55,122 @@ public class TeamsActivityHandler extends ActivityHandler {
         CompletableFuture<InvokeResponse> result;
 
         try {
-            if (turnContext.getActivity().getName() == null && turnContext.getActivity().isTeamsActivity()) {
+            if (
+                turnContext.getActivity().getName() == null
+                    && turnContext.getActivity().isTeamsActivity()
+            ) {
                 result = onTeamsCardActionInvoke(turnContext);
             } else {
                 switch (turnContext.getActivity().getName()) {
                     case "fileConsent/invoke":
-                        result = onTeamsFileConsent(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), FileConsentCardResponse.class)
+                        result = onTeamsFileConsent(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                FileConsentCardResponse.class
+                            )
                         );
                         break;
 
                     case "actionableMessage/executeAction":
-                         result = onTeamsO365ConnectorCardAction(turnContext, Serialization.safeGetAs(
-                             turnContext.getActivity().getValue(), O365ConnectorCardActionQuery.class)
-                         )
-                            .thenApply(aVoid -> createInvokeResponse(null));
+                        result = onTeamsO365ConnectorCardAction(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                O365ConnectorCardActionQuery.class
+                            )
+                        ).thenApply(aVoid -> createInvokeResponse(null));
                         break;
 
                     case "composeExtension/queryLink":
-                        result = onTeamsAppBasedLinkQuery(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), AppBasedLinkQuery.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsAppBasedLinkQuery(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                AppBasedLinkQuery.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/query":
-                        result = onTeamsMessagingExtensionQuery(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), MessagingExtensionQuery.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsMessagingExtensionQuery(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                MessagingExtensionQuery.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/selectItem":
-                        result = onTeamsMessagingExtensionSelectItem(turnContext, turnContext.getActivity().getValue())
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsMessagingExtensionSelectItem(
+                            turnContext,
+                            turnContext.getActivity().getValue()
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/submitAction":
-                        result = onTeamsMessagingExtensionSubmitActionDispatch(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), MessagingExtensionAction.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsMessagingExtensionSubmitActionDispatch(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                MessagingExtensionAction.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/fetchTask":
-                        result = onTeamsMessagingExtensionFetchTask(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), MessagingExtensionAction.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsMessagingExtensionFetchTask(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                MessagingExtensionAction.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/querySettingUrl":
                         result = onTeamsMessagingExtensionConfigurationQuerySettingUrl(
-                            turnContext, Serialization.safeGetAs(
-                                turnContext.getActivity().getValue(), MessagingExtensionQuery.class
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                MessagingExtensionQuery.class
                             )
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/setting":
                         result = onTeamsMessagingExtensionConfigurationSetting(
-                            turnContext, turnContext.getActivity().getValue()
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                            turnContext,
+                            turnContext.getActivity().getValue()
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "composeExtension/onCardButtonClicked":
                         result = onTeamsMessagingExtensionCardButtonClicked(
-                            turnContext, turnContext.getActivity().getValue()
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                            turnContext,
+                            turnContext.getActivity().getValue()
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "task/fetch":
-                        result = onTeamsTaskModuleFetch(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), TaskModuleRequest.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsTaskModuleFetch(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                TaskModuleRequest.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     case "task/submit":
-                        result = onTeamsTaskModuleSubmit(turnContext, Serialization.safeGetAs(
-                            turnContext.getActivity().getValue(), TaskModuleRequest.class)
-                        )
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                        result = onTeamsTaskModuleSubmit(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                TaskModuleRequest.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
 
                     default:
@@ -153,12 +184,17 @@ public class TeamsActivityHandler extends ActivityHandler {
         }
 
         return result.exceptionally(e -> {
-            if (e instanceof CompletionException && e.getCause() instanceof InvokeResponseExcetion) {
-                return ((InvokeResponseExcetion) e.getCause()).createInvokeResponse();
-            } else if (e instanceof InvokeResponseExcetion) {
-                return ((InvokeResponseExcetion) e).createInvokeResponse();
+            if (
+                e instanceof CompletionException && e.getCause() instanceof InvokeResponseException
+            ) {
+                return ((InvokeResponseException) e.getCause()).createInvokeResponse();
+            } else if (e instanceof InvokeResponseException) {
+                return ((InvokeResponseException) e).createInvokeResponse();
             }
-            return new InvokeResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, e.getLocalizedMessage());
+            return new InvokeResponse(
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                e.getLocalizedMessage()
+            );
         });
     }
 
@@ -176,80 +212,84 @@ public class TeamsActivityHandler extends ActivityHandler {
 
     protected CompletableFuture<InvokeResponse> onTeamsFileConsent(
         TurnContext turnContext,
-        FileConsentCardResponse fileConsentCardResponse) {
-
+        FileConsentCardResponse fileConsentCardResponse
+    ) {
         switch (fileConsentCardResponse.getAction()) {
             case "accept":
-                return onTeamsFileConsentAccept(turnContext, fileConsentCardResponse)
-                    .thenApply(aVoid -> createInvokeResponse(null));
+                return onTeamsFileConsentAccept(turnContext, fileConsentCardResponse).thenApply(
+                    aVoid -> createInvokeResponse(null)
+                );
 
             case "decline":
-                return onTeamsFileConsentDecline(turnContext, fileConsentCardResponse)
-                    .thenApply(aVoid -> createInvokeResponse(null));
+                return onTeamsFileConsentDecline(turnContext, fileConsentCardResponse).thenApply(
+                    aVoid -> createInvokeResponse(null)
+                );
 
             default:
                 CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
-                result.completeExceptionally(new InvokeResponseExcetion(
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    fileConsentCardResponse.getAction() + " is not a supported Action."
-                ));
+                result.completeExceptionally(
+                    new InvokeResponseException(
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        fileConsentCardResponse.getAction() + " is not a supported Action."
+                    )
+                );
                 return result;
         }
     }
 
     protected CompletableFuture<Void> onTeamsFileConsentAccept(
         TurnContext turnContext,
-        FileConsentCardResponse fileConsentCardResponse) {
-
+        FileConsentCardResponse fileConsentCardResponse
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onTeamsFileConsentDecline(
         TurnContext turnContext,
-        FileConsentCardResponse fileConsentCardResponse) {
-
+        FileConsentCardResponse fileConsentCardResponse
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(
         TurnContext turnContext,
-        MessagingExtensionQuery query) {
-
+        MessagingExtensionQuery query
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onTeamsO365ConnectorCardAction(
         TurnContext turnContext,
-        O365ConnectorCardActionQuery query) {
-
+        O365ConnectorCardActionQuery query
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(
         TurnContext turnContext,
-        AppBasedLinkQuery query) {
-
+        AppBasedLinkQuery query
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionSelectItem(
         TurnContext turnContext,
-        Object query) {
-
+        Object query
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionFetchTask(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
-
+        MessagingExtensionAction action
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitActionDispatch(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
-
+        MessagingExtensionAction action
+    ) {
         if (!StringUtils.isEmpty(action.getBotMessagePreviewAction())) {
             switch (action.getBotMessagePreviewAction()) {
                 case "edit":
@@ -260,10 +300,13 @@ public class TeamsActivityHandler extends ActivityHandler {
 
                 default:
                     CompletableFuture<MessagingExtensionActionResponse> result = new CompletableFuture<>();
-                    result.completeExceptionally(new InvokeResponseExcetion(
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        action.getBotMessagePreviewAction() + " is not a support BotMessagePreviewAction"
-                    ));
+                    result.completeExceptionally(
+                        new InvokeResponseException(
+                            HttpURLConnection.HTTP_BAD_REQUEST,
+                            action.getBotMessagePreviewAction()
+                                + " is not a support BotMessagePreviewAction"
+                        )
+                    );
                     return result;
             }
         } else {
@@ -273,64 +316,65 @@ public class TeamsActivityHandler extends ActivityHandler {
 
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
-
+        MessagingExtensionAction action
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewEdit(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
-
+        MessagingExtensionAction action
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewSend(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
-
+        MessagingExtensionAction action
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionConfigurationQuerySettingUrl(
         TurnContext turnContext,
-        MessagingExtensionQuery query) {
-
+        MessagingExtensionQuery query
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onTeamsMessagingExtensionConfigurationSetting(
         TurnContext turnContext,
-        Object settings) {
-
+        Object settings
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleFetch(
         TurnContext turnContext,
-        TaskModuleRequest taskModuleRequest) {
-
+        TaskModuleRequest taskModuleRequest
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onTeamsMessagingExtensionCardButtonClicked(
         TurnContext turnContext,
-        Object cardData) {
-
+        Object cardData
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onTeamsTaskModuleSubmit(
         TurnContext turnContext,
-        TaskModuleRequest taskModuleRequest) {
-
+        TaskModuleRequest taskModuleRequest
+    ) {
         return notImplemented();
     }
 
     protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
         if (turnContext.getActivity().isTeamsActivity()) {
-            ResultPair<TeamsChannelData> channelData =
-                turnContext.getActivity().tryGetChannelData(TeamsChannelData.class);
+            ResultPair<TeamsChannelData> channelData = turnContext.getActivity().tryGetChannelData(
+                TeamsChannelData.class
+            );
 
             if (turnContext.getActivity().getMembersAdded() != null) {
                 return onTeamsMembersAddedDispatch(
@@ -414,13 +458,16 @@ public class TeamsActivityHandler extends ActivityHandler {
                 // the getMembers call
                 if (teamMembers == null) {
                     List<TeamsChannelAccount> result = TeamsInfo.getMembers(turnContext).join();
-                    teamMembers = result.stream().collect(Collectors.toMap(ChannelAccount::getId, item -> item));
+                    teamMembers = result.stream().collect(
+                        Collectors.toMap(ChannelAccount::getId, item -> item)
+                    );
                 }
 
                 if (teamMembers.containsKey(memberAdded.getId())) {
                     teamsMembersAdded.add(teamMembers.get(memberAdded.getId()));
                 } else {
-                    // unable to find the member added in ConversationUpdate Activity in the response from
+                    // unable to find the member added in ConversationUpdate Activity in the
+                    // response from
                     // the getMembers call
                     TeamsChannelAccount newTeamsChannelAccount = new TeamsChannelAccount();
                     newTeamsChannelAccount.setId(memberAdded.getId());
@@ -489,7 +536,6 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
-
     protected CompletableFuture<Void> onTeamsChannelRenamed(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
@@ -512,7 +558,9 @@ public class TeamsActivityHandler extends ActivityHandler {
 
     protected <T> CompletableFuture<T> notImplemented(String body) {
         CompletableFuture<T> result = new CompletableFuture<>();
-        result.completeExceptionally(new InvokeResponseExcetion(HttpURLConnection.HTTP_NOT_IMPLEMENTED, body));
+        result.completeExceptionally(
+            new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED, body)
+        );
         return result;
     }
 

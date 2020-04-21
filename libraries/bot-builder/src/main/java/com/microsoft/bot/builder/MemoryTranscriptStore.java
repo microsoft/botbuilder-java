@@ -16,10 +16,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The memory transcript store stores transcripts in volatile memory in a Dictionary.
+ * The memory transcript store stores transcripts in volatile memory in a
+ * Dictionary.
  *
- * <p>Because this uses an unbounded volatile dictionary this should only be used for unit tests or
- * non-production environments.</p>
+ * <p>
+ * Because this uses an unbounded volatile dictionary this should only be used
+ * for unit tests or non-production environments.
+ * </p>
  */
 public class MemoryTranscriptStore implements TranscriptStore {
     /**
@@ -78,16 +81,20 @@ public class MemoryTranscriptStore implements TranscriptStore {
      *
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
-     * @param continuationToken The continuation token from the previous page of results.
-     * @param startDate         A cutoff date. Activities older than this date are not included.
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
+     * @param continuationToken The continuation token from the previous page of
+     *                          results.
+     * @param startDate         A cutoff date. Activities older than this date are
+     *                          not included.
+     * @return A task that represents the work queued to execute. If the task
+     *         completes successfully, the result contains the matching activities.
      */
     @Override
-    public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                            String conversationId,
-                                                                            String continuationToken,
-                                                                            OffsetDateTime startDate) {
+    public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(
+        String channelId,
+        String conversationId,
+        String continuationToken,
+        OffsetDateTime startDate
+    ) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
@@ -101,7 +108,9 @@ public class MemoryTranscriptStore implements TranscriptStore {
             if (channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
                 if (channel.containsKey(conversationId)) {
-                    OffsetDateTime effectiveStartDate = (startDate == null) ? OffsetDateTime.MIN : startDate;
+                    OffsetDateTime effectiveStartDate = (startDate == null)
+                        ? OffsetDateTime.MIN
+                        : startDate;
 
                     ArrayList<Activity> transcript = channel.get(conversationId);
 
@@ -110,12 +119,12 @@ public class MemoryTranscriptStore implements TranscriptStore {
                         .filter(a -> a.getTimestamp().compareTo(effectiveStartDate) >= 0);
 
                     if (continuationToken != null) {
-                        stream = StreamUtils.skipWhile(stream, a -> !a.getId().equals(continuationToken)).skip(1);
+                        stream = StreamUtils
+                            .skipWhile(stream, a -> !a.getId().equals(continuationToken))
+                            .skip(1);
                     }
 
-                    List<Activity> items = stream
-                        .limit(PAGE_SIZE)
-                        .collect(Collectors.toList());
+                    List<Activity> items = stream.limit(PAGE_SIZE).collect(Collectors.toList());
 
                     pagedResult.setItems(items);
                     if (pagedResult.getItems().size() == PAGE_SIZE) {
@@ -138,11 +147,15 @@ public class MemoryTranscriptStore implements TranscriptStore {
     @Override
     public CompletableFuture<Void> deleteTranscript(String channelId, String conversationId) {
         if (channelId == null) {
-            throw new IllegalArgumentException(String.format("%1$s should not be null", "channelId"));
+            throw new IllegalArgumentException(
+                String.format("%1$s should not be null", "channelId")
+            );
         }
 
         if (conversationId == null) {
-            throw new IllegalArgumentException(String.format("%1$s should not be null", "conversationId"));
+            throw new IllegalArgumentException(
+                String.format("%1$s should not be null", "conversationId")
+            );
         }
 
         synchronized (sync) {
@@ -159,11 +172,15 @@ public class MemoryTranscriptStore implements TranscriptStore {
      * Gets the conversations on a channel from the store.
      *
      * @param channelId         The ID of the channel.
-     * @param continuationToken The continuation token from the previous page of results.
+     * @param continuationToken The continuation token from the previous page of
+     *                          results.
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId, String continuationToken) {
+    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(
+        String channelId,
+        String continuationToken
+    ) {
         if (channelId == null) {
             throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
         }
@@ -172,27 +189,25 @@ public class MemoryTranscriptStore implements TranscriptStore {
         synchronized (sync) {
             if (channels.containsKey(channelId)) {
                 HashMap<String, ArrayList<Activity>> channel = channels.get(channelId);
-                Stream<TranscriptInfo> stream = channel.entrySet().stream()
-                    .map(c -> {
-                        OffsetDateTime offsetDateTime;
+                Stream<TranscriptInfo> stream = channel.entrySet().stream().map(c -> {
+                    OffsetDateTime offsetDateTime;
 
-                        if (c.getValue().stream().findFirst().isPresent()) {
-                            offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
-                        } else {
-                            offsetDateTime = OffsetDateTime.now();
-                        }
+                    if (c.getValue().stream().findFirst().isPresent()) {
+                        offsetDateTime = c.getValue().stream().findFirst().get().getTimestamp();
+                    } else {
+                        offsetDateTime = OffsetDateTime.now();
+                    }
 
-                        return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
-                    })
-                    .sorted(Comparator.comparing(TranscriptInfo::getCreated));
+                    return new TranscriptInfo(c.getKey(), channelId, offsetDateTime);
+                }).sorted(Comparator.comparing(TranscriptInfo::getCreated));
 
                 if (continuationToken != null) {
-                    stream = StreamUtils.skipWhile(stream, c -> !c.getId().equals(continuationToken)).skip(1);
+                    stream = StreamUtils
+                        .skipWhile(stream, c -> !c.getId().equals(continuationToken))
+                        .skip(1);
                 }
 
-                List<TranscriptInfo> items = stream
-                    .limit(PAGE_SIZE)
-                    .collect(Collectors.toList());
+                List<TranscriptInfo> items = stream.limit(PAGE_SIZE).collect(Collectors.toList());
 
                 pagedResult.setItems(items);
                 if (items.size() == PAGE_SIZE) {

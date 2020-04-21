@@ -30,6 +30,7 @@ public class IntentScore {
 
     /**
      * Gets confidence in an intent.
+     * 
      * @return Confidence in an intent.
      */
     public double getScore() {
@@ -38,6 +39,7 @@ public class IntentScore {
 
     /**
      * Sets confidence in an intent.
+     * 
      * @param withScore Confidence in an intent.
      */
     public void setScore(double withScore) {
@@ -46,6 +48,7 @@ public class IntentScore {
 
     /**
      * Gets extra properties to include in the results.
+     * 
      * @return Any extra properties to include in the results.
      */
     @JsonAnyGetter
@@ -55,7 +58,8 @@ public class IntentScore {
 
     /**
      * Sets extra properties to include in the results.
-     * @param key The key of the property.
+     * 
+     * @param key   The key of the property.
      * @param value The JsonNode value of the property.
      */
     @JsonAnySetter

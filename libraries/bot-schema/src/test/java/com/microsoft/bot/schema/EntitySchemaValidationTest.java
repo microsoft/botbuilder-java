@@ -12,10 +12,12 @@ import org.junit.Test;
 public class EntitySchemaValidationTest {
     @Test
     public void EntityTests_GeoCoordinatesSerializationDeserializationTest() {
-        GeoCoordinates geoCoordinates = new GeoCoordinates() {{
-           setLatitude(22.00);
-           setLongitude(23.00);
-        }};
+        GeoCoordinates geoCoordinates = new GeoCoordinates() {
+            {
+                setLatitude(22.00);
+                setLongitude(23.00);
+            }
+        };
 
         Assert.assertEquals("GeoCoordinates", geoCoordinates.getType());
 
@@ -24,32 +26,44 @@ public class EntitySchemaValidationTest {
 
         GeoCoordinates geoDeserialized = deserializedEntity.getAs(GeoCoordinates.class);
         Assert.assertEquals(geoCoordinates.getType(), geoDeserialized.getType());
-        Assert.assertEquals(geoCoordinates.getLatitude(), geoDeserialized.getLatitude(), Double.MAX_VALUE);
-        Assert.assertEquals(geoCoordinates.getLongitude(), geoDeserialized.getLongitude(), Double.MAX_VALUE);
+        Assert.assertEquals(
+            geoCoordinates.getLatitude(), geoDeserialized.getLatitude(), Double.MAX_VALUE
+        );
+        Assert.assertEquals(
+            geoCoordinates.getLongitude(), geoDeserialized.getLongitude(), Double.MAX_VALUE
+        );
     }
 
     @Test
     public void EntityTests_MentionSerializationDeserializationTest() {
-        Mention mentionEntity = new Mention() {{
-            setText("TESTTEST");
-        }};
+        Mention mentionEntity = new Mention() {
+            {
+                setText("TESTTEST");
+            }
+        };
 
         Assert.assertEquals("mention", mentionEntity.getType());
 
         Entity deserializedEntity = new Entity().setAs(mentionEntity);
         Assert.assertEquals(deserializedEntity.getType(), mentionEntity.getType());
-        Assert.assertEquals(deserializedEntity.getProperties().get("text").textValue(), mentionEntity.getText());
+        Assert.assertEquals(
+            deserializedEntity.getProperties().get("text").textValue(), mentionEntity.getText()
+        );
 
         Mention mentionDeserialized = deserializedEntity.getAs(Mention.class);
         Assert.assertEquals(mentionEntity.getType(), mentionDeserialized.getType());
-        Assert.assertEquals(deserializedEntity.getProperties().get("text").textValue(), mentionEntity.getText());
+        Assert.assertEquals(
+            deserializedEntity.getProperties().get("text").textValue(), mentionEntity.getText()
+        );
     }
 
     @Test
     public void EntityTests_PlaceSerializationDeserializationTest() {
-        Place placeEntity = new Place() {{
-            setName("TESTTEST");
-        }};
+        Place placeEntity = new Place() {
+            {
+                setName("TESTTEST");
+            }
+        };
 
         Assert.assertEquals("Place", placeEntity.getType());
 

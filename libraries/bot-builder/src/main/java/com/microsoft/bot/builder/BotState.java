@@ -15,13 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
- * Defines a state management object and automates the reading and writing of associated state
- * properties to a storage layer.
+ * Defines a state management object and automates the reading and writing of
+ * associated state properties to a storage layer.
  *
- * <p>Each state management object defines a scope for a storage layer. State properties are
- * created within a state management scope, and the Bot Framework defines these scopes:
- * {@link ConversationState}, {@link UserState}, and {@link PrivateConversationState}.
- * You can define additional scopes for your bot.</p>
+ * <p>
+ * Each state management object defines a scope for a storage layer. State
+ * properties are created within a state management scope, and the Bot Framework
+ * defines these scopes: {@link ConversationState}, {@link UserState}, and
+ * {@link PrivateConversationState}. You can define additional scopes for your
+ * bot.
+ * </p>
  */
 public abstract class BotState implements PropertyManager {
     /**
@@ -53,8 +56,8 @@ public abstract class BotState implements PropertyManager {
     }
 
     /**
-     * Creates a named state property within the scope of a BotState and returns
-     * an accessor for the property.
+     * Creates a named state property within the scope of a BotState and returns an
+     * accessor for the property.
      *
      * @param name name of property.
      * @param <T>  type of property.
@@ -79,11 +82,13 @@ public abstract class BotState implements PropertyManager {
     }
 
     /**
-     * Reads in  the current state object and caches it in the context object for this turn.
+     * Reads in the current state object and caches it in the context object for
+     * this turn.
      *
      * @param turnContext The context object for this turn.
-     * @param force       true to overwrite any existing state cache; or false to load state from
-     *                    storage only if the cache doesn't already exist.
+     * @param force       true to overwrite any existing state cache; or false to
+     *                    load state from storage only if the cache doesn't already
+     *                    exist.
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> load(TurnContext turnContext, boolean force) {
@@ -94,12 +99,14 @@ public abstract class BotState implements PropertyManager {
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
         String storageKey = getStorageKey(turnContext);
         if (force || cachedState == null || cachedState.getState() == null) {
-            return storage.read(new String[]{storageKey})
-                .thenApply(val -> {
-                    turnContext.getTurnState().replace(
-                        contextServiceKey, new CachedBotState((Map<String, Object>) val.get(storageKey)));
-                    return null;
-                });
+            return storage.read(new String[] {storageKey}).thenApply(val -> {
+                turnContext.getTurnState()
+                    .replace(
+                        contextServiceKey,
+                        new CachedBotState((Map<String, Object>) val.get(storageKey))
+                    );
+                return null;
+            });
         }
 
         return CompletableFuture.completedFuture(null);
@@ -119,8 +126,9 @@ public abstract class BotState implements PropertyManager {
      * Writes the state cache for this BotState to the storage layer.
      *
      * @param turnContext The context object for this turn.
-     * @param force       true to save the state cache to storage; or false to save state to storage
-     *                    only if a property in the cache has changed.
+     * @param force       true to save the state cache to storage; or false to save
+     *                    state to storage only if a property in the cache has
+     *                    changed.
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> saveChanges(TurnContext turnContext, boolean force) {
@@ -131,15 +139,16 @@ public abstract class BotState implements PropertyManager {
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
         if (force || cachedState != null && cachedState.isChanged()) {
             String storageKey = getStorageKey(turnContext);
-            Map<String, Object> changes = new HashMap<String, Object>() {{
-                put(storageKey, cachedState.state);
-            }};
+            Map<String, Object> changes = new HashMap<String, Object>() {
+                {
+                    put(storageKey, cachedState.state);
+                }
+            };
 
-            return storage.write(changes)
-                .thenApply(val -> {
-                    cachedState.setHash(cachedState.computeHash(cachedState.state));
-                    return null;
-                });
+            return storage.write(changes).thenApply(val -> {
+                cachedState.setHash(cachedState.computeHash(cachedState.state));
+                return null;
+            });
         }
 
         return CompletableFuture.completedFuture(null);
@@ -148,9 +157,11 @@ public abstract class BotState implements PropertyManager {
     /**
      * Clears the state cache for this BotState.
      *
-     * <p>This method clears the state cache in the turn context. Call
-     * {@link #saveChanges(TurnContext, boolean)} to persist this
-     * change in the storage layer.</p>
+     * <p>
+     * This method clears the state cache in the turn context. Call
+     * {@link #saveChanges(TurnContext, boolean)} to persist this change in the
+     * storage layer.
+     * </p>
      *
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
@@ -176,15 +187,14 @@ public abstract class BotState implements PropertyManager {
         }
 
         String storageKey = getStorageKey(turnContext);
-        return storage.delete(new String[]{storageKey})
-            .thenApply(result -> {
-                CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-                if (cachedState != null) {
-                    turnContext.getTurnState().remove(contextServiceKey);
-                }
+        return storage.delete(new String[] {storageKey}).thenApply(result -> {
+            CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+            if (cachedState != null) {
+                turnContext.getTurnState().remove(contextServiceKey);
+            }
 
-                return null;
-            });
+            return null;
+        });
     }
 
     /**
@@ -204,8 +214,8 @@ public abstract class BotState implements PropertyManager {
     }
 
     /**
-     * When overridden in a derived class, gets the key to use when reading and writing state to
-     * and from storage.
+     * When overridden in a derived class, gets the key to use when reading and
+     * writing state to and from storage.
      *
      * @param turnContext The context object for this turn.
      * @return The storage key.
@@ -218,11 +228,13 @@ public abstract class BotState implements PropertyManager {
      * @param turnContext  The context object for this turn.
      * @param propertyName The name of the property to get.
      * @param <T>          The property type.
-     * @return A task that represents the work queued to execute.  If the task is successful, the
-     * result contains the property value.
+     * @return A task that represents the work queued to execute. If the task is
+     *         successful, the result contains the property value.
      */
-    protected <T> CompletableFuture<T> getPropertyValue(TurnContext turnContext,
-                                                             String propertyName) {
+    protected <T> CompletableFuture<T> getPropertyValue(
+        TurnContext turnContext,
+        String propertyName
+    ) {
         if (turnContext == null) {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
@@ -232,7 +244,8 @@ public abstract class BotState implements PropertyManager {
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        return (CompletableFuture<T>) CompletableFuture.completedFuture(cachedState.getState().get(propertyName));
+        return (CompletableFuture<T>) CompletableFuture
+            .completedFuture(cachedState.getState().get(propertyName));
     }
 
     /**
@@ -242,7 +255,10 @@ public abstract class BotState implements PropertyManager {
      * @param propertyName The name of the property to delete.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> deletePropertyValue(TurnContext turnContext, String propertyName) {
+    protected CompletableFuture<Void> deletePropertyValue(
+        TurnContext turnContext,
+        String propertyName
+    ) {
         if (turnContext == null) {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
@@ -264,9 +280,11 @@ public abstract class BotState implements PropertyManager {
      * @param value        The value to set on the property.
      * @return A task that represents the work queued to execute.
      */
-    protected CompletableFuture<Void> setPropertyValue(TurnContext turnContext,
-                                                            String propertyName,
-                                                            Object value) {
+    protected CompletableFuture<Void> setPropertyValue(
+        TurnContext turnContext,
+        String propertyName,
+        Object value
+    ) {
         if (turnContext == null) {
             throw new IllegalArgumentException("turnContext cannot be null");
         }
@@ -308,6 +326,7 @@ public abstract class BotState implements PropertyManager {
 
         /**
          * Construct with supplied state.
+         *
          * @param withState The initial state.
          */
         CachedBotState(Map<String, Object> withState) {
@@ -351,11 +370,14 @@ public abstract class BotState implements PropertyManager {
     /**
      * Implements StatePropertyAccessor for an PropertyContainer.
      *
-     * <p>Note the semantic of this accessor are intended to be lazy, this means teh Get, Set and Delete
-     * methods will first call LoadAsync. This will be a no-op if the data is already loaded.
-     * The implication is you can just use this accessor in the application code directly without first
-     * calling LoadAsync this approach works with the AutoSaveStateMiddleware which will save as needed
-     * at the end of a turn.</p>
+     * <p>
+     * Note the semantic of this accessor are intended to be lazy, this means teh
+     * Get, Set and Delete methods will first call LoadAsync. This will be a no-op
+     * if the data is already loaded. The implication is you can just use this
+     * accessor in the application code directly without first calling LoadAsync
+     * this approach works with the AutoSaveStateMiddleware which will save as
+     * needed at the end of a turn.
+     * </p>
      *
      * @param <T> type of value the propertyAccessor accesses.
      */
@@ -374,7 +396,7 @@ public abstract class BotState implements PropertyManager {
          * StatePropertyAccessor constructor.
          *
          * @param withState The parent BotState.
-         * @param withName The property name.
+         * @param withName  The property name.
          */
         BotStatePropertyAccessor(BotState withState, String withName) {
             botState = withState;
@@ -382,13 +404,15 @@ public abstract class BotState implements PropertyManager {
         }
 
         /**
-         * Get the property value. The semantics are intended to be lazy, note the use of
-         * {@link BotState#load(TurnContext)} at the start.
+         * Get the property value. The semantics are intended to be lazy, note the use
+         * of {@link BotState#load(TurnContext)} at the start.
          *
          * @param turnContext         The context object for this turn.
-         * @param defaultValueFactory Defines the default value. Invoked when no value been set for the requested
-         *                            state property.  If defaultValueFactory is defined as null,
-         *                            the MissingMemberException will be thrown if the underlying property is not set.
+         * @param defaultValueFactory Defines the default value. Invoked when no value
+         *                            been set for the requested state property. If
+         *                            defaultValueFactory is defined as null, the
+         *                            MissingMemberException will be thrown if the
+         *                            underlying property is not set.
          * @return A task that represents the work queued to execute.
          */
         @Override
@@ -423,8 +447,8 @@ public abstract class BotState implements PropertyManager {
         }
 
         /**
-         * Set the property value. The semantics are intended to be lazy, note the use of
-         * {@link BotState#load(TurnContext)} at the start.
+         * Set the property value. The semantics are intended to be lazy, note the use
+         * of {@link BotState#load(TurnContext)} at the start.
          *
          * @param turnContext The turn context.
          * @param value       The value to set.

@@ -25,8 +25,8 @@ import retrofit2.http.Streaming;
 import retrofit2.Response;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in Attachments.
+ * An instance of this class provides access to all the operations defined in
+ * Attachments.
  */
 public class RestAttachments implements Attachments {
     /** The Retrofit service to perform REST calls. */
@@ -38,7 +38,8 @@ public class RestAttachments implements Attachments {
      * Initializes an instance of AttachmentsImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this
+     *                     operation class.
      */
     RestAttachments(Retrofit withRetrofit, RestConnectorClient withClient) {
         this.service = withRetrofit.create(AttachmentsService.class);
@@ -46,30 +47,36 @@ public class RestAttachments implements Attachments {
     }
 
     /**
-     * The interface defining all the services for Attachments to be
-     * used by Retrofit to perform actually REST calls.
+     * The interface defining all the services for Attachments to be used by
+     * Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
     interface AttachmentsService {
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachmentInfo" })
         @GET("v3/attachments/{attachmentId}")
-        CompletableFuture<Response<ResponseBody>> getAttachmentInfo(@Path("attachmentId") String attachmentId,
-                                                                    @Header("accept-language") String acceptLanguage,
-                                                                    @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getAttachmentInfo(
+            @Path("attachmentId") String attachmentId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachment" })
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Attachments getAttachment" })
         @GET("v3/attachments/{attachmentId}/views/{viewId}")
         @Streaming
-        CompletableFuture<Response<ResponseBody>> getAttachment(@Path("attachmentId") String attachmentId,
-                                                         @Path("viewId") String viewId,
-                                                         @Header("accept-language") String acceptLanguage,
-                                                         @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getAttachment(
+            @Path("attachmentId") String attachmentId,
+            @Path("viewId") String viewId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
     }
 
     /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
+     * GetAttachmentInfo. Get AttachmentInfo structure describing the attachment
+     * views.
      *
      * @param attachmentId attachment id
      * @throws IllegalArgumentException thrown if parameters fail the validation
@@ -77,68 +84,81 @@ public class RestAttachments implements Attachments {
      */
     public CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId) {
         if (attachmentId == null) {
-            throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter attachmentId is required and cannot be null."
+            );
         }
 
-        return service.getAttachmentInfo(attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getAttachmentInfoDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getAttachmentInfoAsync", responseBodyResponse);
-                }
-            });
+        return service.getAttachmentInfo(
+            attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getAttachmentInfoDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("getAttachmentInfoAsync", responseBodyResponse);
+            }
+        });
     }
 
-    private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return this.client.restClient()
-            .responseBuilderFactory().<AttachmentInfo, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<AttachmentInfo>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .responseBuilderFactory()
+            .<AttachmentInfo, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<AttachmentInfo>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 
     /**
-     * GetAttachment.
-     * Get the named view as binary content.
+     * GetAttachment. Get the named view as binary content.
      *
      * @param attachmentId attachment id
-     * @param viewId View id from attachmentInfo
+     * @param viewId       View id from attachmentInfo
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the InputStream object
      */
     public CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId) {
         if (attachmentId == null) {
-            throw new IllegalArgumentException("Parameter attachmentId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter attachmentId is required and cannot be null."
+            );
         }
         if (viewId == null) {
             throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
         }
-        return service.getAttachment(attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getAttachmentDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getAttachmentAsync", responseBodyResponse);
-                }
-            });
+        return service.getAttachment(
+            attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getAttachmentDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("getAttachmentAsync", responseBodyResponse);
+            }
+        });
     }
 
-    private ServiceResponse<InputStream> getAttachmentDelegate(Response<ResponseBody> response)
-        throws ErrorResponseException, IOException, IllegalArgumentException {
+    private ServiceResponse<InputStream> getAttachmentDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return this.client.restClient()
-            .responseBuilderFactory().<InputStream, ErrorResponseException>newInstance(client.serializerAdapter())
-                .register(HttpURLConnection.HTTP_OK, new TypeToken<InputStream>() { }.getType())
-                .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() { }.getType())
-                .register(HttpURLConnection.HTTP_MOVED_TEMP, new TypeToken<Void>() { }.getType())
-                .registerError(ErrorResponseException.class)
-                .build(response);
+            .responseBuilderFactory()
+            .<InputStream, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<InputStream>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_MOVED_TEMP, new TypeToken<Void>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
     }
 }

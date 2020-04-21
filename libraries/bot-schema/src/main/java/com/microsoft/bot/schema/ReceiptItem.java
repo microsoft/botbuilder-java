@@ -18,16 +18,16 @@ public class ReceiptItem {
     private String title;
 
     /**
-     * Subtitle appears just below Title field, differs from Title in font
-     * styling only.
+     * Subtitle appears just below Title field, differs from Title in font styling
+     * only.
      */
     @JsonProperty(value = "subtitle")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String subtitle;
 
     /**
-     * Text field appears just below subtitle, differs from Subtitle in font
-     * styling only.
+     * Text field appears just below subtitle, differs from Subtitle in font styling
+     * only.
      */
     @JsonProperty(value = "text")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

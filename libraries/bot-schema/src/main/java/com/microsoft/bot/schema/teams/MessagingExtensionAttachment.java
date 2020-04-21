@@ -15,6 +15,7 @@ public class MessagingExtensionAttachment extends Attachment {
 
     /**
      * Gets the preview Attachment.
+     * 
      * @return The Attachment.
      */
     public Attachment getPreview() {
@@ -23,6 +24,7 @@ public class MessagingExtensionAttachment extends Attachment {
 
     /**
      * Sets the preview attachment.
+     * 
      * @param withPreview The Attachment.
      */
     public void setPreview(Attachment withPreview) {

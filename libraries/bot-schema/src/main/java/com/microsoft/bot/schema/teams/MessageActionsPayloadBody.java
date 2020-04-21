@@ -17,6 +17,7 @@ public class MessageActionsPayloadBody {
 
     /**
      * Gets type of the content. Possible values include: 'html', 'text'
+     * 
      * @return The content type of the payload.
      */
     public String getContentType() {
@@ -25,6 +26,7 @@ public class MessageActionsPayloadBody {
 
     /**
      * Sets type of the content. Possible values include: 'html',
+     * 
      * @param withContentType The content type of the payload.
      */
     public void setContentType(String withContentType) {
@@ -33,6 +35,7 @@ public class MessageActionsPayloadBody {
 
     /**
      * Gets the content of the body.
+     * 
      * @return The payload content.
      */
     public String getContent() {
@@ -41,6 +44,7 @@ public class MessageActionsPayloadBody {
 
     /**
      * Sets the content of the body.
+     * 
      * @param withContent The payload content.
      */
     public void setContent(String withContent) {

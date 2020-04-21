@@ -5,7 +5,6 @@ package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * A channel info object which describes the channel.
  */
@@ -74,6 +73,7 @@ public class ChannelInfo {
 
     /**
      * Initialzies a new instance of the ChannelInfo class with an id.
+     * 
      * @param withId The id.
      */
     public ChannelInfo(String withId) {

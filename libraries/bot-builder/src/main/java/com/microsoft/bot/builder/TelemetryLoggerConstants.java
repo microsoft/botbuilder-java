@@ -17,7 +17,8 @@ public final class TelemetryLoggerConstants {
     public static final String BOTMSGRECEIVEEVENT = "BotMessageReceived";
 
     /**
-     * The name of the event when logged when a message is sent from the bot to the user.
+     * The name of the event when logged when a message is sent from the bot to the
+     * user.
      */
     public static final String BOTMSGSENDEVENT = "BotMessageSend";
 

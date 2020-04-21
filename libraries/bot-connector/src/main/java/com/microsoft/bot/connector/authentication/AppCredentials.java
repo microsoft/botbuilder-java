@@ -19,7 +19,9 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Base abstraction for AAD credentials for auth and caching.
  *
- * <p>Subclasses must provide the impl for {@link #buildAuthenticator}</p>
+ * <p>
+ * Subclasses must provide the impl for {@link #buildAuthenticator}
+ * </p>
  */
 public abstract class AppCredentials implements ServiceClientCredentials {
     private static final int EXPIRATION_SLACK = 5;
@@ -39,6 +41,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Initializes a new instance of the AppCredentials class.
+     *
      * @param withChannelAuthTenant Optional. The oauth token tenant.
      */
     public AppCredentials(String withChannelAuthTenant) {
@@ -47,6 +50,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Adds the host of service url to trusted hosts.
+     *
      * @param serviceUrl The service URI.
      */
     public static void trustServiceUrl(String serviceUrl) {
@@ -56,10 +60,13 @@ public abstract class AppCredentials implements ServiceClientCredentials {
     /**
      * Adds the host of service url to trusted hosts with the specified expiration.
      *
-     * <p>Note: The will fail to add if the url is not valid.</p>
+     * <p>
+     * Note: The will fail to add if the url is not valid.
+     * </p>
      *
-     * @param serviceUrl The service URI.
-     * @param expirationTime The expiration time after which this service url is not trusted anymore.
+     * @param serviceUrl     The service URI.
+     * @param expirationTime The expiration time after which this service url is not
+     *                       trusted anymore.
      */
     public static void trustServiceUrl(String serviceUrl, LocalDateTime expirationTime) {
         try {
@@ -72,8 +79,10 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Adds the host of service url to trusted hosts with the specified expiration.
-     * @param serviceUrl The service URI.
-     * @param expirationTime The expiration time after which this service url is not trusted anymore.
+     *
+     * @param serviceUrl     The service URI.
+     * @param expirationTime The expiration time after which this service url is not
+     *                       trusted anymore.
      */
     public static void trustServiceUrl(URL serviceUrl, LocalDateTime expirationTime) {
         trustHostNames.put(serviceUrl.getHost(), expirationTime);
@@ -102,12 +111,13 @@ public abstract class AppCredentials implements ServiceClientCredentials {
      * @return true if the service is trusted.
      */
     public static boolean isTrustedServiceUrl(URL serviceUrl) {
-        return !trustHostNames.getOrDefault(
-            serviceUrl.getHost(), LocalDateTime.MIN).isBefore(LocalDateTime.now().minusMinutes(EXPIRATION_SLACK));
+        return !trustHostNames.getOrDefault(serviceUrl.getHost(), LocalDateTime.MIN)
+            .isBefore(LocalDateTime.now().minusMinutes(EXPIRATION_SLACK));
     }
 
     /**
      * Gets the App ID for this credential.
+     *
      * @return The app id.
      */
     public String getAppId() {
@@ -116,6 +126,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Sets the Microsoft app ID for this credential.
+     *
      * @param withAppId The app id.
      */
     public void setAppId(String withAppId) {
@@ -124,6 +135,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Gets tenant to be used for channel authentication.
+     *
      * @return Tenant to be used for channel authentication.
      */
     public String getChannelAuthTenant() {
@@ -134,13 +146,15 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Sets tenant to be used for channel authentication.
+     *
      * @param withAuthTenant Tenant to be used for channel authentication.
      */
     public void setChannelAuthTenant(String withAuthTenant) {
         try {
             // Advanced user only, see https://aka.ms/bots/tenant-restriction
             String endPointUrl = String.format(
-                AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_TEMPLATE, withAuthTenant);
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_TEMPLATE, withAuthTenant
+            );
             new URL(endPointUrl).toString();
             setAuthTenant(withAuthTenant);
         } catch (MalformedURLException e) {
@@ -150,14 +164,18 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * OAuth endpoint to use.
+     *
      * @return The OAuth endpoint.
      */
     public String oAuthEndpoint() {
-        return String.format(AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_TEMPLATE, getChannelAuthTenant());
+        return String.format(
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_TEMPLATE, getChannelAuthTenant()
+        );
     }
 
     /**
      * OAuth scope to use.
+     *
      * @return OAuth scope.
      */
     public String oAuthScope() {
@@ -166,6 +184,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Gets the channel auth token tenant for this credential.
+     *
      * @return The channel auth token tenant.
      */
     protected String getAuthTenant() {
@@ -174,6 +193,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Sets the channel auth token tenant for this credential.
+     *
      * @param withAuthTenant The auth token tenant.
      */
     protected void setAuthTenant(String withAuthTenant) {
@@ -182,13 +202,16 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     /**
      * Gets an OAuth access token.
-     * @return If the task is successful, the result contains the access token string.
+     *
+     * @return If the task is successful, the result contains the access token
+     *         string.
      */
     public CompletableFuture<String> getToken() {
         CompletableFuture<String> result;
 
         try {
-            result = getAuthenticator().acquireToken().thenApply(IAuthenticationResult::accessToken);
+            result = getAuthenticator().acquireToken()
+                .thenApply(IAuthenticationResult::accessToken);
         } catch (MalformedURLException e) {
             result = new CompletableFuture<>();
             result.completeExceptionally(new AuthenticationException(e));
@@ -198,8 +221,8 @@ public abstract class AppCredentials implements ServiceClientCredentials {
     }
 
     /**
-     * Called by the {@link AppCredentialsInterceptor} to determine if the HTTP request should be
-     * modified to contain the token.
+     * Called by the {@link AppCredentialsInterceptor} to determine if the HTTP
+     * request should be modified to contain the token.
      *
      * @param url The HTTP request URL.
      * @return true if the auth token should be added to the request.
@@ -211,13 +234,14 @@ public abstract class AppCredentials implements ServiceClientCredentials {
     // lazy Authenticator create.
     private Authenticator getAuthenticator() throws MalformedURLException {
         if (authenticator == null) {
-            authenticator =  buildAuthenticator();
+            authenticator = buildAuthenticator();
         }
         return authenticator;
     }
 
     /**
      * Returns an appropriate Authenticator that is provided by a subclass.
+     *
      * @return An Authenticator object.
      * @throws MalformedURLException If the endpoint isn't valid.
      */
@@ -226,7 +250,9 @@ public abstract class AppCredentials implements ServiceClientCredentials {
     /**
      * Apply the credentials to the HTTP request.
      *
-     * <p>Note: Provides the same functionality as dotnet ProcessHttpRequestAsync</p>
+     * <p>
+     * Note: Provides the same functionality as dotnet ProcessHttpRequestAsync
+     * </p>
      *
      * @param clientBuilder the builder for building up an {@link OkHttpClient}
      */

@@ -6,8 +6,8 @@ package com.microsoft.bot.schema.teams;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents a user, application, or conversation type that either sent
- * or was referenced in a message.
+ * Represents a user, application, or conversation type that either sent or was
+ * referenced in a message.
  */
 public class MessageActionsPayloadFrom {
     @JsonProperty(value = "user")
@@ -21,6 +21,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Gets details of the user.
+     * 
      * @return The payload user.
      */
     public MessageActionsPayloadUser getUser() {
@@ -29,6 +30,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Sets details of the user.
+     * 
      * @param withUser The payload user.
      */
     public void setUser(MessageActionsPayloadUser withUser) {
@@ -37,6 +39,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Gets details of the app.
+     * 
      * @return The application details.
      */
     public MessageActionsPayloadApp getApplication() {
@@ -45,6 +48,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Sets details of the app.
+     * 
      * @param withApplication The application details.
      */
     public void setApplication(MessageActionsPayloadApp withApplication) {
@@ -53,6 +57,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Gets details of the conversation.
+     * 
      * @return The conversation details.
      */
     public MessageActionsPayloadConversation getConversation() {
@@ -61,6 +66,7 @@ public class MessageActionsPayloadFrom {
 
     /**
      * Sets details of the conversation.
+     * 
      * @param withConversation The conversation details.
      */
     public void setConversation(MessageActionsPayloadConversation withConversation) {

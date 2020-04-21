@@ -21,6 +21,7 @@ public class AppBasedLinkQuery {
 
     /**
      * Initializes a new instance of the AppBasedLinkQuery class.
+     * 
      * @param withUrl The query url.
      */
     public AppBasedLinkQuery(String withUrl) {
@@ -29,7 +30,8 @@ public class AppBasedLinkQuery {
 
     /**
      * Gets url queried by user.
-     * @return  The url
+     * 
+     * @return The url
      */
     public String getUrl() {
         return url;
@@ -37,6 +39,7 @@ public class AppBasedLinkQuery {
 
     /**
      * Sets url queried by user.
+     * 
      * @param withUrl The url.
      */
     public void setUrl(String withUrl) {

@@ -28,6 +28,7 @@ public class ConversationMembers {
 
     /**
      * Get the {@link #id} value.
+     * 
      * @return the id value
      */
     public String getId() {
@@ -36,6 +37,7 @@ public class ConversationMembers {
 
     /**
      * Set the {@link #id} value.
+     * 
      * @param withId the id value to set
      */
     public void setId(String withId) {
@@ -44,6 +46,7 @@ public class ConversationMembers {
 
     /**
      * Get the {@link #members} value.
+     * 
      * @return the members value
      */
     public List<ChannelAccount> getMembers() {
@@ -52,6 +55,7 @@ public class ConversationMembers {
 
     /**
      * Set the {@link #members} value.
+     * 
      * @param withMembers the members value to set
      */
     public void setMembers(List<ChannelAccount> withMembers) {

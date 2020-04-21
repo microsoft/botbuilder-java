@@ -19,8 +19,9 @@ public class O365ConnectorCardActionBase {
     private String id;
 
     /**
-     * Gets the type of the action. Possible values include:
-     * 'ViewAction', 'OpenUri', 'HttpPOST', 'ActionCard'
+     * Gets the type of the action. Possible values include: 'ViewAction',
+     * 'OpenUri', 'HttpPOST', 'ActionCard'
+     * 
      * @return The action type.
      */
     public String getType() {
@@ -28,8 +29,9 @@ public class O365ConnectorCardActionBase {
     }
 
     /**
-     * Sets the type of the action. Possible values include:
-     * 'ViewAction', 'OpenUri', 'HttpPOST', 'ActionCard'
+     * Sets the type of the action. Possible values include: 'ViewAction',
+     * 'OpenUri', 'HttpPOST', 'ActionCard'
+     * 
      * @param withType The action type.
      */
     public void setType(String withType) {
@@ -38,6 +40,7 @@ public class O365ConnectorCardActionBase {
 
     /**
      * Gets the name of the action that will be used as button title.
+     * 
      * @return The action name.
      */
     public String getName() {
@@ -46,6 +49,7 @@ public class O365ConnectorCardActionBase {
 
     /**
      * Sets the name of the action that will be used as button title.
+     * 
      * @param withName The action name.
      */
     public void setName(String withName) {
@@ -54,6 +58,7 @@ public class O365ConnectorCardActionBase {
 
     /**
      * Gets the action id.
+     * 
      * @return The action id.
      */
     public String getId() {
@@ -62,6 +67,7 @@ public class O365ConnectorCardActionBase {
 
     /**
      * Sets the action id.
+     * 
      * @param withId The action id.
      */
     public void setId(String withId) {

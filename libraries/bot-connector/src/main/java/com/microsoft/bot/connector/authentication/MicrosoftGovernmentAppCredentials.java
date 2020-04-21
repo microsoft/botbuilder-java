@@ -19,6 +19,7 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
 
     /**
      * An empty set of credentials.
+     * 
      * @return An empty Gov credentials.
      */
     public static MicrosoftGovernmentAppCredentials empty() {

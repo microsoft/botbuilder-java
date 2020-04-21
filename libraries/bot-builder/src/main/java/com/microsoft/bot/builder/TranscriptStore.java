@@ -18,11 +18,13 @@ public interface TranscriptStore extends TranscriptLogger {
      *
      * @param channelId      The ID of the channel the conversation is in.
      * @param conversationId The ID of the conversation.
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
+     * @return A task that represents the work queued to execute. If the task
+     *         completes successfully, the result contains the matching activities.
      */
-    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                             String conversationId) {
+    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(
+        String channelId,
+        String conversationId
+    ) {
         return getTranscriptActivities(channelId, conversationId, null);
     }
 
@@ -32,12 +34,14 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
      * @param continuationToken The continuation token (if available).
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
+     * @return A task that represents the work queued to execute. If the task
+     *         completes successfully, the result contains the matching activities.
      */
-    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                             String conversationId,
-                                                                             String continuationToken) {
+    default CompletableFuture<PagedResult<Activity>> getTranscriptActivities(
+        String channelId,
+        String conversationId,
+        String continuationToken
+    ) {
         return getTranscriptActivities(channelId, conversationId, continuationToken, null);
     }
 
@@ -47,14 +51,17 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
      * @param continuationToken The continuation token (if available).
-     * @param startDate         A cutoff date. Activities older than this date are not included.
-     * @return A task that represents the work queued to execute.
-     * If the task completes successfully, the result contains the matching activities.
+     * @param startDate         A cutoff date. Activities older than this date are
+     *                          not included.
+     * @return A task that represents the work queued to execute. If the task
+     *         completes successfully, the result contains the matching activities.
      */
-    CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId,
-                                                                     String conversationId,
-                                                                     String continuationToken,
-                                                                     OffsetDateTime startDate);
+    CompletableFuture<PagedResult<Activity>> getTranscriptActivities(
+        String channelId,
+        String conversationId,
+        String continuationToken,
+        OffsetDateTime startDate
+    );
 
     /**
      * Gets the conversations on a channel from the store.
@@ -73,7 +80,10 @@ public interface TranscriptStore extends TranscriptLogger {
      * @param continuationToken The continuation token (if available).
      * @return A task that represents the work queued to execute.
      */
-    CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId, String continuationToken);
+    CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(
+        String channelId,
+        String continuationToken
+    );
 
     /**
      * Deletes conversation data from the store.

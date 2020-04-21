@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.builder.adapters.TestAdapter;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
 
 public class BotStateTests {
 
@@ -39,8 +37,8 @@ public class BotStateTests {
 
     @Test
     public void MakeSureStorageNotCalledNoChangesAsync() {
-        int[] storeCount = {0};
-        int[] readCount = {0};
+        int[] storeCount = { 0 };
+        int[] readCount = { 0 };
 
         Storage mock = new Storage() {
             Map<String, Object> dictionary = new HashMap<>();
@@ -75,27 +73,27 @@ public class BotStateTests {
         Assert.assertEquals(0, storeCount[0]);
 
         propertyA.set(context, "there");
-        Assert.assertEquals(0, storeCount[0]);  // Set on property should not bump
+        Assert.assertEquals(0, storeCount[0]); // Set on property should not bump
 
         userState.saveChanges(context).join();
-        Assert.assertEquals(1, storeCount[0]);  // Explicit save should bump
+        Assert.assertEquals(1, storeCount[0]); // Explicit save should bump
 
         String valueA = propertyA.get(context, null).join();
         Assert.assertEquals("there", valueA);
-        Assert.assertEquals(1, storeCount[0]);  // Gets should not bump
+        Assert.assertEquals(1, storeCount[0]); // Gets should not bump
 
         userState.saveChanges(context).join();
-        Assert.assertEquals(1, storeCount[0]);  // Gets should not bump
+        Assert.assertEquals(1, storeCount[0]); // Gets should not bump
 
         propertyA.delete(context).join();
-        Assert.assertEquals(1, storeCount[0]);  // Delete alone no bump
+        Assert.assertEquals(1, storeCount[0]); // Delete alone no bump
 
         userState.saveChanges(context).join();
-        Assert.assertEquals(2, storeCount[0]);  // Save when dirty should bump
+        Assert.assertEquals(2, storeCount[0]); // Save when dirty should bump
         Assert.assertEquals(1, readCount[0]);
 
         userState.saveChanges(context).join();
-        Assert.assertEquals(2, storeCount[0]);  // Save not dirty should not bump
+        Assert.assertEquals(2, storeCount[0]); // Save not dirty should not bump
         Assert.assertEquals(1, readCount[0]);
     }
 
@@ -320,9 +318,7 @@ public class BotStateTests {
             UserState obj = turnContext.getTurnState().get("UserState");
             Assert.assertNull(obj);
             return CompletableFuture.completedFuture(null);
-        }))
-        .send("set value")
-        .startTest().join();
+        })).send("set value").startTest().join();
     }
 
     @Test
@@ -349,20 +345,25 @@ public class BotStateTests {
             return CompletableFuture.completedFuture(null);
         };
 
-        new TestFlow(adapter, callback)
-            .test("set value", "value saved")
-            .test("get value", "test")
-            .startTest().join();
+        new TestFlow(adapter, callback).test("set value", "value saved").test(
+            "get value",
+            "test"
+        ).startTest().join();
     }
 
     @Test
     public void State_RememberPocoUserState() {
         UserState userState = new UserState(new MemoryStorage());
-        StatePropertyAccessor<TestPocoState> testPocoProperty = userState.createProperty("testPoco");
+        StatePropertyAccessor<TestPocoState> testPocoProperty = userState.createProperty(
+            "testPoco"
+        );
         TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(userState));
 
         new TestFlow(adapter, (turnContext -> {
-            TestPocoState testPocoState = testPocoProperty.get(turnContext, TestPocoState::new).join();
+            TestPocoState testPocoState = testPocoProperty.get(
+                turnContext,
+                TestPocoState::new
+            ).join();
             Assert.assertNotNull("user state should exist", testPocoState);
 
             switch (turnContext.getActivity().getText()) {
@@ -377,10 +378,7 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-        .test("set value", "value saved")
-        .test("get value", "test")
-        .startTest().join();
+        })).test("set value", "value saved").test("get value", "test").startTest().join();
     }
 
     @Test
@@ -405,16 +403,15 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .test("set value", "value saved")
-            .test("get value", "test")
-            .startTest().join();
+        })).test("set value", "value saved").test("get value", "test").startTest().join();
     }
 
     @Test
     public void State_RememberPocoConversationState() {
         ConversationState conversationState = new ConversationState(new MemoryStorage());
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("testPoco");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "testPoco"
+        );
         TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(conversationState));
 
         new TestFlow(adapter, (turnContext -> {
@@ -433,17 +430,20 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .test("set value", "value saved")
-            .test("get value", "test")
-            .startTest().join();
+        })).test("set value", "value saved").test("get value", "test").startTest().join();
     }
 
     @Test
     public void State_RememberPocoPrivateConversationState() {
-        PrivateConversationState privateConversationState = new PrivateConversationState(new MemoryStorage());
-        StatePropertyAccessor<TestPocoState> testProperty = privateConversationState.createProperty("testPoco");
-        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(privateConversationState));
+        PrivateConversationState privateConversationState = new PrivateConversationState(
+            new MemoryStorage()
+        );
+        StatePropertyAccessor<TestPocoState> testProperty = privateConversationState.createProperty(
+            "testPoco"
+        );
+        TestAdapter adapter = new TestAdapter().use(
+            new AutoSaveStateMiddleware(privateConversationState)
+        );
 
         new TestFlow(adapter, (turnContext -> {
             TestPocoState testState = testProperty.get(turnContext, TestPocoState::new).join();
@@ -461,10 +461,7 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .test("set value", "value saved")
-            .test("get value", "test")
-            .startTest().join();
+        })).test("set value", "value saved").test("get value", "test").startTest().join();
     }
 
     @Test
@@ -492,10 +489,7 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .test("set value", "value saved")
-            .test("get value", testGuid)
-            .startTest().join();
+        })).test("set value", "value saved").test("get value", testGuid).startTest().join();
     }
 
     @Test
@@ -520,10 +514,7 @@ public class BotStateTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .test("set value", "value saved")
-            .test("get value", "TypedObject")
-            .startTest().join();
+        })).test("set value", "value saved").test("get value", "TypedObject").startTest().join();
     }
 
     @Test
@@ -532,7 +523,9 @@ public class BotStateTests {
 
         new TestFlow(adapter, turnContext -> {
             TestBotState botStateManager = new TestBotState(new MemoryStorage());
-            StatePropertyAccessor<CustomState> testProperty = botStateManager.createProperty("test");
+            StatePropertyAccessor<CustomState> testProperty = botStateManager.createProperty(
+                "test"
+            );
 
             // read initial state object
             botStateManager.load(turnContext).join();
@@ -557,9 +550,7 @@ public class BotStateTests {
             Assert.assertEquals("test", customState.getCustomString());
 
             return CompletableFuture.completedFuture(null);
-        })
-            .send(Activity.createConversationUpdateActivity())
-            .startTest().join();
+        }).send(Activity.createConversationUpdateActivity()).startTest().join();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -612,14 +603,15 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-
     @Test(expected = IllegalArgumentException.class)
     public void ConversationState_NullConversationThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setConversation(null);
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("test");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "test"
+        );
         TestPocoState value = testProperty.get(context).join();
     }
 
@@ -629,7 +621,9 @@ public class BotStateTests {
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getConversation().setId(null);
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("test");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "test"
+        );
         TestPocoState value = testProperty.get(context).join();
     }
 
@@ -639,7 +633,9 @@ public class BotStateTests {
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getConversation().setId("");
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("test");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "test"
+        );
         TestPocoState value = testProperty.get(context).join();
     }
 
@@ -649,7 +645,9 @@ public class BotStateTests {
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setChannelId(null);
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("test");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "test"
+        );
         TestPocoState value = testProperty.get(context).join();
     }
 
@@ -659,15 +657,18 @@ public class BotStateTests {
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setChannelId("");
-        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty("test");
+        StatePropertyAccessor<TestPocoState> testProperty = conversationState.createProperty(
+            "test"
+        );
         TestPocoState value = testProperty.get(context).join();
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_NullChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setChannelId(null);
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -677,7 +678,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_EmptyChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setChannelId("");
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -687,7 +690,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_NullFromThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setFrom(null);
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -697,7 +702,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_NullFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getFrom().setId(null);
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -707,7 +714,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_EmptyFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getFrom().setId("");
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -717,7 +726,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_NullConversationThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().setConversation(null);
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -727,7 +738,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_NullConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getConversation().setId(null);
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -737,7 +750,9 @@ public class BotStateTests {
     @Test(expected = IllegalArgumentException.class)
     public void PrivateConversationState_EmptyConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
-        PrivateConversationState botState = new PrivateConversationState(new MemoryStorage(dictionary));
+        PrivateConversationState botState = new PrivateConversationState(
+            new MemoryStorage(dictionary)
+        );
         TurnContext context = TestUtilities.createEmptyContext();
         context.getActivity().getConversation().setId("");
         StatePropertyAccessor<TestPocoState> testProperty = botState.createProperty("test");
@@ -754,14 +769,20 @@ public class BotStateTests {
         // Turn 0
         ConversationState botState0 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor0 = botState0.createProperty("test-name");
-        TestPocoState value0 = accessor0.get(turnContext, () -> new TestPocoState("test-value")).join();
+        TestPocoState value0 = accessor0.get(
+            turnContext,
+            () -> new TestPocoState("test-value")
+        ).join();
         value0.setValue("test-value");
         botState0.saveChanges(turnContext).join();
 
         // Turn 1
         ConversationState botState1 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor1 = botState1.createProperty("test-name");
-        TestPocoState value1 = accessor1.get(turnContext, () -> new TestPocoState("default-value")).join();
+        TestPocoState value1 = accessor1.get(
+            turnContext,
+            () -> new TestPocoState("default-value")
+        ).join();
         botState1.saveChanges(turnContext).join();
 
         Assert.assertEquals("test-value", value1.getValue());
@@ -774,7 +795,10 @@ public class BotStateTests {
         // Turn 3
         ConversationState botState4 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor3 = botState4.createProperty("test-name");
-        TestPocoState value4 = accessor1.get(turnContext, () -> new TestPocoState("default-value")).join();
+        TestPocoState value4 = accessor1.get(
+            turnContext,
+            () -> new TestPocoState("default-value")
+        ).join();
 
         Assert.assertEquals("default-value", value4.getValue());
     }
@@ -789,14 +813,20 @@ public class BotStateTests {
         // Turn 0
         ConversationState botState0 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor0 = botState0.createProperty("test-name");
-        TestPocoState value0 = accessor0.get(turnContext, () -> new TestPocoState("test-value")).join();
+        TestPocoState value0 = accessor0.get(
+            turnContext,
+            () -> new TestPocoState("test-value")
+        ).join();
         value0.setValue("test-value");
         botState0.saveChanges(turnContext).join();
 
         // Turn 1
         ConversationState botState1 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor1 = botState1.createProperty("test-name");
-        TestPocoState value1 = accessor1.get(turnContext, () -> new TestPocoState("default-value")).join();
+        TestPocoState value1 = accessor1.get(
+            turnContext,
+            () -> new TestPocoState("default-value")
+        ).join();
         botState1.saveChanges(turnContext).join();
 
         Assert.assertEquals("test-value", value1.getValue());
@@ -808,7 +838,10 @@ public class BotStateTests {
         // Turn 3
         ConversationState botState3 = new ConversationState(storage);
         StatePropertyAccessor<TestPocoState> accessor3 = botState3.createProperty("test-name");
-        TestPocoState value3 = accessor1.get(turnContext, () -> new TestPocoState("default-value")).join();
+        TestPocoState value3 = accessor1.get(
+            turnContext,
+            () -> new TestPocoState("default-value")
+        ).join();
         botState1.saveChanges(turnContext).join();
 
         Assert.assertEquals("default-value", value3.getValue());
@@ -896,10 +929,11 @@ public class BotStateTests {
             super(withStorage, TestBotState.class.getSimpleName());
         }
 
-        //"botstate/{turnContext.Activity.ChannelId}/{turnContext.Activity.Conversation.Id}/{typeof(BotState).Namespace}.{typeof(BotState).Name}";
+        // "botstate/{turnContext.Activity.ChannelId}/{turnContext.Activity.Conversation.Id}/{typeof(BotState).Namespace}.{typeof(BotState).Name}";
         @Override
         public String getStorageKey(TurnContext turnContext) {
-            return "botstate/" + turnContext.getActivity().getConversation().getId() + "/" + BotState.class.getName();
+            return "botstate/" + turnContext.getActivity().getConversation().getId() + "/"
+                + BotState.class.getName();
         }
     }
 
@@ -916,4 +950,3 @@ public class BotStateTests {
         }
     }
 }
-

@@ -30,8 +30,7 @@ public class InspectionTests {
         InspectionState inspectionState = new InspectionState(new MemoryStorage());
         InspectionMiddleware inspectionMiddleware = new InspectionMiddleware(inspectionState);
 
-        TestAdapter adapter = new TestAdapter()
-            .use(inspectionMiddleware);
+        TestAdapter adapter = new TestAdapter().use(inspectionMiddleware);
 
         Activity inboundActivity = MessageFactory.text("hello");
 
@@ -56,7 +55,8 @@ public class InspectionTests {
             inspectionState,
             userState,
             conversationState,
-            null);
+            null
+        );
 
         // (1) send the /INSPECT open command from the emulator to the middleware
         Activity openActivity = MessageFactory.text("/INSPECT open");
@@ -69,25 +69,38 @@ public class InspectionTests {
 
         Activity inspectionOpenResultActivity = inspectionAdapter.activeQueue().poll();
 
-        // (2) send the resulting /INSPECT attach command from the channel to the middleware
+        // (2) send the resulting /INSPECT attach command from the channel to the
+        // middleware
         TestAdapter applicationAdapter = new TestAdapter(Channels.TEST);
         applicationAdapter.use(inspectionMiddleware);
 
         String attachCommand = inspectionOpenResultActivity.getValue().toString();
 
-        applicationAdapter.processActivity(MessageFactory.text(attachCommand), turnContext -> {
-            // nothing happens - just attach the inspector
-            return CompletableFuture.completedFuture(null);
-        }).join();
+        applicationAdapter.processActivity(
+            MessageFactory.text(attachCommand),
+            turnContext -> {
+                // nothing happens - just attach the inspector
+                return CompletableFuture.completedFuture(null);
+            }
+        ).join();
 
         Activity attachResponse = applicationAdapter.activeQueue().poll();
 
-        // (3) send an application messaage from the channel, it should get the reply and then so should the emulator http endpioint
+        // (3) send an application messaage from the channel, it should get the reply
+        // and then so should the emulator http endpioint
         applicationAdapter.processActivity(MessageFactory.text("hi"), turnContext -> {
-            turnContext.sendActivity(MessageFactory.text("echo: " + turnContext.getActivity().getText())).join();
+            turnContext.sendActivity(
+                MessageFactory.text("echo: " + turnContext.getActivity().getText())
+            ).join();
 
-            userState.<Scratch>createProperty("x").get(turnContext, Scratch::new).join().setProperty("hello");
-            conversationState.<Scratch>createProperty("y").get(turnContext, Scratch::new).join().setProperty("world");
+            userState.<Scratch>createProperty("x").get(
+                turnContext,
+                Scratch::new
+            ).join().setProperty("hello");
+            conversationState.<Scratch>createProperty("y").get(
+                turnContext,
+                Scratch::new
+            ).join().setProperty("world");
 
             userState.saveChanges(turnContext).join();
             conversationState.saveChanges(turnContext).join();
@@ -102,23 +115,35 @@ public class InspectionTests {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
 
-        JsonNode inboundTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(0));
+        JsonNode inboundTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(0)
+        );
         Assert.assertEquals("trace", inboundTrace.get("type").textValue());
         Assert.assertEquals("ReceivedActivity", inboundTrace.get("name").textValue());
         Assert.assertEquals("message", inboundTrace.get("value").get("type").textValue());
         Assert.assertEquals("hi", inboundTrace.get("value").get("text").textValue());
 
-        JsonNode outboundTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(1));
+        JsonNode outboundTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(1)
+        );
         Assert.assertEquals("trace", outboundTrace.get("type").textValue());
         Assert.assertEquals("SentActivity", outboundTrace.get("name").textValue());
         Assert.assertEquals("message", outboundTrace.get("value").get("type").textValue());
         Assert.assertEquals("echo: hi", outboundTrace.get("value").get("text").textValue());
 
-        JsonNode stateTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(2));
+        JsonNode stateTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(2)
+        );
         Assert.assertEquals("trace", stateTrace.get("type").textValue());
         Assert.assertEquals("BotState", stateTrace.get("name").textValue());
-        Assert.assertEquals("hello", stateTrace.get("value").get("userState").get("x").get("property").textValue());
-        Assert.assertEquals("world", stateTrace.get("value").get("conversationState").get("y").get("property").textValue());
+        Assert.assertEquals(
+            "hello",
+            stateTrace.get("value").get("userState").get("x").get("property").textValue()
+        );
+        Assert.assertEquals(
+            "world",
+            stateTrace.get("value").get("conversationState").get("y").get("property").textValue()
+        );
     }
 
     @Test
@@ -133,7 +158,8 @@ public class InspectionTests {
             inspectionState,
             userState,
             conversationState,
-            null);
+            null
+        );
 
         // (1) send the /INSPECT open command from the emulator to the middleware
         Activity openActivity = MessageFactory.text("/INSPECT open");
@@ -146,33 +172,56 @@ public class InspectionTests {
 
         Activity inspectionOpenResultActivity = inspectionAdapter.activeQueue().poll();
 
-        // (2) send the resulting /INSPECT attach command from the channel to the middleware
+        // (2) send the resulting /INSPECT attach command from the channel to the
+        // middleware
         TestAdapter applicationAdapter = new TestAdapter(Channels.TEST);
         applicationAdapter.use(inspectionMiddleware);
 
-        // some channels - for example Microsoft Teams - adds an @ mention to the text - this should be taken into account when evaluating the INSPECT
+        // some channels - for example Microsoft Teams - adds an @ mention to the text -
+        // this should be taken into account when evaluating the INSPECT
         String recipientId = "bot";
-        String attachCommand = "<at>" + recipientId + "</at> " + inspectionOpenResultActivity.getValue();
+        String attachCommand = "<at>" + recipientId + "</at> "
+            + inspectionOpenResultActivity.getValue();
         Activity attachActivity = MessageFactory.text(attachCommand);
-        attachActivity.getEntities().add(new Entity() {{
-            setType("mention");
-            getProperties().put("text", JsonNodeFactory.instance.textNode("<at>" + recipientId + "</at>"));
-            getProperties().put("mentioned", JsonNodeFactory.instance.objectNode().put("id", "bot"));
-        }});
+        attachActivity.getEntities().add(new Entity() {
+            {
+                setType("mention");
+                getProperties().put(
+                    "text",
+                    JsonNodeFactory.instance.textNode("<at>" + recipientId + "</at>")
+                );
+                getProperties().put(
+                    "mentioned",
+                    JsonNodeFactory.instance.objectNode().put("id", "bot")
+                );
+            }
+        });
 
-        applicationAdapter.processActivity(attachActivity, turnContext -> {
-            // nothing happens - just attach the inspector
-            return CompletableFuture.completedFuture(null);
-        }).join();
+        applicationAdapter.processActivity(
+            attachActivity,
+            turnContext -> {
+                // nothing happens - just attach the inspector
+                return CompletableFuture.completedFuture(null);
+            }
+        ).join();
 
         Activity attachResponse = applicationAdapter.activeQueue().poll();
 
-        // (3) send an application messaage from the channel, it should get the reply and then so should the emulator http endpioint
+        // (3) send an application messaage from the channel, it should get the reply
+        // and then so should the emulator http endpioint
         applicationAdapter.processActivity(MessageFactory.text("hi"), turnContext -> {
-            turnContext.sendActivity(MessageFactory.text("echo: " + turnContext.getActivity().getText())).join();
+            turnContext.sendActivity(
+                MessageFactory.text("echo: " + turnContext.getActivity().getText())
+            ).join();
 
-            userState.<Scratch>createProperty("x").get(turnContext, Scratch::new).join().setProperty("hello");
-            conversationState.<Scratch>createProperty("y").get(turnContext, Scratch::new).join().setProperty("world");
+            userState.<Scratch>createProperty("x").get(
+                turnContext,
+                Scratch::new
+            ).join().setProperty("hello");
+            conversationState.<Scratch>createProperty("y").get(
+                turnContext,
+                Scratch::new
+            ).join().setProperty("world");
 
             userState.saveChanges(turnContext).join();
             conversationState.saveChanges(turnContext).join();
@@ -187,26 +236,39 @@ public class InspectionTests {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
 
-        JsonNode inboundTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(0));
+        JsonNode inboundTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(0)
+        );
         Assert.assertEquals("trace", inboundTrace.get("type").textValue());
         Assert.assertEquals("ReceivedActivity", inboundTrace.get("name").textValue());
         Assert.assertEquals("message", inboundTrace.get("value").get("type").textValue());
         Assert.assertEquals("hi", inboundTrace.get("value").get("text").textValue());
 
-        JsonNode outboundTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(1));
+        JsonNode outboundTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(1)
+        );
         Assert.assertEquals("trace", outboundTrace.get("type").textValue());
         Assert.assertEquals("SentActivity", outboundTrace.get("name").textValue());
         Assert.assertEquals("message", outboundTrace.get("value").get("type").textValue());
         Assert.assertEquals("echo: hi", outboundTrace.get("value").get("text").textValue());
 
-        JsonNode stateTrace = mapper.readTree(inspectionMiddleware.recordingSession.requests.get(2));
+        JsonNode stateTrace = mapper.readTree(
+            inspectionMiddleware.recordingSession.requests.get(2)
+        );
         Assert.assertEquals("trace", stateTrace.get("type").textValue());
         Assert.assertEquals("BotState", stateTrace.get("name").textValue());
-        Assert.assertEquals("hello", stateTrace.get("value").get("userState").get("x").get("property").textValue());
-        Assert.assertEquals("world", stateTrace.get("value").get("conversationState").get("y").get("property").textValue());
+        Assert.assertEquals(
+            "hello",
+            stateTrace.get("value").get("userState").get("x").get("property").textValue()
+        );
+        Assert.assertEquals(
+            "world",
+            stateTrace.get("value").get("conversationState").get("y").get("property").textValue()
+        );
     }
 
-    // We can't currently supply a custom httpclient like dotnet.  So instead, these test differ from dotnet by
+    // We can't currently supply a custom httpclient like dotnet. So instead, these
+    // test differ from dotnet by
     // supplying a custom InspectionSession that records what is sent through it.
     private static class TestInspectionMiddleware extends InspectionMiddleware {
         public RecordingInspectionSession recordingSession = null;
@@ -215,12 +277,20 @@ public class InspectionTests {
             super(withInspectionState);
         }
 
-        public TestInspectionMiddleware(InspectionState withInspectionState, UserState withUserState, ConversationState withConversationState, MicrosoftAppCredentials withCredentials) {
+        public TestInspectionMiddleware(
+            InspectionState withInspectionState,
+            UserState withUserState,
+            ConversationState withConversationState,
+            MicrosoftAppCredentials withCredentials
+        ) {
             super(withInspectionState, withUserState, withConversationState, withCredentials);
         }
 
         @Override
-        protected InspectionSession createSession(ConversationReference reference, MicrosoftAppCredentials credentials) {
+        protected InspectionSession createSession(
+            ConversationReference reference,
+            MicrosoftAppCredentials credentials
+        ) {
             if (recordingSession == null) {
                 recordingSession = new RecordingInspectionSession(reference, credentials);
             }
@@ -232,12 +302,19 @@ public class InspectionTests {
         private List<String> requests = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
 
-        public RecordingInspectionSession(ConversationReference withConversationReference, MicrosoftAppCredentials withCredentials) {
+        public RecordingInspectionSession(
+            ConversationReference withConversationReference,
+            MicrosoftAppCredentials withCredentials
+        ) {
             super(withConversationReference, withCredentials);
             mapper.findAndRegisterModules();
         }
 
-        public RecordingInspectionSession(ConversationReference withConversationReference, MicrosoftAppCredentials withCredentials, Logger withLogger) {
+        public RecordingInspectionSession(
+            ConversationReference withConversationReference,
+            MicrosoftAppCredentials withCredentials,
+            Logger withLogger
+        ) {
             super(withConversationReference, withCredentials, withLogger);
             mapper.findAndRegisterModules();
         }
@@ -251,7 +328,7 @@ public class InspectionTests {
             try {
                 requests.add(mapper.writeValueAsString(activity));
             } catch (Throwable t) {
-                //noop
+                // noop
             }
 
             return CompletableFuture.completedFuture(true);

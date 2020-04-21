@@ -17,6 +17,7 @@ public class O365ConnectorCardFact {
 
     /**
      * Gets the display name of the fact.
+     * 
      * @return The display name.
      */
     public String getName() {
@@ -25,6 +26,7 @@ public class O365ConnectorCardFact {
 
     /**
      * Sets the display name of the fact.
+     * 
      * @param withName The display name.
      */
     public void setName(String withName) {
@@ -33,6 +35,7 @@ public class O365ConnectorCardFact {
 
     /**
      * Gets the display value for the fact.
+     * 
      * @return The display value.
      */
     public String getValue() {
@@ -41,6 +44,7 @@ public class O365ConnectorCardFact {
 
     /**
      * Sets the display value for the fact.
+     * 
      * @param withValue The display value.
      */
     public void setValue(String withValue) {

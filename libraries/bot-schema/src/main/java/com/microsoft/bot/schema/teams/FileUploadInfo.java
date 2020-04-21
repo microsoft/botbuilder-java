@@ -26,6 +26,7 @@ public class FileUploadInfo {
 
     /**
      * Gets name of the file.
+     * 
      * @return The file name.
      */
     public String getName() {
@@ -34,6 +35,7 @@ public class FileUploadInfo {
 
     /**
      * Sets name of the file.
+     * 
      * @param withName The file name.
      */
     public void setName(String withName) {
@@ -41,8 +43,8 @@ public class FileUploadInfo {
     }
 
     /**
-     * Gets URL to an upload session that the bot can use to set
-     * the file contents.
+     * Gets URL to an upload session that the bot can use to set the file contents.
+     * 
      * @return The url to the upload session.
      */
     public String getUploadUrl() {
@@ -50,8 +52,8 @@ public class FileUploadInfo {
     }
 
     /**
-     * Sets URL to an upload session that the bot can use to set
-     * the file contents.
+     * Sets URL to an upload session that the bot can use to set the file contents.
+     * 
      * @param withUploadUrl The url to the upload session.
      */
     public void setUploadUrl(String withUploadUrl) {
@@ -60,6 +62,7 @@ public class FileUploadInfo {
 
     /**
      * Gets URL to file.
+     * 
      * @return The url to the file content.
      */
     public String getContentUrl() {
@@ -68,6 +71,7 @@ public class FileUploadInfo {
 
     /**
      * Sets URL to file.
+     * 
      * @param withContentUrl The url to the file content.
      */
     public void setContentUrl(String withContentUrl) {
@@ -76,6 +80,7 @@ public class FileUploadInfo {
 
     /**
      * Gets unique Id for the file.
+     * 
      * @return The unique id of the download.
      */
     public String getUniqueId() {
@@ -84,6 +89,7 @@ public class FileUploadInfo {
 
     /**
      * Sets unique Id for the file.
+     * 
      * @param withUniqueId The unique id of the download.
      */
     public void setUniqueId(String withUniqueId) {
@@ -92,6 +98,7 @@ public class FileUploadInfo {
 
     /**
      * Gets type of file.
+     * 
      * @return The type of the file.
      */
     public String getFileType() {
@@ -100,6 +107,7 @@ public class FileUploadInfo {
 
     /**
      * Sets type of file.
+     * 
      * @param withFileType The type of the file.
      */
     public void setFileType(String withFileType) {
