@@ -3,7 +3,8 @@
 
 Bot Framework v4 Conversation Bot sample for Teams.
 
-There are two basic types of Messaging Extension in Teams: Search-based and Action-based. This sample illustrates how to build an Action-based Messaging Extension.
+There are two basic types of Messaging Extension in Teams: [Search-based](https://docs.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/search-commands/define-search-command) and [Action-based](https://docs.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/action-commands/define-action-command). This sample illustrates how to
+build an Action-based Messaging Extension.
 
 ## Prerequisites
 
@@ -54,9 +55,6 @@ the Teams service needs to call into the bot.
 or
 
 2) Selecting the **Share Message** command from the Message command list.  
-### Avoiding Permission-Related Errors
-
-You may encounter permission-related errors when sending a proactive message. This can often be mitigated by using `MicrosoftAppCredentials.TrustServiceUrl()`. See [the documentation](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=csharp#avoiding-401-unauthorized-errors) for more information.
 
 ## Deploy the bot to Azure
 

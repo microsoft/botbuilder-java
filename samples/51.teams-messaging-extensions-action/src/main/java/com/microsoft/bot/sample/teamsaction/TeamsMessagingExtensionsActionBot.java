@@ -10,6 +10,7 @@ import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
 import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -50,22 +51,22 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
         TurnContext turnContext,
         MessagingExtensionAction action
     ) {
-        LinkedHashMap actionData = (LinkedHashMap) action.getData();
+        Map<String, String> actionData = (Map<String, String>) action.getData();
 
         HeroCard card = new HeroCard() {{
-            setTitle((String) actionData.get("title"));
-            setSubtitle((String) actionData.get("subTitle"));
-            setText((String) actionData.get("text"));
+            setTitle(actionData.get("title"));
+            setSubtitle(actionData.get("subTitle"));
+            setText(actionData.get("text"));
         }};
 
-        List<MessagingExtensionAttachment> attachments = Arrays.asList(new MessagingExtensionAttachment(){{
+        List<MessagingExtensionAttachment> attachments = Arrays.asList(new MessagingExtensionAttachment() {{
             setContent(card);
             setContentType(HeroCard.CONTENTTYPE);
             setPreview(card.toAttachment());
         }});
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
-            setComposeExtension(new MessagingExtensionResult(){{
+        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse() {{
+            setComposeExtension(new MessagingExtensionResult() {{
                 setAttachments(attachments);
                 setAttachmentLayout("list");
                 setType("result");
@@ -78,10 +79,10 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
         MessagingExtensionAction action
     ) {
 
-        LinkedHashMap actionData = (LinkedHashMap) action.getData();
+        Map<String, String> actionData = (Map<String, String>) action.getData();
 
         HeroCard card = new HeroCard() {{
-            setTitle(action.getMessagePayload().getFrom().getUser().getDisplayName());
+            setTitle(action.getMessagePayload().getFrom().getUser() != null ? action.getMessagePayload().getFrom().getUser().getDisplayName() : "");
             setText(action.getMessagePayload().getBody().getContent());
         }};
 
@@ -89,19 +90,18 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
             card.setSubtitle("Attachments not included)");
         }
 
-        boolean includeImage = actionData.get("includeImage") != null ? (Boolean.valueOf((String) actionData.get("includeImage"))) : false;
-        if (includeImage)
-        {
-            card.setImages(Arrays.asList(new CardImage(){{
+        boolean includeImage = actionData.get("includeImage") != null ? (Boolean.valueOf(actionData.get("includeImage"))) : false;
+        if (includeImage) {
+            card.setImages(Arrays.asList(new CardImage() {{
                 setUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
             }}));
         }
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
-            setComposeExtension(new MessagingExtensionResult(){{
+        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse() {{
+            setComposeExtension(new MessagingExtensionResult() {{
                 setAttachmentLayout("list");
                 setType("result");
-                setAttachments(Arrays.asList(new MessagingExtensionAttachment(){{
+                setAttachments(Arrays.asList(new MessagingExtensionAttachment() {{
                     setContent(card);
                     setContentType(HeroCard.CONTENTTYPE);
                     setPreview(card.toAttachment());
