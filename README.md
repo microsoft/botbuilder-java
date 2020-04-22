@@ -6,6 +6,8 @@
 [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java)
 [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef)
 [![roadmap badge](https://img.shields.io/badge/visit%20the-roadmap-blue.svg)](https://github.com/Microsoft/botbuilder-java/wiki/Roadmap)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Microsoft/botbuilder-java/blob/master/LICENSE)
+[![Gitter](https://img.shields.io/gitter/room/Microsoft/BotBuilder.svg)](https://gitter.im/Microsoft/BotBuilder)
 
 This repository contains code for the Java version of the Microsoft Bot Framework SDK. The Bot Framework SDK v4 enable developers to model conversation and build sophisticated bot applications.
 
