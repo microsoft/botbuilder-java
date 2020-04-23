@@ -10,6 +10,8 @@ import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.CardAction;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
  * Adapter class to represent BotBuilder card action as adaptive card action (in
  * type of Action.Submit).
@@ -29,7 +31,18 @@ public class TaskModuleAction extends CardAction {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
 
-        ObjectNode data = objectMapper.valueToTree(withValue);
+        ObjectNode data = null;
+        if (withValue instanceof String) {
+
+            try {
+                data = objectMapper.readValue((String) withValue, ObjectNode.class);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(TaskModuleAction.class).error("TaskModuleAction", e);
+            }
+        } else {
+            data = objectMapper.valueToTree(withValue);
+        }
+
         data.put("type", "task/fetch");
 
         try {

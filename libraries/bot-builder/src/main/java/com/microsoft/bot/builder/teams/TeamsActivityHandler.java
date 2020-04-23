@@ -363,7 +363,7 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
-    protected CompletableFuture<Void> onTeamsTaskModuleSubmit(
+    protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleSubmit(
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest
     ) {
