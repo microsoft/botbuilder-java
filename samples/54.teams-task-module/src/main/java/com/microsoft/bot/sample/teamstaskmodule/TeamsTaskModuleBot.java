@@ -3,13 +3,12 @@
 
 package com.microsoft.bot.sample.teamstaskmodule;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.integration.Async;
 import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
@@ -27,10 +26,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text back to the
- * user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting to new conversation
- * participants.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. For this sample, the {@link #onMessageActivity(TurnContext)} echos
+ * the text back to the user. The {@link #onMembersAdded(List, TurnContext)}
+ * will send a greeting to new conversation participants.
+ * </p>
  */
 @Component
 public class TeamsTaskModuleBot extends TeamsActivityHandler {
@@ -46,9 +47,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     }
 
     @Override
-    protected CompletableFuture<Void> onMessageActivity(
-        TurnContext turnContext
-    ) {
+    protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
         Attachment attachment = getTaskModuleHeroCard();
         return turnContext.sendActivity(MessageFactory.attachment(attachment))
             .thenApply(resourceResponse -> null);
@@ -59,33 +58,32 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest
     ) {
-        Activity reply;
-        try {
-            reply = MessageFactory.text(
-                "onTeamsTaskModuleFetch TaskModuleRequest: " +
-                    new ObjectMapper().writeValueAsString(taskModuleRequest));
-        } catch (JsonProcessingException e) {
-            CompletableFuture<TaskModuleResponse> result = new CompletableFuture<>();
-            result.completeExceptionally(new CompletionException(e));
-            return result;
-        }
+        return Async.tryCompletion(
+            () -> MessageFactory.text(
+                "onTeamsTaskModuleFetch TaskModuleRequest: "
+                    + new ObjectMapper().writeValueAsString(taskModuleRequest)
+            )
+        ).thenCompose(turnContext::sendActivity).thenApply(resourceResponse -> {
+            Attachment adaptiveCard = getTaskModuleAdaptiveCard();
 
-        return turnContext.sendActivity(reply)
-            .thenApply(resourceResponse -> {
-                Attachment adaptiveCard = getTaskModuleAdaptiveCard();
-
-                return new TaskModuleResponse() {{
-                    setTask(new TaskModuleContinueResponse() {{
-                        setType("continue");
-                        setValue(new TaskModuleTaskInfo() {{
-                            setCard(adaptiveCard);
-                            setHeight(200);
-                            setWidth(400);
-                            setTitle("Adaptive Card: Inputs");
-                        }});
-                    }});
-                }};
-            });
+            return new TaskModuleResponse() {
+                {
+                    setTask(new TaskModuleContinueResponse() {
+                        {
+                            setType("continue");
+                            setValue(new TaskModuleTaskInfo() {
+                                {
+                                    setCard(adaptiveCard);
+                                    setHeight(200);
+                                    setWidth(400);
+                                    setTitle("Adaptive Card: Inputs");
+                                }
+                            });
+                        }
+                    });
+                }
+            };
+        });
     }
 
     @Override
@@ -93,58 +91,58 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest
     ) {
-        Activity reply;
-        try {
-            reply = MessageFactory.text(
-                "onTeamsTaskModuleSubmit TaskModuleRequest: " +
-                    new ObjectMapper().writeValueAsString(taskModuleRequest));
-        } catch (JsonProcessingException e) {
-            CompletableFuture<TaskModuleResponse> result = new CompletableFuture<>();
-            result.completeExceptionally(new CompletionException(e));
-            return result;
-        }
-
-        turnContext.sendActivity(reply)
-            .thenApply(resourceResponse -> null);
-
-        return CompletableFuture.completedFuture(new TaskModuleResponse() {{
-            setTask(new TaskModuleMessageResponse() {{
-                setType("message");
-                setValue("Thanks!");
-            }});
-        }});
+        return Async.tryCompletion(
+            () -> MessageFactory.text(
+                "onTeamsTaskModuleSubmit TaskModuleRequest: "
+                    + new ObjectMapper().writeValueAsString(taskModuleRequest)
+            )
+        )
+            .thenCompose(turnContext::sendActivity)
+            .thenApply(resourceResponse -> new TaskModuleResponse() {
+                {
+                    setTask(new TaskModuleMessageResponse() {
+                        {
+                            setType("message");
+                            setValue("Thanks!");
+                        }
+                    });
+                }
+            });
     }
 
     private Attachment getTaskModuleHeroCard() {
-        HeroCard card = new HeroCard() {{
-            setTitle("Task Module Invocation from Hero Card");
-            setSubtitle(
-                "This is a hero card with a Task Module Action button.  Click the button to show an Adaptive Card within a Task Module.");
-            setButtons(Arrays.asList(
-                new TaskModuleAction(
-                    "Adaptive Card",
-                    new JSONObject().put(
-                        "data",
-                        "adaptivecard"
-                    ).toString()
-                )
-            ));
-        }};
+        HeroCard card = new HeroCard() {
+            {
+                setTitle("Task Module Invocation from Hero Card");
+                setSubtitle(
+                    "This is a hero card with a Task Module Action button.  "
+                        + "Click the button to show an Adaptive Card within a Task Module."
+                );
+                setButtons(
+                    Arrays.asList(
+                        new TaskModuleAction(
+                            "Adaptive Card",
+                            new JSONObject().put("data", "adaptivecard").toString()
+                        )
+                    )
+                );
+            }
+        };
         return card.toAttachment();
     }
 
     private Attachment getTaskModuleAdaptiveCard() {
-        try {
-            InputStream inputStream = getClass().getClassLoader()
-                .getResourceAsStream("adaptivecard.json");
+        return Async.tryThrow(() -> {
+            InputStream inputStream =
+                getClass().getClassLoader().getResourceAsStream("adaptivecard.json");
             String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
-            return new Attachment() {{
-                setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(new ObjectMapper().readValue(result, ObjectNode.class));
-            }};
-        } catch (Throwable t) {
-            throw new CompletionException(t);
-        }
+            return new Attachment() {
+                {
+                    setContentType("application/vnd.microsoft.card.adaptive");
+                    setContent(new ObjectMapper().readValue(result, ObjectNode.class));
+                }
+            };
+        });
     }
 }
