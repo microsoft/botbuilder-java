@@ -5,7 +5,6 @@ package com.microsoft.bot.sample.teamsaction;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
@@ -23,18 +22,11 @@ import java.util.concurrent.CompletableFuture;
  */
 @Component
 public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
-    private String appId;
-    private String appPassword;
-
-    public TeamsMessagingExtensionsActionBot(Configuration configuration) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
-    }
-
     @Override
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(
         TurnContext turnContext,
-        MessagingExtensionAction action) {
+        MessagingExtensionAction action
+    ) {
         switch (action.getCommandId()) {
             // These commandIds are defined in the Teams App Manifest.
             case "createCard":
@@ -43,7 +35,8 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
             case "shareMessage":
                 return shareMessageCommand(turnContext, action);
             default:
-                return notImplemented(String.format("Invalid CommandId: %s", action.getCommandId()));
+                return notImplemented(
+                    String.format("Invalid CommandId: %s", action.getCommandId()));
         }
     }
 
@@ -59,11 +52,12 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
             setText(actionData.get("text"));
         }};
 
-        List<MessagingExtensionAttachment> attachments = Arrays.asList(new MessagingExtensionAttachment() {{
-            setContent(card);
-            setContentType(HeroCard.CONTENTTYPE);
-            setPreview(card.toAttachment());
-        }});
+        List<MessagingExtensionAttachment> attachments = Arrays
+            .asList(new MessagingExtensionAttachment() {{
+                setContent(card);
+                setContentType(HeroCard.CONTENTTYPE);
+                setPreview(card.toAttachment());
+            }});
 
         return CompletableFuture.completedFuture(new MessagingExtensionActionResponse() {{
             setComposeExtension(new MessagingExtensionResult() {{
@@ -78,22 +72,27 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
         TurnContext turnContext,
         MessagingExtensionAction action
     ) {
-
         Map<String, String> actionData = (Map<String, String>) action.getData();
 
         HeroCard card = new HeroCard() {{
-            setTitle(action.getMessagePayload().getFrom().getUser() != null ? action.getMessagePayload().getFrom().getUser().getDisplayName() : "");
+            setTitle(
+                action.getMessagePayload().getFrom().getUser() != null ? action.getMessagePayload()
+                    .getFrom().getUser().getDisplayName() : "");
             setText(action.getMessagePayload().getBody().getContent());
         }};
 
-        if (action.getMessagePayload().getAttachments() != null && !action.getMessagePayload().getAttachments().isEmpty()) {
+        if (action.getMessagePayload().getAttachments() != null && !action.getMessagePayload()
+            .getAttachments().isEmpty()) {
             card.setSubtitle("Attachments not included)");
         }
 
-        boolean includeImage = actionData.get("includeImage") != null ? (Boolean.valueOf(actionData.get("includeImage"))) : false;
+        boolean includeImage = actionData.get("includeImage") != null ? (
+            Boolean.valueOf(actionData.get("includeImage"))
+        ) : false;
         if (includeImage) {
             card.setImages(Arrays.asList(new CardImage() {{
-                setUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
+                setUrl(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
             }}));
         }
 
