@@ -9,6 +9,7 @@ package com.microsoft.bot.integration;
 public interface Configuration {
     /**
      * Returns a value for the specified property name.
+     * 
      * @param key The property name.
      * @return The property value.
      */

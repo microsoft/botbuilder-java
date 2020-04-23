@@ -28,59 +28,68 @@ public class AutoSaveStateMiddlewareTests {
         ConversationState convState = new ConversationState(storage);
         StatePropertyAccessor<Integer> convProperty = convState.createProperty("convCount");
 
-        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(userState, convState));
+        TestAdapter adapter = new TestAdapter().use(
+            new AutoSaveStateMiddleware(userState, convState)
+        );
 
         final int USER_INITIAL_COUNT = 100;
         final int CONVERSATION_INITIAL_COUNT = 10;
 
         BotCallbackHandler botLogic = (turnContext -> {
             Integer userCount = userProperty.get(turnContext, () -> USER_INITIAL_COUNT).join();
-            Integer convCount = convProperty.get(turnContext, () -> CONVERSATION_INITIAL_COUNT).join();
+            Integer convCount = convProperty.get(
+                turnContext,
+                () -> CONVERSATION_INITIAL_COUNT
+            ).join();
 
-            if(turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
+            if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
                 if (StringUtils.equals(turnContext.getActivity().getText(), "get userCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString())).join();
-                }
-                else if (StringUtils.equals(turnContext.getActivity().getText(), "get convCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString())).join();
+                    turnContext.sendActivity(
+                        turnContext.getActivity().createReply(userCount.toString())
+                    ).join();
+                } else if (
+                    StringUtils.equals(turnContext.getActivity().getText(), "get convCount")
+                ) {
+                    turnContext.sendActivity(
+                        turnContext.getActivity().createReply(convCount.toString())
+                    ).join();
                 }
             }
 
-            // increment userCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
+            // increment userCount and set property using accessor. To be saved later by
+            // AutoSaveStateMiddleware
             userCount++;
             userProperty.set(turnContext, userCount).join();
 
-            // increment convCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
+            // increment convCount and set property using accessor. To be saved later by
+            // AutoSaveStateMiddleware
             convCount++;
             convProperty.set(turnContext, convCount).join();
 
             return CompletableFuture.completedFuture(null);
         });
 
-        new TestFlow(adapter, botLogic)
-            .send("test1")
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 1))
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 2))
-            .send("get convCount")
-            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3))
-            .startTest().join();
+        new TestFlow(adapter, botLogic).send("test1").send("get userCount").assertReply(
+            String.format("%d", USER_INITIAL_COUNT + 1)
+        ).send("get userCount").assertReply(String.format("%d", USER_INITIAL_COUNT + 2)).send(
+            "get convCount"
+        ).assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3)).startTest().join();
 
-        adapter = new TestAdapter(new ConversationReference(){{
-            setChannelId("test");
-            setServiceUrl("https://test.com");
-            setUser(new ChannelAccount("user1", "User1"));
-            setBot(new ChannelAccount("bot", "Bot"));
-            setConversation(new ConversationAccount(false, "convo2", "Conversation2"));
-        }}).use(new AutoSaveStateMiddleware(userState, convState));
+        adapter = new TestAdapter(new ConversationReference() {
+            {
+                setChannelId("test");
+                setServiceUrl("https://test.com");
+                setUser(new ChannelAccount("user1", "User1"));
+                setBot(new ChannelAccount("bot", "Bot"));
+                setConversation(new ConversationAccount(false, "convo2", "Conversation2"));
+            }
+        }).use(new AutoSaveStateMiddleware(userState, convState));
 
-        new TestFlow(adapter, botLogic)
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 4))
-            .send("get convCount")
-            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 1))
-            .startTest().join();
+        new TestFlow(adapter, botLogic).send("get userCount").assertReply(
+            String.format("%d", USER_INITIAL_COUNT + 4)
+        ).send("get convCount").assertReply(
+            String.format("%d", CONVERSATION_INITIAL_COUNT + 1)
+        ).startTest().join();
     }
 
     @Test
@@ -95,10 +104,12 @@ public class AutoSaveStateMiddlewareTests {
         ConversationState convState = new ConversationState(storage);
         StatePropertyAccessor<Integer> convProperty = convState.createProperty("convCount");
 
-        AutoSaveStateMiddleware bss = new AutoSaveStateMiddleware(){{
-           add(userState);
-           add(convState);
-        }};
+        AutoSaveStateMiddleware bss = new AutoSaveStateMiddleware() {
+            {
+                add(userState);
+                add(convState);
+            }
+        };
 
         TestAdapter adapter = new TestAdapter().use(bss);
 
@@ -107,58 +118,67 @@ public class AutoSaveStateMiddlewareTests {
 
         BotCallbackHandler botLogic = (turnContext -> {
             Integer userCount = userProperty.get(turnContext, () -> USER_INITIAL_COUNT).join();
-            Integer convCount = convProperty.get(turnContext, () -> CONVERSATION_INITIAL_COUNT).join();
+            Integer convCount = convProperty.get(
+                turnContext,
+                () -> CONVERSATION_INITIAL_COUNT
+            ).join();
 
-            if(turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
+            if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
                 if (StringUtils.equals(turnContext.getActivity().getText(), "get userCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(userCount.toString())).join();
-                }
-                else if (StringUtils.equals(turnContext.getActivity().getText(), "get convCount")) {
-                    turnContext.sendActivity(turnContext.getActivity().createReply(convCount.toString())).join();
+                    turnContext.sendActivity(
+                        turnContext.getActivity().createReply(userCount.toString())
+                    ).join();
+                } else if (
+                    StringUtils.equals(turnContext.getActivity().getText(), "get convCount")
+                ) {
+                    turnContext.sendActivity(
+                        turnContext.getActivity().createReply(convCount.toString())
+                    ).join();
                 }
             }
 
-            // increment userCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
+            // increment userCount and set property using accessor. To be saved later by
+            // AutoSaveStateMiddleware
             userCount++;
             userProperty.set(turnContext, userCount).join();
 
-            // increment convCount and set property using accessor.  To be saved later by AutoSaveStateMiddleware
+            // increment convCount and set property using accessor. To be saved later by
+            // AutoSaveStateMiddleware
             convCount++;
             convProperty.set(turnContext, convCount).join();
 
             return CompletableFuture.completedFuture(null);
         });
 
-        new TestFlow(adapter, botLogic)
-            .send("test1")
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 1))
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 2))
-            .send("get convCount")
-            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3))
-            .startTest().join();
+        new TestFlow(adapter, botLogic).send("test1").send("get userCount").assertReply(
+            String.format("%d", USER_INITIAL_COUNT + 1)
+        ).send("get userCount").assertReply(String.format("%d", USER_INITIAL_COUNT + 2)).send(
+            "get convCount"
+        ).assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 3)).startTest().join();
 
         // new adapter on new conversation
-        AutoSaveStateMiddleware bss2 = new AutoSaveStateMiddleware(){{
-            add(userState);
-            add(convState);
-        }};
+        AutoSaveStateMiddleware bss2 = new AutoSaveStateMiddleware() {
+            {
+                add(userState);
+                add(convState);
+            }
+        };
 
-        adapter = new TestAdapter(new ConversationReference(){{
-            setChannelId(Channels.TEST);
-            setServiceUrl("https://test.com");
-            setUser(new ChannelAccount("user1", "User1"));
-            setBot(new ChannelAccount("bot", "Bot"));
-            setConversation(new ConversationAccount(false, "convo2", "Conversation2"));
-        }}).use(bss2);
+        adapter = new TestAdapter(new ConversationReference() {
+            {
+                setChannelId(Channels.TEST);
+                setServiceUrl("https://test.com");
+                setUser(new ChannelAccount("user1", "User1"));
+                setBot(new ChannelAccount("bot", "Bot"));
+                setConversation(new ConversationAccount(false, "convo2", "Conversation2"));
+            }
+        }).use(bss2);
 
-        new TestFlow(adapter, botLogic)
-            .send("get userCount")
-            .assertReply(String.format("%d", USER_INITIAL_COUNT + 4))
-            .send("get convCount")
-            .assertReply(String.format("%d", CONVERSATION_INITIAL_COUNT + 1))
-            .startTest().join();
+        new TestFlow(adapter, botLogic).send("get userCount").assertReply(
+            String.format("%d", USER_INITIAL_COUNT + 4)
+        ).send("get convCount").assertReply(
+            String.format("%d", CONVERSATION_INITIAL_COUNT + 1)
+        ).startTest().join();
     }
 
 }

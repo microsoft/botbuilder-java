@@ -17,6 +17,7 @@ public class MessagingExtensionQueryOptions {
 
     /**
      * Gets number of entities to skip.
+     * 
      * @return The number of entities to skip.
      */
     public int getSkip() {
@@ -25,6 +26,7 @@ public class MessagingExtensionQueryOptions {
 
     /**
      * Sets number of entities to skip.
+     * 
      * @param withSkip The number of entities to skip.
      */
     public void setSkip(int withSkip) {
@@ -33,6 +35,7 @@ public class MessagingExtensionQueryOptions {
 
     /**
      * Gets number of entities to fetch.
+     * 
      * @return The number of entities to fetch.
      */
     public int getCount() {
@@ -41,6 +44,7 @@ public class MessagingExtensionQueryOptions {
 
     /**
      * Sets number of entities to fetch.
+     * 
      * @param withCount The number of entities to fetch.
      */
     public void setCount(int withCount) {

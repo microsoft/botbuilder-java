@@ -34,14 +34,15 @@ public class ConversationState extends BotState {
             throw new IllegalArgumentException("invalid activity-missing channelId");
         }
 
-        if (turnContext.getActivity().getConversation() == null
-            || StringUtils.isEmpty(turnContext.getActivity().getConversation().getId())) {
+        if (
+            turnContext.getActivity().getConversation() == null
+                || StringUtils.isEmpty(turnContext.getActivity().getConversation().getId())
+        ) {
             throw new IllegalArgumentException("invalid activity-missing Conversation.Id");
         }
 
         // {channelId}/conversations/{conversationId}
-        return turnContext.getActivity().getChannelId()
-            + "/conversations/"
+        return turnContext.getActivity().getChannelId() + "/conversations/"
             + turnContext.getActivity().getConversation().getId();
     }
 }

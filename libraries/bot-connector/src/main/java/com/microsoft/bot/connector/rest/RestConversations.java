@@ -39,8 +39,8 @@ import retrofit2.http.Query;
 import retrofit2.Response;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in Conversations.
+ * An instance of this class provides access to all the operations defined in
+ * Conversations.
  */
 public class RestConversations implements Conversations {
     /**
@@ -56,7 +56,8 @@ public class RestConversations implements Conversations {
      * Initializes an instance of ConversationsImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient   the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this
+     *                     operation class.
      */
     RestConversations(Retrofit withRetrofit, RestConnectorClient withClient) {
         this.service = withRetrofit.create(ConversationsService.class);
@@ -64,124 +65,148 @@ public class RestConversations implements Conversations {
     }
 
     /**
-     * The interface defining all the services for Conversations to be
-     * used by Retrofit to perform actually REST calls.
+     * The interface defining all the services for Conversations to be used by
+     * Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
     interface ConversationsService {
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversations"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversations" })
         @GET("v3/conversations")
-        CompletableFuture<Response<ResponseBody>> getConversations(@Query("continuationToken") String continuationToken,
-                                                                   @Header("accept-language") String acceptLanguage,
-                                                                   @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getConversations(
+            @Query("continuationToken") String continuationToken,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations createConversation"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations createConversation" })
         @POST("v3/conversations")
-        CompletableFuture<Response<ResponseBody>> createConversation(@Body ConversationParameters parameters,
-                                                                     @Header("accept-language") String acceptLanguage,
-                                                                     @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> createConversation(
+            @Body ConversationParameters parameters,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendToConversation"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendToConversation" })
         @POST("v3/conversations/{conversationId}/activities")
-        CompletableFuture<Response<ResponseBody>> sendToConversation(@Path("conversationId") String conversationId,
-                                                                     @Body Activity activity,
-                                                                     @Header("accept-language") String acceptLanguage,
-                                                                     @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> sendToConversation(
+            @Path("conversationId") String conversationId,
+            @Body Activity activity,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations updateActivity"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations updateActivity" })
         @PUT("v3/conversations/{conversationId}/activities/{activityId}")
-        CompletableFuture<Response<ResponseBody>> updateActivity(@Path("conversationId") String conversationId,
-                                                                 @Path("activityId") String activityId,
-                                                                 @Body Activity activity,
-                                                                 @Header("accept-language") String acceptLanguage,
-                                                                 @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> updateActivity(
+            @Path("conversationId") String conversationId,
+            @Path("activityId") String activityId,
+            @Body Activity activity,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity" })
         @POST("v3/conversations/{conversationId}/activities/{activityId}")
-        CompletableFuture<Response<ResponseBody>> replyToActivity(@Path("conversationId") String conversationId,
-                                                                  @Path("activityId") String activityId,
-                                                                  @Body Activity activity,
-                                                                  @Header("accept-language") String acceptLanguage,
-                                                                  @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> replyToActivity(
+            @Path("conversationId") String conversationId,
+            @Path("activityId") String activityId,
+            @Body Activity activity,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteActivity"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteActivity" })
         @HTTP(path = "v3/conversations/{conversationId}/activities/{activityId}", method = "DELETE", hasBody = true)
-        CompletableFuture<Response<ResponseBody>> deleteActivity(@Path("conversationId") String conversationId,
-                                                                 @Path("activityId") String activityId,
-                                                                 @Header("accept-language") String acceptLanguage,
-                                                                 @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> deleteActivity(
+            @Path("conversationId") String conversationId,
+            @Path("activityId") String activityId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers" })
         @GET("v3/conversations/{conversationId}/members")
-        CompletableFuture<Response<ResponseBody>> getConversationMembers(@Path("conversationId") String conversationId,
-                                                                         @Header("accept-language") String acceptLanguage,
-                                                                         @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getConversationMembers(
+            @Path("conversationId") String conversationId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationMembers" })
         @GET("v3/conversations/{conversationId}/members/{userId}")
         CompletableFuture<Response<ResponseBody>> getConversationMember(
             @Path("userId") String userId,
             @Path("conversationId") String conversationId,
             @Header("accept-language") String acceptLanguage,
-            @Header("User-Agent") String userAgent);
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteConversationMember"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations deleteConversationMember" })
         @HTTP(path = "v3/conversations/{conversationId}/members/{memberId}", method = "DELETE", hasBody = true)
         CompletableFuture<Response<ResponseBody>> deleteConversationMember(
             @Path("conversationId") String conversationId,
             @Path("memberId") String memberId,
             @Header("accept-language") String acceptLanguage,
-            @Header("User-Agent") String userAgent);
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getActivityMembers"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getActivityMembers" })
         @GET("v3/conversations/{conversationId}/activities/{activityId}/members")
-        CompletableFuture<Response<ResponseBody>> getActivityMembers(@Path("conversationId") String conversationId,
-                                                                     @Path("activityId") String activityId,
-                                                                     @Header("accept-language") String acceptLanguage,
-                                                                     @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> getActivityMembers(
+            @Path("conversationId") String conversationId,
+            @Path("activityId") String activityId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations uploadAttachment" })
         @POST("v3/conversations/{conversationId}/attachments")
-        CompletableFuture<Response<ResponseBody>> uploadAttachment(@Path("conversationId") String conversationId,
-                                                                   @Body AttachmentData attachmentUpload,
-                                                                   @Header("accept-language") String acceptLanguage,
-                                                                   @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> uploadAttachment(
+            @Path("conversationId") String conversationId,
+            @Body AttachmentData attachmentUpload,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations sendConversationHistory" })
         @POST("v3/conversations/{conversationId}/activities/history")
-        CompletableFuture<Response<ResponseBody>> sendConversationHistory(@Path("conversationId") String conversationId,
-                                                                          @Body Transcript history,
-                                                                          @Header("accept-language") String acceptLanguage,
-                                                                          @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> sendConversationHistory(
+            @Path("conversationId") String conversationId,
+            @Body Transcript history,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers" })
         @GET("v3/conversations/{conversationId}/pagedmembers")
         CompletableFuture<Response<ResponseBody>> getConversationPagedMembers(
             @Path("conversationId") String conversationId,
             @Header("accept-language") String acceptLanguage,
-            @Header("User-Agent") String userAgent);
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8",
-                  "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations getConversationPagedMembers" })
         @GET("v3/conversations/{conversationId}/pagedmembers?continuationToken={continuationToken}")
         CompletableFuture<Response<ResponseBody>> getConversationPagedMembers(
             @Path("conversationId") String conversationId,
             @Path("continuationToken") String continuationToken,
             @Header("accept-language") String acceptLanguage,
-            @Header("User-Agent") String userAgent);
+            @Header("User-Agent") String userAgent
+        );
     }
 
     /**
@@ -201,7 +226,8 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<ConversationsResult> getConversations(String continuationToken) {
-        return service.getConversations(continuationToken, client.getAcceptLanguage(), client.getUserAgent())
+        return service
+            .getConversations(continuationToken, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return getConversationsDelegate(responseBodyResponse).body();
@@ -214,9 +240,11 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ConversationsResult> getConversationsDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<ConversationsResult, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationsResult>() {
             }.getType())
@@ -230,35 +258,51 @@ public class RestConversations implements Conversations {
      * @see Conversations#createConversation
      */
     @Override
-    public CompletableFuture<ConversationResourceResponse> createConversation(ConversationParameters parameters) {
+    public CompletableFuture<ConversationResourceResponse> createConversation(
+        ConversationParameters parameters
+    ) {
         if (parameters == null) {
-            throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter parameters is required and cannot be null."
+            );
         }
         Validator.validate(parameters);
 
-        return service.createConversation(parameters, client.getAcceptLanguage(), client.getUserAgent())
+        return service
+            .createConversation(parameters, client.getAcceptLanguage(), client.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
                     return createConversationDelegate(responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("createConversationAsync", responseBodyResponse);
+                    throw new ErrorResponseException(
+                        "createConversationAsync",
+                        responseBodyResponse
+                    );
                 }
             });
     }
 
     private ServiceResponse<ConversationResourceResponse> createConversationDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
-            .<ConversationResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+        return client.restClient()
+            .responseBuilderFactory()
+            .<ConversationResourceResponse, ErrorResponseException>newInstance(
+                client.serializerAdapter()
+            )
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationResourceResponse>() {
             }.getType())
-            .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ConversationResourceResponse>() {
-            }.getType())
-            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ConversationResourceResponse>() {
-            }.getType())
+            .register(
+                HttpURLConnection.HTTP_CREATED, new TypeToken<ConversationResourceResponse>() {
+                }.getType()
+            )
+            .register(
+                HttpURLConnection.HTTP_ACCEPTED, new TypeToken<ConversationResourceResponse>() {
+                }.getType()
+            )
             .registerError(ErrorResponseException.class)
             .build(response);
     }
@@ -269,32 +313,42 @@ public class RestConversations implements Conversations {
      * @see Conversations#sendToConversation
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendToConversation(String conversationId, Activity activity) {
+    public CompletableFuture<ResourceResponse> sendToConversation(
+        String conversationId,
+        Activity activity
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (activity == null) {
-            throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activity is required and cannot be null."
+            );
         }
         Validator.validate(activity);
 
-        return service.sendToConversation(conversationId, activity, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return sendToConversationDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("sendToConversationAsync", responseBodyResponse);
-                }
-            });
+        return service.sendToConversation(
+            conversationId, activity, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return sendToConversationDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("sendToConversationAsync", responseBodyResponse);
+            }
+        });
     }
 
     private ServiceResponse<ResourceResponse> sendToConversationDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -311,22 +365,31 @@ public class RestConversations implements Conversations {
      * @see Conversations#updateActivity
      */
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(String conversationId,
-                                                              String activityId,
-                                                              Activity activity) {
+    public CompletableFuture<ResourceResponse> updateActivity(
+        String conversationId,
+        String activityId,
+        Activity activity
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (activityId == null) {
-            throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activityId is required and cannot be null."
+            );
         }
         if (activity == null) {
-            throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activity is required and cannot be null."
+            );
         }
         Validator.validate(activity);
 
-        return service.updateActivity(conversationId, activityId, activity,
-                                      client.getAcceptLanguage(), client.getUserAgent())
+        return service.updateActivity(
+            conversationId, activityId, activity, client.getAcceptLanguage(), client.getUserAgent()
+        )
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -340,10 +403,12 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> updateActivityDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -360,22 +425,31 @@ public class RestConversations implements Conversations {
      * @see Conversations#replyToActivity
      */
     @Override
-    public CompletableFuture<ResourceResponse> replyToActivity(String conversationId,
-                                                               String activityId,
-                                                               Activity activity) {
+    public CompletableFuture<ResourceResponse> replyToActivity(
+        String conversationId,
+        String activityId,
+        Activity activity
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (activityId == null) {
-            throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activityId is required and cannot be null."
+            );
         }
         if (activity == null) {
-            throw new IllegalArgumentException("Parameter activity is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activity is required and cannot be null."
+            );
         }
         Validator.validate(activity);
 
-        return service.replyToActivity(conversationId, activityId, activity,
-                                       client.getAcceptLanguage(), client.getUserAgent())
+        return service.replyToActivity(
+            conversationId, activityId, activity, client.getAcceptLanguage(), client.getUserAgent()
+        )
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -389,10 +463,12 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> replyToActivityDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -411,29 +487,36 @@ public class RestConversations implements Conversations {
     @Override
     public CompletableFuture<Void> deleteActivity(String conversationId, String activityId) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (activityId == null) {
-            throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activityId is required and cannot be null."
+            );
         }
 
-        return service.deleteActivity(conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return deleteActivityDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("deleteActivityAsync", responseBodyResponse);
-                }
-            });
+        return service.deleteActivity(
+            conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return deleteActivityDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("deleteActivityAsync", responseBodyResponse);
+            }
+        });
     }
 
     private ServiceResponse<Void> deleteActivityDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<Void, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
             }.getType())
             .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() {
@@ -450,25 +533,33 @@ public class RestConversations implements Conversations {
     @Override
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
 
-        return service.getConversationMembers(conversationId, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getConversationMembersDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationMembersAsync", responseBodyResponse);
-                }
-            });
+        return service.getConversationMembers(
+            conversationId, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getConversationMembersDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException(
+                    "getConversationMembersAsync",
+                    responseBodyResponse
+                );
+            }
+        });
     }
 
     private ServiceResponse<List<ChannelAccount>> getConversationMembersDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
             }.getType())
@@ -482,30 +573,41 @@ public class RestConversations implements Conversations {
      * @see Conversations#getConversationMember
      */
     @Override
-    public CompletableFuture<ChannelAccount> getConversationMember(String userId, String conversationId) {
+    public CompletableFuture<ChannelAccount> getConversationMember(
+        String userId,
+        String conversationId
+    ) {
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
         }
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
 
-        return service.getConversationMember(userId, conversationId, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getConversationMemberDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationMembersAsync", responseBodyResponse);
-                }
-            });
+        return service.getConversationMember(
+            userId, conversationId, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getConversationMemberDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException(
+                    "getConversationMembersAsync",
+                    responseBodyResponse
+                );
+            }
+        });
     }
 
     private ServiceResponse<ChannelAccount> getConversationMemberDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<ChannelAccount, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ChannelAccount>() {
             }.getType())
@@ -519,16 +621,24 @@ public class RestConversations implements Conversations {
      * @see Conversations#deleteConversationMember
      */
     @Override
-    public CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId) {
+    public CompletableFuture<Void> deleteConversationMember(
+        String conversationId,
+        String memberId
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (memberId == null) {
-            throw new IllegalArgumentException("Parameter memberId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter memberId is required and cannot be null."
+            );
         }
 
-        return service.deleteConversationMember(conversationId, memberId,
-                                                client.getAcceptLanguage(), client.getUserAgent())
+        return service.deleteConversationMember(
+            conversationId, memberId, client.getAcceptLanguage(), client.getUserAgent()
+        )
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -536,17 +646,21 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("deleteConversationMemberAsync", responseBodyResponse);
+                    throw new ErrorResponseException(
+                        "deleteConversationMemberAsync",
+                        responseBodyResponse
+                    );
                 }
             });
     }
 
-
     private ServiceResponse<Void> deleteConversationMemberDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<Void, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
             }.getType())
             .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() {
@@ -561,30 +675,40 @@ public class RestConversations implements Conversations {
      * @see Conversations#getActivityMembers
      */
     @Override
-    public CompletableFuture<List<ChannelAccount>> getActivityMembers(String conversationId, String activityId) {
+    public CompletableFuture<List<ChannelAccount>> getActivityMembers(
+        String conversationId,
+        String activityId
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (activityId == null) {
-            throw new IllegalArgumentException("Parameter activityId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter activityId is required and cannot be null."
+            );
         }
 
-        return service.getActivityMembers(conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getActivityMembersDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getActivityMembersAsync", responseBodyResponse);
-                }
-            });
+        return service.getActivityMembers(
+            conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getActivityMembersDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException("getActivityMembersAsync", responseBodyResponse);
+            }
+        });
     }
 
     private ServiceResponse<List<ChannelAccount>> getActivityMembersDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
             }.getType())
@@ -598,18 +722,25 @@ public class RestConversations implements Conversations {
      * @see Conversations#uploadAttachment
      */
     @Override
-    public CompletableFuture<ResourceResponse> uploadAttachment(String conversationId,
-                                                                AttachmentData attachmentUpload) {
+    public CompletableFuture<ResourceResponse> uploadAttachment(
+        String conversationId,
+        AttachmentData attachmentUpload
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (attachmentUpload == null) {
-            throw new IllegalArgumentException("Parameter attachmentUpload is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter attachmentUpload is required and cannot be null."
+            );
         }
         Validator.validate(attachmentUpload);
 
-        return service.uploadAttachment(conversationId, attachmentUpload,
-                                        client.getAcceptLanguage(), client.getUserAgent())
+        return service.uploadAttachment(
+            conversationId, attachmentUpload, client.getAcceptLanguage(), client.getUserAgent()
+        )
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -623,10 +754,12 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> uploadAttachmentDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -636,7 +769,6 @@ public class RestConversations implements Conversations {
             .registerError(ErrorResponseException.class)
             .build(response);
     }
-
 
     /**
      * Implementation of sendConversationHistory.
@@ -644,17 +776,23 @@ public class RestConversations implements Conversations {
      * @see Conversations#sendConversationHistory
      */
     @Override
-    public CompletableFuture<ResourceResponse> sendConversationHistory(String conversationId, Transcript history) {
+    public CompletableFuture<ResourceResponse> sendConversationHistory(
+        String conversationId,
+        Transcript history
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (history == null) {
             throw new IllegalArgumentException("Parameter history is required and cannot be null.");
         }
         Validator.validate(history);
 
-        return service.sendConversationHistory(conversationId, history,
-                                               client.getAcceptLanguage(), client.getUserAgent())
+        return service.sendConversationHistory(
+            conversationId, history, client.getAcceptLanguage(), client.getUserAgent()
+        )
 
             .thenApply(responseBodyResponse -> {
                 try {
@@ -662,16 +800,21 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("sendConversationHistoryAsync", responseBodyResponse);
+                    throw new ErrorResponseException(
+                        "sendConversationHistoryAsync",
+                        responseBodyResponse
+                    );
                 }
             });
     }
 
     private ServiceResponse<ResourceResponse> sendConversationHistoryDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .responseBuilderFactory()
+            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -682,34 +825,43 @@ public class RestConversations implements Conversations {
             .build(response);
     }
 
-
     /**
      * Implementation of getConversationPagedMembers.
      *
      * @see Conversations#getConversationPagedMembers(String conversationId)
      */
     @Override
-    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId) {
+    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(
+        String conversationId
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
 
-        return service.getConversationPagedMembers(conversationId, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getConversationPagedMembersDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationPagedMembers", responseBodyResponse);
-                }
-            });
+        return service.getConversationPagedMembers(
+            conversationId, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getConversationPagedMembersDelegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException(
+                    "getConversationPagedMembers",
+                    responseBodyResponse
+                );
+            }
+        });
     }
 
     private ServiceResponse<PagedMembersResult> getConversationPagedMembersDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
             }.getType())
@@ -720,40 +872,53 @@ public class RestConversations implements Conversations {
     /**
      * Implementation of getConversationPagedMembers.
      *
-     * @see Conversations#getConversationPagedMembers(String conversationId, String continuationToken)
+     * @see Conversations#getConversationPagedMembers(String conversationId, String
+     *      continuationToken)
      *
-     * @param conversationId Conversation ID
+     * @param conversationId    Conversation ID
      * @param continuationToken The continuationToken from a previous call.
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @throws RuntimeException         all other wrapped checked exceptions if the
+     *                                  request fails to be sent
      * @return the PagedMembersResult object if successful.
      */
-    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(String conversationId,
-                                                                             String continuationToken) {
+    public CompletableFuture<PagedMembersResult> getConversationPagedMembers(
+        String conversationId,
+        String continuationToken
+    ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException("Parameter conversationId is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter conversationId is required and cannot be null."
+            );
         }
         if (continuationToken == null) {
-            throw new IllegalArgumentException("Parameter continuationToken is required and cannot be null.");
+            throw new IllegalArgumentException(
+                "Parameter continuationToken is required and cannot be null."
+            );
         }
 
         return service.getConversationPagedMembers(
-            conversationId, continuationToken, client.getAcceptLanguage(), client.getUserAgent())
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getConversationPagedMembers2Delegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationPagedMembers", responseBodyResponse);
-                }
-            });
+            conversationId, continuationToken, client.getAcceptLanguage(), client.getUserAgent()
+        ).thenApply(responseBodyResponse -> {
+            try {
+                return getConversationPagedMembers2Delegate(responseBodyResponse).body();
+            } catch (ErrorResponseException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new ErrorResponseException(
+                    "getConversationPagedMembers",
+                    responseBodyResponse
+                );
+            }
+        });
     }
 
     private ServiceResponse<PagedMembersResult> getConversationPagedMembers2Delegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient().responseBuilderFactory()
+        return client.restClient()
+            .responseBuilderFactory()
             .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
             }.getType())

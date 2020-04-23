@@ -17,6 +17,7 @@ public class NotificationInfo {
 
     /**
      * Initialize new NotificationInfo.
+     * 
      * @param withAlert initial alert value.
      */
     public NotificationInfo(boolean withAlert) {

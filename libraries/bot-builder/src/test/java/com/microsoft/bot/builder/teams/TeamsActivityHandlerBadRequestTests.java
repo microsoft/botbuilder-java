@@ -21,17 +21,23 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TeamsActivityHandlerBadRequestTests {
     @Test
     public void TestFileConsentBadAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("this.is.a.bad.action");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("this.is.a.bad.action");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -46,17 +52,24 @@ public class TeamsActivityHandlerBadRequestTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(400, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            400,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewBadAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("this.is.a.bad.action");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("this.is.a.bad.action");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -71,6 +84,9 @@ public class TeamsActivityHandlerBadRequestTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(400, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            400,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 }

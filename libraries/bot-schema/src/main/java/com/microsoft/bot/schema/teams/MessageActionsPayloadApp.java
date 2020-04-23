@@ -20,8 +20,9 @@ public class MessageActionsPayloadApp {
 
     /**
      * Gets the type of application.
-     * @return Possible values include: 'aadApplication', 'bot', 'tenantBot', 'office365Connector',
-     * 'webhook'
+     * 
+     * @return Possible values include: 'aadApplication', 'bot', 'tenantBot',
+     *         'office365Connector', 'webhook'
      */
     public String getApplicationIdentityType() {
         return applicationIdentityType;
@@ -29,8 +30,10 @@ public class MessageActionsPayloadApp {
 
     /**
      * Sets the type of application.
-     * @param withApplicationIdentityType Possible values include: 'aadApplication', 'bot', 'tenantBot',
-     *                                    'office365Connector', 'webhook'
+     * 
+     * @param withApplicationIdentityType Possible values include: 'aadApplication',
+     *                                    'bot', 'tenantBot', 'office365Connector',
+     *                                    'webhook'
      */
     public void setApplicationIdentityType(String withApplicationIdentityType) {
         applicationIdentityType = withApplicationIdentityType;
@@ -38,6 +41,7 @@ public class MessageActionsPayloadApp {
 
     /**
      * Gets the id of the application.
+     * 
      * @return The application id.
      */
     public String getId() {
@@ -46,6 +50,7 @@ public class MessageActionsPayloadApp {
 
     /**
      * Sets the id of the application.
+     * 
      * @param withId The application id.
      */
     public void setId(String withId) {
@@ -54,6 +59,7 @@ public class MessageActionsPayloadApp {
 
     /**
      * Gets the plaintext display name of the application.
+     * 
      * @return The display name of the application.
      */
     public String getDisplayName() {
@@ -62,6 +68,7 @@ public class MessageActionsPayloadApp {
 
     /**
      * Sets the plaintext display name of the application.
+     * 
      * @param withDisplayName The display name of the application.
      */
     public void setDisplayName(String withDisplayName) {

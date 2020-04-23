@@ -12,7 +12,7 @@ public class InspectionState extends BotState {
     /**
      * Initializes a new instance of the BotState class.
      *
-     * @param withStorage           The storage provider to use.
+     * @param withStorage The storage provider to use.
      */
     public InspectionState(Storage withStorage) {
         super(withStorage, InspectionState.class.getSimpleName());

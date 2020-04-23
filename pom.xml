@@ -65,6 +65,18 @@
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-pmd-plugin</artifactId>
           </plugin>
           <plugin>
@@ -367,19 +379,6 @@
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
     <module>libraries/bot-integration-spring</module>
-
-    <module>samples/servlet-echo</module>
-    <module>samples/02.echo-bot</module>
-    <module>samples/03.welcome-user</module>
-    <module>samples/08.suggested-actions</module>
-    <module>samples/16.proactive-messages</module>
-    <module>samples/45.state-management</module>
-    <module>samples/47.inspection</module>
-    <module>samples/50.teams-messaging-extensions-search</module>
-    <module>samples/51.teams-messaging-extensions-action</module>
-    <module>samples/52.teams-messaging-extensions-search-auth-config</module>
-    <module>samples/53.teams-messaging-extensions-action-preview</module>
-    <module>samples/57.teams-conversation-bot</module>
   </modules>
 
   <build>

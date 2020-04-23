@@ -10,7 +10,6 @@ import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationReference;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,18 +19,22 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user and updates the shared {@link ConversationReferences}.
- * The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants with instructions for sending a proactive message.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would
+ * be added. For this sample, the {@link #onMessageActivity(TurnContext)} echos
+ * the text back to the user and updates the shared
+ * {@link ConversationReferences}. The
+ * {@link #onMembersAdded(List, TurnContext)} will send a greeting to new
+ * conversation participants with instructions for sending a proactive message.
+ * </p>
  */
 @Component
 public class ProactiveBot extends ActivityHandler {
     @Value("${server.port:8080}")
     private int port;
 
-    private static final String WELCOMEMESSAGE = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:%d/api/notify to proactively message everyone who has previously messaged this bot.";
+    private static final String WELCOMEMESSAGE =
+        "Welcome to the Proactive Bot sample.  Navigate to http://localhost:%d/api/notify to proactively message everyone who has previously messaged this bot.";
 
     private ConversationReferences conversationReferences;
 
@@ -49,10 +52,15 @@ public class ProactiveBot extends ActivityHandler {
     }
 
     @Override
-    protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+    protected CompletableFuture<Void> onMembersAdded(
+        List<ChannelAccount> membersAdded,
+        TurnContext turnContext
+    ) {
         return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(MessageFactory.text(String.format(WELCOMEMESSAGE, port))))
+            .map(
+                channel -> turnContext
+                    .sendActivity(MessageFactory.text(String.format(WELCOMEMESSAGE, port)))
+            )
             .collect(CompletableFutures.toFutureList())
             .thenApply(resourceResponses -> null);
     }

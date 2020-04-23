@@ -26,7 +26,7 @@ import java.util.UUID;
 @RestController
 public class NotifyController {
     /**
-     * The BotFrameworkHttpAdapter to use.  Note is is provided by dependency
+     * The BotFrameworkHttpAdapter to use. Note is is provided by dependency
      * injection via the constructor.
      *
      * @see com.microsoft.bot.integration.spring.BotDependencyConfiguration
@@ -37,14 +37,16 @@ public class NotifyController {
     private String appId;
 
     @Autowired
-    public NotifyController(BotFrameworkHttpAdapter withAdapter,
-                            Configuration withConfiguration,
-                            ConversationReferences withReferences) {
+    public NotifyController(
+        BotFrameworkHttpAdapter withAdapter,
+        Configuration withConfiguration,
+        ConversationReferences withReferences
+    ) {
         adapter = withAdapter;
         conversationReferences = withReferences;
 
         // If the channel is the Emulator, and authentication is not in use,
-        // the AppId will be null.  We generate a random AppId for this case only.
+        // the AppId will be null. We generate a random AppId for this case only.
         // This is not required for production, since the AppId will have a value.
         appId = withConfiguration.getProperty("MicrosoftAppId");
         if (StringUtils.isEmpty(appId)) {
@@ -55,13 +57,15 @@ public class NotifyController {
     @GetMapping("/api/notify")
     public ResponseEntity<Object> proactiveMessage() {
         for (ConversationReference reference : conversationReferences.values()) {
-            adapter.continueConversation(appId, reference, turnContext -> turnContext.sendActivity("proactive hello")
-                .thenApply(resourceResponse -> null));
+            adapter.continueConversation(
+                appId, reference, turnContext -> turnContext.sendActivity("proactive hello").thenApply(resourceResponse -> null)
+            );
         }
 
         // Let the caller know proactive messages have been sent
         return new ResponseEntity<>(
             "<html><body><h1>Proactive messages have been sent.</h1></body></html>",
-            HttpStatus.ACCEPTED);
+            HttpStatus.ACCEPTED
+        );
     }
 }

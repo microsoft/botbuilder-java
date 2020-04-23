@@ -23,6 +23,7 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
 
     /**
      * Initializes an instance of ConnectorClient client.
+     * 
      * @param restClient The RestClient to use.
      */
     public RestOAuthClient(RestClient restClient) {
@@ -33,7 +34,7 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
     /**
      * Initializes an instance of ConnectorClient client.
      *
-     * @param baseUrl the base URL of the host
+     * @param baseUrl     the base URL of the host
      * @param credentials the management credentials for Azure
      */
     public RestOAuthClient(String baseUrl, ServiceClientCredentials credentials) {
@@ -43,6 +44,7 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
 
     /**
      * Gets the BotSignIns object to access its operations.
+     * 
      * @return the BotSignIns object.
      */
     @Override
@@ -50,9 +52,9 @@ public class RestOAuthClient extends AzureServiceClient implements OAuthClient {
         return botSignIn;
     }
 
-
     /**
      * Gets the UserTokens object to access its operations.
+     * 
      * @return the UserTokens object.
      */
     @Override

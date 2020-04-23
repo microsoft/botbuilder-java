@@ -7,7 +7,8 @@ import com.microsoft.bot.builder.Bot;
 import javax.servlet.annotation.WebServlet;
 
 /**
- * This is the Servlet that will receive incoming Channel Activity messages for the Bot.
+ * This is the Servlet that will receive incoming Channel Activity messages for
+ * the Bot.
  *
  * @see EchoBot
  */

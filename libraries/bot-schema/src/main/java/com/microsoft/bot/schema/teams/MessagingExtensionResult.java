@@ -37,8 +37,9 @@ public class MessagingExtensionResult {
     private Activity activityPreview;
 
     /**
-     * Gets hint for how to deal with multiple attachments.
-     * Possible values include: 'list', 'grid'
+     * Gets hint for how to deal with multiple attachments. Possible values include:
+     * 'list', 'grid'
+     * 
      * @return The attachment layout hint.
      */
     public String getAttachmentLayout() {
@@ -46,8 +47,9 @@ public class MessagingExtensionResult {
     }
 
     /**
-     * Sets hint for how to deal with multiple attachments.
-     * Possible values include: 'list', 'grid'
+     * Sets hint for how to deal with multiple attachments. Possible values include:
+     * 'list', 'grid'
+     * 
      * @param withAttachmentLayout The attachment layout hint.
      */
     public void setAttachmentLayout(String withAttachmentLayout) {
@@ -55,8 +57,9 @@ public class MessagingExtensionResult {
     }
 
     /**
-     * Gets the type of the result. Possible values include:
-     * 'result', 'auth', 'config', 'message', 'botMessagePreview'
+     * Gets the type of the result. Possible values include: 'result', 'auth',
+     * 'config', 'message', 'botMessagePreview'
+     * 
      * @return The result type.
      */
     public String getType() {
@@ -64,8 +67,9 @@ public class MessagingExtensionResult {
     }
 
     /**
-     * Sets the type of the result. Possible values include:
-     * 'result', 'auth', 'config', 'message', 'botMessagePreview'
+     * Sets the type of the result. Possible values include: 'result', 'auth',
+     * 'config', 'message', 'botMessagePreview'
+     * 
      * @param withType The result type.
      */
     public void setType(String withType) {
@@ -74,6 +78,7 @@ public class MessagingExtensionResult {
 
     /**
      * Gets (Only when type is result) Attachments.
+     * 
      * @return The result attachments.
      */
     public List<MessagingExtensionAttachment> getAttachments() {
@@ -81,8 +86,9 @@ public class MessagingExtensionResult {
     }
 
     /**
-     * Sets (Only when type is result) Attachments.
-     * This replaces all previous attachments on the object.
+     * Sets (Only when type is result) Attachments. This replaces all previous
+     * attachments on the object.
+     * 
      * @param withAttachments The result attachments.
      */
     public void setAttachments(List<MessagingExtensionAttachment> withAttachments) {
@@ -90,8 +96,9 @@ public class MessagingExtensionResult {
     }
 
     /**
-     * Sets (Only when type is result) Attachments to the specific attachment.
-     * This replaces all previous attachments on the object.
+     * Sets (Only when type is result) Attachments to the specific attachment. This
+     * replaces all previous attachments on the object.
+     * 
      * @param withAttachment The attachment.
      */
     public void setAttachment(MessagingExtensionAttachment withAttachment) {
@@ -100,6 +107,7 @@ public class MessagingExtensionResult {
 
     /**
      * Gets (Only when type is auth or config) suggested actions.
+     * 
      * @return The suggested actions.
      */
     public MessagingExtensionSuggestedAction getSuggestedActions() {
@@ -108,6 +116,7 @@ public class MessagingExtensionResult {
 
     /**
      * Sets (Only when type is auth or config) suggested actions.
+     * 
      * @param withSuggestedActions The suggested actions.
      */
     public void setSuggestedActions(MessagingExtensionSuggestedAction withSuggestedActions) {
@@ -116,6 +125,7 @@ public class MessagingExtensionResult {
 
     /**
      * Gets (Only when type is message) Text.
+     * 
      * @return The result text.
      */
     public String getText() {
@@ -124,6 +134,7 @@ public class MessagingExtensionResult {
 
     /**
      * Sets (Only when type is message) Text.
+     * 
      * @param withText The result text.
      */
     public void setText(String withText) {
@@ -132,6 +143,7 @@ public class MessagingExtensionResult {
 
     /**
      * Gets (Only when type is botMessagePreview) Message activity.
+     * 
      * @return The preview Activity.
      */
     public Activity getActivityPreview() {
@@ -140,6 +152,7 @@ public class MessagingExtensionResult {
 
     /**
      * Sets (Only when type is botMessagePreview) Message activity.
+     * 
      * @param withActivityPreview The preview Activity.
      */
     public void setActivityPreview(Activity withActivityPreview) {

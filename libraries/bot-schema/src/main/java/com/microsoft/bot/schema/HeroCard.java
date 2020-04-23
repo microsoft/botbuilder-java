@@ -168,12 +168,15 @@ public class HeroCard {
 
     /**
      * Creates an @{link Attachment} for this card.
+     * 
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
-        return new Attachment() {{
-           setContent(HeroCard.this);
-           setContentType(CONTENTTYPE);
-        }};
+        return new Attachment() {
+            {
+                setContent(HeroCard.this);
+                setContentType(CONTENTTYPE);
+            }
+        };
     }
 }

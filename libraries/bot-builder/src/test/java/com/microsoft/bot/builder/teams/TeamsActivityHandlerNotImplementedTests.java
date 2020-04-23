@@ -30,241 +30,317 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TeamsActivityHandlerNotImplementedTests {
     @Test
     public void TestInvoke() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("gibberish");
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("gibberish");
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentAccept() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("accept");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("accept");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentDecline() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("decline");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("decline");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestActionableMessageExecuteAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("actionableMessage/executeAction");
-            setValue(new O365ConnectorCardActionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("actionableMessage/executeAction");
+                setValue(new O365ConnectorCardActionQuery());
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestComposeExtensionQueryLink() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/queryLink");
-            setValue(new AppBasedLinkQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/queryLink");
+                setValue(new AppBasedLinkQuery());
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestComposeExtensionQuery() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/query");
-            setValue(new MessagingExtensionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/query");
+                setValue(new MessagingExtensionQuery());
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSelectItem() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/selectItem");
-            setValue(new O365ConnectorCardActionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/selectItem");
+                setValue(new O365ConnectorCardActionQuery());
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionQuery());
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEdit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("edit");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("edit");
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSend() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("send");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("send");
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionFetchTask() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/fetchTask");
-            setValue(new MessagingExtensionAction() {{
-                setCommandId("testCommand");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/fetchTask");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setCommandId("testCommand");
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionConfigurationQuerySettingsUrl() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/querySettingsUrl");
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/querySettingsUrl");
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionConfigurationSetting() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/setting");
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/setting");
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestTaskModuleFetch() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("task/fetch");
-            setValue(new TaskModuleRequest() {{
-                setData(new HashMap<String, Object>() {{
-                    put("key", "value");
-                    put("type", "task / fetch");
-                }});
-                setContext(new TaskModuleRequestContext() {{
-                    setTheme("default");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("task/fetch");
+                setValue(new TaskModuleRequest() {
+                    {
+                        setData(new HashMap<String, Object>() {
+                            {
+                                put("key", "value");
+                                put("type", "task / fetch");
+                            }
+                        });
+                        setContext(new TaskModuleRequestContext() {
+                            {
+                                setTheme("default");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestTaskModuleSubmit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("task/submit");
-            setValue(new TaskModuleRequest() {{
-                setData(new HashMap<String, Object>() {{
-                    put("key", "value");
-                    put("type", "task / fetch");
-                }});
-                setContext(new TaskModuleRequestContext() {{
-                    setTheme("default");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("task/submit");
+                setValue(new TaskModuleRequest() {
+                    {
+                        setData(new HashMap<String, Object>() {
+                            {
+                                put("key", "value");
+                                put("type", "task / fetch");
+                            }
+                        });
+                        setContext(new TaskModuleRequestContext() {
+                            {
+                                setTheme("default");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentAcceptImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("accept");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("accept");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertImplemented(activity, new TestActivityHandlerFileConsent());
     }
 
     @Test
     public void TestFileConsentDeclineImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("decline");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("decline");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         assertImplemented(activity, new TestActivityHandlerFileConsent());
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEditImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("edit");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("edit");
+                    }
+                });
+            }
+        };
 
         assertImplemented(activity, new TestActivityHandlerPrevieAction());
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSendImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("send");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("send");
+                    }
+                });
+            }
+        };
 
         assertImplemented(activity, new TestActivityHandlerPrevieAction());
     }
@@ -274,7 +350,7 @@ public class TeamsActivityHandlerNotImplementedTests {
     }
 
     private void assertImplemented(Activity activity, ActivityHandler bot) {
-        assertInvokeResponse(activity, bot,200);
+        assertInvokeResponse(activity, bot, 200);
     }
 
     private void assertInvokeResponse(Activity activity, ActivityHandler bot, int expectedStatus) {
@@ -290,7 +366,10 @@ public class TeamsActivityHandlerNotImplementedTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(expectedStatus, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            expectedStatus,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     private static class TestActivityHandler extends TeamsActivityHandler {
@@ -307,8 +386,9 @@ public class TeamsActivityHandlerNotImplementedTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsFileConsentDecline(TurnContext turnContext,
-                                                                    FileConsentCardResponse fileConsentCardResponse
+        protected CompletableFuture<Void> onTeamsFileConsentDecline(
+            TurnContext turnContext,
+            FileConsentCardResponse fileConsentCardResponse
         ) {
             return CompletableFuture.completedFuture(null);
         }

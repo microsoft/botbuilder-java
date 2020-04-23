@@ -13,7 +13,10 @@ import javax.servlet.http.HttpServlet;
 /**
  * Provides default factory methods to create Bot dependencies.
  *
- * <p>Subclasses must implement the {@link #getBot()} method to return a Bot object.</p>
+ * <p>
+ * Subclasses must implement the {@link #getBot()} method to return a Bot
+ * object.
+ * </p>
  */
 public abstract class ServletWithBotConfiguration extends HttpServlet {
     private Storage storage;
@@ -89,8 +92,7 @@ public abstract class ServletWithBotConfiguration extends HttpServlet {
     }
 
     /**
-     * Returns a {@link Storage} object.
-     * Default scope of Singleton.
+     * Returns a {@link Storage} object. Default scope of Singleton.
      *
      * @return A Storage object.
      */

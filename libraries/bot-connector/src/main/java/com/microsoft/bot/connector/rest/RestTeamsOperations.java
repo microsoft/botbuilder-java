@@ -37,13 +37,13 @@ public class RestTeamsOperations implements TeamsOperations {
      * Initializes an instance of ConversationsImpl.
      *
      * @param withRetrofit the Retrofit instance built from a Retrofit Builder.
-     * @param withClient the instance of the service client containing this operation class.
+     * @param withClient   the instance of the service client containing this
+     *                     operation class.
      */
     RestTeamsOperations(Retrofit withRetrofit, RestTeamsConnectorClient withClient) {
         service = withRetrofit.create(RestTeamsOperations.TeamsService.class);
         client = withClient;
     }
-
 
     /**
      * Implementation of fetchChannelList.
@@ -69,11 +69,14 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     private ServiceResponse<ConversationList> fetchChannelListDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<ConversationList, ErrorResponseException>newInstance(client.serializerAdapter())
-            .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationList>() { }.getType())
+            .responseBuilderFactory()
+            .<ConversationList, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationList>() {
+            }.getType())
             .registerError(ErrorResponseException.class)
             .build(response);
     }
@@ -102,32 +105,41 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     private ServiceResponse<TeamDetails> fetchTeamDetailsDelegate(
-        Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
         return client.restClient()
-            .responseBuilderFactory().<TeamDetails, ErrorResponseException>newInstance(client.serializerAdapter())
-            .register(HttpURLConnection.HTTP_OK, new TypeToken<TeamDetails>() { }.getType())
+            .responseBuilderFactory()
+            .<TeamDetails, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<TeamDetails>() {
+            }.getType())
             .registerError(ErrorResponseException.class)
             .build(response);
     }
 
     /**
-     * The interface defining all the services for TeamsOperations to be
-     * used by Retrofit to perform actually REST calls.
+     * The interface defining all the services for TeamsOperations to be used by
+     * Retrofit to perform actually REST calls.
      */
-    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
+    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
     interface TeamsService {
-        @Headers({"Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchChannelList"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchChannelList" })
         @POST("v3/teams/{teamId}/conversations")
-        CompletableFuture<Response<ResponseBody>> fetchChannelList(@Path("teamId") String teamId,
-                                                                   @Header("accept-language") String acceptLanguage,
-                                                                   @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> fetchChannelList(
+            @Path("teamId") String teamId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
 
-        @Headers({"Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchTeamDetails"})
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchTeamDetails" })
         @POST("v3/teams/{teamId}")
-        CompletableFuture<Response<ResponseBody>> fetchTeamDetails(@Path("teamId") String teamId,
-                                                                   @Header("accept-language") String acceptLanguage,
-                                                                   @Header("User-Agent") String userAgent);
+        CompletableFuture<Response<ResponseBody>> fetchTeamDetails(
+            @Path("teamId") String teamId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
     }
 
 }

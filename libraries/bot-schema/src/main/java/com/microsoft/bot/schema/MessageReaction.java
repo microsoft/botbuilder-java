@@ -23,6 +23,7 @@ public class MessageReaction {
 
     /**
      * Performs a deep copy of a MessageReaction.
+     *
      * @param messageReaction The MessageReaction to copy.
      * @return A clone of the MessageReaction.
      */
@@ -31,13 +32,16 @@ public class MessageReaction {
             return null;
         }
 
-        return new MessageReaction() {{
-           setType(messageReaction.getType());
-        }};
+        return new MessageReaction() {
+            {
+                setType(messageReaction.getType());
+            }
+        };
     }
 
     /**
      * Performs a deep copy of a List of MessageReactions.
+     *
      * @param messageReactions The List to clone.
      * @return A clone of the List.
      */
@@ -60,12 +64,12 @@ public class MessageReaction {
 
     /**
      * MessageReaction of a type.
+     *
      * @param withType The type.
      */
     public MessageReaction(String withType) {
         type = withType;
     }
-
 
     /**
      * Get the type value.
