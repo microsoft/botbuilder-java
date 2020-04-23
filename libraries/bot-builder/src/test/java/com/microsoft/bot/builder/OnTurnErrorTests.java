@@ -14,11 +14,13 @@ public class OnTurnErrorTests {
         TestAdapter adapter = new TestAdapter();
         adapter.setOnTurnError(((turnContext, exception) -> {
             if (exception instanceof NotImplementedException) {
-                return turnContext.sendActivity(turnContext.getActivity().createReply(exception.getMessage()))
-                    .thenApply(resourceResponse -> null);
+                return turnContext.sendActivity(
+                    turnContext.getActivity().createReply(exception.getMessage())
+                ).thenApply(resourceResponse -> null);
             } else {
-                return turnContext.sendActivity("Unexpected exception")
-                    .thenApply(resourceResponse -> null);
+                return turnContext.sendActivity("Unexpected exception").thenApply(
+                    resourceResponse -> null
+                );
             }
         }));
 
@@ -27,18 +29,18 @@ public class OnTurnErrorTests {
                 turnContext.sendActivity(turnContext.getActivity().getText());
             }
 
-            if (StringUtils.equals(turnContext.getActivity().getText(), "NotImplementedException")) {
+            if (
+                StringUtils.equals(turnContext.getActivity().getText(), "NotImplementedException")
+            ) {
                 CompletableFuture<Void> result = new CompletableFuture<>();
                 result.completeExceptionally(new NotImplementedException("Test"));
                 return result;
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply("foo", "passthrough")
-            .send("NotImplementedException")
-            .assertReply("Test")
-            .startTest().join();
+        })
+        ).send("foo").assertReply("foo", "passthrough").send("NotImplementedException").assertReply(
+            "Test"
+        ).startTest().join();
     }
 }

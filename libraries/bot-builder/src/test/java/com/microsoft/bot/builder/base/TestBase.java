@@ -40,9 +40,11 @@ public abstract class TestBase {
     public TestName testName = new TestName();
     protected InterceptorManager interceptorManager = null;
     private PrintStream out;
+
     protected TestBase() {
         this(RunCondition.BOTH);
     }
+
     protected TestBase(RunCondition runCondition) {
         this.runCondition = runCondition;
     }
@@ -58,7 +60,9 @@ public abstract class TestBase {
                 throw new IOException("Unknown AZURE_TEST_MODE: " + azureTestMode);
             }
         } else {
-            System.out.print("Environment variable 'AZURE_TEST_MODE' has not been set yet. Using 'PLAYBACK' mode.");
+            System.out.print(
+                "Environment variable 'AZURE_TEST_MODE' has not been set yet. Using 'PLAYBACK' mode."
+            );
             testMode = TestMode.RECORD;
         }
     }
@@ -68,7 +72,9 @@ public abstract class TestBase {
             Properties mavenProps = new Properties();
             InputStream in = TestBase.class.getResourceAsStream("/maven.properties");
             if (in == null) {
-                throw new IOException("The file \"maven.properties\" has not been generated yet. Please execute \"mvn compile\" to generate the file.");
+                throw new IOException(
+                    "The file \"maven.properties\" has not been generated yet. Please execute \"mvn compile\" to generate the file."
+                );
             }
             mavenProps.load(in);
 
@@ -87,12 +93,13 @@ public abstract class TestBase {
     }
 
     public static boolean isPlaybackMode() {
-        if (testMode == null) try {
-            initTestMode();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Can't init test mode.");
-        }
+        if (testMode == null)
+            try {
+                initTestMode();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Can't init test mode.");
+            }
         return testMode == TestMode.PLAYBACK;
     }
 
@@ -114,12 +121,17 @@ public abstract class TestBase {
     }
 
     private String shouldCancelTest(boolean isPlaybackMode) {
-        // Determine whether to run the test based on the condition the test has been configured with
+        // Determine whether to run the test based on the condition the test has been
+        // configured with
         switch (this.runCondition) {
             case MOCK_ONLY:
-                return (!isPlaybackMode) ? "Test configured to run only as mocked, not live." : null;
+                return (!isPlaybackMode)
+                    ? "Test configured to run only as mocked, not live."
+                    : null;
+
             case LIVE_ONLY:
                 return (isPlaybackMode) ? "Test configured to run only as live, not mocked." : null;
+
             default:
                 return null;
         }
@@ -138,36 +150,23 @@ public abstract class TestBase {
 
         if (isPlaybackMode()) {
             credentials = new TokenCredentials(null, ZERO_TOKEN);
-            restClient = buildRestClient(new RestClient.Builder()
-                    .withBaseUrl(hostUri + "/")
-                    .withSerializerAdapter(new JacksonAdapter())
-                    .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
-                    .withCredentials(credentials)
-                    .withLogLevel(LogLevel.NONE)
-                    .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
-                    .withInterceptor(interceptorManager.initInterceptor())
-                , true);
+            restClient = buildRestClient(
+                new RestClient.Builder().withBaseUrl(hostUri + "/").withSerializerAdapter(new JacksonAdapter()).withResponseBuilderFactory(new ServiceResponseBuilder.Factory()).withCredentials(credentials).withLogLevel(LogLevel.NONE).withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS)).withInterceptor(interceptorManager.initInterceptor()), true
+            );
 
             out = System.out;
             System.setOut(new PrintStream(new OutputStream() {
                 public void write(int b) {
-                    //DO NOTHING
+                    // DO NOTHING
                 }
             }));
         } else { // Record mode
             credentials = new MicrosoftAppCredentials(clientId, clientSecret);
-            restClient = buildRestClient(new RestClient.Builder()
-                    .withBaseUrl(hostUri + "/")
-                    .withSerializerAdapter(new JacksonAdapter())
-                    .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
-                    .withCredentials(credentials)
-                    .withLogLevel(LogLevel.NONE)
-                    .withReadTimeout(3, TimeUnit.MINUTES)
-                    .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
-                    .withInterceptor(interceptorManager.initInterceptor())
-                , false);
+            restClient = buildRestClient(
+                new RestClient.Builder().withBaseUrl(hostUri + "/").withSerializerAdapter(new JacksonAdapter()).withResponseBuilderFactory(new ServiceResponseBuilder.Factory()).withCredentials(credentials).withLogLevel(LogLevel.NONE).withReadTimeout(3, TimeUnit.MINUTES).withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS)).withInterceptor(interceptorManager.initInterceptor()), false
+            );
 
-            //interceptorManager.addTextReplacementRule(hostUri, PLAYBACK_URI);
+            // interceptorManager.addTextReplacementRule(hostUri, PLAYBACK_URI);
         }
         initializeClients(restClient, botId, userId);
     }
@@ -189,7 +188,11 @@ public abstract class TestBase {
         return builder.build();
     }
 
-    protected abstract void initializeClients(RestClient restClient, String botId, String userId) throws IOException;
+    protected abstract void initializeClients(
+        RestClient restClient,
+        String botId,
+        String userId
+    ) throws IOException;
 
     protected abstract void cleanUpResources();
 

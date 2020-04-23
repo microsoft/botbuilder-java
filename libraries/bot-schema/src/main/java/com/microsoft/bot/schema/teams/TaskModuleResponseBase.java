@@ -13,8 +13,9 @@ public class TaskModuleResponseBase {
     private String type;
 
     /**
-     * Gets choice of action options when responding to the
-     * task/submit message. Possible values include: 'message', 'continue'
+     * Gets choice of action options when responding to the task/submit message.
+     * Possible values include: 'message', 'continue'
+     * 
      * @return The response type.
      */
     public String getType() {
@@ -22,8 +23,9 @@ public class TaskModuleResponseBase {
     }
 
     /**
-     * Sets choice of action options when responding to the
-     * task/submit message. Possible values include: 'message', 'continue'
+     * Sets choice of action options when responding to the task/submit message.
+     * Possible values include: 'message', 'continue'
+     * 
      * @param withType The response type.
      */
     public void setType(String withType) {

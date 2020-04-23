@@ -23,18 +23,26 @@ import java.util.concurrent.ExecutorService;
 /**
  * This provides the default dependency creation for a Bot application.
  *
- * <p>This class should be subclassed by a class with the {@link org.springframework.context.annotation.Configuration}
- * annotation (or SpringBootApplication annotation).</p>
+ * <p>
+ * This class should be subclassed by a class with the
+ * {@link org.springframework.context.annotation.Configuration} annotation (or
+ * SpringBootApplication annotation).
+ * </p>
  *
- * <p>The Bot should be annotated with @Component, possibly including @AutoWired to indicate which
- * constructor to use.</p>
+ * <p>
+ * The Bot should be annotated with @Component, possibly including @AutoWired to
+ * indicate which constructor to use.
+ * </p>
  */
 public abstract class BotDependencyConfiguration {
     /**
      * Returns an ExecutorService.
      *
-     * <p>For now, return the bot-connector ExecutorService.  This is an area of consideration.  The
-     * goal here is to have a common ExecutorService to avoid multiple thread pools.</p>
+     * <p>
+     * For now, return the bot-connector ExecutorService. This is an area of
+     * consideration. The goal here is to have a common ExecutorService to avoid
+     * multiple thread pools.
+     * </p>
      *
      * @return An ExecutorService.
      */
@@ -75,8 +83,8 @@ public abstract class BotDependencyConfiguration {
     /**
      * Returns the ChannelProvider for the application.
      *
-     * By default, it uses the {@link ConfigurationChannelProvider} class.
-     * Default scope of Singleton.
+     * By default, it uses the {@link ConfigurationChannelProvider} class. Default
+     * scope of Singleton.
      *
      * @param configuration The Configuration object to read from.
      * @return A ChannelProvider object.
@@ -91,8 +99,8 @@ public abstract class BotDependencyConfiguration {
     /**
      * Returns the BotFrameworkHttpAdapter for the application.
      *
-     * By default, it uses the {@link BotFrameworkHttpAdapter} class.
-     * Default scope of Singleton.
+     * By default, it uses the {@link BotFrameworkHttpAdapter} class. Default scope
+     * of Singleton.
      *
      * @param configuration The Configuration object to read from.
      * @return A BotFrameworkHttpAdapter object.
@@ -105,8 +113,7 @@ public abstract class BotDependencyConfiguration {
     }
 
     /**
-     * Returns a {@link Storage} object.
-     * Default scope of Singleton.
+     * Returns a {@link Storage} object. Default scope of Singleton.
      *
      * @return A Storage object.
      */
@@ -116,8 +123,7 @@ public abstract class BotDependencyConfiguration {
     }
 
     /**
-     * Returns a ConversationState object.
-     * Default scope of Singleton.
+     * Returns a ConversationState object. Default scope of Singleton.
      *
      * @param storage The Storage object to use.
      * @return A ConversationState object.
@@ -128,8 +134,7 @@ public abstract class BotDependencyConfiguration {
     }
 
     /**
-     * Returns a UserState object.
-     * Default scope of Singleton.
+     * Returns a UserState object. Default scope of Singleton.
      *
      * @param storage The Storage object to use.
      * @return A UserState object.
@@ -140,10 +145,12 @@ public abstract class BotDependencyConfiguration {
     }
 
     /**
-     * Creates an InspectionState used by {@link com.microsoft.bot.builder.inspection.InspectionMiddleware}.
-     * Default scope of Singleton.
+     * Creates an InspectionState used by
+     * {@link com.microsoft.bot.builder.inspection.InspectionMiddleware}. Default
+     * scope of Singleton.
      *
-     * @param storage The Storage to use. {@link BotDependencyConfiguration#getStorage()}
+     * @param storage The Storage to use.
+     *                {@link BotDependencyConfiguration#getStorage()}
      * @return An InspectionState object that uses the specified storage.
      */
     @Bean

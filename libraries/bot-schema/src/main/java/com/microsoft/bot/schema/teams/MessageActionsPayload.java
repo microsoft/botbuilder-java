@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Represents the individual message within a chat or channel where a
- * message actions is taken.
+ * Represents the individual message within a chat or channel where a message
+ * actions is taken.
  */
 public class MessageActionsPayload {
     @JsonProperty(value = "id")
@@ -66,6 +66,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets unique id of the message.
+     * 
      * @return The unique id.
      */
     public String getId() {
@@ -74,6 +75,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets unique id of the message.
+     * 
      * @param withId The new id of the message.
      */
     public void setId(String withId) {
@@ -82,6 +84,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets id of the parent/root message of the thread.
+     * 
      * @return The id of the parent/root message.
      */
     public String getReplyToId() {
@@ -90,6 +93,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets id of the parent/root message of the thread.
+     * 
      * @param withReplyToId The id of the parent/root message.
      */
     public void setReplyToId(String withReplyToId) {
@@ -98,6 +102,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets type of message - automatically set to message.
+     * 
      * @return Possible values include: 'message'
      */
     public String getMessageType() {
@@ -106,6 +111,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets type of message.
+     * 
      * @param withMessageType Possible values include: 'message'
      */
     public void setMessageType(String withMessageType) {
@@ -114,6 +120,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets timestamp of when the message was created.
+     * 
      * @return The timestamp of the message.
      */
     public String getCreatedDateTime() {
@@ -122,6 +129,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets timestamp of when the message was created.
+     * 
      * @param withCreatedDateTime The message timestamp.
      */
     public void setCreatedDateTime(String withCreatedDateTime) {
@@ -130,6 +138,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets timestamp of when the message was edited or updated.
+     * 
      * @return The timestamp of the message.
      */
     public String getLastModifiedDateTime() {
@@ -138,6 +147,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets timestamp of when the message was edited or updated.
+     * 
      * @param withLastModifiedDateTime The message timestamp.
      */
     public void setLastModifiedDateTime(String withLastModifiedDateTime) {
@@ -146,6 +156,7 @@ public class MessageActionsPayload {
 
     /**
      * Indicates whether a message has been soft deleted.
+     * 
      * @return True if deleted.
      */
     public Boolean getDeleted() {
@@ -154,6 +165,7 @@ public class MessageActionsPayload {
 
     /**
      * Indicates whether a message has been soft deleted.
+     * 
      * @param withDeleted True if deleted.
      */
     public void setDeleted(Boolean withDeleted) {
@@ -162,6 +174,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets subject line of the message.
+     * 
      * @return The message subject line.
      */
     public String getSubject() {
@@ -170,6 +183,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets subject line of the message.
+     * 
      * @param withSubject The message subject line.
      */
     public void setSubject(String withSubject) {
@@ -178,6 +192,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets summary text of the message that could be used for notifications.
+     * 
      * @return The summary text.
      */
     public String getSummary() {
@@ -186,7 +201,8 @@ public class MessageActionsPayload {
 
     /**
      * Sets summary text of the message that could be used for notifications.
-     * @param withSummary  The summary text.
+     * 
+     * @param withSummary The summary text.
      */
     public void setSummary(String withSummary) {
         summary = withSummary;
@@ -194,6 +210,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets the importance of the message.
+     * 
      * @return Possible values include: 'normal', 'high', 'urgent'
      */
     public String getImportance() {
@@ -202,7 +219,8 @@ public class MessageActionsPayload {
 
     /**
      * Sets the importance of the message.
-     * @param withImportance  Possible values include: 'normal', 'high', 'urgent'
+     * 
+     * @param withImportance Possible values include: 'normal', 'high', 'urgent'
      */
     public void setImportance(String withImportance) {
         importance = withImportance;
@@ -210,6 +228,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets locale of the message set by the client.
+     * 
      * @return The message locale.
      */
     public String getLocale() {
@@ -218,6 +237,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets locale of the message set by the client.
+     * 
      * @param withLocale The message locale.
      */
     public void setLocale(String withLocale) {
@@ -226,6 +246,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets sender of the message.
+     * 
      * @return The message sender.
      */
     public MessageActionsPayloadFrom getFrom() {
@@ -234,6 +255,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets sender of the message.
+     * 
      * @param withFrom The message sender.
      */
     public void setFrom(MessageActionsPayloadFrom withFrom) {
@@ -242,6 +264,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets plaintext/HTML representation of the content of the message.
+     * 
      * @return The message body.
      */
     public MessageActionsPayloadBody getBody() {
@@ -250,6 +273,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets plaintext/HTML representation of the content of the message.
+     * 
      * @param withBody The message body.
      */
     public void setBody(MessageActionsPayloadBody withBody) {
@@ -258,6 +282,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets how the attachment(s) are displayed in the message.
+     * 
      * @return The attachment layout.
      */
     public String getAttachmentLayout() {
@@ -266,6 +291,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets how the attachment(s) are displayed in the message.
+     * 
      * @param withAttachmentLayout The attachment layout.
      */
     public void setAttachmentLayout(String withAttachmentLayout) {
@@ -274,6 +300,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets attachments in the message - card, image, file, etc.
+     * 
      * @return The message attachments.
      */
     public List<MessageActionsPayloadAttachment> getAttachments() {
@@ -282,6 +309,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets attachments in the message - card, image, file, etc.
+     * 
      * @param withAttachments The message attachments.
      */
     public void setAttachments(List<MessageActionsPayloadAttachment> withAttachments) {
@@ -290,6 +318,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets list of entities mentioned in the message.
+     * 
      * @return The list of mentions.
      */
     public List<MessageActionsPayloadMention> getMentions() {
@@ -298,6 +327,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets list of entities mentioned in the message.
+     * 
      * @param withMentions The list of mentions.
      */
     public void setMentions(List<MessageActionsPayloadMention> withMentions) {
@@ -306,6 +336,7 @@ public class MessageActionsPayload {
 
     /**
      * Gets reactions for the message.
+     * 
      * @return Message reactions.
      */
     public List<MessageActionsPayloadReaction> getReactions() {
@@ -314,6 +345,7 @@ public class MessageActionsPayload {
 
     /**
      * Sets reactions for the message.
+     * 
      * @param withReactions Message reactions.
      */
     public void setReactions(List<MessageActionsPayloadReaction> withReactions) {

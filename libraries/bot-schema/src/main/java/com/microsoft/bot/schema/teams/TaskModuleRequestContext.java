@@ -14,6 +14,7 @@ public class TaskModuleRequestContext {
 
     /**
      * Gets the theme value.
+     * 
      * @return The theme.
      */
     public String getTheme() {
@@ -22,6 +23,7 @@ public class TaskModuleRequestContext {
 
     /**
      * Sets the theme value.
+     * 
      * @param withTheme The theme.
      */
     public void setTheme(String withTheme) {

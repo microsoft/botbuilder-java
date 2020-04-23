@@ -35,6 +35,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Return the top scoring intent and its score.
+     * 
      * @return The top scoring intent and score.
      */
     @JsonIgnore
@@ -56,6 +57,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Gets the input text to recognize.
+     * 
      * @return The original text.
      */
     public String getText() {
@@ -64,6 +66,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Sets the input text to recognize.
+     * 
      * @param withText The text to recognize.
      */
     public void setText(String withText) {
@@ -71,7 +74,9 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Gets the input text as modified by the recognizer, for example for spelling correction.
+     * Gets the input text as modified by the recognizer, for example for spelling
+     * correction.
+     * 
      * @return Text modified by recognizer.
      */
     public String getAlteredText() {
@@ -79,7 +84,9 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Sets the input text as modified by the recognizer, for example for spelling correction.
+     * Sets the input text as modified by the recognizer, for example for spelling
+     * correction.
+     * 
      * @param withAlteredText Text modified by recognizer.
      */
     public void setAlteredText(String withAlteredText) {
@@ -87,7 +94,9 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Gets the recognized intents, with the intent as key and the confidence as value.
+     * Gets the recognized intents, with the intent as key and the confidence as
+     * value.
+     * 
      * @return Mapping from intent to information about the intent.
      */
     public Map<String, IntentScore> getIntents() {
@@ -95,7 +104,9 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Sets the recognized intents, with the intent as key and the confidence as value.
+     * Sets the recognized intents, with the intent as key and the confidence as
+     * value.
+     * 
      * @param withIntents Mapping from intent to information about the intent.
      */
     public void setIntents(Map<String, IntentScore> withIntents) {
@@ -104,6 +115,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Gets the recognized top-level entities.
+     * 
      * @return Object with each top-level recognized entity as a key.
      */
     public JsonNode getEntities() {
@@ -112,6 +124,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Sets the recognized top-level entities.
+     * 
      * @param withEntities Object with each top-level recognized entity as a key.
      */
     public void setEntities(JsonNode withEntities) {
@@ -119,8 +132,9 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Gets properties that are not otherwise defined by the RecognizerResult type but that
-     * might appear in the REST JSON object.
+     * Gets properties that are not otherwise defined by the RecognizerResult type
+     * but that might appear in the REST JSON object.
+     * 
      * @return The extended properties for the object.
      */
     @JsonAnyGetter
@@ -129,14 +143,17 @@ public class RecognizerResult implements RecognizerConvert {
     }
 
     /**
-     * Sets properties that are not otherwise defined by the RecognizerResult type but that
-     * might appear in the REST JSON object.
+     * Sets properties that are not otherwise defined by the RecognizerResult type
+     * but that might appear in the REST JSON object.
      *
-     * <p>With this, properties not represented in the defined type are not dropped when
-     * the JSON object is deserialized, but are instead stored in this property. Such properties
-     * will be written to a JSON object when the instance is serialized.</p>
+     * <p>
+     * With this, properties not represented in the defined type are not dropped
+     * when the JSON object is deserialized, but are instead stored in this
+     * property. Such properties will be written to a JSON object when the instance
+     * is serialized.
+     * </p>
      *
-     * @param key The property key.
+     * @param key   The property key.
      * @param value The property value.
      */
     @JsonAnySetter
@@ -146,6 +163,7 @@ public class RecognizerResult implements RecognizerConvert {
 
     /**
      * Convert recognizer result.
+     * 
      * @param result Result to convert.
      */
     @Override

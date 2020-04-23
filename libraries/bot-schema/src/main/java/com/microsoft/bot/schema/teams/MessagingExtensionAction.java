@@ -31,6 +31,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Gets id of the command assigned by Bot.
+     * 
      * @return The command id.
      */
     public String getCommandId() {
@@ -39,6 +40,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Sets id of the command assigned by Bot.
+     * 
      * @param withCommandId The command id.
      */
     public void setCommandId(String withCommandId) {
@@ -46,8 +48,9 @@ public class MessagingExtensionAction extends TaskModuleRequest {
     }
 
     /**
-     * Gets the context from which the command originates.
-     * Possible values include: 'message', 'compose', 'commandbox'
+     * Gets the context from which the command originates. Possible values include:
+     * 'message', 'compose', 'commandbox'
+     * 
      * @return The command context.
      */
     public String getCommandContext() {
@@ -55,8 +58,9 @@ public class MessagingExtensionAction extends TaskModuleRequest {
     }
 
     /**
-     * Sets the context from which the command originates.
-     * Possible values include: 'message', 'compose', 'commandbox'
+     * Sets the context from which the command originates. Possible values include:
+     * 'message', 'compose', 'commandbox'
+     * 
      * @param withCommandContext The command context.
      */
     public void setCommandContext(String withCommandContext) {
@@ -64,8 +68,9 @@ public class MessagingExtensionAction extends TaskModuleRequest {
     }
 
     /**
-     * Gets bot message preview action taken by user. Possible
-     * values include: 'edit', 'send'
+     * Gets bot message preview action taken by user. Possible values include:
+     * 'edit', 'send'
+     * 
      * @return The preview action.
      */
     public String getBotMessagePreviewAction() {
@@ -73,8 +78,9 @@ public class MessagingExtensionAction extends TaskModuleRequest {
     }
 
     /**
-     * Sets bot message preview action taken by user. Possible
-     * values include: 'edit', 'send'
+     * Sets bot message preview action taken by user. Possible values include:
+     * 'edit', 'send'
+     * 
      * @param withBotMessagePreviewAction The preview action.
      */
     public void setBotMessagePreviewAction(String withBotMessagePreviewAction) {
@@ -83,6 +89,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Gets the list of preview Activities.
+     * 
      * @return The preview activities.
      */
     public List<Activity> getBotActivityPreview() {
@@ -91,6 +98,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Sets the list of preview Activities.
+     * 
      * @param withBotActivityPreview The preview activities.
      */
     public void setBotActivityPreview(List<Activity> withBotActivityPreview) {
@@ -99,6 +107,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Gets message content sent as part of the command request.
+     * 
      * @return The message payload.
      */
     public MessageActionsPayload getMessagePayload() {
@@ -107,6 +116,7 @@ public class MessagingExtensionAction extends TaskModuleRequest {
 
     /**
      * Sets message content sent as part of the command request.
+     * 
      * @param withMessagePayload The message payload.
      */
     public void setMessagePayload(MessageActionsPayload withMessagePayload) {

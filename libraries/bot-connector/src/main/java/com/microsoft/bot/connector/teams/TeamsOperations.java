@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public interface TeamsOperations {
     /**
      * Fetches channel list for a given team.
+     * 
      * @param teamId The team id.
      * @return A ConversationList object.
      */
@@ -28,6 +29,7 @@ public interface TeamsOperations {
 
     /**
      * Fetches details related to a team.
+     * 
      * @param teamId The team id.
      * @return The TeamDetails
      */

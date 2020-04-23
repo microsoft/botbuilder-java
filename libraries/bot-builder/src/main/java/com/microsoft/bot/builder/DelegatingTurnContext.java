@@ -22,6 +22,7 @@ public class DelegatingTurnContext implements TurnContext {
 
     /**
      * Initializes a new instance of the DelegatingTurnContext class.
+     * 
      * @param withTurnContext The TurnContext to wrap.
      */
     public DelegatingTurnContext(TurnContext withTurnContext) {
@@ -30,6 +31,7 @@ public class DelegatingTurnContext implements TurnContext {
 
     /**
      * Gets the inner context's activity.
+     * 
      * @return The inner {@link TurnContext#getAdapter()}.
      */
     @Override
@@ -39,6 +41,7 @@ public class DelegatingTurnContext implements TurnContext {
 
     /**
      * Gets the inner context's activity.
+     * 
      * @return The inner {@link TurnContext#getTurnState()}.
      */
     @Override
@@ -48,6 +51,7 @@ public class DelegatingTurnContext implements TurnContext {
 
     /**
      * Gets the inner context's activity.
+     * 
      * @return The inner {@link TurnContext#getActivity()}.
      */
     @Override
@@ -57,6 +61,7 @@ public class DelegatingTurnContext implements TurnContext {
 
     /**
      * Gets the inner context's responded value.
+     * 
      * @return The inner {@link TurnContext#getResponded()}.
      */
     @Override
@@ -78,9 +83,11 @@ public class DelegatingTurnContext implements TurnContext {
 
     @SuppressWarnings("checkstyle:DesignForExtension")
     @Override
-    public CompletableFuture<ResourceResponse> sendActivity(String textReplyToSend,
-                                                            String speak,
-                                                            InputHints inputHint) {
+    public CompletableFuture<ResourceResponse> sendActivity(
+        String textReplyToSend,
+        String speak,
+        InputHints inputHint
+    ) {
         return innerTurnContext.sendActivity(textReplyToSend, speak, inputHint);
     }
 

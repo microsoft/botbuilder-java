@@ -24,7 +24,8 @@ public final class UserAgent {
             String buildVersion = properties.getProperty("version");
             String osVersion = System.getProperty("os.name");
             String javaVersion = System.getProperty("java.version");
-            osJavaBotbuilderCache = String.format("BotBuilder/%s (JVM %s; %s)", buildVersion, javaVersion, osVersion);
+            osJavaBotbuilderCache =
+                String.format("BotBuilder/%s (JVM %s; %s)", buildVersion, javaVersion, osVersion);
 
             LoggerFactory.getLogger(UserAgent.class).info("UserAgent: {}", osJavaBotbuilderCache);
         });
@@ -39,6 +40,7 @@ public final class UserAgent {
 
     /**
      * Retrieve the user agent string for BotBuilder.
+     * 
      * @return THe user agent string.
      */
     public static String value() {

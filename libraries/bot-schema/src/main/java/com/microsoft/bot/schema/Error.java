@@ -24,6 +24,7 @@ public class Error {
 
     /**
      * Get the code value.
+     * 
      * @return the code value
      */
     public String getCode() {
@@ -32,6 +33,7 @@ public class Error {
 
     /**
      * Set the code value.
+     * 
      * @param withCode the code value to set
      */
     public void setCode(String withCode) {
@@ -40,6 +42,7 @@ public class Error {
 
     /**
      * Get the message value.
+     * 
      * @return the message value
      */
     public String getMessage() {
@@ -48,6 +51,7 @@ public class Error {
 
     /**
      * Set the message value.
+     * 
      * @param withMessage the message value to set
      */
     public void setMessage(String withMessage) {
@@ -56,6 +60,7 @@ public class Error {
 
     /**
      * Gets error from inner http call.
+     * 
      * @return The InnerHttpError.
      */
     public InnerHttpError getInnerHttpError() {
@@ -64,6 +69,7 @@ public class Error {
 
     /**
      * Sets error from inner http call.
+     * 
      * @param withInnerHttpError The InnerHttpError.
      */
     public void setInnerHttpError(InnerHttpError withInnerHttpError) {

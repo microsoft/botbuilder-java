@@ -12,13 +12,13 @@ import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An instance of this class provides access to all the operations defined
- * in Attachments.
+ * An instance of this class provides access to all the operations defined in
+ * Attachments.
  */
 public interface Attachments {
     /**
-     * GetAttachmentInfo.
-     * Get AttachmentInfo structure describing the attachment views.
+     * GetAttachmentInfo. Get AttachmentInfo structure describing the attachment
+     * views.
      *
      * @param attachmentId attachment id
      * @return the observable to the AttachmentInfo object
@@ -27,8 +27,7 @@ public interface Attachments {
     CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId);
 
     /**
-     * GetAttachment.
-     * Get the named view as binary content.
+     * GetAttachment. Get the named view as binary content.
      *
      * @param attachmentId attachment id
      * @param viewId       View id from attachmentInfo

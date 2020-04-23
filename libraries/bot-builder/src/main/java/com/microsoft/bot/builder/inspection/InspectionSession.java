@@ -19,30 +19,41 @@ public class InspectionSession {
     private Logger logger;
     private ConnectorClient connectorClient;
 
-    public InspectionSession(ConversationReference withConversationReference, MicrosoftAppCredentials withCredentials) {
+    public InspectionSession(
+        ConversationReference withConversationReference,
+        MicrosoftAppCredentials withCredentials
+    ) {
         this(withConversationReference, withCredentials, null);
     }
 
-    public InspectionSession(ConversationReference withConversationReference,
-                             MicrosoftAppCredentials withCredentials,
-                             Logger withLogger) {
+    public InspectionSession(
+        ConversationReference withConversationReference,
+        MicrosoftAppCredentials withCredentials,
+        Logger withLogger
+    ) {
         conversationReference = withConversationReference;
         logger = withLogger != null ? withLogger : LoggerFactory.getLogger(InspectionSession.class);
-        connectorClient = new RestConnectorClient(conversationReference.getServiceUrl(), withCredentials);
+        connectorClient = new RestConnectorClient(
+            conversationReference.getServiceUrl(),
+            withCredentials
+        );
     }
 
     public CompletableFuture<Boolean> send(Activity activity) {
         return connectorClient.getConversations().sendToConversation(
-            activity.applyConversationReference(conversationReference))
+            activity.applyConversationReference(conversationReference)
+        )
 
             .handle((result, exception) -> {
                 if (exception == null) {
                     return true;
                 }
 
-                logger.warn("Exception '{}' while attempting to call Emulator for inspection, check it is running, "
+                logger.warn(
+                    "Exception '{}' while attempting to call Emulator for inspection, check it is running, "
                         + "and you have correct credentials in the Emulator and the InspectionMiddleware.",
-                    exception.getMessage());
+                    exception.getMessage()
+                );
 
                 return false;
             });

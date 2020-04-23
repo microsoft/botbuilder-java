@@ -18,7 +18,8 @@ public class ErrorResponseException extends RestException {
     /**
      * Initializes a new instance of the ErrorResponseException class.
      *
-     * @param message the exception message or the response content if a message is not available
+     * @param message  the exception message or the response content if a message is
+     *                 not available
      * @param response the HTTP response
      */
     public ErrorResponseException(final String message, final Response<ResponseBody> response) {
@@ -28,18 +29,22 @@ public class ErrorResponseException extends RestException {
     /**
      * Initializes a new instance of the ErrorResponseException class.
      *
-     * @param message the exception message or the response content if a message is not available
+     * @param message  the exception message or the response content if a message is
+     *                 not available
      * @param response the HTTP response
-     * @param body the deserialized response body
+     * @param body     the deserialized response body
      */
-    public ErrorResponseException(final String message,
-                                  final Response<ResponseBody> response,
-                                  final ErrorResponse body) {
+    public ErrorResponseException(
+        final String message,
+        final Response<ResponseBody> response,
+        final ErrorResponse body
+    ) {
         super(message, response, body);
     }
 
     /**
      * The HTTP response body.
+     * 
      * @return the HTTP response body
      */
     @Override

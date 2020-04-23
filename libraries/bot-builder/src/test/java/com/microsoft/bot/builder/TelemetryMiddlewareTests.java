@@ -34,37 +34,35 @@ public class TelemetryMiddlewareTests {
         Assert.assertNotNull(logger.getTelemetryClient());
     }
 
-
     @Test
     public void Telemetry_LogActivities() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new TelemetryLoggerMiddleware(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new TelemetryLoggerMiddleware(mockTelemetryClient, true)
+        );
 
-        String[] conversationId = new String[]{null};
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
-            turnContext.sendActivity(new Activity() {{
-                setType(ActivityTypes.TYPING);
-                setRelatesTo(turnContext.getActivity().getRelatesTo());
-            }}).join();
+            turnContext.sendActivity(new Activity() {
+                {
+                    setType(ActivityTypes.TYPING);
+                    setRelatesTo(turnContext.getActivity().getRelatesTo());
+                }
+            }).join();
             turnContext.sendActivity("echo:" + turnContext.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:foo")
-            .send("bar")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:bar")
-            .startTest().join();
+        })).send("foo").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:foo").send("bar").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:bar").startTest().join();
 
         // verify BotTelemetryClient was invoked 6 times, and capture arguments.
-        verify(mockTelemetryClient, times(6)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(6)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -112,33 +110,32 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Telemetry_NoPII() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new TelemetryLoggerMiddleware(mockTelemetryClient, false));
+        TestAdapter adapter = new TestAdapter().use(
+            new TelemetryLoggerMiddleware(mockTelemetryClient, false)
+        );
 
-        String[] conversationId = new String[]{null};
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
-            turnContext.sendActivity(new Activity() {{
-                setType(ActivityTypes.TYPING);
-                setRelatesTo(turnContext.getActivity().getRelatesTo());
-            }}).join();
+            turnContext.sendActivity(new Activity() {
+                {
+                    setType(ActivityTypes.TYPING);
+                    setRelatesTo(turnContext.getActivity().getRelatesTo());
+                }
+            }).join();
             turnContext.sendActivity("echo:" + turnContext.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:foo")
-            .send("bar")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:bar")
-            .startTest().join();
+        })).send("foo").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:foo").send("bar").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:bar").startTest().join();
 
         // verify BotTelemetryClient was invoked 6 times, and capture arguments.
-        verify(mockTelemetryClient, times(6)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(6)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -183,11 +180,12 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Transcript_LogUpdateActivities() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new TelemetryLoggerMiddleware(mockTelemetryClient, true));
-        Activity[] activityToUpdate = new Activity[]{null};
+        TestAdapter adapter = new TestAdapter().use(
+            new TelemetryLoggerMiddleware(mockTelemetryClient, true)
+        );
+        Activity[] activityToUpdate = new Activity[] { null };
 
-        String[] conversationId = new String[]{null};
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
 
@@ -202,14 +200,13 @@ public class TelemetryMiddlewareTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .send("update")
-            .assertReply("new response")
-            .startTest().join();
+        })).send("foo").send("update").assertReply("new response").startTest().join();
 
         // verify BotTelemetryClient was invoked 4 times, and capture arguments.
-        verify(mockTelemetryClient, times(4)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(4)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -226,11 +223,12 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Transcript_LogDeleteActivities() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new TelemetryLoggerMiddleware(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new TelemetryLoggerMiddleware(mockTelemetryClient, true)
+        );
 
-        String[] activityId = new String[]{null};
-        String[] conversationId = new String[]{null};
+        String[] activityId = new String[] { null };
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
 
@@ -243,14 +241,13 @@ public class TelemetryMiddlewareTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply("response")
-            .send("deleteIt")
-            .startTest().join();
+        })).send("foo").assertReply("response").send("deleteIt").startTest().join();
 
         // verify BotTelemetryClient was invoked 4 times, and capture arguments.
-        verify(mockTelemetryClient, times(4)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(4)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -264,33 +261,32 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Telemetry_OverrideReceive() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new OverrideReceiveLogger(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new OverrideReceiveLogger(mockTelemetryClient, true)
+        );
 
-        String[] conversationId = new String[]{null};
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
-            turnContext.sendActivity(new Activity() {{
-                setType(ActivityTypes.TYPING);
-                setRelatesTo(turnContext.getActivity().getRelatesTo());
-            }}).join();
+            turnContext.sendActivity(new Activity() {
+                {
+                    setType(ActivityTypes.TYPING);
+                    setRelatesTo(turnContext.getActivity().getRelatesTo());
+                }
+            }).join();
             turnContext.sendActivity("echo:" + turnContext.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:foo")
-            .send("bar")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:bar")
-            .startTest().join();
+        })).send("foo").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:foo").send("bar").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:bar").startTest().join();
 
         // verify BotTelemetryClient was invoked 8 times, and capture arguments.
-        verify(mockTelemetryClient, times(8)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(8)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -299,7 +295,9 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(0).containsKey("foo"));
         Assert.assertTrue(StringUtils.equals(properties.get(0).get("foo"), "bar"));
         Assert.assertTrue(properties.get(0).containsKey("ImportantProperty"));
-        Assert.assertTrue(StringUtils.equals(properties.get(0).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(0).get("ImportantProperty"), "ImportantValue")
+        );
 
         Assert.assertEquals("MyReceive", eventNames.get(1));
         Assert.assertEquals(7, properties.get(1).size());
@@ -334,33 +332,32 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Telemetry_OverrideSend() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new OverrideSendLogger(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new OverrideSendLogger(mockTelemetryClient, true)
+        );
 
-        String[] conversationId = new String[]{null};
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
-            turnContext.sendActivity(new Activity() {{
-                setType(ActivityTypes.TYPING);
-                setRelatesTo(turnContext.getActivity().getRelatesTo());
-            }}).join();
+            turnContext.sendActivity(new Activity() {
+                {
+                    setType(ActivityTypes.TYPING);
+                    setRelatesTo(turnContext.getActivity().getRelatesTo());
+                }
+            }).join();
             turnContext.sendActivity("echo:" + turnContext.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:foo")
-            .send("bar")
-            .assertReply(activity -> {
-                Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
-            })
-            .assertReply("echo:bar")
-            .startTest().join();
+        })).send("foo").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:foo").send("bar").assertReply(activity -> {
+            Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+        }).assertReply("echo:bar").startTest().join();
 
         // verify BotTelemetryClient was invoked 10 times, and capture arguments.
-        verify(mockTelemetryClient, times(10)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(10)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -380,7 +377,9 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(1).containsKey("foo"));
         Assert.assertTrue(StringUtils.equals(properties.get(1).get("foo"), "bar"));
         Assert.assertTrue(properties.get(1).containsKey("ImportantProperty"));
-        Assert.assertTrue(StringUtils.equals(properties.get(1).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(1).get("ImportantProperty"), "ImportantValue")
+        );
 
         Assert.assertEquals("MySend", eventNames.get(2));
         Assert.assertEquals(5, properties.get(2).size());
@@ -394,11 +393,12 @@ public class TelemetryMiddlewareTests {
     @Test
     public void Telemetry_OverrideUpdateDeleteActivities() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new OverrideUpdateDeleteLogger(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new OverrideUpdateDeleteLogger(mockTelemetryClient, true)
+        );
 
-        Activity[] activityToUpdate = new Activity[]{null};
-        String[] conversationId = new String[]{null};
+        Activity[] activityToUpdate = new Activity[] { null };
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
 
@@ -415,14 +415,13 @@ public class TelemetryMiddlewareTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .send("update")
-            .assertReply("new response")
-            .startTest().join();
+        })).send("foo").send("update").assertReply("new response").startTest().join();
 
         // verify BotTelemetryClient was invoked 5 times, and capture arguments.
-        verify(mockTelemetryClient, times(5)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(5)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -431,24 +430,29 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(3).containsKey("foo"));
         Assert.assertTrue(StringUtils.equals(properties.get(3).get("foo"), "bar"));
         Assert.assertTrue(properties.get(3).containsKey("ImportantProperty"));
-        Assert.assertTrue(StringUtils.equals(properties.get(3).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(3).get("ImportantProperty"), "ImportantValue")
+        );
 
         Assert.assertEquals(TelemetryLoggerConstants.BOTMSGDELETEEVENT, eventNames.get(4));
         Assert.assertEquals(2, properties.get(4).size());
         Assert.assertTrue(properties.get(4).containsKey("foo"));
         Assert.assertTrue(StringUtils.equals(properties.get(4).get("foo"), "bar"));
         Assert.assertTrue(properties.get(4).containsKey("ImportantProperty"));
-        Assert.assertTrue(StringUtils.equals(properties.get(4).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(4).get("ImportantProperty"), "ImportantValue")
+        );
     }
 
     @Test
     public void Telemetry_AdditionalProps() {
         BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
-        TestAdapter adapter = new TestAdapter()
-            .use(new OverrideFillLogger(mockTelemetryClient, true));
+        TestAdapter adapter = new TestAdapter().use(
+            new OverrideFillLogger(mockTelemetryClient, true)
+        );
 
-        Activity[] activityToUpdate = new Activity[]{null};
-        String[] conversationId = new String[]{null};
+        Activity[] activityToUpdate = new Activity[] { null };
+        String[] conversationId = new String[] { null };
         new TestFlow(adapter, (turnContext -> {
             conversationId[0] = turnContext.getActivity().getConversation().getId();
 
@@ -465,14 +469,13 @@ public class TelemetryMiddlewareTests {
             }
 
             return CompletableFuture.completedFuture(null);
-        }))
-            .send("foo")
-            .send("update")
-            .assertReply("new response")
-            .startTest().join();
+        })).send("foo").send("update").assertReply("new response").startTest().join();
 
         // verify BotTelemetryClient was invoked 5 times, and capture arguments.
-        verify(mockTelemetryClient, times(5)).trackEvent(eventNameCaptor.capture(), propertiesCaptor.capture());
+        verify(mockTelemetryClient, times(5)).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
         List<String> eventNames = eventNameCaptor.getAllValues();
         List<Map<String, String>> properties = propertiesCaptor.getAllValues();
 
@@ -498,7 +501,9 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(1).containsKey("text"));
         Assert.assertTrue(StringUtils.equals(properties.get(1).get("text"), "response"));
         Assert.assertTrue(StringUtils.equals(properties.get(1).get("foo"), "bar"));
-        Assert.assertTrue(StringUtils.equals(properties.get(1).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(1).get("ImportantProperty"), "ImportantValue")
+        );
 
         Assert.assertEquals(TelemetryLoggerConstants.BOTMSGUPDATEEVENT, eventNames.get(3));
         Assert.assertEquals(7, properties.get(3).size());
@@ -509,7 +514,9 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(3).containsKey("text"));
         Assert.assertTrue(StringUtils.equals(properties.get(3).get("text"), "new response"));
         Assert.assertTrue(StringUtils.equals(properties.get(3).get("foo"), "bar"));
-        Assert.assertTrue(StringUtils.equals(properties.get(3).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(3).get("ImportantProperty"), "ImportantValue")
+        );
 
         Assert.assertEquals(TelemetryLoggerConstants.BOTMSGDELETEEVENT, eventNames.get(4));
         Assert.assertEquals(5, properties.get(4).size());
@@ -518,64 +525,85 @@ public class TelemetryMiddlewareTests {
         Assert.assertTrue(properties.get(4).containsKey("conversationId"));
         Assert.assertTrue(properties.get(4).containsKey("foo"));
         Assert.assertTrue(StringUtils.equals(properties.get(4).get("foo"), "bar"));
-        Assert.assertTrue(StringUtils.equals(properties.get(4).get("ImportantProperty"), "ImportantValue"));
+        Assert.assertTrue(
+            StringUtils.equals(properties.get(4).get("ImportantProperty"), "ImportantValue")
+        );
     }
 
     private static class OverrideReceiveLogger extends TelemetryLoggerMiddleware {
-        public OverrideReceiveLogger(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
+        public OverrideReceiveLogger(
+            BotTelemetryClient withTelemetryClient,
+            boolean withLogPersonalInformation
+        ) {
             super(withTelemetryClient, withLogPersonalInformation);
         }
 
         @Override
         protected CompletableFuture<Void> onReceiveActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-               put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGRECEIVEEVENT, customProperties);
+            getTelemetryClient().trackEvent(
+                TelemetryLoggerConstants.BOTMSGRECEIVEEVENT,
+                customProperties
+            );
 
-            return fillReceiveEventProperties(activity, null)
-                .thenApply(eventProperties -> {
-                    getTelemetryClient().trackEvent("MyReceive", eventProperties);
-                    return null;
-                });
+            return fillReceiveEventProperties(activity, null).thenApply(eventProperties -> {
+                getTelemetryClient().trackEvent("MyReceive", eventProperties);
+                return null;
+            });
         }
     }
 
     private static class OverrideSendLogger extends TelemetryLoggerMiddleware {
-        public OverrideSendLogger(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
+        public OverrideSendLogger(
+            BotTelemetryClient withTelemetryClient,
+            boolean withLogPersonalInformation
+        ) {
             super(withTelemetryClient, withLogPersonalInformation);
         }
 
         @Override
         protected CompletableFuture<Void> onSendActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGSENDEVENT, customProperties);
+            getTelemetryClient().trackEvent(
+                TelemetryLoggerConstants.BOTMSGSENDEVENT,
+                customProperties
+            );
 
-            return fillSendEventProperties(activity, null)
-                .thenApply(eventProperties -> {
-                    getTelemetryClient().trackEvent("MySend", eventProperties);
-                    return null;
-                });
+            return fillSendEventProperties(activity, null).thenApply(eventProperties -> {
+                getTelemetryClient().trackEvent("MySend", eventProperties);
+                return null;
+            });
         }
     }
 
     private static class OverrideUpdateDeleteLogger extends TelemetryLoggerMiddleware {
-        public OverrideUpdateDeleteLogger(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
+        public OverrideUpdateDeleteLogger(
+            BotTelemetryClient withTelemetryClient,
+            boolean withLogPersonalInformation
+        ) {
             super(withTelemetryClient, withLogPersonalInformation);
         }
 
         @Override
         protected CompletableFuture<Void> onUpdateActivity(Activity activity) {
-            Map<String, String> properties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> properties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
             getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGUPDATEEVENT, properties);
             return CompletableFuture.completedFuture(null);
@@ -583,10 +611,12 @@ public class TelemetryMiddlewareTests {
 
         @Override
         protected CompletableFuture<Void> onDeleteActivity(Activity activity) {
-            Map<String, String> properties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> properties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
             getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGDELETEEVENT, properties);
             return CompletableFuture.completedFuture(null);
@@ -594,64 +624,89 @@ public class TelemetryMiddlewareTests {
     }
 
     private static class OverrideFillLogger extends TelemetryLoggerMiddleware {
-        public OverrideFillLogger(BotTelemetryClient withTelemetryClient, boolean withLogPersonalInformation) {
+        public OverrideFillLogger(
+            BotTelemetryClient withTelemetryClient,
+            boolean withLogPersonalInformation
+        ) {
             super(withTelemetryClient, withLogPersonalInformation);
         }
 
         @Override
         protected CompletableFuture<Void> onReceiveActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            return fillReceiveEventProperties(activity, customProperties)
-                .thenApply(allProperties -> {
-                    getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGRECEIVEEVENT, allProperties);
+            return fillReceiveEventProperties(activity, customProperties).thenApply(
+                allProperties -> {
+                    getTelemetryClient().trackEvent(
+                        TelemetryLoggerConstants.BOTMSGRECEIVEEVENT,
+                        allProperties
+                    );
                     return null;
-                });
+                }
+            );
         }
 
         @Override
         protected CompletableFuture<Void> onSendActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            return fillSendEventProperties(activity, customProperties)
-                .thenApply(allProperties -> {
-                    getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGSENDEVENT, allProperties);
-                    return null;
-                });
+            return fillSendEventProperties(activity, customProperties).thenApply(allProperties -> {
+                getTelemetryClient().trackEvent(
+                    TelemetryLoggerConstants.BOTMSGSENDEVENT,
+                    allProperties
+                );
+                return null;
+            });
         }
 
         @Override
         protected CompletableFuture<Void> onUpdateActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            return fillUpdateEventProperties(activity, customProperties)
-                .thenApply(allProperties -> {
-                    getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGUPDATEEVENT, allProperties);
+            return fillUpdateEventProperties(activity, customProperties).thenApply(
+                allProperties -> {
+                    getTelemetryClient().trackEvent(
+                        TelemetryLoggerConstants.BOTMSGUPDATEEVENT,
+                        allProperties
+                    );
                     return null;
-                });
+                }
+            );
         }
 
         @Override
         protected CompletableFuture<Void> onDeleteActivity(Activity activity) {
-            Map<String, String> customProperties = new HashMap<String, String>() {{
-                put("foo", "bar");
-                put("ImportantProperty", "ImportantValue");
-            }};
+            Map<String, String> customProperties = new HashMap<String, String>() {
+                {
+                    put("foo", "bar");
+                    put("ImportantProperty", "ImportantValue");
+                }
+            };
 
-            return fillDeleteEventProperties(activity, customProperties)
-                .thenApply(allProperties -> {
-                    getTelemetryClient().trackEvent(TelemetryLoggerConstants.BOTMSGDELETEEVENT, allProperties);
+            return fillDeleteEventProperties(activity, customProperties).thenApply(
+                allProperties -> {
+                    getTelemetryClient().trackEvent(
+                        TelemetryLoggerConstants.BOTMSGDELETEEVENT,
+                        allProperties
+                    );
                     return null;
-                });
+                }
+            );
         }
     }
 }
