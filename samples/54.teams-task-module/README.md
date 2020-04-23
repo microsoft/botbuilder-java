@@ -1,7 +1,4 @@
-﻿
-# Teams Conversation Bot
-
-Bot Framework v4 Conversation Bot sample for Teams.
+﻿# Teams Task Module
 
 Bot Framework Teams Task Module sample.
 
@@ -44,10 +41,10 @@ the Teams service needs to call into the bot.
 1) From the root of this project folder:
     - Build the sample using `mvn package`
     - Unless done previously, install the packages in the local cache by using `mvn install`
-    - Run it by using `java -jar .\target\bot-teams-conversation-sample.jar`
+    - Run it by using `java -jar .\target\bot-teams-task-module-sample.jar`
 
 
-## Interacting with the bot
+## Interacting with the bot in Teams
 
 > Note this `manifest.json` specified that the bot will be installed in "personal", "team" and "groupchat" scope which is why you immediately entered a one on one chat conversation with the bot. You can at mention the bot in a group chat or in a Channel in the Team you installed it in. Please refer to Teams documentation for more details.
 
