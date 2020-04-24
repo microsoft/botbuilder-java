@@ -20,7 +20,7 @@ public class SimpleGraphClient {
         this.token = token;
     }
 
-    public List<Message> searchMailInbox (String search) {
+    public List<Message> searchMailInbox(String search) {
         IGraphServiceClient client = getAuthenticatedClient();
 
         final List<Option> options = new LinkedList<Option>();

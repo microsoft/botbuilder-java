@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -113,6 +114,14 @@ public class ThumbnailCard {
     }
 
     /**
+     * Sets the images list with a single image.
+     * @param image The image to set as the list.
+     */
+    public void setImage(CardImage image) {
+        setImages(Collections.singletonList(image));
+    }
+
+    /**
      * Get the buttons value.
      *
      * @return the buttons value
@@ -150,7 +159,7 @@ public class ThumbnailCard {
 
     /**
      * Creates an @{link Attachment} for this card.
-     * 
+     *
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {

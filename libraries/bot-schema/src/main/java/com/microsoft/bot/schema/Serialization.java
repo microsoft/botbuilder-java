@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -104,5 +105,16 @@ public final class Serialization {
      */
     public static String toString(Object source) throws JsonProcessingException {
         return objectMapper.writeValueAsString(source);
+    }
+
+    /**
+     * Parses a JSON document.
+     *
+     * @param json The JSON to parse.
+     * @return A JsonNode containg the node tree.
+     * @throws IOException Error parsing json.
+     */
+    public static JsonNode jsonToTree(String json) throws IOException {
+        return objectMapper.readTree(json);
     }
 }
