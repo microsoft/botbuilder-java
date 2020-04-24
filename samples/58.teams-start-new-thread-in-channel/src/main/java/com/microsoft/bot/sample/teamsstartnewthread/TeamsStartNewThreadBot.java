@@ -16,16 +16,14 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class implements the functionality of the Bot.
  *
  * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text back to the
- * user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting to new conversation
- * participants.</p>
+ * added.  For this sample, the {@link #onMessageActivity(TurnContext)} creates a thread in a Teams channel.
+ * </p>
  */
 @Component
 public class TeamsStartNewThreadBot extends TeamsActivityHandler {
