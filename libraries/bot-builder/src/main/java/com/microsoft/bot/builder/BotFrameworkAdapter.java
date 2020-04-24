@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.io.BaseEncoding;
 import com.microsoft.bot.builder.integration.AdapterIntegration;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
@@ -38,6 +37,7 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationsResult;
 import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -327,10 +328,7 @@ public class BotFrameworkAdapter extends BotAdapter
         BotCallbackHandler callback
     ) {
         return continueConversation(
-            claimsIdentity,
-            reference,
-            getBotFrameworkOAuthScope(),
-            callback
+            claimsIdentity, reference, getBotFrameworkOAuthScope(), callback
         );
     }
 
@@ -380,9 +378,7 @@ public class BotFrameworkAdapter extends BotAdapter
             context.getTurnState().add(OAUTH_SCOPE_KEY, audience);
 
             pipelineResult = createConnectorClient(
-                reference.getServiceUrl(),
-                claimsIdentity,
-                audience
+                reference.getServiceUrl(), claimsIdentity, audience
             ).thenCompose(connectorClient -> {
                 context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
                 return runPipeline(context, callback);
@@ -430,11 +426,7 @@ public class BotFrameworkAdapter extends BotAdapter
         BotAssert.activityNotNull(activity);
 
         return JwtTokenValidation.authenticateRequest(
-            activity,
-            authHeader,
-            credentialProvider,
-            channelProvider,
-            authConfiguration
+            activity, authHeader, credentialProvider, channelProvider, authConfiguration
         ).thenCompose(claimsIdentity -> processActivity(claimsIdentity, activity, callback));
     }
 
@@ -897,7 +889,7 @@ public class BotFrameworkAdapter extends BotAdapter
                 || StringUtils.isEmpty(context.getActivity().getFrom().getId())
         ) {
             throw new IllegalArgumentException(
-                "BotFrameworkAdapter.GetuserToken(): missing from or from.id"
+                "BotFrameworkAdapter.getUserToken(): missing from or from.id"
             );
         }
 
@@ -908,10 +900,8 @@ public class BotFrameworkAdapter extends BotAdapter
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
             return oAuthClient.getUserToken()
                 .getToken(
-                    context.getActivity().getFrom().getId(),
-                    connectionName,
-                    context.getActivity().getChannelId(),
-                    magicCode
+                    context.getActivity().getFrom().getId(), connectionName,
+                    context.getActivity().getChannelId(), magicCode
                 );
         });
     }
@@ -958,10 +948,9 @@ public class BotFrameworkAdapter extends BotAdapter
                     }
                 };
 
-                ObjectMapper mapper = new ObjectMapper();
-                String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                String state = BaseEncoding.base64().encode(encodedState);
+                String serializedState = Serialization.toString(tokenExchangeState);
+                String state = Base64.getEncoder()
+                    .encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
 
                 return oAuthClient.getBotSignIn().getSignInUrl(state);
             } catch (Throwable t) {
@@ -1019,10 +1008,9 @@ public class BotFrameworkAdapter extends BotAdapter
                     }
                 };
 
-                ObjectMapper mapper = new ObjectMapper();
-                String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                String state = BaseEncoding.base64().encode(encodedState);
+                String serializedState = Serialization.toString(tokenExchangeState);
+                String state = Base64.getEncoder()
+                    .encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
 
                 return oAuthClient.getBotSignIn().getSignInUrl(state);
             } catch (Throwable t) {
@@ -1053,8 +1041,7 @@ public class BotFrameworkAdapter extends BotAdapter
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
             return oAuthClient.getUserToken()
                 .signOut(
-                    context.getActivity().getFrom().getId(),
-                    connectionName,
+                    context.getActivity().getFrom().getId(), connectionName,
                     context.getActivity().getChannelId()
                 );
         }).thenApply(signOutResult -> null);
@@ -1269,11 +1256,7 @@ public class BotFrameworkAdapter extends BotAdapter
         }
 
         return createConversation(
-            channelId,
-            serviceUrl,
-            credentials,
-            conversationParameters,
-            callback
+            channelId, serviceUrl, credentials, conversationParameters, callback
         );
     }
 
@@ -1300,7 +1283,6 @@ public class BotFrameworkAdapter extends BotAdapter
                     .equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.EMULATOR)
                 && credentialProvider.isAuthenticationDisabled().join()
         ) {
-
             OAuthClientConfig.emulateOAuthCards = true;
         }
 
@@ -1310,17 +1292,26 @@ public class BotFrameworkAdapter extends BotAdapter
             ? oAuthAppCredentials
             : getAppCredentials(appId, oAuthScope).join();
 
+        OAuthClient oAuthClient = new RestOAuthClient(
+            OAuthClientConfig.emulateOAuthCards
+                ? turnContext.getActivity().getServiceUrl()
+                : OAuthClientConfig.OAUTHENDPOINT,
+            credentials
+        );
+
+        // adding the oAuthClient into the TurnState
+        // TokenResolver.cs will use it get the correct credentials to poll for
+        // token for streaming scenario
+        turnContext.getTurnState().add(BotAdapter.OAUTH_CLIENT_KEY, oAuthClient);
+
         if (OAuthClientConfig.emulateOAuthCards) {
             // do not join task - we want this to run in the background.
-            OAuthClient oAuthClient =
-                new RestOAuthClient(turnContext.getActivity().getServiceUrl(), credentials);
             return OAuthClientConfig
                 .sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards)
                 .thenApply(result -> oAuthClient);
         }
 
-        return CompletableFuture
-            .completedFuture(new RestOAuthClient(OAuthClientConfig.OAUTHENDPOINT, credentials));
+        return CompletableFuture.completedFuture(oAuthClient);
     }
 
     /**
@@ -1394,8 +1385,7 @@ public class BotFrameworkAdapter extends BotAdapter
         CompletableFuture<ConnectorClient> result = new CompletableFuture<>();
 
         String clientKey = keyForConnectorClient(
-            serviceUrl,
-            usingAppCredentials != null ? usingAppCredentials.getAppId() : null,
+            serviceUrl, usingAppCredentials != null ? usingAppCredentials.getAppId() : null,
             usingAppCredentials != null ? usingAppCredentials.oAuthScope() : null
         );
 
@@ -1553,7 +1543,8 @@ public class BotFrameworkAdapter extends BotAdapter
     }
 
     /**
-     * Get the AppCredentials cache.  For unit testing.
+     * Get the AppCredentials cache. For unit testing.
+     *
      * @return The AppCredentials cache.
      */
     protected Map<String, AppCredentials> getCredentialsCache() {
@@ -1561,7 +1552,8 @@ public class BotFrameworkAdapter extends BotAdapter
     }
 
     /**
-     * Get the ConnectorClient cache.  For unit testing.
+     * Get the ConnectorClient cache. For unit testing.
+     *
      * @return The ConnectorClient cache.
      */
     protected Map<String, ConnectorClient> getConnectorClientCache() {

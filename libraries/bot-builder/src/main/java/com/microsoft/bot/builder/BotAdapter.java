@@ -45,6 +45,11 @@ public abstract class BotAdapter {
     public static final String OAUTH_SCOPE_KEY = "Microsoft.Bot.Builder.BotAdapter.OAuthScope";
 
     /**
+     * Key to store bot oauth client.
+     */
+    public static final String OAUTH_CLIENT_KEY = "OAuthClient";
+
+    /**
      * The collection of middleware in the adapter's pipeline.
      */
     private final MiddlewareSet middlewareSet = new MiddlewareSet();
