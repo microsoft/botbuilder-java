@@ -108,117 +108,116 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
         TurnContext turnContext,
         MessagingExtensionQuery query) {
 
-//        UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
-//        CompletableFuture<TokenResponse> tokenResponse = tokenProvider.getUserToken(turnContext, connectionName, "");
-//        CompletableFuture<String> signInLink = tokenProvider.getOauthSignInLink(turnContext, connectionName);
+        UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
+
+        TokenResponse tokenResponse = tokenProvider.getUserToken(turnContext, connectionName, "0").join();
+        return tokenProvider.getOauthSignInLink(turnContext, connectionName)
+            .thenApply(signInLink -> {
+                return new MessagingExtensionResponse() {{
+                    setComposeExtension(new MessagingExtensionResult() {{
+                        setType("config");
+                        setSuggestedActions(new MessagingExtensionSuggestedAction() {{
+                            setActions(Arrays.asList(
+                                new CardAction() {{
+                                    setType(ActionTypes.OPEN_URL);
+                                    setValue(signInLink);
+                                    setTitle("Bot Service Auth");
+                                }}
+                            ));
+                        }});
+                    }});
+                }};
+            });
+
+//        CompletableFuture<String> userConfigSettings = userConfigProperty.get(turnContext);
+
+//        return userConfigSettings.
+//            thenCompose(settings -> {
+//                if ("email".toLowerCase().equals("email")) {
+//                    String magicCode = "";
+//                    String state = query.getState();
+//                    if (state != null && !state.isEmpty()) {
+//                        magicCode = state;
+//                    }
+//                    UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
+//                    CompletableFuture<TokenResponse> tokenResponse = tokenProvider.getUserToken(turnContext, connectionName, magicCode);
+//                    return tokenResponse.
+//                        thenApply(
+//                            response -> {
+//                                if (response == null ||
+//                                    response.getToken() == null ||
+//                                    response.getToken().isEmpty()) {
+//                                    CompletableFuture<String> signInLink = tokenProvider.getOauthSignInLink(turnContext, connectionName);
 //
-//        return signInLink
-//            .thenApply(link -> {
-//           return new MessagingExtensionResponse() {{
-//               setComposeExtension(new MessagingExtensionResult() {{
-//                   setType("config");
-//                   setSuggestedActions(new MessagingExtensionSuggestedAction() {{
-//                       setActions(Arrays.asList(
-//                           new CardAction() {{
-//                               setType(ActionTypes.OPEN_URL);
-//                               setValue(signInLink);
-//                               setTitle("Bot Service Auth");
-//                           }}
-//                       ));
-//                   }});
-//               }});
-//           }};
-//       });
-
-        CompletableFuture<String> userConfigSettings = userConfigProperty.get(turnContext);
-
-        return userConfigSettings.
-            thenCompose(settings -> {
-                if ("email".toLowerCase().equals("email")) {
-                    String magicCode = "";
-                    String state = query.getState();
-                    if (state != null && !state.isEmpty()) {
-                        magicCode = state;
-                    }
-                    UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
-                    CompletableFuture<TokenResponse> tokenResponse = tokenProvider.getUserToken(turnContext, connectionName, magicCode);
-                    return tokenResponse.
-                        thenApply(
-                            response -> {
-                                if (response == null ||
-                                    response.getToken() == null ||
-                                    response.getToken().isEmpty()) {
-                                    CompletableFuture<String> signInLink = tokenProvider.getOauthSignInLink(turnContext, connectionName);
-
-                                    return signInLink
-                                        .thenApply(link -> new MessagingExtensionResponse() {{
-                                           setComposeExtension(new MessagingExtensionResult() {{
-                                               setType("config");
-                                               setSuggestedActions(new MessagingExtensionSuggestedAction() {{
-                                                   setActions(Arrays.asList(
-                                                       new CardAction() {{
-                                                           setType(ActionTypes.OPEN_URL);
-                                                           setValue(signInLink);
-                                                           setTitle("Bot Service Auth");
-                                                       }}
-                                                   ));
-                                               }});
-                                           }});
-                                       }});
-                                }
-                                String search = "";
-                                if (query.getParameters() != null && !query.getParameters().isEmpty()) {
-                                    search = (String) query.getParameters().get(0).getValue();
-                                }
-
-                                return searchMail(search, response.getToken());
-                            }
-                        );
-                }
-
-                String search = "";
-                if (query.getParameters() != null && !query.getParameters().isEmpty()) {
-                    search = (String) query.getParameters().get(0).getValue();
-                }
-
-                return findPackages(search)
-                    .thenApply(packages -> {
-                        List<MessagingExtensionAttachment> attachments = new ArrayList<>();
-                        for (String[] item : packages) {
-                            ThumbnailCard previewCard = new ThumbnailCard() {{
-                                setTitle(item[0]);
-                                setTap(new CardAction() {{
-                                    setType(ActionTypes.INVOKE);
-                                    setValue(new JSONObject().put("data", item).toString());
-                                }});
-                            }};
-
-                            if (!StringUtils.isEmpty(item[4])) {
-                                previewCard.setImages(Collections.singletonList(new CardImage() {{
-                                    setUrl(item[4]);
-                                    setAlt("Icon");
-                                }}));
-                            }
-
-                            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
-                                setContentType(HeroCard.CONTENTTYPE);
-                                setContent(new HeroCard() {{
-                                    setTitle(item[0]);
-                                }});
-                                setPreview(previewCard.toAttachment());
-                            }};
-
-                            attachments.add(attachment);
-                        }
-
-                        return new MessagingExtensionResult() {{
-                            setType("result");
-                            setAttachmentLayout("list");
-                            setAttachments(attachments);
-                        }};
-                    });
-
-            }).thenApply(result -> new MessagingExtensionResponse((MessagingExtensionResult) result));
+//                                    return signInLink
+//                                        .thenApply(link -> new MessagingExtensionResponse() {{
+//                                           setComposeExtension(new MessagingExtensionResult() {{
+//                                               setType("config");
+//                                               setSuggestedActions(new MessagingExtensionSuggestedAction() {{
+//                                                   setActions(Arrays.asList(
+//                                                       new CardAction() {{
+//                                                           setType(ActionTypes.OPEN_URL);
+//                                                           setValue(signInLink);
+//                                                           setTitle("Bot Service Auth");
+//                                                       }}
+//                                                   ));
+//                                               }});
+//                                           }});
+//                                       }});
+//                                }
+//                                String search = "";
+//                                if (query.getParameters() != null && !query.getParameters().isEmpty()) {
+//                                    search = (String) query.getParameters().get(0).getValue();
+//                                }
+//
+//                                return searchMail(search, response.getToken());
+//                            }
+//                        );
+//                }
+//
+//                String search = "";
+//                if (query.getParameters() != null && !query.getParameters().isEmpty()) {
+//                    search = (String) query.getParameters().get(0).getValue();
+//                }
+//
+//                return findPackages(search)
+//                    .thenApply(packages -> {
+//                        List<MessagingExtensionAttachment> attachments = new ArrayList<>();
+//                        for (String[] item : packages) {
+//                            ThumbnailCard previewCard = new ThumbnailCard() {{
+//                                setTitle(item[0]);
+//                                setTap(new CardAction() {{
+//                                    setType(ActionTypes.INVOKE);
+//                                    setValue(new JSONObject().put("data", item).toString());
+//                                }});
+//                            }};
+//
+//                            if (!StringUtils.isEmpty(item[4])) {
+//                                previewCard.setImages(Collections.singletonList(new CardImage() {{
+//                                    setUrl(item[4]);
+//                                    setAlt("Icon");
+//                                }}));
+//                            }
+//
+//                            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
+//                                setContentType(HeroCard.CONTENTTYPE);
+//                                setContent(new HeroCard() {{
+//                                    setTitle(item[0]);
+//                                }});
+//                                setPreview(previewCard.toAttachment());
+//                            }};
+//
+//                            attachments.add(attachment);
+//                        }
+//
+//                        return new MessagingExtensionResult() {{
+//                            setType("result");
+//                            setAttachmentLayout("list");
+//                            setAttachments(attachments);
+//                        }};
+//                    });
+//
+//            }).thenApply(result -> new MessagingExtensionResponse((MessagingExtensionResult) result));
     }
 
     @Override
