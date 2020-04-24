@@ -6,13 +6,9 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.bot.azure.CloudException;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.BotSignIn;
-import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.rest.ServiceResponse;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
@@ -25,6 +21,7 @@ import retrofit2.Response;
  * An instance of this class provides access to all the operations defined in
  * BotSignIns.
  */
+@SuppressWarnings("PMD")
 public class RestBotSignIn implements BotSignIn {
     /** The Retrofit service to perform REST calls. */
     private BotSignInsService service;
@@ -47,10 +44,10 @@ public class RestBotSignIn implements BotSignIn {
      * The interface defining all the services for BotSignIns to be used by Retrofit
      * to perform actually REST calls.
      */
-    @SuppressWarnings({ "checkstyle:linelength", "checkstyle:JavadocMethod" })
+    @SuppressWarnings({"checkstyle:linelength", "checkstyle:JavadocMethod"})
     interface BotSignInsService {
-        @Headers({ "Content-Type: application/json; charset=utf-8",
-            "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl" })
+        @Headers({"Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl"})
         @GET("api/botsignin/GetSignInUrl")
         CompletableFuture<Response<ResponseBody>> getSignInUrl(
             @Query("state") String state,
@@ -117,14 +114,11 @@ public class RestBotSignIn implements BotSignIn {
 
     private ServiceResponse<String> getSignInUrlDelegate(
         Response<ResponseBody> response
-    ) throws CloudException, IOException, IllegalArgumentException {
+    ) throws ErrorResponseException, IllegalArgumentException {
+        if (!response.isSuccessful()) {
+            throw new ErrorResponseException("getSignInUrl", response);
+        }
 
-        return client.restClient()
-            .responseBuilderFactory()
-            .<String, CloudException>newInstance(client.serializerAdapter())
-            .register(HttpURLConnection.HTTP_OK, new TypeToken<String>() {
-            }.getType())
-            .registerError(CloudException.class)
-            .build(response);
+        return new ServiceResponse<>(response.body().source().buffer().readUtf8(), response);
     }
 }

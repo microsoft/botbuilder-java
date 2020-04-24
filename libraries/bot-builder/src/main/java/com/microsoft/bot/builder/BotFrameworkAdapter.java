@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.io.BaseEncoding;
 import com.microsoft.bot.builder.integration.AdapterIntegration;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
@@ -38,6 +37,7 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationsResult;
 import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -947,10 +948,9 @@ public class BotFrameworkAdapter extends BotAdapter
                     }
                 };
 
-                ObjectMapper mapper = new ObjectMapper();
-                String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                String state = BaseEncoding.base64().encode(encodedState);
+                String serializedState = Serialization.toString(tokenExchangeState);
+                String state = Base64.getEncoder()
+                    .encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
 
                 return oAuthClient.getBotSignIn().getSignInUrl(state);
             } catch (Throwable t) {
@@ -1008,10 +1008,9 @@ public class BotFrameworkAdapter extends BotAdapter
                     }
                 };
 
-                ObjectMapper mapper = new ObjectMapper();
-                String serializedState = mapper.writeValueAsString(tokenExchangeState);
-                byte[] encodedState = serializedState.getBytes(StandardCharsets.UTF_8);
-                String state = BaseEncoding.base64().encode(encodedState);
+                String serializedState = Serialization.toString(tokenExchangeState);
+                String state = Base64.getEncoder()
+                    .encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
 
                 return oAuthClient.getBotSignIn().getSignInUrl(state);
             } catch (Throwable t) {
