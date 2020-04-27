@@ -3,34 +3,37 @@
 
 package com.microsoft.bot.sample.teamsactionpreview;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
 import com.microsoft.bot.integration.Configuration;
+import com.microsoft.bot.sample.teamsactionpreview.models.AdaptiveCard;
+import com.microsoft.bot.sample.teamsactionpreview.models.Body;
+import com.microsoft.bot.sample.teamsactionpreview.models.Choice;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.teams.*;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the functionality of the Bot.
  *
  * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * added.  This sample shows how to create a simple card based on
+ * parameters entered by the user from a Task Module.
+ * </p>
  */
 @Component
 public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandler {
@@ -71,17 +74,18 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
 
         Attachment adaptiveCardEditor = getAdaptiveCardAttachment("adaptiveCardEditor.json");
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
-            setTask(new TaskModuleContinueResponse(){{
-                setValue(new TaskModuleTaskInfo(){{
-                    setCard(adaptiveCardEditor);
-                    setWidth(500);
-                    setHeight(450);
-                    setTitle("Task Module Fetch Example");
+        return CompletableFuture.completedFuture(
+            new MessagingExtensionActionResponse(){{
+                setTask(new TaskModuleContinueResponse(){{
+                    setValue(new TaskModuleTaskInfo(){{
+                        setCard(adaptiveCardEditor);
+                        setWidth(500);
+                        setHeight(450);
+                        setTitle("Task Module Fetch Example");
+                    }});
+                    setType("continue");
                 }});
-                setType("continue");
             }});
-        }});
     }
 
     @Override
@@ -150,22 +154,25 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         Object cardData) {
         // If the adaptive card was added to the compose window (by either the OnTeamsMessagingExtensionSubmitActionAsync or
         // OnTeamsMessagingExtensionBotMessagePreviewSendAsync handler's return values) the submit values will come in here.
-        Activity reply = MessageFactory.text("OnTeamsMessagingExtensionCardButtonClickedAsync Value: ");
+        Activity reply = MessageFactory.text("OnTeamsMessagingExtensionCardButtonClickedAsync");
         return turnContext.sendActivity(reply)
             .thenApply(resourceResponse -> null);
     }
 
     private Attachment getAdaptiveCardAttachment(String fileName) {
         try {
-            InputStream input = getClass().getClassLoader().getResourceAsStream(fileName);
+            InputStream input = getClass()
+                .getClassLoader()
+                .getResourceAsStream(fileName);
             String content = IOUtils.toString(input, StandardCharsets.UTF_8);
 
             return new Attachment(){{
                 setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(new ObjectMapper().readValue(content, ObjectNode.class));
+                setContent(new ObjectMapper().readValue(content, AdaptiveCard.class));
             }};
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("getAdaptiveCardAttachment", e);
         }
         return new Attachment();
     }
@@ -175,21 +182,17 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         MessagingExtensionAction action
     ){
         LinkedHashMap data = (LinkedHashMap) action.getData();
-        ObjectNode content = (ObjectNode) attachment.getContent();
-        JsonNode body = content.get("body");
-        for (JsonNode arrayItem : body) {
-            if (arrayItem.has("choices")){
-                JsonNode choices = arrayItem.get("choices");
+        AdaptiveCard card = (AdaptiveCard) attachment.getContent();
+        for (Body item : card.getBody() ) {
+            if (item.getChoices() != null) {
                 for (int index = 0 ; index < 3 ; index++) {
-                    ObjectNode choice = (ObjectNode) choices.get(index);
-                    choice.put("title", (String) data.get("Option" + (index + 1)));
-                    choice.put("value", (String) data.get("Option" + (index + 1)));
+                    item.getChoices().get(index).setTitle((String) data.get("Option" + (index + 1)));
+                    item.getChoices().get(index).setValue((String) data.get("Option" + (index + 1)));
                 }
             }
 
-            if(arrayItem.has("id") && arrayItem.get("id").asText().equals("Question")){
-                ObjectNode question = (ObjectNode) arrayItem;
-                question.put("text", (String) data.get("Question"));
+            if (item.getId() != null && item.getId().equals("Question")) {
+                item.setText((String) data.get("Question"));
             }
         }
     }
@@ -197,27 +200,45 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
     private void updateAttachmentAdaptiveCardEdit(
         Attachment attachment,
         Attachment preview
-    ){
-        LinkedHashMap data = (LinkedHashMap)preview.getContent();
-        List bodyPreview = (ArrayList<LinkedHashMap>) data.get("body");
-        ObjectNode content = (ObjectNode) attachment.getContent();
-        JsonNode body = content.get("body");
-        for (JsonNode arrayItem : body) {
+    ) {
+        AdaptiveCard prv = null;
+        try {
+            String cardAsString = new ObjectMapper().writeValueAsString(preview.getContent());
+            prv = new ObjectMapper().readValue(cardAsString, AdaptiveCard.class);
+        } catch (JsonProcessingException e) {
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("updateAttachmentAdaptiveCardEdit", e);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("updateAttachmentAdaptiveCardEdit", e);
+        }
 
-            if(arrayItem.has("id") && arrayItem.get("id").asText().equals("Question")){
-                ObjectNode question = (ObjectNode) arrayItem;
-                LinkedHashMap previewQuestion = (LinkedHashMap) bodyPreview.get(1);
-                question.put("value", (String) previewQuestion.get("text"));
-            }
+        AdaptiveCard atc = (AdaptiveCard) attachment.getContent();
 
-            if(arrayItem.has("id") && arrayItem.get("id").asText().startsWith("Option")){
-                ObjectNode option = (ObjectNode) arrayItem;
-                int responseIndex = Integer.parseInt(arrayItem.get("id").asText().charAt(6) + "");
-                LinkedHashMap previewOptions = (LinkedHashMap) bodyPreview.get(3);
-                List choices = (ArrayList) previewOptions.get("choices");
-                LinkedHashMap previewOption = (LinkedHashMap) choices.get(responseIndex - 1);
-                option.put("value", (String) previewOption.get("value"));
-            }
+        Body question = atc.getBody().stream()
+            .filter(i -> "Question".equals(i.getId()))
+            .findAny()
+            .orElse(null);
+
+        question.setValue(prv.getBody().stream()
+            .filter(i -> "Question".equals(i.getId()))
+            .findAny()
+            .orElse(null).getText());
+
+        List<Body> options = atc.getBody().stream()
+            .filter(i -> i.getId()!= null && i.getId().startsWith("Option"))
+            .collect(Collectors.toList());
+
+        for (Body item: options) {
+            int responseIndex = Integer.parseInt(item.getId().charAt(6) + "");
+            Choice choice = prv.getBody().stream()
+                .filter(i -> i.getId() != null && i.getId().equals("Choices"))
+                .findFirst()
+                .orElse(null)
+                .getChoices()
+                .get(responseIndex - 1);
+
+            item.setValue(choice.getValue());
         }
     }
 }
