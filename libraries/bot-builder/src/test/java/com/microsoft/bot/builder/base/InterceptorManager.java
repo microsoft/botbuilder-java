@@ -32,13 +32,19 @@ public class InterceptorManager {
     protected RecordedData recordedData;
     private Map<String, String> textReplacementRules = new HashMap<String, String>();
 
-    private InterceptorManager(String testName, TestBase.TestMode testMode) {
+    private InterceptorManager(
+        String testName,
+        TestBase.TestMode testMode
+    ) {
         this.testName = testName;
         this.testMode = testMode;
     }
 
     // factory method
-    public static InterceptorManager create(String testName, TestBase.TestMode testMode) throws IOException {
+    public static InterceptorManager create(
+        String testName,
+        TestBase.TestMode testMode
+    ) throws IOException {
         InterceptorManager interceptorManager = new InterceptorManager(testName, testMode);
 
         return interceptorManager;
@@ -66,6 +72,7 @@ public class InterceptorManager {
                         return record(chain);
                     }
                 };
+
             case PLAYBACK:
                 readDataFromFile();
                 return new Interceptor() {
@@ -74,6 +81,7 @@ public class InterceptorManager {
                         return playback(chain);
                     }
                 };
+
             default:
                 System.out.println("==> Unknown AZURE_TEST_MODE: " + testMode);
         }
@@ -85,9 +93,11 @@ public class InterceptorManager {
             case RECORD:
                 writeDataToFile();
                 break;
+
             case PLAYBACK:
                 // Do nothing
                 break;
+
             default:
                 System.out.println("==> Unknown AZURE_TEST_MODE: " + testMode);
         }
@@ -110,7 +120,9 @@ public class InterceptorManager {
         }
 
         networkCallRecord.Method = request.method();
-        networkCallRecord.Uri = applyReplacementRule(request.url().toString().replaceAll("\\?$", ""));
+        networkCallRecord.Uri = applyReplacementRule(
+            request.url().toString().replaceAll("\\?$", "")
+        );
 
         networkCallRecord.Body = bodyToString(request);
 
@@ -122,8 +134,10 @@ public class InterceptorManager {
 
         // remove pre-added header if this is a waiting or redirection
         if (networkCallRecord.Response.get("Body") != null) {
-            if (networkCallRecord.Response.get("Body").contains("<Status>InProgress</Status>")
-                || Integer.parseInt(networkCallRecord.Response.get("StatusCode")) == 307) {
+            if (
+                networkCallRecord.Response.get("Body").contains("<Status>InProgress</Status>")
+                    || Integer.parseInt(networkCallRecord.Response.get("StatusCode")) == 307
+            ) {
                 // Do nothing
             } else {
                 synchronized (recordedData.getNetworkCallRecords()) {
@@ -154,9 +168,14 @@ public class InterceptorManager {
         incomingUrl = removeHost(incomingUrl);
         NetworkCallRecord networkCallRecord = null;
         synchronized (recordedData) {
-            for (Iterator<NetworkCallRecord> iterator = recordedData.getNetworkCallRecords().iterator(); iterator.hasNext(); ) {
+            for (
+                 Iterator<NetworkCallRecord> iterator = recordedData.getNetworkCallRecords().iterator();
+                 iterator.hasNext();) {
                 NetworkCallRecord record = iterator.next();
-                if (record.Method.equalsIgnoreCase(incomingMethod) && removeHost(record.Uri).equalsIgnoreCase(incomingUrl)) {
+                if (
+                    record.Method.equalsIgnoreCase(incomingMethod)
+                        && removeHost(record.Uri).equalsIgnoreCase(incomingUrl)
+                ) {
                     networkCallRecord = record;
                     iterator.remove();
                     break;
@@ -172,16 +191,19 @@ public class InterceptorManager {
 
         int recordStatusCode = Integer.parseInt(networkCallRecord.Response.get("StatusCode"));
 
-        //Response originalResponse = chain.proceed(request);
-        //originalResponse.body().close();
+        // Response originalResponse = chain.proceed(request);
+        // originalResponse.body().close();
 
-        Response.Builder responseBuilder = new Response.Builder()
-            .request(request.newBuilder().build())
-            .protocol(Protocol.HTTP_2)
-            .code(recordStatusCode).message("-");
+        Response.Builder responseBuilder = new Response.Builder().request(
+            request.newBuilder().build()
+        ).protocol(Protocol.HTTP_2).code(recordStatusCode).message("-");
 
         for (Map.Entry<String, String> pair : networkCallRecord.Response.entrySet()) {
-            if (!pair.getKey().equals("StatusCode") && !pair.getKey().equals("Body") && !pair.getKey().equals("Content-Length")) {
+            if (
+                !pair.getKey().equals("StatusCode")
+                    && !pair.getKey().equals("Body")
+                        && !pair.getKey().equals("Content-Length")
+            ) {
                 String rawHeader = pair.getValue();
                 for (Map.Entry<String, String> rule : textReplacementRules.entrySet()) {
                     if (rule.getValue() != null) {
@@ -208,13 +230,22 @@ public class InterceptorManager {
             ResponseBody responseBody;
 
             if (contentType.toLowerCase().contains("application/json")) {
-                responseBody = ResponseBody.create(MediaType.parse(contentType), rawBody.getBytes());
+                responseBody = ResponseBody.create(
+                    MediaType.parse(contentType),
+                    rawBody.getBytes()
+                );
             } else {
-                responseBody = ResponseBody.create(MediaType.parse(contentType), BaseEncoding.base64().decode(rawBody));
+                responseBody = ResponseBody.create(
+                    MediaType.parse(contentType),
+                    BaseEncoding.base64().decode(rawBody)
+                );
             }
 
             responseBuilder.body(responseBody);
-            responseBuilder.addHeader("Content-Length", String.valueOf(rawBody.getBytes(StandardCharsets.UTF_8).length));
+            responseBuilder.addHeader(
+                "Content-Length",
+                String.valueOf(rawBody.getBytes(StandardCharsets.UTF_8).length)
+            );
         }
 
         Response newResponse = responseBuilder.build();
@@ -222,13 +253,19 @@ public class InterceptorManager {
         return newResponse;
     }
 
-    private void extractResponseData(Map<String, String> responseData, Response response) throws IOException {
+    private void extractResponseData(
+        Map<String, String> responseData,
+        Response response
+    ) throws IOException {
         Map<String, List<String>> headers = response.headers().toMultimap();
         boolean addedRetryAfter = false;
         for (Map.Entry<String, List<String>> header : headers.entrySet()) {
             String headerValueToStore = header.getValue().get(0);
 
-            if (header.getKey().equalsIgnoreCase("location") || header.getKey().equalsIgnoreCase("azure-asyncoperation")) {
+            if (
+                header.getKey().equalsIgnoreCase("location")
+                    || header.getKey().equalsIgnoreCase("azure-asyncoperation")
+            ) {
                 headerValueToStore = applyReplacementRule(headerValueToStore);
             }
             if (header.getKey().equalsIgnoreCase("retry-after")) {

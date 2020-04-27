@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
  */
 public class SuggestedActions {
     /**
-     * Ids of the recipients that the actions should be shown to.  These Ids
-     * are relative to the channelId and a subset of all recipients of the
-     * activity.
+     * Ids of the recipients that the actions should be shown to. These Ids are
+     * relative to the channelId and a subset of all recipients of the activity.
      */
     @JsonProperty(value = "to")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -33,6 +32,7 @@ public class SuggestedActions {
 
     /**
      * Performs a deep copy of a SuggestedActions.
+     *
      * @param suggestedActions The SuggestedActions to copy.
      * @return A clone of the SuggestedActions.
      */
@@ -41,13 +41,17 @@ public class SuggestedActions {
             return null;
         }
 
-        return new SuggestedActions() {{
-            setTo(suggestedActions.getTo());
+        return new SuggestedActions() {
+            {
+                setTo(suggestedActions.getTo());
 
-            setActions(suggestedActions.getActions().stream()
-                .map(card -> CardAction.clone(card))
-                .collect(Collectors.toCollection(ArrayList::new)));
-        }};
+                List<CardAction> cloned = suggestedActions.getActions()
+                    .stream()
+                    .map(card -> CardAction.clone(card))
+                    .collect(Collectors.toCollection(ArrayList::new));
+                setActions(cloned);
+            }
+        };
     }
 
     /**
@@ -59,6 +63,7 @@ public class SuggestedActions {
 
     /**
      * SuggestedActions with CardActions.
+     *
      * @param withCardActions The array of CardActions.
      */
     public SuggestedActions(CardAction[] withCardActions) {

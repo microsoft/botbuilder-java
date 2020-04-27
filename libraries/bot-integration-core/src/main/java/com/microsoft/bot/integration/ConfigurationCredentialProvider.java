@@ -12,6 +12,7 @@ import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 public class ConfigurationCredentialProvider extends SimpleCredentialProvider {
     /**
      * Initializes a new instance using a {@link Configuration}.
+     * 
      * @param configuration The Configuration to use.
      */
     public ConfigurationCredentialProvider(Configuration configuration) {

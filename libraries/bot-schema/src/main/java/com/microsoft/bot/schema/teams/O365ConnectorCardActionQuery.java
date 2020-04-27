@@ -16,8 +16,9 @@ public class O365ConnectorCardActionQuery {
     private String actionId;
 
     /**
-     * Gets the results of body string defined in
-     * O365ConnectorCardHttpPOST with substituted input values.
+     * Gets the results of body string defined in O365ConnectorCardHttpPOST with
+     * substituted input values.
+     * 
      * @return The query body.
      */
     public String getBody() {
@@ -25,8 +26,9 @@ public class O365ConnectorCardActionQuery {
     }
 
     /**
-     * Sets the results of body string defined in
-     * O365ConnectorCardHttpPOST with substituted input values.
+     * Sets the results of body string defined in O365ConnectorCardHttpPOST with
+     * substituted input values.
+     * 
      * @param withBody The query body.
      */
     public void setBody(String withBody) {
@@ -34,8 +36,9 @@ public class O365ConnectorCardActionQuery {
     }
 
     /**
-     * Gets the action Id associated with the HttpPOST action button
-     * triggered, defined in O365ConnectorCardActionBase.
+     * Gets the action Id associated with the HttpPOST action button triggered,
+     * defined in O365ConnectorCardActionBase.
+     * 
      * @return The action id.
      */
     public String getActionId() {
@@ -43,8 +46,9 @@ public class O365ConnectorCardActionQuery {
     }
 
     /**
-     * Sets the action Id associated with the HttpPOST action button
-     * triggered, defined in O365ConnectorCardActionBase.
+     * Sets the action Id associated with the HttpPOST action button triggered,
+     * defined in O365ConnectorCardActionBase.
+     * 
      * @param withActionId The action id.
      */
     public void setActionId(String withActionId) {

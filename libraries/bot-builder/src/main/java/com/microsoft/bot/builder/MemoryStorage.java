@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MemoryStorage implements Storage {
     /**
-     * Special field for holding the type information for the top level
-     * object being stored.
+     * Special field for holding the type information for the top level object being
+     * stored.
      */
     private static final String TYPENAMEFORNONENTITY = "__type_name_";
 
@@ -60,6 +60,7 @@ public class MemoryStorage implements Storage {
 
     /**
      * Initializes a new instance of the MemoryStorage class.
+     *
      * @param values A pre-existing dictionary to use; or null to use a new one.
      */
     public MemoryStorage(Map<String, JsonNode> values) {
@@ -68,7 +69,7 @@ public class MemoryStorage implements Storage {
             .findAndRegisterModules();
         objectMapper.enableDefaultTyping();
 
-        memory = values != null  ? values : new ConcurrentHashMap<>();
+        memory = values != null ? values : new ConcurrentHashMap<>();
     }
 
     /**
@@ -76,7 +77,8 @@ public class MemoryStorage implements Storage {
      *
      * @param keys keys of the items to read
      * @return A task that represents the work queued to execute. If the activities
-     * are successfully sent, the task result contains the items read, indexed by key.
+     *         are successfully sent, the task result contains the items read,
+     *         indexed by key.
      */
     @Override
     public CompletableFuture<Map<String, Object>> read(String[] keys) {
@@ -95,7 +97,9 @@ public class MemoryStorage implements Storage {
                             if (!(stateNode.hasNonNull(TYPENAMEFORNONENTITY))) {
                                 logger.error("Read failed: Type info not present for " + key);
                                 throw new RuntimeException(
-                                    String.format("Read failed: Type info not present for key " + key));
+                                    String
+                                        .format("Read failed: Type info not present for key " + key)
+                                );
                             }
                             String clsName = stateNode.get(TYPENAMEFORNONENTITY).textValue();
 
@@ -106,14 +110,17 @@ public class MemoryStorage implements Storage {
                             } catch (ClassNotFoundException e) {
                                 logger.error("Read failed: Could not load class {}", clsName);
                                 throw new RuntimeException(
-                                    String.format("Read failed: Could not load class %s", clsName));
+                                    String.format("Read failed: Could not load class %s", clsName)
+                                );
                             }
 
                             // Populate dictionary
                             storeItems.put(key, objectMapper.treeToValue(stateNode, cls));
                         } catch (JsonProcessingException e) {
                             logger.error("Read failed: {}", e.toString());
-                            throw new RuntimeException(String.format("Read failed: %s", e.toString()));
+                            throw new RuntimeException(
+                                String.format("Read failed: %s", e.toString())
+                            );
                         }
                     }
                 }
@@ -144,19 +151,24 @@ public class MemoryStorage implements Storage {
                     }
                 }
 
-                // Dictionary stores Key:JsonNode (with type information held within the JsonNode)
+                // Dictionary stores Key:JsonNode (with type information held within the
+                // JsonNode)
                 JsonNode newState = objectMapper.valueToTree(newValue);
-                ((ObjectNode) newState).put(TYPENAMEFORNONENTITY, newValue.getClass().getTypeName());
+                ((ObjectNode) newState)
+                    .put(TYPENAMEFORNONENTITY, newValue.getClass().getTypeName());
 
                 // Set ETag if applicable
                 if (newValue instanceof StoreItem) {
                     StoreItem newStoreItem = (StoreItem) newValue;
-                    if (oldStateETag != null
-                        && !StringUtils.equals(newStoreItem.getETag(), "*")
-                        && !StringUtils.equals(newStoreItem.getETag(), oldStateETag)) {
+                    if (
+                        oldStateETag != null && !StringUtils.equals(newStoreItem.getETag(), "*")
+                            && !StringUtils.equals(newStoreItem.getETag(), oldStateETag)
+                    ) {
 
-                        String msg = String.format("eTag conflict. Original: %s, Current: %s",
-                            newStoreItem.getETag(), oldStateETag);
+                        String msg = String.format(
+                            "eTag conflict. Original: %s, Current: %s", newStoreItem.getETag(),
+                            oldStateETag
+                        );
                         logger.error(msg);
                         throw new RuntimeException(msg);
                     }

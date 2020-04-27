@@ -32,7 +32,8 @@ public enum TextFormatTypes {
 
     /**
      * Creates a ActionTypes enum from a string.
-     * @param withValue The string value.  Should be a valid enum value.
+     * 
+     * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */
     TextFormatTypes(String withValue) {

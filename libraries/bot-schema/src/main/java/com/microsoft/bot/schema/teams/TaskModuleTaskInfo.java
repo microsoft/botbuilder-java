@@ -36,7 +36,9 @@ public class TaskModuleTaskInfo {
     private String completionBotId;
 
     /**
-     * Gets the text that appears below the app name and to the right of the app icon.
+     * Gets the text that appears below the app name and to the right of the app
+     * icon.
+     * 
      * @return The title text.
      */
     public String getTitle() {
@@ -44,7 +46,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Sets the text that appears below the app name and to the right of the app icon.
+     * Sets the text that appears below the app name and to the right of the app
+     * icon.
+     * 
      * @param withTitle The title text.
      */
     public void setTitle(String withTitle) {
@@ -54,6 +58,7 @@ public class TaskModuleTaskInfo {
     /**
      * Gets title height. This can be a number, representing the task module's
      * height in pixels, or a string, one of: small, medium, large.
+     * 
      * @return The title height.
      */
     public Object getHeight() {
@@ -63,6 +68,7 @@ public class TaskModuleTaskInfo {
     /**
      * Sets title height. This can be a number, representing the task module's
      * height in pixels, or a string, one of: small, medium, large.
+     * 
      * @param withHeight The title height.
      */
     public void setHeight(Object withHeight) {
@@ -70,8 +76,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Gets title width. This can be a number, representing the task module's
-     * width in pixels, or a string, one of: small, medium, large.
+     * Gets title width. This can be a number, representing the task module's width
+     * in pixels, or a string, one of: small, medium, large.
+     * 
      * @return The title width.
      */
     public Object getWidth() {
@@ -79,8 +86,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Sets title width. This can be a number, representing the task module's
-     * width in pixels, or a string, one of: small, medium, large.
+     * Sets title width. This can be a number, representing the task module's width
+     * in pixels, or a string, one of: small, medium, large.
+     * 
      * @param withWidth The title width.
      */
     public void setWidth(Object withWidth) {
@@ -88,8 +96,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Gets the URL of what is loaded as an iframe inside the task
-     * module. One of url or card is required.
+     * Gets the URL of what is loaded as an iframe inside the task module. One of
+     * url or card is required.
+     * 
      * @return The module url.
      */
     public String getUrl() {
@@ -97,8 +106,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Sets the URL of what is loaded as an iframe inside the task
-     * module. One of url or card is required.
+     * Sets the URL of what is loaded as an iframe inside the task module. One of
+     * url or card is required.
+     * 
      * @param withUrl The module url.
      */
     public void setUrl(String withUrl) {
@@ -107,6 +117,7 @@ public class TaskModuleTaskInfo {
 
     /**
      * Gets the Adaptive card to appear in the task module.
+     * 
      * @return The module task card.
      */
     public Attachment getCard() {
@@ -115,6 +126,7 @@ public class TaskModuleTaskInfo {
 
     /**
      * Sets the Adaptive card to appear in the task module.
+     * 
      * @param withCard The module task card.
      */
     public void setCard(Attachment withCard) {
@@ -122,8 +134,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Gets the URL if a client does not support the task module feature,
-     * this URL is opened in a browser tab.
+     * Gets the URL if a client does not support the task module feature, this URL
+     * is opened in a browser tab.
+     * 
      * @return The fallback url.
      */
     public String getFallbackUrl() {
@@ -131,8 +144,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Sets the URL if a client does not support the task module feature,
-     * this URL is opened in a browser tab.
+     * Sets the URL if a client does not support the task module feature, this URL
+     * is opened in a browser tab.
+     * 
      * @param withFallbackUrl The fallback url.
      */
     public void setFallbackUrl(String withFallbackUrl) {
@@ -140,8 +154,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Gets id if a client does not support the task module feature,
-     * this URL is opened in a browser tab.
+     * Gets id if a client does not support the task module feature, this URL is
+     * opened in a browser tab.
+     * 
      * @return The completion id.
      */
     public String getCompletionBotId() {
@@ -149,8 +164,9 @@ public class TaskModuleTaskInfo {
     }
 
     /**
-     * Sets id if a client does not support the task module feature,
-     * this URL is opened in a browser tab.
+     * Sets id if a client does not support the task module feature, this URL is
+     * opened in a browser tab.
+     * 
      * @param withCompletionBotId The completion id.
      */
     public void setCompletionBotId(String withCompletionBotId) {

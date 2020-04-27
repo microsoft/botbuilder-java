@@ -10,21 +10,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TaskModuleMessageResponse extends TaskModuleResponseBase {
     @JsonProperty(value = "value")
-    private TaskModuleTaskInfo value;
+    private String value;
 
     /**
      * Gets info teams will display the value of value in a popup message box.
+     * 
      * @return The popup info.
      */
-    public TaskModuleTaskInfo getValue() {
+    public String getValue() {
         return value;
     }
 
     /**
      * Sets info teams will display the value of value in a popup message box.
+     * 
      * @param withValue The popup info.
      */
-    public void setValue(TaskModuleTaskInfo withValue) {
+    public void setValue(String withValue) {
         value = withValue;
     }
 }

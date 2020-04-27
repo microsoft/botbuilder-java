@@ -54,19 +54,28 @@ public class TeamsActivityHandlerTests {
     @Test
     public void TestConversationUpdateTeamsMemberAdded() {
         String baseUri = "https://test.coffee";
-        ConnectorClient connectorClient = getConnectorClient("http://localhost/", MicrosoftAppCredentials.empty());
+        ConnectorClient connectorClient = getConnectorClient(
+            "http://localhost/",
+            MicrosoftAppCredentials.empty()
+        );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setMembersAdded(new ArrayList<ChannelAccount>() {{
-                add(new ChannelAccount("id-1"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-            setChannelData(new TeamsChannelData() {{
-                setEventType("teamMemberAdded");
-                setTeam(new TeamInfo("team-id"));
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("id-1"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamMemberAdded");
+                        setTeam(new TeamInfo("team-id"));
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -82,16 +91,23 @@ public class TeamsActivityHandlerTests {
     @Test
     public void TestConversationUpdateTeamsMemberAddedNoTeam() {
         String baseUri = "https://test.coffee";
-        ConnectorClient connectorClient = getConnectorClient("http://localhost/", MicrosoftAppCredentials.empty());
+        ConnectorClient connectorClient = getConnectorClient(
+            "http://localhost/",
+            MicrosoftAppCredentials.empty()
+        );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setMembersAdded(new ArrayList<ChannelAccount>() {{
-                add(new ChannelAccount("id-3"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-            setConversation(new ConversationAccount("conversation-id"));
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("id-3"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+                setConversation(new ConversationAccount("conversation-id"));
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -107,34 +123,45 @@ public class TeamsActivityHandlerTests {
     @Test
     public void TestConversationUpdateTeamsMemberAddedFullDetailsInEvent() {
         String baseUri = "https://test.coffee";
-        ConnectorClient connectorClient = getConnectorClient("http://localhost/", MicrosoftAppCredentials.empty());
+        ConnectorClient connectorClient = getConnectorClient(
+            "http://localhost/",
+            MicrosoftAppCredentials.empty()
+        );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setMembersAdded(new ArrayList<ChannelAccount>() {{
-                add(new TeamsChannelAccount() {{
-                    setId("id-1");
-                    setName("name-1");
-                    setAadObjectId("aadobject-1");
-                    setEmail("test@microsoft.com");
-                    setGivenName("given-1");
-                    setSurname("surname-1");
-                    setUserPrincipalName("t@microsoft.com");
-                }});
-            }});
-            setRecipient(new ChannelAccount("b"));
-            setChannelData(new TeamsChannelData() {{
-                setEventType("teamMemberAdded");
-                setTeam(new TeamInfo("team-id"));
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new TeamsChannelAccount() {
+                            {
+                                setId("id-1");
+                                setName("name-1");
+                                setAadObjectId("aadobject-1");
+                                setEmail("test@microsoft.com");
+                                setGivenName("given-1");
+                                setSurname("surname-1");
+                                setUserPrincipalName("t@microsoft.com");
+                            }
+                        });
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamMemberAdded");
+                        setTeam(new TeamInfo("team-id"));
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         // serialize to json and back to verify we can get back to the
-        // correct Activity.  i.e., In this case, mainly the TeamsChannelAccount.
+        // correct Activity. i.e., In this case, mainly the TeamsChannelAccount.
         try {
             JacksonAdapter jacksonAdapter = new JacksonAdapter();
             String json = jacksonAdapter.serialize(activity);
-            activity =jacksonAdapter.deserialize(json, Activity.class);
+            activity = jacksonAdapter.deserialize(json, Activity.class);
         } catch (Throwable t) {
             Assert.fail("Should not have thrown in serialization test.");
         }
@@ -152,16 +179,22 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsMemberRemoved() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setMembersRemoved(new ArrayList<ChannelAccount>() {{
-                add(new ChannelAccount("a"));
-            }});
-            setRecipient(new ChannelAccount("b"));
-            setChannelData(new TeamsChannelData() {{
-                setEventType("teamMemberRemoved");
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersRemoved(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("a"));
+                    }
+                });
+                setRecipient(new ChannelAccount("b"));
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamMemberRemoved");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -175,12 +208,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelCreated() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setChannelData(new TeamsChannelData() {{
-                setEventType("channelCreated");
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("channelCreated");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -194,12 +231,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelDeleted() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setChannelData(new TeamsChannelData() {{
-                setEventType("channelDeleted");
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("channelDeleted");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -213,12 +254,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelRenamed() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setChannelData(new TeamsChannelData() {{
-                setEventType("channelRenamed");
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("channelRenamed");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -232,12 +277,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamRenamed() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {{
-            setChannelData(new TeamsChannelData() {{
-                setEventType("teamRenamed");
-            }});
-            setChannelId(Channels.MSTEAMS);
-        }};
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamRenamed");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -251,17 +300,23 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestFileConsentAccept() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("accept");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("accept");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -280,22 +335,31 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestFileConsentDecline() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("fileConsent/invoke");
-            setValue(new FileConsentCardResponse() {{
-                setAction("decline");
-                setUploadInfo(new FileUploadInfo() {{
-                    setUniqueId("uniqueId");
-                    setFileType("fileType");
-                    setUploadUrl("uploadUrl");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("fileConsent/invoke");
+                setValue(new FileConsentCardResponse() {
+                    {
+                        setAction("decline");
+                        setUploadInfo(new FileUploadInfo() {
+                            {
+                                setUniqueId("uniqueId");
+                                setFileType("fileType");
+                                setUploadUrl("uploadUrl");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -314,15 +378,20 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestActionableMessageExecuteAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("actionableMessage/executeAction");
-            setValue(new O365ConnectorCardActionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("actionableMessage/executeAction");
+                setValue(new O365ConnectorCardActionQuery());
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -340,15 +409,20 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestComposeExtensionQueryLink() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/queryLink");
-            setValue(new AppBasedLinkQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/queryLink");
+                setValue(new AppBasedLinkQuery());
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -366,15 +440,20 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestComposeExtensionQuery() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/query");
-            setValue(new MessagingExtensionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/query");
+                setValue(new MessagingExtensionQuery());
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -392,15 +471,20 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionSelectItemAsync() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/selectItem");
-            setValue(new MessagingExtensionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/selectItem");
+                setValue(new MessagingExtensionQuery());
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -418,15 +502,20 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionSubmitAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionQuery());
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionQuery());
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -445,17 +534,24 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEdit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("edit");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("edit");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -474,17 +570,24 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSend() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/submitAction");
-            setValue(new MessagingExtensionAction() {{
-                setBotMessagePreviewAction("send");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/submitAction");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setBotMessagePreviewAction("send");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -503,17 +606,24 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionFetchTask() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/fetchTask");
-            setValue(new MessagingExtensionAction() {{
-                setCommandId("testCommand");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/fetchTask");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setCommandId("testCommand");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -531,17 +641,24 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionConfigurationQuerySettingUrl() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/querySettingUrl");
-            setValue(new MessagingExtensionAction() {{
-                setCommandId("testCommand");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/querySettingUrl");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setCommandId("testCommand");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -555,21 +672,31 @@ public class TeamsActivityHandlerTests {
 
         Assert.assertEquals(2, bot.record.size());
         Assert.assertEquals("onInvokeActivity", bot.record.get(0));
-        Assert.assertEquals("onTeamsMessagingExtensionConfigurationQuerySettingUrl", bot.record.get(1));
+        Assert.assertEquals(
+            "onTeamsMessagingExtensionConfigurationQuerySettingUrl",
+            bot.record.get(1)
+        );
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestMessagingExtensionConfigurationSetting() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("composeExtension/setting");
-            setValue(new MessagingExtensionAction() {{
-                setCommandId("testCommand");
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("composeExtension/setting");
+                setValue(new MessagingExtensionAction() {
+                    {
+                        setCommandId("testCommand");
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -587,23 +714,34 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestTaskModuleFetch() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("task/fetch");
-            setValue(new TaskModuleRequest() {{
-                setData(new HashMap<String, Object>() {{
-                    put("key", "value");
-                    put("type", "task / fetch");
-                }});
-                setContext(new TaskModuleRequestContext() {{
-                    setTheme("default");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("task/fetch");
+                setValue(new TaskModuleRequest() {
+                    {
+                        setData(new HashMap<String, Object>() {
+                            {
+                                put("key", "value");
+                                put("type", "task / fetch");
+                            }
+                        });
+                        setContext(new TaskModuleRequestContext() {
+                            {
+                                setTheme("default");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -621,23 +759,34 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestTaskModuleSubmit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("task/submit");
-            setValue(new TaskModuleRequest() {{
-                setData(new HashMap<String, Object>() {{
-                    put("key", "value");
-                    put("type", "task / fetch");
-                }});
-                setContext(new TaskModuleRequestContext() {{
-                    setTheme("default");
-                }});
-            }});
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("task/submit");
+                setValue(new TaskModuleRequest() {
+                    {
+                        setData(new HashMap<String, Object>() {
+                            {
+                                put("key", "value");
+                                put("type", "task / fetch");
+                            }
+                        });
+                        setContext(new TaskModuleRequestContext() {
+                            {
+                                setTheme("default");
+                            }
+                        });
+                    }
+                });
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -655,14 +804,19 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     @Test
     public void TestSigninVerifyState() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {{
-            setName("signin/verifyState");
-        }};
+        Activity activity = new Activity(ActivityTypes.INVOKE) {
+            {
+                setName("signin/verifyState");
+            }
+        };
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -680,7 +834,10 @@ public class TeamsActivityHandlerTests {
         Assert.assertNotNull(activitiesToSend.get());
         Assert.assertEquals(1, activitiesToSend.get().size());
         Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
-        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
     }
 
     private static class NotImplementedAdapter extends BotAdapter {
@@ -696,8 +853,9 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        public CompletableFuture<ResourceResponse> updateActivity(TurnContext context,
-                                                                  Activity activity
+        public CompletableFuture<ResourceResponse> updateActivity(
+            TurnContext context,
+            Activity activity
         ) {
             CompletableFuture<ResourceResponse> result = new CompletableFuture<>();
             result.completeExceptionally(new NotImplementedException("updateActivity"));
@@ -705,8 +863,9 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        public CompletableFuture<Void> deleteActivity(TurnContext context,
-                                                      ConversationReference reference
+        public CompletableFuture<Void> deleteActivity(
+            TurnContext context,
+            ConversationReference reference
         ) {
             CompletableFuture<Void> result = new CompletableFuture<>();
             result.completeExceptionally(new NotImplementedException("deleteActivity"));
@@ -718,15 +877,15 @@ public class TeamsActivityHandlerTests {
         public List<String> record = new ArrayList<>();
 
         @Override
-        protected CompletableFuture<InvokeResponse> onInvokeActivity(
-            TurnContext turnContext
-        ) {
+        protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
             record.add("onInvokeActivity");
             return super.onInvokeActivity(turnContext);
         }
 
         @Override
-        protected CompletableFuture<InvokeResponse> onTeamsCardActionInvoke(TurnContext turnContext) {
+        protected CompletableFuture<InvokeResponse> onTeamsCardActionInvoke(
+            TurnContext turnContext
+        ) {
             record.add("onTeamsCardActionInvoke");
             return super.onTeamsCardActionInvoke(turnContext);
         }
@@ -738,24 +897,27 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<InvokeResponse> onTeamsFileConsent(TurnContext turnContext,
-                                                                       FileConsentCardResponse fileConsentCardResponse
+        protected CompletableFuture<InvokeResponse> onTeamsFileConsent(
+            TurnContext turnContext,
+            FileConsentCardResponse fileConsentCardResponse
         ) {
             record.add("onTeamsFileConsent");
             return super.onTeamsFileConsent(turnContext, fileConsentCardResponse);
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsFileConsentAccept(TurnContext turnContext,
-                                                                   FileConsentCardResponse fileConsentCardResponse
+        protected CompletableFuture<Void> onTeamsFileConsentAccept(
+            TurnContext turnContext,
+            FileConsentCardResponse fileConsentCardResponse
         ) {
             record.add("onTeamsFileConsentAccept");
             return CompletableFuture.completedFuture(null);
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsFileConsentDecline(TurnContext turnContext,
-                                                                    FileConsentCardResponse fileConsentCardResponse
+        protected CompletableFuture<Void> onTeamsFileConsentDecline(
+            TurnContext turnContext,
+            FileConsentCardResponse fileConsentCardResponse
         ) {
             record.add("onTeamsFileConsentDecline");
             return CompletableFuture.completedFuture(null);
@@ -771,8 +933,9 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsO365ConnectorCardAction(TurnContext turnContext,
-                                                                         O365ConnectorCardActionQuery query
+        protected CompletableFuture<Void> onTeamsO365ConnectorCardAction(
+            TurnContext turnContext,
+            O365ConnectorCardActionQuery query
         ) {
             record.add("onTeamsO365ConnectorCardAction");
             return CompletableFuture.completedFuture(null);
@@ -878,8 +1041,9 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsTaskModuleSubmit(TurnContext turnContext,
-                                                                  TaskModuleRequest taskModuleRequest
+        protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleSubmit(
+            TurnContext turnContext,
+            TaskModuleRequest taskModuleRequest
         ) {
             record.add("onTeamsTaskModuleSubmit");
             return CompletableFuture.completedFuture(null);
@@ -892,8 +1056,9 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded,
-                                                         TurnContext turnContext
+        protected CompletableFuture<Void> onMembersAdded(
+            List<ChannelAccount> membersAdded,
+            TurnContext turnContext
         ) {
             record.add("onMembersAdded");
             return CompletableFuture.completedFuture(null);
@@ -929,36 +1094,40 @@ public class TeamsActivityHandlerTests {
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsChannelCreated(ChannelInfo channelInfo,
-                                                                TeamInfo teamInfo,
-                                                                TurnContext turnContext
+        protected CompletableFuture<Void> onTeamsChannelCreated(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
         ) {
             record.add("onTeamsChannelCreated");
             return super.onTeamsChannelCreated(channelInfo, teamInfo, turnContext);
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsChannelDeleted(ChannelInfo channelInfo,
-                                                                TeamInfo teamInfo,
-                                                                TurnContext turnContext
+        protected CompletableFuture<Void> onTeamsChannelDeleted(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
         ) {
             record.add("onTeamsChannelDeleted");
             return super.onTeamsChannelDeleted(channelInfo, teamInfo, turnContext);
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsChannelRenamed(ChannelInfo channelInfo,
-                                                                TeamInfo teamInfo,
-                                                                TurnContext turnContext
+        protected CompletableFuture<Void> onTeamsChannelRenamed(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
         ) {
             record.add("onTeamsChannelRenamed");
             return super.onTeamsChannelRenamed(channelInfo, teamInfo, turnContext);
         }
 
         @Override
-        protected CompletableFuture<Void> onTeamsTeamRenamed(ChannelInfo channelInfo,
-                                                             TeamInfo teamInfo,
-                                                             TurnContext turnContext
+        protected CompletableFuture<Void> onTeamsTeamRenamed(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
         ) {
             record.add("onTeamsTeamRenamed");
             return super.onTeamsTeamRenamed(channelInfo, teamInfo, turnContext);
@@ -969,64 +1138,138 @@ public class TeamsActivityHandlerTests {
         Conversations mockConversations = Mockito.mock(Conversations.class);
 
         // createConversation
-        Mockito.when(mockConversations.createConversation(Mockito.any(ConversationParameters.class))).thenReturn(
-            CompletableFuture.completedFuture(new ConversationResourceResponse() {{
+        Mockito.when(
+            mockConversations.createConversation(Mockito.any(ConversationParameters.class))
+        ).thenReturn(CompletableFuture.completedFuture(new ConversationResourceResponse() {
+            {
                 setId("team-id");
                 setServiceUrl("https://serviceUrl/");
                 setActivityId("activityId123");
-            }})
-        );
+            }
+        }));
 
         // getConversationMembers (Team)
         Mockito.when(mockConversations.getConversationMembers("team-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {{
-                add(new ChannelAccount() {{
-                    setId("id-1");
-                    setName("name-1");
-                    setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-1"));
-                    setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-1"));
-                    setProperties("surname", JsonNodeFactory.instance.textNode("surname-1"));
-                    setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
-                    setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-1"));
-                    setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-1"));
-                }});
-                add(new ChannelAccount() {{
-                    setId("id-2");
-                    setName("name-2");
-                    setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-2"));
-                    setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-2"));
-                    setProperties("surname", JsonNodeFactory.instance.textNode("surname-2"));
-                    setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
-                    setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-2"));
-                    setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-2"));
-                }});
-            }})
+            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
+                {
+                    add(new ChannelAccount() {
+                        {
+                            setId("id-1");
+                            setName("name-1");
+                            setProperties(
+                                "objectId",
+                                JsonNodeFactory.instance.textNode("objectId-1")
+                            );
+                            setProperties(
+                                "givenName",
+                                JsonNodeFactory.instance.textNode("givenName-1")
+                            );
+                            setProperties(
+                                "surname",
+                                JsonNodeFactory.instance.textNode("surname-1")
+                            );
+                            setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+                            setProperties(
+                                "userPrincipalName",
+                                JsonNodeFactory.instance.textNode("userPrincipalName-1")
+                            );
+                            setProperties(
+                                "tenantId",
+                                JsonNodeFactory.instance.textNode("tenantId-1")
+                            );
+                        }
+                    });
+                    add(new ChannelAccount() {
+                        {
+                            setId("id-2");
+                            setName("name-2");
+                            setProperties(
+                                "objectId",
+                                JsonNodeFactory.instance.textNode("objectId-2")
+                            );
+                            setProperties(
+                                "givenName",
+                                JsonNodeFactory.instance.textNode("givenName-2")
+                            );
+                            setProperties(
+                                "surname",
+                                JsonNodeFactory.instance.textNode("surname-2")
+                            );
+                            setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
+                            setProperties(
+                                "userPrincipalName",
+                                JsonNodeFactory.instance.textNode("userPrincipalName-2")
+                            );
+                            setProperties(
+                                "tenantId",
+                                JsonNodeFactory.instance.textNode("tenantId-2")
+                            );
+                        }
+                    });
+                }
+            })
         );
 
         // getConversationMembers (Group chat)
         Mockito.when(mockConversations.getConversationMembers("conversation-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {{
-                add(new ChannelAccount() {{
-                    setId("id-3");
-                    setName("name-3");
-                    setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-3"));
-                    setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-3"));
-                    setProperties("surname", JsonNodeFactory.instance.textNode("surname-3"));
-                    setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
-                    setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-3"));
-                    setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-3"));
-                }});
-                add(new ChannelAccount() {{
-                    setId("id-4");
-                    setName("name-4");
-                    setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-4"));
-                    setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-4"));
-                    setProperties("surname", JsonNodeFactory.instance.textNode("surname-4"));
-                    setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
-                    setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-4"));
-                    setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-4"));
-                }});
-            }})
+            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
+                {
+                    add(new ChannelAccount() {
+                        {
+                            setId("id-3");
+                            setName("name-3");
+                            setProperties(
+                                "objectId",
+                                JsonNodeFactory.instance.textNode("objectId-3")
+                            );
+                            setProperties(
+                                "givenName",
+                                JsonNodeFactory.instance.textNode("givenName-3")
+                            );
+                            setProperties(
+                                "surname",
+                                JsonNodeFactory.instance.textNode("surname-3")
+                            );
+                            setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
+                            setProperties(
+                                "userPrincipalName",
+                                JsonNodeFactory.instance.textNode("userPrincipalName-3")
+                            );
+                            setProperties(
+                                "tenantId",
+                                JsonNodeFactory.instance.textNode("tenantId-3")
+                            );
+                        }
+                    });
+                    add(new ChannelAccount() {
+                        {
+                            setId("id-4");
+                            setName("name-4");
+                            setProperties(
+                                "objectId",
+                                JsonNodeFactory.instance.textNode("objectId-4")
+                            );
+                            setProperties(
+                                "givenName",
+                                JsonNodeFactory.instance.textNode("givenName-4")
+                            );
+                            setProperties(
+                                "surname",
+                                JsonNodeFactory.instance.textNode("surname-4")
+                            );
+                            setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
+                            setProperties(
+                                "userPrincipalName",
+                                JsonNodeFactory.instance.textNode("userPrincipalName-4")
+                            );
+                            setProperties(
+                                "tenantId",
+                                JsonNodeFactory.instance.textNode("tenantId-4")
+                            );
+                        }
+                    });
+                }
+            })
         );
 
         ConnectorClient mockConnectorClient = Mockito.mock(ConnectorClient.class);

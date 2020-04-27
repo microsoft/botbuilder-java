@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents a transcript logger that writes activities to a <see cref="Trace"/> object.
+ * Represents a transcript logger that writes activities to a
+ * <see cref="Trace"/> object.
  */
 public class TraceTranscriptLogger implements TranscriptLogger {
     /**

@@ -39,6 +39,7 @@ public class ConversationReference {
 
     /**
      * Performs a deep copy of a ConversationReference.
+     * 
      * @param conversationReference The ConversationReference to copy.
      * @return A clone of the ConversationReference.
      */
@@ -47,18 +48,21 @@ public class ConversationReference {
             return null;
         }
 
-        return new ConversationReference() {{
-            setActivityId(conversationReference.getActivityId());
-            setBot(ChannelAccount.clone(conversationReference.getBot()));
-            setUser(ChannelAccount.clone(conversationReference.getUser()));
-            setConversation(ConversationAccount.clone(conversationReference.getConversation()));
-            setServiceUrl(conversationReference.getServiceUrl());
-            setChannelId(conversationReference.getChannelId());
-        }};
+        return new ConversationReference() {
+            {
+                setActivityId(conversationReference.getActivityId());
+                setBot(ChannelAccount.clone(conversationReference.getBot()));
+                setUser(ChannelAccount.clone(conversationReference.getUser()));
+                setConversation(ConversationAccount.clone(conversationReference.getConversation()));
+                setServiceUrl(conversationReference.getServiceUrl());
+                setChannelId(conversationReference.getChannelId());
+            }
+        };
     }
 
     /**
      * Creates {@link Activity} from conversation reference as it is posted to bot.
+     * 
      * @return A continuation activity.
      */
     @JsonIgnore
@@ -165,8 +169,8 @@ public class ConversationReference {
     }
 
     /**
-     * Service endpoint where operations concerning the referenced conversation
-     * may be performed.
+     * Service endpoint where operations concerning the referenced conversation may
+     * be performed.
      *
      * @return the serviceUrl value
      */
@@ -175,8 +179,8 @@ public class ConversationReference {
     }
 
     /**
-     * Service endpoint where operations concerning the referenced conversation
-     * may be performed.
+     * Service endpoint where operations concerning the referenced conversation may
+     * be performed.
      *
      * @param withServiceUrl the serviceUrl value to set
      */

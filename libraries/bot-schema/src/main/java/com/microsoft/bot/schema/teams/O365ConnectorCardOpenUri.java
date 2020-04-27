@@ -23,6 +23,7 @@ public class O365ConnectorCardOpenUri extends O365ConnectorCardActionBase {
 
     /**
      * Gets target os / urls.
+     * 
      * @return List of target urls.
      */
     public List<O365ConnectorCardOpenUriTarget> getTargets() {
@@ -31,6 +32,7 @@ public class O365ConnectorCardOpenUri extends O365ConnectorCardActionBase {
 
     /**
      * Sets target os / urls.
+     * 
      * @param withTargets List of target urls.
      */
     public void setTargets(List<O365ConnectorCardOpenUriTarget> withTargets) {

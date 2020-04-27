@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public interface NextDelegate {
     /**
      * The delegate to call to continue the bot middleware pipeline.
+     * 
      * @return Future task.
      */
     CompletableFuture<Void> next();

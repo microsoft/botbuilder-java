@@ -9,6 +9,7 @@ package com.microsoft.bot.builder;
 public interface RecognizerConvert {
     /**
      * Convert recognizer result.
+     * 
      * @param result Result to convert.
      */
     void convert(Object result);

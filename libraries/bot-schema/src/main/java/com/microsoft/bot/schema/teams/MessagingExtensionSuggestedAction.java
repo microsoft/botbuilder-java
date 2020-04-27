@@ -19,6 +19,7 @@ public class MessagingExtensionSuggestedAction {
 
     /**
      * Gets the actions.
+     * 
      * @return The list of CardActions.
      */
     public List<CardAction> getActions() {
@@ -27,6 +28,7 @@ public class MessagingExtensionSuggestedAction {
 
     /**
      * Sets the actions.
+     * 
      * @param withActions The list of CardActions.
      */
     public void setActions(List<CardAction> withActions) {

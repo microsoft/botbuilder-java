@@ -14,7 +14,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 
-
 public class TranscriptMiddlewareTest {
 
     @Test
@@ -33,9 +32,11 @@ public class TranscriptMiddlewareTest {
                 return null;
             }
         };
-        Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
-            setRelatesTo(context.getActivity().getRelatesTo());
-        }};
+        Activity typingActivity = new Activity(ActivityTypes.TYPING) {
+            {
+                setRelatesTo(context.getActivity().getRelatesTo());
+            }
+        };
 
         try {
             context.sendActivity(typingActivity).join();
@@ -49,36 +50,41 @@ public class TranscriptMiddlewareTest {
     @Test
     public final void Transcript_LogActivities() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] conversationId = {null};
+        TestAdapter adapter = (new TestAdapter()).use(
+            new TranscriptLoggerMiddleware(transcriptStore)
+        );
+        final String[] conversationId = { null };
 
         new TestFlow(adapter, (context) -> {
-                conversationId[0] = context.getActivity().getConversation().getId();
-                Activity typingActivity = new Activity(ActivityTypes.TYPING) {{
+            conversationId[0] = context.getActivity().getConversation().getId();
+            Activity typingActivity = new Activity(ActivityTypes.TYPING) {
+                {
                     setRelatesTo(context.getActivity().getRelatesTo());
-                }};
-
-                context.sendActivity(typingActivity).join();
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Assert.fail();
                 }
+            };
 
-                context.sendActivity("echo:" + context.getActivity().getText()).join();
-                return CompletableFuture.completedFuture(null);
-        })
-            .send("foo")
-            .assertReply((activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING))
-            .assertReply("echo:foo")
-            .send("bar")
-            .assertReply((activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING))
-            .assertReply("echo:bar")
-            .startTest().join();
+            context.sendActivity(typingActivity).join();
 
-        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
+
+            context.sendActivity("echo:" + context.getActivity().getText()).join();
+            return CompletableFuture.completedFuture(null);
+        }
+        ).send("foo").assertReply(
+            (activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING)
+        ).assertReply("echo:foo").send("bar").assertReply(
+            (activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING)
+        ).assertReply("echo:bar").startTest().join();
+
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0]
+        ).join();
         Assert.assertEquals(6, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertNotEquals(pagedResult.getItems().get(1), null);
@@ -97,9 +103,11 @@ public class TranscriptMiddlewareTest {
     @Test
     public void Transcript_LogUpdateActivities() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] conversationId = {null};
-        final Activity[] activityToUpdate = {null};
+        TestAdapter adapter = (new TestAdapter()).use(
+            new TranscriptLoggerMiddleware(transcriptStore)
+        );
+        final String[] conversationId = { null };
+        final Activity[] activityToUpdate = { null };
         new TestFlow(adapter, (context) -> {
             conversationId[0] = context.getActivity().getConversation().getId();
             if (context.getActivity().getText().equals("update")) {
@@ -115,29 +123,34 @@ public class TranscriptMiddlewareTest {
             }
 
             return CompletableFuture.completedFuture(null);
-        })
-            .send("foo")
-            .delay(50)
-            .send("update")
-            .delay(50)
-            .assertReply("new response")
-            .startTest().join();
+        }
+        ).send("foo").delay(50).send("update").delay(50).assertReply(
+            "new response"
+        ).startTest().join();
 
-        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0]
+        ).join();
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
-        Assert.assertEquals( ((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
+        Assert.assertEquals("new response", ((Activity) pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity) pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals(
+            ((Activity) pagedResult.getItems().get(1)).getId(),
+            ((Activity) pagedResult.getItems().get(2)).getId()
+        );
     }
 
     @Test
     public final void Transcript_LogDeleteActivities() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] conversationId = {null};
-        final String[] activityId = {null};
+        TestAdapter adapter = (new TestAdapter()).use(
+            new TranscriptLoggerMiddleware(transcriptStore)
+        );
+        final String[] conversationId = { null };
+        final String[] activityId = { null };
         new TestFlow(adapter, (context) -> {
             conversationId[0] = context.getActivity().getConversation().getId();
             if (context.getActivity().getText().equals("deleteIt")) {
@@ -149,27 +162,39 @@ public class TranscriptMiddlewareTest {
             }
 
             return CompletableFuture.completedFuture(null);
-        })
-            .send("foo")
-            .delay(50)
-            .assertReply("response")
-            .send("deleteIt")
-            .startTest().join();
+        }).send("foo").delay(50).assertReply("response").send("deleteIt").startTest().join();
 
-        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0]
+        ).join();
         for (Object act : pagedResult.getItems()) {
-            System.out.printf("Here is the object: %s : Type: %s\n", act.getClass().getTypeName(), ((Activity) act).getType());
+            System.out.printf(
+                "Here is the object: %s : Type: %s\n",
+                act.getClass().getTypeName(),
+                ((Activity) act).getType()
+            );
         }
 
         for (Object activity : pagedResult.getItems()) {
-            System.out.printf("Recipient: %s\nText: %s\n", ((Activity) activity).getRecipient().getName(), ((Activity) activity).getText());
+            System.out.printf(
+                "Recipient: %s\nText: %s\n",
+                ((Activity) activity).getRecipient().getName(),
+                ((Activity) activity).getText()
+            );
         }
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
         Assert.assertEquals("deleteIt", ((Activity) pagedResult.getItems().get(2)).getText());
-        Assert.assertEquals(ActivityTypes.MESSAGE_DELETE, ((Activity) pagedResult.getItems().get(3)).getType());
-        Assert.assertEquals(((Activity) pagedResult.getItems().get(1)).getId(), ((Activity) pagedResult.getItems().get(3)).getId());
+        Assert.assertEquals(
+            ActivityTypes.MESSAGE_DELETE,
+            ((Activity) pagedResult.getItems().get(3)).getType()
+        );
+        Assert.assertEquals(
+            ((Activity) pagedResult.getItems().get(1)).getId(),
+            ((Activity) pagedResult.getItems().get(3)).getId()
+        );
     }
 
     @Test
@@ -178,10 +203,12 @@ public class TranscriptMiddlewareTest {
         OffsetDateTime dateTimeStartOffset2 = OffsetDateTime.now(ZoneId.of("UTC"));
 
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
+        TestAdapter adapter = (new TestAdapter()).use(
+            new TranscriptLoggerMiddleware(transcriptStore)
+        );
 
-        final String[] conversationId = {null};
-        final Activity[] activityToUpdate = {null};
+        final String[] conversationId = { null };
+        final Activity[] activityToUpdate = { null };
         new TestFlow(adapter, (context) -> {
             conversationId[0] = context.getActivity().getConversation().getId();
             if (context.getActivity().getText().equals("update")) {
@@ -196,39 +223,59 @@ public class TranscriptMiddlewareTest {
             }
 
             return CompletableFuture.completedFuture(null);
-        })
-            .send("foo")
-            .delay(50)
-            .send("update")
-            .delay(50)
-            .assertReply("new response")
-            .startTest().join();
+        }
+        ).send("foo").delay(50).send("update").delay(50).assertReply(
+            "new response"
+        ).startTest().join();
 
-        PagedResult pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, dateTimeStartOffset1).join();
+        PagedResult pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0],
+            null,
+            dateTimeStartOffset1
+        ).join();
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
-        Assert.assertEquals(((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
+        Assert.assertEquals("new response", ((Activity) pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity) pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals(
+            ((Activity) pagedResult.getItems().get(1)).getId(),
+            ((Activity) pagedResult.getItems().get(2)).getId()
+        );
 
-        pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, OffsetDateTime.MIN).join();
+        pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0],
+            null,
+            OffsetDateTime.MIN
+        ).join();
         Assert.assertEquals(4, pagedResult.getItems().size());
         Assert.assertEquals("foo", ((Activity) pagedResult.getItems().get(0)).getText());
         Assert.assertEquals("response", ((Activity) pagedResult.getItems().get(1)).getText());
-        Assert.assertEquals("new response", ((Activity)pagedResult.getItems().get(2)).getText());
-        Assert.assertEquals("update", ((Activity)pagedResult.getItems().get(3)).getText());
-        Assert.assertEquals(((Activity)pagedResult.getItems().get(1)).getId(),  ((Activity) pagedResult.getItems().get(2)).getId());
+        Assert.assertEquals("new response", ((Activity) pagedResult.getItems().get(2)).getText());
+        Assert.assertEquals("update", ((Activity) pagedResult.getItems().get(3)).getText());
+        Assert.assertEquals(
+            ((Activity) pagedResult.getItems().get(1)).getId(),
+            ((Activity) pagedResult.getItems().get(2)).getId()
+        );
 
-        pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0], null, OffsetDateTime.MAX).join();
+        pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0],
+            null,
+            OffsetDateTime.MAX
+        ).join();
         Assert.assertEquals(0, pagedResult.getItems().size());
     }
 
     @Test
     public final void Transcript_RolesAreFilled() {
         MemoryTranscriptStore transcriptStore = new MemoryTranscriptStore();
-        TestAdapter adapter = (new TestAdapter()).use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] conversationId = {null};
+        TestAdapter adapter = (new TestAdapter()).use(
+            new TranscriptLoggerMiddleware(transcriptStore)
+        );
+        final String[] conversationId = { null };
 
         new TestFlow(adapter, (context) -> {
             // The next assert implicitly tests the immutability of the incoming
@@ -239,11 +286,12 @@ public class TranscriptMiddlewareTest {
             conversationId[0] = context.getActivity().getConversation().getId();
             context.sendActivity("echo:" + context.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
-        })
-            .send("test")
-            .startTest().join();
+        }).send("test").startTest().join();
 
-        PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
+        PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities(
+            "test",
+            conversationId[0]
+        ).join();
         Assert.assertEquals(2, pagedResult.getItems().size());
         Assert.assertNotNull(pagedResult.getItems().get(0).getFrom());
         Assert.assertEquals(RoleTypes.USER, pagedResult.getItems().get(0).getFrom().getRole());
@@ -253,4 +301,3 @@ public class TranscriptMiddlewareTest {
         System.out.printf("Complete");
     }
 }
-

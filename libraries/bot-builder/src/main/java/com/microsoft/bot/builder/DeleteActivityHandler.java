@@ -19,15 +19,20 @@ public interface DeleteActivityHandler {
      * @param context   The context object for the turn.
      * @param reference The conversation containing the activity.
      * @param next      The delegate to call to continue event processing.
-     * @return A task that represents the work queued to execute.
-     * A handler calls the {@code next} delegate to pass control to
-     * the next registered handler. If a handler doesn’t call the next delegate,
-     * the adapter does not call any of the subsequent handlers and does not delete the
-     * activity.
-     * <p>The conversation reference's {@link ConversationReference#getActivityId}
-     * indicates the activity in the conversation to replace.</p>
+     * @return A task that represents the work queued to execute. A handler calls
+     *         the {@code next} delegate to pass control to the next registered
+     *         handler. If a handler doesn’t call the next delegate, the adapter
+     *         does not call any of the subsequent handlers and does not delete the
+     *         activity.
+     *         <p>
+     *         The conversation reference's
+     *         {@link ConversationReference#getActivityId} indicates the activity in
+     *         the conversation to replace.
+     *         </p>
      */
-    CompletableFuture<Void> invoke(TurnContext context,
-                                   ConversationReference reference,
-                                   Supplier<CompletableFuture<Void>> next);
+    CompletableFuture<Void> invoke(
+        TurnContext context,
+        ConversationReference reference,
+        Supplier<CompletableFuture<Void>> next
+    );
 }

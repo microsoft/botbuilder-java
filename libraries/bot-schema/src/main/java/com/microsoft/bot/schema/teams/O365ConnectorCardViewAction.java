@@ -23,6 +23,7 @@ public class O365ConnectorCardViewAction extends O365ConnectorCardActionBase {
 
     /**
      * Gets target urls, only the first url effective for card button.
+     * 
      * @return List of button targets.
      */
     public List<String> getTarget() {
@@ -31,6 +32,7 @@ public class O365ConnectorCardViewAction extends O365ConnectorCardActionBase {
 
     /**
      * Sets target urls, only the first url effective for card button.
+     * 
      * @param withTarget List of button targets.
      */
     public void setTarget(List<String> withTarget) {

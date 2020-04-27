@@ -19,9 +19,11 @@ public interface ChannelProvider {
     CompletableFuture<String> getChannelService();
 
     /**
-     * Gets a value of whether this provider represents a channel on Government Azure.
+     * Gets a value of whether this provider represents a channel on Government
+     * Azure.
      *
-     * @return True if this channel provider represents a channel on Government Azure.
+     * @return True if this channel provider represents a channel on Government
+     *         Azure.
      */
     boolean isGovernment();
 

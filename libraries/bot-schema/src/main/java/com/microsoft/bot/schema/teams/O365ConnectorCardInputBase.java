@@ -25,8 +25,9 @@ public class O365ConnectorCardInputBase {
     private String value;
 
     /**
-     * Gets input type name. Possible values include: 'textInput',
-     * 'dateInput', 'multichoiceInput'
+     * Gets input type name. Possible values include: 'textInput', 'dateInput',
+     * 'multichoiceInput'
+     * 
      * @return The input type.
      */
     public String getType() {
@@ -34,8 +35,9 @@ public class O365ConnectorCardInputBase {
     }
 
     /**
-     * Sets input type name. Possible values include: 'textInput',
-     * 'dateInput', 'multichoiceInput'
+     * Sets input type name. Possible values include: 'textInput', 'dateInput',
+     * 'multichoiceInput'
+     * 
      * @param withType The input type.
      */
     public void setType(String withType) {
@@ -44,6 +46,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Gets the input Id. It must be unique per entire O365 connector card.
+     * 
      * @return The card id.
      */
     public String getId() {
@@ -52,6 +55,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Sets the input Id. It must be unique per entire O365 connector card.
+     * 
      * @param withId The card id.
      */
     public void setId(String withId) {
@@ -59,8 +63,8 @@ public class O365ConnectorCardInputBase {
     }
 
     /**
-     * Gets whether this input is a required field. Default
-     * value is false.
+     * Gets whether this input is a required field. Default value is false.
+     * 
      * @return True if required input.
      */
     public Boolean getRequired() {
@@ -69,6 +73,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Sets whether this input is a required field.
+     * 
      * @param withRequired True if required input.
      */
     public void setRequired(Boolean withRequired) {
@@ -77,6 +82,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Gets input title that will be shown as the placeholder.
+     * 
      * @return The input title.
      */
     public String getTitle() {
@@ -85,6 +91,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Sets input title that will be shown as the placeholder.
+     * 
      * @param withTitle The input title.
      */
     public void setTitle(String withTitle) {
@@ -93,6 +100,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Gets default value for this input field.
+     * 
      * @return The default input value.
      */
     public String getValue() {
@@ -101,6 +109,7 @@ public class O365ConnectorCardInputBase {
 
     /**
      * Sets default value for this input field.
+     * 
      * @param withValue The default input value.
      */
     public void setValue(String withValue) {

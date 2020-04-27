@@ -150,12 +150,15 @@ public class ThumbnailCard {
 
     /**
      * Creates an @{link Attachment} for this card.
+     * 
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
-        return new Attachment() {{
-            setContent(ThumbnailCard.this);
-            setContentType(CONTENTTYPE);
-        }};
+        return new Attachment() {
+            {
+                setContent(ThumbnailCard.this);
+                setContentType(CONTENTTYPE);
+            }
+        };
     }
 }

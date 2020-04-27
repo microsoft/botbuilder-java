@@ -18,34 +18,38 @@ public class CredentialsAuthenticator implements Authenticator {
 
     /**
      * Constructs an Authenticator using appId and appPassword.
-     * @param appId The app id.
-     * @param appPassword The app password.
+     *
+     * @param appId         The app id.
+     * @param appPassword   The app password.
      * @param configuration The OAuthConfiguration.
      * @throws MalformedURLException Invalid endpoint.
      */
-    CredentialsAuthenticator(
-        String appId, String appPassword, OAuthConfiguration configuration) throws MalformedURLException {
+    CredentialsAuthenticator(String appId, String appPassword, OAuthConfiguration configuration)
+        throws MalformedURLException {
 
-        app = ConfidentialClientApplication.builder(
-            appId, ClientCredentialFactory.create(appPassword))
+        app = ConfidentialClientApplication
+            .builder(appId, ClientCredentialFactory.create(appPassword))
             .authority(configuration.getAuthority())
             .build();
 
-        parameters = ClientCredentialParameters.builder(
-            Collections.singleton(configuration.getScope()))
+        parameters = ClientCredentialParameters
+            .builder(Collections.singleton(configuration.getScope()))
             .build();
     }
 
     /**
      * Gets an auth result via MSAL.
+     *
      * @return The auth result.
      */
     @Override
     public CompletableFuture<IAuthenticationResult> acquireToken() {
         return app.acquireToken(parameters)
-            .exceptionally(exception -> {
-                // wrapping whatever msal throws into our own exception
-                throw new AuthenticationException(exception);
-            });
+            .exceptionally(
+                exception -> {
+                    // wrapping whatever msal throws into our own exception
+                    throw new AuthenticationException(exception);
+                }
+            );
     }
 }

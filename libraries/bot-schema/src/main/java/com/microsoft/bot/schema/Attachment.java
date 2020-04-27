@@ -54,14 +54,14 @@ public class Attachment {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String thumbnailUrl;
     /**
-     * Holds the overflow properties that aren't first class
-     * properties in the object.  This allows extensibility
-     * while maintaining the object.
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
      */
     private HashMap<String, JsonNode> properties = new HashMap<String, JsonNode>();
 
     /**
      * Performs a deep copy of an Attachment.
+     *
      * @param attachment The Attachment to copy.
      * @return A cloned version of the Attachment.
      */
@@ -70,21 +70,24 @@ public class Attachment {
             return null;
         }
 
-        return new Attachment() {{
-            setContentType(attachment.getContentType());
-            setContent(attachment.getContent());
-            setContentUrl(attachment.getContentUrl());
-            setName(attachment.getName());
-            setThumbnailUrl(attachment.getThumbnailUrl());
+        return new Attachment() {
+            {
+                setContentType(attachment.getContentType());
+                setContent(attachment.getContent());
+                setContentUrl(attachment.getContentUrl());
+                setName(attachment.getName());
+                setThumbnailUrl(attachment.getThumbnailUrl());
 
-            for (String key : attachment.getProperties().keySet()) {
-                this.setProperties(key, attachment.getProperties().get(key));
+                for (String key : attachment.getProperties().keySet()) {
+                    this.setProperties(key, attachment.getProperties().get(key));
+                }
             }
-        }};
+        };
     }
 
     /**
      * Clones a List of Attachments.
+     *
      * @param attachments The list of Attachments to clone.
      * @return A new List of cloned Attachments.
      */
@@ -97,7 +100,6 @@ public class Attachment {
             .map(attachment -> Attachment.clone(attachment))
             .collect(Collectors.toCollection(ArrayList::new));
     }
-
 
     /**
      * Get the contentType value.
@@ -190,9 +192,9 @@ public class Attachment {
     }
 
     /**
-     * Overflow properties.
-     * Properties that are not modelled as first class properties in the object are accessible here.
-     * Note: A property value can be be nested.
+     * Overflow properties. Properties that are not modelled as first class
+     * properties in the object are accessible here. Note: A property value can be
+     * be nested.
      *
      * @return A Key-Value map of the properties
      */

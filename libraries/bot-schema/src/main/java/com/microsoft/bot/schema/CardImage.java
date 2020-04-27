@@ -40,6 +40,7 @@ public class CardImage {
 
     /**
      * Creates a new CardImage with an initial URL.
+     * 
      * @param withUrl The URL for the image.
      */
     public CardImage(String withUrl) {
