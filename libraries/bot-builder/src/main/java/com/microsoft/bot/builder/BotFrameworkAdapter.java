@@ -125,6 +125,11 @@ public class BotFrameworkAdapter extends BotAdapter
     private Map<String, ConnectorClient> connectorClients = new ConcurrentHashMap<>();
 
     /**
+     * OAuthClient cache.
+     */
+    private Map<String, OAuthClient> oAuthClients = new ConcurrentHashMap<>();
+
+    /**
      * Initializes a new instance of the {@link BotFrameworkAdapter} class, using a
      * credential provider.
      *
@@ -1287,31 +1292,37 @@ public class BotFrameworkAdapter extends BotAdapter
         }
 
         String appId = getBotAppId(turnContext);
+        String cacheKey = appId + (oAuthAppCredentials != null ? oAuthAppCredentials.getAppId() : "");
         String oAuthScope = getBotFrameworkOAuthScope();
         AppCredentials credentials = oAuthAppCredentials != null
             ? oAuthAppCredentials
             : getAppCredentials(appId, oAuthScope).join();
 
-        OAuthClient oAuthClient = new RestOAuthClient(
-            OAuthClientConfig.emulateOAuthCards
-                ? turnContext.getActivity().getServiceUrl()
-                : OAuthClientConfig.OAUTHENDPOINT,
-            credentials
-        );
+        OAuthClient client = oAuthClients.computeIfAbsent(cacheKey, key -> {
+                OAuthClient oAuthClient = new RestOAuthClient(
+                    OAuthClientConfig.emulateOAuthCards
+                        ? turnContext.getActivity().getServiceUrl()
+                        : OAuthClientConfig.OAUTHENDPOINT,
+                    credentials
+                );
+
+                if (OAuthClientConfig.emulateOAuthCards) {
+                    // do not join task - we want this to run in the background.
+                    OAuthClientConfig
+                        .sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards);
+                }
+
+                return oAuthClient;
+            });
 
         // adding the oAuthClient into the TurnState
         // TokenResolver.cs will use it get the correct credentials to poll for
         // token for streaming scenario
-        turnContext.getTurnState().add(BotAdapter.OAUTH_CLIENT_KEY, oAuthClient);
-
-        if (OAuthClientConfig.emulateOAuthCards) {
-            // do not join task - we want this to run in the background.
-            return OAuthClientConfig
-                .sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards)
-                .thenApply(result -> oAuthClient);
+        if (turnContext.getTurnState().get(BotAdapter.OAUTH_CLIENT_KEY) == null) {
+            turnContext.getTurnState().add(BotAdapter.OAUTH_CLIENT_KEY, client);
         }
 
-        return CompletableFuture.completedFuture(oAuthClient);
+        return CompletableFuture.completedFuture(client);
     }
 
     /**

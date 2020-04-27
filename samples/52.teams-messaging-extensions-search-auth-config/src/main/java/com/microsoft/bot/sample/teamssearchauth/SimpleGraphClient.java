@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.sample.teamssearchauth;
 
 
@@ -14,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SimpleGraphClient {
-
     private String token;
     public SimpleGraphClient(String token) {
         this.token = token;
@@ -34,18 +36,18 @@ public class SimpleGraphClient {
         return message.getCurrentPage().subList(0, 10);
     }
 
-    private IGraphServiceClient getAuthenticatedClient () {
-
+    private IGraphServiceClient getAuthenticatedClient() {
         // Create default logger to only log errors
         DefaultLogger logger = new DefaultLogger();
         logger.setLoggingLevel(LoggerLevel.ERROR);
 
-        SimpleAuthProvider authProvider = new SimpleAuthProvider(this.token);
         // Build a Graph client
         return GraphServiceClient.builder()
-            .authenticationProvider(authProvider)
+            .authenticationProvider(request -> {
+                // Add the access token in the Authorization header
+                request.addHeader("Authorization", "Bearer " + SimpleGraphClient.this.token);
+            })
             .logger(logger)
             .buildClient();
     }
-
 }
