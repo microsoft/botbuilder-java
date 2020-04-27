@@ -41,7 +41,7 @@ the Teams service needs to call into the bot.
 1) From the root of this project folder:
     - Build the sample using `mvn package`
     - Unless done previously, install the packages in the local cache by using `mvn install`
-    - Run it by using `java -jar .\target\bot-teams-task-module-sample.jar`
+    - Run it by using `java -jar .\target\bot-teams-start-new-thread-sample-.jar`
 
 
 ## Interacting with the bot in Teams
