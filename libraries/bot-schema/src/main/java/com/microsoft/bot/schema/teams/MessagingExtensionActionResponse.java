@@ -15,6 +15,7 @@ public class MessagingExtensionActionResponse {
     private TaskModuleResponseBase task;
 
     @JsonProperty(value = "composeExtension")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private MessagingExtensionResult composeExtension;
 
     /**

@@ -3,8 +3,7 @@
 
 Bot Framework v4 Conversation Bot sample for Teams.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+This Messaging Extension has been created using [Bot Framework](https://dev.botframework.com). It shows how to create a simple card based on parameters entered by the user from a Task Module.
 
 ## Prerequisites
 
@@ -50,21 +49,7 @@ the Teams service needs to call into the bot.
 
 You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
 
-1. **Show Welcome**
-  - **Result:** The bot will send the welcome card for you to interact with
-  - **Valid Scopes:** personal, group chat, team chat
-2. **MentionMe**
-  - **Result:** The bot will respond to the message and mention the user
-  - **Valid Scopes:** personal, group chat, team chat
-3. **MessageAllMembers**
-  - **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
-  - **Valid Scopes:** personal, group chat, team chat
-
-You can select an option from the command list by typing ```@TeamsConversationBot``` into the compose message area and ```What can I do?``` text above the compose area.
-
-### Avoiding Permission-Related Errors
-
-You may encounter permission-related errors when sending a proactive message. This can often be mitigated by using `MicrosoftAppCredentials.TrustServiceUrl()`. See [the documentation](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=csharp#avoiding-401-unauthorized-errors) for more information.
+Click the Messaging Extension icon in the Compose Box's Messaging Extension menu.
 
 ## Deploy the bot to Azure
 

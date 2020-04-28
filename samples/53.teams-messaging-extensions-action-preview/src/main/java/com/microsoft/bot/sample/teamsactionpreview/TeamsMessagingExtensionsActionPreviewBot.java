@@ -3,210 +3,231 @@
 
 package com.microsoft.bot.sample.teamsactionpreview;
 
-import com.codepoetics.protonpack.collectors.CompletableFutures;
-import com.microsoft.bot.builder.BotFrameworkAdapter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.builder.teams.TeamsInfo;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.integration.Configuration;
-import com.microsoft.bot.schema.ActionTypes;
+import com.microsoft.bot.sample.teamsactionpreview.models.AdaptiveCard;
+import com.microsoft.bot.sample.teamsactionpreview.models.Body;
+import com.microsoft.bot.sample.teamsactionpreview.models.Choice;
 import com.microsoft.bot.schema.Activity;
-import com.microsoft.bot.schema.CardAction;
-import com.microsoft.bot.schema.ConversationParameters;
-import com.microsoft.bot.schema.ConversationReference;
-import com.microsoft.bot.schema.HeroCard;
-import com.microsoft.bot.schema.Mention;
-import com.microsoft.bot.schema.teams.TeamInfo;
-import com.microsoft.bot.schema.teams.TeamsChannelAccount;
-import org.apache.commons.lang3.StringUtils;
+import com.microsoft.bot.schema.Attachment;
+import com.microsoft.bot.schema.teams.*;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the functionality of the Bot.
  *
  * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * added.  This sample shows how to create a simple card based on
+ * parameters entered by the user from a Task Module.
+ * </p>
  */
 @Component
 public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandler {
-    private String appId;
-    private String appPassword;
 
-    public TeamsMessagingExtensionsActionPreviewBot(Configuration configuration) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
+    @Override
+    protected CompletableFuture<Void> onMessageActivity(
+        TurnContext turnContext) {
+        if (turnContext.getActivity().getValue() != null) {
+            // This was a message from the card.
+            LinkedHashMap obj = (LinkedHashMap) turnContext.getActivity().getValue();
+            String answer = (String) obj.get("Answer");
+            String choices = (String) obj.get("Choices");
+         return turnContext.sendActivity(
+             MessageFactory.text(
+                 String.format("%1$s answered '%2$s' and chose '%3$s",
+                     turnContext.getActivity().getFrom().getName(),
+                     answer,
+                     choices)))
+             .thenApply(resourceResponse -> null);
+        }
+
+        // This is a regular text message.
+        return turnContext.sendActivity(MessageFactory.text("Hello from the TeamsMessagingExtensionsActionPreviewBot."))
+            .thenApply(resourceResponse -> null);
     }
 
     @Override
-    protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        turnContext.getActivity().removeRecipientMention();
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionFetchTask(
+        TurnContext turnContext,
+        MessagingExtensionAction action) {
 
-        switch (turnContext.getActivity().getText().trim()) {
-            case "MentionMe":
-                return mentionActivity(turnContext);
+        Attachment adaptiveCardEditor = getAdaptiveCardAttachment("adaptiveCardEditor.json");
 
-            case "UpdateCardAction":
-                return updateCardActivity(turnContext);
+        return CompletableFuture.completedFuture(
+            new MessagingExtensionActionResponse(){{
+                setTask(new TaskModuleContinueResponse(){{
+                    setValue(new TaskModuleTaskInfo(){{
+                        setCard(adaptiveCardEditor);
+                        setWidth(500);
+                        setHeight(450);
+                        setTitle("Task Module Fetch Example");
+                    }});
+                    setType("continue");
+                }});
+            }});
+    }
 
-            case "Delete":
-                return deleteCardActivity(turnContext);
+    @Override
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(
+        TurnContext turnContext,
+        MessagingExtensionAction action) {
 
-            case "MessageAllMembers":
-                return messageAllMembers(turnContext);
+        Attachment adaptiveCard = getAdaptiveCardAttachment("submitCard.json");
 
-            default:
-                // This will come back deserialized as a Map.
-                Object value = new Object() {
-                    int count = 0;
-                };
+        updateAttachmentAdaptiveCard(adaptiveCard, action);
 
-                HeroCard card = new HeroCard() {{
-                    setTitle("Welcome Card");
-                    setText("Click the buttons below to update this card");
-                    setButtons(Arrays.asList(
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Update Card");
-                            setText("UpdateCardAction");
-                            setValue(value);
-                        }},
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Message All Members");
-                            setText("MessageAllMembers");
-                        }}
-                    ));
-                }};
+        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
+            setComposeExtension(new MessagingExtensionResult(){{
+                setType("botMessagePreview");
+                setActivityPreview(MessageFactory.attachment(adaptiveCard));
+            }});
+        }});
+    }
 
-                return turnContext.sendActivity(MessageFactory.attachment(card.toAttachment()))
-                    .thenApply(resourceResponse -> null);
+    @Override
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewEdit(
+        TurnContext turnContext,
+        MessagingExtensionAction action) {
+
+        // This is a preview edit call and so this time we want to re-create the adaptive card editor.
+        Attachment adaptiveCard = getAdaptiveCardAttachment("adaptiveCardEditor.json");
+
+        Activity preview = action.getBotActivityPreview().get(0);
+        Attachment previewCard = preview.getAttachments().get(0);
+        updateAttachmentAdaptiveCardEdit(adaptiveCard, previewCard);
+
+        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
+            setTask(new TaskModuleContinueResponse(){{
+                setValue(new TaskModuleTaskInfo(){{
+                    setCard(adaptiveCard);
+                    setHeight(450);
+                    setWidth(500);
+                    setTitle("Task Module Fetch Example");
+                }});
+                setType("continue");
+            }});
+        }});
+    }
+
+    @Override
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewSend(
+        TurnContext turnContext,
+        MessagingExtensionAction action) {
+        // The data has been returned to the bot in the action structure.
+
+        Activity preview = action.getBotActivityPreview().get(0);
+        Attachment previewCard = preview.getAttachments().get(0);
+
+        Activity message = MessageFactory.attachment(previewCard);
+
+        return turnContext.sendActivity(message)
+            .thenApply(resourceResponse -> null);
+    }
+
+    @Override
+    protected CompletableFuture<Void> onTeamsMessagingExtensionCardButtonClicked(
+        TurnContext turnContext,
+        Object cardData) {
+        // If the adaptive card was added to the compose window (by either the OnTeamsMessagingExtensionSubmitActionAsync or
+        // OnTeamsMessagingExtensionBotMessagePreviewSendAsync handler's return values) the submit values will come in here.
+        Activity reply = MessageFactory.text("OnTeamsMessagingExtensionCardButtonClickedAsync");
+        return turnContext.sendActivity(reply)
+            .thenApply(resourceResponse -> null);
+    }
+
+    private Attachment getAdaptiveCardAttachment(String fileName) {
+        try {
+            InputStream input = getClass()
+                .getClassLoader()
+                .getResourceAsStream(fileName);
+            String content = IOUtils.toString(input, StandardCharsets.UTF_8);
+
+            return new Attachment(){{
+                setContentType("application/vnd.microsoft.card.adaptive");
+                setContent(new ObjectMapper().readValue(content, AdaptiveCard.class));
+            }};
+        } catch (IOException e) {
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("getAdaptiveCardAttachment", e);
+        }
+        return new Attachment();
+    }
+
+    private void updateAttachmentAdaptiveCard(
+        Attachment attachment,
+        MessagingExtensionAction action
+    ){
+        LinkedHashMap data = (LinkedHashMap) action.getData();
+        AdaptiveCard card = (AdaptiveCard) attachment.getContent();
+        for (Body item : card.getBody() ) {
+            if (item.getChoices() != null) {
+                for (int index = 0 ; index < 3 ; index++) {
+                    item.getChoices().get(index).setTitle((String) data.get("Option" + (index + 1)));
+                    item.getChoices().get(index).setValue((String) data.get("Option" + (index + 1)));
+                }
+            }
+
+            if (item.getId() != null && item.getId().equals("Question")) {
+                item.setText((String) data.get("Question"));
+            }
         }
     }
 
-    @Override
-    protected CompletableFuture<Void> onTeamsMembersAdded(
-        List<TeamsChannelAccount> membersAdded,
-        TeamInfo teamInfo,
-        TurnContext turnContext
+    private void updateAttachmentAdaptiveCardEdit(
+        Attachment attachment,
+        Attachment preview
     ) {
-        return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(
-                MessageFactory.text("Welcome to the team " + channel.getGivenName() + " " + channel.getSurname() + ".")))
-            .collect(CompletableFutures.toFutureList())
-            .thenApply(resourceResponses -> null);
-    }
+        AdaptiveCard prv = null;
+        try {
+            String cardAsString = new ObjectMapper().writeValueAsString(preview.getContent());
+            prv = new ObjectMapper().readValue(cardAsString, AdaptiveCard.class);
+        } catch (JsonProcessingException e) {
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("updateAttachmentAdaptiveCardEdit", e);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
+                .error("updateAttachmentAdaptiveCardEdit", e);
+        }
 
-    private CompletableFuture<Void> deleteCardActivity(TurnContext turnContext) {
-        return turnContext.deleteActivity(turnContext.getActivity().getReplyToId());
-    }
+        AdaptiveCard atc = (AdaptiveCard) attachment.getContent();
 
-    // If you encounter permission-related errors when sending this message, see
-    // https://aka.ms/BotTrustServiceUrl
-    private CompletableFuture<Void> messageAllMembers(TurnContext turnContext) {
-        String teamsChannelId = turnContext.getActivity().teamsGetChannelId();
-        String serviceUrl = turnContext.getActivity().getServiceUrl();
-        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
+        Body question = atc.getBody().stream()
+            .filter(i -> "Question".equals(i.getId()))
+            .findAny()
+            .orElse(null);
 
-        return TeamsInfo.getMembers(turnContext)
-            .thenCompose(members -> {
-                List<CompletableFuture<Void>> conversations = new ArrayList<>();
+        question.setValue(prv.getBody().stream()
+            .filter(i -> "Question".equals(i.getId()))
+            .findAny()
+            .orElse(null).getText());
 
-                // Send a message to each member.  These will all go out
-                // at the same time.
-                for (TeamsChannelAccount member : members) {
-                    Activity proactiveMessage = MessageFactory.text(
-                        "Hello " + member.getGivenName() + " " + member.getSurname()
-                            + ". I'm a Teams conversation bot.");
+        List<Body> options = atc.getBody().stream()
+            .filter(i -> i.getId()!= null && i.getId().startsWith("Option"))
+            .collect(Collectors.toList());
 
-                    ConversationParameters conversationParameters = new ConversationParameters() {{
-                       setIsGroup(false);
-                       setBot(turnContext.getActivity().getRecipient());
-                       setMembers(Collections.singletonList(member));
-                       setTenantId(turnContext.getActivity().getConversation().getTenantId());
-                    }};
+        for (Body item: options) {
+            int responseIndex = Integer.parseInt(item.getId().charAt(6) + "");
+            Choice choice = prv.getBody().stream()
+                .filter(i -> i.getId() != null && i.getId().equals("Choices"))
+                .findFirst()
+                .orElse(null)
+                .getChoices()
+                .get(responseIndex - 1);
 
-                    conversations.add(
-                        ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
-                            teamsChannelId,
-                            serviceUrl,
-                            credentials,
-                            conversationParameters,
-                            (context) -> {
-                                ConversationReference reference = context.getActivity().getConversationReference();
-                                return context.getAdapter().continueConversation(
-                                    appId,
-                                    reference,
-                                    (inner_context) -> inner_context.sendActivity(proactiveMessage)
-                                        .thenApply(resourceResponse -> null)
-                                );
-                            }
-                        )
-                    );
-                }
-
-                return CompletableFuture.allOf(conversations.toArray(new CompletableFuture[0]));
-            })
-            // After all member messages are sent, send confirmation to the user.
-            .thenApply(conversations -> turnContext.sendActivity(MessageFactory.text("All messages have been sent.")))
-            .thenApply(allSent -> null);
-    }
-
-    private CompletableFuture<Void> updateCardActivity(TurnContext turnContext) {
-        Map data = (Map) turnContext.getActivity().getValue();
-        data.put("count", (int) data.get("count") + 1);
-
-        HeroCard card = new HeroCard() {{
-            setTitle("Welcome Card");
-            setText("Update count - " + data.get("count"));
-            setButtons(Arrays.asList(
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Update Card");
-                    setText("UpdateCardAction");
-                    setValue(data);
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Message All Members");
-                    setText("MessageAllMembers");
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Delete card");
-                    setText("Delete");
-                }}
-            ));
-        }};
-
-        Activity updatedActivity = MessageFactory.attachment(card.toAttachment());
-        updatedActivity.setId(turnContext.getActivity().getReplyToId());
-
-        return turnContext.updateActivity(updatedActivity)
-            .thenApply(resourceResponse -> null);
-    }
-
-    private CompletableFuture<Void> mentionActivity(TurnContext turnContext) {
-        Mention mention = new Mention();
-        mention.setMentioned(turnContext.getActivity().getFrom());
-        mention.setText("<at>" + URLEncoder.encode(turnContext.getActivity().getFrom().getName()) + "</at>");
-
-        Activity replyActivity = MessageFactory.text("Hello " + mention.getText() + ".'");
-        replyActivity.setMentions(Collections.singletonList(mention));
-
-        return turnContext.sendActivity(replyActivity)
-            .thenApply(resourceResponse -> null);
+            item.setValue(choice.getValue());
+        }
     }
 }
