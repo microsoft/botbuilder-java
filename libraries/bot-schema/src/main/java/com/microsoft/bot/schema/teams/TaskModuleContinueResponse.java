@@ -13,8 +13,15 @@ public class TaskModuleContinueResponse extends TaskModuleResponseBase {
     private TaskModuleTaskInfo value;
 
     /**
+     * Initializes a new instance.
+     */
+    public TaskModuleContinueResponse() {
+        setType("continue");
+    }
+
+    /**
      * Gets the Adaptive card to appear in the task module.
-     * 
+     *
      * @return The value info.
      */
     public TaskModuleTaskInfo getValue() {
@@ -23,7 +30,7 @@ public class TaskModuleContinueResponse extends TaskModuleResponseBase {
 
     /**
      * Sets the Adaptive card to appear in the task module.
-     * 
+     *
      * @param withValue The value info.
      */
     public void setValue(TaskModuleTaskInfo withValue) {
