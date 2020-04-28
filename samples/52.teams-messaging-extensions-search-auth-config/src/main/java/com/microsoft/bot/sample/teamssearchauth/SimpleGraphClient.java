@@ -30,7 +30,6 @@ public class SimpleGraphClient {
 
         IMessageCollectionPage message = client.me().messages()
             .buildRequest(options)
-            .select("internetMessageHeaders")
             .get();
 
         return message.getCurrentPage().subList(0, 10);
