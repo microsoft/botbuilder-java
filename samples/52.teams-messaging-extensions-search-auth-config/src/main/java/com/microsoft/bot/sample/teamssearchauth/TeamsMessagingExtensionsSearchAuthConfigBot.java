@@ -13,11 +13,6 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.*;
 import com.microsoft.bot.schema.teams.*;
 import com.microsoft.graph.models.extensions.Message;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicReference;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -29,9 +24,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class implements the functionality of the Bot.
@@ -45,8 +45,6 @@ import java.util.concurrent.CompletionException;
 @Component
 public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHandler {
 
-    private String appId;
-    private String appPassword;
     private String siteUrl;
     private String connectionName;
     private UserState userState;
@@ -56,8 +54,6 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
         Configuration configuration,
         UserState userState
     ) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
         connectionName = configuration.getProperty("ConnectionName");
         siteUrl = configuration.getProperty("SiteUrl");
         userConfigProperty = userState.createProperty("UserConfiguration");
@@ -187,28 +183,26 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
 
         UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
         return tokenProvider.getUserToken(turnContext, connectionName, magicCode)
-            .thenApply(response -> {
+            .thenCompose(response -> {
                 if (response == null || StringUtils.isEmpty(response.getToken())) {
                     // There is no token, so the user has not signed in yet.
-                    String link = tokenProvider.getOauthSignInLink(turnContext, connectionName).join();
-                        //.thenApply(link -> {
-                            return new MessagingExtensionResponse() {{
-                                setComposeExtension(new MessagingExtensionResult() {{
-                                    setType("auth");
-                                    setSuggestedActions(
-                                        new MessagingExtensionSuggestedAction() {{
-                                            setAction(
-                                                new CardAction() {{
-                                                    setType(ActionTypes.OPEN_URL);
-                                                    setValue(link);
-                                                    setTitle("Bot Service OAuth");
-                                                }}
-                                            );
-                                        }}
-                                    );
-                                }});
-                            }};
-                        //});
+                    return tokenProvider.getOauthSignInLink(turnContext, connectionName)
+                        .thenApply(link -> new MessagingExtensionResponse() {{
+                            setComposeExtension(new MessagingExtensionResult() {{
+                                setType("auth");
+                                setSuggestedActions(
+                                    new MessagingExtensionSuggestedAction() {{
+                                        setAction(
+                                            new CardAction() {{
+                                                setType(ActionTypes.OPEN_URL);
+                                                setValue(link);
+                                                setTitle("Bot Service OAuth");
+                                            }}
+                                        );
+                                    }}
+                                );
+                            }});
+                        }});
                 }
 
                 String search = "";
@@ -216,7 +210,7 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
                     search = (String) query.getParameters().get(0).getValue();
                 }
 
-                return new MessagingExtensionResponse(searchMail(search, response.getToken()));
+                return CompletableFuture.completedFuture(new MessagingExtensionResponse(searchMail(search, response.getToken())));
             });
     }
 
