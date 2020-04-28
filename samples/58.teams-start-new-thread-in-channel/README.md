@@ -1,8 +1,9 @@
-﻿# Teams Task Module
+﻿# Teams Start Thread In A Team
 
-Bot Framework Teams Task Module sample.
+Bot Framework v4 Conversation Bot sample for Teams.
 
- This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
+how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
 
 ## Prerequisites
 
