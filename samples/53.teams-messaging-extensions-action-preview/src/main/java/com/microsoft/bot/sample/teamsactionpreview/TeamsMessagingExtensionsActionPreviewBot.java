@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.sample.teamsactionpreview.models.AdaptiveCard;
 import com.microsoft.bot.sample.teamsactionpreview.models.Body;
 import com.microsoft.bot.sample.teamsactionpreview.models.Choice;
@@ -37,13 +36,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandler {
-    private String appId;
-    private String appPassword;
-
-    public TeamsMessagingExtensionsActionPreviewBot(Configuration configuration) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
-    }
 
     @Override
     protected CompletableFuture<Void> onMessageActivity(
@@ -141,11 +133,8 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
 
         Activity message = MessageFactory.attachment(previewCard);
 
-        // THIS WILL WORK IF THE BOT IS INSTALLED. (SendActivityAsync will throw if the bot is not installed.)
-        turnContext.sendActivity(message)
+        return turnContext.sendActivity(message)
             .thenApply(resourceResponse -> null);
-
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
