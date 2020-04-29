@@ -32,8 +32,10 @@ the Teams service needs to call into the bot.
     - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
     - __*If you don't have an Azure account*__ you can use this [Bot Framework registration](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/create-a-bot-for-teams#register-your-web-service-with-the-bot-framework)
+    
+1) [Add Authentication to your bot via Azure Bot Service](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-authentication?view=azure-bot-service-4.0&tabs=csharp)
 
-1) Update the `resources/application.properties` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.)
+1) Update the `resources/application.properties` configuration for the bot to use the `MicrosoftAppId`, `MicrosfotAppPassword`, `ConnectionName`, and `SiteUrl` from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.)
 
 1) __*This step is specific to Teams.*__
     - **Edit** the `manifest.json` contained in the  `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) *everywhere* you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`)
@@ -46,21 +48,9 @@ the Teams service needs to call into the bot.
     - Run it by using `java -jar .\target\bot-teams-messaging-extensions-search-auth-config-sample.jar`
 
 
-## Interacting with the bot
+## Interacting with the bot in Teams
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
-
-1. **Show Welcome**
-  - **Result:** The bot will send the welcome card for you to interact with
-  - **Valid Scopes:** personal, group chat, team chat
-2. **MentionMe**
-  - **Result:** The bot will respond to the message and mention the user
-  - **Valid Scopes:** personal, group chat, team chat
-3. **MessageAllMembers**
-  - **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
-  - **Valid Scopes:** personal, group chat, team chat
-
-You can select an option from the command list by typing ```@TeamsConversationBot``` into the compose message area and ```What can I do?``` text above the compose area.
+Once the Messaging Extension is installed, click the icon for **Config Auth Search** in the Compose Box's Messaging Extension menu to display the search window.  Left click to choose **Settings** and view the Config page.
 
 ### Avoiding Permission-Related Errors
 

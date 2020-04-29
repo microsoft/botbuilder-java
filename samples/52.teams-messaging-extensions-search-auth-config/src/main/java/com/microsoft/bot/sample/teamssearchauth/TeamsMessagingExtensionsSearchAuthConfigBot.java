@@ -3,210 +3,374 @@
 
 package com.microsoft.bot.sample.teamssearchauth;
 
-import com.codepoetics.protonpack.collectors.CompletableFutures;
-import com.microsoft.bot.builder.BotFrameworkAdapter;
-import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.builder.teams.TeamsInfo;
-import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
+import com.microsoft.bot.connector.ExecutorFactory;
 import com.microsoft.bot.integration.Configuration;
-import com.microsoft.bot.schema.ActionTypes;
-import com.microsoft.bot.schema.Activity;
-import com.microsoft.bot.schema.CardAction;
-import com.microsoft.bot.schema.ConversationParameters;
-import com.microsoft.bot.schema.ConversationReference;
-import com.microsoft.bot.schema.HeroCard;
-import com.microsoft.bot.schema.Mention;
-import com.microsoft.bot.schema.teams.TeamInfo;
-import com.microsoft.bot.schema.teams.TeamsChannelAccount;
+import com.microsoft.bot.schema.*;
+import com.microsoft.bot.schema.teams.*;
+import com.microsoft.graph.models.extensions.Message;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class implements the functionality of the Bot.
  *
- * <p>This is where application specific logic for interacting with the users would be
- * added.  For this sample, the {@link #onMessageActivity(TurnContext)} echos the text
- * back to the user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting
- * to new conversation participants.</p>
+ * <p>
+ * This is where application specific logic for interacting with the users would be added. For this
+ * sample, the {@link #onMessageActivity(TurnContext)} echos the text back to the user. The {@link
+ * #onMembersAdded(List, TurnContext)} will send a greeting to new conversation participants.
+ * </p>
  */
 @Component
 public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHandler {
-    private String appId;
-    private String appPassword;
 
-    public TeamsMessagingExtensionsSearchAuthConfigBot(Configuration configuration) {
-        appId = configuration.getProperty("MicrosoftAppId");
-        appPassword = configuration.getProperty("MicrosoftAppPassword");
+    private String siteUrl;
+    private String connectionName;
+    private UserState userState;
+    private StatePropertyAccessor<String> userConfigProperty;
+
+    public TeamsMessagingExtensionsSearchAuthConfigBot(
+        Configuration configuration,
+        UserState userState
+    ) {
+        connectionName = configuration.getProperty("ConnectionName");
+        siteUrl = configuration.getProperty("SiteUrl");
+        userConfigProperty = userState.createProperty("UserConfiguration");
+        this.userState = userState;
     }
 
     @Override
-    protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        turnContext.getActivity().removeRecipientMention();
+    public CompletableFuture<Void> onTurn(TurnContext turnContext) {
+        return super.onTurn(turnContext)
+            .thenCompose(saveResult -> userState.saveChanges(turnContext));
+    }
 
-        switch (turnContext.getActivity().getText().trim()) {
-            case "MentionMe":
-                return mentionActivity(turnContext);
+    @Override
+    protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionConfigurationQuerySettingUrl(
+        TurnContext turnContext,
+        MessagingExtensionQuery query
+    ) {
+        return userConfigProperty.get(turnContext, () -> "").thenApply(userConfigSettings -> {
+            AtomicReference<String> escapedSettings = new AtomicReference<>("");
+            if (!StringUtils.isEmpty(userConfigSettings)) {
+                try {
+                    escapedSettings.set(
+                        URLEncoder.encode(userConfigSettings, StandardCharsets.UTF_8.toString()));
+                } catch (UnsupportedEncodingException e) {
+                    escapedSettings.set(userConfigSettings);
+                }
+            }
 
-            case "UpdateCardAction":
-                return updateCardActivity(turnContext);
+            return new MessagingExtensionResponse(new MessagingExtensionResult() {{
+                setType("config");
+                setSuggestedActions(new MessagingExtensionSuggestedAction() {{
+                    setAction(new CardAction() {{
+                        setType(ActionTypes.OPEN_URL);
+                        setValue(String.format("%s/searchSettings.html?settings=%s",
+                            siteUrl, escapedSettings.get()));
+                    }});
+                }});
+            }});
+        });
+    }
 
-            case "Delete":
-                return deleteCardActivity(turnContext);
+    @Override
+    protected CompletableFuture<Void> onTeamsMessagingExtensionConfigurationSetting(
+        TurnContext turnContext,
+        Object settings
+    ) {
+        if (settings != null) {
+            Map<String, String> settingsData = (Map<String, String>) settings;
+            String state = settingsData.get("state");
+            return userConfigProperty.set(turnContext, state);
+        }
 
-            case "MessageAllMembers":
-                return messageAllMembers(turnContext);
+        return CompletableFuture.completedFuture(null);
+    }
 
-            default:
-                // This will come back deserialized as a Map.
-                Object value = new Object() {
-                    int count = 0;
-                };
+    @Override
+    protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(
+        TurnContext turnContext,
+        MessagingExtensionQuery query
+    ) {
+        return userConfigProperty.get(turnContext)
+            .thenCompose(settings -> {
+                if (settings != null && settings.toLowerCase().contains("email")) {
+                    return emailExtensionQuery(turnContext, query);
+                }
 
-                HeroCard card = new HeroCard() {{
-                    setTitle("Welcome Card");
-                    setText("Click the buttons below to update this card");
-                    setButtons(Arrays.asList(
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Update Card");
-                            setText("UpdateCardAction");
-                            setValue(value);
-                        }},
-                        new CardAction() {{
-                            setType(ActionTypes.MESSAGE_BACK);
-                            setTitle("Message All Members");
-                            setText("MessageAllMembers");
-                        }}
-                    ));
+                return packageExtensionQuery(query);
+            });
+    }
+
+    private CompletableFuture<MessagingExtensionResponse> packageExtensionQuery(
+        MessagingExtensionQuery query
+    ) {
+        String search = "";
+        if (query.getParameters() != null && !query.getParameters().isEmpty()) {
+            search = (String) query.getParameters().get(0).getValue();
+        }
+
+        return findPackages(search).thenApply(packages -> {
+            List<MessagingExtensionAttachment> attachments = new ArrayList<>();
+            for (String[] item : packages) {
+                ThumbnailCard previewCard = new ThumbnailCard() {{
+                    setTitle(item[0]);
+                    setTap(new CardAction() {{
+                        setType(ActionTypes.INVOKE);
+                        setValue(new JSONObject().put("data", item).toString());
+                    }});
                 }};
 
-                return turnContext.sendActivity(MessageFactory.attachment(card.toAttachment()))
-                    .thenApply(resourceResponse -> null);
+                if (!StringUtils.isEmpty(item[4])) {
+                    previewCard.setImage(new CardImage() {{
+                        setUrl(item[4]);
+                        setAlt("Icon");
+                    }});
+                }
+
+                MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
+                    setContentType(HeroCard.CONTENTTYPE);
+                    setContent(new HeroCard() {{
+                        setTitle(item[0]);
+                    }});
+                    setPreview(previewCard.toAttachment());
+                }};
+
+                attachments.add(attachment);
+            }
+
+            return new MessagingExtensionResponse(new MessagingExtensionResult() {{
+                setType("result");
+                setAttachmentLayout("list");
+                setAttachments(attachments);
+            }});
+        });
+    }
+
+    private CompletableFuture<MessagingExtensionResponse> emailExtensionQuery(
+        TurnContext turnContext,
+        MessagingExtensionQuery query
+    ) {
+        // When the Bot Service Auth flow completes, the action.State will contain a
+        // magic code used for verification.
+        String magicCode = "";
+        String state = query.getState();
+        if (state != null && !state.isEmpty()) {
+            magicCode = state;
+        }
+
+        UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
+        return tokenProvider.getUserToken(turnContext, connectionName, magicCode)
+            .thenCompose(response -> {
+                if (response == null || StringUtils.isEmpty(response.getToken())) {
+                    // There is no token, so the user has not signed in yet.
+                    return tokenProvider.getOauthSignInLink(turnContext, connectionName)
+                        .thenApply(link -> new MessagingExtensionResponse() {{
+                            setComposeExtension(new MessagingExtensionResult() {{
+                                setType("auth");
+                                setSuggestedActions(
+                                    new MessagingExtensionSuggestedAction() {{
+                                        setAction(
+                                            new CardAction() {{
+                                                setType(ActionTypes.OPEN_URL);
+                                                setValue(link);
+                                                setTitle("Bot Service OAuth");
+                                            }}
+                                        );
+                                    }}
+                                );
+                            }});
+                        }});
+                }
+
+                String search = "";
+                if (query.getParameters() != null && !query.getParameters().isEmpty()) {
+                    search = (String) query.getParameters().get(0).getValue();
+                }
+
+                return CompletableFuture.completedFuture(new MessagingExtensionResponse(searchMail(search, response.getToken())));
+            });
+    }
+
+    @Override
+    protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionSelectItem(
+        TurnContext turnContext,
+        Object query
+    ) {
+        Map cardValue = (Map) query;
+        List<String> data = (ArrayList) cardValue.get("data");
+        ThumbnailCard card = new ThumbnailCard() {{
+            setTitle(data.get(0));
+            setSubtitle(data.get(2));
+            setButtons(Arrays.asList(new CardAction() {{
+                setType(ActionTypes.OPEN_URL);
+                setTitle("Project");
+                setValue(data.get(3));
+            }}));
+        }};
+
+        if (!StringUtils.isEmpty(data.get(4))) {
+            card.setImage(new CardImage() {{
+                setUrl(data.get(4));
+                setAlt("Icon");
+            }});
+        }
+
+        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
+            setContentType(ThumbnailCard.CONTENTTYPE);
+            setContent(card);
+        }};
+
+        MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
+            setType("result");
+            setAttachmentLayout("list");
+            setAttachments(Collections.singletonList(attachment));
+        }};
+
+        return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
+    }
+
+    @Override
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(
+        TurnContext turnContext,
+        MessagingExtensionAction action
+    ) {
+        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse());
+    }
+
+    @Override
+    protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionFetchTask(
+        TurnContext turnContext,
+        MessagingExtensionAction action
+    ) {
+        if (action.getCommandId().toUpperCase().equals("SIGNOUTCOMMAND")) {
+            UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
+            return tokenProvider.signOutUser(
+                turnContext,
+                connectionName,
+                turnContext.getActivity().getFrom().getId()
+            ).thenApply(response -> new MessagingExtensionActionResponse() {{
+                setTask(new TaskModuleContinueResponse() {{
+                    setValue(new TaskModuleTaskInfo() {{
+                        setCard(createAdaptiveCardAttachment());
+                        setHeight(200);
+                        setWidth(400);
+                        setTitle("Adaptive Card: Inputs");
+                    }});
+                }});
+            }});
+        }
+
+        return notImplemented();
+    }
+
+    private Attachment createAdaptiveCardAttachment() {
+        try (
+            InputStream input = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("adaptiveCard.json")
+        ) {
+            String adaptiveCardJson = IOUtils.toString(input, StandardCharsets.UTF_8.toString());
+
+            return new Attachment() {{
+                setContentType("application/vnd.microsoft.card.adaptive");
+                setContent(Serialization.jsonToTree(adaptiveCardJson));
+            }};
+        } catch (IOException e) {
+            (LoggerFactory.getLogger(TeamsMessagingExtensionsSearchAuthConfigBot.class))
+                .error("Unable to createAdaptiveCardAttachment", e);
+            return new Attachment();
         }
     }
 
-    @Override
-    protected CompletableFuture<Void> onTeamsMembersAdded(
-        List<TeamsChannelAccount> membersAdded,
-        TeamInfo teamInfo,
-        TurnContext turnContext
-    ) {
-        return membersAdded.stream()
-            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-            .map(channel -> turnContext.sendActivity(
-                MessageFactory.text("Welcome to the team " + channel.getGivenName() + " " + channel.getSurname() + ".")))
-            .collect(CompletableFutures.toFutureList())
-            .thenApply(resourceResponses -> null);
-    }
+    private MessagingExtensionResult searchMail(String text, String token) {
+        SimpleGraphClient graph = new SimpleGraphClient(token);
+        List<Message> messages = graph.searchMailInbox(text);
 
-    private CompletableFuture<Void> deleteCardActivity(TurnContext turnContext) {
-        return turnContext.deleteActivity(turnContext.getActivity().getReplyToId());
-    }
+        List<MessagingExtensionAttachment> attachments = new ArrayList<>();
+        for (Message msg : messages) {
+            attachments.add(new MessagingExtensionAttachment() {{
+                setContentType(HeroCard.CONTENTTYPE);
+                setContent(new HeroCard() {{
+                    setTitle(msg.from.emailAddress.address);
+                    setSubtitle(msg.subject);
+                    setText(msg.body.content);
+                }});
+                setPreview(new ThumbnailCard() {{
+                    setTitle(msg.from.emailAddress.address);
+                    setText(String.format("%s<br />%s", msg.subject, msg.bodyPreview));
+                    setImage(new CardImage() {{
+                        setUrl(
+                            "https://raw.githubusercontent.com/microsoft/botbuilder-samples/master/docs/media/OutlookLogo.jpg"
+                        );
+                        setAlt("Outlook logo");
+                    }});
+                }}.toAttachment());
+            }});
+        }
 
-    // If you encounter permission-related errors when sending this message, see
-    // https://aka.ms/BotTrustServiceUrl
-    private CompletableFuture<Void> messageAllMembers(TurnContext turnContext) {
-        String teamsChannelId = turnContext.getActivity().teamsGetChannelId();
-        String serviceUrl = turnContext.getActivity().getServiceUrl();
-        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
-
-        return TeamsInfo.getMembers(turnContext)
-            .thenCompose(members -> {
-                List<CompletableFuture<Void>> conversations = new ArrayList<>();
-
-                // Send a message to each member.  These will all go out
-                // at the same time.
-                for (TeamsChannelAccount member : members) {
-                    Activity proactiveMessage = MessageFactory.text(
-                        "Hello " + member.getGivenName() + " " + member.getSurname()
-                            + ". I'm a Teams conversation bot.");
-
-                    ConversationParameters conversationParameters = new ConversationParameters() {{
-                       setIsGroup(false);
-                       setBot(turnContext.getActivity().getRecipient());
-                       setMembers(Collections.singletonList(member));
-                       setTenantId(turnContext.getActivity().getConversation().getTenantId());
-                    }};
-
-                    conversations.add(
-                        ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
-                            teamsChannelId,
-                            serviceUrl,
-                            credentials,
-                            conversationParameters,
-                            (context) -> {
-                                ConversationReference reference = context.getActivity().getConversationReference();
-                                return context.getAdapter().continueConversation(
-                                    appId,
-                                    reference,
-                                    (inner_context) -> inner_context.sendActivity(proactiveMessage)
-                                        .thenApply(resourceResponse -> null)
-                                );
-                            }
-                        )
-                    );
-                }
-
-                return CompletableFuture.allOf(conversations.toArray(new CompletableFuture[0]));
-            })
-            // After all member messages are sent, send confirmation to the user.
-            .thenApply(conversations -> turnContext.sendActivity(MessageFactory.text("All messages have been sent.")))
-            .thenApply(allSent -> null);
-    }
-
-    private CompletableFuture<Void> updateCardActivity(TurnContext turnContext) {
-        Map data = (Map) turnContext.getActivity().getValue();
-        data.put("count", (int) data.get("count") + 1);
-
-        HeroCard card = new HeroCard() {{
-            setTitle("Welcome Card");
-            setText("Update count - " + data.get("count"));
-            setButtons(Arrays.asList(
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Update Card");
-                    setText("UpdateCardAction");
-                    setValue(data);
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Message All Members");
-                    setText("MessageAllMembers");
-                }},
-                new CardAction() {{
-                    setType(ActionTypes.MESSAGE_BACK);
-                    setTitle("Delete card");
-                    setText("Delete");
-                }}
-            ));
+        return new MessagingExtensionResult() {{
+            setType("result");
+            setAttachmentLayout("list");
+            setAttachments(attachments);
         }};
-
-        Activity updatedActivity = MessageFactory.attachment(card.toAttachment());
-        updatedActivity.setId(turnContext.getActivity().getReplyToId());
-
-        return turnContext.updateActivity(updatedActivity)
-            .thenApply(resourceResponse -> null);
     }
 
-    private CompletableFuture<Void> mentionActivity(TurnContext turnContext) {
-        Mention mention = new Mention();
-        mention.setMentioned(turnContext.getActivity().getFrom());
-        mention.setText("<at>" + URLEncoder.encode(turnContext.getActivity().getFrom().getName()) + "</at>");
+    private CompletableFuture<List<String[]>> findPackages(String text) {
+        return CompletableFuture.supplyAsync(() -> {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(
+                String.format(
+                    "https://azuresearch-usnc.nuget.org/query?q=id:%s&prerelease=true",
+                    text
+                )
+            ).build();
 
-        Activity replyActivity = MessageFactory.text("Hello " + mention.getText() + ".'");
-        replyActivity.setMentions(Collections.singletonList(mention));
+            List<String[]> filteredItems = new ArrayList<String[]>();
+            try {
+                Response response = client.newCall(request).execute();
+                JSONObject obj = new JSONObject(response.body().string());
+                JSONArray dataArray = (JSONArray) obj.get("data");
 
-        return turnContext.sendActivity(replyActivity)
-            .thenApply(resourceResponse -> null);
+                dataArray.forEach(i -> {
+                    JSONObject item = (JSONObject) i;
+                    filteredItems.add(
+                        new String[]{
+                            item.getString("id"), item.getString("version"),
+                            item.getString("description"),
+                            item.has("projectUrl") ? item.getString("projectUrl") : "",
+                            item.has("iconUrl") ? item.getString("iconUrl") : ""
+                        }
+                    );
+                });
+
+            } catch (IOException e) {
+                LoggerFactory.getLogger(TeamsMessagingExtensionsSearchAuthConfigBot.class)
+                    .error("findPackages", e);
+                throw new CompletionException(e);
+            }
+            return filteredItems;
+        }, ExecutorFactory.getExecutor());
     }
 }
