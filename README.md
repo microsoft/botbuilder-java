@@ -48,26 +48,17 @@ CheckStyle is available in different flavours:
 Any IDE that can import and work with Maven projects should work.  As a matter of practice we use the command line to perform Maven builds.  If your IDE can be configured to defer build and run to Maven it should also work.
 - Java
   - We use the [Azul JDK 8](https://www.azul.com/downloads/azure-only/zulu/?version=java-8-lts&architecture=x86-64-bit&package=jdk) to build and test with.  While not a requirement to develop the SDK with, it is recommended as this is what Azure is using for Java 1.8.  If you do install this JDK, make sure your IDE is targeting that JVM, and your path (from command line) and JAVA_HOME point to that.
-  
+
 - Visual Studio Code
   - Extensions
     - Java Extension Pack by Microsoft
-    - Checkstyle for Java by ShengChen (Optional)
     - EditorConfig for VS Code by EditorConfig (Recommended)
-  - Recommended setup
-    - Open the settings for "Language Support for Java by RedHat" and set:
-      - Java > Format > Settings: Profile = "BotFramework"
-      - Java > Format > Settings: Url = "etc/botframework-java-formatter.xml"
-      - This will format the code (on command) to BotFramework style.
-    
+
 - IntelliJ
   - Extensions
     - Checkstyle by IDEA
-    - Eclipse Code Formatter by Vojtech-Krasa (Recommended)
   - Recommended setup
     - When importing the SDK for the first time, make sure "Auto import" is checked.
-    - If the Eclipse Code Formatter was installed:
-      - Got to Settings > Other Settings -> Eclipse Code Formatter, and set the formatter config file to etc/botframework-java-formatter.xml
 
 ## Reporting Security Issues
 
