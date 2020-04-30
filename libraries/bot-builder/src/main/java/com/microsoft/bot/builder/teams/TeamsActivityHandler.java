@@ -456,18 +456,17 @@ public class TeamsActivityHandler extends ActivityHandler {
                 try {
                     teamsChannelAccount = TeamsInfo.getMember(turnContext, memberAdded.getId()).join();
                 } catch (CompletionException ex) {
-                    try {
-                        throw ex.getCause();
-                    } catch (ErrorResponseException erx) {
-                        ErrorResponse response = erx.body();
+                    Throwable causeException = ex.getCause();
+                    if (causeException instanceof ErrorResponseException) {
+                        ErrorResponse response = ((ErrorResponseException) causeException).body();
                         if (response != null) {
                             Error error = response.getError();
                             if (error != null && !error.getCode().equals("ConversationNotFound")) {
-                                throw erx;
+                                throw ex;
                             }
                         }
-                    } catch (Throwable impossible) {
-                        throw new AssertionError(impossible);
+                    } else  {
+                        throw ex;
                     }
                 }
 
