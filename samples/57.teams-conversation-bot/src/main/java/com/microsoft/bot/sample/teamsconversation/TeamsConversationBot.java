@@ -78,20 +78,7 @@ public class TeamsConversationBot extends TeamsActivityHandler {
                     {
                         setTitle("Welcome Card");
                         setText("Click the buttons below to update this card");
-                        setButtons(Arrays.asList(new CardAction() {
-                            {
-                                setType(ActionTypes.MESSAGE_BACK);
-                                setTitle("Update Card");
-                                setText("UpdateCardAction");
-                                setValue(value);
-                            }
-                        }, new CardAction() {
-                            {
-                                setType(ActionTypes.MESSAGE_BACK);
-                                setTitle("Message All Members");
-                                setText("MessageAllMembers");
-                            }
-                        }));
+                        setButtons(getHeroCardButtons(value));
                     }
                 };
 
@@ -189,26 +176,7 @@ public class TeamsConversationBot extends TeamsActivityHandler {
             {
                 setTitle("Welcome Card");
                 setText("Update count - " + data.get("count"));
-                setButtons(Arrays.asList(new CardAction() {
-                    {
-                        setType(ActionTypes.MESSAGE_BACK);
-                        setTitle("Update Card");
-                        setText("UpdateCardAction");
-                        setValue(data);
-                    }
-                }, new CardAction() {
-                    {
-                        setType(ActionTypes.MESSAGE_BACK);
-                        setTitle("Message All Members");
-                        setText("MessageAllMembers");
-                    }
-                }, new CardAction() {
-                    {
-                        setType(ActionTypes.MESSAGE_BACK);
-                        setTitle("Delete card");
-                        setText("Delete");
-                    }
-                }));
+                setButtons(getHeroCardButtons(data));
             }
         };
 
@@ -218,6 +186,35 @@ public class TeamsConversationBot extends TeamsActivityHandler {
         return turnContext.updateActivity(updatedActivity).thenApply(resourceResponse -> null);
     }
 
+    private List<CardAction> getHeroCardButtons(Object value) {
+        return Arrays.asList(new CardAction() {
+            {
+                setType(ActionTypes.MESSAGE_BACK);
+                setTitle("Update Card");
+                setText("UpdateCardAction");
+                setValue(value);
+            }
+        }, new CardAction() {
+            {
+                setType(ActionTypes.MESSAGE_BACK);
+                setTitle("Message All Members");
+                setText("MessageAllMembers");
+            }
+        }, new CardAction() {
+            {
+                setType(ActionTypes.MESSAGE_BACK);
+                setTitle("Delete card");
+                setText("Delete");
+            }
+        }, new CardAction() {
+            {
+                setType(ActionTypes.MESSAGE_BACK);
+                setTitle("Who am I?");
+                setText("MentionMe");
+            }
+        });
+    }
+
     private CompletableFuture<Void> mentionActivity(TurnContext turnContext) {
         Mention mention = new Mention();
         mention.setMentioned(turnContext.getActivity().getFrom());
@@ -225,7 +222,7 @@ public class TeamsConversationBot extends TeamsActivityHandler {
             "<at>" + URLEncoder.encode(turnContext.getActivity().getFrom().getName()) + "</at>"
         );
 
-        Activity replyActivity = MessageFactory.text("Hello " + mention.getText() + ".'");
+        Activity replyActivity = MessageFactory.text("Hello " + mention.getText() + ".");
         replyActivity.setMentions(Collections.singletonList(mention));
 
         return turnContext.sendActivity(replyActivity).thenApply(resourceResponse -> null);
