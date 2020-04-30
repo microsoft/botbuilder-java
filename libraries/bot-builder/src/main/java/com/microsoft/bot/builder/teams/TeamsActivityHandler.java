@@ -9,7 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.rest.ErrorResponseException;
 import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.Error;
+import com.microsoft.bot.schema.ErrorResponse;
 import com.microsoft.bot.schema.ResultPair;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
@@ -30,10 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.stream.Collectors;
 
 /**
  * A Teams implementation of the Bot interface intended for further subclassing.
@@ -439,11 +440,11 @@ public class TeamsActivityHandler extends ActivityHandler {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
 
-        Map<String, TeamsChannelAccount> teamMembers = null;
-
         List<TeamsChannelAccount> teamsMembersAdded = new ArrayList<>();
         for (ChannelAccount memberAdded : membersAdded) {
             if (!memberAdded.getProperties().isEmpty()) {
+                // when the ChannelAccount object is fully a TeamsChannelAccount
+                // (when Teams changes the service to return the full details)
                 try {
                     JsonNode node = mapper.valueToTree(memberAdded);
                     teamsMembersAdded.add(mapper.treeToValue(node, TeamsChannelAccount.class));
@@ -451,32 +452,34 @@ public class TeamsActivityHandler extends ActivityHandler {
                     return withException(jpe);
                 }
             } else {
-                // this code path is intended to be temporary and should be removed in 4.7/4.8
-                // or whenever Teams is updated
-
-                // we have a simple ChannelAccount so will try to flesh out the details using
-                // the getMembers call
-                if (teamMembers == null) {
-                    List<TeamsChannelAccount> result = TeamsInfo.getMembers(turnContext).join();
-                    teamMembers = result.stream().collect(
-                        Collectors.toMap(ChannelAccount::getId, item -> item)
-                    );
+                TeamsChannelAccount teamsChannelAccount = null;
+                try {
+                    teamsChannelAccount = TeamsInfo.getMember(turnContext, memberAdded.getId()).join();
+                } catch (CompletionException ex) {
+                    Throwable causeException = ex.getCause();
+                    if (causeException instanceof ErrorResponseException) {
+                        ErrorResponse response = ((ErrorResponseException) causeException).body();
+                        if (response != null) {
+                            Error error = response.getError();
+                            if (error != null && !error.getCode().equals("ConversationNotFound")) {
+                                throw ex;
+                            }
+                        }
+                    } else  {
+                        throw ex;
+                    }
                 }
 
-                if (teamMembers.containsKey(memberAdded.getId())) {
-                    teamsMembersAdded.add(teamMembers.get(memberAdded.getId()));
-                } else {
-                    // unable to find the member added in ConversationUpdate Activity in the
-                    // response from
-                    // the getMembers call
-                    TeamsChannelAccount newTeamsChannelAccount = new TeamsChannelAccount();
-                    newTeamsChannelAccount.setId(memberAdded.getId());
-                    newTeamsChannelAccount.setName(memberAdded.getName());
-                    newTeamsChannelAccount.setAadObjectId(memberAdded.getAadObjectId());
-                    newTeamsChannelAccount.setRole(memberAdded.getRole());
-
-                    teamsMembersAdded.add(newTeamsChannelAccount);
+                if (teamsChannelAccount == null) {
+                    // unable to find the member added in ConversationUpdate Activity in the response from the
+                    // getMember call
+                    teamsChannelAccount = new TeamsChannelAccount();
+                    teamsChannelAccount.setId(memberAdded.getId());
+                    teamsChannelAccount.setName(memberAdded.getName());
+                    teamsChannelAccount.setAadObjectId(memberAdded.getAadObjectId());
+                    teamsChannelAccount.setRole(memberAdded.getRole());
                 }
+                teamsMembersAdded.add(teamsChannelAccount);
             }
         }
 

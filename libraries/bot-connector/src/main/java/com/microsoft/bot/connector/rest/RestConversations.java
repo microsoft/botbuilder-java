@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.azure.AzureResponseBuilder;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.AttachmentData;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -606,12 +607,13 @@ public class RestConversations implements Conversations {
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return ((AzureResponseBuilder<ChannelAccount, ErrorResponseException>) client.restClient()
             .responseBuilderFactory()
             .<ChannelAccount, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ChannelAccount>() {
             }.getType())
-            .registerError(ErrorResponseException.class)
+            .registerError(ErrorResponseException.class))
+            .withThrowOnGet404(true)
             .build(response);
     }
 
