@@ -141,6 +141,8 @@ public class TeamsActivityHandlerTests {
                                 setGivenName("given-1");
                                 setSurname("surname-1");
                                 setUserPrincipalName("t@microsoft.com");
+                                setTenantId("testTenantId");
+                                setUserRole("guest");
                             }
                         });
                     }

@@ -24,9 +24,15 @@ public class TeamsChannelAccount extends ChannelAccount {
     @JsonProperty(value = "userPrincipalName")
     private String userPrincipalName;
 
+    @JsonProperty(value = "userRole")
+    private String userRole;
+
+    @JsonProperty(value = "tenantId")
+    private String tenantId;
+
     /**
      * Gets given name part of the user name.
-     * 
+     *
      * @return The users given name.
      */
     public String getGivenName() {
@@ -35,7 +41,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets given name part of the user name.
-     * 
+     *
      * @param withGivenName The users given name.
      */
     public void setGivenName(String withGivenName) {
@@ -44,7 +50,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets surname part of the user name.
-     * 
+     *
      * @return The users surname.
      */
     public String getSurname() {
@@ -53,7 +59,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets surname part of the user name.
-     * 
+     *
      * @param withSurname The users surname.
      */
     public void setSurname(String withSurname) {
@@ -62,7 +68,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets email Id of the user.
-     * 
+     *
      * @return The users email address.
      */
     public String getEmail() {
@@ -71,7 +77,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets email Id of the user.
-     * 
+     *
      * @param withEmail The users email address.
      */
     public void setEmail(String withEmail) {
@@ -80,7 +86,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets unique user principal name.
-     * 
+     *
      * @return The users principal name.
      */
     public String getUserPrincipalName() {
@@ -89,7 +95,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets unique user principal name.
-     * 
+     *
      * @param withUserPrincipalName The users principal name.
      */
     public void setUserPrincipalName(String withUserPrincipalName) {
@@ -98,7 +104,7 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Gets the AAD object id.
-     * 
+     *
      * @return The AAD object id.
      */
     @JsonGetter(value = "objectId")
@@ -108,11 +114,47 @@ public class TeamsChannelAccount extends ChannelAccount {
 
     /**
      * Sets the AAD object id.
-     * 
+     *
      * @param withObjectId The AAD object Id.
      */
     @JsonSetter(value = "objectId")
     public void setObjectId(String withObjectId) {
         setAadObjectId(withObjectId);
+    }
+
+    /**
+     * Gets user role.
+     *
+     * @return The user role.
+     */
+    public String getUserRole() {
+        return userRole;
+    }
+
+    /**
+     * Sets user role.
+     *
+     * @param withUserRole The user role.
+     */
+    public void setUserRole(String withUserRole) {
+        userRole = withUserRole;
+    }
+
+    /**
+     * Gets the tenant id.
+     *
+     * @return The tenant id.
+     */
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    /**
+     * Sets tenant id.
+     *
+     * @param withTenantId The tenant id.
+     */
+    public void setTenantId(String withTenantId) {
+        tenantId = withTenantId;
     }
 }
