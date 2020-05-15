@@ -52,6 +52,43 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TeamsActivityHandlerTests {
     @Test
+    public void TestConversationUpdateBotTeamsMemberAdded() {
+        String baseUri = "https://test.coffee";
+        ConnectorClient connectorClient = getConnectorClient(
+            "http://localhost/",
+            MicrosoftAppCredentials.empty()
+        );
+
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setMembersAdded(new ArrayList<ChannelAccount>() {
+                    {
+                        add(new ChannelAccount("botid-1"));
+                    }
+                });
+                setRecipient(new ChannelAccount("botid-1"));
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamMemberAdded");
+                        setTeam(new TeamInfo("team-id"));
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
+        turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsMembersAdded", bot.record.get(1));
+    }
+
+    @Test
     public void TestConversationUpdateTeamsMemberAdded() {
         String baseUri = "https://test.coffee";
         ConnectorClient connectorClient = getConnectorClient(
@@ -100,7 +137,7 @@ public class TeamsActivityHandlerTests {
             {
                 setMembersAdded(new ArrayList<ChannelAccount>() {
                     {
-                        add(new ChannelAccount("id-3"));
+                        add(new ChannelAccount("id-1"));
                     }
                 });
                 setRecipient(new ChannelAccount("b"));
@@ -1272,6 +1309,72 @@ public class TeamsActivityHandlerTests {
                     });
                 }
             })
+        );
+
+        // getConversationMember (Team)
+        Mockito.when(mockConversations.getConversationMember("id-1", "team-id")).thenReturn(
+            CompletableFuture.completedFuture(
+                new ChannelAccount() {
+                    {
+                        setId("id-1");
+                        setName("name-1");
+                        setProperties(
+                            "objectId",
+                            JsonNodeFactory.instance.textNode("objectId-1")
+                        );
+                        setProperties(
+                            "givenName",
+                            JsonNodeFactory.instance.textNode("givenName-1")
+                        );
+                        setProperties(
+                            "surname",
+                            JsonNodeFactory.instance.textNode("surname-1")
+                        );
+                        setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+                        setProperties(
+                            "userPrincipalName",
+                            JsonNodeFactory.instance.textNode("userPrincipalName-1")
+                        );
+                        setProperties(
+                            "tenantId",
+                            JsonNodeFactory.instance.textNode("tenantId-1")
+                        );
+                    }
+                }
+            )
+        );
+
+        // getConversationMember (Group chat)
+        Mockito.when(mockConversations.getConversationMember("id-1", "conversation-id")).thenReturn(
+            CompletableFuture.completedFuture(
+                new ChannelAccount() {
+                    {
+                        setId("id-1");
+                        setName("name-1");
+                        setProperties(
+                            "objectId",
+                            JsonNodeFactory.instance.textNode("objectId-1")
+                        );
+                        setProperties(
+                            "givenName",
+                            JsonNodeFactory.instance.textNode("givenName-1")
+                        );
+                        setProperties(
+                            "surname",
+                            JsonNodeFactory.instance.textNode("surname-1")
+                        );
+                        setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+                        setProperties(
+                            "userPrincipalName",
+                            JsonNodeFactory.instance.textNode("userPrincipalName-1")
+                        );
+                        setProperties(
+                            "tenantId",
+                            JsonNodeFactory.instance.textNode("tenantId-1")
+                        );
+                    }
+                }
+            )
         );
 
         ConnectorClient mockConnectorClient = Mockito.mock(ConnectorClient.class);
