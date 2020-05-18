@@ -324,11 +324,7 @@ public final class TeamsInfo {
 
         ConversationParameters conversationParameters = new ConversationParameters();
         conversationParameters.setIsGroup(true);
-        // conversationParameters.setChannelData(new Object() {
-        // Object channel = new Object() {
-        // String id = teamsChannelId;
-        // };
-        // });
+
         conversationParameters.setChannelData(teamsChannelData);
         conversationParameters.setActivity(activity);
 
