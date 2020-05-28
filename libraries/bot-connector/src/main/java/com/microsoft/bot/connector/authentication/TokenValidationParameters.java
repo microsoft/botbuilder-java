@@ -42,6 +42,17 @@ public class TokenValidationParameters {
     public boolean requireSignedTokens;
 
     /**
+     * Optional (and not recommended) Function to return OpenIdMetaData resolver
+     * for a given url.
+     */
+    public OpenIdMetadataResolver issuerSigningKeyResolver;
+
+    /**
+     * True to validate the signing cert.
+     */
+    public boolean validateIssuerSigningKey = true;
+
+    /**
      * Default parameters.
      */
     public TokenValidationParameters() {
@@ -61,6 +72,8 @@ public class TokenValidationParameters {
             other.clockSkew,
             other.requireSignedTokens
         );
+        this.issuerSigningKeyResolver = other.issuerSigningKeyResolver;
+        this.validateIssuerSigningKey = other.validateIssuerSigningKey;
     }
 
     /**

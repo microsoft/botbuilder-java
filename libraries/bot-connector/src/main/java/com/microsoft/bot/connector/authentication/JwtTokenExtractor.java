@@ -9,6 +9,12 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.Verification;
 import com.microsoft.bot.connector.ExecutorFactory;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
+import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +22,16 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Extracts relevant data from JWT Tokens.
  */
 public class JwtTokenExtractor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenIdMetadata.class);
-    private static final ConcurrentMap<String, OpenIdMetadata> OPENID_METADATA_CACHE =
-        new ConcurrentHashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachingOpenIdMetadata.class);
 
     private TokenValidationParameters tokenValidationParameters;
     private List<String> allowedSigningAlgorithms;
+    private OpenIdMetadataResolver openIdMetadataResolver;
     private OpenIdMetadata openIdMetadata;
 
     /**
@@ -43,13 +46,18 @@ public class JwtTokenExtractor {
         String withMetadataUrl,
         List<String> withAllowedSigningAlgorithms
     ) {
-
         this.tokenValidationParameters =
             new TokenValidationParameters(withTokenValidationParameters);
         this.tokenValidationParameters.requireSignedTokens = true;
         this.allowedSigningAlgorithms = withAllowedSigningAlgorithms;
-        this.openIdMetadata = OPENID_METADATA_CACHE
-            .computeIfAbsent(withMetadataUrl, key -> new OpenIdMetadata(withMetadataUrl));
+
+        if (tokenValidationParameters.issuerSigningKeyResolver == null) {
+            this.openIdMetadataResolver = new CachingOpenIdMetadataResolver();
+        } else {
+            this.openIdMetadataResolver = tokenValidationParameters.issuerSigningKeyResolver;
+        }
+
+        this.openIdMetadata = this.openIdMetadataResolver.get(withMetadataUrl);
     }
 
     /**
@@ -143,13 +151,27 @@ public class JwtTokenExtractor {
             try {
                 verification.build().verify(token);
 
+                // If specified, validate the signing certificate.
+                if (
+                    tokenValidationParameters.validateIssuerSigningKey
+                    && key.certificateChain != null
+                    && key.certificateChain.size() > 0
+                ) {
+                    // Note that decodeCertificate will return null if the cert could not
+                    // be decoded.  This would likely be the case if it were in an expected
+                    // encoding.  Going to err on the side of ignoring this check.
+                    // May want to reconsider this and throw on null cert.
+                    X509Certificate cert = decodeCertificate(key.certificateChain.get(0));
+                    if (cert != null && !isCertValid(cert)) {
+                        throw new JWTVerificationException("Signing certificate is not valid");
+                    }
+                }
+
                 // Note: On the Emulator Code Path, the endorsements collection is null so the
-                // validation code
-                // below won't run. This is normal.
+                // validation code below won't run. This is normal.
                 if (key.endorsements != null) {
                     // Validate Channel / Token Endorsements. For this, the channelID present on the
-                    // Activity
-                    // needs to be matched by an endorsement.
+                    // Activity needs to be matched by an endorsement.
                     boolean isEndorsed =
                         EndorsementsValidator.validate(channelId, key.endorsements);
                     if (!isEndorsed) {
@@ -162,8 +184,7 @@ public class JwtTokenExtractor {
                     }
 
                     // Verify that additional endorsements are satisfied. If no additional
-                    // endorsements are expected,
-                    // the requirement is satisfied as well
+                    // endorsements are expected, the requirement is satisfied as well
                     boolean additionalEndorsementsSatisfied = requiredEndorsements.stream()
                         .allMatch(
                             (endorsement) -> EndorsementsValidator
@@ -194,5 +215,22 @@ public class JwtTokenExtractor {
                 throw new AuthenticationException(ex);
             }
         }, ExecutorFactory.getExecutor());
+    }
+
+    private X509Certificate decodeCertificate(String certStr) {
+        try {
+            byte[] decoded = Base64.getDecoder().decode(certStr);
+            return (X509Certificate) CertificateFactory
+                .getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
+        } catch (CertificateException e) {
+            return null;
+        }
+    }
+
+    private boolean isCertValid(X509Certificate cert) {
+        Date now = new Date();
+        Date endValid = cert.getNotAfter();
+        Date startValid = cert.getNotBefore();
+        return now.getTime() >= startValid.getTime() && now.getTime() <= endValid.getTime();
     }
 }
