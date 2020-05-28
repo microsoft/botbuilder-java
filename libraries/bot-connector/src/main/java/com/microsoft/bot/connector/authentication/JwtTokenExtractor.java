@@ -231,6 +231,7 @@ public class JwtTokenExtractor {
         Date now = new Date();
         Date endValid = cert.getNotAfter();
         Date startValid = cert.getNotBefore();
-        return now.getTime() >= startValid.getTime() && now.getTime() <= endValid.getTime();
+        return now.getTime() >= (startValid.getTime() - tokenValidationParameters.clockSkew.toMillis())
+            && now.getTime() <= (endValid.getTime() + tokenValidationParameters.clockSkew.toMillis());
     }
 }
