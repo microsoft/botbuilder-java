@@ -158,7 +158,7 @@ public class JwtTokenExtractor {
                     && key.certificateChain.size() > 0
                 ) {
                     // Note that decodeCertificate will return null if the cert could not
-                    // be decoded.  This would likely be the case if it were in an expected
+                    // be decoded.  This would likely be the case if it were in an unexpected
                     // encoding.  Going to err on the side of ignoring this check.
                     // May want to reconsider this and throw on null cert.
                     X509Certificate cert = decodeCertificate(key.certificateChain.get(0));
@@ -222,16 +222,16 @@ public class JwtTokenExtractor {
             byte[] decoded = Base64.getDecoder().decode(certStr);
             return (X509Certificate) CertificateFactory
                 .getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
-        } catch (CertificateException e) {
+        } catch (Throwable t) {
             return null;
         }
     }
 
     private boolean isCertValid(X509Certificate cert) {
-        Date now = new Date();
-        Date endValid = cert.getNotAfter();
-        Date startValid = cert.getNotBefore();
-        return now.getTime() >= (startValid.getTime() - tokenValidationParameters.clockSkew.toMillis())
-            && now.getTime() <= (endValid.getTime() + tokenValidationParameters.clockSkew.toMillis());
+        long now = (new Date()).getTime();
+        long clockskew = tokenValidationParameters.clockSkew.toMillis();
+        long startValid = cert.getNotBefore().getTime() - clockskew;
+        long endValid = cert.getNotAfter().getTime() + clockskew;
+        return now >= startValid && now <= endValid;
     }
 }
