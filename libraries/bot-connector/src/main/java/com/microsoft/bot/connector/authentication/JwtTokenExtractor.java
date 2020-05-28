@@ -227,7 +227,7 @@ public class JwtTokenExtractor {
     }
 
     private boolean isCertValid(X509Certificate cert) {
-        long now = (new Date()).getTime();
+        long now = new Date().getTime();
         long clockskew = tokenValidationParameters.clockSkew.toMillis();
         long startValid = cert.getNotBefore().getTime() - clockskew;
         long endValid = cert.getNotAfter().getTime() + clockskew;
