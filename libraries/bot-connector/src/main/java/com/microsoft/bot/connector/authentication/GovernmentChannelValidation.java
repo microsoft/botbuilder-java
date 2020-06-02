@@ -20,7 +20,7 @@ public final class GovernmentChannelValidation {
      * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting
      * to a bot.
      */
-    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
+    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
         new TokenValidationParameters() {
             {
                 this.validateIssuer = true;
