@@ -442,8 +442,11 @@ public class TeamsActivityHandler extends ActivityHandler {
 
         List<TeamsChannelAccount> teamsMembersAdded = new ArrayList<>();
         for (ChannelAccount memberAdded : membersAdded) {
-            if (!memberAdded.getProperties().isEmpty()) {
-                // when the ChannelAccount object is fully a TeamsChannelAccount
+            boolean isBot = turnContext.getActivity().getRecipient() != null
+                && StringUtils.equals(memberAdded.getId(), turnContext.getActivity().getRecipient().getId());
+
+            if (!memberAdded.getProperties().isEmpty() || isBot) {
+                // when the ChannelAccount object is fully a TeamsChannelAccount, or for the bot
                 // (when Teams changes the service to return the full details)
                 try {
                     JsonNode node = mapper.valueToTree(memberAdded);
