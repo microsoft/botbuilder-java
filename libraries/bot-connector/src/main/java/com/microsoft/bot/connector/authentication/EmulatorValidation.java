@@ -23,7 +23,7 @@ public final class EmulatorValidation {
      * TO BOT FROM EMULATOR: Token validation parameters when connecting to a
      * channel.
      */
-    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
+    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
         new TokenValidationParameters() {
             {
                 this.validateIssuer = true;

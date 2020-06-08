@@ -9,9 +9,11 @@ import java.util.List;
 /**
  * Wrapper to hold Jwk key data.
  */
-class OpenIdMetadataKey {
+public class OpenIdMetadataKey {
     @SuppressWarnings("checkstyle:VisibilityModifier")
-    RSAPublicKey key;
+    public RSAPublicKey key;
     @SuppressWarnings("checkstyle:VisibilityModifier")
-    List<String> endorsements;
+    public List<String> endorsements;
+    @SuppressWarnings("checkstyle:VisibilityModifier")
+    public List<String> certificateChain;
 }
