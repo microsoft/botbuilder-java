@@ -14,6 +14,9 @@ public class OAuthCardTest {
         }
     };
 
+    /**
+     *Ensures that the OAuthCard can be used as an attachment.
+     */
     @Test
     public void testToAttachment() {
         Attachment attachment = card.toAttachment();
