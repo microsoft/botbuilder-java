@@ -6,6 +6,9 @@ package com.microsoft.bot.schema;
 import org.junit.Assert;
 import org.junit.Test;
 
+/***
+ * Tests to ensure the VideoCard methods work as expected.
+ */
 public class VideoCardTest {
     VideoCard card = new VideoCard(){
         {

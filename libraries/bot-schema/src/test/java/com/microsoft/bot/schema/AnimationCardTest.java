@@ -20,10 +20,10 @@ public class AnimationCardTest {
         }
     };
 
-    @Test
     /**
      *Ensures that the AnimationCard can be used as an attachment.
      */
+    @Test
     public void testToAttachment() {
         Attachment attachment = card.toAttachment();
         Assert.assertNotNull(attachment);

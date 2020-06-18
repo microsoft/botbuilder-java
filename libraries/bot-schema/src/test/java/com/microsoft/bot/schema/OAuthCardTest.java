@@ -6,6 +6,9 @@ package com.microsoft.bot.schema;
 import org.junit.Assert;
 import org.junit.Test;
 
+/***
+ * Tests to ensure the OAuthCard methods work as expected.
+ */
 public class OAuthCardTest {
     OAuthCard card = new OAuthCard(){
         {

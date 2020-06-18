@@ -20,10 +20,10 @@ public class AudioCardTest {
         };
     };
 
-    @Test
     /**
      *Ensures that the AudioCard can be used as an attachment.
      */
+    @Test
     public void testToAttachment() {
         Attachment attachment = card.toAttachment();
         Assert.assertNotNull(attachment);
