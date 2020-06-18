@@ -6,21 +6,20 @@ package com.microsoft.bot.schema;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class OAuthCardTest {
-    OAuthCard card = new OAuthCard(){
+public class SigninCardTest {
+    SigninCard card = new SigninCard(){
         {
-            setText("Test OAuth Text");
-            setConnectionName("Test Connection Name");
+            setText("Test Signin Text");
         }
     };
 
     /**
-     *Ensures that the OAuthCard can be used as an attachment.
+     *Ensures that the SigninCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
         Attachment attachment = card.toAttachment();
         Assert.assertNotNull(attachment);
-        Assert.assertEquals("application/vnd.microsoft.card.oauth", attachment.getContentType());
+        Assert.assertEquals("application/vnd.microsoft.card.signin", attachment.getContentType());
     }
 }
