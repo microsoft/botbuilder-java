@@ -9,13 +9,22 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tests to ensure that MessageActionsPayload works as expected.
+ */
 public class MessageActionsPayloadTest {
+    /**
+     * Ensures the constructor of the MessageActionsPayload class works as expected.
+     */
     @Test
     public void TestMessageActionPayloadConstructor(){
         MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
         Assert.assertNotNull(messageActionsPayload);
     }
 
+    /**
+     * Ensures that the Id property can be set and retrieved.
+     */
     @Test
     public void TestGetId(){
         String id = "testId";
@@ -29,6 +38,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, id);
     }
 
+    /**
+     * Ensures that the ReplyToId property can be set and retrieved.
+     */
     @Test
     public void TestGetReplyToId(){
         String replyToId = "testReplyToId";
@@ -42,6 +54,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, replyToId);
     }
 
+    /**
+     * Ensures that the MessageType property can be set and retrieved.
+     */
     @Test
     public void TestGetMessageType(){
         String messageType = "testMessageType";
@@ -55,6 +70,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, messageType);
     }
 
+    /**
+     * Ensures that the CreatedDateTime property can be set and retrieved.
+     */
     @Test
     public void TestGetCreatedDateTime(){
         String createdDateTime = "2000-01-01";
@@ -68,6 +86,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, createdDateTime);
     }
 
+    /**
+     * Ensures that the LastModifiedDateTime property can be set and retrieved.
+     */
     @Test
     public void TestGetLastModifiedDateTime(){
         String lastModifiedDateTime = "2000-01-01";
@@ -81,6 +102,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, lastModifiedDateTime);
     }
 
+    /**
+     * Ensures that the Deleted property can be set and retrieved.
+     */
     @Test
     public void TestGetDeleted(){
         Boolean deleted = false;
@@ -94,6 +118,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, deleted);
     }
 
+    /**
+     * Ensures that the Subject property can be set and retrieved.
+     */
     @Test
     public void TestGetSubject(){
         String subject = "testSubject";
@@ -107,6 +134,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, subject);
     }
 
+    /**
+     * Ensures that the Summary property can be set and retrieved.
+     */
     @Test
     public void TestGetSummary(){
         String summary = "testSummary";
@@ -120,6 +150,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, summary);
     }
 
+    /**
+     * Ensures that the Importance property can be set and retrieved.
+     */
     @Test
     public void TestGetImportance(){
         String importance = "normal";
@@ -133,6 +166,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, importance);
     }
 
+    /**
+     * Ensures that the LinkToMessage property can be set and retrieved.
+     */
     @Test
     public void TestGetLinkToMessage(){
         String linkToMessage = "https://teams.microsoft.com/l/message/testing-id";
@@ -146,6 +182,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, linkToMessage);
     }
 
+    /**
+     * Ensures that the Locale property can be set and retrieved.
+     */
     @Test
     public void TestGetLocale(){
         String locale = "US";
@@ -159,6 +198,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, locale);
     }
 
+    /**
+     * Ensures that the From property can be set and retrieved.
+     */
     @Test
     public void TestGetFrom(){
         MessageActionsPayloadFrom from = new MessageActionsPayloadFrom();
@@ -172,6 +214,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, from);
     }
 
+    /**
+     * Ensures that the Body property can be set and retrieved.
+     */
     @Test
     public void TestGetBody(){
         MessageActionsPayloadBody body = new MessageActionsPayloadBody();
@@ -185,6 +230,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, body);
     }
 
+    /**
+     * Ensures that the AttachmentLayout property can be set and retrieved.
+     */
     @Test
     public void TestGetAttachmentLayout(){
         String attachmentLayout = "testAttachmentLayout";
@@ -198,6 +246,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, attachmentLayout);
     }
 
+    /**
+     * Ensures that the Attachments property can be set and retrieved.
+     */
     @Test
     public void TestGetAttachments(){
         List<MessageActionsPayloadAttachment> attachments = new ArrayList<MessageActionsPayloadAttachment>();
@@ -211,6 +262,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, attachments);
     }
 
+    /**
+     * Ensures that the Mentions property can be set and retrieved.
+     */
     @Test
     public void TestGetMentions(){
         List<MessageActionsPayloadMention> mentions = new ArrayList<MessageActionsPayloadMention>();
@@ -224,6 +278,9 @@ public class MessageActionsPayloadTest {
         Assert.assertEquals(result, mentions);
     }
 
+    /**
+     * Ensures that the Reactions property can be set and retrieved.
+     */
     @Test
     public void TestGetReactions(){
         List<MessageActionsPayloadReaction> reactions = new ArrayList<MessageActionsPayloadReaction>();
