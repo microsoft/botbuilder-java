@@ -230,18 +230,22 @@ public class MessageActionsPayload {
     }
 
     /**
-     * Gets the link back to the message
+     * Gets the link back to the message.
      *
      * @return The link back to the message.
      */
-    public String getLinkToMessage() { return linkToMessage; }
+    public String getLinkToMessage() {
+        return linkToMessage;
+    }
 
     /**
      * Sets link back to the message.
      *
      * @param withLinkToMessage The link back to the message.
      */
-    public void setLinkToMessage(String withLinkToMessage) { linkToMessage = withLinkToMessage; }
+    public void setLinkToMessage(String withLinkToMessage) {
+        linkToMessage = withLinkToMessage;
+    }
 
     /**
      * Gets locale of the message set by the client.
