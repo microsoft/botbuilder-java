@@ -1626,14 +1626,16 @@ public class Activity {
     }
 
     /**
-     * Determines if the Activity was sent via an Http/Https connection or Streaming by looking at the ServiceUrl property.
-     * @returns True if the Activity was originate from a streaming connection.
+     * Determines if the Activity was sent via an Http/Https connection or Streaming
+     * This can be determined by looking at the ServiceUrl property:
+     * (1) All channels that send messages via http/https are not streaming
+     * (2) Channels that send messages via streaming have a ServiceUrl that does not begin with http/https.
+     *
+     * @return True if the Activity was originate from a streaming connection.
      */
-    public Boolean IsFromStreamingConnection() {
-        String serviceUrl = this.getServiceUrl();
-
+    public Boolean isFromStreamingConnection() {
         if (serviceUrl != null) {
-            Boolean isHttp = serviceUrl.toLowerCase().startsWith("http");
+            Boolean isHttp = this.getServiceUrl().toLowerCase().startsWith("http");
             return !isHttp;
         }
 
@@ -1824,7 +1826,7 @@ public class Activity {
      * @return This activity as a message activity; or null.
      */
     public Activity asMessageActivity() {
-        return isActivity(ActivityTypes.MESSAGE)? this : null;
+        return isActivity(ActivityTypes.MESSAGE) ? this : null;
     }
 
     /**
@@ -1833,7 +1835,7 @@ public class Activity {
      * @return This activity as a contact relation update activity; or null.
      */
     public Activity asContactRelationUpdateActivity() {
-        return isActivity(ActivityTypes.CONTACT_RELATION_UPDATE)? this : null;
+        return isActivity(ActivityTypes.CONTACT_RELATION_UPDATE) ? this : null;
     }
 
     /**
@@ -1842,7 +1844,7 @@ public class Activity {
      * @return This activity as an installation update activity; or null.
      */
     public Activity asInstallationUpdateActivity() {
-        return isActivity(ActivityTypes.INSTALLATION_UPDATE)? this : null;
+        return isActivity(ActivityTypes.INSTALLATION_UPDATE) ? this : null;
     }
 
     /**
@@ -1851,7 +1853,7 @@ public class Activity {
      * @return This activity as a conversation update activity; or null.
      */
     public Activity asConversationUpdateActivity() {
-        return isActivity(ActivityTypes.CONVERSATION_UPDATE)? this : null;
+        return isActivity(ActivityTypes.CONVERSATION_UPDATE) ? this : null;
     }
 
     /**
@@ -1860,7 +1862,7 @@ public class Activity {
      * @return This activity as a typing activity; or null.
      */
     public Activity asTypingActivity() {
-        return isActivity(ActivityTypes.TYPING)? this : null;
+        return isActivity(ActivityTypes.TYPING) ? this : null;
     }
 
     /**
@@ -1869,7 +1871,7 @@ public class Activity {
      * @return This activity as an end of conversation activity; or null.
      */
     public Activity asEndOfConversationActivity() {
-        return isActivity(ActivityTypes.END_OF_CONVERSATION)? this : null;
+        return isActivity(ActivityTypes.END_OF_CONVERSATION) ? this : null;
     }
 
     /**
@@ -1878,7 +1880,7 @@ public class Activity {
      * @return This activity as an event activity; or null.
      */
     public Activity asEventActivity() {
-        return isActivity(ActivityTypes.EVENT)? this : null;
+        return isActivity(ActivityTypes.EVENT) ? this : null;
     }
 
     /**
@@ -1887,7 +1889,7 @@ public class Activity {
      * @return This activity as an invoke activity; or null.
      */
     public Activity asInvokeActivity() {
-        return isActivity(ActivityTypes.INVOKE)? this : null;
+        return isActivity(ActivityTypes.INVOKE) ? this : null;
     }
 
     /**
@@ -1896,7 +1898,7 @@ public class Activity {
      * @return This activity as a message update activity; or null.
      */
     public Activity asMessageUpdateActivity() {
-        return isActivity(ActivityTypes.MESSAGE_UPDATE)? this : null;
+        return isActivity(ActivityTypes.MESSAGE_UPDATE) ? this : null;
     }
 
     /**
@@ -1905,7 +1907,7 @@ public class Activity {
      * @return This activity as a message delete activity; or null.
      */
     public Activity asMessageDeleteActivity() {
-        return isActivity(ActivityTypes.MESSAGE_DELETE)? this : null;
+        return isActivity(ActivityTypes.MESSAGE_DELETE) ? this : null;
     }
 
     /**
@@ -1914,7 +1916,7 @@ public class Activity {
      * @return This activity as a message reaction activity; or null.
      */
     public Activity asMessageReactionActivity() {
-        return isActivity(ActivityTypes.MESSAGE_REACTION)? this : null;
+        return isActivity(ActivityTypes.MESSAGE_REACTION) ? this : null;
     }
 
     /**
@@ -1923,7 +1925,7 @@ public class Activity {
      * @return This activity as a suggestion activity; or null.
      */
     public Activity asSuggestionActivity() {
-        return isActivity(ActivityTypes.SUGGESTION)? this : null;
+        return isActivity(ActivityTypes.SUGGESTION) ? this : null;
     }
 
     /**
@@ -1932,7 +1934,7 @@ public class Activity {
      * @return This activity as a trace activity; or null.
      */
     public Activity asTraceActivity() {
-        return isActivity(ActivityTypes.TRACE)? this : null;
+        return isActivity(ActivityTypes.TRACE) ? this : null;
     }
 
     /**
@@ -1941,6 +1943,6 @@ public class Activity {
      * @return This activity as a handoff activity; or null.
      */
     public Activity asHandoffActivity() {
-        return isActivity(ActivityTypes.HANDOFF)? this : null;
+        return isActivity(ActivityTypes.HANDOFF) ? this : null;
     }
 }

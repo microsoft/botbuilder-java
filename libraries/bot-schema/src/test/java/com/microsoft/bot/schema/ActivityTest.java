@@ -770,18 +770,18 @@ public class ActivityTest {
         Activity activity = createActivity();
         activity.setServiceUrl(null);
 
-        Assert.assertFalse(activity.IsFromStreamingConnection());
+        Assert.assertFalse(activity.isFromStreamingConnection());
 
         nonStreaming.forEach(s ->
         {
             activity.setServiceUrl(s);
-            Assert.assertFalse(activity.IsFromStreamingConnection());
+            Assert.assertFalse(activity.isFromStreamingConnection());
         });
 
         streaming.forEach(s ->
         {
             activity.setServiceUrl(s);
-            Assert.assertTrue(activity.IsFromStreamingConnection());
+            Assert.assertTrue(activity.isFromStreamingConnection());
         });
     }
 }
