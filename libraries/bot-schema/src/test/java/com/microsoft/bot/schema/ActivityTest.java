@@ -272,4 +272,107 @@ public class ActivityTest {
         Assert.assertEquals("tenant_id", teamsChannelData.getTenant().getId());
     }
 
+    @Test
+    public void CreateMessageActivity() {
+        Activity activity = Activity.createMessageActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.MESSAGE);
+    }
+
+    @Test
+    public void CreateContactRelationUpdateActivity() {
+        Activity activity = Activity.createContactRelationUpdateActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.CONTACT_RELATION_UPDATE);
+    }
+
+    @Test
+    public void CreateConversationUpdateActivity() {
+        Activity activity = Activity.createConversationUpdateActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.CONVERSATION_UPDATE);
+    }
+
+    @Test
+    public void CreateTypingActivity() {
+        Activity activity = Activity.createTypingActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+    }
+
+    @Test
+    public void CreateHandoffActivity() {
+        Activity activity = Activity.createHandoffActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.HANDOFF);
+    }
+
+    @Test
+    public void CreateEndOfConversationActivity() {
+        Activity activity = Activity.createEndOfConversationActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.END_OF_CONVERSATION);
+    }
+
+    @Test
+    public void CreateEventActivity() {
+        Activity activity = Activity.createEventActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.EVENT);
+    }
+
+    @Test
+    public void CreateInvokeActivity() {
+        Activity activity = Activity.createInvokeActivity();
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.INVOKE);
+    }
+
+    @Test
+    public void CreateTraceActivity() {
+        String name = "test-activity";
+        String valueType = "string";
+        String value = "test-value";
+        String label = "test-label";
+
+        Activity activity = Activity.createTraceActivity(name, valueType, value, label);
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(activity.getName(), name);
+    }
+
+    @Test
+    public void CreateReply() {
+        Activity activity = createActivity();
+
+        String text = "test reply";
+        String locale = "en-us";
+
+        Activity reply = activity.createReply(text, locale);
+
+        Assert.assertEquals(reply.getType(), ActivityTypes.MESSAGE);
+        Assert.assertEquals(reply.getText(), text);
+    }
+
+    @Test
+    public void AsMessageActivity() {
+        Activity activity = createActivity();
+
+        activity.setType("message");
+
+        Activity result = activity.asMessageActivity();
+
+        Assert.assertEquals(result.getType(), ActivityTypes.MESSAGE);
+    }
+
+    @Test
+    public void AsMessageActivityIsNull() {
+        Activity activity = createActivity();
+
+        activity.setType("trace");
+
+        Activity result = activity.asMessageActivity();
+
+        Assert.assertEquals(result.getType(), null);
+    }
 }
