@@ -1517,6 +1517,7 @@ public class Activity {
                 setBot(Activity.this.getRecipient());
                 setConversation(Activity.this.getConversation());
                 setChannelId(Activity.this.getChannelId());
+                setLocale(Activity.this.getLocale());
                 setServiceUrl(Activity.this.getServiceUrl());
             }
         };
