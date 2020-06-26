@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ActivityTest {
     @Test
@@ -19,11 +20,8 @@ public class ActivityTest {
 
         Assert.assertEquals(activity.getId(), conversationReference.getActivityId());
         Assert.assertEquals(activity.getFrom().getId(), conversationReference.getUser().getId());
-        Assert
-            .assertEquals(activity.getRecipient().getId(), conversationReference.getBot().getId());
-        Assert.assertEquals(
-            activity.getConversation().getId(), conversationReference.getConversation().getId()
-        );
+        Assert.assertEquals(activity.getRecipient().getId(), conversationReference.getBot().getId());
+        Assert.assertEquals(activity.getConversation().getId(), conversationReference.getConversation().getId());
         Assert.assertEquals(activity.getLocale(), conversationReference.getLocale());
         Assert.assertEquals(activity.getChannelId(), conversationReference.getChannelId());
         Assert.assertEquals(activity.getServiceUrl(), conversationReference.getServiceUrl());
@@ -43,11 +41,8 @@ public class ActivityTest {
 
         Assert.assertEquals(reply.getId(), conversationReference.getActivityId());
         Assert.assertEquals(activity.getFrom().getId(), conversationReference.getUser().getId());
-        Assert
-            .assertEquals(activity.getRecipient().getId(), conversationReference.getBot().getId());
-        Assert.assertEquals(
-            activity.getConversation().getId(), conversationReference.getConversation().getId()
-        );
+        Assert.assertEquals(activity.getRecipient().getId(), conversationReference.getBot().getId());
+        Assert.assertEquals(activity.getConversation().getId(), conversationReference.getConversation().getId());
         Assert.assertEquals(activity.getLocale(), conversationReference.getLocale());
         Assert.assertEquals(activity.getChannelId(), conversationReference.getChannelId());
         Assert.assertEquals(activity.getServiceUrl(), conversationReference.getServiceUrl());
@@ -77,7 +72,8 @@ public class ActivityTest {
                     }
                 });
                 setActivityId("cr_12345");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+                                    // tests stay in English
             }
         };
 
@@ -86,13 +82,10 @@ public class ActivityTest {
         Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
         Assert.assertEquals(conversationReference.getLocale(), activity.getLocale());
         Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
-        Assert.assertEquals(
-            conversationReference.getConversation().getId(), activity.getConversation().getId()
-        );
+        Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
 
         Assert.assertEquals(conversationReference.getUser().getId(), activity.getFrom().getId());
-        Assert
-            .assertEquals(conversationReference.getBot().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getBot().getId(), activity.getRecipient().getId());
         Assert.assertEquals(conversationReference.getActivityId(), activity.getId());
     }
 
@@ -120,7 +113,8 @@ public class ActivityTest {
                     }
                 });
                 setActivityId("12345");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+                                    // tests stay in English
             }
         };
 
@@ -129,13 +123,10 @@ public class ActivityTest {
         Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
         Assert.assertEquals(conversationReference.getLocale(), activity.getLocale());
         Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
-        Assert.assertEquals(
-            conversationReference.getConversation().getId(), activity.getConversation().getId()
-        );
+        Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
 
         Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
-        Assert
-            .assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
         Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
     }
 
@@ -184,7 +175,8 @@ public class ActivityTest {
                 setRecipient(account2);
                 setConversation(conversationAccount);
                 setChannelId("ChannelId123");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+                                    // tests stay in English
                 setServiceUrl("ServiceUrl123");
             }
         };
@@ -193,24 +185,22 @@ public class ActivityTest {
     }
 
     private static final String serializedActivity = "{\n" + "  \"attachments\": [],\n"
-        + "  \"channelId\": \"directlinespeech\",\n" + "  \"conversation\":\n" + "  {\n"
-        + "    \"id\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n" + "    \"isGroup\": false\n"
-        + "  },\n" + "  \"entities\": [],\n" + "  \"from\":\n" + "  {\n"
-        + "    \"id\": \"ConnectedCarAssistant\"\n" + "  },\n"
-        + "  \"id\": \"9f90f0f5-be7d-410c-ad4a-5826751b26b1\",\n" + "  \"locale\": \"en-us\",\n"
-        + "  \"name\": \"WebviewPreFetch\",\n" + "  \"recipient\":\n" + "  {\n"
-        + "    \"id\": \"ef3de4593d4cc9b8\",\n" + "    \"role\": \"user\"\n" + "  },\n"
-        + "  \"replyToId\": \"4d807515-46c1-44a1-b0f8-88457e3c13f2\",\n"
-        + "  \"serviceUrl\": \"urn:botframework:websocket:directlinespeech\",\n"
-        + "  \"text\": \"\",\n" + "  \"timestamp\": \"2019-11-14T17:50:06.8447816Z\",\n"
-        + "  \"type\": \"event\",\n" + "  \"value\":\n" + "  {\n" + "    \"headers\":\n" + "    {\n"
-        + "      \"opal-sessionid\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n"
-        + "      \"x-Search-ClientId\": \"ef3de4593d4cc9b8\",\n"
-        + "      \"x-Search-Market\": \"en-us\",\n" + "      \"x-Uqu-RefererType\": \"1\",\n"
-        + "      \"x-Uqu-ResponseFormat\": \"0\"\n" + "    },\n"
-        + "    \"uri\": \"https://www.bing.com/commit/v1?q=pull+down+the+driver+side&visualResponsePreference=0&uqurequestid=4D80751546C144A1B0F888457E3C13F2\",\n"
-        + "    \"userAgent\": \"Mozilla/5.0 (Linux; Android 7.1.1; TB-8704V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.11 Safari/537.36 BingMobileApp/36 BMABuild/Production BMAConfig/0\"\n"
-        + "  }\n" + "}\n";
+            + "  \"channelId\": \"directlinespeech\",\n" + "  \"conversation\":\n" + "  {\n"
+            + "    \"id\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n" + "    \"isGroup\": false\n" + "  },\n"
+            + "  \"entities\": [],\n" + "  \"from\":\n" + "  {\n" + "    \"id\": \"ConnectedCarAssistant\"\n" + "  },\n"
+            + "  \"id\": \"9f90f0f5-be7d-410c-ad4a-5826751b26b1\",\n" + "  \"locale\": \"en-us\",\n"
+            + "  \"name\": \"WebviewPreFetch\",\n" + "  \"recipient\":\n" + "  {\n"
+            + "    \"id\": \"ef3de4593d4cc9b8\",\n" + "    \"role\": \"user\"\n" + "  },\n"
+            + "  \"replyToId\": \"4d807515-46c1-44a1-b0f8-88457e3c13f2\",\n"
+            + "  \"serviceUrl\": \"urn:botframework:websocket:directlinespeech\",\n" + "  \"text\": \"\",\n"
+            + "  \"timestamp\": \"2019-11-14T17:50:06.8447816Z\",\n" + "  \"type\": \"event\",\n" + "  \"value\":\n"
+            + "  {\n" + "    \"headers\":\n" + "    {\n"
+            + "      \"opal-sessionid\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n"
+            + "      \"x-Search-ClientId\": \"ef3de4593d4cc9b8\",\n" + "      \"x-Search-Market\": \"en-us\",\n"
+            + "      \"x-Uqu-RefererType\": \"1\",\n" + "      \"x-Uqu-ResponseFormat\": \"0\"\n" + "    },\n"
+            + "    \"uri\": \"https://www.bing.com/commit/v1?q=pull+down+the+driver+side&visualResponsePreference=0&uqurequestid=4D80751546C144A1B0F888457E3C13F2\",\n"
+            + "    \"userAgent\": \"Mozilla/5.0 (Linux; Android 7.1.1; TB-8704V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.11 Safari/537.36 BingMobileApp/36 BMABuild/Production BMAConfig/0\"\n"
+            + "  }\n" + "}\n";
 
     @Test
     public void DeserializeActivity() throws IOException {
@@ -219,45 +209,38 @@ public class ActivityTest {
         Activity activity = objectMapper.readValue(this.serializedActivity, Activity.class);
 
         Assert.assertNotNull(activity.getTimestamp());
-        Assert.assertEquals(
-            "b18a1c99-7a29-4801-ac0c-579f2c36d52c", activity.getConversation().getId()
-        );
+        Assert.assertEquals("b18a1c99-7a29-4801-ac0c-579f2c36d52c", activity.getConversation().getId());
         Assert.assertNotNull(activity.getValue());
     }
 
     private static final String serializedActivityFromTeams = "{" + " \"channelId\": \"msteams\","
-        + " \"channelData\": {" + "   \"teamsChannelId\": \"19:123cb42aa5a0a7e56f83@thread.skype\","
-        + "   \"teamsTeamId\": \"19:104f2cb42aa5a0a7e56f83@thread.skype\"," + "   \"channel\": {"
-        + "     \"id\": \"19:4104f2cb42aa5a0a7e56f83@thread.skype\","
-        + "     \"name\": \"General\" " + "   }," + "   \"team\": {"
-        + "     \"id\": \"19:aab4104f2cb42aa5a0a7e56f83@thread.skype\","
-        + "     \"name\": \"Kahoot\", "
-        + "     \"aadGroupId\": \"0ac65971-e8a0-49a1-8d41-26089125ea30\"" + "   },"
-        + "   \"notification\": {" + "     \"alert\": \"true\"" + "   },"
-        + "   \"eventType\":\"teamMemberAdded\", " + "   \"tenant\": {"
-        + "     \"id\": \"0-b827-4bb0-9df1-e02faba7ac20\"" + "   }" + " }" + "}";
+            + " \"channelData\": {" + "   \"teamsChannelId\": \"19:123cb42aa5a0a7e56f83@thread.skype\","
+            + "   \"teamsTeamId\": \"19:104f2cb42aa5a0a7e56f83@thread.skype\"," + "   \"channel\": {"
+            + "     \"id\": \"19:4104f2cb42aa5a0a7e56f83@thread.skype\"," + "     \"name\": \"General\" " + "   },"
+            + "   \"team\": {" + "     \"id\": \"19:aab4104f2cb42aa5a0a7e56f83@thread.skype\","
+            + "     \"name\": \"Kahoot\", " + "     \"aadGroupId\": \"0ac65971-e8a0-49a1-8d41-26089125ea30\"" + "   },"
+            + "   \"notification\": {" + "     \"alert\": \"true\"" + "   }," + "   \"eventType\":\"teamMemberAdded\", "
+            + "   \"tenant\": {" + "     \"id\": \"0-b827-4bb0-9df1-e02faba7ac20\"" + "   }" + " }" + "}";
 
-    private static final String serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId =
-        "{" + " \"channelId\": \"msteams\"," + " \"channelData\": {" + "   \"channel\": {"
-            + "     \"id\": \"channel_id\"," + "     \"name\": \"channel_name\" " + "   },"
-            + "   \"team\": {" + "     \"id\": \"team_id\"," + "     \"name\": \"team_name\", "
-            + "     \"aadGroupId\": \"aad_groupid\"" + "   }," + "   \"notification\": {"
-            + "     \"alert\": \"true\"" + "   }," + "   \"eventType\":\"teamMemberAdded\", "
-            + "   \"tenant\": {" + "     \"id\": \"tenant_id\"" + "   }" + " }" + "}";
+    private static final String serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId = "{"
+            + " \"channelId\": \"msteams\"," + " \"channelData\": {" + "   \"channel\": {"
+            + "     \"id\": \"channel_id\"," + "     \"name\": \"channel_name\" " + "   }," + "   \"team\": {"
+            + "     \"id\": \"team_id\"," + "     \"name\": \"team_name\", " + "     \"aadGroupId\": \"aad_groupid\""
+            + "   }," + "   \"notification\": {" + "     \"alert\": \"true\"" + "   },"
+            + "   \"eventType\":\"teamMemberAdded\", " + "   \"tenant\": {" + "     \"id\": \"tenant_id\"" + "   }"
+            + " }" + "}";
 
     @Test
     public void GetInformationForMicrosoftTeams() throws JsonProcessingException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        Activity activity =
-            objectMapper.readValue(ActivityTest.serializedActivityFromTeams, Activity.class);
+        Activity activity = objectMapper.readValue(ActivityTest.serializedActivityFromTeams, Activity.class);
         Assert.assertEquals("19:123cb42aa5a0a7e56f83@thread.skype", activity.teamsGetChannelId());
         Assert.assertEquals("19:104f2cb42aa5a0a7e56f83@thread.skype", activity.teamsGetTeamId());
         Assert.assertEquals(true, activity.isTeamsActivity());
 
-        activity = objectMapper.readValue(
-            ActivityTest.serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId, Activity.class
-        );
+        activity = objectMapper.readValue(ActivityTest.serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId,
+                Activity.class);
 
         Assert.assertEquals("channel_id", activity.teamsGetChannelId());
         Assert.assertEquals("team_id", activity.teamsGetTeamId());
@@ -665,6 +648,49 @@ public class ActivityTest {
         Activity result = activity.asHandoffActivity();
 
         Assert.assertEquals(result, null);
+    }
+
+    @Test
+    public void GetMentions() {
+        ArrayList<Entity> mentions = new ArrayList<Entity>();
+
+        mentions.add(new Entity() {
+            {
+                setType("mention");
+            }
+        });
+        mentions.add(new Entity() {
+            {
+                setType("reaction");
+            }
+        });
+
+        Activity activity = createActivity();
+
+        activity.setEntities(mentions);
+
+        List<Mention> mentionsResult = activity.getMentions();
+
+        Assert.assertEquals(mentionsResult.size(), 1);
+        Assert.assertEquals(mentionsResult.get(0).getType(), "mention");
+    }
+
+    @Test
+    public void CreateTrace() {
+        Activity activity = createActivity();
+
+        String name = "test-activity";
+        String value = "test-value";
+        String valueType = "string";
+        String label = "test-label";
+
+        Activity trace = activity.createTrace(name, value, valueType, label);
+
+        Assert.assertEquals(trace.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(trace.getName(), name);
+        Assert.assertEquals(trace.getValue(), value);
+        Assert.assertEquals(trace.getValueType(), valueType);
+        Assert.assertEquals(trace.getLabel(), label);
     }
 
     @Test
