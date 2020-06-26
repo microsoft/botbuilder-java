@@ -1431,7 +1431,11 @@ public class Activity {
             return true;
         }
 
-        return this.getChannelData() != null;
+        if (this.getChannelData() != null) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1601,6 +1605,7 @@ public class Activity {
         this.setChannelId(reference.getChannelId());
         this.setServiceUrl(reference.getServiceUrl());
         this.setConversation(reference.getConversation());
+        this.setLocale((reference.getLocale() == null) ? this.getLocale() : reference.getLocale());
 
         if (isIncoming) {
             this.setFrom(reference.getUser());
@@ -1617,6 +1622,21 @@ public class Activity {
         }
 
         return this;
+    }
+
+    /**
+     * Determines if the Activity was sent via an Http/Https connection or Streaming by looking at the ServiceUrl property.
+     * @returns True if the Activity was originate from a streaming connection.
+     */
+    public Boolean IsFromStreamingConnection() {
+        String serviceUrl = this.getServiceUrl();
+
+        if (serviceUrl != null) {
+            Boolean isHttp = serviceUrl.toLowerCase().startsWith("http");
+            return !isHttp;
+        }
+
+        return false;
     }
 
     /**
