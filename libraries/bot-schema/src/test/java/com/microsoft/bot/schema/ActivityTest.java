@@ -337,6 +337,19 @@ public class ActivityTest {
     }
 
     @Test
+    public void CreateTraceActivityWithoutValueType() {
+        String name = "test-activity";
+        String value = "test-value";
+        String label = "test-label";
+
+        Activity activity = Activity.createTraceActivity(name, null, value, label);
+
+        Assert.assertEquals(activity.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(activity.getValueType(), value.getClass().getTypeName());
+        Assert.assertEquals(activity.getLabel(), label);
+    }
+
+    @Test
     public void CreateReply() {
         Activity activity = createActivity();
 
@@ -348,6 +361,17 @@ public class ActivityTest {
         Assert.assertEquals(reply.getType(), ActivityTypes.MESSAGE);
         Assert.assertEquals(reply.getText(), text);
         Assert.assertEquals(reply.getLocale(), locale);
+    }
+
+    @Test
+    public void CreateReplyWithoutArguments() {
+        Activity activity = createActivity();
+
+        Activity reply = activity.createReply();
+
+        Assert.assertEquals(reply.getType(), ActivityTypes.MESSAGE);
+        Assert.assertEquals(reply.getText(), "");
+        Assert.assertEquals(reply.getLocale(), activity.getLocale());
     }
 
     @Test
@@ -659,6 +683,15 @@ public class ActivityTest {
     }
 
     @Test
+    public void HasContentIsFalseWhenActivityTextHasNoContent() {
+        Activity activity = createActivity();
+
+        boolean result = activity.hasContent();
+
+        Assert.assertEquals(result, false);
+    }
+
+    @Test
     public void HasContentIsTrueWhenActivityTextHasContent() {
         Activity activity = createActivity();
 
@@ -666,7 +699,7 @@ public class ActivityTest {
 
         boolean result = activity.hasContent();
 
-        Assert.assertTrue(result);
+        Assert.assertEquals(result, true);
     }
 
     @Test
@@ -678,7 +711,7 @@ public class ActivityTest {
 
         boolean result = activity.hasContent();
 
-        Assert.assertTrue(result);
+        Assert.assertEquals(result, true);
     }
 
     @Test
@@ -693,7 +726,7 @@ public class ActivityTest {
 
         boolean result = activity.hasContent();
 
-        Assert.assertTrue(result);
+        Assert.assertEquals(result, true);
     }
 
     @Test
@@ -707,7 +740,7 @@ public class ActivityTest {
 
         boolean result = activity.hasContent();
 
-        Assert.assertTrue(result);
+        Assert.assertEquals(result, true);
     }
 
     @Test
