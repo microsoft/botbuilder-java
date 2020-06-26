@@ -340,19 +340,23 @@ public class ActivityTest {
 
         Assert.assertEquals(activity.getType(), ActivityTypes.TRACE);
         Assert.assertEquals(activity.getName(), name);
+        Assert.assertEquals(activity.getValueType(), valueType);
+        Assert.assertEquals(activity.getValue(), value);
+        Assert.assertEquals(activity.getLabel(), label);
     }
 
     @Test
     public void CreateReply() {
         Activity activity = createActivity();
 
-        String text = "test reply";
+        String text = "test-reply";
         String locale = "en-us";
 
         Activity reply = activity.createReply(text, locale);
 
         Assert.assertEquals(reply.getType(), ActivityTypes.MESSAGE);
         Assert.assertEquals(reply.getText(), text);
+        Assert.assertEquals(reply.getLocale(), locale);
     }
 
     @Test
