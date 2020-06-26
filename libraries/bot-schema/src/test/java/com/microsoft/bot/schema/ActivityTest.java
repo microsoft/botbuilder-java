@@ -23,6 +23,7 @@ public class ActivityTest {
         Assert.assertEquals(
             activity.getConversation().getId(), conversationReference.getConversation().getId()
         );
+        Assert.assertEquals(activity.getLocale(), conversationReference.getLocale());
         Assert.assertEquals(activity.getChannelId(), conversationReference.getChannelId());
         Assert.assertEquals(activity.getServiceUrl(), conversationReference.getServiceUrl());
     }
@@ -46,6 +47,7 @@ public class ActivityTest {
         Assert.assertEquals(
             activity.getConversation().getId(), conversationReference.getConversation().getId()
         );
+        Assert.assertEquals(activity.getLocale(), conversationReference.getLocale());
         Assert.assertEquals(activity.getChannelId(), conversationReference.getChannelId());
         Assert.assertEquals(activity.getServiceUrl(), conversationReference.getServiceUrl());
     }
@@ -74,12 +76,14 @@ public class ActivityTest {
                     }
                 });
                 setActivityId("cr_12345");
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
             }
         };
 
         activity.applyConversationReference(conversationReference, true);
 
         Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
+        Assert.assertEquals(conversationReference.getLocale(), activity.getLocale());
         Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
         Assert.assertEquals(
             conversationReference.getConversation().getId(), activity.getConversation().getId()
@@ -115,12 +119,14 @@ public class ActivityTest {
                     }
                 });
                 setActivityId("12345");
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
             }
         };
 
         activity.applyConversationReference(conversationReference, false);
 
         Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
+        Assert.assertEquals(conversationReference.getLocale(), activity.getLocale());
         Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
         Assert.assertEquals(
             conversationReference.getConversation().getId(), activity.getConversation().getId()
@@ -177,6 +183,7 @@ public class ActivityTest {
                 setRecipient(account2);
                 setConversation(conversationAccount);
                 setChannelId("ChannelId123");
+                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but tests stay in English
                 setServiceUrl("ServiceUrl123");
             }
         };
