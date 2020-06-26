@@ -192,6 +192,14 @@ public class ActivityTest {
         return activity;
     }
 
+    private Attachment CreateAttachment() {
+        Attachment attachment = new Attachment();
+        attachment.setContent("test-content");
+        attachment.setContentType("application/json");
+
+        return attachment;
+    }
+
     private static final String serializedActivity = "{\n" + "  \"attachments\": [],\n"
         + "  \"channelId\": \"directlinespeech\",\n" + "  \"conversation\":\n" + "  {\n"
         + "    \"id\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n" + "    \"isGroup\": false\n"
@@ -665,6 +673,58 @@ public class ActivityTest {
         Activity result = activity.asHandoffActivity();
 
         Assert.assertEquals(result, null);
+    }
+
+    @Test
+    public void HasContentIsTrueWhenActivityTextHasContent() {
+        Activity activity = createActivity();
+
+        activity.setText("test-text");
+
+        boolean result = activity.hasContent();
+
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void HasContentIsTrueWhenActivitySummaryContent() {
+        Activity activity = createActivity();
+
+        activity.setText(null);
+        activity.setSummary("test-summary");
+
+        boolean result = activity.hasContent();
+
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void HasContentIsTrueWhenActivityAttachmentsHaveContent() {
+        Activity activity = createActivity();
+        ArrayList<Attachment> attachments = new ArrayList<>();
+        attachments.add(CreateAttachment());
+
+        activity.setText(null);
+        activity.setSummary(null);
+        activity.setAttachments(attachments);
+
+        boolean result = activity.hasContent();
+
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void HasContentIsTrueWhenActivityChannelDataHasContent() {
+        Activity activity = createActivity();
+
+        activity.setText(null);
+        activity.setSummary(null);
+        activity.setAttachments(null);
+        activity.setChannelData("test-channelData");
+
+        boolean result = activity.hasContent();
+
+        Assert.assertTrue(result);
     }
 
     @Test
