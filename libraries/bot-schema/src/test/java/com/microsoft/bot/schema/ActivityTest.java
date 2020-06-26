@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ActivityTest {
     @Test
@@ -272,4 +273,35 @@ public class ActivityTest {
         Assert.assertEquals("tenant_id", teamsChannelData.getTenant().getId());
     }
 
+    @Test
+    public void IsFromStreamingConnection() {
+        ArrayList<String> nonStreaming = new ArrayList<>();
+        nonStreaming.add("http://yayay.com");
+        nonStreaming.add("https://yayay.com");
+        nonStreaming.add("HTTP://yayay.com");
+        nonStreaming.add("HTTPS://yayay.com");
+
+        ArrayList<String> streaming = new ArrayList<>();
+        streaming.add("urn:botframework:WebSocket:wss://beep.com");
+        streaming.add("urn:botframework:WebSocket:http://beep.com");
+        streaming.add("URN:botframework:WebSocket:wss://beep.com");
+        streaming.add("URN:botframework:WebSocket:http://beep.com");
+
+        Activity activity = createActivity();
+        activity.setServiceUrl(null);
+
+        Assert.assertFalse(activity.IsFromStreamingConnection());
+
+        nonStreaming.forEach(s ->
+        {
+            activity.setServiceUrl(s);
+            Assert.assertFalse(activity.IsFromStreamingConnection());
+        });
+
+        streaming.forEach(s ->
+        {
+            activity.setServiceUrl(s);
+            Assert.assertTrue(activity.IsFromStreamingConnection());
+        });
+    }
 }
