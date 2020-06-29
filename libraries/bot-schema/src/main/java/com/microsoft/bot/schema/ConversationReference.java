@@ -33,6 +33,10 @@ public class ConversationReference {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String channelId;
 
+    @JsonProperty(value = "locale")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String locale;
+
     @JsonProperty(value = "serviceUrl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String serviceUrl;
@@ -55,6 +59,7 @@ public class ConversationReference {
                 setUser(ChannelAccount.clone(conversationReference.getUser()));
                 setConversation(ConversationAccount.clone(conversationReference.getConversation()));
                 setServiceUrl(conversationReference.getServiceUrl());
+                setLocale(conversationReference.getLocale());
                 setChannelId(conversationReference.getChannelId());
             }
         };
@@ -73,6 +78,7 @@ public class ConversationReference {
         activity.setChannelId(getChannelId());
         activity.setConversation(getConversation());
         activity.setRecipient(getBot());
+        activity.setLocale(getLocale());
         activity.setFrom(getUser());
         activity.setRelatesTo(this);
         return activity;
@@ -166,6 +172,24 @@ public class ConversationReference {
      */
     public void setChannelId(String withChannelId) {
         this.channelId = withChannelId;
+    }
+
+    /**
+     * Get the locale value.
+     *
+     * @return the locale value
+     */
+    public String getLocale() {
+        return this.locale;
+    }
+
+    /**
+     * Set the locale value.
+     *
+     * @param withLocale the locale value to set
+     */
+    public void setLocale(String withLocale) {
+        this.locale = withLocale;
     }
 
     /**
