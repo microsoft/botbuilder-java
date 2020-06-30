@@ -41,6 +41,13 @@ public class CardAction {
     private String text;
 
     /**
+     * Alternate image text to be used in place of the `image` field.
+     */
+    @JsonProperty(value = "imageAltText")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String imageAltText;
+
+    /**
      * (Optional) text to display in the chat feed if the button is clicked.
      */
     @JsonProperty(value = "displayText")
@@ -173,6 +180,24 @@ public class CardAction {
      */
     public void setText(String withText) {
         this.text = withText;
+    }
+
+    /**
+     * Get the image alternate text value.
+     *
+     * @return the text value
+     */
+    public String getImageAltText() {
+        return this.imageAltText;
+    }
+
+    /**
+     * Set the image alternate text value.
+     *
+     * @param withImageAltText the text value to set
+     */
+    public void setImageAltText(String withImageAltText) {
+        this.imageAltText = withImageAltText;
     }
 
     /**
