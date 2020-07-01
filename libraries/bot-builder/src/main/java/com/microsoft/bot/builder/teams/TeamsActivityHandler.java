@@ -416,6 +416,13 @@ public class TeamsActivityHandler extends ActivityHandler {
                             turnContext
                         );
 
+                    case "channelRestored":
+                        return onTeamsChannelRestored(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
                     case "teamRenamed":
                         return onTeamsTeamRenamed(
                             channelData.value().getChannel(),
@@ -543,6 +550,14 @@ public class TeamsActivityHandler extends ActivityHandler {
     }
 
     protected CompletableFuture<Void> onTeamsChannelRenamed(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    protected CompletableFuture<Void> onTeamsChannelRestored(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
         TurnContext turnContext
