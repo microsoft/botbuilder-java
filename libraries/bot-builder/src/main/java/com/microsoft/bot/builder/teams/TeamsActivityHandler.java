@@ -200,7 +200,7 @@ public class TeamsActivityHandler extends ActivityHandler {
     }
 
     /**
-     * Invoked when an card action invoke activity is received from the connector.
+     * Invoked when a card action invoke activity is received from the connector.
      *
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
@@ -278,7 +278,7 @@ public class TeamsActivityHandler extends ActivityHandler {
     }
 
     /**
-     * Invoked when a file consent card is accepted by the user.
+     * Invoked when a file consent card is declined by the user.
      *
      * @param turnContext The current TurnContext.
      * @param fileConsentCardResponse The response representing the value of the invoke activity sent when the user declines a file consent card.
@@ -457,7 +457,7 @@ public class TeamsActivityHandler extends ActivityHandler {
      *
      * @param turnContext The current TurnContext.
      * @param settings Object representing the configuration settings.
-     * @return The Messaging Extension Response for the query.
+     * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onTeamsMessagingExtensionConfigurationSetting(
         TurnContext turnContext,
@@ -587,7 +587,7 @@ public class TeamsActivityHandler extends ActivityHandler {
     /**
      * Override this in a derived class to provide logic for when members other than the bot
      * join the channel, such as your bot's welcome logic.
-     * UseIt will get the associated members with the provided accounts.
+     * It will get the associated members with the provided accounts.
      *
      * @param membersAdded A list of all the accounts added to the channel, as described by the conversation update activity.
      * @param teamInfo The team info object representing the team.
