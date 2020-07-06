@@ -233,7 +233,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * Invoked when a file consent card activity is received from the connector.
      *
      * @param turnContext The current TurnContext.
-     * @param fileConsentCardResponse The response representing the value of the invoke activity sent when the user acts on a file consent card.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user acts on a file consent card.
      * @return An InvokeResponse depending on the action of the file consent card.
      */
     protected CompletableFuture<InvokeResponse> onTeamsFileConsent(
@@ -267,7 +268,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * Invoked when a file consent card is accepted by the user.
      *
      * @param turnContext The current TurnContext.
-     * @param fileConsentCardResponse The response representing the value of the invoke activity sent when the user accepts a file consent card.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user accepts a file consent card.
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onTeamsFileConsentAccept(
@@ -281,7 +283,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * Invoked when a file consent card is declined by the user.
      *
      * @param turnContext The current TurnContext.
-     * @param fileConsentCardResponse The response representing the value of the invoke activity sent when the user declines a file consent card.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user declines a file consent card.
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onTeamsFileConsentDecline(
@@ -510,7 +513,8 @@ public class TeamsActivityHandler extends ActivityHandler {
 
     /**
      * Invoked when a conversation update activity is received from the channel.
-     * Conversation update activities are useful when it comes to responding to users being added to or removed from the channel.
+     * Conversation update activities are useful when it comes to responding to users being added to
+     * or removed from the channel.
      * For example, a bot could respond to a user being added by greeting the user.
      *
      * @param turnContext The current TurnContext.
@@ -624,7 +628,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * join the channel, such as your bot's welcome logic.
      * It will get the associated members with the provided accounts.
      *
-     * @param membersAdded A list of all the accounts added to the channel, as described by the conversation update activity.
+     * @param membersAdded A list of all the accounts added to the channel, as described by
+     * the conversation update activity.
      * @param teamInfo The team info object representing the team.
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
@@ -691,7 +696,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * leave the channel, such as your bot's good-bye logic.
      * It will get the associated members with the provided accounts.
      *
-     * @param membersRemoved A list of all the accounts removed from the channel, as described by the conversation update activity.
+     * @param membersRemoved A list of all the accounts removed from the channel, as described by
+     * the conversation update activity.
      * @param teamInfo The team info object representing the team.
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
@@ -721,7 +727,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * Override this in a derived class to provide logic for when members other than the bot
      * join the channel, such as your bot's welcome logic.
      *
-     * @param membersAdded A list of all the members added to the channel, as described by the conversation update activity.
+     * @param membersAdded A list of all the members added to the channel, as described by
+     * the conversation update activity.
      * @param teamInfo The team info object representing the team.
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
@@ -738,7 +745,8 @@ public class TeamsActivityHandler extends ActivityHandler {
      * Override this in a derived class to provide logic for when members other than the bot
      * leave the channel, such as your bot's good-bye logic.
      *
-     * @param membersRemoved A list of all the members removed from the channel, as described by the conversation update activity.
+     * @param membersRemoved A list of all the members removed from the channel, as described by
+     * the conversation update activity.
      * @param teamInfo The team info object representing the team.
      * @param turnContext The current TurnContext.
      * @return A task that represents the work queued to execute.
