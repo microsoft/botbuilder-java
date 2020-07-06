@@ -416,8 +416,43 @@ public class TeamsActivityHandler extends ActivityHandler {
                             turnContext
                         );
 
+                    case "teamArchived":
+                        return onTeamsTeamArchived(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
+                    case "teamDeleted":
+                        return onTeamsTeamDeleted(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
+                    case "teamHardDeleted":
+                        return onTeamsTeamHardDeleted(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
                     case "teamRenamed":
                         return onTeamsTeamRenamed(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
+                    case "teamRestored":
+                        return onTeamsTeamRestored(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
+                    case "teamUnarchived":
+                        return onTeamsTeamUnarchived(
                             channelData.value().getChannel(),
                             channelData.value().getTeam(),
                             turnContext
@@ -550,7 +585,82 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Invoked when a Team Archived event activity is received from the connector.
+     * Team Archived correspond to the user archiving a team.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsTeamArchived(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a Team Deleted event activity is received from the connector.
+     * Team Deleted correspond to the user deleting a team.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsTeamDeleted(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a Team Hard Deleted event activity is received from the connector.
+     * Team Hard Deleted correspond to the user hard-deleting a team.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsTeamHardDeleted(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
     protected CompletableFuture<Void> onTeamsTeamRenamed(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a Team Restored event activity is received from the connector.
+     * Team Restored correspond to the user restoring a team.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsTeamRestored(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a Team Unarchived event activity is received from the connector.
+     * Team Unarchived correspond to the user unarchiving a team.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsTeamUnarchived(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
         TurnContext turnContext
