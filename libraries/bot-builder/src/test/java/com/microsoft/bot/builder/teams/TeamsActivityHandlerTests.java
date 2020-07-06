@@ -361,6 +361,121 @@ public class TeamsActivityHandlerTests {
     }
 
     @Test
+    public void TestConversationUpdateTeamsTeamArchived() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamArchived");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsTeamArchived", bot.record.get(1));
+    }
+
+    @Test
+    public void TestConversationUpdateTeamsTeamDeleted() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamDeleted");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsTeamDeleted", bot.record.get(1));
+    }
+
+    @Test
+    public void TestConversationUpdateTeamsTeamHardDeleted() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamHardDeleted");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsTeamHardDeleted", bot.record.get(1));
+    }
+
+    @Test
+    public void TestConversationUpdateTeamsTeamRestored() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamRestored");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsTeamRestored", bot.record.get(1));
+    }
+
+    @Test
+    public void TestConversationUpdateTeamsTeamUnarchived() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("teamUnarchived");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsTeamUnarchived", bot.record.get(1));
+    }
+
+    @Test
     public void TestFileConsentAccept() {
         Activity activity = new Activity(ActivityTypes.INVOKE) {
             {
@@ -1203,6 +1318,56 @@ public class TeamsActivityHandlerTests {
         ) {
             record.add("onTeamsTeamRenamed");
             return super.onTeamsTeamRenamed(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsTeamArchived(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsTeamArchived");
+            return super.onTeamsTeamArchived(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsTeamDeleted(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsTeamDeleted");
+            return super.onTeamsTeamDeleted(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsTeamHardDeleted(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsTeamHardDeleted");
+            return super.onTeamsTeamHardDeleted(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsTeamRestored(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsTeamRestored");
+            return super.onTeamsTeamRestored(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsTeamUnarchived(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsTeamUnarchived");
+            return super.onTeamsTeamUnarchived(channelInfo, teamInfo, turnContext);
         }
     }
 
