@@ -315,6 +315,29 @@ public class TeamsActivityHandlerTests {
     }
 
     @Test
+    public void TestConversationUpdateTeamsChannelRestored() {
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
+            {
+                setChannelData(new TeamsChannelData() {
+                    {
+                        setEventType("channelRestored");
+                    }
+                });
+                setChannelId(Channels.MSTEAMS);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onConversationUpdateActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsChannelRestored", bot.record.get(1));
+    }
+
+    @Test
     public void TestConversationUpdateTeamsTeamRenamed() {
         Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
             {
@@ -1275,6 +1298,16 @@ public class TeamsActivityHandlerTests {
         ) {
             record.add("onTeamsChannelRenamed");
             return super.onTeamsChannelRenamed(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsChannelRestored(
+            ChannelInfo channelInfo,
+            TeamInfo teamInfo,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsChannelRestored");
+            return super.onTeamsChannelRestored(channelInfo, teamInfo, turnContext);
         }
 
         @Override

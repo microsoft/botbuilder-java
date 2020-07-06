@@ -199,18 +199,44 @@ public class TeamsActivityHandler extends ActivityHandler {
         });
     }
 
+    /**
+     * Invoked when a card action invoke activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<InvokeResponse> onTeamsCardActionInvoke(TurnContext turnContext) {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a signIn invoke activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onSignInInvoke(TurnContext turnContext) {
         return onTeamsSigninVerifyState(turnContext);
     }
 
+    /**
+     * Invoked when a signIn verify state activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsSigninVerifyState(TurnContext turnContext) {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a file consent card activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user acts on a file consent card.
+     * @return An InvokeResponse depending on the action of the file consent card.
+     */
     protected CompletableFuture<InvokeResponse> onTeamsFileConsent(
         TurnContext turnContext,
         FileConsentCardResponse fileConsentCardResponse
@@ -238,6 +264,14 @@ public class TeamsActivityHandler extends ActivityHandler {
         }
     }
 
+    /**
+     * Invoked when a file consent card is accepted by the user.
+     *
+     * @param turnContext The current TurnContext.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user accepts a file consent card.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsFileConsentAccept(
         TurnContext turnContext,
         FileConsentCardResponse fileConsentCardResponse
@@ -245,6 +279,14 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a file consent card is declined by the user.
+     *
+     * @param turnContext The current TurnContext.
+     * @param fileConsentCardResponse The response representing the value of the invoke activity sent
+     * when the user declines a file consent card.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsFileConsentDecline(
         TurnContext turnContext,
         FileConsentCardResponse fileConsentCardResponse
@@ -252,6 +294,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a Messaging Extension Query activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param query The query for the search command.
+     * @return The Messaging Extension Response for the query.
+     */
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionQuery(
         TurnContext turnContext,
         MessagingExtensionQuery query
@@ -259,6 +308,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a O365 Connector Card Action activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param query The O365 connector card HttpPOST invoke query.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsO365ConnectorCardAction(
         TurnContext turnContext,
         O365ConnectorCardActionQuery query
@@ -266,6 +322,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when an app based link query activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param query The invoke request body type for app-based link query.
+     * @return The Messaging Extension Response for the query.
+     */
     protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(
         TurnContext turnContext,
         AppBasedLinkQuery query
@@ -273,6 +336,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a messaging extension select item activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param query The object representing the query.
+     * @return The Messaging Extension Response for the query.
+     */
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionSelectItem(
         TurnContext turnContext,
         Object query
@@ -280,6 +350,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a Messaging Extension Fetch activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param action The messaging extension action.
+     * @return The Messaging Extension Action Response for the action.
+     */
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionFetchTask(
         TurnContext turnContext,
         MessagingExtensionAction action
@@ -287,6 +364,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a messaging extension submit action dispatch activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param action The messaging extension action.
+     * @return The Messaging Extension Action Response for the action.
+     */
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitActionDispatch(
         TurnContext turnContext,
         MessagingExtensionAction action
@@ -315,6 +399,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         }
     }
 
+    /**
+     * Invoked when a messaging extension submit action activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param action The messaging extension action.
+     * @return The Messaging Extension Action Response for the action.
+     */
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(
         TurnContext turnContext,
         MessagingExtensionAction action
@@ -322,6 +413,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a messaging extension bot message preview edit activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param action The messaging extension action.
+     * @return The Messaging Extension Action Response for the action.
+     */
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewEdit(
         TurnContext turnContext,
         MessagingExtensionAction action
@@ -329,6 +427,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a messaging extension bot message preview send activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param action The messaging extension action.
+     * @return The Messaging Extension Action Response for the action.
+     */
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionBotMessagePreviewSend(
         TurnContext turnContext,
         MessagingExtensionAction action
@@ -336,6 +441,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a messaging extension configuration query setting url activity is received from the connector.
+     *
+     * @param turnContext The current TurnContext.
+     * @param query The Messaging extension query.
+     * @return The Messaging Extension Response for the query.
+     */
     protected CompletableFuture<MessagingExtensionResponse> onTeamsMessagingExtensionConfigurationQuerySettingUrl(
         TurnContext turnContext,
         MessagingExtensionQuery query
@@ -343,6 +455,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Override this in a derived class to provide logic for when a configuration is set for a messaging extension.
+     *
+     * @param turnContext The current TurnContext.
+     * @param settings Object representing the configuration settings.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMessagingExtensionConfigurationSetting(
         TurnContext turnContext,
         Object settings
@@ -350,6 +469,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Override this in a derived class to provide logic for when a task module is fetched.
+     *
+     * @param turnContext The current TurnContext.
+     * @param taskModuleRequest The task module invoke request value payload.
+     * @return A Task Module Response for the request.
+     */
     protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleFetch(
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest
@@ -357,6 +483,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Override this in a derived class to provide logic for when a card button is clicked in a messaging extension.
+     *
+     * @param turnContext The current TurnContext.
+     * @param cardData Object representing the card data.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMessagingExtensionCardButtonClicked(
         TurnContext turnContext,
         Object cardData
@@ -364,6 +497,13 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Override this in a derived class to provide logic for when a task module is submited.
+     *
+     * @param turnContext The current TurnContext.
+     * @param taskModuleRequest The task module invoke request value payload.
+     * @return A Task Module Response for the request.
+     */
     protected CompletableFuture<TaskModuleResponse> onTeamsTaskModuleSubmit(
         TurnContext turnContext,
         TaskModuleRequest taskModuleRequest
@@ -371,6 +511,15 @@ public class TeamsActivityHandler extends ActivityHandler {
         return notImplemented();
     }
 
+    /**
+     * Invoked when a conversation update activity is received from the channel.
+     * Conversation update activities are useful when it comes to responding to users being added to
+     * or removed from the channel.
+     * For example, a bot could respond to a user being added by greeting the user.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
         if (turnContext.getActivity().isTeamsActivity()) {
             ResultPair<TeamsChannelData> channelData = turnContext.getActivity().tryGetChannelData(
@@ -411,6 +560,13 @@ public class TeamsActivityHandler extends ActivityHandler {
 
                     case "channelRenamed":
                         return onTeamsChannelRenamed(
+                            channelData.value().getChannel(),
+                            channelData.value().getTeam(),
+                            turnContext
+                        );
+
+                    case "channelRestored":
+                        return onTeamsChannelRestored(
                             channelData.value().getChannel(),
                             channelData.value().getTeam(),
                             turnContext
@@ -467,6 +623,17 @@ public class TeamsActivityHandler extends ActivityHandler {
         return super.onConversationUpdateActivity(turnContext);
     }
 
+    /**
+     * Override this in a derived class to provide logic for when members other than the bot
+     * join the channel, such as your bot's welcome logic.
+     * It will get the associated members with the provided accounts.
+     *
+     * @param membersAdded A list of all the accounts added to the channel, as described by
+     * the conversation update activity.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMembersAddedDispatch(
         List<ChannelAccount> membersAdded,
         TeamInfo teamInfo,
@@ -524,6 +691,17 @@ public class TeamsActivityHandler extends ActivityHandler {
         return onTeamsMembersAdded(teamsMembersAdded, teamInfo, turnContext);
     }
 
+    /**
+     * Override this in a derived class to provide logic for when members other than the bot
+     * leave the channel, such as your bot's good-bye logic.
+     * It will get the associated members with the provided accounts.
+     *
+     * @param membersRemoved A list of all the accounts removed from the channel, as described by
+     * the conversation update activity.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMembersRemovedDispatch(
         List<ChannelAccount> membersRemoved,
         TeamInfo teamInfo,
@@ -545,6 +723,16 @@ public class TeamsActivityHandler extends ActivityHandler {
         return onTeamsMembersRemoved(teamsMembersRemoved, teamInfo, turnContext);
     }
 
+    /**
+     * Override this in a derived class to provide logic for when members other than the bot
+     * join the channel, such as your bot's welcome logic.
+     *
+     * @param membersAdded A list of all the members added to the channel, as described by
+     * the conversation update activity.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMembersAdded(
         List<TeamsChannelAccount> membersAdded,
         TeamInfo teamInfo,
@@ -553,6 +741,16 @@ public class TeamsActivityHandler extends ActivityHandler {
         return onMembersAdded(new ArrayList<>(membersAdded), turnContext);
     }
 
+    /**
+     * Override this in a derived class to provide logic for when members other than the bot
+     * leave the channel, such as your bot's good-bye logic.
+     *
+     * @param membersRemoved A list of all the members removed from the channel, as described by
+     * the conversation update activity.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsMembersRemoved(
         List<TeamsChannelAccount> membersRemoved,
         TeamInfo teamInfo,
@@ -561,6 +759,15 @@ public class TeamsActivityHandler extends ActivityHandler {
         return onMembersRemoved(new ArrayList<>(membersRemoved), turnContext);
     }
 
+    /**
+     * Invoked when a Channel Created event activity is received from the connector.
+     * Channel Created correspond to the user creating a new channel.
+     *
+     * @param channelInfo The channel info object which describes the channel.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsChannelCreated(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
@@ -569,6 +776,15 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Invoked when a Channel Deleted event activity is received from the connector.
+     * Channel Deleted correspond to the user deleting an existing channel.
+     *
+     * @param channelInfo The channel info object which describes the channel.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsChannelDeleted(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
@@ -577,7 +793,33 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Invoked when a Channel Renamed event activity is received from the connector.
+     * Channel Renamed correspond to the user renaming an existing channel.
+     *
+     * @param channelInfo The channel info object which describes the channel.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsChannelRenamed(
+        ChannelInfo channelInfo,
+        TeamInfo teamInfo,
+        TurnContext turnContext
+    ) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a Channel Restored event activity is received from the connector.
+     * Channel Restored correspond to the user restoring a previously deleted channel.
+     *
+     * @param channelInfo The channel info object which describes the channel.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTeamsChannelRestored(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
         TurnContext turnContext
@@ -630,6 +872,15 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Invoked when a Channel Renamed event activity is received from the connector.
+     * Channel Renamed correspond to the user renaming an existing channel.
+     *
+     * @param channelInfo The channel info object which describes the channel.
+     * @param teamInfo The team info object representing the team.
+     * @param turnContext The current TurnContext.
+     * @return A task that represents the work queued to execute.
+     */
     protected CompletableFuture<Void> onTeamsTeamRenamed(
         ChannelInfo channelInfo,
         TeamInfo teamInfo,
@@ -668,10 +919,21 @@ public class TeamsActivityHandler extends ActivityHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Invoke a new InvokeResponseException with a HTTP 501 code status.
+     *
+     * @return true if this invocation caused this CompletableFuture to transition to a completed state, else false
+     */
     protected <T> CompletableFuture<T> notImplemented() {
         return notImplemented(null);
     }
 
+    /**
+     * Invoke a new InvokeResponseException with a HTTP 501 code status.
+     *
+     * @param body The body for the InvokeResponseException.
+     * @return true if this invocation caused this CompletableFuture to transition to a completed state, else false
+     */
     protected <T> CompletableFuture<T> notImplemented(String body) {
         CompletableFuture<T> result = new CompletableFuture<>();
         result.completeExceptionally(
@@ -680,6 +942,12 @@ public class TeamsActivityHandler extends ActivityHandler {
         return result;
     }
 
+    /**
+     * Error handler that can catch exceptions.
+     *
+     * @param t The exception thrown.
+     * @return A task that represents the work queued to execute.
+     */
     protected <T> CompletableFuture<T> withException(Throwable t) {
         CompletableFuture<T> result = new CompletableFuture<>();
         result.completeExceptionally(new CompletionException(t));
