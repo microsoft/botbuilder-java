@@ -221,6 +221,35 @@ public class ActivityTest {
         Assert.assertNotNull(activity.getValue());
     }
 
+    private static final String serializedActivityWithDifferentTimeZone = "{\n" + "  \"attachments\": [],\n"
+        + "  \"channelId\": \"directlinespeech\",\n" + "  \"conversation\":\n" + "  {\n"
+        + "    \"id\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n" + "    \"isGroup\": false\n" + "  },\n"
+        + "  \"entities\": [],\n" + "  \"from\":\n" + "  {\n" + "    \"id\": \"ConnectedCarAssistant\"\n" + "  },\n"
+        + "  \"id\": \"9f90f0f5-be7d-410c-ad4a-5826751b26b1\",\n" + "  \"locale\": \"en-us\",\n"
+        + "  \"name\": \"WebviewPreFetch\",\n" + "  \"recipient\":\n" + "  {\n"
+        + "    \"id\": \"ef3de4593d4cc9b8\",\n" + "    \"role\": \"user\"\n" + "  },\n"
+        + "  \"replyToId\": \"4d807515-46c1-44a1-b0f8-88457e3c13f2\",\n"
+        + "  \"serviceUrl\": \"urn:botframework:websocket:directlinespeech\",\n" + "  \"text\": \"\",\n"
+        + "  \"timestamp\": \"2019-11-14T17:50:06.8447816+02:00\",\n" + "  \"type\": \"event\",\n" + "  \"value\":\n"
+        + "  {\n" + "    \"headers\":\n" + "    {\n"
+        + "      \"opal-sessionid\": \"b18a1c99-7a29-4801-ac0c-579f2c36d52c\",\n"
+        + "      \"x-Search-ClientId\": \"ef3de4593d4cc9b8\",\n" + "      \"x-Search-Market\": \"en-us\",\n"
+        + "      \"x-Uqu-RefererType\": \"1\",\n" + "      \"x-Uqu-ResponseFormat\": \"0\"\n" + "    },\n"
+        + "    \"uri\": \"https://www.bing.com/commit/v1?q=pull+down+the+driver+side&visualResponsePreference=0&uqurequestid=4D80751546C144A1B0F888457E3C13F2\",\n"
+        + "    \"userAgent\": \"Mozilla/5.0 (Linux; Android 7.1.1; TB-8704V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.11 Safari/537.36 BingMobileApp/36 BMABuild/Production BMAConfig/0\"\n"
+        + "  }\n" + "}\n";
+
+    @Test
+    public void DeserializeActivityWithDifferentTimeZone() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(this.serializedActivityWithDifferentTimeZone, Activity.class);
+
+        Assert.assertNotNull(activity.getTimestamp());
+        Assert.assertEquals("b18a1c99-7a29-4801-ac0c-579f2c36d52c", activity.getConversation().getId());
+        Assert.assertNotNull(activity.getValue());
+    }
+
     private static final String serializedActivityFromTeams = "{" + " \"channelId\": \"msteams\","
             + " \"channelData\": {" + "   \"teamsChannelId\": \"19:123cb42aa5a0a7e56f83@thread.skype\","
             + "   \"teamsTeamId\": \"19:104f2cb42aa5a0a7e56f83@thread.skype\"," + "   \"channel\": {"

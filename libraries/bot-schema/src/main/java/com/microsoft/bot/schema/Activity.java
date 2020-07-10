@@ -3,29 +3,19 @@
 
 package com.microsoft.bot.schema;
 
-import com.microsoft.bot.schema.teams.NotificationInfo;
-import com.microsoft.bot.schema.teams.TeamInfo;
-import com.microsoft.bot.schema.teams.TeamsChannelData;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.bot.schema.teams.NotificationInfo;
+import com.microsoft.bot.schema.teams.TeamInfo;
+import com.microsoft.bot.schema.teams.TeamsChannelData;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +35,7 @@ public class Activity {
 
     @JsonProperty(value = "timestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nX", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nXXX", timezone = "UTC")
     private OffsetDateTime timestamp;
 
     @JsonProperty(value = "localTimestamp")
@@ -858,25 +848,24 @@ public class Activity {
 
     /**
      * Returns payload version of the Entities in an Activity.
-     *
+     * <p>
      * Entities can vary in the number of fields. The {@link Entity} class holds the
      * additional fields in {@link Entity#getProperties()}.
-     *
+     * <p>
      * To convert to other entity types, use {@link Entity#getAs(Class)}.
      *
+     * @return A List of {@link Entity}.
      * @see Mention
      * @see Place
      * @see GeoCoordinates
      * @see Activity#getMentions()
-     *
-     *      {@code
+     * <p>
+     * {@code
      * getEntities().stream()
-     *             .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
-     *             .map(entity -> entity.getAs(Mention.class))
-     *             .collect(Collectors.toCollection(ArrayList::new));
+     * .filter(entity -> entity.getType().equalsIgnoreCase("mention"))
+     * .map(entity -> entity.getAs(Mention.class))
+     * .collect(Collectors.toCollection(ArrayList::new));
      * }
-     *
-     * @return A List of {@link Entity}.
      */
     public List<Entity> getEntities() {
         return this.entities;
@@ -1352,7 +1341,7 @@ public class Activity {
 
     /**
      * Creates a new message activity as a response to this activity.
-     *
+     * <p>
      * This overload uses this Activity's Locale.
      *
      * @param withText The text of the reply.
@@ -1416,7 +1405,7 @@ public class Activity {
      * Checks if this (message) activity has content.
      *
      * @return Returns true, if this message has any content to send. False
-     *         otherwise.
+     * otherwise.
      */
     public boolean hasContent() {
         if (!StringUtils.isBlank(this.getText())) {
@@ -1440,7 +1429,7 @@ public class Activity {
 
     /**
      * Resolves the mentions from the entities of this activity.
-     *
+     * <p>
      * This method is defined on the <see cref="Activity"/> class, but is only
      * intended for use with a message activity, where the activity
      * {@link Activity#type} is set to {@link ActivityTypes#MESSAGE}.
@@ -1506,7 +1495,7 @@ public class Activity {
      * Creates a {@link ConversationReference} based on this activity.
      *
      * @return A conversation reference for the conversation that contains this
-     *         activity.
+     * activity.
      */
     @JsonIgnore
     public ConversationReference getConversationReference() {
@@ -1529,7 +1518,7 @@ public class Activity {
      *
      * @param reply ResourceResponse returned from sendActivity.
      * @return A ConversationReference that can be stored and used later to delete
-     *         or update the activity.
+     * or update the activity.
      */
     @JsonIgnore
     public ConversationReference getReplyConversationReference(ResourceResponse reply) {
@@ -1589,7 +1578,7 @@ public class Activity {
     /**
      * Updates this activity with the delivery information from an existing
      * {@link ConversationReference}.
-     *
+     * <p>
      * Call {@link #getConversationReference} on an incoming activity to get a
      * conversation reference that you can then use to update an outgoing activity
      * with the correct delivery information.
@@ -1660,7 +1649,7 @@ public class Activity {
      * Remove any mention text for given id from the Activity.Text property. For
      * example, given the message "@echoBot Hi Bot", this will remove "@echoBot",
      * leaving "Hi Bot".
-     *
+     * <p>
      * Typically this would be used to remove the mention text for the target
      * recipient (the bot usually), though it could be called for each member. For
      * example:
@@ -1739,7 +1728,7 @@ public class Activity {
      * Get unique identifier representing a channel.
      *
      * @return If this is a Teams Activity with valid data, the unique identifier
-     *         representing a channel.
+     * representing a channel.
      */
     public String teamsGetChannelId() {
         String teamsChannelId;
@@ -1761,7 +1750,7 @@ public class Activity {
      * Get unique identifier representing a team.
      *
      * @return If this is a Teams Activity with valid data, the unique identifier
-     *         representing a team.
+     * representing a team.
      */
     public String teamsGetTeamId() {
         String teamId;
