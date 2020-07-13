@@ -45,7 +45,7 @@ public class Activity {
 
     @JsonProperty(value = "timestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nX", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.nXXX", timezone = "UTC")
     private OffsetDateTime timestamp;
 
     @JsonProperty(value = "localTimestamp")
