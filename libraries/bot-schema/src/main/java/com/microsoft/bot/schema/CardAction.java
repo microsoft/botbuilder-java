@@ -71,7 +71,7 @@ public class CardAction {
 
     /**
      * Perform a deep copy of a CardAction.
-     * 
+     *
      * @param cardAction The CardAction to clone.
      * @return A cloned copy of the CardAction.
      */
@@ -89,6 +89,7 @@ public class CardAction {
                 setType(cardAction.getType());
                 setText(cardAction.getText());
                 setChannelData(cardAction.getChannelData());
+                setImageAltText(cardAction.getImageAltText());
             }
         };
     }
@@ -102,7 +103,7 @@ public class CardAction {
 
     /**
      * Simplify creation of CardActions with string values.
-     * 
+     *
      * @param input The value for both Title and Value.
      */
     public CardAction(String input) {
@@ -238,7 +239,7 @@ public class CardAction {
 
     /**
      * Gets the channelData value.
-     * 
+     *
      * @return ChannelData as a JsonNode.
      */
     public Object getChannelData() {
