@@ -103,18 +103,24 @@ public class SuggestedActionsBot extends ActivityHandler {
                         setTitle("Red");
                         setType(ActionTypes.IM_BACK);
                         setValue("Red");
+                        setImage("https://via.placeholder.com/20/FF0000?text=R");
+                        setImageAltText("R");
                     }
                 }, new CardAction() {
                     {
                         setTitle("Yellow");
                         setType(ActionTypes.IM_BACK);
                         setValue("Yellow");
+                        setImage("https://via.placeholder.com/20/FFFF00?text=Y");
+                        setImageAltText("Y");
                     }
                 }, new CardAction() {
                     {
                         setTitle("Blue");
                         setType(ActionTypes.IM_BACK);
                         setValue("Blue");
+                        setImage("https://via.placeholder.com/20/0000FF?text=B");
+                        setImageAltText("B");
                     }
                 }));
             }
