@@ -3,8 +3,13 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ResultPair;
+import com.microsoft.bot.schema.Serialization;
+import com.microsoft.bot.schema.teams.TeamsChannelData;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -217,6 +222,8 @@ public class TelemetryLoggerMiddleware implements Middleware {
             }
         }
 
+        populateAdditionalChannelProperties(activity, properties);
+
         // Additional Properties can override "stock" properties.
         if (additionalProperties != null) {
             properties.putAll(additionalProperties);
@@ -351,5 +358,37 @@ public class TelemetryLoggerMiddleware implements Middleware {
         }
 
         return CompletableFuture.completedFuture(properties);
+    }
+
+    private void populateAdditionalChannelProperties(
+        Activity activity,
+        Map<String, String> properties
+    ) {
+        if (StringUtils.equalsIgnoreCase(activity.getChannelId(), Channels.MSTEAMS)) {
+            ResultPair<TeamsChannelData> teamsChannelData =
+                activity.tryGetChannelData(TeamsChannelData.class);
+            if (teamsChannelData.result()) {
+                if (teamsChannelData.value().getTenant() != null) {
+                    properties
+                        .put("TeamsTenantId", teamsChannelData.value().getTenant().getId());
+                }
+
+                if (activity.getFrom() != null) {
+                    properties
+                        .put("TeamsUserAadObjectId", activity.getFrom().getAadObjectId());
+                }
+
+                try {
+                    if (teamsChannelData.value().getTeam() != null) {
+                        properties.put(
+                            "TeamsTeamInfo",
+                            Serialization.toString(teamsChannelData.value().getTeam())
+                        );
+                    }
+                } catch (JsonProcessingException ignored) {
+
+                }
+            }
+        }
     }
 }

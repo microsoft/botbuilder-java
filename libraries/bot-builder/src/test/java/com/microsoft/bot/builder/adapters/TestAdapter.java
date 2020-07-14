@@ -130,7 +130,14 @@ public class TestAdapter extends BotAdapter {
                 if (activity.getType() == null)
                     activity.setType(ActivityTypes.MESSAGE);
                 activity.setChannelId(conversationReference().getChannelId());
-                activity.setFrom(conversationReference().getUser());
+
+                if (activity.getFrom() == null
+                    || StringUtils.equalsIgnoreCase(activity.getFrom().getId(), "unknown")
+                    || activity.getFrom().getRole() == RoleTypes.BOT
+                ) {
+                    activity.setFrom(conversationReference().getUser());
+                }
+
                 activity.setRecipient(conversationReference().getBot());
                 activity.setConversation(conversationReference().getConversation());
                 activity.setServiceUrl(conversationReference().getServiceUrl());
