@@ -54,6 +54,11 @@ public class WelcomeUserBot extends ActivityHandler {
             + "of the 'ConversationUpdate' event depends on the channel. You can "
             + "read more information at: " + "https://aka.ms/about-botframework-welcome-user";
 
+    private String LOCALEMESSAGE =
+        "You can use the activity's GetLocale() method to welcome the user "
+            + "using the locale received from the channel. "
+            + "If you are using the Emulator, you can set this value in Settings.";
+
     private static final String PATTERNMESSAGE =
         "It is a good pattern to use this event to send general greeting"
             + "to user, explaining what your bot can do. In this example, the bot "
@@ -87,7 +92,12 @@ public class WelcomeUserBot extends ActivityHandler {
     }
 
     /**
-     * Send a welcome message to new members.
+     * Greet when users are added to the conversation.
+     *
+     * <p>Note that all channels do not send the conversation update activity.
+     * If you find that this bot works in the emulator, but does not in
+     * another channel the reason is most likely that the channel does not
+     * send this activity.</p>
      *
      * @param membersAdded A list of all the members added to the conversation, as
      *                     described by the conversation update activity.
@@ -109,7 +119,12 @@ public class WelcomeUserBot extends ActivityHandler {
                     .sendActivities(
                         MessageFactory.text(
                             "Hi there - " + channel.getName() + ". " + WELCOMEMESSAGE
-                        ), MessageFactory.text(INFOMESSAGE), MessageFactory.text(PATTERNMESSAGE)
+                        ),
+                        MessageFactory.text(
+                            LOCALEMESSAGE
+                            + " Current locale is " + turnContext.getActivity().getLocale()),
+                        MessageFactory.text(INFOMESSAGE),
+                        MessageFactory.text(PATTERNMESSAGE)
                     )
             )
             .collect(CompletableFutures.toFutureList())
@@ -137,7 +152,10 @@ public class WelcomeUserBot extends ActivityHandler {
 
                 String userName = turnContext.getActivity().getFrom().getName();
                 return turnContext
-                    .sendActivities(MessageFactory.text(FIRST_WELCOME_ONE), MessageFactory.text(String.format(FIRST_WELCOME_TWO, userName)));
+                    .sendActivities(
+                        MessageFactory.text(FIRST_WELCOME_ONE),
+                        MessageFactory.text(String.format(FIRST_WELCOME_TWO, userName))
+                    );
             } else {
                 String text = turnContext.getActivity().getText().toLowerCase();
                 switch (text) {
@@ -159,21 +177,24 @@ public class WelcomeUserBot extends ActivityHandler {
     }
 
     private CompletableFuture<ResourceResponse> sendIntroCard(TurnContext turnContext) {
-        HeroCard card = new HeroCard();
-        card.setTitle("Welcome to Bot Framework!");
-        card.setText(
-            "Welcome to Welcome Users bot sample! This Introduction card "
-                + "is a great way to introduce your Bot to the user and suggest "
-                + "some things to get them started. We use this opportunity to "
-                + "recommend a few next steps for learning more creating and deploying bots."
-        );
+        HeroCard card = new HeroCard() {{
+            setTitle("Welcome to Bot Framework!");
+            setText(
+                "Welcome to Welcome Users bot sample! This Introduction card "
+                    + "is a great way to introduce your Bot to the user and suggest "
+                    + "some things to get them started. We use this opportunity to "
+                    + "recommend a few next steps for learning more creating and deploying bots."
+            );
+        }};
+
         card.setImages(Collections.singletonList(new CardImage() {
             {
                 setUrl("https://aka.ms/bf-welcome-card-image");
             }
         }));
-        card.setButtons(Arrays.asList(new CardAction() {
-            {
+
+        card.setButtons(Arrays.asList(
+            new CardAction() {{
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Get an overview");
                 setText("Get an overview");
@@ -181,17 +202,15 @@ public class WelcomeUserBot extends ActivityHandler {
                 setValue(
                     "https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0"
                 );
-            }
-        }, new CardAction() {
-            {
+            }},
+            new CardAction() {{
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Ask a question");
                 setText("Ask a question");
                 setDisplayText("Ask a question");
                 setValue("https://stackoverflow.com/questions/tagged/botframework");
-            }
-        }, new CardAction() {
-            {
+            }},
+            new CardAction() {{
                 setType(ActionTypes.OPEN_URL);
                 setTitle("Learn how to deploy");
                 setText("Learn how to deploy");
@@ -199,8 +218,8 @@ public class WelcomeUserBot extends ActivityHandler {
                 setValue(
                     "https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-deploy-azure?view=azure-bot-service-4.0"
                 );
-            }
-        }));
+            }})
+        );
 
         Activity response = MessageFactory.attachment(card.toAttachment());
         return turnContext.sendActivity(response);
