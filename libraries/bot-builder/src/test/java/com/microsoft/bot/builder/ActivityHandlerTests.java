@@ -22,6 +22,18 @@ public class ActivityHandlerTests {
     }
 
     @Test
+    public void TestOnInstallationUpdate() {
+        Activity activity = new Activity(ActivityTypes.INSTALLATION_UPDATE);
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(1, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+    }
+
+    @Test
     public void TestMemberAdded1() {
         Activity activity = new Activity() {
             {
@@ -429,6 +441,12 @@ public class ActivityHandlerTests {
         protected CompletableFuture onEvent(TurnContext turnContext) {
             record.add("onEvent");
             return super.onEvent(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture onInstallationUpdate(TurnContext turnContext) {
+            record.add("onInstallationUpdate");
+            return super.onInstallationUpdate(turnContext);
         }
 
         @Override

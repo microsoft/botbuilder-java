@@ -77,6 +77,9 @@ public class ActivityHandler implements Bot {
             case ActivityTypes.EVENT:
                 return onEventActivity(turnContext);
 
+            case ActivityTypes.INSTALLATION_UPDATE:
+                return onInstallationUpdate(turnContext);
+
             case ActivityTypes.INVOKE:
                 return onInvokeActivity(turnContext).thenCompose(invokeResponse -> {
                     // If OnInvokeActivityAsync has already sent an InvokeResponse, do not send
@@ -484,6 +487,17 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onEvent(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to
+     * ActivityTypes.InstallationUpdate activities.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onInstallationUpdate(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 
