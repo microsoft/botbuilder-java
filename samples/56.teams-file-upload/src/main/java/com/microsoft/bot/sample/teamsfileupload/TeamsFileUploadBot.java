@@ -187,7 +187,6 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
                 .getContext();
             File filePath = new File("files", context.get("filename"));
             HttpURLConnection connection = null;
-            FileInputStream fileStream = null;
 
             try {
                 URL url = new URL(fileConsentCardResponse.getUploadInfo().getUploadUrl());
@@ -200,12 +199,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
                     String.format("bytes 0-%d/%d", filePath.length() - 1, filePath.length())
                 );
 
-                fileStream = new FileInputStream(filePath);
-                OutputStream uploadStream = connection.getOutputStream();
-                byte[] buffer = new byte[4096];
-                int bytes_read;
-                while ((bytes_read = fileStream.read(buffer)) != -1) {
-                    uploadStream.write(buffer, 0, bytes_read);
+                try (
+                    FileInputStream fileStream = new FileInputStream(filePath);
+                    OutputStream uploadStream = connection.getOutputStream()
+                ) {
+                    byte[] buffer = new byte[4096];
+                    int bytes_read;
+                    while ((bytes_read = fileStream.read(buffer)) != -1) {
+                        uploadStream.write(buffer, 0, bytes_read);
+                    }
                 }
 
                 result.set(new ResultPair<String>(true, null));
@@ -214,12 +216,6 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
             } finally {
                 if (connection != null) {
                     connection.disconnect();
-                }
-                if (fileStream != null) {
-                    try {
-                        fileStream.close();
-                    } catch (Throwable ignored) {
-                    }
                 }
             }
         })
@@ -234,7 +230,6 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
                 .getAs(attachment.getContent(), FileDownloadInfo.class);
             String filePath = "files/" + attachment.getName();
 
-            FileOutputStream fileStream = null;
             HttpURLConnection connection = null;
 
             try {
@@ -242,12 +237,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
 
-                fileStream = new FileOutputStream(filePath);
-                InputStream downloadStream = connection.getInputStream();
-                byte[] buffer = new byte[4096];
-                int bytes_read;
-                while ((bytes_read = downloadStream.read(buffer)) != -1) {
-                    fileStream.write(buffer, 0, bytes_read);
+                try (
+                    FileOutputStream fileStream = new FileOutputStream(filePath);
+                    InputStream downloadStream = connection.getInputStream()
+                ) {
+                    byte[] buffer = new byte[4096];
+                    int bytes_read;
+                    while ((bytes_read = downloadStream.read(buffer)) != -1) {
+                        fileStream.write(buffer, 0, bytes_read);
+                    }
                 }
 
                 result.set(new ResultPair<>(true, null));
@@ -256,12 +254,6 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
             } finally {
                 if (connection != null) {
                     connection.disconnect();
-                }
-                if (fileStream != null) {
-                    try {
-                        fileStream.close();
-                    } catch (Throwable ignored) {
-                    }
                 }
             }
         })
