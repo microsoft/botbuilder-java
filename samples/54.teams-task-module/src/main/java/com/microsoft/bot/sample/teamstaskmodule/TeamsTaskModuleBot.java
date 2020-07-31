@@ -87,7 +87,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
             switch (value.getData()) {
                 // Display the YouTube.html page
                 case TaskModuleIds.YOUTUBE: {
-                    String url = baseUrl + "/" + TaskModuleIds.YOUTUBE;
+                    String url = baseUrl + "/" + TaskModuleIds.YOUTUBE + ".html";
                     taskInfo.setUrl(url);
                     taskInfo.setFallbackUrl(url);
                     setTaskInfo(taskInfo, TaskModuleUIConstants.YOUTUBE);
@@ -97,7 +97,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
                 // Display the CustomForm.html page, and post the form data back via
                 // onTeamsTaskModuleSubmit.
                 case TaskModuleIds.CUSTOMFORM: {
-                    String url = baseUrl + "/" + TaskModuleIds.CUSTOMFORM;
+                    String url = baseUrl + "/" + TaskModuleIds.CUSTOMFORM + ".html";
                     taskInfo.setUrl(url);
                     taskInfo.setFallbackUrl(url);
                     setTaskInfo(taskInfo, TaskModuleUIConstants.CUSTOMFORM);
