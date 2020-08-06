@@ -39,7 +39,7 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
     @BeforeClass
     public static void allTestsInit() throws IOException, InterruptedException, DocumentClientException {
         Process p = Runtime.getRuntime().exec
-            ("cmd /C \"\"" + System.getenv("ProgramFiles") + "\\Azure Cosmos DB Emulator\\CosmosDB.Emulator.exe\"\" /GetStatus");
+            ("cmd /C \"" + System.getenv("ProgramFiles") + "\\Azure Cosmos DB Emulator\\CosmosDB.Emulator.exe\" /GetStatus");
 
         int result = p.waitFor();
         if (result == 2) {
