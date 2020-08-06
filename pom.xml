@@ -5,7 +5,7 @@
 
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-java</artifactId>
-  <version>4.6.0-preview4</version>
+  <version>4.6.0-preview6</version>
   <packaging>pom</packaging>
 
   <name>Microsoft BotBuilder Java SDK Parent</name>
@@ -335,11 +335,6 @@
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
-        <artifactId>bot-configuration</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-ai-luis-v3</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -373,7 +368,6 @@
     <module>libraries/bot-builder</module>
     <module>libraries/bot-integration-core</module>
     <module>libraries/bot-dialogs</module>
-    <module>libraries/bot-configuration</module>
     <module>libraries/bot-ai-luis-v3</module>
     <module>libraries/bot-ai-qna</module>
     <module>libraries/bot-applicationinsights</module>
