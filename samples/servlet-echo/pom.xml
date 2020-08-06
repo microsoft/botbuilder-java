@@ -89,7 +89,7 @@
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-integration-core</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.6.0-preview6</version>
       </dependency>
   </dependencies>
 
