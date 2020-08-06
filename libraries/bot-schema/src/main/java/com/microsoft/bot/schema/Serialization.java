@@ -111,7 +111,7 @@ public final class Serialization {
      * Parses a JSON document.
      *
      * @param json The JSON to parse.
-     * @return A JsonNode containg the node tree.
+     * @return A JsonNode containing the node tree.
      * @throws IOException Error parsing json.
      */
     public static JsonNode jsonToTree(String json) throws IOException {
