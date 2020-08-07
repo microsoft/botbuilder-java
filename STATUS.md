@@ -1,6 +1,6 @@
 # Java Bot Framework
 
-The current release is **Preview 3**.
+The current release is **Preview 6**.
 
 ## Core Packages
 
@@ -10,9 +10,9 @@ The current release is **Preview 3**.
 | bot-connector                   | Preview 2     
 | bot-integration-core            | Preview 2     
 | bot-builder                     | Preview 3
-| bot-builder-teams               | Not Started
-| bot-schema-teams                | Not Started
-| bot-connector-teams             | Not Started
+| bot-builder-teams               | Preview 5
+| bot-schema-teams                | Preview 5
+| bot-connector-teams             | Preview 5
 | bot-dialog                      | Incomplete
 | bot-dialog-adaptive             | Not Started
 | bot-dialog-declarative          | Not Started
@@ -20,8 +20,7 @@ The current release is **Preview 3**.
 | bot-ai-luis-v3                  | Not Started
 | bot-ai-qna                      | Not Started
 | bot-applicationinsights         | Not Started
-| bot-azure                       | Not Started
-| bot-configuration               | Not Started
+| bot-azure                       | Dev Branch - CosmosDBPartionedStorage
 
 ## Samples
 | Package                         | Status        
@@ -51,6 +50,16 @@ The current release is **Preview 3**.
 | 46.teams-auth                   |
 | 47.inspection                   | Preview 3
 | 48.qnamaker-active-learning-bot |
+| 50.teams-messaging-extensions-search | Preview 5
+| 51.teams-messaging-extensions-action | Preview 5
+| 52.teams-messaging-extensions-search-auth-config | Preview 5
+| 53.teams-messaging-extensions-action-preview | Preview 5
+| 54.teams-task-module | Preview 5
+| 55.teams-link-unfurling | Preview 5
+| 56.teams-file-upload | Preview 5
+| 57.teams-conversation-bot | Preview 5
+| 58.qnamaker-multiturn-sample | Preview 5
+| 58.teams-start-new-thread-in-channel | Preview 5
 | servlet-echo                    | Preview 2
 
 ## Build Prerequisites
