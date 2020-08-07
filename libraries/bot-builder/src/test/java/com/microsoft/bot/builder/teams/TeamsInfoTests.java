@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TeamsInfoTests {
     @Test
     public void TestSendMessageToTeamsChannel() {
