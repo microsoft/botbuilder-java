@@ -26,6 +26,10 @@ public final class Serialization {
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.findAndRegisterModules();
+
+        // NOTE: Undetermined if we should accommodate non-public fields.  The normal
+        // Bean pattern, and Jackson default, is for public fields or accessors.
+        //objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     }
 
     /**
@@ -60,6 +64,37 @@ public final class Serialization {
 
         JsonNode node = objectMapper.valueToTree(obj);
         return objectMapper.treeToValue(node, classType);
+    }
+
+    public static Object clone(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+
+        JsonNode node = objectMapper.valueToTree(obj);
+        try {
+            return objectMapper.treeToValue(node, obj.getClass());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static <T> T treeToValue(JsonNode src, Class<T> cls) {
+        try {
+            return objectMapper.treeToValue(src, cls);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Convert Object to JsonNode.
+     * @param obj The object to convert.
+     * @return The JsonNode for the object tree.
+     */
+    public static JsonNode objectToTree(Object obj) {
+        return objectMapper.valueToTree(obj);
     }
 
     /**
@@ -117,4 +152,37 @@ public final class Serialization {
     public static JsonNode jsonToTree(String json) throws IOException {
         return objectMapper.readTree(json);
     }
+
+    public static JsonNode asNode(String s) {
+        return objectMapper.getNodeFactory().textNode(s);
+    }
+
+    public static JsonNode asNode(int i) {
+        return objectMapper.getNodeFactory().numberNode(i);
+    }
+
+    public static JsonNode asNode(long l) {
+        return objectMapper.getNodeFactory().numberNode(l);
+    }
+
+    public static JsonNode asNode(float f) {
+        return objectMapper.getNodeFactory().numberNode(f);
+    }
+
+    public static JsonNode asNode(double d) {
+        return objectMapper.getNodeFactory().numberNode(d);
+    }
+
+    public static JsonNode asNode(short s) {
+        return objectMapper.getNodeFactory().numberNode(s);
+    }
+
+    public static JsonNode asNode(boolean b) {
+        return objectMapper.getNodeFactory().booleanNode(b);
+    }
+
+    public static JsonNode asNode(byte b) {
+        return objectMapper.getNodeFactory().numberNode(b);
+    }
 }
+

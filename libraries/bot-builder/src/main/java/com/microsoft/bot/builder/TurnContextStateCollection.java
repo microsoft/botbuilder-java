@@ -111,6 +111,16 @@ public class TurnContextStateCollection implements AutoCloseable {
     }
 
     /**
+     * Returns <tt>true</tt> if this contains a mapping for the specified
+     * key.
+     * @param key The name of the value.
+     * @return  True if the key exists.
+     */
+    public boolean containsKey(String key) {
+        return state.containsKey(key);
+    }
+
+    /**
      * Auto call of {@link #close}.
      */
     @Override
@@ -135,6 +145,18 @@ public class TurnContextStateCollection implements AutoCloseable {
                     continue;
                 }
                 ((AutoCloseable) entry.getValue()).close();
+            }
+        }
+    }
+
+    /**
+     * Copy the values from another TurnContextStateCollection.
+     * @param other The collection to copy.
+     */
+    public void copy(TurnContextStateCollection other) {
+        if (other != null) {
+            for (String key : other.state.keySet()) {
+                state.put(key, other.state.get(key));
             }
         }
     }

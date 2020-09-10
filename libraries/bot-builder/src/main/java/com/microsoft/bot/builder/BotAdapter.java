@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Represents a bot adapter that can connect a bot to a service endpoint. This
@@ -191,6 +192,10 @@ public abstract class BotAdapter {
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
+            if (!StringUtils.isEmpty(context.getActivity().getLocale())) {
+                context.setLocale(context.getActivity().getLocale());
+            }
+
             return middlewareSet.receiveActivityWithStatus(context, callback)
                 .exceptionally(exception -> {
                     if (onTurnError != null) {

@@ -81,6 +81,10 @@
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-builder</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-integration-core</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>

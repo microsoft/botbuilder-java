@@ -8,6 +8,8 @@ import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
+import java.util.Locale;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -60,6 +62,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Indicates whether at least one response was sent for the current turn.
      */
     private Boolean responded = false;
+
+    private static final String STATE_TURN_LOCALE = "turn.locale";
 
     /**
      * Creates a context object.
@@ -184,6 +188,32 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     @Override
     public boolean getResponded() {
         return responded;
+    }
+
+    /**
+     * Gets the locale on this context object.
+     * @return The string of locale on this context object.
+     */
+    @Override
+    public String getLocale() {
+        return getTurnState().get(STATE_TURN_LOCALE);
+    }
+
+    /**
+     * Set  the locale on this context object.
+     * @param withLocale The string of locale on this context object.
+     */
+    @Override
+    public void setLocale(String withLocale) {
+        if (StringUtils.isEmpty(withLocale)) {
+            getTurnState().remove(STATE_TURN_LOCALE);
+        } else if (
+            LocaleUtils.isAvailableLocale(new Locale.Builder().setLanguageTag(withLocale).build())
+        ) {
+            getTurnState().replace(STATE_TURN_LOCALE, withLocale);
+        } else {
+            getTurnState().replace(STATE_TURN_LOCALE, Locale.ENGLISH.getCountry());
+        }
     }
 
     /**
