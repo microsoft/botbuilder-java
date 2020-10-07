@@ -1821,6 +1821,28 @@ public class Activity {
     }
 
     /**
+     * Sets the notification of a meeting in the TeamsChannelData.
+     * @param alertInMeeting True if this is a meeting alert.
+     * @param externalResourceUrl The external resource Url.
+     */
+    public void teamsNotifyUser(boolean alertInMeeting, String externalResourceUrl) {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        if (teamsChannelData == null) {
+            teamsChannelData = new TeamsChannelData();
+            setChannelData(teamsChannelData);
+        }
+
+        teamsChannelData.setNotification(new NotificationInfo(true, externalResourceUrl));
+    }
+
+    /**
      * Returns this activity as a Message Activity; or null, if this is not that type of activity.
      *
      * @return This activity as a message activity; or null.
