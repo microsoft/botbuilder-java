@@ -13,6 +13,7 @@ package com.microsoft.bot.connector.teams;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.TeamDetails;
 
+import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -34,4 +35,17 @@ public interface TeamsOperations {
      * @return The TeamDetails
      */
     CompletableFuture<TeamDetails> fetchTeamDetails(String teamId);
+
+    /**
+     * Fetches Teams meeting participant details.
+     * @param meetingId Teams meeting id
+     * @param participantId Teams meeting participant id
+     * @param tenantId Teams meeting tenant id
+     * @return TeamsMeetingParticipant
+     */
+    CompletableFuture<TeamsMeetingParticipant> fetchParticipant(
+        String meetingId,
+        String participantId,
+        String tenantId
+    );
 }

@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
@@ -50,9 +51,6 @@ public class Activity {
 
     @JsonProperty(value = "localTimestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern =
-    // "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    // 2019-10-07T09:49:37-05:00
     private OffsetDateTime localTimestamp;
 
     @JsonProperty(value = "localTimezone")
@@ -1758,6 +1756,22 @@ public class Activity {
     }
 
     /**
+     * Gets the TeamsChannelData.
+     * @return TeamsChannelData
+     */
+    public TeamsChannelData teamsGetChannelData() {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        return teamsChannelData;
+    }
+
+    /**
      * Get unique identifier representing a team.
      *
      * @return If this is a Teams Activity with valid data, the unique identifier
@@ -1840,6 +1854,22 @@ public class Activity {
         }
 
         teamsChannelData.setNotification(new NotificationInfo(true, externalResourceUrl));
+    }
+
+    /**
+     * Gets the TeamsMeetingInfo object from the current activity.
+     * @return The current activity's team's meeting, or null.
+     */
+    public TeamsMeetingInfo teamsGetMeetingInfo() {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        return teamsChannelData != null ? teamsChannelData.getMeeting() : null;
     }
 
     /**
