@@ -3,7 +3,12 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Channel data specific to messages received in Microsoft Teams.
@@ -18,23 +23,22 @@ public class TeamsChannelData {
     @JsonProperty(value = "channel")
     private ChannelInfo channel;
 
-    /// Gets or sets type of event.
     @JsonProperty(value = "eventType")
     private String eventType;
 
-    /// Gets or sets information about the team in which the message was
-    /// sent
     @JsonProperty(value = "team")
     private TeamInfo team;
 
-    /// Gets or sets notification settings for the message
     @JsonProperty(value = "notification")
     private NotificationInfo notification;
 
-    /// Gets or sets information about the tenant in which the message was
-    /// sent
     @JsonProperty(value = "tenant")
     private TenantInfo tenant;
+
+    @JsonProperty(value = "meeting")
+    private TeamsMeetingInfo meeting;
+
+    private HashMap<String, JsonNode> properties = new HashMap<>();
 
     /**
      * Get unique identifier representing a channel.
@@ -161,6 +165,45 @@ public class TeamsChannelData {
      */
     public void setTenant(TenantInfo withTenant) {
         this.tenant = withTenant;
+    }
+
+    /**
+     * Information about the meeting in which the message was sent.
+     * @return The meeting info
+     */
+    public TeamsMeetingInfo getMeeting() {
+        return meeting;
+    }
+
+    /**
+     * Sets information about the meeting in which the message was sent.
+     * @param withMeeting The meeting info
+     */
+    public void setMeeting(TeamsMeetingInfo withMeeting) {
+        meeting = withMeeting;
+    }
+
+        /**
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
+     *
+     * @return Map of additional properties.
+     */
+    @JsonAnyGetter
+    public Map<String, JsonNode> getProperties() {
+        return this.properties;
+    }
+
+    /**
+     * Holds the overflow properties that aren't first class properties in the
+     * object. This allows extensibility while maintaining the object.
+     *
+     * @param key       The key of the property to set.
+     * @param withValue The value for the property.
+     */
+    @JsonAnySetter
+    public void setProperties(String key, JsonNode withValue) {
+        this.properties.put(key, withValue);
     }
 
     /**
