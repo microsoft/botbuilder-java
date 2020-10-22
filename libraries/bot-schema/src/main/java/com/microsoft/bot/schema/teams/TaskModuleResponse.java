@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -11,6 +12,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TaskModuleResponse {
     @JsonProperty(value = "task")
     private TaskModuleResponseBase task;
+
+    @JsonProperty(value = "cacheInfo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private CacheInfo cacheInfo;
 
     /**
      * Gets the response task.
@@ -28,5 +33,21 @@ public class TaskModuleResponse {
      */
     public void setTask(TaskModuleResponseBase withTask) {
         task = withTask;
+    }
+
+    /**
+     * Gets the CacheInfo for this MessagingExtensionActionResponse.
+     * @return CacheInfo
+     */
+    public CacheInfo getCacheInfo() {
+        return cacheInfo;
+    }
+
+    /**
+     * Sets the CacheInfo for this MessagingExtensionActionResponse.
+     * @param withCacheInfo CacheInfo
+     */
+    public void setCacheInfo(CacheInfo withCacheInfo) {
+        cacheInfo = withCacheInfo;
     }
 }
