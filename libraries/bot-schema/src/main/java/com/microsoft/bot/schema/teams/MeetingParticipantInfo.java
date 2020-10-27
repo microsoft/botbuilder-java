@@ -1,5 +1,6 @@
 package com.microsoft.bot.schema.teams;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -10,7 +11,8 @@ public class MeetingParticipantInfo {
     private String role;
 
     @JsonProperty(value = "inMeeting")
-    private boolean inMeeting;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Boolean inMeeting;
 
     /**
      * Gets the participant's role in the meeting.
@@ -32,7 +34,7 @@ public class MeetingParticipantInfo {
      * Gets a value indicating whether the participant is in the meeting or not.
      * @return The value indicating if the participant is in the meeting.
      */
-    public boolean isInMeeting() {
+    public Boolean isInMeeting() {
         return inMeeting;
     }
 
@@ -40,7 +42,7 @@ public class MeetingParticipantInfo {
      * Sets a value indicating whether the participant is in the meeting or not.
      * @param withInMeeting The value indicating if the participant is in the meeting.
      */
-    public void setInMeeting(boolean withInMeeting) {
+    public void setInMeeting(Boolean withInMeeting) {
         inMeeting = withInMeeting;
     }
 }
