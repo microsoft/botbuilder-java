@@ -13,7 +13,7 @@ public class CacheInfo {
     private String cacheType;
 
     @JsonProperty(value = "cacheDuration")
-    private int cacheDuration;
+    private Integer cacheDuration;
 
     /**
      * Gets cache type.
@@ -35,7 +35,7 @@ public class CacheInfo {
      * Gets cache duration.
      * @return The time in seconds for which the cached object should remain in the cache.
      */
-    public int getCacheDuration() {
+    public Integer getCacheDuration() {
         return cacheDuration;
     }
 
@@ -44,7 +44,7 @@ public class CacheInfo {
      * @param withCacheDuration The time in seconds for which the cached object should
      *                          remain in the cache.
      */
-    public void setCacheDuration(int withCacheDuration) {
+    public void setCacheDuration(Integer withCacheDuration) {
         cacheDuration = withCacheDuration;
     }
 }
