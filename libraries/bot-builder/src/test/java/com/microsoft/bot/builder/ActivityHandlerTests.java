@@ -34,6 +34,18 @@ public class ActivityHandlerTests {
     }
 
     @Test
+    public void TestOnTypingActivity() {
+        Activity activity = new Activity(ActivityTypes.TYPING);
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(1, bot.getRecord().size());
+        Assert.assertEquals("onTypingActivity", bot.getRecord().get(0));
+    }
+
+    @Test
     public void TestMemberAdded1() {
         Activity activity = new Activity() {
             {
@@ -447,6 +459,12 @@ public class ActivityHandlerTests {
         protected CompletableFuture onInstallationUpdate(TurnContext turnContext) {
             record.add("onInstallationUpdate");
             return super.onInstallationUpdate(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture onTypingActivity(TurnContext turnContext) {
+            record.add("onTypingActivity");
+            return super.onTypingActivity(turnContext);
         }
 
         @Override
