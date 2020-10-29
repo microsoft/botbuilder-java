@@ -74,23 +74,18 @@ Replace the values for `<appid>`, `<appsecret>`, `<botname>`, and `<groupname>` 
 #### To an existing Resource Group
 `az group deployment create --name "echoBotDeploy" --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
 
-### 5. Update the pom.xml
-In pom.xml update the following nodes under azure-webapp-maven-plugin
-- `resourceGroup` using the `<groupname>` used above
-- `appName` using the `<botname>` used above
-
-### 6. Update app id and password
+### 5. Update app id and password
 In src/main/resources/application.properties update 
   - `MicrosoftAppPassword` with the botsecret value
   - `MicrosoftAppId` with the appid from the first step
 
-### 7. Deploy the code
+### 6. Deploy the code
 - Execute `mvn clean package` 
-- Execute `mvn azure-webapp:deploy`
+- Execute `mvn azure-webapp:deploy -Dgroupname="<groupname>" -Dbotname="<botname>"`
 
 If the deployment is successful, you will be able to test it via "Test in Web Chat" from the Azure Portal using the "Bot Channel Registration" for the bot.
 
-After the bot is deployed, you only need to execute #7 if you make changes to the bot.
+After the bot is deployed, you only need to execute #6 if you make changes to the bot.
 
 
 ## Further reading
