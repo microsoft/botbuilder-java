@@ -28,7 +28,7 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 
     - Launch Bot Framework Emulator
     - File -> Open Bot
-    - Enter a Bot URL of `http://localhost:8080/api/messages`
+    - Enter a Bot URL of `http://localhost:3978/api/messages`
 
 ## Deploy the bot to Azure
 

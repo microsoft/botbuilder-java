@@ -31,12 +31,12 @@ This sample is a Spring Boot app and uses the Azure CLI and azure-webapp Maven p
 
     - Launch Bot Framework Emulator
     - File -> Open Bot
-    - Enter a Bot URL of `http://localhost:8080/api/messages`
+    - Enter a Bot URL of `http://localhost:3978/api/messages`
 
 ### Special Instructions for Running Inspection
 
 - In the emulator, select Debug -> Start Debugging.
-- Enter the endpoint url (http://localhost:8080)/api/messages, and select Connect.
+- Enter the endpoint url (http://localhost:3978)/api/messages, and select Connect.
 - The result is a trace activity which contains a statement that looks like /INSPECT attach < identifier >
 - Right click and copy that response.
 - In the original Live Chat session paste the value.
