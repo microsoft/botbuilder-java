@@ -450,10 +450,6 @@ public class ActivityHandler implements Bot {
      * @return A task that represents a HealthCheckResponse.
      */
     protected CompletableFuture<HealthCheckResponse> onHealthCheck(TurnContext turnContext) {
-        // HealthResults results = new HealthResults();
-        // results.setSuccess(true);
-        // HealthCheckResponse checkResponse = new HealthCheckResponse();
-        // checkResponse.setHealthResults(results);
         ConnectorClient client = turnContext.getTurnState().get(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY);
         return CompletableFuture.completedFuture(HealthCheck.createHealthCheckResponse(client));
     }
