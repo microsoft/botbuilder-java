@@ -5,7 +5,6 @@ package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.smartcardio.Card;
 
 /**
  * A clickable action.

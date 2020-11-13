@@ -3,12 +3,16 @@ package com.microsoft.bot.dialogs;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.dialogs.memory.TurnPath;
+import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.integration.Async;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ *  Provides context for the current state of the dialog stack.
+ */
 public class DialogContext {
     private DialogSet dialogs;
     private TurnContext context;
@@ -60,6 +64,12 @@ public class DialogContext {
         services.copy(getParent().getServices());
     }
 
+
+    /**
+     * @param withDialogs
+     * @param withTurnContext
+     * @param withState
+     */
     private void init(DialogSet withDialogs, TurnContext withTurnContext, DialogState withState) {
         dialogs = withDialogs;
         context = withTurnContext;
@@ -67,7 +77,7 @@ public class DialogContext {
         state = new DialogStateManager(this);
         services = new TurnContextStateCollection();
 
-        ObjectPath.SetPathValue(context.getTurnState(), TurnPath.ACTIVITY, context.getActivity());
+        ObjectPath.setPathValue(context.getTurnState(), TurnPath.ACTIVITY, context.getActivity());
     }
 
     /**
@@ -119,8 +129,8 @@ public class DialogContext {
     }
 
     /**
-     * Gets the cached instance of the active dialog on the top of the stack or <c>null</c> if the stack is empty.
-     * @return The cached instance of the active dialog on the top of the stack or <c>null</c> if the stack is empty.
+     * Gets the cached instance of the active dialog on the top of the stack or null if the stack is empty.
+     * @return The cached instance of the active dialog on the top of the stack or null if the stack is empty.
      */
     public DialogInstance getActiveDialog() {
         if (stack.size() > 0) {
@@ -225,7 +235,7 @@ public class DialogContext {
      * Continues execution of the active dialog, if there is one, by passing the current
      * DialogContext to the active dialog's {@link Dialog#continueDialog(DialogContext)}
      * method.
-     * 
+     *
      * @return If the task is successful, the result indicates whether the dialog is still
      * active after the turn has been processed by the dialog.
      */
@@ -357,14 +367,14 @@ public class DialogContext {
                 if (!dialogContext.stack.isEmpty()) {
                     // Check to see if the dialog wants to handle the event
                     if (notify) {
-                        var eventHandled = await dialogContext.emitEvent(eventName, eventValue, false, false);
+                        Boolean eventHandled = dialogContext.emitEvent(eventName, eventValue, false, false).join();
                         if (eventHandled) {
                             break;
                         }
                     }
 
                     // End the active dialog
-                    await dialogContext.endActiveDialog(DialogReason.CANCEL_CALLED);
+                    dialogContext.endActiveDialog(DialogReason.CANCEL_CALLED).join();
                 }
                 else {
                     dialogContext = cancelParents ? dialogContext.getParent() : null;
@@ -373,12 +383,10 @@ public class DialogContext {
                 notify = true;
             }
 
-            return new DialogTurnResult(DialogTurnStatus.CANCELLED);
-        }
-        else
-        {
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.CANCELLED));
+        } else {
             // Stack was empty and no parent
-            return new DialogTurnResult(DialogTurnStatus.EMPTY);
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.EMPTY));
         }
     }
 
@@ -404,7 +412,7 @@ public class DialogContext {
         // End the current dialog and giving the reason.
         return endActiveDialog(DialogReason.REPLACE_CALLED)
             .thenCompose(v -> {
-                ObjectPath.SetPathValue(getContext().getTurnState(), "turn.__repeatDialogId", dialogId);
+                ObjectPath.setPathValue(getContext().getTurnState(), "turn.__repeatDialogId", dialogId);
 
                 // Start replacement dialog
                 return beginDialog(dialogId, options);
@@ -462,19 +470,33 @@ public class DialogContext {
         return null;
     }
 
+
+    /**
+     * @param name
+     * @return CompletableFuture<Boolean>
+     */
     /// <summary>
     /// Searches for a dialog with a given ID.
     /// Emits a named event for the current dialog, or someone who started it, to handle.
     /// </summary>
     /// <param name="name">Name of the event to raise.</param>
     /// <param name="value">Value to send along with the event.</param>
-    /// <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally. Defaults to a value of `true`.</param>
+    /// <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally.
+    ///  Defaults to a value of `true`.</param>
     /// <param name="fromLeaf">Whether the event is emitted from a leaf node.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>True if the event was handled.</returns>
     public CompletableFuture<Boolean> emitEvent(String name) {
         return emitEvent(name, null, true, false);
     }
+
+    /**
+     * @param name
+     * @param value
+     * @param bubble
+     * @param fromLeaf
+     * @return CompletableFuture<Boolean>
+     */
     public CompletableFuture<Boolean> emitEvent(String name, Object value, boolean bubble, boolean fromLeaf) {
         // Initialize event
         DialogEvent dialogEvent = new DialogEvent() {{
@@ -519,16 +541,27 @@ public class DialogContext {
         return getContext() != null ? getContext().getLocale() : null;
     }
 
+
+    /**
+     * @param reason
+     * @return CompletableFuture<Void>
+     */
     private CompletableFuture<Void> endActiveDialog(DialogReason reason) {
         return endActiveDialog(reason, null);
     }
 
+
+    /**
+     * @param reason
+     * @param result
+     * @return CompletableFuture<Void>
+     */
     private CompletableFuture<Void> endActiveDialog(DialogReason reason, Object result) {
         DialogInstance instance = getActiveDialog();
         if (instance == null) {
             return CompletableFuture.completedFuture(null);
         }
-        
+
         return Async.tryCompletion(() -> dialogs.find(instance.getId()))
             .thenCompose(dialog -> {
                 if (dialog != null) {
@@ -543,7 +576,7 @@ public class DialogContext {
                 stack.remove(0);
 
                 // set Turn.LastResult to result
-                ObjectPath.SetPathValue(getContext().getTurnState(), TurnPath.LAST_RESULT, result);
+                ObjectPath.setPathValue(getContext().getTurnState(), TurnPath.LAST_RESULT, result);
 
                 return CompletableFuture.completedFuture(null);
             });

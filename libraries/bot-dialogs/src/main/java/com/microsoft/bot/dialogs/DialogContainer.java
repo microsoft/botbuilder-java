@@ -6,8 +6,10 @@ import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.Severity;
 import com.microsoft.bot.builder.TurnContext;
 import java.util.concurrent.CompletableFuture;
-import org.apache.commons.lang3.StringUtils;
 
+/**
+ * A container for a set of Dialogs.
+ */
 public abstract class DialogContainer extends Dialog {
     @JsonIgnore
     private DialogSet dialogs = new DialogSet();
@@ -31,6 +33,13 @@ public abstract class DialogContainer extends Dialog {
         dialogs.setTelemetryClient(super.getTelemetryClient());
     }
 
+    /**
+     *
+     * Creates an inner dialog context for the containers active child.
+     *
+     * @param dc Parents dialog context.
+     * @return A new dialog context for the active child.
+     */
     public abstract DialogContext createChildContext(DialogContext dc);
 
     /**
@@ -102,7 +111,7 @@ public abstract class DialogContainer extends Dialog {
         dc.getActiveDialog().setVersion(getInternalVersion());
 
         // Check for change of previously stored hash
-        if (current != null && StringUtils.equals(current, dc.getActiveDialog().getVersion())) {
+        if (current != null && current.equals(dc.getActiveDialog().getVersion())) {
             // Give bot an opportunity to handle the change.
             // - If bot handles it the changeHash will have been updated as to avoid triggering the
             //   change again.
