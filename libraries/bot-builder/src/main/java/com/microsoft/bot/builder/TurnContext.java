@@ -54,6 +54,11 @@ public interface TurnContext {
             .sendActivity(turnContext.getActivity().createTrace(name, value, valueType, label));
     }
 
+    /**
+     * @param turnContext The turnContext.
+     * @param name The name of the activity.
+     * @return A future with the ResourceReponse.
+     */
     static CompletableFuture<ResourceResponse> traceActivity(TurnContext turnContext, String name) {
         return traceActivity(turnContext, name, null, null, null);
     }

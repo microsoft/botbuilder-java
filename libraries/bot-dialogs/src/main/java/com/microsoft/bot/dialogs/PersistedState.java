@@ -8,6 +8,16 @@ import java.util.HashMap;
 public class PersistedState {
 
     /**
+     * The user state.
+     */
+    private HashMap<String, Object> userState;
+
+    /**
+     * The converation state.
+     */
+    private HashMap<String, Object> conversationState;
+
+    /**
      * Constructs a PersistedState object.
      */
     public PersistedState() {
@@ -21,41 +31,41 @@ public class PersistedState {
      * @param keys The persisted keys.
      * @param data The data containing the state values.
      */
+    @SuppressWarnings("unchecked")
     public PersistedState(PersistedStateKeys keys, HashMap<String, Object> data) {
-        // UserState = data.ContainsKey(keys.UserState) ? (IDictionary<string, object>)data[keys.UserState] : new ConcurrentDictionary<string, object>();
-        // ConversationState = data.ContainsKey(keys.ConversationState) ? (IDictionary<string, object>)data[keys.ConversationState] : new ConcurrentDictionary<string, object>();
+        if (data.containsKey(keys.getUserState())) {
+            userState = (HashMap<String, Object>) data.get(keys.getUserState());
+        }
+        if (data.containsKey(keys.getConversationState())) {
+            userState = (HashMap<String, Object>) data.get(keys.getConversationState());
+        }
     }
 
     /**
-     * @return userState
+     * @return userState Gets the user profile data.
      */
     public HashMap<String, Object> getUserState() {
         return this.userState;
     }
 
     /**
-     * @param withUserState
+     * @param withUserState Sets user profile data.
      */
     public void setUserState(HashMap<String, Object> withUserState) {
         this.userState = withUserState;
     }
 
     /**
-     * @return conversationState
+     * @return conversationState Gets the dialog state data.
      */
     public HashMap<String, Object> getConversationState() {
         return this.conversationState;
     }
 
     /**
-     * @param withConversationState
+     * @param withConversationState Sets the dialog state data.
      */
     public void setConversationState(HashMap<String, Object> withConversationState) {
         this.conversationState = withConversationState;
     }
-
-    private HashMap<String, Object> userState;
-
-    private HashMap<String, Object> conversationState;
-
 }

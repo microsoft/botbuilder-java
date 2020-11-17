@@ -85,6 +85,12 @@
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-integration-core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-builder</artifactId>
+      <version>4.6.0-preview7</version>
+    </dependency>
   </dependencies>
 
   <profiles>
