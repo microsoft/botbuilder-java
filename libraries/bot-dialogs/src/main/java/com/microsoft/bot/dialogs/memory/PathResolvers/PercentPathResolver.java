@@ -1,4 +1,4 @@
-package com.microsoft.bot.dialogs.memory.PathResolvers;
+package com.microsoft.bot.dialogs.memory.pathresolvers;
 
 /**
  * Maps %xxx => settings.xxx (aka activeDialog.Instance.xxx).

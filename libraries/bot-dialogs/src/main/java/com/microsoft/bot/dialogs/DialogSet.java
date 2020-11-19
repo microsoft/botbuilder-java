@@ -26,11 +26,14 @@ public class DialogSet {
     /**
      * Initializes a new instance of the DialogSet class.
      *
-     * <p>To start and control the dialogs in this dialog set, create a DialogContext
-     * and use its methods to start, continue, or end dialogs. To create a dialog context,
-     * call createContext(TurnContext).</p>
-     * @param withDialogState The state property accessor with which to manage the stack
-     *                        for this dialog set.
+     * <p>
+     * To start and control the dialogs in this dialog set, create a DialogContext
+     * and use its methods to start, continue, or end dialogs. To create a dialog
+     * context, call createContext(TurnContext).
+     * </p>
+     *
+     * @param withDialogState The state property accessor with which to manage the
+     *                        stack for this dialog set.
      */
     public DialogSet(StatePropertyAccessor<DialogState> withDialogState) {
         if (withDialogState == null) {
@@ -50,6 +53,7 @@ public class DialogSet {
 
     /**
      * Gets the BotTelemetryClient to use for logging.
+     *
      * @return The BotTelemetryClient to use for logging.
      */
     public BotTelemetryClient getTelemetryClient() {
@@ -59,14 +63,15 @@ public class DialogSet {
     /**
      * Sets the BotTelemetryClient to use for logging.
      *
-     * <p>When this property is set, it sets the Dialog.TelemetryClient of each
-     * dialog in the set to the new value.</p>
+     * <p>
+     * When this property is set, it sets the Dialog.TelemetryClient of each dialog
+     * in the set to the new value.
+     * </p>
+     *
      * @param withBotTelemetryClient The BotTelemetryClient to use for logging.
      */
     public void setTelemetryClient(BotTelemetryClient withBotTelemetryClient) {
-        telemetryClient = withBotTelemetryClient != null
-            ? withBotTelemetryClient
-            : new NullBotTelemetryClient();
+        telemetryClient = withBotTelemetryClient != null ? withBotTelemetryClient : new NullBotTelemetryClient();
 
         for (Dialog dialog : dialogs.values()) {
             dialog.setTelemetryClient(telemetryClient);
@@ -74,7 +79,9 @@ public class DialogSet {
     }
 
     /**
-     * Gets a unique string which represents the combined versions of all dialogs in this dialogset.
+     * Gets a unique string which represents the combined versions of all dialogs in
+     * this dialogset.
+     *
      * @return Version will change when any of the child dialogs version changes.
      */
     public String getVersion() {
@@ -94,13 +101,14 @@ public class DialogSet {
     }
 
     /**
-     * Adds a new dialog to the set and returns the set to allow fluent chaining.
-     * If the Dialog.Id being added already exists in the set, the dialogs id will be updated to
-     * include a suffix which makes it unique. So adding 2 dialogs named "duplicate" to the set
-     * would result in the first one having an id of "duplicate" and the second one having an id
-     * of "duplicate2".
-     * @param dialog The dialog to add.  The added dialog's Dialog.TelemetryClient is set to the
-     * BotTelemetryClient of the dialog set.
+     * Adds a new dialog to the set and returns the set to allow fluent chaining. If
+     * the Dialog.Id being added already exists in the set, the dialogs id will be
+     * updated to include a suffix which makes it unique. So adding 2 dialogs named
+     * "duplicate" to the set would result in the first one having an id of
+     * "duplicate" and the second one having an id of "duplicate2".
+     *
+     * @param dialog The dialog to add. The added dialog's Dialog.TelemetryClient is
+     *               set to the BotTelemetryClient of the dialog set.
      * @return The dialog set after the operation is complete.
      */
     public DialogSet add(Dialog dialog) {
@@ -148,8 +156,11 @@ public class DialogSet {
     }
 
     /**
-     * Creates a DialogContext which can be used to work with the dialogs in the DialogSet.
-     * @param turnContext Context for the current turn of conversation with the user.
+     * Creates a DialogContext which can be used to work with the dialogs in the
+     * DialogSet.
+     *
+     * @param turnContext Context for the current turn of conversation with the
+     *                    user.
      * @return A CompletableFuture representing the asynchronous operation.
      */
     public CompletableFuture<DialogContext> createContext(TurnContext turnContext) {
@@ -158,20 +169,21 @@ public class DialogSet {
         }
 
         if (dialogState == null) {
-            // Note: This shouldn't ever trigger, as the _dialogState is set in the constructor
+            // Note: This shouldn't ever trigger, as the _dialogState is set in the
+            // constructor
             // and validated there.
             throw new IllegalStateException(
-                "DialogSet.createContext(): DialogSet created with a null StatePropertyAccessor."
-            );
+                    "DialogSet.createContext(): DialogSet created with a null StatePropertyAccessor.");
         }
 
         // Load/initialize dialog state
         return dialogState.get(turnContext, DialogState::new)
-            .thenApply(state -> new DialogContext(this, turnContext, state));
+                .thenApply(state -> new DialogContext(this, turnContext, state));
     }
 
     /**
      * Searches the current DialogSet for a Dialog by its ID.
+     *
      * @param dialogId ID of the dialog to search for.
      * @return The dialog if found; otherwise null
      */
@@ -185,6 +197,7 @@ public class DialogSet {
 
     /**
      * Returns a collection of Dialogs in this DialogSet.
+     *
      * @return The Dialogs in this DialogSet.
      */
     public Collection<Dialog> getDialogs() {

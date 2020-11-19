@@ -214,6 +214,20 @@ public abstract class BotState implements PropertyManager {
     }
 
     /**
+     * Gets the cached bot state instance that wraps the raw cached data for this BotState from the turn context.
+     *
+     * @param turnContext The context object for this turn.
+     * @return The cached bot state instance.
+     */
+    public CachedBotState getCachedState(TurnContext turnContext) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        return turnContext.getTurnState().get(contextServiceKey);
+    }
+
+    /**
      * When overridden in a derived class, gets the key to use when reading and
      * writing state to and from storage.
      *
@@ -301,7 +315,7 @@ public abstract class BotState implements PropertyManager {
     /**
      * Internal cached bot state.
      */
-    private static class CachedBotState {
+    public static class CachedBotState {
         /**
          * In memory cache of BotState properties.
          */
@@ -334,26 +348,46 @@ public abstract class BotState implements PropertyManager {
             hash = computeHash(withState);
         }
 
-        Map<String, Object> getState() {
+        /**
+         * @return The Map of key value pairs which are the state.
+         */
+        public Map<String, Object> getState() {
             return state;
         }
 
+        /**
+         * @param withState The key value pairs to set the state with.
+         */
         void setState(Map<String, Object> withState) {
             state = withState;
         }
 
+        /**
+         * @return The hash value for the state.
+         */
         String getHash() {
             return hash;
         }
 
+        /**
+         * @param witHashCode Set the hash value.
+         */
         void setHash(String witHashCode) {
             hash = witHashCode;
         }
 
+        /**
+         *
+         * @return Boolean to tell if the state has changed.
+         */
         boolean isChanged() {
             return !StringUtils.equals(hash, computeHash(state));
         }
 
+        /**
+         * @param obj The object to compute the hash for.
+         * @return The computed has for the provided object.
+         */
         String computeHash(Object obj) {
             if (obj == null) {
                 return "";

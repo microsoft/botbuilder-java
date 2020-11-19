@@ -34,12 +34,20 @@ public class ClasspathPropertiesConfiguration implements Configuration {
 
     /**
      * Returns a value for the specified property name.
-     * 
+     *
      * @param key The property name.
      * @return The property value.
      */
     @Override
     public String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    /**
+     * @return The Properties value.
+     */
+    @Override
+    public Properties getProperties() {
+        return this.properties;
     }
 }

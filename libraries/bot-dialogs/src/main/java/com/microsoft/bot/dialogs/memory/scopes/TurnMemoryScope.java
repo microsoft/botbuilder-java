@@ -1,6 +1,5 @@
 package com.microsoft.bot.dialogs.memory.scopes;
 
-import java.util.Hashtable;
 import java.util.TreeMap;
 
 import com.microsoft.bot.dialogs.DialogContext;
@@ -14,7 +13,7 @@ public class TurnMemoryScope extends MemoryScope {
      * Initializes a new instance of the TurnMemoryScope class.
      */
     public TurnMemoryScope() {
-        super(ScopePath.Turn, true);
+        super(ScopePath.TURN, true);
     }
 
     /**
@@ -28,10 +27,10 @@ public class TurnMemoryScope extends MemoryScope {
 
         Object returnValue;
 
-        returnValue = dialogContext.getContext().getTurnState().get(ScopePath.Turn);
+        returnValue = dialogContext.getContext().getTurnState().get(ScopePath.TURN);
         if (returnValue == null) {
             returnValue = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
-            dialogContext.getContext().getTurnState().add(ScopePath.Turn, returnValue);
+            dialogContext.getContext().getTurnState().add(ScopePath.TURN, returnValue);
         }
 
         return returnValue;
@@ -46,10 +45,10 @@ public class TurnMemoryScope extends MemoryScope {
             throw new IllegalArgumentException("dialogContext cannot be null.");
         }
 
-        if (dialogContext.getContext().getTurnState().containsKey(ScopePath.Turn)) {
-            dialogContext.getContext().getTurnState().replace(ScopePath.Turn, memory);
+        if (dialogContext.getContext().getTurnState().containsKey(ScopePath.TURN)) {
+            dialogContext.getContext().getTurnState().replace(ScopePath.TURN, memory);
         } else {
-            dialogContext.getContext().getTurnState().add(ScopePath.Turn, memory);
+            dialogContext.getContext().getTurnState().add(ScopePath.TURN, memory);
         }
     }
 }

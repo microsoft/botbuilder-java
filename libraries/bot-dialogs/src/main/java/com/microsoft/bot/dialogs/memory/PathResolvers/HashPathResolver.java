@@ -1,4 +1,4 @@
-package com.microsoft.bot.dialogs.memory.PathResolvers;
+package com.microsoft.bot.dialogs.memory.pathresolvers;
 
 /**
  * Maps #xxx => turn.recognized.intents.xxx.

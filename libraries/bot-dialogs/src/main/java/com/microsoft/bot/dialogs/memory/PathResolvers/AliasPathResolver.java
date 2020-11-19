@@ -1,4 +1,6 @@
-package com.microsoft.bot.dialogs.memory.PathResolvers;
+package com.microsoft.bot.dialogs.memory.pathresolvers;
+
+import com.microsoft.bot.dialogs.memory.PathResolver;
 
 /**
  * Maps aliasXXX -> path.xxx ($foo => dialog.foo).
@@ -10,8 +12,8 @@ public class AliasPathResolver implements PathResolver {
 
     /**
      *
-     * @param alias Alias name.
-     * @param prefix Prefix name.
+     * @param alias   Alias name.
+     * @param prefix  Prefix name.
      * @param postfix Postfix name.
      */
     public AliasPathResolver(String alias, String prefix, String postfix) {
@@ -56,7 +58,7 @@ public class AliasPathResolver implements PathResolver {
     /**
      * @param path Path to transform.
      * @return The transformed path.
-     *      */
+     */
     public String transformPath(String path) {
         if (path == null) {
             throw new IllegalArgumentException("path cannot be null.");
@@ -64,8 +66,9 @@ public class AliasPathResolver implements PathResolver {
 
         path = path.trim();
         if (path.startsWith(getAlias()) && path.length() > getAlias().length()
-            && isPathChar(path.charAt(getAlias().length()))) {
-            // here we only deals with trailing alias, alias in middle be handled in further breakdown
+                && isPathChar(path.charAt(getAlias().length()))) {
+            // here we only deals with trailing alias, alias in middle be handled in further
+            // breakdown
             // $xxx -> path.xxx
             return (prefix + path.charAt(getAlias().length()) + postfix);
         }

@@ -2,6 +2,7 @@ package com.microsoft.bot.dialogs;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
+import com.microsoft.bot.dialogs.memory.DialogStateManager;
 import com.microsoft.bot.dialogs.memory.TurnPath;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.integration.Async;
@@ -18,10 +19,8 @@ public class DialogContext {
     private TurnContext context;
     private List<DialogInstance> stack;
     private DialogContext parent;
-    private DialogContext child;
     private DialogStateManager state;
     private TurnContextStateCollection services;
-    private DialogManager dialogManager;
 
     /**
      * Initializes a new instance of the DialogContext class from the turn context.
@@ -74,7 +73,7 @@ public class DialogContext {
         dialogs = withDialogs;
         context = withTurnContext;
         stack = withState.getDialogStack();
-        state = new DialogStateManager(this);
+        state = new DialogStateManager(this, null);
         services = new TurnContextStateCollection();
 
         ObjectPath.setPathValue(context.getTurnState(), TurnPath.ACTIVITY, context.getActivity());
@@ -120,7 +119,7 @@ public class DialogContext {
         DialogInstance instance = getActiveDialog();
         if (instance != null) {
             Dialog dialog = findDialog(instance.getId());
-            if (dialog instanceof DialogContainer){
+            if (dialog instanceof DialogContainer) {
                 return ((DialogContainer) dialog).createChildContext(this);
             }
         }
@@ -192,10 +191,10 @@ public class DialogContext {
             CompletableFuture<DialogTurnResult> result = CompletableFuture.completedFuture(null);
             result.completeExceptionally(
                 new Exception(String.format(
-                    "DialogContext.beginDialog(): A dialog with an id of '%s' wasn't found." +
-                    " The dialog must be included in the current or parent DialogSet." +
-                    " For example, if subclassing a ComponentDialog you can call AddDialog()" +
-                    " within your constructor.",
+                    "DialogContext.beginDialog(): A dialog with an id of '%s' wasn't found."
+                    + " The dialog must be included in the current or parent DialogSet."
+                    + " For example, if subclassing a ComponentDialog you can call AddDialog()"
+                    + " within your constructor.",
                     dialogId
                 ))
             );
@@ -375,8 +374,7 @@ public class DialogContext {
 
                     // End the active dialog
                     dialogContext.endActiveDialog(DialogReason.CANCEL_CALLED).join();
-                }
-                else {
+                } else {
                     dialogContext = cancelParents ? dialogContext.getParent() : null;
                 }
 
@@ -424,8 +422,7 @@ public class DialogContext {
      * method. Used with dialogs that implement a re-prompt behavior.
      * @return A task that represents the work queued to execute.
      */
-    public CompletableFuture<Void> repromptDialog()
-    {
+    public CompletableFuture<Void> repromptDialog() {
         // Emit 'repromptDialog' event
         return emitEvent(DialogEvents.REPROMPT_DIALOG, null, false, false)
             .thenCompose(handled -> {
@@ -472,29 +469,19 @@ public class DialogContext {
 
 
     /**
-     * @param name
+     * @param name Name of the event to raise.
      * @return CompletableFuture<Boolean>
      */
-    /// <summary>
-    /// Searches for a dialog with a given ID.
-    /// Emits a named event for the current dialog, or someone who started it, to handle.
-    /// </summary>
-    /// <param name="name">Name of the event to raise.</param>
-    /// <param name="value">Value to send along with the event.</param>
-    /// <param name="bubble">Flag to control whether the event should be bubbled to its parent if not handled locally.
-    ///  Defaults to a value of `true`.</param>
-    /// <param name="fromLeaf">Whether the event is emitted from a leaf node.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>True if the event was handled.</returns>
     public CompletableFuture<Boolean> emitEvent(String name) {
         return emitEvent(name, null, true, false);
     }
 
     /**
-     * @param name
-     * @param value
-     * @param bubble
-     * @param fromLeaf
+     * @param name Name of the event to raise.
+     * @param value Value to send along with the event.
+     * @param bubble Flag to control whether the event should be bubbled to its parent if not handled locally.
+     * Defaults to a value of `true`.
+     * @param fromLeaf Whether the event is emitted from a leaf node.
      * @return CompletableFuture<Boolean>
      */
     public CompletableFuture<Boolean> emitEvent(String name, Object value, boolean bubble, boolean fromLeaf) {

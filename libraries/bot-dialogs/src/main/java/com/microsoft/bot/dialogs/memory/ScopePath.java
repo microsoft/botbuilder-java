@@ -1,48 +1,55 @@
 package com.microsoft.bot.dialogs.memory;
 
-public class ScopePath {
-            /// <summary>
-        /// User memory scope root path.
-        /// </summary>
-        public final String User = "user";
+/**
+ * Defines paths for the available scopes.
+ */
+public final class ScopePath {
 
-        /// <summary>
-        /// Conversation memory scope root path.
-        /// </summary>
-        public final String Conversation = "conversation";
+    private ScopePath() {
+    }
 
-        /// <summary>
-        /// Dialog memory scope root path.
-        /// </summary>
-        public final String Dialog = "dialog";
+        /**
+         * User memory scope root path.
+         */
+        public static final String USER = "user";
 
-        /// <summary>
-        /// DialogClass memory scope root path.
-        /// </summary>
-        public final String DialogClass = "dialogclass";
+        /**
+         * Conversation memory scope root path.
+         */
+        public static final String CONVERSATION = "conversation";
 
-        /// <summary>
-        /// DialogContext memory scope root path.
-        /// </summary>
-        public final String DialogContext = "dialogContext";
+        /**
+         * Dialog memory scope root path.
+         */
+        public static final String DIALOG = "dialog";
 
-        /// <summary>
-        /// This memory scope root path.
-        /// </summary>
-        public final String This = "this";
+        /**
+         * DialogClass memory scope root path.
+         */
+        public static final String DIALOG_CLASS = "dialogclass";
 
-        /// <summary>
-        /// Class memory scope root path.
-        /// </summary>
-        public final String Class = "class";
+        /**
+         * DialogContext memory scope root path.
+         */
+        public static final String DIALOG_CONTEXT = "dialogContext";
 
-        /// <summary>
-        /// Settings memory scope root path.
-        /// </summary>
-        public final String Settings = "settings";
+        /**
+         * This memory scope root path.
+         */
+        public static final String THIS = "this";
 
-        /// <summary>
-        /// Turn memory scope root path.
-        /// </summary>
-        public static final String Turn = "turn";
+        /**
+         * Class memory scope root path.
+         */
+        public static final String CLASS = "class";
+
+        /**
+         * Settings memory scope root path.
+         */
+        public static final String SETTINGS = "settings";
+
+        /**
+         * Turn memory scope root path.
+         */
+        public static final String TURN = "turn";
 }

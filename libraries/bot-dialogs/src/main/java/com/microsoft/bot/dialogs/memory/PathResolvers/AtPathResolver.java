@@ -1,4 +1,4 @@
-package com.microsoft.bot.dialogs.memory.PathResolvers;
+package com.microsoft.bot.dialogs.memory.pathresolvers;
 
 /**
  * Maps @@ => turn.recognized.entitites.xxx array.
@@ -10,7 +10,7 @@ public class AtPathResolver extends AliasPathResolver {
     private static final char[] DELIMS = {'.', '[' };
 
     /**
-     *  Initializes a new instance of the AtPathResolver class.
+     * Initializes a new instance of the AtPathResolver class.
      */
     public AtPathResolver() {
         super("@", "", null);
@@ -38,7 +38,6 @@ public class AtPathResolver extends AliasPathResolver {
             } else {
                 end = Math.max(endperiod, endbracket);
             }
-
 
             String property = path.substring(1, end - 1);
             String suffix = path.substring(end);

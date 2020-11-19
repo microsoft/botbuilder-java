@@ -7,13 +7,21 @@ import com.microsoft.bot.builder.ComponentRegistration;
 import com.microsoft.bot.dialogs.memory.ComponentMemoryScopes;
 import com.microsoft.bot.dialogs.memory.ComponentPathResolvers;
 import com.microsoft.bot.dialogs.memory.PathResolver;
-import com.microsoft.bot.dialogs.memory.PathResolvers.AtAtPathResolver;
-import com.microsoft.bot.dialogs.memory.PathResolvers.AtPathResolver;
-import com.microsoft.bot.dialogs.memory.PathResolvers.DollarPathResolver;
-import com.microsoft.bot.dialogs.memory.PathResolvers.HashPathResolver;
-import com.microsoft.bot.dialogs.memory.PathResolvers.PercentPathResolver;
+import com.microsoft.bot.dialogs.memory.pathresolvers.PercentPathResolver;
+import com.microsoft.bot.dialogs.memory.pathresolvers.AtAtPathResolver;
+import com.microsoft.bot.dialogs.memory.pathresolvers.AtPathResolver;
+import com.microsoft.bot.dialogs.memory.pathresolvers.HashPathResolver;
+import com.microsoft.bot.dialogs.memory.pathresolvers.DollarPathResolver;
+import com.microsoft.bot.dialogs.memory.scopes.ClassMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.ConversationMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.DialogClassMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.DialogContextMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.DialogMemoryScope;
 import com.microsoft.bot.dialogs.memory.scopes.MemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.SettingsMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.ThisMemoryScope;
 import com.microsoft.bot.dialogs.memory.scopes.TurnMemoryScope;
+import com.microsoft.bot.dialogs.memory.scopes.UserMemoryScope;
 
 /**
  * Makes Dialogs components available to the system registering functionality.
@@ -42,6 +50,14 @@ public class DialogsComponentRegistration extends ComponentRegistration
     public Iterable<MemoryScope> getMemoryScopes() {
         List<MemoryScope> listToReturn = new ArrayList<MemoryScope>();
         listToReturn.add(new TurnMemoryScope());
+        listToReturn.add(new SettingsMemoryScope());
+        listToReturn.add(new DialogMemoryScope());
+        listToReturn.add(new DialogContextMemoryScope());
+        listToReturn.add(new DialogClassMemoryScope());
+        listToReturn.add(new ClassMemoryScope());
+        listToReturn.add(new ThisMemoryScope());
+        listToReturn.add(new ConversationMemoryScope());
+        listToReturn.add(new UserMemoryScope());
         return listToReturn;
     }
 

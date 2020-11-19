@@ -22,27 +22,52 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Generic Arraylist of Object.
+ */
 class Segments extends ArrayList<Object> {
+
+    /**
+     * Returns the first item in the collection.
+     * @return the first object.
+     */
     public Object first() {
         return get(0);
     }
 
+    /**
+     * Returns the last item in the collection.
+     * @return the last object.
+     */
     public Object last() {
         return get(size() - 1);
     }
 
+    /**
+     * Gets the SegmentType at the specified index.
+     * @param index Index of the requested segment.
+     * @return The SegmentType of item at the requested index.
+     */
     public SegmentType getSegment(int index) {
         return new SegmentType(get(index));
     }
 }
 
+/**
+ * A class wraps an Object and can assist in determining if it's an integer.
+ */
 @SuppressWarnings("checkstyle:VisibilityModifier")
 class SegmentType {
+
     public boolean isInt;
     public int intValue;
     public Segments segmentsValue;
     public String stringValue;
 
+    /**
+     *
+     * @param value The object to create a SegmentType for.
+     */
     SegmentType(Object value) {
         try {
             intValue = Integer.parseInt((String) value);
@@ -61,26 +86,30 @@ class SegmentType {
     }
 }
 
+/**
+ * Helper methods for working with dynamic json objects.
+ */
 public final class ObjectPath {
     private ObjectPath() { }
 
-    /// <summary>
-    /// Does an Object have a subpath.
-    /// </summary>
-    /// <param name="obj">Object.</param>
-    /// <param name="path">path to evaluate.</param>
-    /// <returns>true if the path is there.</returns>
+    /**
+     * Does an Object have a subpath.
+     * @param obj Object.
+     * @param path path to evaluate.
+     * @return true if the path is there.
+     */
     public static boolean hasValue(Object obj, String path) {
         return tryGetPathValue(obj, path, Object.class) != null;
     }
 
-    /// <summary>
-    /// Get the value for a path relative to an Object.
-    /// </summary>
-    /// <typeparam name="T">type to return.</typeparam>
-    /// <param name="obj">Object to start with.</param>
-    /// <param name="path">path to evaluate.</param>
-    /// <returns>value or default(T).</returns>
+    /**
+     * Get the value for a path relative to an Object.
+     * @param <T> type to return.
+     * @param obj Object to start with.
+     * @param path path to evaluate.
+     * @param valueType Type of T
+     * @return value or default(T).
+     */
     @SuppressWarnings("checkstyle:InnerAssignment")
     public static <T> T getPathValue(Object obj, String path, Class<T> valueType) {
         T value;
@@ -91,14 +120,15 @@ public final class ObjectPath {
         throw new IllegalArgumentException(path);
     }
 
-    /// <summary>
-    /// Get the value for a path relative to an Object.
-    /// </summary>
-    /// <typeparam name="T">type to return.</typeparam>
-    /// <param name="obj">Object to start with.</param>
-    /// <param name="path">path to evaluate.</param>
-    /// <param name="defaultValue">default value to use if any part of the path is missing.</param>
-    /// <returns>value or default(T).</returns>
+    /**
+     * Get the value for a path relative to an Object.
+     * @param <T> type to return.
+     * @param obj Object to start with.
+     * @param path path to evaluate.
+     * @param valueType type of T
+     * @param defaultValue  default value to use if any part of the path is missing.
+     * @return value or default(T).
+     */
     @SuppressWarnings("checkstyle:InnerAssignment")
     public static <T> T getPathValue(Object obj, String path, Class<T> valueType, T defaultValue) {
         T value;
@@ -109,14 +139,14 @@ public final class ObjectPath {
         return defaultValue;
     }
 
-    /// <summary>
-    /// Get the value for a path relative to an Object.
-    /// </summary>
-    /// <typeparam name="T">type to return.</typeparam>
-    /// <param name="obj">Object to start with.</param>
-    /// <param name="path">path to evaluate.</param>
-    /// <param name="value">value for the path.</param>
-    /// <returns>true if successful.</returns>
+    /**
+     * Get the value for a path relative to an Object.
+     * @param <T> type to return.
+     * @param obj Object to start with.
+     * @param path path to evaluate.
+     * @param valueType value for the path.
+     * @return true if successful.
+     */
     public static <T> T tryGetPathValue(Object obj, String path, Class<T> valueType) {
         if (obj == null || path == null) {
             return null;
@@ -152,17 +182,23 @@ public final class ObjectPath {
         return mapValueTo(result, valueType);
     }
 
-    /// <summary>
-    /// Given an Object evaluate a path to set the value.
-    /// </summary>
-    /// <param name="obj">Object to start with.</param>
-    /// <param name="path">path to evaluate.</param>
-    /// <param name="value">value to store.</param>
-    /// <param name="json">if true, sets the value as primitive JSON Objects.</param>
+    /**
+     * Given an Object evaluate a path to set the value.
+     * @param obj Object to start with.
+     * @param path path to evaluate.
+     * @param value value to store.
+     */
     public static void setPathValue(Object obj, String path, Object value) {
         setPathValue(obj, path, value, true);
     }
 
+    /**
+     * Given an Object evaluate a path to set the value.
+     * @param obj Object to start with.
+     * @param path path to evaluate.
+     * @param value value to store.
+     * @param json if true, sets the value as primitive JSON Objects.
+     */
     public static void setPathValue(Object obj, String path, Object value, boolean json) {
         Segments segments = tryResolvePath(obj, path);
         if (segments == null) {
@@ -202,11 +238,11 @@ public final class ObjectPath {
         setObjectSegment(current, lastSegment, value, json);
     }
 
-    /// <summary>
-    /// Remove path from Object.
-    /// </summary>
-    /// <param name="obj">Object to change.</param>
-    /// <param name="path">Path to remove.</param>
+    /**
+     * Remove path from Object.
+     * @param obj Object to change.
+     * @param path Path to remove.
+     */
     public static void removePathValue(Object obj, String path) {
         Segments segments = tryResolvePath(obj, path);
         if (segments == null) {
@@ -238,11 +274,11 @@ public final class ObjectPath {
         }
     }
 
-    /// <summary>
-    /// Apply an action to all properties in an Object.
-    /// </summary>
-    /// <param name="obj">Object to map against.</param>
-    /// <param name="action">Action to take.</param>
+    /**
+     * Apply an action to all properties in an Object.
+     * @param obj Object to map against.
+     * @param action Action to take.
+     */
     public static void forEachProperty(Object obj, BiConsumer<String, Object> action) {
         if (obj instanceof Map) {
             ((Map<String, Object>) obj).forEach(action);
@@ -257,11 +293,11 @@ public final class ObjectPath {
         }
     }
 
-    /// <summary>
-    /// Get all properties in an Object.
-    /// </summary>
-    /// <param name="obj">Object to enumerate property names.</param>
-    /// <returns>enumeration of property names on the Object if it is not a value type.</returns>
+    /**
+     * Get all properties in an Object.
+     * @param obj Object to enumerate property names.
+     * @return enumeration of property names on the Object if it is not a value type.
+     */
     public static Collection<String> getProperties(Object obj) {
         if (obj == null) {
             return new ArrayList<>();
@@ -279,12 +315,12 @@ public final class ObjectPath {
         }
     }
 
-    /// <summary>
-    /// Detects if property exists on Object.
-    /// </summary>
-    /// <param name="obj">Object.</param>
-    /// <param name="name">name of the property.</param>
-    /// <returns>true if found.</returns>
+    /**
+     * Detects if property exists on Object.
+     * @param obj Object.
+     * @param name name of the property.
+     * @return true if found.
+     */
     public static boolean containsProperty(Object obj, String name) {
         if (obj == null) {
             return false;
@@ -306,53 +342,63 @@ public final class ObjectPath {
         return false;
     }
 
-    /// <summary>
-    /// Clone an Object.
-    /// </summary>
-    /// <typeparam name="T">Type to clone.</typeparam>
-    /// <param name="obj">The Object.</param>
-    /// <returns>The Object as Json.</returns>
+    /**
+     * Clone an Object.
+     * @param <T> Type to clone.
+     * @param obj The Object.
+     * @return The Object as Json.
+     */
     public static <T> T clone(T obj) {
         return (T) Serialization.getAs(obj, obj.getClass());
     }
 
-    /// <summary>
-    /// Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
-    // overlaying any non-null values from the overlay Object.
-    /// </summary>
-    /// <typeparam name="T">The Object type.</typeparam>
-    /// <param name="startObject">Intial Object.</param>
-    /// <param name="overlayObject">Overlay Object.</param>
-    /// <returns>merged Object.</returns>
+    /**
+     * Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
+     * overlaying any non-null values from the overlay Object.
+     * @param <T> The Object type.
+     * @param startObject Intial Object.
+     * @param overlayObject Overlay Object.
+     * @return merged Object.
+     */
     public static <T> T merge(Object startObject, Object overlayObject) {
         return (T) assign(startObject, overlayObject);
     }
 
+    /**
+     * Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
+     * overlaying any non-null values from the overlay Object.
+     * @param <T> The Object type.
+     * @param startObject Intial Object.
+     * @param overlayObject Overlay Object.
+     * @param type Type of T
+     * @return merged Object.
+     */
     public static <T> T merge(Object startObject, Object overlayObject, Class<T> type) {
         return (T) assign(startObject, overlayObject, type);
     }
 
-    /// <summary>
-    /// Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
-    // overlaying any non-null values from the overlay Object.
-    /// </summary>
-    /// <typeparam name="T">The target type.</typeparam>
-    /// <param name="startObject">intial Object of any type.</param>
-    /// <param name="overlayObject">overlay Object of any type.</param>
-    /// <returns>merged Object.</returns>
+    /**
+     * Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
+     * overlaying any non-null values from the overlay Object.
+     * @param <T> The target type.
+     * @param startObject overlay Object of any type.
+     * @param overlayObject overlay Object of any type.
+     * @return merged Object.
+     */
     public static <T> T assign(T startObject, Object overlayObject) {
         // FIXME this won't work for null startObject
         return (T) assign(startObject, overlayObject, startObject.getClass());
     }
 
-    /// <summary>
-    /// Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
-    //  overlaying any non-null values from the overlay Object.
-    /// </summary>
-    /// <param name="startObject">intial Object of any type.</param>
-    /// <param name="overlayObject">overlay Object of any type.</param>
-    /// <param name="type">type to output.</param>
-    /// <returns>merged Object.</returns>
+    /**
+     * Equivalent to javascripts ObjectPath.Assign, creates a new Object from startObject
+     * overlaying any non-null values from the overlay Object.
+     * @param <T> The Target type.
+     * @param startObject intial Object of any type.
+     * @param overlayObject overlay Object of any type.
+     * @param type type to output.
+     * @return merged Object.
+     */
     public static <T> T assign(Object startObject, Object overlayObject, Class<T> type) {
         if (startObject != null && overlayObject != null) {
             // make a deep clone JsonNode of the startObject
@@ -437,6 +483,13 @@ public final class ObjectPath {
     /// <typeparam name="T">type to convert to.</typeparam>
     /// <param name="val">value to convert.</param>
     /// <returns>converted value.</returns>
+    /**
+     * Convert a generic Object to a typed Object.
+     * @param <T> type to convert to.
+     * @param val value to convert.
+     * @param valueType Type of T
+     * @return converted value.
+     */
     public static <T> T mapValueTo(Object val, Class<T> valueType) {
         if (val.getClass().equals(valueType)) {
             return (T) val;
@@ -493,19 +546,27 @@ public final class ObjectPath {
         */
     }
 
-    /// <summary>
-    /// Given an root Object and property path, resolve to a constant if eval = true or a constant path otherwise.
-    /// conversation[user.name][user.age] => ['conversation', 'joe', 32].
-    /// </summary>
-    /// <param name="obj">root Object.</param>
-    /// <param name="propertyPath">property path to resolve.</param>
-    /// <param name="segments">Path segments.</param>
-    /// <param name="eval">True to evaluate resulting segments.</param>
-    /// <returns>True if it was able to resolve all nested references.</returns>
+    /**
+     * Given an root Object and property path, resolve to a constant if eval = true or a constant path otherwise.
+     * conversation[user.name][user.age] => ['conversation', 'joe', 32].
+     * @param <T> Type of T
+     * @param obj root Object.
+     * @param propertyPath property path to resolve.
+     * @return True if it was able to resolve all nested references.
+     */
     public static <T> Segments tryResolvePath(Object obj, String propertyPath) {
         return tryResolvePath(obj, propertyPath, false);
     }
 
+    /**
+     * Given an root Object and property path, resolve to a constant if eval = true or a constant path otherwise.
+     * conversation[user.name][user.age] => ['conversation', 'joe', 32].
+     * @param <T> Type of T
+     * @param obj root Object.
+     * @param propertyPath property path to resolve.
+     * @param eval True to evaluate resulting segments.
+     * @return True if it was able to resolve all nested references.
+     */
     public static <T> Segments tryResolvePath(Object obj, String propertyPath, boolean eval) {
         Segments soFar = new Segments();
         Segments segments = soFar;
