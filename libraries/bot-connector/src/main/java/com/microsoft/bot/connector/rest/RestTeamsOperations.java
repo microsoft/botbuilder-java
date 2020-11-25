@@ -166,7 +166,7 @@ public class RestTeamsOperations implements TeamsOperations {
     interface TeamsService {
         @Headers({ "Content-Type: application/json; charset=utf-8",
             "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchChannelList" })
-        @POST("v3/teams/{teamId}/conversations")
+        @GET("v3/teams/{teamId}/conversations")
         CompletableFuture<Response<ResponseBody>> fetchChannelList(
             @Path("teamId") String teamId,
             @Header("accept-language") String acceptLanguage,
