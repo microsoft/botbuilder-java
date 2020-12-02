@@ -73,10 +73,10 @@ class CachingOpenIdMetadata implements OpenIdMetadata {
 
         try {
             URL openIdUrl = new URL(this.url);
-            HashMap<String, String> openIdConf =
+            HashMap<String, Object> openIdConf =
                 this.mapper.readValue(openIdUrl, new TypeReference<HashMap<String, Object>>() {
                 });
-            URL keysUrl = new URL(openIdConf.get("jwks_uri"));
+            URL keysUrl = new URL(openIdConf.get("jwks_uri").toString());
             lastUpdated = System.currentTimeMillis();
             UrlJwkProvider provider = new UrlJwkProvider(keysUrl);
             keyCache = provider.getAll().stream().collect(Collectors.toMap(Jwk::getId, jwk -> jwk));

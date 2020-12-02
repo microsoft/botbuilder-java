@@ -28,7 +28,7 @@ public class CredentialsAuthenticator implements Authenticator {
         throws MalformedURLException {
 
         app = ConfidentialClientApplication
-            .builder(appId, ClientCredentialFactory.create(appPassword))
+            .builder(appId, ClientCredentialFactory.createFromSecret(appPassword))
             .authority(configuration.getAuthority())
             .build();
 
