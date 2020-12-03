@@ -15,14 +15,11 @@ public class NotificationInfo {
     @JsonProperty(value = "alert")
     private Boolean alert;
 
-    /**
-     * Initialize new NotificationInfo.
-     * 
-     * @param withAlert initial alert value.
-     */
-    public NotificationInfo(boolean withAlert) {
-        setAlert(withAlert);
-    }
+    @JsonProperty(value = "alertInMeeting")
+    private Boolean alertInMeeting;
+
+    @JsonProperty(value = "externalResourceUrl")
+    private String externalResourceUrl;
 
     /**
      * Getter for alert.
@@ -43,12 +40,55 @@ public class NotificationInfo {
     }
 
     /**
+     * Indicates if this is a meeting alert.
+     * @return True if this is a meeting alert.
+     */
+    public Boolean getAlertInMeeting() {
+        return alertInMeeting;
+    }
+
+    /**
+     * Indicates if this is a meeting alert.
+     * @param withAlertInMeeting True if this is a meeting alert.
+     */
+    public void setAlertInMeeting(Boolean withAlertInMeeting) {
+        alertInMeeting = withAlertInMeeting;
+    }
+
+    /**
+     * Gets the resource Url of a meeting alert.
+     * @return The external resource url.
+     */
+    public String getExternalResourceUrl() {
+        return externalResourceUrl;
+    }
+
+    /**
+     * The resource Url of a meeting alert.
+     * @param withExternalResourceUrl The external resource Url.
+     */
+    public void setExternalResourceUrl(String withExternalResourceUrl) {
+        externalResourceUrl = withExternalResourceUrl;
+    }
+
+    /**
      * A new instance of NotificationInfo.
      *
      * @param withAlert alert value to set.
      */
     public NotificationInfo(Boolean withAlert) {
         alert = withAlert;
+    }
+
+    /**
+     * A new instance of a meeting alert.
+     * @param withAlertInMeeting True if this is a meeting alert.
+     * @param withExternalResourceUrl  The external resource Url.
+     */
+    public NotificationInfo(boolean withAlertInMeeting, String withExternalResourceUrl) {
+        setAlert(true);
+        setAlertInMeeting(withAlertInMeeting);
+        setExternalResourceUrl(withExternalResourceUrl);
     }
 
     /**

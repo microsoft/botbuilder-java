@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Component
 public class ProactiveBot extends ActivityHandler {
-    @Value("${server.port:8080}")
+    @Value("${server.port:3978}")
     private int port;
 
     private static final String WELCOMEMESSAGE =

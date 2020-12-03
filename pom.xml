@@ -5,7 +5,7 @@
 
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-java</artifactId>
-  <version>4.6.0-preview7</version>
+  <version>4.6.0-preview8</version>
   <packaging>pom</packaging>
 
   <name>Microsoft BotBuilder Java SDK Parent</name>
@@ -147,6 +147,19 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>cobertura-maven-plugin</artifactId>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -216,7 +229,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -229,7 +242,7 @@
       <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>msal4j</artifactId>
-        <version>0.5.0-preview</version>
+        <version>1.8.0</version>
       </dependency>
 
       <dependency>

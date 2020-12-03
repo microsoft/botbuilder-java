@@ -18,6 +18,10 @@ public class MessagingExtensionActionResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private MessagingExtensionResult composeExtension;
 
+    @JsonProperty(value = "cacheInfo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private CacheInfo cacheInfo;
+
     /**
      * Gets the Adaptive card to appear in the task module.
      * 
@@ -52,5 +56,21 @@ public class MessagingExtensionActionResponse {
      */
     public void setComposeExtension(MessagingExtensionResult withComposeExtension) {
         composeExtension = withComposeExtension;
+    }
+
+    /**
+     * Gets the CacheInfo for this MessagingExtensionActionResponse.
+     * @return CacheInfo
+     */
+    public CacheInfo getCacheInfo() {
+        return cacheInfo;
+    }
+
+    /**
+     * Sets the CacheInfo for this MessagingExtensionActionResponse.
+     * @param withCacheInfo CacheInfo
+     */
+    public void setCacheInfo(CacheInfo withCacheInfo) {
+        cacheInfo = withCacheInfo;
     }
 }

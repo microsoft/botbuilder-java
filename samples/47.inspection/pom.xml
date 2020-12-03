@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.7.RELEASE</version>
+        <version>2.4.0</version>
         <relativePath/>
     </parent>
 
@@ -51,13 +51,13 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
-        <version>2.1.8.RELEASE</version>
+        <version>2.4.0</version>
         <scope>test</scope>
       </dependency>
 
@@ -79,7 +79,7 @@
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-integration-spring</artifactId>
-        <version>4.6.0-preview7</version>
+        <version>4.6.0-preview8</version>
         <scope>compile</scope>
       </dependency>
   </dependencies>
@@ -143,8 +143,8 @@
                   <version>1.7.0</version>
                   <configuration>
                       <schemaVersion>V2</schemaVersion>
-                      <resourceGroup>{groupname}</resourceGroup>
-                      <appName>{botname}</appName>
+                      <resourceGroup>${groupname}</resourceGroup>
+                      <appName>${botname}</appName>
                       <appSettings>
                           <property>
                               <name>JAVA_OPTS</name>

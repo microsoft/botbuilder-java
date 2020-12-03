@@ -21,6 +21,7 @@ import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
 import com.microsoft.bot.schema.teams.TeamsPagedMembersResult;
+import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -207,6 +208,65 @@ public final class TeamsInfo {
             ? turnContext.getActivity().getConversation().getId()
             : null;
         return getPagedMembers(getConnectorClient(turnContext), conversationId, continuationToken);
+    }
+
+    /**
+     * Gets the details for the given meeting participant. This only works in teams meeting scoped conversations.
+     * @param turnContext The TurnContext that the meeting, participant, and tenant ids are pulled from.
+     * @return TeamsParticipantChannelAccount
+     */
+    public static CompletableFuture<TeamsMeetingParticipant> getMeetingParticipant(
+        TurnContext turnContext
+    ) {
+        return getMeetingParticipant(turnContext, null, null, null);
+    }
+
+    /**
+     * Gets the details for the given meeting participant. This only works in teams meeting scoped conversations.
+     * @param turnContext Turn context.
+     * @param meetingId The meeting id, or null to get from Activities TeamsChannelData
+     * @param participantId The participant id, or null to get from Activities TeamsChannelData
+     * @param tenantId The tenant id, or null to get from Activities TeamsChannelData
+     * @return Team participant channel account.
+     */
+    public static CompletableFuture<TeamsMeetingParticipant> getMeetingParticipant(
+        TurnContext turnContext,
+        String meetingId,
+        String participantId,
+        String tenantId
+    ) {
+        if (StringUtils.isEmpty(meetingId)) {
+            meetingId = turnContext.getActivity().teamsGetMeetingInfo() != null
+                ? turnContext.getActivity().teamsGetMeetingInfo().getId()
+                : null;
+        }
+        if (StringUtils.isEmpty(meetingId)) {
+            return illegalArgument("TeamsInfo.getMeetingParticipant: method requires a meetingId");
+        }
+
+        if (StringUtils.isEmpty(participantId)) {
+            participantId = turnContext.getActivity().getFrom() != null
+                ? turnContext.getActivity().getFrom().getAadObjectId()
+                : null;
+        }
+        if (StringUtils.isEmpty(participantId)) {
+            return illegalArgument("TeamsInfo.getMeetingParticipant: method requires a participantId");
+        }
+
+        if (StringUtils.isEmpty(tenantId)) {
+            tenantId = turnContext.getActivity().teamsGetChannelData() != null
+                ? turnContext.getActivity().teamsGetChannelData().getTenant().getId()
+                : null;
+        }
+        if (StringUtils.isEmpty(tenantId)) {
+            return illegalArgument("TeamsInfo.getMeetingParticipant: method requires a tenantId");
+        }
+
+        return getTeamsConnectorClient(turnContext).getTeams().fetchParticipant(
+            meetingId,
+            participantId,
+            tenantId
+        );
     }
 
     private static CompletableFuture<List<TeamsChannelAccount>> getMembers(
