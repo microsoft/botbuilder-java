@@ -364,6 +364,10 @@
       <id>MyGet</id>
       <url>${repo.url}</url>
     </repository>
+    <repository>
+      <id>ConversationalAI</id>
+      <url>${repo.url}</url>
+    </repository>
   </repositories>
 
   <distributionManagement>
@@ -371,6 +375,10 @@
 <!--      <id>ossrh</id>-->
 <!--      <url>https://oss.sonatype.org/</url>-->
       <id>MyGet</id>
+      <url>${repo.url}</url>
+    </repository>
+    <repository>
+      <id>ConversationalAI</id>
       <url>${repo.url}</url>
     </repository>
   </distributionManagement>
