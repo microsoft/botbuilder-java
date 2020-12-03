@@ -9,10 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import javax.security.auth.login.Configuration;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -37,12 +34,12 @@ public class DialogStateManager {
     /**
      * Information for tracking when path was last modified.
      */
-    private final String PathTracker = "dialog._tracker.paths";
+    private final String pathTracker = "dialog._tracker.paths";
 
-    private static final char[] Separators = { ',', '[' };
+    private static final char[] SEPARATORS = {',', '[' };
 
-    private final DialogContext _dialogContext;
-    private int _version;
+    private final DialogContext dialogContext;
+    private int version;
 
     /**
      * Initializes a new instance of the
@@ -56,7 +53,7 @@ public class DialogStateManager {
         ComponentRegistration.add(new DialogsComponentRegistration());
 
         if (dc != null) {
-            _dialogContext = dc;
+            dialogContext = dc;
         } else {
             throw new IllegalArgumentException("dc cannot be null.");
         }
@@ -110,8 +107,6 @@ public class DialogStateManager {
         this.configuration = withDialogStateManagerConfiguration;
     }
 
-    private Collection<String> keys;
-
     /**
      *
      * @return Gets an Collection containing the keys of the memory scopes.
@@ -120,15 +115,13 @@ public class DialogStateManager {
         return configuration.getMemoryScopes().stream().map(scope -> scope.getName()).collect(Collectors.toList());
     }
 
-    private Collection<Object> values;
-
     /**
      * Gets an Collection containing the values of the memory scopes.
      *
      * @return Values of the memory scopes.
      */
     public Collection<Object> getValues() {
-        return configuration.getMemoryScopes().stream().map(scope -> scope.getMemory(_dialogContext))
+        return configuration.getMemoryScopes().stream().map(scope -> scope.getMemory(dialogContext))
                 .collect(Collectors.toList());
     }
 
@@ -157,7 +150,8 @@ public class DialogStateManager {
      * @return The element with the specified key.
      */
     public Object getElement(String key) {
-        return GetValue(key);
+        //return GetValue(key);
+        return null;
     }
 
     /**
@@ -167,12 +161,12 @@ public class DialogStateManager {
      * @param element The element to store with the provided key.
      */
     public void setElement(String key, Object element) {
-        if (key.indexOf(Separators[0]) == -1 && key.indexOf(Separators[1]) == -1) {
+        if (key.indexOf(SEPARATORS[0]) == -1 && key.indexOf(SEPARATORS[1]) == -1) {
             MemoryScope scope = getMemoryScope(key);
             if (scope != null) {
                 ObjectMapper mapper = new ObjectMapper();
                 try {
-                    scope.setMemory(_dialogContext, mapper.writeValueAsString(element));
+                    scope.setMemory(dialogContext, mapper.writeValueAsString(element));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
@@ -202,7 +196,7 @@ public class DialogStateManager {
      * @return Current version
      */
     public String version() {
-        return Integer.toString(_version);
+        return Integer.toString(version);
     }
 
     /**
@@ -294,7 +288,7 @@ public class DialogStateManager {
         }
 
         if (remainingPath.length() == 0) {
-            Object memory = memoryScope.getMemory(_dialogContext);
+            Object memory = memoryScope.getMemory(dialogContext);
             if (memory == null) {
                 return new ResultPair<>(false, instance);
             }
@@ -304,7 +298,7 @@ public class DialogStateManager {
             return new ResultPair<>(true, instance);
         }
 
-        // TODO: HACK to support .First() retrieval on turn.recognized.entities.foo,
+        // HACK to support .First() retrieval on turn.recognized.entities.foo,
         // replace with Expressions
         // once expression ship
         final String first = ".FIRST()";
@@ -436,10 +430,11 @@ public class DialogStateManager {
             }
 
             // Every set will increase version
-            _version++;
+            version++;
         }
 
-    private static Boolean tryGetFirstNestedValue(Object value,
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        private static Boolean tryGetFirstNestedValue(Object value,
                                                   AtomicReference<String> remainingPath,
                                                   Object memory) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
@@ -475,6 +470,7 @@ public class DialogStateManager {
         return errorMessage.toString();
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private Boolean trackChange(String path, Object value) {
         Boolean hasPath = false;
         ArrayList<Object> segments = ObjectPath.tryResolvePath(this, path, false);
@@ -489,55 +485,46 @@ public class DialogStateManager {
 
                 // Convert to a simple path with _ between segments
                 String pathName = String.join("_", stringSegments);
-                String trackedPath = String.format("%s.%s", PathTracker, pathName);
-                Integer counter = null;
-                counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
+                String trackedPath = String.format("%s.%s", pathTracker, pathName);
+                Integer counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
                 /**
                  *
                  */
-                class UpdateClass {
-                    /**
-                     * Update method
-                     */
-                    public void update() {
-                        ResultPair<Integer> result = tryGetValue(trackedPath, Integer.class);
-                        if (result.result()) {
-                            if (counter == null) {
-                                counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
-                            }
-                            setValue(trackedPath, counter);
-                        }
+                ResultPair<Integer> result = tryGetValue(trackedPath, Integer.class);
+                if (result.result()) {
+                    if (counter == null) {
+                        counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
                     }
+                    setValue(trackedPath, counter);
                 }
 
-                new UpdateClass().update();
 
-                if (value instanceof Object) {
-                    /**
-                     * For an object we need to see if any children path are being tracked
-                     */
-                    class ChildCheck {
-                        /**
-                         *  Check the child properties
-                         * @param property Property to check.
-                         * @param instance Instance of returned value.
-                         */
-                        void checkChildren(String property, Object instance) {
-                            // Add new child segment
-                            trackedPath += "_" + property.toLowerCase();
-                            new UpdateClass().update();
-                            if (instance instanceof Object) {
-                                ObjectPath.forEachProperty(instance, ChildCheck::checkChildren);
-                            }
+                // if (value instanceof Object) {
+                //     /**
+                //      * For an object we need to see if any children path are being tracked
+                //      */
+                //     class ChildCheck {
+                //         /**
+                //          *  Check the child properties
+                //          * @param property Property to check.
+                //          * @param instance Instance of returned value.
+                //          */
+                //         void checkChildren(String property, Object instance) {
+                //             // Add new child segment
+                //             trackedPath += "_" + property.toLowerCase();
+                //             new UpdateClass().update();
+                //             if (instance instanceof Object) {
+                //                 ObjectPath.forEachProperty(instance, ChildCheck::checkChildren);
+                //             }
 
-                            // Remove added child segment
-                            trackedPath = trackedPath.substring(0, trackedPath.lastIndexOf('_'));
-                        }
-                    }
-                    // For an Object we need to see if any children path are being tracked
+                //             // Remove added child segment
+                //             trackedPath = trackedPath.substring(0, trackedPath.lastIndexOf('_'));
+                //         }
+                //     }
+                //     // For an Object we need to see if any children path are being tracked
 
-                    ObjectPath.forEachProperty(value, ChildCheck::checkChildren);
-                }
+                //     ObjectPath.forEachProperty(value, ChildCheck::checkChildren);
+                //}
             }
 
             hasPath = true;
