@@ -1,5 +1,8 @@
 package com.microsoft.bot.dialogs.memory;
 
+/**
+ * Defines path for avaiable turns.
+ */
 public final class TurnPath {
     private TurnPath() { }
 

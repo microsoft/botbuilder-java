@@ -569,7 +569,6 @@ public final class ObjectPath {
      */
     public static <T> Segments tryResolvePath(Object obj, String propertyPath, boolean eval) {
         Segments soFar = new Segments();
-        Segments segments = soFar;
         char first = propertyPath.length() > 0 ? propertyPath.charAt(0) : ' ';
         if (first == '\'' || first == '"') {
             if (!propertyPath.endsWith(String.valueOf(first))) {
@@ -754,10 +753,12 @@ public final class ObjectPath {
     /// <param name="segment">property or array segment to put the value in.</param>
     /// <param name="value">value to store.</param>
     /// <param name="json">if true, value will be normalized to JSON primitive Objects.</param>
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static void setObjectSegment(Object obj, Object segment, Object value) {
         setObjectSegment(obj, segment, true);
     }
 
+    @SuppressWarnings("PMD.EmptyCatchBlock")
     private static void setObjectSegment(Object obj, Object segment, Object value, boolean json) {
         Object normalizedValue = getNormalizedValue(value, json);
 

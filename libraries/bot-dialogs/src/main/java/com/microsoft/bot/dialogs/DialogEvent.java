@@ -1,5 +1,8 @@
 package com.microsoft.bot.dialogs;
 
+/**
+ * Represents an event related to the "lifecycle" of the dialog.
+ */
 public class DialogEvent {
     private boolean bubble;
     private String name;

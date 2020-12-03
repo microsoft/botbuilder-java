@@ -1,5 +1,8 @@
 package com.microsoft.bot.dialogs;
 
+/**
+ * Result returned to the caller of one of the various stack manipulation methods.
+ */
 public enum DialogTurnStatus {
     /// Indicates that there is currently nothing on the dialog stack.
     EMPTY,

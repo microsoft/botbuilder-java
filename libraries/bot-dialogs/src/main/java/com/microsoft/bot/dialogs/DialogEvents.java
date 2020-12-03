@@ -1,5 +1,7 @@
 package com.microsoft.bot.dialogs;
-
+/**
+ * Represents the events related to the "lifecycle" of the dialog.
+ */
 public final class DialogEvents {
     private DialogEvents() { }
 
@@ -15,7 +17,8 @@ public final class DialogEvents {
     /// Event fired when an activity is received from the adapter (or a request to reprocess an activity).
     public static final String ACTIVITY_RECEIVED = "activityReceived";
 
-    /// Event which is fired when the system has detected that deployed code has changed the execution of dialogs between turns.
+    /// Event which is fired when the system has detected that deployed code has changed the execution of dialogs
+    /// between turns.
     public static final String VERSION_CHANGED = "versionChanged";
 
     /// Event fired when there was an exception thrown in the system.

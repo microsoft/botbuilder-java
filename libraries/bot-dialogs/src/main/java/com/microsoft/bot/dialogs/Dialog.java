@@ -8,6 +8,9 @@ import com.microsoft.bot.builder.TurnContext;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Base class for all dialogs.
+ */
 public abstract class Dialog {
     /**
      * A {@link DialogTurnResult} that indicates that the current dialog is
@@ -67,7 +70,7 @@ public abstract class Dialog {
 
     /**
      * Called when the dialog is started and pushed onto the dialog stack.
-     * 
+     *
      * @param dc The {@link DialogContext} for the current turn of
      *           conversation.
      * @return If the task is successful, the result indicates whether the dialog is still

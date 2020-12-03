@@ -70,7 +70,7 @@ public class AliasPathResolver implements PathResolver {
             // here we only deals with trailing alias, alias in middle be handled in further
             // breakdown
             // $xxx -> path.xxx
-            return (prefix + path.charAt(getAlias().length()) + postfix);
+            return prefix + path.charAt(getAlias().length()) + postfix;
         }
 
         return path;

@@ -426,9 +426,7 @@ public class DialogContext {
         // Emit 'repromptDialog' event
         return emitEvent(DialogEvents.REPROMPT_DIALOG, null, false, false)
             .thenCompose(handled -> {
-                if (!handled) {
-                    // Check for a dialog on the stack
-                    if (getActiveDialog() != null) {
+                if (!handled && getActiveDialog() != null) {
                         // Lookup dialog
                         Dialog dialog = this.findDialog(getActiveDialog().getId());
                         if (dialog == null) {
@@ -441,8 +439,6 @@ public class DialogContext {
                         // Ask dialog to re-prompt if supported
                         return dialog.repromptDialog(getContext(), getActiveDialog());
                     }
-                }
-
                 return CompletableFuture.completedFuture(null);
             });
     }
