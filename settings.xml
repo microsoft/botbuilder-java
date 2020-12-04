@@ -137,6 +137,12 @@ under the License.
       <username>${repo.username}</username>
       <password>${repo.password}</password>
     </server>
+    <server>
+      <id>ConversationalAI</id>
+      <!-- only needed for private feeds or when deploying artifacts to the feed -->
+      <username>${repo.username}</username>
+      <password>${repo.password}</password>
+    </server>
   </servers>
 
   <!-- mirrors
