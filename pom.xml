@@ -364,6 +364,12 @@
     <repository>
       <id>${repo.id}</id>
       <url>${repo.url}</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
