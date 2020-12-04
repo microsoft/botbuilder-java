@@ -58,3 +58,11 @@ dependency-reduced-pom.xml
 .vscode/settings.json
 pom.xml.versionsBackup
 libraries/swagger/generated
+/javabotframework_pub.gpg
+/javabotframework_sec.gpg
+/private.pgp
+/privatekey.txt
+/public.pgp
+/.vs/slnx.sqlite
+/.vs/botbuilder-java/v16/.suo
+/.vs/ProjectSettings.json
