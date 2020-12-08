@@ -1,23 +1,30 @@
 'use strict';
 const Generator = require('yeoman-generator');
-const chalk = require('chalk');
-const yosay = require('yosay');
 const path = require('path');
 const _ = require('lodash');
-const extend = require('deep-extend');
 const mkdirp = require('mkdirp');
 
 module.exports = class extends Generator {
   prompting() {
-    // Have Yeoman greet the user.
-    this.log(
-      yosay(`Welcome to the badass ${chalk.red('generator-botbuilder-java')} generator!`)
-    );
-
     const prompts = [
-      { name: 'botName', message: `What 's the name of your bot?`, default: 'sample' },
-      { name: 'description', message: 'What will your bot do?', default: 'sample' },
-      { name: 'dialog', type: 'list', message: 'What default dialog do you want?', choices: ['Echo'] },
+      {
+        name: 'botName',
+        message: `What's the name of your bot?`,
+        type: String,
+        default: 'echo'
+      },
+      {
+        name: 'packageName',
+        message: `What's the fully qualified package name of your bot?`,
+        type: String,
+        default: 'echo'
+      },
+      {
+        name: 'template',
+        type: 'list',
+        message: 'What default template do you want?',
+        choices: ['echo']
+      }
     ];
 
     return this.prompt(prompts).then(props => {
@@ -27,23 +34,44 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    const botName = this.props.botName;
+    const packageName = this.props.packageName.toLowerCase();
+    const packageTree = packageName.replace(/\./g, '/');
     const directoryName = _.kebabCase(this.props.botName);
-    const defaultDialog = this.props.dialog.split(' ')[0].toLowerCase();
+    const defaultDialog = this.props.template.split(' ')[0].toLowerCase();
 
     if (path.basename(this.destinationPath()) !== directoryName) {
-      this.log(`Your bot should be in a directory named ${directoryName}\nI'll automatically create this folder.`);
+      this.log(`Your bot should be in a directory named ${directoryName}`);
       mkdirp(directoryName);
       this.destinationRoot(this.destinationPath(directoryName));
     }
 
-    this.fs.copyTpl(this.templatePath('pom.xml'), this.destinationPath('pom.xml'), { botName: directoryName });
-    this.fs.copy(this.templatePath(`app.java`), this.destinationPath(`app.java`));
-    this.fs.copyTpl(this.templatePath('README.md'), this.destinationPath('README.md'), {
-      botName: this.props.botName, description: this.props.description
-    });
-  }
+    // Copy the project tree
+    this.fs.copyTpl(
+      this.templatePath(path.join(defaultDialog, 'tree', '**')),
+      this.destinationPath(),
+      {
+        botName,
+        packageName
+      }
+    );
 
-  install() {
-    this.installDependencies({bower: false});
+    // Copy main source
+    this.fs.copyTpl(
+      this.templatePath(path.join(defaultDialog, 'src/main/java/**')),
+      this.destinationPath(path.join('src/main/java', packageTree)),
+      {
+        packageName
+      }
+    );
+
+    // Copy test source
+    this.fs.copyTpl(
+      this.templatePath(path.join(defaultDialog, 'src/test/java/**')),
+      this.destinationPath(path.join('src/test/java', packageTree)),
+      {
+        packageName
+      }
+    );
   }
 };

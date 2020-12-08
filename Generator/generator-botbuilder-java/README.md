@@ -16,13 +16,6 @@ Then generate your new project:
 yo botbuilder-java
 ```
 
-## Getting To Know Yeoman
-
- * Yeoman has a heart of gold.
- * Yeoman is a person with feelings and opinions, but is very easy to work with.
- * Yeoman can be too opinionated at times but is easily convinced not to be.
- * Feel free to [learn more about Yeoman](http://yeoman.io/).
-
 ## License
 
 MIT © [Microsoft]()
@@ -34,5 +27,3 @@ MIT © [Microsoft]()
 [travis-url]: https://travis-ci.org/Microsoft/generator-botbuilder-java
 [daviddm-image]: https://david-dm.org/Microsoft/generator-botbuilder-java.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/Microsoft/generator-botbuilder-java
-[coveralls-image]: https://coveralls.io/repos/Microsoft/generator-botbuilder-java/badge.svg
-[coveralls-url]: https://coveralls.io/r/Microsoft/generator-botbuilder-java
