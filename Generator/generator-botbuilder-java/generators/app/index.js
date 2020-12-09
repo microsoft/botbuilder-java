@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 'use strict';
 const pkg = require('../../package.json');
 const Generator = require('yeoman-generator');
@@ -19,10 +22,10 @@ module.exports = class extends Generator {
         super(args, opts);
 
         // allocate an object that we can use to store our user prompt values from our askFor* functions
-        this.templateConfig = Object.create(null);
+        this.templateConfig = {}
 
         // configure the commandline options
-        this._configureCommandlineOptions(this);
+        this._configureCommandlineOptions();
     }
 
     initializing() {
@@ -32,7 +35,6 @@ module.exports = class extends Generator {
 
     prompting() {
         const userPrompts = this._getPrompts();
-        let result = Promise.resolve();
 
         // if we're told to not prompt, then pick what we need and return
         if(this.options.noprompt) {
@@ -40,16 +42,14 @@ module.exports = class extends Generator {
             this._verifyNoPromptOptions();
         }
 
-        // run all prompts in sequence.  Results can be ignored.
-        for(let taskName in userPrompts) {
-            let prompt = userPrompts[taskName];
-            result = result.then(_ => {
-                return new Promise((s, r) => {
-                    setTimeout(_ => prompt().then(s, r), 0);    // set timeout is required, otherwise node hangs
-                });
-            })
+        async function executePrompts([prompt, ...rest]) {
+            if (prompt) {
+              await prompt();
+              return executePrompts(rest);
+            }
         }
-        return result;
+
+        return executePrompts(userPrompts);
     }
 
     writing() {
@@ -60,10 +60,10 @@ module.exports = class extends Generator {
             const packageName = this.templateConfig.packageName.toLowerCase();
             const packageTree = packageName.replace(/\./g, '/');
             const directoryName = _.kebabCase(this.templateConfig.botName);
-            const template = this.templateConfig.template.split(' ')[0].toLowerCase();
+            const template = this.templateConfig.template.toLowerCase();
 
             if (path.basename(this.destinationPath()) !== directoryName) {
-                mkdirp(directoryName);
+                mkdirp.sync(directoryName);
                 this.destinationRoot(this.destinationPath(directoryName));
             }
 
@@ -102,7 +102,7 @@ module.exports = class extends Generator {
             this.log(chalk.green('------------------------ '));
             this.log(chalk.green(' Your new bot is ready!  '));
             this.log(chalk.green('------------------------ '));
-            this.log(`Your bot should be in a directory named ${_.kebabCase(this.templateConfig.botName)}`);
+            this.log(`Your bot should be in a directory named \"${_.kebabCase(this.templateConfig.botName)}\"`);
             this.log('Open the ' + chalk.green.bold('README.md') + ' to learn how to run your bot. ');
             this.log('Thank you for using the Microsoft Bot Framework. ');
             this.log('\n< ** > The Bot Framework Team');
@@ -148,11 +148,11 @@ module.exports = class extends Generator {
 
     _getPrompts() {
         const noprompt = this.options.noprompt;
-        const prompts = {
+        return [
             // ask the user to name their bot
-            askForBotName: () => {
+            async () => {
                 if(noprompt) {
-                    return Promise.resolve();
+                    return;
                 }
 
                 return this.prompt({
@@ -167,9 +167,9 @@ module.exports = class extends Generator {
             },
 
             // ask for package name
-            askForPackageName: () => {
+            async () => {
                 if(noprompt) {
-                    return Promise.resolve();
+                    return;
                 }
 
                 return this.prompt({
@@ -185,9 +185,9 @@ module.exports = class extends Generator {
 
 
             // ask the user which bot template we should use
-            askForBotTemplate: () => {
+            async () => {
                 if(noprompt) {
-                    return Promise.resolve();
+                    return;
                 }
 
                 return this.prompt({
@@ -219,9 +219,9 @@ module.exports = class extends Generator {
             },
 
             // ask the user for final confirmation before we generate their bot
-            askForFinalConfirmation: () => {
+            async () => {
                 if(noprompt) {
-                    return Promise.resolve();
+                    return;
                 }
 
                 return this.prompt({
@@ -234,8 +234,7 @@ module.exports = class extends Generator {
                     this.templateConfig.finalConfirmation = answer.finalConfirmation;
                 });
             }
-        };
-        return prompts;
+        ];
     }
 
     // if we're run with the --noprompt option, verify that
