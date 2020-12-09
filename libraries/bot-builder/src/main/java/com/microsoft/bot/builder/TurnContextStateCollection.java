@@ -40,6 +40,15 @@ public class TurnContextStateCollection implements AutoCloseable {
     }
 
     /**
+     * Returns the Services stored in the TurnContextStateCollection.
+     * @return the Map of String, Object pairs that contains the names and services for this collection.
+     */
+    public Map<String, Object> getTurnStateServices() {
+        return state;
+    }
+
+
+    /**
      * Get a service by type using its full type name as the key.
      *
      * @param type The type of service to be retrieved. This will use the value
@@ -53,7 +62,7 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Adds a value to the turn's context.
-     * 
+     *
      * @param key   The name of the value.
      * @param value The value to add.
      * @param <T>   The type of the value.
@@ -92,7 +101,7 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Removes a value.
-     * 
+     *
      * @param key The name of the value to remove.
      */
     public void remove(String key) {
@@ -101,13 +110,23 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Replaces a value.
-     * 
+     *
      * @param key   The name of the value to replace.
      * @param value The new value.
      */
     public void replace(String key, Object value) {
         state.remove(key);
         add(key, value);
+    }
+
+    /**
+     * Replaces a value.
+     * @param value The service to add.
+     * @param <T>   The type of the value.
+     */
+    public <T> void replace(T value) {
+        String key = value.getClass().getSimpleName();
+        replace(key, value);
     }
 
     /**
@@ -134,7 +153,7 @@ public class TurnContextStateCollection implements AutoCloseable {
 
     /**
      * Close all contained {@link AutoCloseable} values.
-     * 
+     *
      * @throws Exception Exceptions encountered by children during close.
      */
     @Override

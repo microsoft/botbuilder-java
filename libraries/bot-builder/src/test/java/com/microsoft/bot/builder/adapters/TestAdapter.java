@@ -452,4 +452,14 @@ public class TestAdapter extends BotAdapter {
     ) {
         return CompletableFuture.completedFuture(new HashMap<>());
     }
+
+    public static ConversationReference createConversationReference(String name, String user, String bot) {
+        ConversationReference reference = new ConversationReference();
+        reference.setChannelId("test");
+        reference.setServiceUrl("https://test.com");
+        reference.setConversation(new ConversationAccount(false, name, name, null, null, null, null));
+        reference.setUser(new ChannelAccount(user.toLowerCase(), user.toLowerCase()));
+        reference.setBot(new ChannelAccount(bot.toLowerCase(), bot.toLowerCase()));
+        return reference;
+    }
 }

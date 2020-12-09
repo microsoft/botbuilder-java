@@ -104,7 +104,7 @@ public abstract class MemoryScope {
          * @param dialogContext The dialog context Object for this turn.
          * @return CompletableFuture<Void> A future that represents the work queued to execute.
          */
-        public CompletableFuture<Void> deleteAsync(DialogContext dialogContext) {
+        public CompletableFuture<Void> delete(DialogContext dialogContext) {
             return CompletableFuture.completedFuture(null);
         }
 

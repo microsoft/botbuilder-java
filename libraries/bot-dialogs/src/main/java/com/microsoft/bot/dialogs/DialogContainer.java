@@ -22,6 +22,15 @@ public abstract class DialogContainer extends Dialog {
     }
 
     /**
+     * Returns the Dialogs as a DialogSet.
+     * @return The DialogSet of Dialogs.
+     */
+    public DialogSet getDialogs() {
+        return dialogs;
+    }
+
+
+    /**
      * Sets the BotTelemetryClient to use for logging. When setting this property,
      * all of the contained dialogs' BotTelemetryClient properties are also set.
      *

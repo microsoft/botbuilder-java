@@ -2,9 +2,12 @@ package com.microsoft.bot.dialogs.memory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.ComponentRegistration;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogsComponentRegistration;
@@ -36,7 +40,7 @@ public class DialogStateManager {
      */
     private final String pathTracker = "dialog._tracker.paths";
 
-    private static final char[] SEPARATORS = {',', '[' };
+    private static final char[] SEPARATORS = {',', '['};
 
     private final DialogContext dialogContext;
     private int version;
@@ -150,7 +154,7 @@ public class DialogStateManager {
      * @return The element with the specified key.
      */
     public Object getElement(String key) {
-        //return GetValue(key);
+        // return GetValue(key);
         return null;
     }
 
@@ -390,53 +394,301 @@ public class DialogStateManager {
 
     /**
      * Get a String value from memory using a path expression.
+     *
      * @param pathExpression The path expression.
-     * @param defaultValue Default value if the value doesn't exist.
+     * @param defaultValue   Default value if the value doesn't exist.
      * @return String or default value if path is not valid.
      */
     public String getStringValue(String pathExpression, String defaultValue) {
-            return getValue(pathExpression, defaultValue, String.class);
+        return getValue(pathExpression, defaultValue, String.class);
     }
-
 
     /**
      * Set memory to value.
-     * @param path Path to memory.
+     *
+     * @param path  Path to memory.
      * @param value Object to set.
      */
     public void setValue(String path, Object value) {
-            if (value instanceof CompletableFuture) {
-                throw new IllegalArgumentException(
+        if (value instanceof CompletableFuture) {
+            throw new IllegalArgumentException(
                     String.format("%s = You can't pass an unresolved CompletableFuture to SetValue", path));
-            }
+        }
 
-            if (path == null || StringUtils.isEmpty(path)) {
-                throw new IllegalArgumentException("path cannot be null");
-            }
+        if (path == null || StringUtils.isEmpty(path)) {
+            throw new IllegalArgumentException("path cannot be null");
+        }
 
-            if (value != null) {
-                ObjectMapper mapper = new ObjectMapper();
+        if (value != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String jsonValue = mapper.writeValueAsString(value);
+                value = jsonValue;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        path = transformPath(path);
+        if (trackChange(path, value)) {
+            ObjectPath.setPathValue(this, path, value);
+        }
+
+        // Every set will increase version
+        version++;
+    }
+
+    /**
+     * Remove property from memory.
+     *
+     * @param path Path to remove the leaf property.
+     */
+    public void removeValue(String path) {
+        if (!StringUtils.isNotBlank(path)) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
+
+        path = transformPath(path);
+        if (trackChange(path, null)) {
+            ObjectPath.removePathValue(this, path);
+        }
+    }
+
+    /**
+     * Gets all memoryscopes suitable for logging.
+     *
+     * @return JsonNode that which represents all memory scopes.
+     */
+    public JsonNode getMemorySnapshot() {
+        ObjectNode result = new ObjectNode(null);
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<MemoryScope> scopes = configuration.getMemoryScopes().stream().filter((x) -> x.getIncludeInSnapshot())
+                .collect(Collectors.toList());
+        for (MemoryScope scope : scopes) {
+            Object memory = scope.getMemory(dialogContext);
+            if (memory != null) {
                 try {
-                     String jsonValue = mapper.writeValueAsString(value);
-                     value = jsonValue;
+                    result.put(scope.getName(), mapper.writeValueAsString(memory));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
             }
-
-            path = transformPath(path);
-            if (trackChange(path, value)) {
-                ObjectPath.setPathValue(this, path, value);
-            }
-
-            // Every set will increase version
-            version++;
         }
+        return result;
+    }
 
-        @SuppressWarnings("PMD.UnusedFormalParameter")
-        private static Boolean tryGetFirstNestedValue(Object value,
-                                                  AtomicReference<String> remainingPath,
-                                                  Object memory) {
+    /**
+     * Load all of the scopes.
+     *
+     * @return A Completed Future.
+     */
+    public CompletableFuture<Void> loadAllScopesAsync() {
+        configuration.getMemoryScopes().forEach((scope) -> {
+            scope.load(dialogContext, false).join();
+        });
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Save all changes for all scopes.
+     *
+     * @return Completed Future
+     */
+    public CompletableFuture<Void> saveAllChanges() {
+        configuration.getMemoryScopes().forEach((memoryScope) -> {
+            memoryScope.saveChanges(dialogContext, false).join();
+        });
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Delete the memory for a scope.
+     *
+     * @param name name of the scope
+     * @return Completed CompletableFuture<Void>
+     */
+    public CompletableFuture<Void> deleteScopesMemory(String name) {
+        // Make a copy here that is final so it can be used in lamdba expression below
+        final String uCaseName = name.toUpperCase();
+        MemoryScope scope = configuration.getMemoryScopes().stream().filter((s) -> {
+            return s.getName().toUpperCase() == uCaseName;
+        }).findFirst().get();
+        if (scope != null) {
+            scope.delete(dialogContext).join();
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Adds an element to the dialog state manager.
+     *
+     * @param key   Key of the element to add.
+     * @param value Value of the element to add.
+     */
+    public void add(String key, Object value) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Determines whether the dialog state manager contains an element with the
+     * specified key.
+     *
+     * @param key The key to locate in the dialog state manager.
+     * @return true if the dialog state manager contains an element with the key;
+     *         otherwise, false.
+     */
+    public Boolean containsKey(String key) {
+        MemoryScope scope = configuration.getMemoryScopes().stream().filter((s) -> {
+            return s.getName().toUpperCase() == key;
+        }).findFirst().get();
+        return scope != null;
+    }
+
+    /**
+     * Removes the element with the specified key from the dialog state manager.
+     *
+     * @param key The key of the element to remove.
+     * @return true if the element is succesfully removed; otherwise, false.
+     */
+    public Boolean remove(String key) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Gets the value associated with the specified key.
+     *
+     * @param key   The key whose value to get.
+     * @param value When this method returns, the value associated with the
+     *              specified key, if the key is found; otherwise, the default value
+     *              for the type of the value parameter.
+     * @return true if the dialog state manager contains an element with the
+     *         specified key;
+     */
+    public ResultPair<Object> tryGetValue(String key, Object value) {
+        return tryGetValue(key, Object.class);
+    }
+
+    /**
+     * Adds an item to the dialog state manager.
+     *
+     * @param item The SimpleEntry with the key and Object of the item to add.
+     */
+    public void add(SimpleEntry<String, Object> item) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Removes all items from the dialog state manager.
+     */
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Determines whether the dialog state manager contains a specific value.
+     *
+     * @param item The of the item to locate.
+     * @return True if item is found in the dialog state manager; otherwise,false
+     */
+    public Boolean contains(SimpleEntry<String, Object> item) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Copies the elements of the dialog state manager to an array starting at a
+     * particular index.
+     *
+     * @param array      The one-dimensional array that is the destination of the
+     *                   elements copiedfrom the dialog state manager. The array
+     *                   must have zero-based indexing.
+     * @param arrayIndex The zero-based index in array at which copying begins.
+     */
+    public void copyTo(SimpleEntry<String, Object>[] array, int arrayIndex) {
+        for (MemoryScope scope : configuration.getMemoryScopes()) {
+            array[arrayIndex++] = new SimpleEntry<String, Object>(scope.getName(), scope.getMemory(dialogContext));
+        }
+    }
+
+    /// <summary>
+    /// Removes the first occurrence of a specific Object from the dialog state
+    /// manager.
+    /// </summary>
+    /// <param name="item">The Object to remove from the dialog state
+    /// manager.</param>
+    /// <returns><c>true</c> if the item was successfully removed from the dialog
+    /// state manager;
+    /// otherwise, <c>false</c>.</returns>
+    /// <remarks>This method is not supported.</remarks>
+    /**
+     * Removes the first occurrence of a specific Object from the dialog state
+     * manager.
+     *
+     * @param item The Object to remove from the dialog state manager.
+     * @return true if the item was successfully removed from the dialog state
+     *         manager otherwise false
+     */
+    public boolean remove(SimpleEntry<String, Object> item) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Returns an Iterator that iterates through the collection.
+     *
+     * @return An Iterator that can be used to iterate through the collection.
+     */
+    public Iterable<SimpleEntry<String, Object>> getEnumerator() {
+        List<SimpleEntry<String, Object>> resultList = new ArrayList<SimpleEntry<String, Object>>();
+        for (MemoryScope scope : configuration.getMemoryScopes()) {
+            resultList.add(new SimpleEntry<String, Object>(scope.getName(), scope.getMemory(dialogContext)));
+        }
+        return resultList;
+    }
+
+    /**
+     * Track when specific paths are changed.
+     *
+     * @param paths Paths to track.
+     * @return Normalized paths to pass to AnyPathChanged/>.
+     */
+    public List<String> trackPaths(Iterable<String> paths) {
+        List<String> allPaths = new ArrayList<String>();
+        for (String path : allPaths) {
+            String tpath = transformPath(path);
+            // Track any path that resolves to a constant path
+            Object resolved = ObjectPath.tryResolvePath(this, tpath);
+            if (resolved != null) {
+                String npath = String.join("_", resolved.toString());
+                setValue(pathTracker + "." + npath, 0);
+                allPaths.add(npath);
+            }
+        }
+        return allPaths;
+    }
+
+    /**
+     * Check to see if any path has changed since watermark.
+     *
+     * @param counter Time counter to compare to.
+     * @param paths   Paths from Trackpaths to check.
+     * @return True if any path has changed since counter.
+     */
+    public Boolean anyPathChanged(int counter, Iterable<String> paths) {
+        Boolean found = false;
+        if (paths != null) {
+            for (String path : paths) {
+                int resultValue = getValue(pathTracker + "." + path, -1, Integer.class);
+                if (resultValue != -1 && resultValue > counter) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        return found;
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private static Boolean tryGetFirstNestedValue(Object value, AtomicReference<String> remainingPath, Object memory) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
 
         array = ObjectPath.tryGetPathValue(memory, remainingPath.get(), ArrayNode.class);
@@ -470,18 +722,16 @@ public class DialogStateManager {
         return errorMessage.toString();
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     private Boolean trackChange(String path, Object value) {
         Boolean hasPath = false;
         ArrayList<Object> segments = ObjectPath.tryResolvePath(this, path, false);
         if (segments != null) {
-            String root = segments.size() > 1 ? (String) segments.get(1)  : new String();
+            String root = segments.size() > 1 ? (String) segments.get(1) : new String();
 
             // Skip _* as first scope, i.e. _adaptive, _tracker, ...
             if (!root.startsWith("_")) {
-                List<String> stringSegments = segments.stream()
-                                              .map(object -> Objects.toString(object, null))
-                                              .collect(Collectors.toList());
+                List<String> stringSegments = segments.stream().map(Object -> Objects.toString(Object, null))
+                        .collect(Collectors.toList());
 
                 // Convert to a simple path with _ between segments
                 String pathName = String.join("_", stringSegments);
@@ -497,40 +747,52 @@ public class DialogStateManager {
                     }
                     setValue(trackedPath, counter);
                 }
+                if (value instanceof Map) {
+                    final int count = counter;
+                    ((Map<String, Object>) value).forEach((key, val) -> {
+                        checkChildren(key, val, trackedPath, count);
+                    });
+                } else if (value instanceof ObjectNode) {
+                    ObjectNode node = (ObjectNode) value;
+                    Iterator<String> fields = node.fieldNames();
 
-
-                // if (value instanceof Object) {
-                //     /**
-                //      * For an object we need to see if any children path are being tracked
-                //      */
-                //     class ChildCheck {
-                //         /**
-                //          *  Check the child properties
-                //          * @param property Property to check.
-                //          * @param instance Instance of returned value.
-                //          */
-                //         void checkChildren(String property, Object instance) {
-                //             // Add new child segment
-                //             trackedPath += "_" + property.toLowerCase();
-                //             new UpdateClass().update();
-                //             if (instance instanceof Object) {
-                //                 ObjectPath.forEachProperty(instance, ChildCheck::checkChildren);
-                //             }
-
-                //             // Remove added child segment
-                //             trackedPath = trackedPath.substring(0, trackedPath.lastIndexOf('_'));
-                //         }
-                //     }
-                //     // For an Object we need to see if any children path are being tracked
-
-                //     ObjectPath.forEachProperty(value, ChildCheck::checkChildren);
-                //}
+                    while (fields.hasNext()) {
+                        String field = fields.next();
+                        checkChildren(field, node.findValue(field), trackedPath, counter);
+                    }
+                }
             }
-
             hasPath = true;
         }
-
         return hasPath;
+    }
+
+    private void checkChildren(String property, Object instance, String path, Integer counter) {
+        // Add new child segment
+        String trackedPath = path + "_" + property.toLowerCase();
+        ResultPair<Integer> pathCheck = tryGetValue(trackedPath, Integer.class);
+        if (pathCheck.result()) {
+            if (counter == null) {
+                counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
+            }
+            setValue(trackedPath, counter);
+        }
+
+        if (instance instanceof Map) {
+            final int count = counter;
+            ((Map<String, Object>) instance).forEach((key, value) -> {
+                checkChildren(key, value, trackedPath, count);
+            });
+        } else if (instance instanceof ObjectNode) {
+            ObjectNode node = (ObjectNode) instance;
+            Iterator<String> fields = node.fieldNames();
+
+            while (fields.hasNext()) {
+                String field = fields.next();
+                checkChildren(field, node.findValue(field), trackedPath, counter);
+            }
+        }
+
     }
 
 }

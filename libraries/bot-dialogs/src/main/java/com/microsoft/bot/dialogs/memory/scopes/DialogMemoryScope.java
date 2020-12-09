@@ -52,7 +52,7 @@ public class DialogMemoryScope extends MemoryScope {
             throw new IllegalArgumentException("memory cannot be null.");
         }
 
-        if (memory instanceof Map<?, ?>) {
+        if (!(memory instanceof Map<?, ?>)) {
             throw new IllegalArgumentException("memory must be of type Map<?, ?>.");
         }
 
