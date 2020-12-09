@@ -69,7 +69,7 @@ module.exports = class extends Generator {
 
             // Copy the project tree
             this.fs.copyTpl(
-                this.templatePath(path.join(template, 'tree', '**')),
+                this.templatePath(path.join(template, 'project', '**')),
                 this.destinationPath(),
                 {
                     botName,
