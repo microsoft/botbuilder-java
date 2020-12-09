@@ -2,7 +2,7 @@ package com.microsoft.bot.dialogs.memory.scopes;
 
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.memory.ScopePath;
+import com.microsoft.bot.dialogs.ScopePath;
 
 /**
  * MemoryScope represents a named memory scope abstract class.

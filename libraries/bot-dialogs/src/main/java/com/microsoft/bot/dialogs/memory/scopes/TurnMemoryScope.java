@@ -3,7 +3,7 @@ package com.microsoft.bot.dialogs.memory.scopes;
 import java.util.TreeMap;
 
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.memory.ScopePath;
+import com.microsoft.bot.dialogs.ScopePath;
 
 /**
  * TurnMemoryScope represents memory scoped to the current turn.

@@ -5,7 +5,7 @@ import java.util.Map;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContainer;
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.memory.ScopePath;
+import com.microsoft.bot.dialogs.ScopePath;
 
 /**
  * DialogMemoryScope maps "dialog" -> dc.Parent?.ActiveDialog.State ?? ActiveDialog.State.

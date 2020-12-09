@@ -4,7 +4,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.memory.ScopePath;
+import com.microsoft.bot.dialogs.ScopePath;
 import com.microsoft.bot.integration.Configuration;
 
 /**

@@ -3,7 +3,6 @@ package com.microsoft.bot.dialogs;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.dialogs.memory.DialogStateManager;
-import com.microsoft.bot.dialogs.memory.TurnPath;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.integration.Async;
 import java.util.HashMap;

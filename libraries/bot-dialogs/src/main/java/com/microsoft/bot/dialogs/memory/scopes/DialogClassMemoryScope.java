@@ -2,7 +2,7 @@ package com.microsoft.bot.dialogs.memory.scopes;
 
 import com.microsoft.bot.dialogs.DialogContainer;
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.memory.ScopePath;
+import com.microsoft.bot.dialogs.ScopePath;
 
 /**
  * Initializes a new instance of the DialogClassMemoryScope class.

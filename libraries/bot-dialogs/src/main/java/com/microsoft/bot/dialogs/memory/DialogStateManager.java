@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.ComponentRegistration;
 import com.microsoft.bot.dialogs.DialogContext;
+import com.microsoft.bot.dialogs.DialogPath;
 import com.microsoft.bot.dialogs.DialogsComponentRegistration;
 import com.microsoft.bot.dialogs.ObjectPath;
 import com.microsoft.bot.dialogs.memory.scopes.MemoryScope;

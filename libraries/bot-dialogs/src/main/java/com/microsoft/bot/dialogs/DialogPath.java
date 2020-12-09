@@ -1,4 +1,4 @@
-package com.microsoft.bot.dialogs.memory;
+package com.microsoft.bot.dialogs;
 
 /**
  *  Defines path for available dialogs.
