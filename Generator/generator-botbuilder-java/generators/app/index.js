@@ -8,6 +8,7 @@ const path = require('path');
 const _ = require('lodash');
 const chalk = require('chalk');
 const mkdirp = require('mkdirp');
+const camelCase = require('camelcase');
 
 const BOT_TEMPLATE_NAME_EMPTY = 'Empty Bot';
 const BOT_TEMPLATE_NAME_SIMPLE = 'Echo Bot';
@@ -22,7 +23,7 @@ module.exports = class extends Generator {
         super(args, opts);
 
         // allocate an object that we can use to store our user prompt values from our askFor* functions
-        this.templateConfig = {}
+        this.templateConfig = {};
 
         // configure the commandline options
         this._configureCommandlineOptions();
@@ -34,14 +35,13 @@ module.exports = class extends Generator {
     }
 
     prompting() {
-        const userPrompts = this._getPrompts();
-
         // if we're told to not prompt, then pick what we need and return
         if(this.options.noprompt) {
             // this function will throw if it encounters errors/invalid options
-            this._verifyNoPromptOptions();
+            return this._verifyNoPromptOptions();
         }
 
+        const userPrompts = this._getPrompts();
         async function executePrompts([prompt, ...rest]) {
             if (prompt) {
               await prompt();
@@ -59,7 +59,8 @@ module.exports = class extends Generator {
             const botName = this.templateConfig.botName;
             const packageName = this.templateConfig.packageName.toLowerCase();
             const packageTree = packageName.replace(/\./g, '/');
-            const directoryName = _.kebabCase(this.templateConfig.botName);
+            const artifact = camelCase(this.templateConfig.botName);
+            const directoryName = camelCase(this.templateConfig.botName);
             const template = this.templateConfig.template.toLowerCase();
 
             if (path.basename(this.destinationPath()) !== directoryName) {
@@ -73,7 +74,8 @@ module.exports = class extends Generator {
                 this.destinationPath(),
                 {
                     botName,
-                    packageName
+                    packageName,
+                    artifact
                 }
             );
 
@@ -102,7 +104,7 @@ module.exports = class extends Generator {
             this.log(chalk.green('------------------------ '));
             this.log(chalk.green(' Your new bot is ready!  '));
             this.log(chalk.green('------------------------ '));
-            this.log(`Your bot should be in a directory named \"${_.kebabCase(this.templateConfig.botName)}\"`);
+            this.log(`Your bot should be in a directory named "${camelCase(this.templateConfig.botName)}"`);
             this.log('Open the ' + chalk.green.bold('README.md') + ' to learn how to run your bot. ');
             this.log('Thank you for using the Microsoft Bot Framework. ');
             this.log('\n< ** > The Bot Framework Team');
@@ -147,14 +149,9 @@ module.exports = class extends Generator {
     }
 
     _getPrompts() {
-        const noprompt = this.options.noprompt;
         return [
             // ask the user to name their bot
             async () => {
-                if(noprompt) {
-                    return;
-                }
-
                 return this.prompt({
                     type: 'input',
                     name: 'botName',
@@ -168,10 +165,6 @@ module.exports = class extends Generator {
 
             // ask for package name
             async () => {
-                if(noprompt) {
-                    return;
-                }
-
                 return this.prompt({
                     type: 'input',
                     name: 'packageName',
@@ -186,10 +179,6 @@ module.exports = class extends Generator {
 
             // ask the user which bot template we should use
             async () => {
-                if(noprompt) {
-                    return;
-                }
-
                 return this.prompt({
                     type: 'list',
                     name: 'template',
@@ -220,10 +209,6 @@ module.exports = class extends Generator {
 
             // ask the user for final confirmation before we generate their bot
             async () => {
-                if(noprompt) {
-                    return;
-                }
-
                 return this.prompt({
                     type: 'confirm',
                     name: 'finalConfirmation',
@@ -237,11 +222,10 @@ module.exports = class extends Generator {
         ];
     }
 
-    // if we're run with the --noprompt option, verify that
-    // we were all passed in all required options.
-    // return true for success, false for failure
+    // if we're run with the --noprompt option, verify that all required options were supplied.
+    // throw for missing options, or a resolved Promise
     _verifyNoPromptOptions() {
-        this.templateConfig = _.pick(this.options, ['botName', 'packageName'])
+        this.templateConfig = _.pick(this.options, ['botName', 'packageName', 'template'])
 
         // validate we have what we need, or we'll need to throw
         if(!this.templateConfig.botName) {
@@ -263,5 +247,7 @@ module.exports = class extends Generator {
         // when run using --noprompt and we have all the required templateConfig, then set final confirmation to true
         // so we can go forward and create the new bot without prompting the user for confirmation
         this.templateConfig.finalConfirmation = true;
+
+        return Promise.resolve();
     }
 };
