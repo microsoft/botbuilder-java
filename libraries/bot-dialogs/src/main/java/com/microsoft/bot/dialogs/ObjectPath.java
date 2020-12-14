@@ -755,7 +755,7 @@ public final class ObjectPath {
     /// <param name="json">if true, value will be normalized to JSON primitive Objects.</param>
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static void setObjectSegment(Object obj, Object segment, Object value) {
-        setObjectSegment(obj, segment, true);
+        setObjectSegment(obj, segment, value, true);
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -804,11 +804,13 @@ public final class ObjectPath {
         }
 
         // reflection
-        for (Field f : obj.getClass().getDeclaredFields()) {
-            if (f.getName().equalsIgnoreCase(property)) {
-                try {
-                    f.set(obj, normalizedValue);
-                } catch (IllegalAccessException ignore) {
+        if (obj != null) {
+            for (Field f : obj.getClass().getDeclaredFields()) {
+                if (f.getName().equalsIgnoreCase(property)) {
+                    try {
+                        f.set(obj, normalizedValue);
+                    } catch (IllegalAccessException ignore) {
+                    }
                 }
             }
         }

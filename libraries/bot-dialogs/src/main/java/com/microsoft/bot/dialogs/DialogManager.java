@@ -40,13 +40,10 @@ public class DialogManager {
      *                            (Default is "DialogState").
      */
     public DialogManager(Dialog rootDialog, String dialogStateProperty) {
-        if (rootDialog == null) {
-            throw new IllegalArgumentException();
+        if (rootDialog != null) {
+            this.setRootDialog(rootDialog);
         }
-        if (dialogStateProperty == null) {
-            throw new IllegalArgumentException();
-        }
-        this.setRootDialog(rootDialog);
+
         this.dialogStateProperty = dialogStateProperty != null ? dialogStateProperty : null;
     }
 
@@ -97,7 +94,7 @@ public class DialogManager {
      *
      * @return TurnState.
      */
-    public TurnContextStateCollection getTurnContextStateCollection() {
+    public TurnContextStateCollection getInitialTurnState() {
         return initialTurnState;
     }
 
@@ -122,7 +119,7 @@ public class DialogManager {
      */
     public void setRootDialog(Dialog dialog) {
         setDialogs(new DialogSet());
-        if (rootDialogId != null) {
+        if (dialog != null) {
             rootDialogId = dialog.getId();
             getDialogs().setTelemetryClient(dialog.getTelemetryClient());
             getDialogs().add(dialog);
@@ -289,7 +286,7 @@ public class DialogManager {
         while (!endOfTurn) {
             try {
                 ClaimsIdentity claimIdentity = context.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
-                if (SkillValidation.isSkillClaim(claimIdentity.claims())) {
+                if (claimIdentity != null && SkillValidation.isSkillClaim(claimIdentity.claims())) {
                     // The bot is running as a skill.
                     turnResult = handleSkillOnTurn().join();
                 } else {

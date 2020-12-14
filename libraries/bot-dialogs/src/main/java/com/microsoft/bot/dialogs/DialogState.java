@@ -1,6 +1,8 @@
 package com.microsoft.bot.dialogs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,7 +10,7 @@ import java.util.List;
  */
 public class DialogState {
     @JsonProperty(value = "dialogStack")
-    private List<DialogInstance> dialogStack;
+    private List<DialogInstance> dialogStack = new ArrayList<DialogInstance>();
 
     /**
      * Initializes a new instance of the class with an empty stack.
@@ -22,7 +24,7 @@ public class DialogState {
      * @param withDialogStack The state information to initialize the stack with.
      */
     public DialogState(List<DialogInstance> withDialogStack) {
-        dialogStack = withDialogStack;
+        dialogStack = withDialogStack != null ? withDialogStack : new ArrayList<DialogInstance>();
     }
 
     /**

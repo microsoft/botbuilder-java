@@ -34,9 +34,14 @@ public class DialogMemoryScope extends MemoryScope {
             }
         }
 
-        return dialogContext.getParent().getActiveDialog().getState() != null
-                ? dialogContext.getParent().getActiveDialog().getState()
-                : dialogContext.getActiveDialog().getState();
+        if (dialogContext.getParent() != null) {
+            if (dialogContext.getParent().getActiveDialog() != null) {
+                return dialogContext.getParent().getActiveDialog().getState();
+            }
+        } else if (dialogContext.getActiveDialog() != null) {
+            return dialogContext.getActiveDialog().getStackIndex();
+        }
+        return null;
     }
 
     /**

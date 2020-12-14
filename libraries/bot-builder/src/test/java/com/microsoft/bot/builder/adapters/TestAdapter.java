@@ -123,6 +123,35 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
+        /**
+     * Adds middleware to the adapter to register an Storage object on the turn context.
+     * The middleware registers the state objects on the turn context at the start of each turn.
+     * @param storage The storage object to register.
+     * @return The updated adapter.
+     */
+    public TestAdapter useStorage(Storage storage) {
+        if (storage == null) {
+            throw new IllegalArgumentException("Storage cannot be null");
+        }
+        return this.use(new RegisterClassMiddleware<Storage>(storage));
+    }
+
+    /**
+     * Adds middleware to the adapter to register one or more BotState objects on the turn context.
+     * The middleware registers the state objects on the turn context at the start of each turn.
+     * @param botstates The state objects to register.
+     * @return The updated adapter.
+     */
+    public TestAdapter useBotState(BotState... botstates) {
+        if (botstates == null) {
+            throw new IllegalArgumentException("botstates cannot be null");
+        }
+        for (BotState botState : botstates) {
+            this.use(new RegisterClassMiddleware<BotState>(botState));
+        }
+        return this;
+    }
+
     public CompletableFuture<Void> processActivity(Activity activity, BotCallbackHandler callback) {
         return CompletableFuture.supplyAsync(() -> {
             synchronized (conversationReference()) {

@@ -52,12 +52,12 @@ public class TurnContextStateCollection implements AutoCloseable {
      * Get a service by type using its full type name as the key.
      *
      * @param type The type of service to be retrieved. This will use the value
-     *             returned by Class.getSimpleName as the key.
+     *             returned by Class.getName as the key.
      * @param <T>  The type of the value.
      * @return The service stored under the specified key.
      */
     public <T> T get(Class<T> type) {
-        return get(type.getSimpleName());
+        return get(type.getName());
     }
 
     /**
@@ -85,7 +85,7 @@ public class TurnContextStateCollection implements AutoCloseable {
     }
 
     /**
-     * Add a service using its type name ({@link Class#getSimpleName()} as the key.
+     * Add a service using its type name ({@link Class#getName()} as the key.
      *
      * @param value The service to add.
      * @param <T>   The type of the value.
@@ -96,7 +96,7 @@ public class TurnContextStateCollection implements AutoCloseable {
             throw new IllegalArgumentException("value");
         }
 
-        add(value.getClass().getSimpleName(), value);
+        add(value.getClass().getName(), value);
     }
 
     /**
@@ -125,7 +125,7 @@ public class TurnContextStateCollection implements AutoCloseable {
      * @param <T>   The type of the value.
      */
     public <T> void replace(T value) {
-        String key = value.getClass().getSimpleName();
+        String key = value.getClass().getName();
         replace(key, value);
     }
 

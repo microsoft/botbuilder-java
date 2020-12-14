@@ -1,15 +1,19 @@
 package com.microsoft.bot.dialogs;
 
-import java.util.function.BiFunction;
+import static org.junit.Assert.fail;
 
-import com.google.common.base.Function;
+import java.util.concurrent.CompletableFuture;
+
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.dialogs.memory.DialogStateManagerConfiguration;
+import com.microsoft.bot.dialogs.memory.scopes.MemoryScope;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
 
 /**
@@ -19,15 +23,43 @@ public class DialogStateManagerTests {
 
     @Rule public TestName name = new TestName();
 
-    private TestFlow createDialogContext(BiFunction<DialogContext, Function, TestFlow> tf) {
-        TestAdapter adapter = new TestAdapter(
-                    TestAdapter.createConversationReference(name.getMethodName(), "User1", "Bot"));
-        //     adapter.UseStorage(new MemoryStorage())
-        //     .UseBotState(new UserState(new MemoryStorage()))
-        //     .UseBotState(new ConversationState(new MemoryStorage()));
+    @Test
+    public void testMemoryScopeNullChecks() {
+        DialogTestFunction testFunction = dialogContext -> {
+            DialogStateManagerConfiguration configuration = dialogContext.getState().getConfiguration();
+            for (MemoryScope scope : configuration.getMemoryScopes()) {
+                try {
+                    scope.getMemory(null);
+                    fail(String.format("Should have thrown exception with null for getMemory %s",
+                        scope.getClass().getName()));
+                } catch (Exception ex) {
+                }
+                try {
+                    scope.setMemory(null, new Object());
+                    fail(String.format("Should have thrown exception with null for setMemory %s",
+                        scope.getClass().getName()));
+                } catch (Exception ex) {
 
-        DialogManager dm = new DialogManager(new LamdaDialog(handler), null);
-        dm.InitialTurnState.Set(new ResourceExplorer());
-        return new TestFlow(adapter, dm.OnTurnAsync).SendConversationUpdate();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
+
+        createDialogContext(testFunction).startTest().join();
+    }
+
+    private TestFlow createDialogContext(DialogTestFunction handler) {
+        TestAdapter adapter = new TestAdapter(
+            TestAdapter.createConversationReference(name.getMethodName(), "User1", "Bot"))
+            .useStorage(new MemoryStorage())
+            .useBotState(new UserState(new MemoryStorage()))
+            .useBotState(new ConversationState(new MemoryStorage()));
+
+        DialogManager dm = new DialogManager(new LamdbaDialog(name.getMethodName(), handler), name.getMethodName());
+        //dm.getInitialTurnState().add(new ResourceExplorer());
+        return new TestFlow(adapter, (turnContext -> {
+            dm.onTurn(turnContext);
+            return CompletableFuture.completedFuture(null);
+        })).sendConverationUpdate();
     }
 }

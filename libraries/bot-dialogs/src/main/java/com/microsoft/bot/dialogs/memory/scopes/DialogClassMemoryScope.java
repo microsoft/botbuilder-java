@@ -1,5 +1,7 @@
 package com.microsoft.bot.dialogs.memory.scopes;
 
+import javax.lang.model.util.ElementScanner6;
+
 import com.microsoft.bot.dialogs.DialogContainer;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.ScopePath;
@@ -33,11 +35,14 @@ public class DialogClassMemoryScope extends MemoryScope {
 
         // Otherwise we always bind to parent, or if there is no parent the active
         // dialog
-        if (dialogContext.getParent() != null) {
+        if (dialogContext.getParent() != null && dialogContext.getParent().getActiveDialog() != null) {
             return new ReadOnlyObject(dialogContext.findDialog(dialogContext.getParent().getActiveDialog().getId()));
-        } else {
+        } else if (dialogContext.getActiveDialog() != null) {
             return new ReadOnlyObject(dialogContext.findDialog(dialogContext.getActiveDialog().getId()));
+        } else {
+            return null;
         }
+
     }
 
     /**

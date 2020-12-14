@@ -76,12 +76,12 @@ public class DialogStateManager {
 
             components.forEach((component) -> {
                 if (component instanceof ComponentMemoryScopes) {
-                    configuration.getMemoryScopes().forEach((scope) -> {
+                    ((ComponentMemoryScopes) component).getMemoryScopes().forEach((scope) -> {
                         this.configuration.getMemoryScopes().add(scope);
                     });
                 }
                 if (component instanceof ComponentPathResolvers) {
-                    configuration.getPathResolvers().forEach((pathResolver) -> {
+                    ((ComponentPathResolvers) component).getPathResolvers().forEach((pathResolver) -> {
                         this.configuration.getPathResolvers().add(pathResolver);
                     });
                 }
@@ -89,7 +89,7 @@ public class DialogStateManager {
         }
 
         // cache for any other new dialogStatemanager instances in this turn.
-        dc.getContext().getTurnState().add(this.configuration);
+        dc.getContext().getTurnState().replace(this.configuration);
     }
 
     private DialogStateManagerConfiguration configuration;
@@ -461,8 +461,8 @@ public class DialogStateManager {
      * @return JsonNode that which represents all memory scopes.
      */
     public JsonNode getMemorySnapshot() {
-        ObjectNode result = new ObjectNode(null);
         ObjectMapper mapper = new ObjectMapper();
+        ObjectNode result = mapper.createObjectNode();
 
         List<MemoryScope> scopes = configuration.getMemoryScopes().stream().filter((x) -> x.getIncludeInSnapshot())
                 .collect(Collectors.toList());

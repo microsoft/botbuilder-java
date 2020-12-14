@@ -1,6 +1,9 @@
 package com.microsoft.bot.dialogs.memory.scopes;
 
+import java.util.Optional;
+
 import com.microsoft.bot.dialogs.DialogContext;
+import com.microsoft.bot.dialogs.DialogInstance;
 import com.microsoft.bot.dialogs.ScopePath;
 
 import org.json.JSONArray;
@@ -56,8 +59,15 @@ public class DialogContextMemoryScope extends MemoryScope {
 
         // top of stack is stack[0].
         memory.put(stackKey, stack);
-        memory.put(activeDialogKey, dialogContext.getActiveDialog().getId());
-        memory.put(parentKey, dialogContext.getParent().getActiveDialog().getId());
+        memory.put(activeDialogKey, Optional.ofNullable(dialogContext)
+                                    .map(DialogContext::getActiveDialog)
+                                    .map(DialogInstance::getId)
+                                    .orElse(null));
+        memory.put(parentKey, Optional.ofNullable(dialogContext)
+                                    .map(DialogContext::getParent)
+                                    .map(DialogContext::getActiveDialog)
+                                    .map(DialogInstance::getId)
+                                    .orElse(null));
         return memory;
     }
 

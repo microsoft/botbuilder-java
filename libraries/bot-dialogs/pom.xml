@@ -54,6 +54,7 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-documentdb</artifactId>
@@ -87,7 +88,15 @@
       <artifactId>bot-builder</artifactId>
       <version>4.6.0-preview8</version>
     </dependency>
-  </dependencies>
+
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-builder</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+</dependencies>
 
   <profiles>
     <profile>

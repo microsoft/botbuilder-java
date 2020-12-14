@@ -35,7 +35,7 @@ public class BotStateMemoryScope<T extends BotState> extends MemoryScope {
             throw new IllegalArgumentException("dialogContext cannot be null.");
         }
 
-        BotState botState = getBotState(dialogContext);
+        T botState = getBotState(dialogContext);
         if (botState != null) {
             CachedBotState cachedState = botState.getCachedState(dialogContext.getContext());
             return cachedState.getState();
@@ -57,7 +57,7 @@ public class BotStateMemoryScope<T extends BotState> extends MemoryScope {
      */
     @Override
     public CompletableFuture<Void> load(DialogContext dialogContext, Boolean force) {
-        BotState botState = getBotState(dialogContext);
+        T botState = getBotState(dialogContext);
 
         if (botState != null) {
             return botState.load(dialogContext.getContext(), force);
@@ -73,7 +73,7 @@ public class BotStateMemoryScope<T extends BotState> extends MemoryScope {
      */
     @Override
     public CompletableFuture<Void> saveChanges(DialogContext dialogContext, Boolean force) {
-        BotState botState = getBotState(dialogContext);
+        T botState = getBotState(dialogContext);
 
         if (botState != null) {
             return botState.saveChanges(dialogContext.getContext(), force);
@@ -82,7 +82,7 @@ public class BotStateMemoryScope<T extends BotState> extends MemoryScope {
         }
     }
 
-    private BotState getBotState(DialogContext dialogContext) {
+    private T getBotState(DialogContext dialogContext) {
         return dialogContext.getContext().getTurnState().get(type);
     }
 }
