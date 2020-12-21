@@ -1,87 +1,33 @@
 {
-  "name": "generator-botbuilder-java",
-  "version": "0.0.0",
-  "description": "Template to create conversational bots in Java using Microsoft Bot Framework.",
-  "homepage": "https://github.com/Microsoft/botbuilder-java",
-  "author": {
-    "name": "Microsoft",
-    "email": "",
-    "url": ""
-  },
-  "files": [
-    "generators"
-  ],
-  "main": "generators/index.js",
-  "keywords": [
-    "bot",
-    "bots",
-    "chatbots",
-    "bot framework",
-    "yeoman-generator"
-  ],
-  "devDependencies": {
-    "yeoman-test": "^1.7.0",
-    "yeoman-assert": "^3.1.0",
-    "coveralls": "^3.0.0",
-    "nsp": "^2.8.0",
-    "eslint": "^4.19.1",
-    "prettier": "^1.11.1",
-    "husky": "^0.14.3",
-    "lint-staged": "^6.1.1",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-prettier": "^2.6.0",
-    "eslint-config-xo": "^0.20.1",
-    "jest": "^22.0.6"
-  },
-  "engines": {
-    "npm": ">= 4.0.0"
-  },
-  "dependencies": {
-    "yeoman-generator": "^2.0.1",
-    "chalk": "^2.1.0",
-    "yosay": "^2.0.1"
-  },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "scripts": {
-    "prepublishOnly": "nsp check",
-    "pretest": "eslint .",
-    "precommit": "lint-staged",
-    "test": "jest"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ],
-    "*.json": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "xo",
-      "prettier"
-    ],
-    "env": {
-      "jest": true,
-      "node": true
+    "name": "generator-java",
+    "version": "4.9.1",
+    "description": "A yeoman generator for creating Java bots built with Bot Framework v4",
+    "homepage": "https://github.com/Microsoft/BotBuilder-Samples/tree/master/generators/generator-botbuilder",
+    "author": {
+        "name": "Microsoft",
+        "email": "botframework@microsoft.com",
+        "url": "http://dev.botframework.com"
     },
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": true,
-          "printWidth": 90
-        }
-      ]
-    },
-    "plugins": [
-      "prettier"
-    ]
-  },
-  "repository": "https://github.com/Microsoft/botbuilder-java.git",
-  "license": "MIT"
+    "license": "SEE LICENSE IN LICENSE.md",
+    "repository": "https://github.com/Microsoft/BotBuilder-Samples.git",
+    "files": [
+        "components",
+        "generators"
+    ],
+    "keywords": [
+        "botbuilder",
+        "bots",
+        "bot framework",
+        "yeoman-generator",
+        "Microsoft AI",
+        "Microsoft Teams",
+        "Conversational AI"
+    ],
+    "dependencies": {
+        "chalk": "~4.0.0",
+        "lodash": "~4.17.15",
+        "mkdirp": "^1.0.4",
+        "camelcase": "~6.0.0",
+        "yeoman-generator": "~4.10.1"
+    }
 }
