@@ -11,7 +11,7 @@ public class ThisMemoryScope extends MemoryScope {
      * DialogMemoryScope maps "this" -> dc.ActiveDialog.State.
      */
     public ThisMemoryScope() {
-        super(ScopePath.THIS, false);
+        super(ScopePath.THIS, true);
     }
 
     /**

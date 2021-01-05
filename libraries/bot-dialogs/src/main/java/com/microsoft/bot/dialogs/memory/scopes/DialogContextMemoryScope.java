@@ -24,7 +24,7 @@ public class DialogContextMemoryScope extends MemoryScope {
      * Initializes a new instance of the TurnMemoryScope class.
      */
     public DialogContextMemoryScope() {
-        super(ScopePath.DIALOG_CONTEXT, true);
+        super(ScopePath.DIALOG_CONTEXT, false);
     }
 
     /**

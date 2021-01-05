@@ -1,12 +1,15 @@
 package com.microsoft.bot.dialogs.memory;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.ComponentRegistration;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogPath;
@@ -34,7 +38,7 @@ import org.apache.commons.lang3.StringUtils;
  * off of turn state PathResolvers allow for shortcut behavior for mapping
  * things like $foo -> dialog.foo.
  */
-public class DialogStateManager {
+public class DialogStateManager implements Map<String, Object> {
 
     /**
      * Information for tracking when path was last modified.
@@ -87,7 +91,6 @@ public class DialogStateManager {
                 }
             });
         }
-
         // cache for any other new dialogStatemanager instances in this turn.
         dc.getContext().getTurnState().replace(this.configuration);
     }
@@ -110,33 +113,6 @@ public class DialogStateManager {
      */
     public void setConfiguration(DialogStateManagerConfiguration withDialogStateManagerConfiguration) {
         this.configuration = withDialogStateManagerConfiguration;
-    }
-
-    /**
-     *
-     * @return Gets an Collection containing the keys of the memory scopes.
-     */
-    public Collection<String> getKeys() {
-        return configuration.getMemoryScopes().stream().map(scope -> scope.getName()).collect(Collectors.toList());
-    }
-
-    /**
-     * Gets an Collection containing the values of the memory scopes.
-     *
-     * @return Values of the memory scopes.
-     */
-    public Collection<Object> getValues() {
-        return configuration.getMemoryScopes().stream().map(scope -> scope.getMemory(dialogContext))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Gets the number of memory scopes in the dialog state manager.
-     *
-     * @return Number of memory scopes in the configuration.
-     */
-    public int getCount() {
-        return configuration.getMemoryScopes().size();
     }
 
     /**
@@ -230,12 +206,11 @@ public class DialogStateManager {
             scope = path.substring(0, sepIndex);
             MemoryScope memoryScope = getMemoryScope(scope);
             if (memoryScope != null) {
-                remainingPath = new StringBuilder(path.substring(sepIndex + 1));
+                remainingPath.append(path.substring(sepIndex + 1));
                 return memoryScope;
             }
         }
 
-        remainingPath = new StringBuilder();
         MemoryScope resultScope = getMemoryScope(scope);
         if (resultScope == null) {
             throw new IllegalArgumentException(getBadScopeMessage(path));
@@ -422,12 +397,7 @@ public class DialogStateManager {
 
         if (value != null) {
             ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonValue = mapper.writeValueAsString(value);
-                value = jsonValue;
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            value = mapper.valueToTree(value);
         }
 
         path = transformPath(path);
@@ -794,6 +764,67 @@ public class DialogStateManager {
             }
         }
 
+    }
+
+    @Override
+    public final int size() {
+        return configuration.getMemoryScopes().size();
+    }
+
+    @Override
+    public final boolean isEmpty() {
+        return (size() == 0);
+    }
+
+    @Override
+    public final boolean containsKey(Object key) {
+        return false;
+    }
+
+    @Override
+    public final boolean containsValue(Object value) {
+        return false;
+    }
+
+    @Override
+    public final Object get(Object key) {
+        return tryGetValue(key.toString(), Object.class).value();
+    }
+
+    @Override
+    public final Object put(String key, Object value) {
+        return null;
+    }
+
+    @Override
+    public final Object remove(Object key) {
+        return null;
+    }
+
+    @Override
+    public final void putAll(Map<? extends String, ? extends Object> m) {
+    }
+
+
+    @Override
+    public final Set<String> keySet() {
+        return configuration.getMemoryScopes().stream().map(scope -> scope.getName()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public final Collection<Object> values() {
+        return configuration.getMemoryScopes().stream().map(scope -> scope.getMemory(dialogContext))
+        .collect(Collectors.toSet());
+    }
+
+    @Override
+    public final Set<Entry<String, Object>> entrySet() {
+        Set<Entry<String, Object>> resultSet = new HashSet<Entry<String, Object>>();
+        configuration.getMemoryScopes().forEach((scope) -> {
+            resultSet.add(new AbstractMap.SimpleEntry<String, Object>(scope.getName(), scope.getMemory(dialogContext)));
+        });
+
+        return resultSet;
     }
 
 }

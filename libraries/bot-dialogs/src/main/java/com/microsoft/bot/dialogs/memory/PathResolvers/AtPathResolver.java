@@ -39,7 +39,7 @@ public class AtPathResolver extends AliasPathResolver {
                 end = Math.max(endperiod, endbracket);
             }
 
-            String property = path.substring(1, end - 1);
+            String property = path.substring(1, end);
             String suffix = path.substring(end);
             path = prefix + property + ".first()" + suffix;
         }

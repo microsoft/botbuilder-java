@@ -1,7 +1,5 @@
 package com.microsoft.bot.dialogs.memory.scopes;
 
-import javax.lang.model.util.ElementScanner6;
-
 import com.microsoft.bot.dialogs.DialogContainer;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.ScopePath;
@@ -14,7 +12,7 @@ public class DialogClassMemoryScope extends MemoryScope {
      * Initializes a new instance of the DialogClassMemoryScope class.
      */
     public DialogClassMemoryScope() {
-        super(ScopePath.DIALOG_CLASS, true);
+        super(ScopePath.DIALOG_CLASS, false);
     }
 
     /**

@@ -695,13 +695,12 @@ public final class ObjectPath {
 
         if (obj instanceof Map) {
             Map<String, Object> dict = (Map<String, Object>) obj;
-            List<Object> matches = dict.keySet().stream()
-                .filter(key -> key.equalsIgnoreCase(property))
-                .map(dict::get)
+            List<Entry<String, Object>> matches = dict.entrySet().stream()
+                .filter(key -> key.getKey().equalsIgnoreCase(property))
                 .collect(Collectors.toList());
 
             if (matches.size() > 0) {
-                return matches.get(0);
+                return matches.get(0).getValue();
             }
 
             return null;
@@ -778,13 +777,19 @@ public final class ObjectPath {
         // Map
         String property = (String) segment;
         if (obj instanceof Map) {
+            Boolean wasSet = false;
             Map<String, Object> dict = (Map<String, Object>) obj;
             for (String key : dict.keySet()) {
                 if (key.equalsIgnoreCase(property)) {
+                    wasSet = true;
                     dict.put(key, normalizedValue);
                     break;
                 }
             }
+            if (!wasSet) {
+                dict.put(property, normalizedValue);
+            }
+
             return;
         }
 

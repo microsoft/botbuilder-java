@@ -15,7 +15,7 @@ public class SettingsMemoryScope extends MemoryScope {
      * Initializes a new instance of the TurnMemoryScope class.
      */
     public SettingsMemoryScope() {
-        super(ScopePath.SETTINGS, true);
+        super(ScopePath.SETTINGS, false);
     }
 
     /**
