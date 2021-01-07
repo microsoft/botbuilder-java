@@ -15,7 +15,7 @@ import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
-import com.microsoft.bot.rest.serializer.JacksonAdapter;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;

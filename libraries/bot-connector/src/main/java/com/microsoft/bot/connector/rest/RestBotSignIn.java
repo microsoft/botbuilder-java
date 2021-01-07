@@ -8,7 +8,7 @@ package com.microsoft.bot.connector.rest;
 
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.BotSignIn;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.restclient.ServiceResponse;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
