@@ -4,7 +4,7 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.msal4j.IAuthenticationResult;
-import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;

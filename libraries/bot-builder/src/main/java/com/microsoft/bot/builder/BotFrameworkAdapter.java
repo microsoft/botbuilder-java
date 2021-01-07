@@ -41,7 +41,7 @@ import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.TokenExchangeState;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
-import com.microsoft.bot.rest.retry.RetryStrategy;
+import com.microsoft.bot.restclient.retry.RetryStrategy;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 

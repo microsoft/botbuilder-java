@@ -6,16 +6,16 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.bot.azure.AzureResponseBuilder;
-import com.microsoft.bot.azure.AzureServiceClient;
-import com.microsoft.bot.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
 import com.microsoft.bot.connector.UserAgent;
-import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
-import com.microsoft.bot.rest.RestClient;
-import com.microsoft.bot.rest.retry.RetryStrategy;
+import com.microsoft.bot.restclient.ServiceClient;
+import com.microsoft.bot.restclient.ServiceResponseBuilder;
+import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
+import com.microsoft.bot.restclient.RestClient;
+import com.microsoft.bot.restclient.retry.RetryStrategy;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -35,7 +35,7 @@ import retrofit2.Retrofit;
  * accomplished with JWT Bearer tokens, and is described in detail in the
  * [Connector Authentication](/en-us/restapi/authentication) document.
  */
-public class RestConnectorClient extends AzureServiceClient implements ConnectorClient {
+public class RestConnectorClient extends ServiceClient implements ConnectorClient {
     private static final int RETRY_TIMEOUT = 30;
 
     /**
@@ -281,8 +281,8 @@ public class RestConnectorClient extends AzureServiceClient implements Connector
         return new RestClient.Builder(new OkHttpClient.Builder(), new Retrofit.Builder())
             .withBaseUrl(baseUrl)
             .withCredentials(credentials)
-            .withSerializerAdapter(new AzureJacksonAdapter())
-            .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
+            .withSerializerAdapter(new JacksonAdapter())
+            .withResponseBuilderFactory(new ServiceResponseBuilder.Factory());
     }
 
     /**

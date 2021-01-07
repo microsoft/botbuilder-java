@@ -8,7 +8,7 @@ package com.microsoft.bot.connector.rest;
 
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.connector.teams.TeamsOperations;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.restclient.ServiceResponse;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;

@@ -210,7 +210,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param activityId     activityId to delete
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if
+     * @return the {@link com.microsoft.bot.restclient.ServiceResponse} object if
      *         successful.
      */
     CompletableFuture<Void> deleteActivity(String conversationId, String activityId);
@@ -244,7 +244,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param memberId       ID of the member to delete from this conversation
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if
+     * @return the {@link com.microsoft.bot.restclient.ServiceResponse} object if
      *         successful.
      */
     CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId);

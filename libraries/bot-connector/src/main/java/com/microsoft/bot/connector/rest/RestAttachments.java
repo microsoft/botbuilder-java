@@ -10,7 +10,7 @@ import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Attachments;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.schema.AttachmentInfo;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.restclient.ServiceResponse;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;

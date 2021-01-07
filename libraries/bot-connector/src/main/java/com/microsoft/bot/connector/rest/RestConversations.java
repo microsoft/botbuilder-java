@@ -6,7 +6,7 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.bot.azure.AzureResponseBuilder;
+import com.microsoft.bot.restclient.ServiceResponseBuilder;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.AttachmentData;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -19,8 +19,8 @@ import com.microsoft.bot.schema.Transcript;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Conversations;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.bot.rest.ServiceResponse;
-import com.microsoft.bot.rest.Validator;
+import com.microsoft.bot.restclient.ServiceResponse;
+import com.microsoft.bot.restclient.Validator;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -607,7 +607,7 @@ public class RestConversations implements Conversations {
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return ((AzureResponseBuilder<ChannelAccount, ErrorResponseException>) client.restClient()
+        return ((ServiceResponseBuilder<ChannelAccount, ErrorResponseException>) client.restClient()
             .responseBuilderFactory()
             .<ChannelAccount, ErrorResponseException>newInstance(client.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ChannelAccount>() {

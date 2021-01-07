@@ -1,7 +1,7 @@
 package com.microsoft.bot.connector.teams;
 
-import com.microsoft.bot.rest.RestClient;
-import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.restclient.RestClient;
+import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
 
 /**
  * Teams operations.
