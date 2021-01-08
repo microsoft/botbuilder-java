@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Strings;
 import com.microsoft.bot.builder.Middleware;
 import com.microsoft.bot.builder.NextDelegate;
 import com.microsoft.bot.builder.StatePropertyAccessor;
@@ -54,7 +56,7 @@ public class TranslationMiddleware implements Middleware  {
         return this.shouldTranslate(turnContext).thenCompose(translate -> {
             if (translate) {
                 if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
-                    return this.translator.translate(turnContext.getActivity().getText(), TranslationSettings.getDefaultLanguage()).thenApply(text -> {
+                    return this.translator.translate(turnContext.getActivity().getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
                         turnContext.getActivity().setText(text);
                     });
                 }
@@ -63,8 +65,8 @@ public class TranslationMiddleware implements Middleware  {
             }
         }).thenCompose(task -> {
             turnContext.onSendActivities((newContext, activities, nextSend) -> {
-                return this.languageStateProperty.get(turnContext, () -> TranslationSettings.getDefaultLanguage()).thenCompose(userLanguage -> {
-                    Boolean shouldTranslate = !userLanguage.equals(TranslationSettings.getDefaultLanguage());
+                return this.languageStateProperty.get(turnContext, () -> TranslationSettings.DEFAULT_LANGUAGE).thenCompose(userLanguage -> {
+                    Boolean shouldTranslate = !userLanguage.equals(TranslationSettings.DEFAULT_LANGUAGE);
 
                     // Translate messages sent to the user to user language
                     if (shouldTranslate) {
@@ -76,17 +78,15 @@ public class TranslationMiddleware implements Middleware  {
                         if (Arrays.asList(tasks).isEmpty()) {
                             CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()]));
                         }
-
-                        return nextSend.get();
                     }
 
-                    return CompletableFuture.completedFuture(null);
+                    return nextSend.get();
                 });
             });
 
             turnContext.onUpdateActivity((newContext, activity, nextUpdate) -> {
-                return this.languageStateProperty.get(turnContext, () -> TranslationSettings.getDefaultLanguage()).thenCompose(userLanguage -> {
-                    Boolean shouldTranslate = !userLanguage.equals(TranslationSettings.getDefaultLanguage());
+                return this.languageStateProperty.get(turnContext, () -> TranslationSettings.DEFAULT_LANGUAGE).thenCompose(userLanguage -> {
+                    Boolean shouldTranslate = !userLanguage.equals(TranslationSettings.DEFAULT_LANGUAGE);
 
                     // Translate messages sent to the user to user language
                     if (activity.getType() == ActivityTypes.MESSAGE) {
@@ -105,18 +105,18 @@ public class TranslationMiddleware implements Middleware  {
 
     private CompletableFuture<Void> translateMessageActivity(Activity activity, String targetLocale) {
         if (activity.getType() == ActivityTypes.MESSAGE) {
-            return this.translator.translate(activity.getText(), TranslationSettings.getDefaultLanguage()).thenApply(text -> {
+            return this.translator.translate(activity.getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
                 activity.setText(text);
             });
         }
     }
 
     private CompletableFuture<Boolean> shouldTranslate(TurnContext turnContext) {
-        return this.languageStateProperty.get(turnContext, () -> TranslationSettings.getDefaultLanguage()).thenApply(userLanguage -> {
-            if (userLanguage == null) {
-                userLanguage = TranslationSettings.getDefaultLanguage();
+        return this.languageStateProperty.get(turnContext, () -> TranslationSettings.DEFAULT_LANGUAGE).thenApply(userLanguage -> {
+            if (Strings.isNullOrEmpty(userLanguage)) {
+                userLanguage = TranslationSettings.DEFAULT_LANGUAGE;
             }
-            return !userLanguage.equals(TranslationSettings.getDefaultLanguage());
+            return !userLanguage.equals(TranslationSettings.DEFAULT_LANGUAGE);
         });
     }
 }

@@ -18,6 +18,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,6 @@ public class MicrosoftTranslator {
     private static final String PATH = "/translate?api-version=3.0";
     private static final String URI_PARAMS = "&to=";
 
-    private static OkHttpClient httpClient = new OkHttpClient();
-
     private static String key;
 
     /**
@@ -39,7 +38,7 @@ public class MicrosoftTranslator {
     public MicrosoftTranslator(Configuration configuration) {
         String translatorKey = configuration.getProperty("TranslatorKey");
 
-        if (translatorKey == null) {
+        if (Strings.isNullOrEmpty(translatorKey)) {
             throw new IllegalArgumentException("key");
         }
 
@@ -65,6 +64,7 @@ public class MicrosoftTranslator {
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), body);
 
+            OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                 .url(uri)
                 .header("Ocp-Apim-Subscription-Key", MicrosoftTranslator.key)
@@ -72,7 +72,7 @@ public class MicrosoftTranslator {
                 .build();
 
             try {
-                Response response = MicrosoftTranslator.httpClient.newCall(request).execute();
+                Response response = client.newCall(request).execute();
 
                 if (!response.isSuccessful()) {
                     String message = new StringBuilder("The call to the translation service returned HTTP status code ")

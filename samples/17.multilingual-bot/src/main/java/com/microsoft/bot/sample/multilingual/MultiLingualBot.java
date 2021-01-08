@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
 package com.microsoft.bot.sample.multilingual;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.StatePropertyAccessor;
@@ -47,11 +49,10 @@ public class MultiLingualBot extends ActivityHandler {
      * @param withUserState User state object.
      */
     public MultiLingualBot(UserState withUserState) {
-        if (withUserState != null) {
-            this.userState = withUserState;
-        } else {
+        if (withUserState == null) {
             throw new IllegalArgumentException("userState");
         }
+        this.userState = withUserState;
 
         this.languagePreference = userState.createProperty("LanguagePreference");
     }
@@ -59,14 +60,14 @@ public class MultiLingualBot extends ActivityHandler {
     /**
      * This method is executed when a user is joining to the conversation.
      * @param membersAdded A list of all the members added to the conversation,
-     *                     as described by the conversation update activity.
+     * as described by the conversation update activity.
      * @param turnContext The context object for this turn.
      * @return A task that represents the work queued to execute.
      */
     @Override
     protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded,
                                                      TurnContext turnContext) {
-        return this.sendWelcomeMessage(turnContext);
+        return MultiLingualBot.sendWelcomeMessage(turnContext);
     }
 
     /**
@@ -172,7 +173,7 @@ public class MultiLingualBot extends ActivityHandler {
      * @return the utterance.
      */
     private static Boolean isLanguageChangeRequested(String utterance) {
-        if (utterance == null || utterance.isEmpty()) {
+        if (Strings.isNullOrEmpty(utterance)) {
             return false;
         }
 

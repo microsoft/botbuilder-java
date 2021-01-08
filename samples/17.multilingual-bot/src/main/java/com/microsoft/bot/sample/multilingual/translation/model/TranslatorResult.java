@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TranslatorResult {
     @JsonProperty("text")
     private String text;
+
     @JsonProperty("to")
     private String to;
 
@@ -24,10 +25,10 @@ public class TranslatorResult {
 
     /**
      * Sets the translation result text.
-     * @param resultText Translation result.
+     * @param withText Translation result.
      */
-    public void setText(String resultText) {
-        this.text = resultText;
+    public void setText(String withText) {
+        this.text = withText;
     }
 
     /**
@@ -40,9 +41,9 @@ public class TranslatorResult {
 
     /**
      * Sets the target language locale.
-     * @param locale Target locale.
+     * @param withTo Target locale.
      */
-    public void setTo(String locale) {
-        this.to = locale;
+    public void setTo(String withTo) {
+        this.to = withTo;
     }
 }
