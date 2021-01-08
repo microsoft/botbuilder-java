@@ -56,7 +56,10 @@ public class TranslationMiddleware implements Middleware  {
         return this.shouldTranslate(turnContext).thenCompose(translate -> {
             if (translate) {
                 if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
-                    return this.translator.translate(turnContext.getActivity().getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
+                    return this.translator.translate(
+                        turnContext.getActivity().getText(),
+                        TranslationSettings.DEFAULT_LANGUAGE)
+                    .thenApply(text -> {
                         turnContext.getActivity().setText(text);
                     });
                 }

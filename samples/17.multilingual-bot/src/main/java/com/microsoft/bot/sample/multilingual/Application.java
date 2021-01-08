@@ -11,6 +11,7 @@ import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
+import com.microsoft.bot.sample.multilingual.translation.MicrosoftTranslator;
 import com.microsoft.bot.sample.multilingual.translation.TranslationMiddleware;
 
 import org.springframework.boot.SpringApplication;
@@ -53,7 +54,7 @@ public class Application extends BotDependencyConfiguration {
         ConversationState conversationState = this.getConversationState(storage);
 
         BotFrameworkHttpAdapter adapter = new AdapterWithErrorHandler(configuration, conversationState);
-        TranslationMiddleware translationMiddleware = this.getTranslationMiddleware();
+        TranslationMiddleware translationMiddleware = this.getTranslationMiddleware(configuration);
         adapter.use(translationMiddleware);
         return adapter;
     }
@@ -73,10 +74,10 @@ public class Application extends BotDependencyConfiguration {
      * @return TranslationMiddleware
      */
     @Bean
-    public TranslationMiddleware getTranslationMiddleware() {
+    public TranslationMiddleware getTranslationMiddleware(Configuration configuration) {
         Storage storage = this.getStorage();
         UserState userState = this.getUserState(storage);
-        MicrosoftTranslator microsoftTranslator = this.getMicrosoftTranslator();
+        MicrosoftTranslator microsoftTranslator = this.getMicrosoftTranslator(configuration);
         return new TranslationMiddleware(microsoftTranslator, userState);
     }
 

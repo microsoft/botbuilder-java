@@ -4,7 +4,9 @@
 package com.microsoft.bot.sample.multilingual;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.common.base.Strings;
+
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.StatePropertyAccessor;
@@ -16,6 +18,7 @@ import com.microsoft.bot.schema.CardAction;
 import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.SuggestedActions;
 import com.microsoft.bot.schema.Attachment;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
