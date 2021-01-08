@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.proactive;
+package com.microsoft.bot.sample.multilingual;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.sample.multilingual;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.google.common.base.Strings;
 
@@ -15,19 +14,20 @@ import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.CardAction;
-import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.SuggestedActions;
+import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.Attachment;
+import com.microsoft.bot.schema.Serialization;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * This bot demonstrates how to use Microsoft Translator.
@@ -148,20 +148,19 @@ public class MultiLingualBot extends ActivityHandler {
      */
     private static Attachment createAdaptiveCardAttachment() {
         // combine path for cross platform support
-        try {
-            Path path = Paths.get(".", "cards", "welcomeCard.json");
-            BufferedReader reader = Files.newBufferedReader(path);
-            String adaptiveCard = reader.readLine();
-            ObjectMapper mapper = new ObjectMapper();
-            return new Attachment() {
-                {
-                    setContentType("application/vnd.microsoft.card.adaptive");
-                    setContent(mapper.readValue(adaptiveCard, String.class));
-                }
-            };
+        try (
+            InputStream input = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("cards/welcomeCard.json")
+        ) {
+            String adaptiveCardJson = IOUtils.toString(input, StandardCharsets.UTF_8.toString());
+
+            return new Attachment() {{
+                setContentType("application/vnd.microsoft.card.adaptive");
+                setContent(Serialization.jsonToTree(adaptiveCardJson));
+            }};
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return new Attachment();
         }
     }
 

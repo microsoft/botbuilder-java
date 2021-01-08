@@ -61,11 +61,11 @@ public class TranslationMiddleware implements Middleware  {
                         TranslationSettings.DEFAULT_LANGUAGE)
                     .thenApply(text -> {
                         turnContext.getActivity().setText(text);
+                        return CompletableFuture.completedFuture(null);
                     });
                 }
-
-                return CompletableFuture.completedFuture(null);
             }
+            return CompletableFuture.completedFuture(null);
         }).thenCompose(task -> {
             turnContext.onSendActivities((newContext, activities, nextSend) -> {
                 return this.languageStateProperty.get(turnContext, () -> TranslationSettings.DEFAULT_LANGUAGE).thenCompose(userLanguage -> {
@@ -102,16 +102,18 @@ public class TranslationMiddleware implements Middleware  {
                 });
             });
 
-            return CompletableFuture.completedFuture(null);
+            return next.next();
         });
     }
 
     private CompletableFuture<Void> translateMessageActivity(Activity activity, String targetLocale) {
         if (activity.getType() == ActivityTypes.MESSAGE) {
-            return this.translator.translate(activity.getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
+            this.translator.translate(activity.getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
                 activity.setText(text);
+                return CompletableFuture.completedFuture(null);
             });
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     private CompletableFuture<Boolean> shouldTranslate(TurnContext turnContext) {

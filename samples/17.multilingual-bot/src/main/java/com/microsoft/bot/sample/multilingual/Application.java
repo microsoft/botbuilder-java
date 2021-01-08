@@ -71,6 +71,7 @@ public class Application extends BotDependencyConfiguration {
 
     /**
      * Create the Translation Middleware that will be added to the middleware pipeline in the AdapterWithErrorHandler.
+     * @param configuration The Configuration object to use.
      * @return TranslationMiddleware
      */
     @Bean
