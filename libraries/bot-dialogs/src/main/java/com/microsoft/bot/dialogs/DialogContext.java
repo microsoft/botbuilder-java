@@ -103,11 +103,19 @@ public class DialogContext {
     }
 
     /**
-     * Gets or sets the parent DialogContext, if any. Used when searching for the ID of a dialog to start.
+     * Gets the parent DialogContext, if any. Used when searching for the ID of a dialog to start.
      * @return The parent "DialogContext, if any. Used when searching for the ID of a dialog to start.
      */
     public DialogContext getParent() {
         return parent;
+    }
+
+    /**
+     * Set the parent DialogContext.
+     * @param withDialogContext The DialogContext to set the parent to.
+     */
+    public void setParent(DialogContext withDialogContext) {
+        parent = withDialogContext;
     }
 
     /**

@@ -91,7 +91,7 @@ public class ChoiceFactoryOptions {
     private String inlineOrMore;
 
     @JsonProperty(value = "includeNumbers")
-    private boolean includeNumbers;
+    private Boolean includeNumbers;
 
     /**
      * Gets the character used to separate individual choices when there are more than 2 choices.
@@ -157,7 +157,7 @@ public class ChoiceFactoryOptions {
      *
      * @return If false, the list style will use a bulleted list.
      */
-    public boolean getIncludeNumbers() {
+    public Boolean getIncludeNumbers() {
         return includeNumbers;
     }
 
@@ -167,7 +167,7 @@ public class ChoiceFactoryOptions {
      *
      * @param withIncludeNumbers If false, the list style will use a bulleted list instead.
      */
-    public void setIncludeNumbers(boolean withIncludeNumbers) {
+    public void setIncludeNumbers(Boolean withIncludeNumbers) {
         this.includeNumbers = withIncludeNumbers;
     }
 }
