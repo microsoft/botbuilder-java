@@ -3,7 +3,7 @@
 
 package com.microsoft.bot.sample.multilingual;
 
-
+import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.google.common.base.Strings;
 
 import com.microsoft.bot.builder.ActivityHandler;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This bot demonstrates how to use Microsoft Translator.
@@ -128,18 +129,16 @@ public class MultiLingualBot extends ActivityHandler {
     }
 
     private static CompletableFuture<Void> sendWelcomeMessage(TurnContext turnContext) {
-        for (ChannelAccount member: turnContext.getActivity().getMembersAdded()) {
-            // Greet anyone that was not the target (recipient) of this message.
-            // To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
-            if (member.getId() != turnContext.getActivity().getRecipient().getId()) {
+        return turnContext.getActivity().getMembersAdded().stream()
+            .filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
+            .map(channel -> {
                 Attachment welcomeCard = MultiLingualBot.createAdaptiveCardAttachment();
                 Activity response = MessageFactory.attachment(welcomeCard);
                 return turnContext.sendActivity(response)
-                    .thenCompose(task -> turnContext.sendActivity(MessageFactory.text(WELCOME_TEXT))
-                    .thenApply(resourceResponse -> null));
-            }
-        }
-        return CompletableFuture.completedFuture(null);
+                    .thenCompose(task -> turnContext.sendActivity(MessageFactory.text(WELCOME_TEXT)));
+            })
+            .collect(CompletableFutures.toFutureList())
+            .thenApply(resourceResponse -> null);
     }
 
     /**
