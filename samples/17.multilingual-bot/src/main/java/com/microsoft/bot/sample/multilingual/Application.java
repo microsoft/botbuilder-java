@@ -81,15 +81,4 @@ public class Application extends BotDependencyConfiguration {
         MicrosoftTranslator microsoftTranslator = this.getMicrosoftTranslator(configuration);
         return new TranslationMiddleware(microsoftTranslator, userState);
     }
-
-    /**
-     * Create the multilingual bot.
-     * @return MultiLingualBot
-     */
-    @Bean
-    public MultiLingualBot getMultilingualBot() {
-        Storage storage = this.getStorage();
-        UserState userState = this.getUserState(storage);
-        return new MultiLingualBot(userState);
-    }
 }

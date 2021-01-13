@@ -4,11 +4,14 @@
 package com.microsoft.bot.sample.multilingual.translation.model;
 
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Array of translated results from Translator API v3.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TranslatorResponse {
     @JsonProperty("translations")
     private List<TranslatorResult> translations;

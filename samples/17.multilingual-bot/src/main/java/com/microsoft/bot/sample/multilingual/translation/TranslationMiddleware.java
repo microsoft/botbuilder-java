@@ -78,8 +78,8 @@ public class TranslationMiddleware implements Middleware  {
                             tasks.add(this.translateMessageActivity(activity, userLanguage));
                         }
 
-                        if (Arrays.asList(tasks).isEmpty()) {
-                            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()]));
+                        if (!Arrays.asList(tasks).isEmpty()) {
+                            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()])).join();
                         }
                     }
 
@@ -108,9 +108,8 @@ public class TranslationMiddleware implements Middleware  {
 
     private CompletableFuture<Void> translateMessageActivity(Activity activity, String targetLocale) {
         if (activity.getType() == ActivityTypes.MESSAGE) {
-            this.translator.translate(activity.getText(), TranslationSettings.DEFAULT_LANGUAGE).thenApply(text -> {
+            return this.translator.translate(activity.getText(), targetLocale).thenAccept(text -> {
                 activity.setText(text);
-                return CompletableFuture.completedFuture(null);
             });
         }
         return CompletableFuture.completedFuture(null);

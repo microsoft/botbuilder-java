@@ -38,7 +38,7 @@ public class MicrosoftTranslator {
     public MicrosoftTranslator(Configuration configuration) {
         String translatorKey = configuration.getProperty("TranslatorKey");
 
-        if (Strings.isNullOrEmpty(translatorKey)) {
+        if (translatorKey == null) {
             throw new IllegalArgumentException("key");
         }
 
