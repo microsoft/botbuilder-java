@@ -10,6 +10,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.Verification;
 import com.microsoft.bot.connector.ExecutorFactory;
 import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
@@ -156,12 +157,8 @@ public class JwtTokenExtractor {
                     && key.certificateChain != null
                     && key.certificateChain.size() > 0
                 ) {
-                    // Note that decodeCertificate will return null if the cert could not
-                    // be decoded.  This would likely be the case if it were in an unexpected
-                    // encoding.  Going to err on the side of ignoring this check.
-                    // May want to reconsider this and throw on null cert.
                     X509Certificate cert = decodeCertificate(key.certificateChain.get(0));
-                    if (cert != null && !isCertValid(cert)) {
+                    if (!isCertValid(cert)) {
                         throw new JWTVerificationException("Signing certificate is not valid");
                     }
                 }
@@ -209,24 +206,24 @@ public class JwtTokenExtractor {
                 }
 
                 return new ClaimsIdentity(decodedJWT);
-            } catch (JWTVerificationException ex) {
+            } catch (JWTVerificationException | CertificateException ex) {
                 LOGGER.warn(ex.getMessage());
                 throw new AuthenticationException(ex);
             }
         }, ExecutorFactory.getExecutor());
     }
 
-    private X509Certificate decodeCertificate(String certStr) {
-        try {
-            byte[] decoded = Base64.getDecoder().decode(certStr);
-            return (X509Certificate) CertificateFactory
-                .getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
-        } catch (Throwable t) {
-            return null;
-        }
+    private X509Certificate decodeCertificate(String certStr) throws CertificateException {
+        byte[] decoded = Base64.getDecoder().decode(certStr);
+        return (X509Certificate) CertificateFactory
+            .getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
     }
 
     private boolean isCertValid(X509Certificate cert) {
+        if (cert == null) {
+            return false;
+        }
+
         long now = new Date().getTime();
         long clockskew = tokenValidationParameters.clockSkew.toMillis();
         long startValid = cert.getNotBefore().getTime() - clockskew;
