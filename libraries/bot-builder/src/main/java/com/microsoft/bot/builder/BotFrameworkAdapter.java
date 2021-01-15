@@ -286,10 +286,6 @@ public class BotFrameworkAdapter extends BotAdapter
         ConversationReference reference,
         BotCallbackHandler callback
     ) {
-        if (StringUtils.isEmpty(botAppId)) {
-            throw new IllegalArgumentException("botAppId");
-        }
-
         if (reference == null) {
             throw new IllegalArgumentException("reference");
         }
@@ -298,14 +294,14 @@ public class BotFrameworkAdapter extends BotAdapter
             throw new IllegalArgumentException("callback");
         }
 
+        botAppId = botAppId == null ? "" : botAppId;
+
         // Hand craft Claims Identity.
-        HashMap<String, String> claims = new HashMap<String, String>() {
-            {
-                // Adding claims for both Emulator and Channel.
-                put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
-                put(AuthenticationConstants.APPID_CLAIM, botAppId);
-            }
-        };
+        // Adding claims for both Emulator and Channel.
+        HashMap<String, String> claims = new HashMap<String, String>();
+        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+        claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
+
         ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
 
         String audience = getBotFrameworkOAuthScope();
@@ -382,12 +378,22 @@ public class BotFrameworkAdapter extends BotAdapter
             context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
             context.getTurnState().add(OAUTH_SCOPE_KEY, audience);
 
-            pipelineResult = createConnectorClient(
-                reference.getServiceUrl(), claimsIdentity, audience
-            ).thenCompose(connectorClient -> {
-                context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-                return runPipeline(context, callback);
-            });
+            String appIdFromClaims = JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims());
+            return credentialProvider.isValidAppId(appIdFromClaims)
+                .thenCompose(isValidAppId -> {
+                    // If we receive a valid app id in the incoming token claims, add the
+                    // channel service URL to the trusted services list so we can send messages back.
+                    if (!StringUtils.isEmpty(appIdFromClaims) && isValidAppId) {
+                        AppCredentials.trustServiceUrl(reference.getServiceUrl());
+                    }
+
+                    return createConnectorClient(
+                        reference.getServiceUrl(), claimsIdentity, audience
+                    ).thenCompose(connectorClient -> {
+                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
+                        return runPipeline(context, callback);
+                    });
+                });
         } catch (Exception e) {
             pipelineResult.completeExceptionally(e);
         }
