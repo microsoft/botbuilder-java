@@ -2,8 +2,12 @@ package com.microsoft.bot.dialogs.prompts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
 import com.microsoft.bot.builder.AutoSaveStateMiddleware;
@@ -20,6 +24,8 @@ import com.microsoft.bot.dialogs.DialogTurnResult;
 import com.microsoft.bot.dialogs.DialogTurnStatus;
 import com.microsoft.bot.dialogs.TestLocale;
 import com.microsoft.bot.dialogs.choices.Choice;
+import com.microsoft.bot.dialogs.choices.ChoiceFactory;
+import com.microsoft.bot.dialogs.choices.ChoiceFactoryOptions;
 import com.microsoft.bot.dialogs.choices.FoundChoice;
 import com.microsoft.bot.dialogs.choices.ListStyle;
 import com.microsoft.bot.schema.ActionTypes;
@@ -40,42 +46,6 @@ import org.junit.Test;
 public class ChoicePromptTests {
     private static List<Choice> colorChoices = Arrays.asList(new Choice("red"), new Choice("green"),
             new Choice("blue"));
-
-    /**
-     * Generates an Enumerable of variations on all supported locales.
-     *
-     * @return An iterable collection of Objects.
-     */
-    public static List<Object[]> getLocaleVariationTest() {
-        TestLocale[] testLocales = new TestLocale[13];
-        testLocales[0] = new TestLocale(PromptCultureModels.BULGARIAN, null, null, null);
-        testLocales[1] = new TestLocale(PromptCultureModels.CHINESE, null, null, null);
-        testLocales[2] = new TestLocale(PromptCultureModels.DUTCH, null, null, null);
-        testLocales[3] = new TestLocale(PromptCultureModels.ENGLISH, null, null, null);
-        testLocales[4] = new TestLocale(PromptCultureModels.FRENCH, null, null, null);
-        testLocales[5] = new TestLocale(PromptCultureModels.HINDI, null, null, null);
-        testLocales[6] = new TestLocale(PromptCultureModels.ITALIAN, null, null, null);
-        testLocales[7] = new TestLocale(PromptCultureModels.JAPANESE, null, null, null);
-        testLocales[8] = new TestLocale(PromptCultureModels.KOREAN, null, null, null);
-        testLocales[9] = new TestLocale(PromptCultureModels.PORTUGUESE, null, null, null);
-        testLocales[10] = new TestLocale(PromptCultureModels.SPANISH, null, null, null);
-        testLocales[11] = new TestLocale(PromptCultureModels.SWEDISH, null, null, null);
-        testLocales[12] = new TestLocale(PromptCultureModels.TURKISH, null, null, null);
-
-        List<Object[]> resultList = new ArrayList<Object[]>();
-        for (TestLocale testLocale : testLocales) {
-            resultList.add(new Object[] { testLocale.getValidLocale(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-        }
-
-        return resultList;
-    }
 
     @Test
     public void ChoicePromptWithEmptyIdShouldFail() {
@@ -530,292 +500,407 @@ public class ChoicePromptTests {
         .join();
     }
 
-    // @Test
-    // public void ShouldNotRecognizeOtherText() {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    // This is being left out for now due to it failing due to an issue in the Text Recognizers library.
+    // It should be worked out in the recognizers and then this test should be enabled again.
+    //@Test
+    public void ShouldNotRecognizeOtherText() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
 
-    //     var dialogs = new DialogSet(dialogState);
-    //     var listPrompt = new ChoicePrompt("ChoicePrompt", defaultLocale: Culture.English) {
-    //         Style = ListStyle.None,
-    //     };
-    //     dialogs.Add(listPrompt);
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        // Create and add custom activity prompt to DialogSet.
+        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", null, Culture.English);
+        listPrompt.setStyle(ListStyle.NONE);
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+        dialogs.add(listPrompt);
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt(
-    //                     "ChoicePrompt",
-    //                     new PromptOptions {
-    //                         Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?" },
-    //                         RetryPrompt = new Activity { Type = ActivityTypes.Message, Text = "your favorite color, please?" },
-    //                         Choices = _colorChoices,
-    //                     },
-    //                     cancellationToken);
-    //             }
-    //         })
-    //         .send("hello")
-    //         .assertReply(StartsWithValidator("favorite color?"))
-    //         .send("what was that?")
-    //         .assertReply("your favorite color, please?")
-    //         .startTest();
-    // }
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                Activity retryActivity = new Activity(ActivityTypes.MESSAGE);
+                retryActivity.setText("your favorite color, please?");
+                options.setRetryPrompt(retryActivity);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+        })
+        .send("hello")
+        .assertReply(new Validators().validedStartsWith("favorite color?"))
+        .send("what was that?")
+        .assertReply("your favorite color, please?")
+        .startTest()
+        .join();
+    }
 
-    // @Test
-    // public void ShouldCallCustomValidator() {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void ShouldCallCustomValidator() {
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    //     var dialogs = new DialogSet(dialogState);
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
 
-    //     PromptValidator<FoundChoice> validator =  (promptContext) -> {
-    //          promptContext.Context.SendActivity(MessageFactory.Text("validator called"));
-    //         return true;
-    //     };
-    //     var listPrompt = new ChoicePrompt("ChoicePrompt", validator, Culture.English) {
-    //         Style = ListStyle.None,
-    //     };
-    //     dialogs.Add(listPrompt);
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+        PromptValidator<FoundChoice> validator =  (promptContext) -> {
+            promptContext.getContext().sendActivity(MessageFactory.text("validator called"));
+           return CompletableFuture.completedFuture(true);
+       };
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt(
-    //                     "ChoicePrompt",
-    //                     new PromptOptions {
-    //                         Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?" },
-    //                         Choices = _colorChoices,
-    //                     },
-    //                     cancellationToken);
-    //             }
-    //         })
-    //         .send("hello")
-    //         .assertReply(StartsWithValidator("favorite color?"))
-    //         .send("I'll take the red please.")
-    //         .assertReply("validator called")
-    //         .startTest();
-    // }
+        // Create and add custom activity prompt to DialogSet.
+        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", validator, Culture.English);
+        listPrompt.setStyle(ListStyle.NONE);
 
-    // @Test
-    // public void ShouldUseChoiceStyleIfPresent() {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        dialogs.add(listPrompt);
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
 
-    //     var dialogs = new DialogSet(dialogState);
-    //     dialogs.Add(new ChoicePrompt("ChoicePrompt", defaultLocale: Culture.English) { Style = ListStyle.HeroCard });
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+            })
+            .send("hello")
+            .assertReply(new Validators().validedStartsWith("favorite color?"))
+            .send("I'll take the red please.")
+            .assertReply("validator called")
+            .startTest()
+            .join();
+    }
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+    @Test
+    public void ShouldUseChoiceStyleIfPresent() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt(
-    //                     "ChoicePrompt",
-    //                     new PromptOptions {
-    //                         Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?" },
-    //                         Choices = _colorChoices,
-    //                         Style = ListStyle.SuggestedAction,
-    //                     },
-    //                     cancellationToken);
-    //             }
-    //         })
-    //         .send("hello")
-    //         .assertReply(SuggestedActionsValidator(
-    //             "favorite color?",
-    //             new SuggestedActions {
-    //                 Actions new ArrayList<CardAction> {
-    //                     new CardAction { Type = "imBack", Value = "red", Title = "red" },
-    //                     new CardAction { Type = "imBack", Value = "green", Title = "green" },
-    //                     new CardAction { Type = "imBack", Value = "blue", Title = "blue" },
-    //                 },
-    //             }))
-    //         .startTest();
-    // }
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
 
-    // public void ShouldRecognizeLocaleVariationsOfCorrectLocales(String testCulture, String inlineOr, String inlineOrMore, String separator) {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        // Create and add custom activity prompt to DialogSet.
+        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", null, Culture.English);
+        listPrompt.setStyle(ListStyle.HEROCARD);
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+        dialogs.add(listPrompt);
 
-    //     // Create new DialogSet.
-    //     var dialogs = new DialogSet(dialogState);
-    //     dialogs.Add(new ChoicePrompt("ChoicePrompt", defaultLocale: testCulture));
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
 
-    //     var helloLocale = MessageFactory.Text("hello");
-    //     helloLocale.Locale = testCulture;
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                options.setStyle(ListStyle.SUGGESTED_ACTION);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+        })
+        .send("hello")
+        .assertReply(new Validators().validateSuggestedActions("favorite color?", new SuggestedActions(new
+        CardAction[]
+        {
+            new CardAction() {
+                {
+                    setType(ActionTypes.IM_BACK);
+                    setValue("red");
+                    setTitle("red");
+                }
+            },
+            new CardAction() {
+                {
+                    setType(ActionTypes.IM_BACK);
+                    setValue("green");
+                    setTitle("green");
+                }
+            },
+            new CardAction() {
+                {
+                    setType(ActionTypes.IM_BACK);
+                    setValue("blue");
+                    setTitle("blue");
+                }
+            }
+        })))
+        .startTest()
+        .join();
+    }
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //         var dc =  dialogs.CreateContext(turnContext);
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_English() {
+        PromptCultureModel  cultureModel = PromptCultureModels.ENGLISH;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //         var results =  dc.ContinueDialog(cancellationToken);
-    //         if (results.Status == DialogTurnStatus.Empty) {
-    //              dc.Prompt(
-    //                 "ChoicePrompt",
-    //                 new PromptOptions {
-    //                     Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?", Locale = testCulture },
-    //                     Choices = _colorChoices,
-    //                 },
-    //                 cancellationToken);
-    //         }
-    //     })
-    //         .send(helloLocale)
-    //         .assertReply((activity) -> {
-    //             // Use ChoiceFactory to build the expected answer, manually
-    //             var expectedChoices = ChoiceFactory.Inline(_colorChoices, null, null, new ChoiceFactoryOptions() {
-    //                 InlineOr = inlineOr,
-    //                 InlineOrMore = inlineOrMore,
-    //                 InlineSeparator = separator,
-    //             }).Text;
-    //             Assert.Equal($"favorite color?{expectedChoices}", activity.AsMessageActivity().Text);
-    //         })
-    //         .startTest();
-    // }
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Spanish() {
+        PromptCultureModel  cultureModel = PromptCultureModels.SPANISH;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    // public void ShouldDefaultToEnglishLocale(String activityLocale) {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Chinese() {
+        PromptCultureModel  cultureModel = PromptCultureModels.CHINESE;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Hindi() {
+        PromptCultureModel  cultureModel = PromptCultureModels.HINDI;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //     // Create new DialogSet.
-    //     var dialogs = new DialogSet(dialogState);
-    //     dialogs.Add(new ChoicePrompt("ChoicePrompt", defaultLocale: activityLocale));
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Italian() {
+        PromptCultureModel  cultureModel = PromptCultureModels.ITALIAN;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //     var helloLocale = MessageFactory.Text("hello");
-    //     helloLocale.Locale = activityLocale;
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Japanese() {
+        PromptCultureModel  cultureModel = PromptCultureModels.JAPANESE;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //         var dc =  dialogs.CreateContext(turnContext);
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Korean() {
+        PromptCultureModel  cultureModel = PromptCultureModels.KOREAN;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //         var results =  dc.ContinueDialog(cancellationToken);
-    //         if (results.Status == DialogTurnStatus.Empty) {
-    //              dc.Prompt(
-    //                 "ChoicePrompt",
-    //                 new PromptOptions {
-    //                     Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?", Locale = activityLocale },
-    //                     Choices = _colorChoices,
-    //                 },
-    //                 cancellationToken);
-    //         }
-    //     })
-    //         .send(helloLocale)
-    //         .assertReply((activity) -> {
-    //             // Use ChoiceFactory to build the expected answer, manually
-    //             var expectedChoices = ChoiceFactory.Inline(_colorChoices, null, null, new ChoiceFactoryOptions() {
-    //                 InlineOr = English.InlineOr,
-    //                 InlineOrMore = English.InlineOrMore,
-    //                 InlineSeparator = English.Separator,
-    //             }).Text;
-    //             Assert.Equal($"favorite color?{expectedChoices}", activity.AsMessageActivity().Text);
-    //         })
-    //         .startTest();
-    // }
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Portuguese() {
+        PromptCultureModel  cultureModel = PromptCultureModels.PORTUGUESE;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    // @Test
-    // public void ShouldAcceptAndRecognizeCustomLocaleDict() {
-    //     var convoState = new ConversationState(new MemoryStorage());
-    //     var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Swedish() {
+        PromptCultureModel  cultureModel = PromptCultureModels.SWEDISH;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //     var adapter = new TestAdapter()
-    //         .Use(new AutoSaveStateMiddleware(convoState));
+    @Test
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Turkish() {
+        PromptCultureModel  cultureModel = PromptCultureModels.TURKISH;
+        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
+        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
+        cultureModel.getSeparator());
+    }
 
-    //     // Create new DialogSet.
-    //     var dialogs = new DialogSet(dialogState);
+    public void ShouldRecognizeLocaleVariationsOfCorrectLocales(String testCulture, String inlineOr,
+                                                                String inlineOrMore, String separator) {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    //     var culture = new PromptCultureModel() {
-    //         InlineOr = " customOr ",
-    //         InlineOrMore = " customOrMore ",
-    //         Locale = "custom-custom",
-    //         Separator = "customSeparator",
-    //         NoInLanguage = "customNo",
-    //         YesInLanguage = "customYes",
-    //     };
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
 
-    //     var customDict = new Dictionary<String, ChoiceFactoryOptions>() {
-    //         { culture.Locale, new ChoiceFactoryOptions(culture.Separator, culture.InlineOr, culture.InlineOrMore, true) },
-    //     };
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        // Create and add custom activity prompt to DialogSet.
+        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", null, testCulture);
 
-    //     dialogs.Add(new ChoicePrompt("ChoicePrompt", customDict, null, culture.Locale));
+        dialogs.add(listPrompt);
 
-    //     var helloLocale = MessageFactory.Text("hello");
-    //     helloLocale.Locale = culture.Locale;
+        Activity helloLocale = MessageFactory.text("hello");
+        helloLocale.setLocale(testCulture);
 
-    //      new TestFlow(adapter,  (turnContext) -> {
-    //         var dc =  dialogs.CreateContext(turnContext);
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
 
-    //         var results =  dc.ContinueDialog(cancellationToken);
-    //         if (results.Status == DialogTurnStatus.Empty) {
-    //              dc.Prompt(
-    //                 "ChoicePrompt",
-    //                 new PromptOptions {
-    //                     Prompt = new Activity { Type = ActivityTypes.Message, Text = "favorite color?", Locale = culture.Locale },
-    //                     Choices = _colorChoices,
-    //                 },
-    //                 cancellationToken);
-    //         }
-    //     })
-    //         .send(helloLocale)
-    //         .assertReply((activity) -> {
-    //             // Use ChoiceFactory to build the expected answer, manually
-    //             var expectedChoices = ChoiceFactory.Inline(_colorChoices, null, null, new ChoiceFactoryOptions() {
-    //                 InlineOr = culture.InlineOr,
-    //                 InlineOrMore = culture.InlineOrMore,
-    //                 InlineSeparator = culture.Separator,
-    //             }).Text;
-    //             Assert.Equal($"favorite color?{expectedChoices}", activity.AsMessageActivity().Text);
-    //         })
-    //         .startTest();
-    // }
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+        })
+        .send(helloLocale)
+        .assertReply((activity) -> {
+            // Use ChoiceFactory to build the expected answer, manually
+            ChoiceFactoryOptions testChoiceOption = new ChoiceFactoryOptions();
+            testChoiceOption.setInlineOr(inlineOr);
+            testChoiceOption.setInlineOrMore(inlineOrMore);
+            testChoiceOption.setInlineSeparator(separator);
 
-    /*
-     * @Test public void ShouldHandleAnUndefinedRequest() { var convoState = new
-     * ConversationState(new MemoryStorage()); var testProperty =
-     * convoState.CreateProperty<Dictionary<String, Object>>("test");
-     *
-     * var adapter = new TestAdapter() .Use(convoState);
-     *
-     * PromptValidator<FoundChoice> validator = (context, promptContext) -> {
-     * Assert.IsTrue(false); return CompletableFuture.completedFuture(null); };
-     *
-     * new TestFlow(adapter, (turnContext) -> { var state =
-     * testProperty.Get(turnContext, () -> new Dictionary<String, Object>()); var
-     * prompt = new ChoicePrompt(Culture.English, validator); prompt.Style =
-     * ListStyle.None;
-     *
-     * var dialogCompletion = prompt.ContinueDialog(turnContext, state); if
-     * (!dialogCompletion.IsActive && !dialogCompletion.IsCompleted) {
-     * prompt.Begin(turnContext, state, new ChoicePromptOptions { PromptString =
-     * "favorite color?", Choices = ChoiceFactory.ToChoices(colorChoices) }); } else
-     * if (dialogCompletion.IsActive && !dialogCompletion.IsCompleted) { if
-     * (dialogCompletion.Result == null) {
-     * turnContext.SendActivity("NotRecognized"); } } }) .send("hello")
-     * .assertReply(StartsWithValidator("favorite color?"))
-     * .send("value shouldn't have been recognized.") .assertReply("NotRecognized")
-     * .startTest(); }
-     */
+            String expectedChoices = ChoiceFactory.inline(colorChoices, null, null, testChoiceOption).getText();
+            Assert.assertEquals(String.format("favorite color?%s", expectedChoices), activity.getText());
+        })
+        .startTest()
+        .join();
+    }
+
+    @Test
+    public void ShouldDefaultToEnglishLocaleNull() {
+        PerformShouldDefaultToEnglishLocale(null);
+    }
+
+    @Test
+    public void ShouldDefaultToEnglishLocaleEmptyString() {
+        PerformShouldDefaultToEnglishLocale("");
+    }
+
+    @Test
+    public void ShouldDefaultToEnglishLocaleNotSupported() {
+        Assert.assertThrows(IllformedLocaleException.class, () -> {
+            try {
+                    PerformShouldDefaultToEnglishLocale("not-supported");
+            } catch (CompletionException ex) {
+                throw ex.getCause();
+            }
+        });
+    }
+
+    public void PerformShouldDefaultToEnglishLocale(String locale) {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
+
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
+
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        // Create and add custom activity prompt to DialogSet.
+        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", null, Culture.English);
+
+        dialogs.add(listPrompt);
+
+        Activity helloLocale = MessageFactory.text("hello");
+        helloLocale.setLocale(locale);
+
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
+
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+        })
+        .send(helloLocale)
+        .assertReply((activity) -> {
+            // Use ChoiceFactory to build the expected answer, manually
+            ChoiceFactoryOptions testChoiceOption = new ChoiceFactoryOptions();
+            testChoiceOption.setInlineOr(PromptCultureModels.ENGLISH.getInlineOr());
+            testChoiceOption.setInlineOrMore(PromptCultureModels.ENGLISH.getInlineOrMore());
+            testChoiceOption.setInlineSeparator(PromptCultureModels.ENGLISH.getSeparator());
+
+            String expectedChoices = ChoiceFactory.inline(colorChoices, null, null, testChoiceOption).getText();
+            Assert.assertEquals(String.format("favorite color?%s", expectedChoices), activity.getText());
+        })
+        .startTest()
+        .join();
+    }
+
+    @Test
+    public void ShouldAcceptAndRecognizeCustomLocaleDict() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
+
+        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        PromptCultureModel culture = new PromptCultureModel() {
+            {
+                setInlineOr(" customOr ");
+                setInlineOrMore(" customOrMore ");
+                setLocale("custom-custom");
+                setSeparator("customSeparator");
+                setNoInLanguage("customNo");
+                setYesInLanguage("customYes");
+            }
+        };
+
+        Map<String, ChoiceFactoryOptions> customDict = new HashMap<String, ChoiceFactoryOptions>();
+        ChoiceFactoryOptions choiceOption = new ChoiceFactoryOptions(culture.getSeparator(),
+                                                                    culture.getInlineOr(),
+                                                                    culture.getInlineOrMore(),
+                                                                    true);
+        customDict.put(culture.getLocale(), choiceOption);
+
+        dialogs.add(new ChoicePrompt("ChoicePrompt", customDict, null, culture.getLocale()));
+
+        Activity helloLocale = MessageFactory.text("hello");
+        helloLocale.setLocale(culture.getLocale());
+        new TestFlow(adapter, (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
+            DialogTurnResult results = dc.continueDialog().join();
+
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("favorite color?");
+                activity.setLocale(culture.getLocale());
+                options.setPrompt(activity);
+                options.setChoices(colorChoices);
+                dc.prompt("ChoicePrompt", options).join();
+            }
+            return CompletableFuture.completedFuture(null);
+        })
+        .send(helloLocale)
+        .assertReply((activity) -> {
+            // Use ChoiceFactory to build the expected answer, manually
+            ChoiceFactoryOptions testChoiceOption = new ChoiceFactoryOptions(culture.getSeparator(),
+            culture.getInlineOr(),
+            culture.getInlineOrMore(),
+            true);
+
+            String expectedChoices = ChoiceFactory.inline(colorChoices, null, null, testChoiceOption).getText();
+            Assert.assertEquals(String.format("favorite color?%s", expectedChoices), activity.getText());
+        })
+        .startTest()
+        .join();
+    }
 
     class Validators {
-
         public Validators() {
 
         }
-
         private Consumer<Activity> validedStartsWith(String expected) {
             return activity -> {
                 //Assert.IsAssignableFrom<MessageActivity>(activity);
@@ -869,13 +954,4 @@ public class ChoicePromptTests {
         }
 
     }
-
-    // private Action<Activity> validateSpeak(String expectedText, String expectedSpeak) {
-    //     return activity -> {
-    //         Assert.IsAssignableFrom<MessageActivity>(activity);
-    //         var msg = (MessageActivity)activity;
-    //         Assert.Equal(expectedText, msg.Text);
-    //         Assert.Equal(expectedSpeak, msg.Speak);
-    //     };
-    // }
 }

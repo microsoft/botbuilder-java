@@ -133,7 +133,13 @@ public final class ChoiceFactory {
 
         // Format list of choices
         String connector = "";
-        StringBuilder txtBuilder = new StringBuilder(text).append(' ');
+        StringBuilder txtBuilder;
+        if (StringUtils.isNotBlank(text)) {
+            txtBuilder = new StringBuilder(text).append(' ');
+        } else {
+            txtBuilder = new StringBuilder().append(' ');
+        }
+
         for (int index = 0; index < choices.size(); index++) {
             Choice choice = choices.get(index);
             String title = choice.getAction() != null && choice.getAction().getTitle() != null
