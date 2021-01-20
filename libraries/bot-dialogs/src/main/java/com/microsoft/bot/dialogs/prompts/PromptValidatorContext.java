@@ -81,10 +81,10 @@ public class PromptValidatorContext<T> {
      * @return the attempt count.
      */
     public int getAttemptCount() {
-        if (state.containsKey(Prompt.ATTEMPTCOUNTKEY)) {
+        if (!state.containsKey(Prompt.ATTEMPTCOUNTKEY)) {
             return 0;
         }
 
-        return Integer.parseInt((String) state.get(Prompt.ATTEMPTCOUNTKEY));
+        return (int) state.get(Prompt.ATTEMPTCOUNTKEY);
     }
 }

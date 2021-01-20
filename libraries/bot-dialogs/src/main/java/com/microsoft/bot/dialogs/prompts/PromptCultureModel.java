@@ -13,6 +13,13 @@ public class PromptCultureModel {
     private String noInLanguage;
 
     /**
+     * Creates a PromptCultureModel.
+     */
+    public PromptCultureModel() {
+
+    }
+
+    /**
      * Gets Culture Model's Locale.
      *
      * @return Ex: Locale. Example: "en-US".

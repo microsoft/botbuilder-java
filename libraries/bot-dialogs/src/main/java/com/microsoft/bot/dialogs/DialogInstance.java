@@ -18,6 +18,13 @@ public class DialogInstance {
 
     /**
      * Creates a DialogInstance with id and state.
+     */
+    public DialogInstance() {
+
+    }
+
+    /**
+     * Creates a DialogInstance with id and state.
      * @param withId The id
      * @param withState The state.
      */

@@ -22,6 +22,13 @@ public class Choice {
 
     /**
      * Creates a Choice.
+     */
+    public Choice() {
+        this(null);
+    }
+
+    /**
+     * Creates a Choice.
      * @param withValue The value.
      */
     public Choice(String withValue) {

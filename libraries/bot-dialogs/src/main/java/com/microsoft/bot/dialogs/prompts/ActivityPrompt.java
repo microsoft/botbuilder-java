@@ -44,7 +44,7 @@ public class ActivityPrompt extends Dialog {
      */
     public ActivityPrompt(String dialogId, PromptValidator<Activity> validator) {
         super(dialogId);
-        if (StringUtils.isAllBlank(dialogId)) {
+        if (StringUtils.isEmpty(dialogId)) {
             throw new IllegalArgumentException("dialogId cannot be empty");
         }
 
@@ -128,10 +128,7 @@ public class ActivityPrompt extends Dialog {
         PromptOptions options = (PromptOptions) instance.getState().get(persistedOptions);
         PromptRecognizerResult<Activity> recognized = onRecognize(dc.getContext(), state, options).join();
 
-        // Increment attempt count
-        // Convert.ToInt32 For issue
-        // https://github.com/Microsoft/botbuilder-dotnet/issues/1859
-        state.put(Prompt.ATTEMPTCOUNTKEY, Integer.parseInt((String) state.get(Prompt.ATTEMPTCOUNTKEY) + 1));
+        state.put(Prompt.ATTEMPTCOUNTKEY, (int) state.get(Prompt.ATTEMPTCOUNTKEY) + 1);
 
         // Validate the return value
         boolean isValid = false;
@@ -236,12 +233,13 @@ public class ActivityPrompt extends Dialog {
         Map<String, Object> state,
         PromptOptions options,
         Boolean isRetry) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext");
+            throw new IllegalArgumentException("turnContext cannot be null");
         }
 
         if (options == null) {
-            throw new IllegalArgumentException(" options cannot be null.");
+            throw new IllegalArgumentException("options cannot be null");
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
@@ -249,6 +247,7 @@ public class ActivityPrompt extends Dialog {
         } else if (options.getPrompt() != null) {
              turnContext.sendActivity(options.getPrompt()).join();
         }
+
         return CompletableFuture.completedFuture(null);
     }
 

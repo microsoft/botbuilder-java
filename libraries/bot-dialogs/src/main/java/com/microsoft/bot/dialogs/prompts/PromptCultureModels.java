@@ -14,10 +14,6 @@ public final class PromptCultureModels {
 
     }
 
-
-    private static final List<String> SUPPORTED_LOCALES = Arrays.stream(getSupportedCultures())
-                                                               .map(x -> x.getLocale()).collect(Collectors.toList());
-
     public static final String BULGARIAN_CULTURE = "bg-bg";
     public static final String CHINESE_CULTURE = "zh-cn";
     public static final String DUTCH_CULTURE = "nl-nl";
@@ -63,12 +59,12 @@ public final class PromptCultureModels {
      */
     public static final PromptCultureModel DUTCH = new PromptCultureModel() {
         {
-        setInlineOr(" of ");
-        setInlineOrMore(", of ");
-        setLocale(DUTCH_CULTURE);
-        setNoInLanguage("Nee");
-        setSeparator(", ");
-        setYesInLanguage("Ja");
+            setInlineOr(" of ");
+            setInlineOrMore(", of ");
+            setLocale(DUTCH_CULTURE);
+            setNoInLanguage("Nee");
+            setSeparator(", ");
+            setYesInLanguage("Ja");
         }
     };
 
@@ -226,6 +222,46 @@ public final class PromptCultureModels {
         }
     };
 
+    private static PromptCultureModel[] promptCultureModelArray =
+    {
+        BULGARIAN,
+        CHINESE,
+        DUTCH,
+        ENGLISH,
+        FRENCH,
+        GERMAN,
+        HINDI,
+        ITALIAN,
+        JAPANESE,
+        KOREAN,
+        PORTUGUESE,
+        SPANISH,
+        SWEDISH,
+        TURKISH
+    };
+
+    /**
+     * Gets a list of the supported culture models.
+     *
+     * @return   Array of {@link PromptCultureModel} with the supported cultures.
+     */
+    public static PromptCultureModel[] getSupportedCultures() {
+        return promptCultureModelArray;
+    }
+
+    private static final List<String> SUPPORTED_LOCALES = Arrays.stream(getSupportedCultures())
+                                                               .map(x -> x.getLocale()).collect(Collectors.toList());
+
+    // private static List<String> supportedlocales;
+
+    // static {
+    //     supportedlocales = new ArrayList<String>();
+    //     PromptCultureModel[] cultures = getSupportedCultures();
+    //     for (PromptCultureModel promptCultureModel : cultures) {
+    //         supportedlocales.add(promptCultureModel.getLocale());
+    //     }
+    // }
+
     /**
      * Use Recognizers-Text to normalize various potential setLocale strings to a standard.
      *
@@ -256,8 +292,8 @@ public final class PromptCultureModels {
             //If there is no cultureCode like "-*", map only the prefix
             //For example, "es-mx" will be mapped to "es-es"
             fallbackCultureCodes = SUPPORTED_LOCALES.stream()
-                                                    .filter(o -> cCode.startsWith(o.split("-")[0]))
-                                                    .collect(Collectors.toList());
+                                                   .filter(o -> cCode.startsWith(o.split("-")[0]))
+                                                   .collect(Collectors.toList());
 
             if (fallbackCultureCodes.size() > 0) {
                 return fallbackCultureCodes.get(0);
@@ -266,35 +302,4 @@ public final class PromptCultureModels {
 
         return cultureCode;
     }
-
-
-
-
-    /**
-     * Gets a list of the supported culture models.
-     *
-     * @return   Array of {@link PromptCultureModel} with the supported cultures.
-     */
-    public static PromptCultureModel[] getSupportedCultures() {
-        return promptCultureModelArray;
-    }
-
-    private static PromptCultureModel[] promptCultureModelArray =
-    {
-        BULGARIAN,
-        CHINESE,
-        DUTCH,
-        ENGLISH,
-        FRENCH,
-        GERMAN,
-        HINDI,
-        ITALIAN,
-        JAPANESE,
-        KOREAN,
-        PORTUGUESE,
-        SPANISH,
-        SWEDISH,
-        TURKISH
-    };
-
 }

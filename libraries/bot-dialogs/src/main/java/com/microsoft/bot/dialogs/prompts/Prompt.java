@@ -88,13 +88,21 @@ public abstract class Prompt<T> extends Dialog {
 
         // Ensure prompts have input hint set
         PromptOptions opt = (PromptOptions) options;
-        if (opt.getPrompt() != null && StringUtils.isEmpty(opt.getPrompt().getInputHint().toString())) {
-            opt.getPrompt().setInputHint(InputHints.EXPECTING_INPUT);
+
+        if (opt.getPrompt() != null) {
+            if ((opt.getPrompt().getInputHint() == null)
+                || StringUtils.isEmpty(opt.getPrompt().getInputHint().toString())) {
+                    opt.getPrompt().setInputHint(InputHints.EXPECTING_INPUT);
+                }
         }
 
-        if (opt.getRetryPrompt() != null && StringUtils.isEmpty(opt.getRetryPrompt().getInputHint().toString())) {
-            opt.getRetryPrompt().setInputHint(InputHints.EXPECTING_INPUT);
+        if (opt.getRetryPrompt() != null) {
+            if ((opt.getRetryPrompt().getInputHint() == null)
+                || StringUtils.isEmpty(opt.getRetryPrompt().getInputHint().toString())) {
+                    opt.getRetryPrompt().setInputHint(InputHints.EXPECTING_INPUT);
+                }
         }
+
 
         // Initialize prompt state
         Map<String, Object> state = dc.getActiveDialog().getState();
@@ -142,10 +150,7 @@ public abstract class Prompt<T> extends Dialog {
         PromptOptions options = (PromptOptions) instance.getState().get(persistedOptions);
         PromptRecognizerResult<T> recognized = onRecognize(dc.getContext(), state, options).join();
 
-        // Increment attempt count
-        // Convert.ToInt32 For issue
-        // https://github.com/Microsoft/botbuilder-dotnet/issues/1859
-        state.put(ATTEMPTCOUNTKEY, Integer.parseInt((String) state.get(ATTEMPTCOUNTKEY)) + 1);
+        state.put(ATTEMPTCOUNTKEY, (int) state.get(ATTEMPTCOUNTKEY) + 1);
 
         // Validate the return value
         Boolean isValid = false;
@@ -300,7 +305,12 @@ public abstract class Prompt<T> extends Dialog {
     protected Activity appendChoices(Activity prompt, String channelId, List<Choice> choices,
                                             ListStyle style, ChoiceFactoryOptions options) {
         // Get base prompt text (if any)
-        String text = prompt != null && !StringUtils.isNotBlank(prompt.getText()) ? prompt.getText() : "";
+        String text = "";
+        if (prompt != null && prompt.getText() != null) {
+            if (StringUtils.isNotBlank(prompt.getText())) {
+                text = prompt.getText();
+            }
+        }
 
         // Create temporary msg
         Activity msg;

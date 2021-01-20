@@ -18,6 +18,18 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
      * Initializes a new instance of the {@link AttachmentPrompt} class.
      *
      * @param dialogId   The ID to assign to this prompt.
+     *
+     * The value of {@link dialogId} must be unique within the {@link DialogSet} or
+     * {@link ComponentDialog} to which the prompt is added.
+     */
+    public AttachmentPrompt(String dialogId) {
+        this(dialogId, null);
+    }
+
+    /**
+     * Initializes a new instance of the {@link AttachmentPrompt} class.
+     *
+     * @param dialogId   The ID to assign to this prompt.
      * @param validator  Optional, a {@link PromptValidator{T}} that contains additional,
      *                   custom validation for this prompt.
      *
