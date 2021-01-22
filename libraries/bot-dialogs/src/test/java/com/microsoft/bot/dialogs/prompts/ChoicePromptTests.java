@@ -645,68 +645,6 @@ public class ChoicePromptTests {
     }
 
     @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_English() {
-        PromptCultureModel  cultureModel = PromptCultureModels.ENGLISH;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Spanish() {
-        PromptCultureModel  cultureModel = PromptCultureModels.SPANISH;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales(String testCulture, String inlineOr,
-                                                                String inlineOrMore, String separator) {
-        ConversationState convoState = new ConversationState(new MemoryStorage());
-        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
-
-        TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
-
-        // Create new DialogSet.
-        DialogSet dialogs = new DialogSet(dialogState);
-        // Create and add custom activity prompt to DialogSet.
-        ChoicePrompt listPrompt = new ChoicePrompt("ChoicePrompt", null, testCulture);
-
-        dialogs.add(listPrompt);
-
-        Activity helloLocale = MessageFactory.text("hello");
-        helloLocale.setLocale(testCulture);
-
-        new TestFlow(adapter, (turnContext) -> {
-            DialogContext dc =  dialogs.createContext(turnContext).join();
-            DialogTurnResult results = dc.continueDialog().join();
-
-            if (results.getStatus() == DialogTurnStatus.EMPTY) {
-                PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
-                options.setChoices(colorChoices);
-                dc.prompt("ChoicePrompt", options).join();
-            }
-            return CompletableFuture.completedFuture(null);
-        })
-        .send(helloLocale)
-        .assertReply((activity) -> {
-            // Use ChoiceFactory to build the expected answer, manually
-            ChoiceFactoryOptions testChoiceOption = new ChoiceFactoryOptions();
-            testChoiceOption.setInlineOr(inlineOr);
-            testChoiceOption.setInlineOrMore(inlineOrMore);
-            testChoiceOption.setInlineSeparator(separator);
-
-            String expectedChoices = ChoiceFactory.inline(colorChoices, null, null, testChoiceOption).getText();
-            Assert.assertEquals(String.format("favorite color?%s", expectedChoices), activity.getText());
-        })
-        .startTest()
-        .join();
-    }
-
-    @Test
     public void ShouldDefaultToEnglishLocaleNull() {
         PerformShouldDefaultToEnglishLocale(null);
     }

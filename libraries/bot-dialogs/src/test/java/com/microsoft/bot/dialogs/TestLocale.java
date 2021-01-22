@@ -50,39 +50,57 @@ public class TestLocale {
         lowerTwoLetter = getLowerTwoLetter(validLocale);
     }
 
-    public String Separator = culture.getSeparator();
-
-    public String InlineOr = culture.getInlineOr();
-
-    public String InlineOrMore = culture.getInlineOrMore();
-
-
-    private String getCapEnding(String validLocale) {
-        return String.format("%s%s-%s%s}",
-                            validLocale.substring(0,1),
-                            validLocale.substring(1,1),
-                            validLocale.substring(3,1).toString().toUpperCase(),
-                            validLocale.subSequence(4,0).toString().toUpperCase());
+    public String getSeparator() {
+        if (culture != null) {
+            return culture.getSeparator();
+        } else {
+            return "";
+        }
     }
 
-    private String getTitleEnding(String validLocale) {
-        return String.format("%s%s-%s%s}",
-                            validLocale.substring(0,1),
-                            validLocale.substring(1,1),
-                            validLocale.substring(3,1).toString().toUpperCase(),
-                            validLocale.subSequence(4,0));
+    public String getInlineOr() {
+        if (culture != null) {
+            return culture.getInlineOr();
+        } else {
+            return "";
+        }
     }
 
-    private String getCapTwoLetter(String validLocale) {
-        return String.format("%s%s}",
-                            validLocale.substring(0,1).toString().toUpperCase(),
-                            validLocale.substring(1,1).toString().toUpperCase());
+    public String getInlineOrMore() {
+        if (culture != null) {
+            return culture.getInlineOrMore();
+        } else {
+            return "";
+        }
     }
 
-    private String getLowerTwoLetter(String validLocale) {
-        return String.format("%s%s}",
-                            validLocale.substring(0,1),
-                            validLocale.substring(1,1));
+
+    private String getCapEnding(String locale) {
+        return String.format("%s%s-%s%s",
+                        locale.substring(0, 1),
+                        locale.substring(1, 2),
+                        locale.substring(3, 4).toUpperCase(),
+                        locale.substring(4, 5).toUpperCase());
+    }
+
+    private String getTitleEnding(String locale) {
+        return String.format("%s%s-%s%s",
+        locale.substring(0, 1),
+        locale.substring(1, 2),
+        locale.substring(3, 4).toUpperCase(),
+        locale.substring(4, 5));
+    }
+
+    private String getCapTwoLetter(String locale) {
+        return String.format("%s%s",
+        locale.substring(0, 1).toUpperCase(),
+        locale.substring(1, 2).toUpperCase());
+    }
+
+    private String getLowerTwoLetter(String locale) {
+        return String.format("%s%s",
+        locale.substring(0, 1),
+        locale.substring(1, 2));
     }
 
     /**

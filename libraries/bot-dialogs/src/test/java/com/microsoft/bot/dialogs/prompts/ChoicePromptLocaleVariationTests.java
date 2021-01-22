@@ -37,20 +37,20 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ChoicePromptLocaleVariationTests {
 
-    public static void main(String[] args) {
-        new JUnitCore().run(FilterRequest.aClass(ChoicePromptLocaleVariationTests.class).filterWith(new Filter() {
-            @Override
-            public boolean shouldRun(Description description) {
-                System.out.println("Should run test: classname[" + description.getClassName() + "] method name[" + description.getMethodName() + "]");
-                return description != null && description.getMethodName() != null && description.getMethodName().equals("test");
-            }
+    // public static void main(String[] args) {
+    //     new JUnitCore().run(FilterRequest.aClass(ChoicePromptLocaleVariationTests.class).filterWith(new Filter() {
+    //         @Override
+    //         public boolean shouldRun(Description description) {
+    //             System.out.println("Should run test: classname[" + description.getClassName() + "] method name[" + description.getMethodName() + "]");
+    //             return description != null && description.getMethodName() != null && description.getMethodName().equals("test");
+    //         }
 
-            @Override
-            public String describe() {
-                return null;
-            }
-        }).getRunner());
-    }
+    //         @Override
+    //         public String describe() {
+    //             return null;
+    //         }
+    //     }).getRunner());
+    // }
 
     String testCulture;
     String inlineOr;
@@ -63,6 +63,39 @@ public class ChoicePromptLocaleVariationTests {
         this.inlineOrMore = inlineOrMore;
         this.separator  = separator;
     }
+    public static List<Object[]> getLocaleVariationTest() {
+        TestLocale[] testLocales = new TestLocale[2];
+        testLocales[0] = new TestLocale(PromptCultureModels.BULGARIAN, null, null, null);
+        testLocales[1] = new TestLocale(PromptCultureModels.SPANISH, null, null, null);
+        // testLocales[2] = new TestLocale(PromptCultureModels.DUTCH, null, null, null);
+        // testLocales[3] = new TestLocale(PromptCultureModels.ENGLISH, null, null, null);
+        // testLocales[4] = new TestLocale(PromptCultureModels.FRENCH, null, null, null);
+        // testLocales[5] = new TestLocale(PromptCultureModels.HINDI, null, null, null);
+        // testLocales[6] = new TestLocale(PromptCultureModels.ITALIAN, null, null, null);
+        // testLocales[7] = new TestLocale(PromptCultureModels.JAPANESE, null, null, null);
+        // testLocales[8] = new TestLocale(PromptCultureModels.KOREAN, null, null, null);
+        // testLocales[9] = new TestLocale(PromptCultureModels.PORTUGUESE, null, null, null);
+        // testLocales[10] = new TestLocale(PromptCultureModels.CHINESE, null, null, null);
+        // testLocales[11] = new TestLocale(PromptCultureModels.SWEDISH, null, null, null);
+        // testLocales[12] = new TestLocale(PromptCultureModels.TURKISH, null, null, null);
+
+        List<Object[]> resultList = new ArrayList<Object[]>();
+        for (TestLocale testLocale : testLocales) {
+            resultList.add(new Object[] {testLocale.getValidLocale(), testLocale.getInlineOr(),
+                    testLocale.getInlineOrMore(), testLocale.getSeparator() });
+            resultList.add(new Object[] {testLocale.getCapEnding(), testLocale.getInlineOr(),
+                    testLocale.getInlineOrMore(), testLocale.getSeparator() });
+            resultList.add(new Object[] {testLocale.getTitleEnding(), testLocale.getInlineOr(),
+                    testLocale.getInlineOrMore(), testLocale.getSeparator() });
+            resultList.add(new Object[] {testLocale.getCapTwoLetter(), testLocale.getInlineOr(),
+                    testLocale.getInlineOrMore(), testLocale.getSeparator() });
+            resultList.add(new Object[] {testLocale.getLowerTwoLetter(), testLocale.getInlineOr(),
+                    testLocale.getInlineOrMore(), testLocale.getSeparator() });
+            }
+
+        return resultList;
+    }
+
 
     @Parameterized.Parameters
     public static List<Object[]> data() {
@@ -70,42 +103,12 @@ public class ChoicePromptLocaleVariationTests {
 
     }
 
-     public static List<Object[]> getLocaleVariationTest() {
-        TestLocale[] testLocales = new TestLocale[13];
-        testLocales[0] = new TestLocale(PromptCultureModels.BULGARIAN, null, null, null);
-        testLocales[1] = new TestLocale(PromptCultureModels.CHINESE, null, null, null);
-        testLocales[2] = new TestLocale(PromptCultureModels.DUTCH, null, null, null);
-        testLocales[3] = new TestLocale(PromptCultureModels.ENGLISH, null, null, null);
-        testLocales[4] = new TestLocale(PromptCultureModels.FRENCH, null, null, null);
-        testLocales[5] = new TestLocale(PromptCultureModels.HINDI, null, null, null);
-        testLocales[6] = new TestLocale(PromptCultureModels.ITALIAN, null, null, null);
-        testLocales[7] = new TestLocale(PromptCultureModels.JAPANESE, null, null, null);
-        testLocales[8] = new TestLocale(PromptCultureModels.KOREAN, null, null, null);
-        testLocales[9] = new TestLocale(PromptCultureModels.PORTUGUESE, null, null, null);
-        testLocales[10] = new TestLocale(PromptCultureModels.SPANISH, null, null, null);
-        testLocales[11] = new TestLocale(PromptCultureModels.SWEDISH, null, null, null);
-        testLocales[12] = new TestLocale(PromptCultureModels.TURKISH, null, null, null);
-
-        List<Object[]> resultList = new ArrayList<Object[]>();
-        for (TestLocale testLocale : testLocales) {
-            resultList.add(new Object[] { testLocale.getValidLocale(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-            resultList.add(new Object[] { testLocale.getCapEnding(), testLocale.InlineOr, testLocale.InlineOrMore,
-                    testLocale.Separator });
-        }
-
-        return resultList;
-    }
 
 
     private static List<Choice> colorChoices = Arrays.asList(new Choice("red"), new Choice("green"),
             new Choice("blue"));
 
-    //@Test
+    @Test
     public void testShouldRecognizeLocaleVariationsOfCorrectLocales() {
         Assert.assertEquals(1, 1);
         System.out.println("Testing: " + testCulture);
