@@ -22,7 +22,6 @@ import com.microsoft.bot.dialogs.DialogSet;
 import com.microsoft.bot.dialogs.DialogState;
 import com.microsoft.bot.dialogs.DialogTurnResult;
 import com.microsoft.bot.dialogs.DialogTurnStatus;
-import com.microsoft.bot.dialogs.TestLocale;
 import com.microsoft.bot.dialogs.choices.Choice;
 import com.microsoft.bot.dialogs.choices.ChoiceFactory;
 import com.microsoft.bot.dialogs.choices.ChoiceFactoryOptions;
@@ -656,70 +655,6 @@ public class ChoicePromptTests {
     @Test
     public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Spanish() {
         PromptCultureModel  cultureModel = PromptCultureModels.SPANISH;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Chinese() {
-        PromptCultureModel  cultureModel = PromptCultureModels.CHINESE;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Hindi() {
-        PromptCultureModel  cultureModel = PromptCultureModels.HINDI;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Italian() {
-        PromptCultureModel  cultureModel = PromptCultureModels.ITALIAN;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Japanese() {
-        PromptCultureModel  cultureModel = PromptCultureModels.JAPANESE;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Korean() {
-        PromptCultureModel  cultureModel = PromptCultureModels.KOREAN;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Portuguese() {
-        PromptCultureModel  cultureModel = PromptCultureModels.PORTUGUESE;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Swedish() {
-        PromptCultureModel  cultureModel = PromptCultureModels.SWEDISH;
-        ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
-        cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
-        cultureModel.getSeparator());
-    }
-
-    @Test
-    public void ShouldRecognizeLocaleVariationsOfCorrectLocales_Turkish() {
-        PromptCultureModel  cultureModel = PromptCultureModels.TURKISH;
         ShouldRecognizeLocaleVariationsOfCorrectLocales(cultureModel.getLocale(),
         cultureModel.getInlineOr(), cultureModel.getInlineOrMore(),
         cultureModel.getSeparator());

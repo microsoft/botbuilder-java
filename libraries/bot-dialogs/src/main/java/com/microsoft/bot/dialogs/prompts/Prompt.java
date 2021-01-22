@@ -89,18 +89,14 @@ public abstract class Prompt<T> extends Dialog {
         // Ensure prompts have input hint set
         PromptOptions opt = (PromptOptions) options;
 
-        if (opt.getPrompt() != null) {
-            if ((opt.getPrompt().getInputHint() == null)
-                || StringUtils.isEmpty(opt.getPrompt().getInputHint().toString())) {
+        if (opt.getPrompt() != null && (opt.getPrompt().getInputHint() == null
+                || StringUtils.isEmpty(opt.getPrompt().getInputHint().toString()))) {
                     opt.getPrompt().setInputHint(InputHints.EXPECTING_INPUT);
-                }
         }
 
-        if (opt.getRetryPrompt() != null) {
-            if ((opt.getRetryPrompt().getInputHint() == null)
-                || StringUtils.isEmpty(opt.getRetryPrompt().getInputHint().toString())) {
+        if (opt.getRetryPrompt() != null && (opt.getRetryPrompt().getInputHint() == null
+                || StringUtils.isEmpty(opt.getRetryPrompt().getInputHint().toString()))) {
                     opt.getRetryPrompt().setInputHint(InputHints.EXPECTING_INPUT);
-                }
         }
 
 
@@ -306,10 +302,8 @@ public abstract class Prompt<T> extends Dialog {
                                             ListStyle style, ChoiceFactoryOptions options) {
         // Get base prompt text (if any)
         String text = "";
-        if (prompt != null && prompt.getText() != null) {
-            if (StringUtils.isNotBlank(prompt.getText())) {
+        if (prompt != null && prompt.getText() != null && StringUtils.isNotBlank(prompt.getText())) {
                 text = prompt.getText();
-            }
         }
 
         // Create temporary msg

@@ -31,6 +31,20 @@ public class NumberPrompt<T> extends Prompt<T> {
      *
      * @param dialogId      Unique ID of the dialog within its parent
      *                      {@link DialogSet} or {@link ComponentDialog} .
+     * @param classOfNumber Type of <T> used to determine within the class what type was created for. This is required
+     *                      due to type erasure in Java not allowing checking the type of <T> during runtime.
+     * @throws UnsupportedDataTypeException thrown if a type other than int, long, float, or double are used for <T>.
+     */
+    public NumberPrompt(String dialogId, Class<T> classOfNumber)
+            throws UnsupportedDataTypeException {
+        this(dialogId, null, null, classOfNumber);
+    }
+
+    /**
+     * Initializes a new instance of the {@link NumberPrompt{T}} class.
+     *
+     * @param dialogId      Unique ID of the dialog within its parent
+     *                      {@link DialogSet} or {@link ComponentDialog} .
      * @param validator     Validator that will be called each time the user
      *                      responds to the prompt.
      * @param defaultLocale Locale to use.
@@ -45,9 +59,9 @@ public class NumberPrompt<T> extends Prompt<T> {
         this.defaultLocale = defaultLocale;
         this.classOfNumber = classOfNumber;
 
-        if (!(classOfNumber.getSimpleName() == "int" || classOfNumber.getSimpleName() == "long"
-                || classOfNumber.getSimpleName() == "float" || classOfNumber.getSimpleName() == "double")) {
-            throw new UnsupportedDataTypeException(String.format("NumberPrompt: Type argument %0 <T> is not supported",
+        if (!(classOfNumber.getSimpleName().equals("Long") || classOfNumber.getSimpleName().equals("Integer")
+              || classOfNumber.getSimpleName().equals("Float") || classOfNumber.getSimpleName().equals("Double"))) {
+            throw new UnsupportedDataTypeException(String.format("NumberPrompt: Type argument %s <T> is not supported",
                     classOfNumber.getSimpleName()));
         }
     }
@@ -98,7 +112,7 @@ public class NumberPrompt<T> extends Prompt<T> {
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be nulle");
+            throw new IllegalArgumentException("options cannot be null");
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
@@ -143,7 +157,7 @@ public class NumberPrompt<T> extends Prompt<T> {
             String culture = turnContext.getActivity().getLocale() != null ? turnContext.getActivity().getLocale()
                     : defaultLocale != null ? defaultLocale : PromptCultureModels.ENGLISH_CULTURE;
             List<ModelResult> results = recognizeNumberWithUnit(utterance, culture);
-            if (results.size() > 0) {
+            if (results != null && results.size() > 0) {
                 // Try to parse value based on type
                 String text = "";
 
@@ -153,33 +167,33 @@ public class NumberPrompt<T> extends Prompt<T> {
                     text = (String) valueResolution;
                 }
 
-                if (classOfNumber.getSimpleName() == "float") {
+                if (classOfNumber.getSimpleName().equals("Float")) {
                     try {
-                        float value = Float.parseFloat(text);
+                        Float value = Float.parseFloat(text);
                         result.setSucceeded(true);
                         result.setValue((T) (Object) value);
 
                     } catch (NumberFormatException numberFormatException) {
                     }
-                } else if (classOfNumber.getSimpleName() == "int") {
+                } else if (classOfNumber.getSimpleName().equals("Integer")) {
                     try {
-                        int value = Integer.parseInt(text);
+                        Integer value = Integer.parseInt(text);
                         result.setSucceeded(true);
                         result.setValue((T) (Object) value);
 
                     } catch (NumberFormatException numberFormatException) {
                     }
-                } else if (classOfNumber.getSimpleName() == "long") {
+                } else if (classOfNumber.getSimpleName().equals("Long")) {
                     try {
-                        long value = Long.parseLong(text);
+                        Long value = Long.parseLong(text);
                         result.setSucceeded(true);
                         result.setValue((T) (Object) value);
 
                     } catch (NumberFormatException numberFormatException) {
                     }
-                } else if (classOfNumber.getSimpleName() == "double") {
+                } else if (classOfNumber.getSimpleName().equals("Double")) {
                     try {
-                        double value = Double.parseDouble(text);
+                        Double value = Double.parseDouble(text);
                         result.setSucceeded(true);
                         result.setValue((T) (Object) value);
 

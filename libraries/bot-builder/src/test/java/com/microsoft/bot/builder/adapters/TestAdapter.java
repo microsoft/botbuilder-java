@@ -178,6 +178,9 @@ public class TestAdapter extends BotAdapter {
             if (activity.getTimestamp() == null || activity.getTimestamp().toEpochSecond() == 0)
                 activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
 
+            if (activity.getLocalTimestamp() == null || activity.getLocalTimestamp().toEpochSecond() == 0)
+                activity.setLocalTimestamp(OffsetDateTime.now());
+
             return activity;
         }).thenCompose(activity1 -> {
             TurnContextImpl context = new TurnContextImpl(this, activity1);

@@ -41,6 +41,15 @@ public class ConfirmPrompt extends Prompt<Boolean> {
      * Initializes a new instance of the {@link ConfirmPrompt} class.
      *
      * @param dialogId      The ID to assign to this prompt.
+     */
+    public ConfirmPrompt(String dialogId) {
+        this(dialogId, null, null);
+    }
+
+    /**
+     * Initializes a new instance of the {@link ConfirmPrompt} class.
+     *
+     * @param dialogId      The ID to assign to this prompt.
      * @param validator     Optional, a {@link PromptValidator{FoundChoice}} that
      *                      contains additional, custom validation for this prompt.
      * @param defaultLocale Optional, the default locale used to determine
@@ -224,8 +233,8 @@ public class ConfirmPrompt extends Prompt<Boolean> {
         Triplet<Choice, Choice, ChoiceFactoryOptions> defaults = choiceDefaults.get(culture);
         ChoiceFactoryOptions localChoiceOptions = getChoiceOptions() != null ? getChoiceOptions()
                                                   : defaults.getValue2();
-        List<Choice> choices = new ArrayList<Choice>(Arrays.asList(confirmChoices.getValue0(),
-                                                                   confirmChoices.getValue1()));
+        List<Choice> choices = new ArrayList<Choice>(Arrays.asList(defaults.getValue0(),
+                                                                   defaults.getValue1()));
 
         ListStyle localStyle = options.getStyle() != null ? options.getStyle() : getStyle();
         if (isRetry && options.getRetryPrompt() != null) {
@@ -274,8 +283,8 @@ public class ConfirmPrompt extends Prompt<Boolean> {
                     ChoiceRecognizer.recognizeBoolean(utterance, culture);
             if (results.size() > 0) {
                 com.microsoft.recognizers.text.ModelResult first = results.get(0);
-                Boolean value = Boolean.parseBoolean((String) first.resolution.get("value"));
-                if (value) {
+                Boolean value = (Boolean) first.resolution.get("value");
+                if (value != null) {
                     result.setSucceeded(true);
                     result.setValue(value);
                 }
