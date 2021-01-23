@@ -29,11 +29,6 @@ public abstract class Dialog {
      * @param dialogId The ID to assign to this dialog.
      */
     public Dialog(String dialogId) {
-
-        if (StringUtils.isBlank(dialogId)) {
-            throw new IllegalArgumentException("dialogId cannot be null");
-        }
-
         id = dialogId;
         telemetryClient = new NullBotTelemetryClient();
     }
