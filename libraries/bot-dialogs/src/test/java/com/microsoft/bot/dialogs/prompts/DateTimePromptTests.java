@@ -102,7 +102,6 @@ public class DateTimePromptTests {
                         elements.add(dateTimeResolution.getTimex());
                     }
                 }
-                //Activity reply = MessageFactory.text($"Timex:'{resolution.Timex}' Value:'{resolution.Value}'");
                 Activity reply = MessageFactory.text(String.join(" ", elements));
                 turnContext.sendActivity(reply).join();
             }

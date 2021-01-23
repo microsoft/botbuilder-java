@@ -22,6 +22,14 @@ public abstract class DialogContainer extends Dialog {
     }
 
     /**
+     * Creates a new instance with the default dialog id.
+     * @param dialogId Id of the dialog.
+     */
+    public DialogContainer(String dialogId) {
+        super(dialogId);
+    }
+
+    /**
      * Returns the Dialogs as a DialogSet.
      * @return The DialogSet of Dialogs.
      */
@@ -126,7 +134,7 @@ public abstract class DialogContainer extends Dialog {
         dc.getActiveDialog().setVersion(getInternalVersion());
 
         // Check for change of previously stored hash
-        if (current != null && current.equals(dc.getActiveDialog().getVersion())) {
+        if (current != null && !current.equals(dc.getActiveDialog().getVersion())) {
             // Give bot an opportunity to handle the change.
             // - If bot handles it the changeHash will have been updated as to avoid
             // triggering the

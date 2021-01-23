@@ -48,7 +48,7 @@ public class WaterfallDialog extends Dialog {
      *         way of evaluating the content of the steps.
      */
     public String getVersion() {
-        return String.format("%0:%1", getId(), steps.size());
+        return String.format("%s:%d", getId(), steps.size());
     }
 
     /**
@@ -144,7 +144,10 @@ public class WaterfallDialog extends Dialog {
 
         // Increment step index and run step
         Map<String, Object> state = dc.getActiveDialog().getState();
-        int index = Integer.parseInt((String) state.get(stepIndex));
+        int index = 0;
+        if (state.containsKey(stepIndex)) {
+            index = (int) state.get(stepIndex);
+        }
 
         return runStep(dc, index + 1, reason, result);
     }
@@ -226,13 +229,12 @@ public class WaterfallDialog extends Dialog {
 
         if (index < steps.size()) {
             // Update persisted step index
-            HashMap<String, Object> state =
-                new HashMap<String, Object>((Map<String, Object>) dc.getActiveDialog().getState());
+            Map<String, Object> state = (Map<String, Object>) dc.getActiveDialog().getState();
 
             state.put(stepIndex, index);
 
             // Create step context
-            Map<String, Object> options = (Map<String, Object>) state.get(persistedOptions);
+            Object options = state.get(persistedOptions);
             Map<String, Object> values = (Map<String, Object>) state.get(persistedValues);
             WaterfallStepContext stepContext =
                 new WaterfallStepContext(this, dc, options, values, index, reason, result);

@@ -65,10 +65,10 @@ public class ChoicePromptLocaleVariationTests {
     }
     public static List<Object[]> getLocaleVariationTest() {
         TestLocale[] testLocales = new TestLocale[2];
-        testLocales[0] = new TestLocale(PromptCultureModels.BULGARIAN, null, null, null);
+        testLocales[0] = new TestLocale(PromptCultureModels.ENGLISH, null, null, null);
         testLocales[1] = new TestLocale(PromptCultureModels.SPANISH, null, null, null);
         // testLocales[2] = new TestLocale(PromptCultureModels.DUTCH, null, null, null);
-        // testLocales[3] = new TestLocale(PromptCultureModels.ENGLISH, null, null, null);
+        // testLocales[3] = new TestLocale(PromptCultureModels.BULGARIAN, null, null, null);
         // testLocales[4] = new TestLocale(PromptCultureModels.FRENCH, null, null, null);
         // testLocales[5] = new TestLocale(PromptCultureModels.HINDI, null, null, null);
         // testLocales[6] = new TestLocale(PromptCultureModels.ITALIAN, null, null, null);
@@ -102,8 +102,6 @@ public class ChoicePromptLocaleVariationTests {
         return getLocaleVariationTest();
 
     }
-
-
 
     private static List<Choice> colorChoices = Arrays.asList(new Choice("red"), new Choice("green"),
             new Choice("blue"));
