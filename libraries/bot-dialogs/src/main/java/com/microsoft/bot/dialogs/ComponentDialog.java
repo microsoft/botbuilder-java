@@ -52,9 +52,9 @@ import com.microsoft.bot.builder.TurnContext;
                 throw new IllegalArgumentException("outerDc cannot be null.");
             }
 
-            ensureInitialized(outerDc);
+            ensureInitialized(outerDc).join();
 
-            this.checkForVersionChange(outerDc);
+            this.checkForVersionChange(outerDc).join();
 
             DialogContext innerDc = this.createChildContext(outerDc);
             DialogTurnResult turnResult = onBeginDialog(innerDc, options).join();
@@ -62,7 +62,8 @@ import com.microsoft.bot.builder.TurnContext;
             // Check for end of inner dialog
             if (turnResult.getStatus() != DialogTurnStatus.WAITING) {
                 // Return result to calling dialog
-                return endComponent(outerDc, turnResult.getResult());
+                DialogTurnResult result = endComponent(outerDc, turnResult.getResult()).join();
+                return CompletableFuture.completedFuture(result);
             }
 
             getTelemetryClient().trackDialogView(getId(), null, null);
@@ -91,9 +92,9 @@ import com.microsoft.bot.builder.TurnContext;
          */
         @Override
         public CompletableFuture<DialogTurnResult> continueDialog(DialogContext outerDc) {
-            ensureInitialized(outerDc);
+            ensureInitialized(outerDc).join();
 
-            this.checkForVersionChange(outerDc);
+            this.checkForVersionChange(outerDc).join();
 
             // Continue execution of inner dialog
             DialogContext innerDc = this.createChildContext(outerDc);
@@ -102,7 +103,8 @@ import com.microsoft.bot.builder.TurnContext;
             // Check for end of inner dialog
             if (turnResult.getStatus() != DialogTurnStatus.WAITING) {
                 // Return to calling dialog
-                return this.endComponent(outerDc, turnResult.getResult());
+                DialogTurnResult result =  this.endComponent(outerDc, turnResult.getResult()).join();
+                return CompletableFuture.completedFuture(result);
             }
 
             // Just signal waiting
@@ -135,9 +137,9 @@ import com.microsoft.bot.builder.TurnContext;
         public CompletableFuture<DialogTurnResult> resumeDialog(DialogContext outerDc, DialogReason reason,
                 Object result) {
 
-            ensureInitialized(outerDc);
+            ensureInitialized(outerDc).join();
 
-            this.checkForVersionChange(outerDc);
+            this.checkForVersionChange(outerDc).join();
 
             // Containers are typically leaf nodes on the stack but the dev is free to push
             // other dialogs
@@ -147,7 +149,7 @@ import com.microsoft.bot.builder.TurnContext;
             // To avoid the container prematurely ending we need to implement this method
             // and simply
             // ask our inner dialog stack to re-prompt.
-            repromptDialog(outerDc.getContext(), outerDc.getActiveDialog());
+            repromptDialog(outerDc.getContext(), outerDc.getActiveDialog()).join();
             return CompletableFuture.completedFuture(END_OF_TURN);
         }
 
@@ -189,7 +191,7 @@ import com.microsoft.bot.builder.TurnContext;
             // Forward cancel to inner dialogs
             if (reason == DialogReason.CANCEL_CALLED) {
                 DialogContext innerDc = this.createInnerDc(turnContext, instance);
-                innerDc.cancelAllDialogs();
+                innerDc.cancelAllDialogs().join();
             }
 
             return onEndDialog(turnContext, instance, reason);
@@ -238,7 +240,7 @@ import com.microsoft.bot.builder.TurnContext;
         protected CompletableFuture<Void> ensureInitialized(DialogContext outerDc) {
             if (!this.initialized) {
                 this.initialized = true;
-                onInitialize(outerDc);
+                onInitialize(outerDc).join();
             }
             return CompletableFuture.completedFuture(null);
         }

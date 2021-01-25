@@ -795,14 +795,19 @@ public final class ObjectPath {
 
         // ObjectNode
         if (obj instanceof ObjectNode) {
+            boolean wasSet = false;
             ObjectNode node = (ObjectNode) obj;
             Iterator<String> fields = node.fieldNames();
             while (fields.hasNext()) {
                 String field = fields.next();
                 if (field.equalsIgnoreCase(property)) {
+                    wasSet = true;
                     node.set(property, Serialization.objectToTree(normalizedValue));
                     break;
                 }
+            }
+            if (!wasSet) {
+                node.set(property, Serialization.objectToTree(normalizedValue));
             }
 
             return;

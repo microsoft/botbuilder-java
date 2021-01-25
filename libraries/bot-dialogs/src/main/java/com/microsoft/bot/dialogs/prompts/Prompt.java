@@ -60,6 +60,9 @@ public abstract class Prompt<T> extends Dialog {
      */
     public Prompt(String dialogId, PromptValidator<T> validator) {
         super(dialogId);
+        if (StringUtils.isBlank(dialogId)) {
+            throw new IllegalArgumentException("dialogId cannot be null");
+        }
         this.validator = validator;
     }
 

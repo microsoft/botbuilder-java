@@ -283,15 +283,15 @@ public class DialogStateManager implements Map<String, Object> {
         final String first = ".FIRST()";
         int iFirst = path.toUpperCase(Locale.US).lastIndexOf(first);
         if (iFirst >= 0) {
-            Object entity = null;
             remainingPath = new StringBuilder(path.substring(iFirst + first.length()));
             path = path.substring(0, iFirst);
-            if (tryGetFirstNestedValue(entity, new AtomicReference<String>(path), this)) {
-                if (StringUtils.isEmpty(remainingPath.toString()) || remainingPath.toString() == null) {
-                    instance = (TypeT) ObjectPath.mapValueTo(entity, clsType);
+            ResultPair<Object> getResult = tryGetFirstNestedValue(new AtomicReference<String>(path), this);
+            if (getResult.result()) {
+                if (StringUtils.isEmpty(remainingPath.toString())) {
+                    instance = (TypeT) ObjectPath.mapValueTo(getResult.getRight(), clsType);
                     return new ResultPair<>(true, instance);
                 }
-                instance = (TypeT) ObjectPath.tryGetPathValue(entity, path, clsType);
+                instance = (TypeT) ObjectPath.tryGetPathValue(getResult.getRight(), remainingPath.toString(), clsType);
 
                 return new ResultPair<>(true, instance);
             }
@@ -301,7 +301,7 @@ public class DialogStateManager implements Map<String, Object> {
 
         instance = (TypeT) ObjectPath.tryGetPathValue(this, path, clsType);
 
-        return new ResultPair<>(true, instance);
+        return new ResultPair<>(instance != null, instance);
     }
 
     /**
@@ -320,7 +320,7 @@ public class DialogStateManager implements Map<String, Object> {
         }
 
         ResultPair<T> result = tryGetValue(pathExpression, clsType);
-        if (result.result()) {
+         if (result.result()) {
             return result.value();
         } else {
             return defaultValue;
@@ -509,10 +509,12 @@ public class DialogStateManager implements Map<String, Object> {
      *         otherwise, false.
      */
     public Boolean containsKey(String key) {
-        MemoryScope scope = configuration.getMemoryScopes().stream().filter((s) -> {
-            return s.getName().toUpperCase() == key;
-        }).findFirst().get();
-        return scope != null;
+        for (MemoryScope scope : configuration.getMemoryScopes()) {
+            if (scope.getName().toUpperCase().equals(key.toUpperCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -658,9 +660,9 @@ public class DialogStateManager implements Map<String, Object> {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Boolean tryGetFirstNestedValue(Object value, AtomicReference<String> remainingPath, Object memory) {
+    private static ResultPair<Object> tryGetFirstNestedValue(AtomicReference<String> remainingPath, Object memory) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
-
+        Object value;
         array = ObjectPath.tryGetPathValue(memory, remainingPath.get(), ArrayNode.class);
 
         if (array != null && array.size() > 0) {
@@ -669,14 +671,14 @@ public class DialogStateManager implements Map<String, Object> {
                 if (firstNode.size() > 0) {
                     JsonNode secondNode = firstNode.get(0);
                     value = ObjectPath.mapValueTo(secondNode, Object.class);
-                    return true;
+                    return new ResultPair<Object>(true, value);
                 }
-                return false;
+                return new ResultPair<Object>(false, null);
             }
             value = ObjectPath.mapValueTo(firstNode, Object.class);
-            return true;
+            return new ResultPair<Object>(true, value);
         }
-        return false;
+        return new ResultPair<Object>(false, null);
     }
 
     private String getBadScopeMessage(String path) {

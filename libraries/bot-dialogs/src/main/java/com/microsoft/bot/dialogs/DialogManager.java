@@ -44,7 +44,7 @@ public class DialogManager {
             this.setRootDialog(rootDialog);
         }
 
-        this.dialogStateProperty = dialogStateProperty != null ? dialogStateProperty : null;
+        this.dialogStateProperty = dialogStateProperty != null ? dialogStateProperty : "DialogState";
     }
 
     private ConversationState conversationState;
@@ -324,10 +324,10 @@ public class DialogManager {
     /// Helper to send a trace activity with a memory snapshot of the active dialog
     /// DC.
     /// </summary>
-    private static CompletableFuture<Void> sendStateSnapshotTraceAsync(DialogContext dc, String traceLabel) {
+    private static CompletableFuture<Void> sendStateSnapshotTrace(DialogContext dc, String traceLabel) {
         // send trace of memory
         JsonNode snapshot = getActiveDialogContext(dc).getState().getMemorySnapshot();
-        Activity traceActivity = (Activity) Activity.createTraceActivity("BotState",
+        Activity traceActivity = (Activity) Activity.createTraceActivity("Bot State",
                 "https://www.botframework.com/schemas/botState", snapshot, traceLabel);
         dc.getContext().sendActivity(traceActivity).join();
         return CompletableFuture.completedFuture(null);
@@ -393,7 +393,7 @@ public class DialogManager {
             }
         }
 
-        sendStateSnapshotTraceAsync(dc, "Bot State");
+        sendStateSnapshotTrace(dc, "BotState").join();
 
         return CompletableFuture.completedFuture(turnResult);
     }

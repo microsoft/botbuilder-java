@@ -19,6 +19,8 @@ public class TestAdapter extends BotAdapter {
     private final Queue<Activity> botReplies = new LinkedList<>();
     private int nextId = 0;
     private ConversationReference conversationReference;
+    private String locale;
+    private boolean sendTraceActivity = false;
 
     private static class UserTokenKey {
         public String connectionName;
@@ -54,6 +56,11 @@ public class TestAdapter extends BotAdapter {
     }
 
     public TestAdapter(String channelId) {
+        this(channelId, false);
+    }
+
+    public TestAdapter(String channelId, boolean sendTraceActivity) {
+        this.sendTraceActivity = sendTraceActivity;
         setConversationReference(new ConversationReference() {
             {
                 setChannelId(channelId);
@@ -77,6 +84,7 @@ public class TestAdapter extends BotAdapter {
                         setId("Conversation1");
                     }
                 });
+                setLocale(this.getLocale());
             }
         });
     }
@@ -108,6 +116,7 @@ public class TestAdapter extends BotAdapter {
                             setId("Conversation1");
                         }
                     });
+                    setLocale(this.getLocale());
                 }
             });
         }
@@ -241,6 +250,12 @@ public class TestAdapter extends BotAdapter {
                 try {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException e) {
+                }
+            } else if (activity.getType() == ActivityTypes.TRACE) {
+                if (sendTraceActivity) {
+                    synchronized (botReplies) {
+                        botReplies.add(activity);
+                    }
                 }
             } else {
                 synchronized (botReplies) {
@@ -492,6 +507,23 @@ public class TestAdapter extends BotAdapter {
         reference.setConversation(new ConversationAccount(false, name, name, null, null, null, null));
         reference.setUser(new ChannelAccount(user.toLowerCase(), user.toLowerCase()));
         reference.setBot(new ChannelAccount(bot.toLowerCase(), bot.toLowerCase()));
+        reference.setLocale("en-us");
         return reference;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setSendTraceActivity(boolean sendTraceActivity) {
+        this.sendTraceActivity = sendTraceActivity;
+    }
+
+    public boolean getSendTraceActivity() {
+        return sendTraceActivity;
     }
 }

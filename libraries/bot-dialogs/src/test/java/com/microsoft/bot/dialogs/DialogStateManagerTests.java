@@ -2,9 +2,15 @@ package com.microsoft.bot.dialogs;
 
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryConnectorClient;
 import com.microsoft.bot.builder.MemoryStorage;
@@ -168,6 +174,81 @@ public class DialogStateManagerTests {
 
         createDialogContext(testFunction).startTest().join();
     }
+
+    @Test
+    public void TestEntitiesRetrieval() {
+        DialogTestFunction testFunction = dc -> {
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            String[] array = new String[] {
+                "test1",
+                "test2",
+                "test3"
+            };
+
+            String[] array2 = new String[] {
+                "testx",
+                "testy",
+                "testz"
+            };
+
+            String[][] arrayarray = new String[][] {
+                array2,
+                array
+            };
+
+            JsonNode arrayNode = mapper.valueToTree(array);
+            JsonNode arrayArrayNode = mapper.valueToTree(arrayarray);
+
+            dc.getState().setValue("turn.recognized.entities.single", arrayNode);
+            dc.getState().setValue("turn.recognized.entities.double", arrayArrayNode);
+
+            Assert.assertEquals("test1", dc.getState().getValue("@single", new String(), String.class));
+            Assert.assertEquals("testx", dc.getState().getValue("@double", new String(), String.class));
+            Assert.assertEquals("test1", dc.getState().getValue("turn.recognized.entities.single.First()",
+                                    new String(), String.class));
+            Assert.assertEquals("testx", dc.getState().getValue("turn.recognized.entities.double.First()",
+                                    new String(), String.class));
+
+
+
+            // arrayarray = new JArray();
+            ArrayNode secondArray = mapper.createArrayNode();
+            ArrayNode array1Node = mapper.createArrayNode();
+            ObjectNode node1 = mapper.createObjectNode();
+            node1.put("name", "test1");
+            ObjectNode node2 = mapper.createObjectNode();
+            node2.put("name", "test2");
+            ObjectNode node3 = mapper.createObjectNode();
+            node3.put("name", "test3");
+            array1Node.addAll(Arrays.asList(node1, node2, node3));
+
+            ArrayNode array2Node = mapper.createArrayNode();
+            ObjectNode node1a = mapper.createObjectNode();
+            node1a.put("name", "testx");
+            ObjectNode node2a = mapper.createObjectNode();
+            node2a.put("name", "testy");
+            ObjectNode node3a = mapper.createObjectNode();
+            node3a.put("name", "testz");
+            array2Node.addAll(Arrays.asList(node1a, node2a, node3a));
+            secondArray.addAll(Arrays.asList(array2Node, array1Node));
+             dc.getState().setValue("turn.recognized.entities.single", array1Node);
+             dc.getState().setValue("turn.recognized.entities.double", secondArray);
+
+            Assert.assertEquals("test1", dc.getState().getValue("@single.name", new String(), String.class));
+            Assert.assertEquals("test1", dc.getState().getValue("turn.recognized.entities.single.First().name",
+                new String(), String.class));
+            Assert.assertEquals("testx", dc.getState().getValue("@double.name", new String(), String.class));
+            Assert.assertEquals("testx", dc.getState().getValue("turn.recognized.entities.double.First().name",
+                new String(), String.class));
+            return CompletableFuture.completedFuture(null);
+
+        };
+
+        createDialogContext(testFunction).startTest().join();
+    }
+
 
     private TestFlow createDialogContext(DialogTestFunction handler) {
         TestAdapter adapter = new TestAdapter(
