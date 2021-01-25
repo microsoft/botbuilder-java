@@ -4,11 +4,10 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.bot.connector.ExecutorFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -24,7 +23,7 @@ public final class Retry {
 
     /**
      * Runs a task with retry.
-     * 
+     *
      * @param task                  The task to run.
      * @param retryExceptionHandler Called when an exception happens.
      * @param <TResult>             The type of the result.
@@ -36,41 +35,50 @@ public final class Retry {
         Supplier<CompletableFuture<TResult>> task,
         BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler
     ) {
+        return runInternal(task, retryExceptionHandler, 1, new ArrayList<>());
+    }
 
-        CompletableFuture<TResult> result = new CompletableFuture<>();
+    private static <TResult> CompletableFuture<TResult> runInternal(
+        Supplier<CompletableFuture<TResult>> task,
+        BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler,
+        final Integer retryCount,
+        final List<Throwable> exceptions
+    ) {
+        AtomicReference<RetryParams> retry = new AtomicReference<>();
 
-        ExecutorFactory.getExecutor().execute(() -> {
-            RetryParams retry = RetryParams.stopRetrying();
-            List<Throwable> exceptions = new ArrayList<>();
-            int currentRetryCount = 0;
+        return task.get()
+            .exceptionally((t) -> {
+                exceptions.add(t);
+                retry.set(retryExceptionHandler.apply(new RetryException(t), retryCount));
+                return null;
+            })
+            .thenCompose(taskResult -> {
+                CompletableFuture<TResult> result = new CompletableFuture<>();
 
-            do {
-                try {
-                    result.complete(task.get().join());
-                } catch (Throwable t) {
-                    exceptions.add(t);
-                    retry = retryExceptionHandler.apply(new RetryException(t), currentRetryCount);
+                if (retry.get() == null) {
+                    result.complete(taskResult);
+                    return result;
                 }
 
-                if (retry.getShouldRetry()) {
-                    currentRetryCount++;
+                if (retry.get().getShouldRetry()) {
                     try {
-                        Thread.sleep(withBackoff(retry.getRetryAfter(), currentRetryCount));
+                        Thread.sleep(withBackOff(retry.get().getRetryAfter(), retryCount));
                     } catch (InterruptedException e) {
                         throw new RetryException(e);
                     }
+
+                    return runInternal(task, retryExceptionHandler, retryCount + 1, exceptions);
                 }
-            } while (retry.getShouldRetry());
 
-            result.completeExceptionally(new RetryException("Exceeded retry count", exceptions));
-        });
+                result.completeExceptionally(new RetryException("Exceeded retry count", exceptions));
 
-        return result;
+                return result;
+            });
     }
 
     private static final double BACKOFF_MULTIPLIER = 1.1;
 
-    private static long withBackoff(long delay, int retryCount) {
+    private static long withBackOff(long delay, int retryCount) {
         double result = delay * Math.pow(BACKOFF_MULTIPLIER, retryCount - 1);
         return (long) Math.min(result, Long.MAX_VALUE);
     }

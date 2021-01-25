@@ -10,7 +10,7 @@ import java.time.Duration;
  * State for Retry.
  */
 public class RetryParams {
-    private static final int MAX_RETRIES = 10;
+    public static final int MAX_RETRIES = 10;
     private static final Duration MAX_DELAY = Duration.ofSeconds(10);
     private static final Duration DEFAULT_BACKOFF_TIME = Duration.ofMillis(50);
 
@@ -23,11 +23,9 @@ public class RetryParams {
      * @return A RetryParams that returns false for {@link #getShouldRetry()}.
      */
     public static RetryParams stopRetrying() {
-        return new RetryParams() {
-            {
-                setShouldRetry(false);
-            }
-        };
+        return new RetryParams() {{
+            setShouldRetry(false);
+        }};
     }
 
     /**
