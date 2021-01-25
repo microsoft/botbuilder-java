@@ -35,7 +35,7 @@ public final class Retry {
         Supplier<CompletableFuture<TResult>> task,
         BiFunction<RuntimeException, Integer, RetryParams> retryExceptionHandler
     ) {
-        return runInternal(task, retryExceptionHandler,1, new ArrayList<>());
+        return runInternal(task, retryExceptionHandler, 1, new ArrayList<>());
     }
 
     private static <TResult> CompletableFuture<TResult> runInternal(
@@ -67,7 +67,7 @@ public final class Retry {
                         throw new RetryException(e);
                     }
 
-                    return runInternal(task, retryExceptionHandler,retryCount + 1, exceptions);
+                    return runInternal(task, retryExceptionHandler, retryCount + 1, exceptions);
                 }
 
                 result.completeExceptionally(new RetryException("Exceeded retry count", exceptions));
