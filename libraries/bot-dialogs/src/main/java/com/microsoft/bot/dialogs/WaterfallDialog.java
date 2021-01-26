@@ -167,7 +167,7 @@ public class WaterfallDialog extends Dialog {
             HashMap<String, Object> state = new HashMap<String, Object>((Map<String, Object>) instance.getState());
 
             // Create step context
-            int index = Integer.parseInt((String) state.get(stepIndex));
+            int index = (int) state.get(stepIndex);
             String stepName = waterfallStepName(index);
             String instanceId = (String) state.get(persistedInstanceId);
 

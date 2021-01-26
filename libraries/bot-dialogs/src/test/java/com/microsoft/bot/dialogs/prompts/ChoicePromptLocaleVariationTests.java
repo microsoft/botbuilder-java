@@ -37,21 +37,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ChoicePromptLocaleVariationTests {
 
-    // public static void main(String[] args) {
-    //     new JUnitCore().run(FilterRequest.aClass(ChoicePromptLocaleVariationTests.class).filterWith(new Filter() {
-    //         @Override
-    //         public boolean shouldRun(Description description) {
-    //             System.out.println("Should run test: classname[" + description.getClassName() + "] method name[" + description.getMethodName() + "]");
-    //             return description != null && description.getMethodName() != null && description.getMethodName().equals("test");
-    //         }
-
-    //         @Override
-    //         public String describe() {
-    //             return null;
-    //         }
-    //     }).getRunner());
-    // }
-
     String testCulture;
     String inlineOr;
     String inlineOrMore;

@@ -14,7 +14,6 @@ import com.microsoft.bot.builder.TestUtilities;
 import com.microsoft.bot.builder.TurnContext;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.joda.time.Interval;
 import org.junit.Assert;
 import org.junit.Test;
 

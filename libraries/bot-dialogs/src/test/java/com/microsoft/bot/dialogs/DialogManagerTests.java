@@ -1,7 +1,6 @@
 package com.microsoft.bot.dialogs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -17,9 +16,6 @@ import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.connector.authentication.ClaimsIdentity;
-import com.microsoft.bot.dialogs.ComponentDialog;
-import com.microsoft.bot.dialogs.prompts.Prompt;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.dialogs.prompts.TextPrompt;
 import com.microsoft.bot.schema.Activity;

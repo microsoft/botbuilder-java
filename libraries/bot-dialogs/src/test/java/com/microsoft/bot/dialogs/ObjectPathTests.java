@@ -1,6 +1,5 @@
 package com.microsoft.bot.dialogs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.schema.Serialization;
 import java.io.IOException;
