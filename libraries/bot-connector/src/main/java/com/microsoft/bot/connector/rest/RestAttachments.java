@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.connector.Async;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Attachments;
 import com.google.common.reflect.TypeToken;
@@ -84,9 +85,9 @@ public class RestAttachments implements Attachments {
      */
     public CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId) {
         if (attachmentId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter attachmentId is required and cannot be null."
-            );
+            ));
         }
 
         return service.getAttachmentInfo(
@@ -125,13 +126,16 @@ public class RestAttachments implements Attachments {
      */
     public CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId) {
         if (attachmentId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter attachmentId is required and cannot be null."
-            );
+            ));
         }
         if (viewId == null) {
-            throw new IllegalArgumentException("Parameter viewId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter viewId is required and cannot be null."
+            ));
         }
+
         return service.getAttachment(
             attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent()
         ).thenApply(responseBodyResponse -> {
