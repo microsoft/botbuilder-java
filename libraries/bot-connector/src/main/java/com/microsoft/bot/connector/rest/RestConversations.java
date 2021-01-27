@@ -6,6 +6,7 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.restclient.ServiceResponseBuilder;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.AttachmentData;
@@ -263,9 +264,9 @@ public class RestConversations implements Conversations {
         ConversationParameters parameters
     ) {
         if (parameters == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter parameters is required and cannot be null."
-            );
+            ));
         }
         Validator.validate(parameters);
 
@@ -319,14 +320,14 @@ public class RestConversations implements Conversations {
         Activity activity
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (activity == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activity is required and cannot be null."
-            );
+            ));
         }
         Validator.validate(activity);
 
@@ -372,35 +373,39 @@ public class RestConversations implements Conversations {
         Activity activity
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (activityId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activityId is required and cannot be null."
-            );
+            ));
         }
         if (activity == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activity is required and cannot be null."
-            );
+            ));
         }
-        Validator.validate(activity);
 
-        return service.updateActivity(
-            conversationId, activityId, activity, client.getAcceptLanguage(), client.getUserAgent()
-        )
+        return Async.tryCompletable(() -> {
+            Validator.validate(activity);
+            return service.updateActivity(
+                conversationId, activityId, activity, client.getAcceptLanguage(),
+                client.getUserAgent()
+            )
 
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return updateActivityDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("updateActivityAsync", responseBodyResponse);
-                }
-            });
+                .thenApply(responseBodyResponse -> {
+                    try {
+                        return updateActivityDelegate(responseBodyResponse).body();
+                    } catch (ErrorResponseException e) {
+                        throw e;
+                    } catch (Throwable t) {
+                        throw new ErrorResponseException(
+                            "updateActivityAsync", responseBodyResponse);
+                    }
+                });
+        });
     }
 
     private ServiceResponse<ResourceResponse> updateActivityDelegate(
@@ -432,19 +437,19 @@ public class RestConversations implements Conversations {
         Activity activity
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (activityId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activityId is required and cannot be null."
-            );
+            ));
         }
         if (activity == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activity is required and cannot be null."
-            );
+            ));
         }
         Validator.validate(activity);
 
@@ -488,14 +493,14 @@ public class RestConversations implements Conversations {
     @Override
     public CompletableFuture<Void> deleteActivity(String conversationId, String activityId) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (activityId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activityId is required and cannot be null."
-            );
+            ));
         }
 
         return service.deleteActivity(
@@ -534,9 +539,9 @@ public class RestConversations implements Conversations {
     @Override
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
 
         return service.getConversationMembers(
@@ -579,12 +584,14 @@ public class RestConversations implements Conversations {
         String conversationId
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
 
         return service.getConversationMember(
@@ -628,14 +635,14 @@ public class RestConversations implements Conversations {
         String memberId
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (memberId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter memberId is required and cannot be null."
-            );
+            ));
         }
 
         return service.deleteConversationMember(
@@ -682,14 +689,14 @@ public class RestConversations implements Conversations {
         String activityId
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (activityId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter activityId is required and cannot be null."
-            );
+            ));
         }
 
         return service.getActivityMembers(
@@ -729,14 +736,14 @@ public class RestConversations implements Conversations {
         AttachmentData attachmentUpload
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (attachmentUpload == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter attachmentUpload is required and cannot be null."
-            );
+            ));
         }
         Validator.validate(attachmentUpload);
 
@@ -783,12 +790,14 @@ public class RestConversations implements Conversations {
         Transcript history
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (history == null) {
-            throw new IllegalArgumentException("Parameter history is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter history is required and cannot be null."
+            ));
         }
         Validator.validate(history);
 
@@ -837,9 +846,9 @@ public class RestConversations implements Conversations {
         String conversationId
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
 
         return service.getConversationPagedMembers(
@@ -889,14 +898,14 @@ public class RestConversations implements Conversations {
         String continuationToken
     ) {
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
-            );
+            ));
         }
         if (continuationToken == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter continuationToken is required and cannot be null."
-            );
+            ));
         }
 
         return service.getConversationPagedMembers(
