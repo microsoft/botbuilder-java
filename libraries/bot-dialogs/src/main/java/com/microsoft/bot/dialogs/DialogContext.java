@@ -4,7 +4,7 @@ import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.dialogs.memory.DialogStateManager;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
-import com.microsoft.bot.integration.Async;
+import com.microsoft.bot.connector.Async;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -246,7 +246,7 @@ public class DialogContext {
      * active after the turn has been processed by the dialog.
      */
     public CompletableFuture<DialogTurnResult> continueDialog() {
-        return Async.tryCompletion(() -> {
+        return Async.tryCompletable(() -> {
             // if we are continuing and haven't emitted the activityReceived event, emit it
             // NOTE: This is backward compatible way for activity received to be fired even if
             // you have legacy dialog loop
@@ -259,7 +259,7 @@ public class DialogContext {
                     true
                 );
             }
-            return null;
+            return CompletableFuture.completedFuture(null);
         })
         .thenCompose(v -> {
             if (getActiveDialog() != null) {
@@ -552,7 +552,7 @@ public class DialogContext {
             return CompletableFuture.completedFuture(null);
         }
 
-        return Async.tryCompletion(() -> dialogs.find(instance.getId()))
+        return Async.wrapBlock(() -> dialogs.find(instance.getId()))
             .thenCompose(dialog -> {
                 if (dialog != null) {
                     // Notify dialog of end
