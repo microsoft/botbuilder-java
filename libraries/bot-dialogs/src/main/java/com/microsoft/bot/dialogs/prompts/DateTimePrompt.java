@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.recognizers.text.ModelResult;
 import com.microsoft.recognizers.text.datetime.DateTimeOptions;
@@ -86,12 +87,17 @@ public class DateTimePrompt extends Prompt<List<DateTimeResolution>> {
     @Override
     protected CompletableFuture<Void> onPrompt(TurnContext turnContext, Map<String, Object> state,
                                                PromptOptions options, Boolean isRetry) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "options cannot be null"
+            ));
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
@@ -120,7 +126,9 @@ public class DateTimePrompt extends Prompt<List<DateTimeResolution>> {
             onRecognize(TurnContext turnContext, Map<String, Object> state, PromptOptions options) {
 
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         PromptRecognizerResult<List<DateTimeResolution>> result =

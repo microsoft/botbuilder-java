@@ -6,6 +6,8 @@ import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
@@ -165,15 +167,18 @@ public class DialogSet {
      */
     public CompletableFuture<DialogContext> createContext(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("TurnContext is required");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext is required"
+            ));
         }
 
         if (dialogState == null) {
             // Note: This shouldn't ever trigger, as the _dialogState is set in the
             // constructor
             // and validated there.
-            throw new IllegalStateException(
-                    "DialogSet.createContext(): DialogSet created with a null StatePropertyAccessor.");
+            return Async.completeExceptionally(new IllegalStateException(
+                "DialogSet.createContext(): DialogSet created with a null StatePropertyAccessor."
+            ));
         }
 
         // Load/initialize dialog state

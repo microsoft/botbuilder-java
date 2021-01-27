@@ -226,14 +226,18 @@ public class ActivityPromptTests {
     @Test
     public void OnPromptErrorsWithNullContext() {
         Assert.assertThrows(IllegalArgumentException.class, () -> {
-            EventActivityPrompt eventPrompt = new EventActivityPrompt("EventActivityPrompt",
-                                                        new BasicActivityPromptValidator());
+            try {
+                EventActivityPrompt eventPrompt = new EventActivityPrompt("EventActivityPrompt",
+                                                            new BasicActivityPromptValidator());
 
-            PromptOptions options = new PromptOptions();
-            Activity activity = new Activity(ActivityTypes.MESSAGE);
-            activity.setText("please send an event.");
-            options.setPrompt(activity);
-            eventPrompt.onPromptNullContext(options);
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("please send an event.");
+                options.setPrompt(activity);
+                eventPrompt.onPromptNullContext(options).join();
+            } catch (CompletionException ex) {
+                throw ex.getCause();
+            }
         });
     }
 
@@ -263,7 +267,7 @@ public class ActivityPromptTests {
                     .startTest().join();
 
                 } catch (CompletionException ex) {
-                    throw ex.getCause();
+                    throw ex.getCause().getCause();
                 }
         });
     }

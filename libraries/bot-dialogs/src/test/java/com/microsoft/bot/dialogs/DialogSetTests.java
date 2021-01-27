@@ -3,6 +3,7 @@ package com.microsoft.bot.dialogs;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.ConversationState;
@@ -43,10 +44,14 @@ public class DialogSetTests {
     @Test
     public void DialogSet_NullCreateContext() {
         Assert.assertThrows(IllegalArgumentException.class, () -> {
-            ConversationState convoState = new ConversationState(new MemoryStorage());
-            StatePropertyAccessor<DialogState> dialogStateProperty = convoState.createProperty("dialogState");
-            DialogSet ds = new DialogSet(dialogStateProperty);
-            ds.createContext(null);
+            try {
+                ConversationState convoState = new ConversationState(new MemoryStorage());
+                StatePropertyAccessor<DialogState> dialogStateProperty = convoState.createProperty("dialogState");
+                DialogSet ds = new DialogSet(dialogStateProperty);
+                ds.createContext(null).join();
+                } catch (CompletionException ex) {
+                    throw ex.getCause();
+                }
         });
     }
 

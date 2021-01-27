@@ -14,6 +14,7 @@ import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.connector.authentication.SkillValidation;
 import com.microsoft.bot.dialogs.memory.DialogStateManager;
@@ -213,8 +214,10 @@ public class DialogManager {
             if (cState != null) {
                 conversationState = cState;
             } else {
-                throw new IllegalStateException(String.format("Unable to get an instance of %s from turnContext.",
-                        ConversationState.class.toString()));
+                return Async.completeExceptionally(new IllegalStateException(
+                    String.format("Unable to get an instance of %s from turnContext.",
+                    ConversationState.class.toString())
+                ));
             }
         } else {
             context.getTurnState().replace(conversationState);
@@ -304,7 +307,7 @@ public class DialogManager {
                     // error was NOT handled, throw the exception and end the turn. (This will
                     // trigger
                     // the Adapter.OnError handler and end the entire dialog stack)
-                    throw new RuntimeException(err);
+                    return Async.completeExceptionally(new RuntimeException(err));
                 }
             }
         }
@@ -348,7 +351,9 @@ public class DialogManager {
     @SuppressWarnings({"TodoComment"})
     //TODO: Add Skills support here
     private CompletableFuture<DialogTurnResult> handleSkillOnTurn() {
-        throw new NotImplementedException("Skills are not implemented in this release");
+        return Async.completeExceptionally(new NotImplementedException(
+                "Skills are not implemented in this release"
+            ));
     }
 
     /**

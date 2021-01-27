@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 
     /**
      * A {@link Dialog} that is composed of other dialogs.
@@ -49,7 +50,9 @@ import com.microsoft.bot.builder.TurnContext;
         public CompletableFuture<DialogTurnResult> beginDialog(DialogContext outerDc, Object options) {
 
             if (outerDc == null) {
-                throw new IllegalArgumentException("outerDc cannot be null.");
+                return Async.completeExceptionally(new IllegalArgumentException(
+                    "outerDc cannot be null."
+                ));
             }
 
             ensureInitialized(outerDc).join();

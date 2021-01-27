@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.dialogs.choices.Choice;
 import com.microsoft.bot.dialogs.choices.ChoiceFactoryOptions;
 import com.microsoft.bot.dialogs.choices.ChoiceRecognizers;
@@ -201,12 +202,17 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
     @Override
     protected  CompletableFuture<Void> onPrompt(TurnContext turnContext, Map<String, Object> state,
                                                 PromptOptions options, Boolean isRetry) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "options cannot be null"
+            ));
         }
 
         String culture = determineCulture(turnContext.getActivity());
@@ -248,8 +254,11 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
     @Override
     protected CompletableFuture<PromptRecognizerResult<FoundChoice>> onRecognize(TurnContext turnContext,
                                     Map<String, Object> state, PromptOptions options) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         List<Choice> choices = options.getChoices() != null ? options.getChoices() : new ArrayList<Choice>();

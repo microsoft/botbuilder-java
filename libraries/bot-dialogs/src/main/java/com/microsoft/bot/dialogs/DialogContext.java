@@ -189,7 +189,9 @@ public class DialogContext {
      */
     public CompletableFuture<DialogTurnResult> beginDialog(String dialogId, Object options) {
         if (StringUtils.isEmpty(dialogId)) {
-            throw new IllegalArgumentException("DialogContext.beginDialog, dialogId is required");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "DialogContext.beginDialog, dialogId is required"
+            ));
         }
 
         // Look up dialog
@@ -227,11 +229,15 @@ public class DialogContext {
      */
     public CompletableFuture<DialogTurnResult> prompt(String dialogId, PromptOptions options) {
         if (StringUtils.isEmpty(dialogId)) {
-            throw new IllegalArgumentException("DialogContext.prompt, dialogId is required");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "DialogContext.prompt, dialogId is required"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("DialogContext.prompt, PromptOptions is required");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "DialogContext.prompt, PromptOptions is required"
+            ));
         }
 
         return beginDialog(dialogId, options);

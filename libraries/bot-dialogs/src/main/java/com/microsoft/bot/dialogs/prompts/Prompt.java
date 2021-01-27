@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogEvent;
@@ -81,12 +82,17 @@ public abstract class Prompt<T> extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
+
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         if (!(options instanceof PromptOptions)) {
-            throw new IllegalArgumentException("Prompt options are required for Prompt dialogs");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Prompt options are required for Prompt dialogs"
+            ));
         }
 
         // Ensure prompts have input hint set
@@ -134,8 +140,11 @@ public abstract class Prompt<T> extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
+
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         // Don't do anything for non-message activities

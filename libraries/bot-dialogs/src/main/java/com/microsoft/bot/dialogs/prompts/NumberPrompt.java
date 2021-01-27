@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.activation.UnsupportedDataTypeException;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.recognizers.text.ModelResult;
 import com.microsoft.recognizers.text.number.NumberRecognizer;
@@ -107,12 +108,17 @@ public class NumberPrompt<T> extends Prompt<T> {
     @Override
     protected CompletableFuture<Void> onPrompt(TurnContext turnContext, Map<String, Object> state,
             PromptOptions options, Boolean isRetry) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "options cannot be null"
+            ));
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
@@ -143,8 +149,11 @@ public class NumberPrompt<T> extends Prompt<T> {
     @SuppressWarnings("PMD")
     protected CompletableFuture<PromptRecognizerResult<T>> onRecognize(TurnContext turnContext,
             Map<String, Object> state, PromptOptions options) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         PromptRecognizerResult<T> result = new PromptRecognizerResult<T>();

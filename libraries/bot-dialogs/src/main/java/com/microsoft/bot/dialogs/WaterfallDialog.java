@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.ActivityTypes;
 
 import org.apache.commons.lang3.StringUtils;
@@ -77,8 +78,11 @@ public class WaterfallDialog extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
+
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         // Initialize waterfall state
@@ -113,7 +117,9 @@ public class WaterfallDialog extends Dialog {
     @Override
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         // Don't do anything for non-message activities.
@@ -138,8 +144,11 @@ public class WaterfallDialog extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> resumeDialog(DialogContext dc, DialogReason reason, Object result) {
+
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         // Increment step index and run step
@@ -223,8 +232,11 @@ public class WaterfallDialog extends Dialog {
      */
     protected CompletableFuture<DialogTurnResult> runStep(DialogContext dc, int index,
                                                           DialogReason reason, Object result) {
+
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         if (index < steps.size()) {

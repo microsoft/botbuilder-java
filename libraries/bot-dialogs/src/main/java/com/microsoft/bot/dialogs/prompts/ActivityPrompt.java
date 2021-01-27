@@ -8,6 +8,7 @@ import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogInstance;
@@ -70,11 +71,15 @@ public class ActivityPrompt extends Dialog {
     @Override
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         if (!(options instanceof PromptOptions)) {
-            throw new IllegalArgumentException("Prompt options are required for Prompt dialogs");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Prompt options are required for Prompt dialogs"
+            ));
         }
 
         // Ensure prompts have input hint set
@@ -119,7 +124,9 @@ public class ActivityPrompt extends Dialog {
     @Override
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
         if (dc == null) {
-            throw new IllegalArgumentException("dc cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "dc cannot be null."
+            ));
         }
 
         // Perform base recognition
@@ -235,11 +242,15 @@ public class ActivityPrompt extends Dialog {
         Boolean isRetry) {
 
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "options cannot be null"
+            ));
         }
 
         if (isRetry && options.getRetryPrompt() != null) {

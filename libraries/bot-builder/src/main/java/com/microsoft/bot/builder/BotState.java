@@ -175,7 +175,9 @@ public abstract class BotState implements PropertyManager {
      */
     public CompletableFuture<Void> clearState(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         turnContext.getTurnState().replace(contextServiceKey, new CachedBotState());
@@ -190,7 +192,9 @@ public abstract class BotState implements PropertyManager {
      */
     public CompletableFuture<Void> delete(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         String storageKey = getStorageKey(turnContext);
@@ -288,11 +292,15 @@ public abstract class BotState implements PropertyManager {
         String propertyName
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            throw new IllegalArgumentException("propertyName cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "propertyName cannot be empty"
+            ));
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
@@ -314,11 +322,15 @@ public abstract class BotState implements PropertyManager {
         Object value
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null."
+            ));
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            throw new IllegalArgumentException("propertyName cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "propertyName cannot be empty"
+            ));
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);

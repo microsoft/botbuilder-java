@@ -48,13 +48,17 @@ public class NumberPromptTests {
     @Test
     public void NumberPromptWithNullTurnContextShouldFail() {
          Assert.assertThrows(IllegalArgumentException.class, () -> {
-            NumberPromptMock numberPromptMock = new NumberPromptMock("NumberPromptMock", null, null);
+             try {
+                NumberPromptMock numberPromptMock = new NumberPromptMock("NumberPromptMock", null, null);
 
-            PromptOptions options = new PromptOptions();
-            Activity activity = new Activity(ActivityTypes.MESSAGE);
-            activity.setText("Please send a number.");
-            options.setPrompt(activity);
-            numberPromptMock.onPromptNullContext(options);
+                PromptOptions options = new PromptOptions();
+                Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("Please send a number.");
+                options.setPrompt(activity);
+                numberPromptMock.onPromptNullContext(options).join();
+             } catch (CompletionException ex) {
+                throw ex.getCause();
+            }
         });
     }
 
@@ -74,7 +78,7 @@ public class NumberPromptTests {
             dialogs.add(numberPromptMock);
             new TestFlow(adapter, (turnContext) -> {
                 DialogContext dc = dialogs.createContext(turnContext).join();
-                numberPromptMock.onPromptNullOptions(dc);
+                numberPromptMock.onPromptNullOptions(dc).join();
                 return CompletableFuture.completedFuture(null);
             })
             .send("hello")
@@ -89,8 +93,12 @@ public class NumberPromptTests {
     @Test
     public void OnRecognizeWithNullTurnContextShouldFail() {
         Assert.assertThrows(IllegalArgumentException.class, () -> {
+            try {
             NumberPromptMock numberPromptMock = new NumberPromptMock("NumberPromptMock", null, null);
-             numberPromptMock.onRecognizeNullContext();
+            numberPromptMock.onRecognizeNullContext();
+            } catch (CompletionException ex) {
+                throw ex.getCause();
+            }
         });
     }
 

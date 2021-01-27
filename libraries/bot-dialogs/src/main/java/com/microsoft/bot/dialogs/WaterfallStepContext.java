@@ -3,6 +3,8 @@ package com.microsoft.bot.dialogs;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import com.microsoft.bot.connector.Async;
+
 /**
  * Provides context for a step in a {@link waterfallDialog} .
  *
@@ -113,9 +115,10 @@ public class WaterfallStepContext extends DialogContext {
     public CompletableFuture<DialogTurnResult> next(Object result) {
         // Ensure next hasn't been called
         if (nextCalled) {
-            throw new IllegalStateException(
+            return Async.completeExceptionally(new IllegalStateException(
                 String.format("WaterfallStepContext.next(): method already called for dialog and step '%0 %1",
-                parentWaterfall.getId(), index));
+            parentWaterfall.getId(), index)
+            ));
         }
 
         // Trigger next step

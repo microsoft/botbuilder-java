@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.Attachment;
@@ -56,12 +57,17 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
     @Override
     protected CompletableFuture<Void> onPrompt(TurnContext turnContext, Map<String, Object> state,
                                                PromptOptions options, Boolean isRetry) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("options cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "options cannot be null"
+            ));
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
@@ -88,8 +94,11 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
     @Override
     protected CompletableFuture<PromptRecognizerResult<List<Attachment>>> onRecognize(TurnContext turnContext,
                     Map<String, Object> state, PromptOptions options) {
+
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         PromptRecognizerResult<List<Attachment>> result = new PromptRecognizerResult<List<Attachment>>();
