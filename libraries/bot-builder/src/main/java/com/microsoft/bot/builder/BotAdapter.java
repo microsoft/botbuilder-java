@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
@@ -188,7 +189,9 @@ public abstract class BotAdapter {
         TurnContext context,
         BotCallbackHandler callback
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {

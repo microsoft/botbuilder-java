@@ -6,15 +6,15 @@
 
 package com.microsoft.bot.connector.rest;
 
-import com.microsoft.bot.azure.AzureResponseBuilder;
-import com.microsoft.bot.azure.AzureServiceClient;
-import com.microsoft.bot.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.bot.connector.UserAgent;
 import com.microsoft.bot.connector.teams.TeamsConnectorClient;
 import com.microsoft.bot.connector.teams.TeamsOperations;
-import com.microsoft.bot.rest.RestClient;
-import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
-import com.microsoft.bot.rest.retry.RetryStrategy;
+import com.microsoft.bot.restclient.RestClient;
+import com.microsoft.bot.restclient.ServiceClient;
+import com.microsoft.bot.restclient.ServiceResponseBuilder;
+import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
+import com.microsoft.bot.restclient.retry.RetryStrategy;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -34,7 +34,7 @@ import retrofit2.Retrofit;
  * accomplished with JWT Bearer tokens, and is described in detail in the
  * [Connector Authentication](/en-us/restapi/authentication) document.
  */
-public class RestTeamsConnectorClient extends AzureServiceClient implements TeamsConnectorClient {
+public class RestTeamsConnectorClient extends ServiceClient implements TeamsConnectorClient {
     private static final int RETRY_TIMEOUT = 30;
 
     /** Gets or sets the preferred language for the response. */
@@ -259,8 +259,8 @@ public class RestTeamsConnectorClient extends AzureServiceClient implements Team
         return new RestClient.Builder(new OkHttpClient.Builder(), new Retrofit.Builder())
             .withBaseUrl(baseUrl)
             .withCredentials(credentials)
-            .withSerializerAdapter(new AzureJacksonAdapter())
-            .withResponseBuilderFactory(new AzureResponseBuilder.Factory());
+            .withSerializerAdapter(new JacksonAdapter())
+            .withResponseBuilderFactory(new ServiceResponseBuilder.Factory());
     }
 
     /**

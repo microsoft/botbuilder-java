@@ -26,7 +26,7 @@ public class TurnContextStateCollection implements AutoCloseable {
      * @return The value.
      * @throws IllegalArgumentException Null key.
      */
-    public <T> T get(String key) {
+    public <T> T get(String key) throws IllegalArgumentException {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
@@ -68,7 +68,7 @@ public class TurnContextStateCollection implements AutoCloseable {
      * @param <T>   The type of the value.
      * @throws IllegalArgumentException For null key or value.
      */
-    public <T> void add(String key, T value) {
+    public <T> void add(String key, T value) throws IllegalArgumentException {
         if (key == null) {
             throw new IllegalArgumentException("key");
         }
@@ -91,7 +91,7 @@ public class TurnContextStateCollection implements AutoCloseable {
      * @param <T>   The type of the value.
      * @throws IllegalArgumentException For null value.
      */
-    public <T> void add(T value) {
+    public <T> void add(T value) throws IllegalArgumentException {
         if (value == null) {
             throw new IllegalArgumentException("value");
         }

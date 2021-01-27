@@ -4,6 +4,7 @@ import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.AadResourceUrls;
+import java.util.concurrent.CompletionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class OAuthConnectorTests extends OAuthTestBase  {
         OAuthClient client = new RestOAuthClient("http://localhost", null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetUserToken_ShouldThrowOnEmptyConnectionName() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
         client.getUserToken().getToken("userid", null).join();
@@ -52,40 +53,40 @@ public class OAuthConnectorTests extends OAuthTestBase  {
         }).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void SignOutUser_ShouldThrowOnEmptyUserId() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getUserToken().signOut(null);
+        client.getUserToken().signOut(null).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetSigninLink_ShouldThrowOnNullState() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getBotSignIn().getSignInUrl(null);
+        client.getBotSignIn().getSignInUrl(null).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetTokenStatus_ShouldThrowOnNullUserId() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getUserToken().getTokenStatus(null);
+        client.getUserToken().getTokenStatus(null).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetAadTokensAsync_ShouldThrowOnNullUserId() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getUserToken().getAadTokens(null, "connection", new AadResourceUrls());
+        client.getUserToken().getAadTokens(null, "connection", new AadResourceUrls()).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetAadTokensAsync_ShouldThrowOnNullConncetionName() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getUserToken().getAadTokens("user", null, new AadResourceUrls());
+        client.getUserToken().getAadTokens("user", null, new AadResourceUrls()).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void GetAadTokensAsync_ShouldThrowOnNullResourceUrls() {
         OAuthClient client = new RestOAuthClient("http://localhost", new BotAccessTokenStub("token"));
-        client.getUserToken().getAadTokens("user", "connection", null);
+        client.getUserToken().getAadTokens("user", "connection", null).join();
     }
 }
 

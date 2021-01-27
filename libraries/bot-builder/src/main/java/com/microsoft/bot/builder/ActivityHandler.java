@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -53,17 +54,21 @@ public class ActivityHandler implements Bot {
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("TurnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException("turnContext must have a non-null Activity.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext must have a non-null Activity."
+            ));
         }
 
         if (turnContext.getActivity().getType() == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "turnContext.getActivity must have a non-null Type."
-            );
+            ));
         }
 
         switch (turnContext.getActivity().getType()) {

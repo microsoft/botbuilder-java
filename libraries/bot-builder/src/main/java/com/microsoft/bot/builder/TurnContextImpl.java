@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
@@ -299,7 +300,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         InputHints inputHint
     ) {
         if (StringUtils.isEmpty(textReplyToSend)) {
-            throw new IllegalArgumentException("textReplyToSend");
+            return Async.completeExceptionally(new IllegalArgumentException("textReplyToSend"));
         }
 
         Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {
@@ -332,7 +333,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(Activity activityToSend) {
-        BotAssert.activityNotNull(activityToSend);
+        if (activityToSend == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         return sendActivities(Collections.singletonList(activityToSend))
             .thenApply(resourceResponses -> {
@@ -357,7 +360,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     @Override
     public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
         if (activities == null || activities.size() == 0) {
-            throw new IllegalArgumentException("activities");
+            return Async.completeExceptionally(new IllegalArgumentException("activities"));
         }
 
         // Bind the relevant Conversation Reference properties, such as URLs and
@@ -403,7 +406,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         List<Activity> activities,
         int nextCallbackIndex
     ) {
-
         if (nextCallbackIndex == onSendActivities.size()) {
             return sendActivitiesThroughAdapter(activities);
         }
@@ -430,7 +432,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(Activity withActivity) {
-        BotAssert.activityNotNull(withActivity);
+        if (withActivity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         ConversationReference conversationReference = activity.getConversationReference();
         withActivity.applyConversationReference(conversationReference);
@@ -448,10 +452,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Iterator<UpdateActivityHandler> updateHandlers,
         Supplier<CompletableFuture<ResourceResponse>> callAtBottom
     ) {
-
-        BotAssert.activityNotNull(updateActivity);
+        if (updateActivity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
         if (updateHandlers == null) {
-            throw new IllegalArgumentException("updateHandlers");
+            return Async.completeExceptionally(new IllegalArgumentException("updateHandlers"));
         }
 
         // No middleware to run.
@@ -491,7 +496,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     public CompletableFuture<Void> deleteActivity(String activityId) {
         if (StringUtils.isWhitespace(activityId) || StringUtils.isEmpty(activityId)) {
-            throw new IllegalArgumentException("activityId");
+            return Async.completeExceptionally(new IllegalArgumentException("activityId"));
         }
 
         ConversationReference cr = activity.getConversationReference();
@@ -516,7 +521,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     @Override
     public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
         if (conversationReference == null) {
-            throw new IllegalArgumentException("conversationReference");
+            return Async.completeExceptionally(new IllegalArgumentException("conversationReference"));
         }
 
         Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () -> getAdapter()
@@ -532,9 +537,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Iterator<DeleteActivityHandler> deleteHandlers,
         Supplier<CompletableFuture<Void>> callAtBottom
     ) {
-        BotAssert.conversationReferenceNotNull(cr);
+        if (cr == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("ConversationReference"));
+        }
         if (deleteHandlers == null) {
-            throw new IllegalArgumentException("deleteHandlers");
+            return Async.completeExceptionally(new IllegalArgumentException("deleteHandlers"));
         }
 
         // No middleware to run.

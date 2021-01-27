@@ -26,7 +26,7 @@ public class PrivateConversationState extends BotState {
      * @return The storage key.
      */
     @Override
-    public String getStorageKey(TurnContext turnContext) {
+    public String getStorageKey(TurnContext turnContext) throws IllegalArgumentException {
         if (turnContext.getActivity() == null) {
             throw new IllegalArgumentException("invalid activity");
         }

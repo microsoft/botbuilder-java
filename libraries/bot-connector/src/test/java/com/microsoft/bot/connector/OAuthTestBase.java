@@ -6,7 +6,7 @@ import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.ChannelAccount;
-import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.restclient.RestClient;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

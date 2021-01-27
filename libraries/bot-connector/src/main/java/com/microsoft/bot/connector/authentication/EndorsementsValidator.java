@@ -38,8 +38,10 @@ public abstract class EndorsementsValidator {
      *                            endorsement list, or the incoming activity is not
      *                            considered valid.
      * @return True is the expected endorsement is found in the Endorsement set.
+     * @throws IllegalArgumentException Missing endorsements
      */
-    public static boolean validate(String expectedEndorsement, List<String> endorsements) {
+    public static boolean validate(String expectedEndorsement, List<String> endorsements)
+        throws IllegalArgumentException {
 
         // If the Activity came in and doesn't have a Channel ID then it's making no
         // assertions as to who endorses it. This means it should pass.

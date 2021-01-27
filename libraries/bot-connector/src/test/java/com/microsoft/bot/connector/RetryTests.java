@@ -16,7 +16,7 @@ public class RetryTests {
            exceptionToThrow = null;
         }};
 
-        String result = Retry.run(() ->
+        Retry.run(() ->
             faultyClass.faultyTask(),
             ((e, integer) -> faultyClass.exceptionHandler(e, integer)))
             .join();
@@ -32,8 +32,8 @@ public class RetryTests {
             triesUntilSuccess = 3;
         }};
 
-        String result = Retry.run(() ->
-                faultyClass.faultyTask(),
+        Retry.run(() ->
+            faultyClass.faultyTask(),
             ((e, integer) -> faultyClass.exceptionHandler(e, integer)))
             .join();
 
@@ -50,11 +50,14 @@ public class RetryTests {
 
         try {
             Retry.run(() ->
-                    faultyClass.faultyTask(),
+                faultyClass.faultyTask(),
                 ((e, integer) -> faultyClass.exceptionHandler(e, integer)))
                 .join();
+            Assert.fail("Should have thrown a RetryException because it exceeded max retry");
         } catch (CompletionException e) {
             Assert.assertTrue(e.getCause() instanceof RetryException);
+            Assert.assertEquals(RetryParams.MAX_RETRIES, faultyClass.callCount);
+            Assert.assertTrue(RetryParams.MAX_RETRIES == ((RetryException) e.getCause()).getExceptions().size());
         }
     }
 
@@ -69,7 +72,9 @@ public class RetryTests {
             callCount++;
 
             if (callCount < triesUntilSuccess && exceptionToThrow != null) {
-                throw exceptionToThrow;
+                CompletableFuture<String> result = new CompletableFuture<>();
+                result.completeExceptionally(exceptionToThrow);
+                return result;
             }
 
             return CompletableFuture.completedFuture(null);
