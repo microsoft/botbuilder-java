@@ -37,9 +37,10 @@ public class RecognizerResult implements RecognizerConvert {
      * Return the top scoring intent and its score.
      * 
      * @return The top scoring intent and score.
+     * @throws IllegalArgumentException No intents available.
      */
     @JsonIgnore
-    public IntentScore getTopScoringIntent() {
+    public IntentScore getTopScoringIntent() throws IllegalArgumentException {
         if (getIntents() == null) {
             throw new IllegalArgumentException("RecognizerResult.Intents cannot be null");
         }

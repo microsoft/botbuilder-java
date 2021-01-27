@@ -4,6 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.codepoetics.protonpack.StreamUtils;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 
 import java.time.OffsetDateTime;
@@ -49,7 +50,8 @@ public class MemoryTranscriptStore implements TranscriptStore {
     @Override
     public final CompletableFuture<Void> logActivity(Activity activity) {
         if (activity == null) {
-            throw new IllegalArgumentException("activity cannot be null for LogActivity()");
+            return Async.completeExceptionally(
+                new IllegalArgumentException("activity cannot be null for LogActivity()"));
         }
 
         synchronized (sync) {
@@ -96,11 +98,13 @@ public class MemoryTranscriptStore implements TranscriptStore {
         OffsetDateTime startDate
     ) {
         if (channelId == null) {
-            throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
+            return Async.completeExceptionally(
+                new IllegalArgumentException(String.format("missing %1$s", "channelId")));
         }
 
         if (conversationId == null) {
-            throw new IllegalArgumentException(String.format("missing %1$s", "conversationId"));
+            return Async.completeExceptionally(
+                new IllegalArgumentException(String.format("missing %1$s", "conversationId")));
         }
 
         PagedResult<Activity> pagedResult = new PagedResult<>();
@@ -147,15 +151,15 @@ public class MemoryTranscriptStore implements TranscriptStore {
     @Override
     public CompletableFuture<Void> deleteTranscript(String channelId, String conversationId) {
         if (channelId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 String.format("%1$s should not be null", "channelId")
-            );
+            ));
         }
 
         if (conversationId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 String.format("%1$s should not be null", "conversationId")
-            );
+            ));
         }
 
         synchronized (sync) {
@@ -182,7 +186,9 @@ public class MemoryTranscriptStore implements TranscriptStore {
         String continuationToken
     ) {
         if (channelId == null) {
-            throw new IllegalArgumentException(String.format("missing %1$s", "channelId"));
+            return Async.completeExceptionally(new IllegalArgumentException(String.format(
+                "missing %1$s", "channelId"
+            )));
         }
 
         PagedResult<TranscriptInfo> pagedResult = new PagedResult<>();
