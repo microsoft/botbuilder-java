@@ -2,7 +2,6 @@ package com.microsoft.bot.dialogs.prompts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,11 +25,7 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 
 import org.junit.Assert;
-import org.junit.internal.requests.FilterRequest;
 import org.junit.Test;
-import org.junit.runner.Description;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.manipulation.Filter;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
