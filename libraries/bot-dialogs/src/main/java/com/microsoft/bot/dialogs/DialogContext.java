@@ -200,17 +200,15 @@ public class DialogContext {
         // Look up dialog
         Dialog dialog = findDialog(dialogId);
         if (dialog == null) {
-            CompletableFuture<DialogTurnResult> result = CompletableFuture.completedFuture(null);
-            result.completeExceptionally(
-                new Exception(String.format(
-                    "DialogContext.beginDialog(): A dialog with an id of '%s' wasn't found."
-                    + " The dialog must be included in the current or parent DialogSet."
-                    + " For example, if subclassing a ComponentDialog you can call AddDialog()"
-                    + " within your constructor.",
-                    dialogId
-                ))
-            );
-            return result;
+            Async.completeExceptionally(new Exception(String.format(
+                "DialogContext.beginDialog(): A dialog with an id of '%s' wasn't found."
+                + " The dialog must be included in the current or parent DialogSet."
+                + " For example, if subclassing a ComponentDialog you can call AddDialog()"
+                + " within your constructor.",
+                dialogId
+            ))
+        );
+        return result;
         }
 
         // Push new instance onto stack
