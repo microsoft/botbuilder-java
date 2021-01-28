@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.dialogs;
 /**
  * Represents the events related to the "lifecycle" of the dialog.
