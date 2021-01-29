@@ -206,9 +206,7 @@ public class DialogContext {
                 + " For example, if subclassing a ComponentDialog you can call AddDialog()"
                 + " within your constructor.",
                 dialogId
-            ))
-        );
-        return result;
+            )));
         }
 
         // Push new instance onto stack

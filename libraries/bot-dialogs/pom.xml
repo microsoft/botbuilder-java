@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -53,8 +53,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-documentdb</artifactId>
@@ -65,42 +63,15 @@
       <artifactId>azure-storage-blob</artifactId>
       <version>12.8.0</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.microsoft.recognizers.text</groupId>
-      <artifactId>recognizers-text</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.microsoft.recognizers.text.number</groupId>
-      <artifactId>recognizers-text-number</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.microsoft.recognizers.text.datetime</groupId>
-      <artifactId>recognizers-text-date-time</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.microsoft.recognizers.text.choice</groupId>
-      <artifactId>recognizers-text-choice</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-integration-core</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-builder</artifactId>
       <version>4.6.0-preview8</version>
     </dependency>
-
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-builder</artifactId>
@@ -108,7 +79,27 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-</dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>24.1-jre</version>
+    </dependency>
+    <dependency>
+      <groupId>org.javatuples</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.20</version>
+    </dependency>
+  </dependencies>
 
   <profiles>
     <profile>
@@ -137,7 +128,23 @@
               <check/>
             </configuration>
           </plugin>
-
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <configuration>
+              <analysisCache>true</analysisCache>
+              <excludes>
+                <exclude>com/microsoft/recognizers/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <excludes>com/microsoft/recognizers/**</excludes>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
