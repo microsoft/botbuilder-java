@@ -220,9 +220,9 @@ public class WaterfallTests {
              try {
                  numberPrompt = new NumberPrompt<Integer>("number", null, PromptCultureModels.ENGLISH_CULTURE,
                          Integer.class);
-             } catch (UnsupportedDataTypeException e) {
+             } catch (Throwable t) {
                  // TODO Auto-generated catch block
-                 e.printStackTrace();
+                 t.printStackTrace();
              }
             dialogs.add(numberPrompt);
 

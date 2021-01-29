@@ -4,7 +4,6 @@
 package com.microsoft.bot.dialogs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +37,9 @@ public class WaterfallDialog extends Dialog {
      * @param dialogId The dialog ID.
      * @param actions  Optional actions to be defined by the caller.
      */
-    public WaterfallDialog(String dialogId, Collection<WaterfallStep> actions) {
+    public WaterfallDialog(String dialogId, List<WaterfallStep> actions) {
         super(dialogId);
-        steps = actions != null ? new ArrayList<WaterfallStep>(actions) : new ArrayList<WaterfallStep>();
+        steps = actions != null ? actions : new ArrayList<WaterfallStep>();
     }
 
     /**
@@ -126,7 +125,7 @@ public class WaterfallDialog extends Dialog {
         }
 
         // Don't do anything for non-message activities.
-        if (dc.getContext().getActivity().getType() != ActivityTypes.MESSAGE) {
+        if (!dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             return CompletableFuture.completedFuture(END_OF_TURN);
         }
 

@@ -200,7 +200,7 @@ public class DialogContext {
         // Look up dialog
         Dialog dialog = findDialog(dialogId);
         if (dialog == null) {
-            Async.completeExceptionally(new Exception(String.format(
+            return Async.completeExceptionally(new Exception(String.format(
                 "DialogContext.beginDialog(): A dialog with an id of '%s' wasn't found."
                 + " The dialog must be included in the current or parent DialogSet."
                 + " For example, if subclassing a ComponentDialog you can call AddDialog()"

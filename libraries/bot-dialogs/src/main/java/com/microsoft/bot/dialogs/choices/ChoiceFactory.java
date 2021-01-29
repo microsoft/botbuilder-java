@@ -11,6 +11,7 @@ import com.microsoft.bot.schema.CardAction;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.InputHints;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -374,6 +375,16 @@ public final class ChoiceFactory {
      */
     public static List<Choice> toChoices(List<String> choices) {
         return choices == null ? new ArrayList<>() : choices.stream().map(Choice::new).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a list of strings as a list of Choices.
+     *
+     * @param choices The strings to convert.
+     * @return A List of Choices.
+     */
+    public static List<Choice> toChoices(String... choices) {
+        return toChoices(Arrays.asList(choices));
     }
 
     private static List<CardAction> extractActions(List<Choice> choices) {

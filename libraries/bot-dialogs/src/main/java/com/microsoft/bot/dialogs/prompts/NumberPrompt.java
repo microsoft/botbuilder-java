@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import javax.activation.UnsupportedDataTypeException;
-
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.ActivityTypes;
@@ -37,11 +35,27 @@ public class NumberPrompt<T> extends Prompt<T> {
      *                      {@link DialogSet} or {@link ComponentDialog} .
      * @param classOfNumber Type of <T> used to determine within the class what type was created for. This is required
      *                      due to type erasure in Java not allowing checking the type of <T> during runtime.
-     * @throws UnsupportedDataTypeException thrown if a type other than int, long, float, or double are used for <T>.
+     * @throws IllegalArgumentException thrown if a type other than int, long, float, or double are used for <T>.
      */
     public NumberPrompt(String dialogId, Class<T> classOfNumber)
-            throws UnsupportedDataTypeException {
+            throws IllegalArgumentException {
         this(dialogId, null, null, classOfNumber);
+    }
+
+    /**
+     * Initializes a new instance of the {@link NumberPrompt{T}} class.
+     *
+     * @param dialogId      Unique ID of the dialog within its parent
+     *                      {@link DialogSet} or {@link ComponentDialog} .
+     * @param validator     Validator that will be called each time the user
+     *                      responds to the prompt.
+     * @param classOfNumber Type of <T> used to determine within the class what type was created for. This is required
+     *                      due to type erasure in Java not allowing checking the type of <T> during runtime.
+     * @throws IllegalArgumentException thrown if a type other than int, long, float, or double are used for <T>.
+     */
+    public NumberPrompt(String dialogId, PromptValidator<T> validator, Class<T> classOfNumber)
+        throws IllegalArgumentException {
+        this(dialogId, validator, null, classOfNumber);
     }
 
     /**
@@ -54,18 +68,17 @@ public class NumberPrompt<T> extends Prompt<T> {
      * @param defaultLocale Locale to use.
      * @param classOfNumber Type of <T> used to determine within the class what type was created for. This is required
      *                      due to type erasure in Java not allowing checking the type of <T> during runtime.
-     * @throws UnsupportedDataTypeException thrown if a type other than int, long, float, or double are used for <T>.
+     * @throws IllegalArgumentException thrown if a type other than int, long, float, or double are used for <T>.
      */
     public NumberPrompt(String dialogId, PromptValidator<T> validator, String defaultLocale, Class<T> classOfNumber)
-            throws UnsupportedDataTypeException {
-
+        throws IllegalArgumentException {
         super(dialogId, validator);
         this.defaultLocale = defaultLocale;
         this.classOfNumber = classOfNumber;
 
         if (!(classOfNumber.getSimpleName().equals("Long") || classOfNumber.getSimpleName().equals("Integer")
               || classOfNumber.getSimpleName().equals("Float") || classOfNumber.getSimpleName().equals("Double"))) {
-            throw new UnsupportedDataTypeException(String.format("NumberPrompt: Type argument %s <T> is not supported",
+            throw new IllegalArgumentException(String.format("NumberPrompt: Type argument %s <T> is not supported",
                     classOfNumber.getSimpleName()));
         }
     }
@@ -160,7 +173,7 @@ public class NumberPrompt<T> extends Prompt<T> {
         }
 
         PromptRecognizerResult<T> result = new PromptRecognizerResult<T>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             String utterance = turnContext.getActivity().getText();
             if (StringUtils.isEmpty(utterance)) {
                 return CompletableFuture.completedFuture(result);
