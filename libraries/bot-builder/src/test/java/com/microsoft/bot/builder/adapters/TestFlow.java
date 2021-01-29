@@ -73,7 +73,19 @@ public class TestFlow {
     }
 
     /**
-     * Send an activity from the user to the bot
+     *  Creates a conversation update activity and process it the activity.
+     * @return A new TestFlow Object
+     */
+    public TestFlow sendConverationUpdate() {
+        return new TestFlow(testTask.thenCompose(result -> {
+            Activity cu = Activity.createConversationUpdateActivity();
+            cu.getMembersAdded().add(this.adapter.conversationReference().getUser());
+            return this.adapter.processActivity(cu, callback);
+        }), this);
+    }
+
+    /**
+     * Send an activity from the user to the bot.
      *
      * @param userActivity
      * @return

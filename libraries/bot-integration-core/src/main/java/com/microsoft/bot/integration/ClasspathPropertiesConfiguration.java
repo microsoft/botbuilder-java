@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.integration;
 
 import org.slf4j.LoggerFactory;
@@ -34,12 +37,20 @@ public class ClasspathPropertiesConfiguration implements Configuration {
 
     /**
      * Returns a value for the specified property name.
-     * 
+     *
      * @param key The property name.
      * @return The property value.
      */
     @Override
     public String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    /**
+     * @return The Properties value.
+     */
+    @Override
+    public Properties getProperties() {
+        return this.properties;
     }
 }

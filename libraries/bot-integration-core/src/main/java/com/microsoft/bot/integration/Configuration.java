@@ -3,15 +3,24 @@
 
 package com.microsoft.bot.integration;
 
+import java.util.Properties;
+
 /**
  * Provides read-only access to configuration properties.
  */
 public interface Configuration {
     /**
      * Returns a value for the specified property name.
-     * 
+     *
      * @param key The property name.
      * @return The property value.
      */
     String getProperty(String key);
+
+    /**
+     * Returns the Properties in the Configuration.
+     *
+     * @return The Properties in the Configuration.
+     */
+    Properties getProperties();
 }

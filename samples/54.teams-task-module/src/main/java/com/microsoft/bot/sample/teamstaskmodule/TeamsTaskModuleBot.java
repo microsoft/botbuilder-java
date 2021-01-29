@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.integration.Async;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.sample.teamstaskmodule.models.AdaptiveCardTaskFetchValue;
 import com.microsoft.bot.sample.teamstaskmodule.models.CardTaskFetchValue;
