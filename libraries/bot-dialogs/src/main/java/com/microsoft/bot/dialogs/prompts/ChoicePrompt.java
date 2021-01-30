@@ -43,6 +43,15 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
      * Initializes a new instance of the {@link ChoicePrompt} class.
      *
      * @param dialogId      The ID to assign to this prompt.
+     */
+    public ChoicePrompt(String dialogId) {
+        this(dialogId, null, null);
+    }
+
+    /**
+     * Initializes a new instance of the {@link ChoicePrompt} class.
+     *
+     * @param dialogId      The ID to assign to this prompt.
      * @param validator     Optional, a {@link PromptValidator{FoundChoice}} that
      *                      contains additional, custom validation for this prompt.
      * @param defaultLocale Optional, the default locale used to determine
@@ -267,7 +276,7 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
         List<Choice> choices = options.getChoices() != null ? options.getChoices() : new ArrayList<Choice>();
 
         PromptRecognizerResult<FoundChoice> result = new PromptRecognizerResult<FoundChoice>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             Activity activity = turnContext.getActivity();
             String utterance = activity.getText();
             if (StringUtils.isEmpty(utterance)) {

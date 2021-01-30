@@ -114,8 +114,8 @@ public class ComponentDialogTests {
             dialogs.add(createWaterfall());
             try {
                 dialogs.add(new NumberPrompt<Integer>("number", Integer.class));
-            } catch (UnsupportedDataTypeException e) {
-                e.printStackTrace();
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
 
             DialogContext dc = dialogs.createContext(turnContext).join();

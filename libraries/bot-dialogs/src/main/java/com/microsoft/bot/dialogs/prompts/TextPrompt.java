@@ -104,7 +104,7 @@ public class TextPrompt extends Prompt<String> {
         }
 
         PromptRecognizerResult<String> result = new PromptRecognizerResult<String>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             Activity message = turnContext.getActivity();
             if (message.getText() != null) {
                 result.setSucceeded(true);

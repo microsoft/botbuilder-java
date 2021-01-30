@@ -105,7 +105,7 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
         }
 
         PromptRecognizerResult<List<Attachment>> result = new PromptRecognizerResult<List<Attachment>>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             Activity message = turnContext.getActivity();
             if (message.getAttachments() != null && message.getAttachments().size() > 0) {
                 result.setSucceeded(true);

@@ -45,7 +45,7 @@ public class NumberPromptTests {
 
     @Test
     public void NumberPromptWithUnsupportedTypeShouldFail() {
-        Assert.assertThrows(UnsupportedDataTypeException.class, () -> new NumberPrompt<Short>("prompt", Short.class));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new NumberPrompt<Short>("prompt", Short.class));
     }
 
     @Test

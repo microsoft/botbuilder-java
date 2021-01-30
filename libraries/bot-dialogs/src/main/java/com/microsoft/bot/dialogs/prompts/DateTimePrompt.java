@@ -136,7 +136,7 @@ public class DateTimePrompt extends Prompt<List<DateTimeResolution>> {
 
         PromptRecognizerResult<List<DateTimeResolution>> result =
                                 new PromptRecognizerResult<List<DateTimeResolution>>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             String utterance = turnContext.getActivity().getText();
             if (StringUtils.isEmpty(utterance)) {
                 return CompletableFuture.completedFuture(result);

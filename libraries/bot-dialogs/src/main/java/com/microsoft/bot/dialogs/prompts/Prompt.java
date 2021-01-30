@@ -151,7 +151,7 @@ public abstract class Prompt<T> extends Dialog {
         }
 
         // Don't do anything for non-message activities
-        if (dc.getContext().getActivity().getType() != ActivityTypes.MESSAGE) {
+        if (!dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }
 
@@ -248,7 +248,7 @@ public abstract class Prompt<T> extends Dialog {
     @Override
     protected CompletableFuture<Boolean> onPreBubbleEvent(DialogContext dc, DialogEvent e) {
         if (e.getName() == DialogEvents.ACTIVITY_RECEIVED
-            && dc.getContext().getActivity().getType() == ActivityTypes.MESSAGE) {
+            && dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             // Perform base recognition
             Map<String, Object> state = dc.getActiveDialog().getState();
             PromptRecognizerResult<T> recognized =  onRecognize(dc.getContext(),

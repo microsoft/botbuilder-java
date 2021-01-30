@@ -283,7 +283,7 @@ public class ConfirmPrompt extends Prompt<Boolean> {
         }
 
         PromptRecognizerResult<Boolean> result = new PromptRecognizerResult<Boolean>();
-        if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
             // Recognize utterance
             String utterance = turnContext.getActivity().getText();
             if (StringUtils.isBlank(utterance)) {
