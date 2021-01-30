@@ -48,6 +48,7 @@ public class UserProfileDialog extends ComponentDialog {
             this::summaryStep
         };
 
+        // Add named dialogs to the DialogSet. These names are saved in the dialog state.
         addDialog(new WaterfallDialog("WaterfallDialog", Arrays.asList(waterfallSteps)));
         addDialog(new TextPrompt("TextPrompt"));
         addDialog(new NumberPrompt<Integer>("NumberPrompt", UserProfileDialog::agePromptValidator, Integer.class));
@@ -55,10 +56,13 @@ public class UserProfileDialog extends ComponentDialog {
         addDialog(new ConfirmPrompt("ConfirmPrompt"));
         addDialog(new AttachmentPrompt("AttachmentPrompt", UserProfileDialog::picturePromptValidator));
 
+        // The initial child Dialog to run.
         setInitialDialogId("WaterfallDialog");
     }
 
     private static CompletableFuture<DialogTurnResult> transportStep(WaterfallStepContext stepContext) {
+        // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
+        // Running a prompt here means the next WaterfallStep will be run when the user's response is received.
         PromptOptions promptOptions = new PromptOptions();
         promptOptions.setPrompt(MessageFactory.text("Please enter your mode of transport."));
         promptOptions.setChoices(ChoiceFactory.toChoices("Car", "Bus", "Bicycle"));
@@ -128,7 +132,8 @@ public class UserProfileDialog extends ComponentDialog {
     }
 
     private static CompletableFuture<DialogTurnResult> confirmStep(WaterfallStepContext stepContext) {
-        stepContext.getValues().put("picture", ((List<Attachment>)stepContext.getResult()));
+        List<Attachment> attachments = (List<Attachment>)stepContext.getResult();
+        stepContext.getValues().put("picture", attachments == null ? null : attachments.get(0));
 
         // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
         PromptOptions promptOptions = new PromptOptions();
@@ -169,7 +174,7 @@ public class UserProfileDialog extends ComponentDialog {
                     }
 
                     return stepContext.getContext().sendActivity(
-                        MessageFactory.text("A profile picture was saved but could not be displayed here.")
+                        MessageFactory.text("A profile picture wasn't attached.")
                     );
                 })
                 .thenCompose(resourceResponse -> stepContext.endDialog());

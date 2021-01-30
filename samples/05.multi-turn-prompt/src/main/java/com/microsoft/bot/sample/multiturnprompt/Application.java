@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
  * extends the {@link com.microsoft.bot.builder.Bot} interface should be
  * annotated with @Component.
  *
- * @see WelcomeUserBot
+ * @see DialogBot
  */
 @SpringBootApplication
 
