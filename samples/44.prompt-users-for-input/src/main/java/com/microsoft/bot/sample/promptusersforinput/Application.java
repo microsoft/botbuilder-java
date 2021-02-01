@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.multiturnprompt;
+package com.microsoft.bot.sample.promptusersforinput;
 
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;

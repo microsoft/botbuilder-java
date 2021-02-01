@@ -13,7 +13,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com), i
 ## To try this sample locally
 - From the root of this project folder:
   - Build the sample using `mvn package`
-  - Run it by using `java -jar .\target\bot-multiturnprompt-sample.jar`
+  - Run it by using `java -jar .\target\bot-promptusersforinput-sample.jar`
 
 - Test the bot using Bot Framework Emulator
 
