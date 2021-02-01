@@ -1,8 +1,8 @@
-# Multi-turn prompt
+# Prompt users for input
 
-Bot Framework v4 multi-turn prompt bot sample
+Bot Framework v4 Prompt Users for Input bot sample
 
-This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to use the prompts classes included in `botbuilder-dialogs`.  This bot will ask for the user's name and age, then store the responses. It demonstrates a multi-turn dialog flow using a text prompt, a number prompt, and state accessors to store and retrieve values.
+This bot has been created using [Bot Framework](https://dev.botframework.com), The bot maintains conversation state to track and direct the conversation and ask the user questions. The bot maintains user state to track the user's answers.
 
 ## Prerequisites
 

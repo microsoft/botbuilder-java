@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>This package contains the Multi-turn Prompt sample using Spring Boot.</description>
+    <description>This package contains the Prompt Users for Input sample using Spring Boot.</description>
     <url>http://maven.apache.org</url>
 
     <parent>
