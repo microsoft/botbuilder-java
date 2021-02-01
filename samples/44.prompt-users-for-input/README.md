@@ -2,7 +2,7 @@
 
 Bot Framework v4 Prompt Users for Input bot sample
 
-This bot has been created using [Bot Framework](https://dev.botframework.com), The bot maintains conversation state to track and direct the conversation and ask the user questions. The bot maintains user state to track the user's answers.
+This bot has been created using [Bot Framework](https://dev.botframework.com). The bot maintains conversation state to track and direct the conversation and ask the user questions. The bot maintains user state to track the user's answers.
 
 ## Prerequisites
 
