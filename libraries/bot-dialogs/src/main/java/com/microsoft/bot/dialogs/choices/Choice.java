@@ -5,6 +5,7 @@ package com.microsoft.bot.dialogs.choices;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.schema.CardAction;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,6 +34,26 @@ public class Choice {
      */
     public Choice(String withValue) {
         value = withValue;
+    }
+
+    /**
+     * Creates a Choice.
+     * @param withValue The value.
+     * @param withSynonyms The list of synonyms to recognize in addition to the value.
+     */
+    public Choice(String withValue, List<String> withSynonyms) {
+        value = withValue;
+        synonyms = withSynonyms;
+    }
+
+    /**
+     * Creates a Choice.
+     * @param withValue The value.
+     * @param withSynonyms The list of synonyms to recognize in addition to the value.
+     */
+    public Choice(String withValue, String... withSynonyms) {
+        value = withValue;
+        synonyms = Arrays.asList(withSynonyms);
     }
 
     /**

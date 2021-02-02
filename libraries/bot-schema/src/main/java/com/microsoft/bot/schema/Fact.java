@@ -28,6 +28,22 @@ public class Fact {
     private String value;
 
     /**
+     * Creates a new fact.
+     */
+    public Fact() {
+    }
+
+    /**
+     * Creates a new fact.
+     * @param withKey The key value.
+     * @param withValue The value
+     */
+    public Fact(String withKey, String withValue) {
+        key = withKey;
+        value = withValue;
+    }
+
+    /**
      * Get the key value.
      *
      * @return the key value
