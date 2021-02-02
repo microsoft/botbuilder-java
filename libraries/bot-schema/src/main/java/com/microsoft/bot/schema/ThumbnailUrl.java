@@ -25,6 +25,20 @@ public class ThumbnailUrl {
     private String alt;
 
     /**
+     * Creates a new ThumbnailUrl.
+     */
+    public ThumbnailUrl() {
+    }
+
+    /**
+     * Creates a new ThumbnailUrl.
+     * @param withUrl The url value to set.
+     */
+    public ThumbnailUrl(String withUrl) {
+        url = withUrl;
+    }
+
+    /**
      * Get the url value.
      *
      * @return the url value
