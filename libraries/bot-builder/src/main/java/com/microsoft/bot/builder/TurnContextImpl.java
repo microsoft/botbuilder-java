@@ -7,6 +7,7 @@ import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.DeliveryModes;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
 import java.util.Locale;
@@ -38,6 +39,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * message.
      */
     private final Activity activity;
+
+    private List<Activity> bufferedReplyActivities = new ArrayList<>();
 
     /**
      * Response handlers for send activity operations.
@@ -218,6 +221,14 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
 
     /**
+     * Gets a list of activities to send when `context.Activity.DeliveryMode == 'expectReplies'.
+     * @return A list of activities.
+     */
+    public List<Activity> getBufferedReplyActivities() {
+        return bufferedReplyActivities;
+    }
+
+    /**
      * Sends a message activity to the sender of the incoming activity.
      *
      * <p>
@@ -385,12 +396,21 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     private CompletableFuture<ResourceResponse[]> sendActivitiesThroughAdapter(
         List<Activity> activities
     ) {
-        return adapter.sendActivities(this, activities).thenApply(responses -> {
+        if (DeliveryModes.fromString(getActivity().getDeliveryMode()) == DeliveryModes.EXPECT_REPLIES) {
+            ResourceResponse[] responses = new ResourceResponse[activities.size()];
             boolean sentNonTraceActivity = false;
 
             for (int index = 0; index < responses.length; index++) {
                 Activity sendActivity = activities.get(index);
-                sendActivity.setId(responses[index].getId());
+                bufferedReplyActivities.add(sendActivity);
+
+                // Ensure the TurnState has the InvokeResponseKey, since this activity
+                // is not being sent through the adapter, where it would be added to TurnState.
+                if (activity.isType(ActivityTypes.INVOKE_RESPONSE)) {
+                    getTurnState().add(BotFrameworkAdapter.INVOKE_RESPONSE_KEY, activity);
+                }
+
+                responses[index] = new ResourceResponse();
                 sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
             }
 
@@ -398,8 +418,24 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 responded = true;
             }
 
-            return responses;
-        });
+            return CompletableFuture.completedFuture(responses);
+        } else {
+            return adapter.sendActivities(this, activities).thenApply(responses -> {
+                boolean sentNonTraceActivity = false;
+
+                for (int index = 0; index < responses.length; index++) {
+                    Activity sendActivity = activities.get(index);
+                    sendActivity.setId(responses[index].getId());
+                    sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
+                }
+
+                if (sentNonTraceActivity) {
+                    responded = true;
+                }
+
+                return responses;
+            });
+        }
     }
 
     private CompletableFuture<ResourceResponse[]> sendActivitiesThroughCallbackPipeline(
