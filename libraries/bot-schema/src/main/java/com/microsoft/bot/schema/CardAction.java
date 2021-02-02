@@ -102,13 +102,37 @@ public class CardAction {
     }
 
     /**
-     * Simplify creation of CardActions with string values.
+     * Creation of CardAction with string values.
      *
-     * @param input The value for both Title and Value.
+     * @param withInput The value for both Title and Value.
      */
-    public CardAction(String input) {
-        setTitle(input);
-        setValue(input);
+    public CardAction(String withInput) {
+        setTitle(withInput);
+        setValue(withInput);
+    }
+
+    /**
+     * Creation of CardAction with type and title.
+     *
+     * @param withType the type value to set.
+     * @param withTitle the title value to set.
+     */
+    public CardAction(ActionTypes withType, String withTitle) {
+        setType(withType);
+        setTitle(withTitle);
+    }
+
+    /**
+     * Creation of CardAction with type and title.
+     *
+     * @param withType the type value to set.
+     * @param withTitle the title value to set.
+     * @param withValue The value for both Title and Value.
+     */
+    public CardAction(ActionTypes withType, String withTitle, String withValue) {
+        setType(withType);
+        setTitle(withTitle);
+        setValue(withValue);
     }
 
     /**
