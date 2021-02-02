@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -195,6 +196,15 @@ public class AudioCard {
     }
 
     /**
+     * Set the media value.
+     *
+     * @param withMedia the media value to set
+     */
+    public void setMedia(MediaUrl... withMedia) {
+        this.media = Arrays.asList(withMedia);
+    }
+
+    /**
      * Get the buttons value.
      *
      * @return the buttons value
@@ -210,6 +220,15 @@ public class AudioCard {
      */
     public void setButtons(List<CardAction> withButtons) {
         this.buttons = withButtons;
+    }
+
+    /**
+     * Set the buttons value.
+     *
+     * @param withButtons the buttons value to set
+     */
+    public void setButtons(CardAction... withButtons) {
+        this.buttons = Arrays.asList(withButtons);
     }
 
     /**

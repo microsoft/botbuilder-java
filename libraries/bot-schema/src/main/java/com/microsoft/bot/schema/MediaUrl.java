@@ -26,6 +26,22 @@ public class MediaUrl {
     private String profile;
 
     /**
+     * Creates a new MediaUrl.
+     */
+    public MediaUrl() {
+    }
+
+    /**
+     * Creates a new MediaUrl.
+     *
+     * @param withUrl The url value.
+     */
+    public MediaUrl(String withUrl) {
+        url = withUrl;
+
+    }
+
+    /**
      * Get the url value.
      *
      * @return the url value
