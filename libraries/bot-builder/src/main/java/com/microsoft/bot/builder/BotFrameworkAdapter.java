@@ -1482,7 +1482,7 @@ public class BotFrameworkAdapter extends BotAdapter
 
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
             AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
-                ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
+                ? new MicrosoftGovernmentAppCredentials(appId, appPassword, scope)
                 : new MicrosoftAppCredentials(appId, appPassword);
             appCredentialMap.put(cacheKey, credentials);
             return credentials;
