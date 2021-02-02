@@ -37,6 +37,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
 
     private String appId;
     private String authTenant;
+    private String authScope;
     private Authenticator authenticator;
 
     /**
@@ -45,7 +46,20 @@ public abstract class AppCredentials implements ServiceClientCredentials {
      * @param withChannelAuthTenant Optional. The oauth token tenant.
      */
     public AppCredentials(String withChannelAuthTenant) {
+        this(withChannelAuthTenant, AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE);
+    }
+
+    /**
+     * Initializes a new instance of the AppCredentials class.
+     *
+     * @param withChannelAuthTenant Optional. The oauth token tenant.
+     * @param withOAuthScope The scope for the token.
+     */
+    public AppCredentials(String withChannelAuthTenant, String withOAuthScope) {
         setChannelAuthTenant(withChannelAuthTenant);
+        authScope = StringUtils.isEmpty(withOAuthScope)
+            ? AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+            : withOAuthScope;
     }
 
     /**
@@ -179,7 +193,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
      * @return OAuth scope.
      */
     public String oAuthScope() {
-        return AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
+        return authScope;
     }
 
     /**
