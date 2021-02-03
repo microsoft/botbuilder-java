@@ -3,6 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "groupLocation": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "Specifies the location of the Resource Group."
@@ -33,12 +34,14 @@
             }
         },
         "botSku": {
+            "defaultValue": "F0",
             "type": "string",
             "metadata": {
                 "description": "The pricing tier of the Bot Service Registration. Acceptable values are F0 and S1."
             }
         },
         "newAppServicePlanName": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "The name of the App Service Plan."
@@ -47,10 +50,10 @@
         "newAppServicePlanSku": {
             "type": "object",
             "defaultValue": {
-                "name": "S1",
-                "tier": "Standard",
-                "size": "S1",
-                "family": "S",
+                "name": "P1v2",
+                "tier": "PremiumV2",
+                "size": "P1v2",
+                "family": "Pv2",
                 "capacity": 1
             },
             "metadata": {
@@ -58,6 +61,7 @@
             }
         },
         "newAppServicePlanLocation": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "The location of the App Service Plan. Defaults to \"westus\"."
@@ -72,8 +76,10 @@
         }
     },
     "variables": {
-        "appServicePlanName": "[parameters('newAppServicePlanName')]",
-        "resourcesLocation": "[parameters('newAppServicePlanLocation')]",
+        "resourcesLocation": "[if(empty(parameters('newAppServicePlanLocation')), deployment().location, parameters('newAppServicePlanLocation'))]",
+        "effectiveGroupLocation": "[if(empty(parameters('groupLocation')), variables('resourcesLocation'), parameters('groupLocation'))]",
+        "effectivePlanLocation": "[if(empty(parameters('newAppServicePlanLocation')), deployment().location, parameters('newAppServicePlanLocation'))]",
+        "appServicePlanName": "[if(empty(parameters('newAppServicePlanName')), concat(parameters('botId'), 'ServicePlan'), parameters('newAppServicePlanName'))]",
         "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
         "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
         "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]",
@@ -84,8 +90,9 @@
             "name": "[parameters('groupName')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2018-05-01",
-            "location": "[parameters('groupLocation')]",
-            "properties": {}
+            "location": "[variables('effectiveGroupLocation')]",
+            "properties": {
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -110,8 +117,10 @@
                             "apiVersion": "2018-02-01",
                             "location": "[variables('resourcesLocation')]",
                             "sku": "[parameters('newAppServicePlanSku')]",
+                            "kind": "linux",
                             "properties": {
-                                "name": "[variables('appServicePlanName')]"
+                                "name": "[variables('appServicePlanName')]",
+                                "reserved":true
                             }
                         },
                         {
@@ -130,8 +139,8 @@
                                 "siteConfig": {
                                     "appSettings": [
                                         {
-                                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                                            "value": "10.14.1"
+                                            "name": "JAVA_OPTS",
+                                            "value": "-Dserver.port=80"
                                         },
                                         {
                                             "name": "MicrosoftAppId",
