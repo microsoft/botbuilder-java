@@ -38,6 +38,11 @@ public class OAuthCard {
     private List<CardAction> buttons;
 
     /**
+     * The resource to try to perform token exchange with.
+     */
+    private TokenExchangeResource tokenExchangeResource;
+
+    /**
      * Get the text value.
      *
      * @return the text value
@@ -93,7 +98,7 @@ public class OAuthCard {
 
     /**
      * Creates an @{link Attachment} for this card.
-     * 
+     *
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
@@ -103,5 +108,21 @@ public class OAuthCard {
                 setContentType(CONTENTTYPE);
             }
         };
+    }
+
+    /**
+     * Gets the resource to try to perform token exchange with.
+     * @return The tokenExchangeResource value.
+     */
+    public TokenExchangeResource getTokenExchangeResource() {
+        return tokenExchangeResource;
+    }
+
+    /**
+     * Sets the resource to try to perform token exchange with.
+     * @param withExchangeResource The tokenExchangeResource value.
+     */
+    public void setTokenExchangeResource(TokenExchangeResource withExchangeResource) {
+        tokenExchangeResource = withExchangeResource;
     }
 }

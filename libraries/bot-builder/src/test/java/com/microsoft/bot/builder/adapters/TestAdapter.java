@@ -4,10 +4,14 @@
 package com.microsoft.bot.builder.adapters;
 
 import com.microsoft.bot.builder.*;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.UserToken;
+import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
+
+import static org.mockito.ArgumentMatchers.nullable;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -15,12 +19,16 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class TestAdapter extends BotAdapter {
+public class TestAdapter extends BotAdapter implements UserTokenProvider {
+
+    private final String exceptionExpected = "ExceptionExpected";
     private final Queue<Activity> botReplies = new LinkedList<>();
     private int nextId = 0;
     private ConversationReference conversationReference;
     private String locale;
     private boolean sendTraceActivity = false;
+    private Map<ExchangableTokenKey, String> exchangableToken = new HashMap<ExchangableTokenKey, String>();
+
 
     private static class UserTokenKey {
         public String connectionName;
@@ -32,7 +40,7 @@ public class TestAdapter extends BotAdapter {
             if (!(rhs instanceof UserTokenKey))
                 return false;
             return StringUtils.equals(connectionName, ((UserTokenKey) rhs).connectionName)
-                && StringUtils.equals(userId, ((UserTokenKey) rhs).userId)
+                    && StringUtils.equals(userId, ((UserTokenKey) rhs).userId)
                     && StringUtils.equals(channelId, ((UserTokenKey) rhs).channelId);
         }
 
@@ -132,9 +140,11 @@ public class TestAdapter extends BotAdapter {
         return this;
     }
 
-        /**
-     * Adds middleware to the adapter to register an Storage object on the turn context.
-     * The middleware registers the state objects on the turn context at the start of each turn.
+    /**
+     * Adds middleware to the adapter to register an Storage object on the turn
+     * context. The middleware registers the state objects on the turn context at
+     * the start of each turn.
+     *
      * @param storage The storage object to register.
      * @return The updated adapter.
      */
@@ -146,8 +156,10 @@ public class TestAdapter extends BotAdapter {
     }
 
     /**
-     * Adds middleware to the adapter to register one or more BotState objects on the turn context.
-     * The middleware registers the state objects on the turn context at the start of each turn.
+     * Adds middleware to the adapter to register one or more BotState objects on
+     * the turn context. The middleware registers the state objects on the turn
+     * context at the start of each turn.
+     *
      * @param botstates The state objects to register.
      * @return The updated adapter.
      */
@@ -169,10 +181,8 @@ public class TestAdapter extends BotAdapter {
                     activity.setType(ActivityTypes.MESSAGE);
                 activity.setChannelId(conversationReference().getChannelId());
 
-                if (activity.getFrom() == null
-                    || StringUtils.equalsIgnoreCase(activity.getFrom().getId(), "unknown")
-                    || activity.getFrom().getRole() == RoleTypes.BOT
-                ) {
+                if (activity.getFrom() == null || StringUtils.equalsIgnoreCase(activity.getFrom().getId(), "unknown")
+                        || activity.getFrom().getRole() == RoleTypes.BOT) {
                     activity.setFrom(conversationReference().getUser());
                 }
 
@@ -206,10 +216,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<ResourceResponse[]> sendActivities(
-        TurnContext context,
-        List<Activity> activities
-    ) {
+    public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext context, List<Activity> activities) {
         List<ResourceResponse> responses = new LinkedList<ResourceResponse>();
 
         for (Activity activity : activities) {
@@ -221,23 +228,12 @@ public class TestAdapter extends BotAdapter {
 
             responses.add(new ResourceResponse(activity.getId()));
 
-            System.out.println(
-                String.format(
-                    "TestAdapter:SendActivities, Count:%s (tid:%s)",
-                    activities.size(),
-                    Thread.currentThread().getId()
-                )
-            );
+            System.out.println(String.format("TestAdapter:SendActivities, Count:%s (tid:%s)", activities.size(),
+                    Thread.currentThread().getId()));
             for (Activity act : activities) {
                 System.out.printf(" :--------\n : To:%s\n", act.getRecipient().getName());
-                System.out.printf(
-                    " : From:%s\n",
-                    (act.getFrom() == null) ? "No from set" : act.getFrom().getName()
-                );
-                System.out.printf(
-                    " : Text:%s\n :---------\n",
-                    (act.getText() == null) ? "No text set" : act.getText()
-                );
+                System.out.printf(" : From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
+                System.out.printf(" : Text:%s\n :---------\n", (act.getText() == null) ? "No text set" : act.getText());
             }
 
             // This is simulating DELAY
@@ -263,16 +259,11 @@ public class TestAdapter extends BotAdapter {
                 }
             }
         }
-        return CompletableFuture.completedFuture(
-            responses.toArray(new ResourceResponse[responses.size()])
-        );
+        return CompletableFuture.completedFuture(responses.toArray(new ResourceResponse[responses.size()]));
     }
 
     @Override
-    public CompletableFuture<ResourceResponse> updateActivity(
-        TurnContext context,
-        Activity activity
-    ) {
+    public CompletableFuture<ResourceResponse> updateActivity(TurnContext context, Activity activity) {
         synchronized (botReplies) {
             List<Activity> replies = new ArrayList<>(botReplies);
             for (int i = 0; i < botReplies.size(); i++) {
@@ -283,9 +274,7 @@ public class TestAdapter extends BotAdapter {
                     for (Activity item : replies) {
                         botReplies.add(item);
                     }
-                    return CompletableFuture.completedFuture(
-                        new ResourceResponse(activity.getId())
-                    );
+                    return CompletableFuture.completedFuture(new ResourceResponse(activity.getId()));
                 }
             }
         }
@@ -293,10 +282,7 @@ public class TestAdapter extends BotAdapter {
     }
 
     @Override
-    public CompletableFuture<Void> deleteActivity(
-        TurnContext context,
-        ConversationReference reference
-    ) {
+    public CompletableFuture<Void> deleteActivity(TurnContext context, ConversationReference reference) {
         synchronized (botReplies) {
             ArrayList<Activity> replies = new ArrayList<>(botReplies);
             for (int i = 0; i < botReplies.size(); i++) {
@@ -363,13 +349,8 @@ public class TestAdapter extends BotAdapter {
         return processActivity(this.makeActivity(userSays), callback);
     }
 
-    public void addUserToken(
-        String connectionName,
-        String channelId,
-        String userId,
-        String token,
-        String withMagicCode
-    ) {
+    public void addUserToken(String connectionName, String channelId, String userId, String token,
+            String withMagicCode) {
         UserTokenKey userKey = new UserTokenKey();
         userKey.connectionName = connectionName;
         userKey.channelId = channelId;
@@ -388,116 +369,35 @@ public class TestAdapter extends BotAdapter {
         }
     }
 
-    public CompletableFuture<TokenResponse> getUserToken(
-        TurnContext turnContext,
-        String connectionName,
-        String magicCode
-    ) {
-        UserTokenKey key = new UserTokenKey();
-        key.connectionName = connectionName;
-        key.channelId = turnContext.getActivity().getChannelId();
-        key.userId = turnContext.getActivity().getFrom().getId();
+    public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext, String connectionName,
+            String magicCode) {
+        return getUserToken(turnContext, connectionName, magicCode);
 
-        if (magicCode != null) {
-            TokenMagicCode magicCodeRecord = magicCodes.stream().filter(
-                tokenMagicCode -> key.equals(tokenMagicCode.key)
-            ).findFirst().orElse(null);
-            if (
-                magicCodeRecord != null && StringUtils.equals(magicCodeRecord.magicCode, magicCode)
-            ) {
-                addUserToken(
-                    connectionName,
-                    key.channelId,
-                    key.userId,
-                    magicCodeRecord.userToken,
-                    null
-                );
-            }
-        }
-
-        if (userTokens.containsKey(key)) {
-            return CompletableFuture.completedFuture(new TokenResponse() {
-                {
-                    setConnectionName(connectionName);
-                    setToken(userTokens.get(key));
-                }
-            });
-        }
-
-        return CompletableFuture.completedFuture(null);
     }
 
-    public CompletableFuture<String> getOAuthSignInLink(
-        TurnContext turnContext,
-        String connectionName
-    ) {
-        return getOAuthSignInLink(
-            turnContext,
-            connectionName,
-            turnContext.getActivity().getFrom().getId(),
-            null
-        );
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName) {
+        return getOAuthSignInLink(turnContext, connectionName, turnContext.getActivity().getFrom().getId(), null);
     }
 
-    public CompletableFuture<String> getOAuthSignInLink(
-        TurnContext turnContext,
-        String connectionName,
-        String userId,
-        String finalRedirect
-    ) {
-        String link = String.format(
-            "https://fake.com/oauthsignin/%s/{turnContext.Activity.ChannelId}/%s",
-            connectionName,
-            userId == null ? "" : userId
-        );
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName, String userId,
+            String finalRedirect) {
+        String link = String.format("https://fake.com/oauthsignin/%s/{turnContext.Activity.ChannelId}/%s",
+                connectionName, userId == null ? "" : userId);
         return CompletableFuture.completedFuture(link);
     }
 
-    public CompletableFuture<Void> signOutUser(
-        TurnContext turnContext,
-        String connectionName,
-        String userId
-    ) {
-        String channelId = turnContext.getActivity().getChannelId();
-        final String effectiveUserId = userId == null
-            ? turnContext.getActivity().getFrom().getId()
-            : userId;
-
-        userTokens.keySet().stream().filter(
-            t -> StringUtils.equals(t.channelId, channelId) && StringUtils.equals(t.userId, effectiveUserId) && connectionName == null || StringUtils.equals(t.connectionName, connectionName)
-        ).collect(Collectors.toList()).forEach(key -> userTokens.remove(key));
-
-        return CompletableFuture.completedFuture(null);
+    public CompletableFuture<Void> signOutUser(TurnContext turnContext, String connectionName, String userId) {
+        return signOutUser(turnContext, null, connectionName, userId);
     }
 
-    public CompletableFuture<TokenStatus[]> getTokenStatus(
-        TurnContext turnContext,
-        String userId,
-        String includeFilter
-    ) {
-        String[] filter = includeFilter == null ? null : includeFilter.split(",");
-        List<TokenStatus> records = userTokens.keySet().stream().filter(
-            x -> StringUtils.equals(x.channelId, turnContext.getActivity().getChannelId()) && StringUtils.equals(x.userId, turnContext.getActivity().getFrom().getId()) && (includeFilter == null || Arrays.binarySearch(filter, x.connectionName) != -1)
-        ).map(r -> new TokenStatus() {
-            {
-                setConnectionName(r.connectionName);
-                setHasToken(true);
-                setServiceProviderDisplayName(r.connectionName);
-            }
-        }).collect(Collectors.toList());
-
-        if (records.size() > 0)
-            return CompletableFuture.completedFuture(records.toArray(new TokenStatus[0]));
-        return CompletableFuture.completedFuture(null);
+    public CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, String userId,
+            String includeFilter) {
+        return getTokenStatus(turnContext, null, userId, includeFilter);
     }
 
-    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(
-        TurnContext turnContext,
-        String connectionName,
-        String[] resourceUrls,
-        String userId
-    ) {
-        return CompletableFuture.completedFuture(new HashMap<>());
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext turnContext, String connectionName,
+            String[] resourceUrls, String userId) {
+        return getAadTokens(turnContext, null, connectionName, resourceUrls, userId);
     }
 
     public static ConversationReference createConversationReference(String name, String user, String bot) {
@@ -526,4 +426,213 @@ public class TestAdapter extends BotAdapter {
     public boolean getSendTraceActivity() {
         return sendTraceActivity;
     }
+
+    @Override
+    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName) {
+        return getOauthSignInLink(turnContext, null, connectionName);
+    }
+
+    @Override
+    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName, String userId,
+            String finalRedirect) {
+        return getOauthSignInLink(turnContext, null, connectionName, userId, finalRedirect);
+    }
+
+    @Override
+    public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName, String magicCode) {
+                UserTokenKey key = new UserTokenKey();
+                key.connectionName = connectionName;
+                key.channelId = turnContext.getActivity().getChannelId();
+                key.userId = turnContext.getActivity().getFrom().getId();
+
+                if (magicCode != null) {
+                    TokenMagicCode magicCodeRecord = magicCodes.stream()
+                            .filter(tokenMagicCode -> key.equals(tokenMagicCode.key)).findFirst().orElse(null);
+                    if (magicCodeRecord != null && StringUtils.equals(magicCodeRecord.magicCode, magicCode)) {
+                        addUserToken(connectionName, key.channelId, key.userId, magicCodeRecord.userToken, null);
+                    }
+                }
+
+                if (userTokens.containsKey(key)) {
+                    return CompletableFuture.completedFuture(new TokenResponse() {
+                        {
+                            setConnectionName(connectionName);
+                            setToken(userTokens.get(key));
+                        }
+                    });
+                }
+
+                return CompletableFuture.completedFuture(null);
+     }
+
+    @Override
+    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName) {
+                return CompletableFuture.completedFuture(
+                    String.format("https://fake.com/oauthsignin/%s/%s",
+                                  connectionName,
+                                  turnContext.getActivity().getChannelId()));
+            }
+
+    @Override
+    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName, String userId, String finalRedirect) {
+        return CompletableFuture.completedFuture(
+            String.format("https://fake.com/oauthsignin/%s/%s/%s",
+                          connectionName,
+                          turnContext.getActivity().getChannelId(),
+                          userId));
+}
+
+    @Override
+    public CompletableFuture<Void> signOutUser(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName, String userId) {
+            String channelId = turnContext.getActivity().getChannelId();
+            final String effectiveUserId = userId == null ? turnContext.getActivity().getFrom().getId() : userId;
+
+            userTokens.keySet().stream()
+                    .filter(t -> StringUtils.equals(t.channelId, channelId)
+                            && StringUtils.equals(t.userId, effectiveUserId)
+                            && connectionName == null || StringUtils.equals(t.connectionName, connectionName))
+                    .collect(Collectors.toList()).forEach(key -> userTokens.remove(key));
+
+            return CompletableFuture.completedFuture(null);
+        }
+
+    @Override
+    public CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String userId, String includeFilter) {
+                String[] filter = includeFilter == null ? null : includeFilter.split(",");
+                List<TokenStatus> records = userTokens.keySet().stream()
+                        .filter(x -> StringUtils.equals(x.channelId, turnContext.getActivity().getChannelId())
+                                && StringUtils.equals(x.userId, turnContext.getActivity().getFrom().getId())
+                                && (includeFilter == null || Arrays.binarySearch(filter, x.connectionName) != -1))
+                        .map(r -> new TokenStatus() {
+                            {
+                                setConnectionName(r.connectionName);
+                                setHasToken(true);
+                                setServiceProviderDisplayName(r.connectionName);
+                            }
+                        }).collect(Collectors.toList());
+
+                if (records.size() > 0)
+                    return CompletableFuture.completedFuture(records.toArray(new TokenStatus[0]));
+                return CompletableFuture.completedFuture(null);
+            }
+
+    @Override
+    public CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext context,
+            AppCredentials oAuthAppCredentials, String connectionName, String[] resourceUrls, String userId) {
+        return CompletableFuture.completedFuture(new HashMap<>());
+    }
+
+    @Override
+    public CompletableFuture<SignInResource> getSignInResource(TurnContext turnContext, String connectionName) {
+        String id = null;
+        if (turnContext != null
+            && turnContext.getActivity() != null
+            && turnContext.getActivity().getRecipient() != null
+            && turnContext.getActivity().getRecipient().getId() != null) {
+                id = turnContext.getActivity().getRecipient().getId();
+        }
+
+        return getSignInResource(turnContext, connectionName, id, null);
+    }
+
+    @Override
+    public CompletableFuture<SignInResource> getSignInResource(TurnContext turnContext, String connectionName,
+            String userId, String finalRedirect) {
+                return getSignInResource(turnContext, null, connectionName, userId, finalRedirect);
+    }
+
+    @Override
+    public CompletableFuture<SignInResource> getSignInResource(TurnContext turnContext,
+            AppCredentials oAuthAppCredentials, String connectionName, String userId, String finalRedirect) {
+
+                SignInResource signInResource = new SignInResource();
+                signInResource.setSignInLink(
+                    String.format("https://fake.com/oauthsignin/%s/%s/%s",
+                    connectionName,
+                    turnContext.getActivity().getChannelId(),
+                    userId));
+                TokenExchangeResource tokenExchangeResource = new TokenExchangeResource();
+                tokenExchangeResource.setId(UUID.randomUUID().toString());
+                tokenExchangeResource.setProviderId(null);
+                tokenExchangeResource.setUri(String.format("api://%s/resource", connectionName));
+                signInResource.setTokenExchangeResource(tokenExchangeResource);
+                return CompletableFuture.completedFuture(signInResource);
+    }
+
+    @Override
+    public CompletableFuture<TokenResponse> exchangeToken(TurnContext turnContext, String connectionName, String userId,
+            TokenExchangeRequest exchangeRequest) {
+        return exchangeToken(turnContext, null, connectionName, userId, exchangeRequest);
+    }
+
+    @Override
+    public CompletableFuture<TokenResponse> exchangeToken(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName, String userId, TokenExchangeRequest exchangeRequest) {
+
+            String exchangableValue = null;
+            if (exchangeRequest.getToken() == null) {
+                if (StringUtils.isNotBlank(exchangeRequest.getToken())) {
+                    exchangableValue = exchangeRequest.getToken();
+                } else {
+                    exchangableValue = exchangeRequest.getUri();
+                }
+            }
+
+            ExchangableTokenKey key = new ExchangableTokenKey();
+            if (turnContext != null
+                && turnContext.getActivity() != null
+                && turnContext.getActivity().getChannelId() != null) {
+                key.channelId = turnContext.getActivity().getChannelId();
+            }
+            key.connectionName = connectionName;
+            key.exchangableItem = exchangableValue;
+            key.userId = userId;
+
+            String token = exchangableToken.get(key);
+            if (token != null) {
+                if (token.equals(exceptionExpected)) {
+                    return Async.completeExceptionally(
+                        new RuntimeException("Exception occurred during exchanging tokens")
+                    );
+                }
+
+                return CompletableFuture.completedFuture(new TokenResponse() {
+                    {
+                    setChannelId(key.channelId);
+                    setConnectionName(key.connectionName);
+                    setToken(token);
+                    }
+                });
+            } else {
+                return CompletableFuture.completedFuture(null);
+            }
+
+    }
+
+    class ExchangableTokenKey extends UserTokenKey {
+
+        private String exchangableItem = "";
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (!(rhs instanceof ExchangableTokenKey)) {
+                return false;
+            }
+            return StringUtils.equals(exchangableItem, ((ExchangableTokenKey) rhs).exchangableItem)
+                && super.equals(rhs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(exchangableItem) + super.hashCode();
+        }
+
+
+    }
+
 }

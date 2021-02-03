@@ -7,6 +7,7 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.schema.AadResourceUrls;
+import com.microsoft.bot.schema.TokenExchangeRequest;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
 import java.util.List;
@@ -41,6 +42,22 @@ public interface UserToken {
         String connectionName,
         String channelId,
         String code
+    );
+
+    /**
+     *
+     * @param userId            the String value
+     * @param connectionName    the String value
+     * @param channelId         the String value
+     * @param exchangeRequest   a TokenExchangeRequest
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the TokenResponse object
+     */
+    CompletableFuture<TokenResponse> exchangeToken(
+        String userId,
+        String connectionName,
+        String channelId,
+        TokenExchangeRequest exchangeRequest
     );
 
     /**
