@@ -7,8 +7,9 @@
 package com.microsoft.bot.connector.rest;
 
 import com.google.common.reflect.TypeToken;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.teams.TeamsOperations;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.restclient.ServiceResponse;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
@@ -56,7 +57,9 @@ public class RestTeamsOperations implements TeamsOperations {
     @Override
     public CompletableFuture<ConversationList> fetchChannelList(String teamId) {
         if (teamId == null) {
-            throw new IllegalArgumentException("Parameter teamId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter teamId is required and cannot be null."
+            ));
         }
 
         return service.fetchChannelList(teamId, client.getAcceptLanguage(), client.getUserAgent())
@@ -92,7 +95,9 @@ public class RestTeamsOperations implements TeamsOperations {
     @Override
     public CompletableFuture<TeamDetails> fetchTeamDetails(String teamId) {
         if (teamId == null) {
-            throw new IllegalArgumentException("Parameter teamId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter teamId is required and cannot be null."
+            ));
         }
 
         return service.fetchTeamDetails(teamId, client.getAcceptLanguage(), client.getUserAgent())

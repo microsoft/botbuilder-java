@@ -6,9 +6,10 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.connector.Async;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.BotSignIn;
-import com.microsoft.bot.rest.ServiceResponse;
+import com.microsoft.bot.restclient.ServiceResponse;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.ResponseBody;
@@ -65,8 +66,11 @@ public class RestBotSignIn implements BotSignIn {
      */
     public CompletableFuture<String> getSignInUrl(String state) {
         if (state == null) {
-            throw new IllegalArgumentException("Parameter state is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter state is required and cannot be null."
+            ));
         }
+
         final String codeChallenge = null;
         final String emulatorUrl = null;
         final String finalRedirect = null;
@@ -98,8 +102,11 @@ public class RestBotSignIn implements BotSignIn {
         String finalRedirect
     ) {
         if (state == null) {
-            throw new IllegalArgumentException("Parameter state is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter state is required and cannot be null."
+            ));
         }
+
         return service.getSignInUrl(state, codeChallenge, emulatorUrl, finalRedirect)
             .thenApply(responseBodyResponse -> {
                 try {

@@ -54,7 +54,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>20.0</version>
+      <version>30.1-jre</version>
     </dependency>
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
@@ -95,7 +95,9 @@
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>msal4j</artifactId>
+      <version>1.8.1</version>
     </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-parameter-names</artifactId>
@@ -174,7 +176,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
             <configuration>
-              <excludes>com/microsoft/bot/rest/**,com/microsoft/bot/azure/**</excludes>
+              <excludes>com/microsoft/bot/restclient/**</excludes>
             </configuration>
           </plugin>
         </plugins>

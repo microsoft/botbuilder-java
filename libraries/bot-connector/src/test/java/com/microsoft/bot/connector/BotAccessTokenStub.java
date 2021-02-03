@@ -1,6 +1,9 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector;
 
-import com.microsoft.bot.rest.credentials.ServiceClientCredentials;
+import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 
 public class BotAccessTokenStub implements ServiceClientCredentials {

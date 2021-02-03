@@ -6,6 +6,7 @@ package com.microsoft.bot.builder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,10 @@ public class TraceTranscriptLogger implements TranscriptLogger {
      */
     @Override
     public CompletableFuture<Void> logActivity(Activity activity) {
-        BotAssert.activityNotNull(activity);
+        if (activity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
+
         String event = null;
         try {
             event = mapper.writeValueAsString(activity);

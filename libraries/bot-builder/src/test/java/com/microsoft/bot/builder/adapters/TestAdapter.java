@@ -19,6 +19,8 @@ public class TestAdapter extends BotAdapter {
     private final Queue<Activity> botReplies = new LinkedList<>();
     private int nextId = 0;
     private ConversationReference conversationReference;
+    private String locale;
+    private boolean sendTraceActivity = false;
 
     private static class UserTokenKey {
         public String connectionName;
@@ -54,6 +56,11 @@ public class TestAdapter extends BotAdapter {
     }
 
     public TestAdapter(String channelId) {
+        this(channelId, false);
+    }
+
+    public TestAdapter(String channelId, boolean sendTraceActivity) {
+        this.sendTraceActivity = sendTraceActivity;
         setConversationReference(new ConversationReference() {
             {
                 setChannelId(channelId);
@@ -77,6 +84,7 @@ public class TestAdapter extends BotAdapter {
                         setId("Conversation1");
                     }
                 });
+                setLocale(this.getLocale());
             }
         });
     }
@@ -108,6 +116,7 @@ public class TestAdapter extends BotAdapter {
                             setId("Conversation1");
                         }
                     });
+                    setLocale(this.getLocale());
                 }
             });
         }
@@ -120,6 +129,35 @@ public class TestAdapter extends BotAdapter {
     @Override
     public TestAdapter use(Middleware middleware) {
         super.use(middleware);
+        return this;
+    }
+
+        /**
+     * Adds middleware to the adapter to register an Storage object on the turn context.
+     * The middleware registers the state objects on the turn context at the start of each turn.
+     * @param storage The storage object to register.
+     * @return The updated adapter.
+     */
+    public TestAdapter useStorage(Storage storage) {
+        if (storage == null) {
+            throw new IllegalArgumentException("Storage cannot be null");
+        }
+        return this.use(new RegisterClassMiddleware<Storage>(storage));
+    }
+
+    /**
+     * Adds middleware to the adapter to register one or more BotState objects on the turn context.
+     * The middleware registers the state objects on the turn context at the start of each turn.
+     * @param botstates The state objects to register.
+     * @return The updated adapter.
+     */
+    public TestAdapter useBotState(BotState... botstates) {
+        if (botstates == null) {
+            throw new IllegalArgumentException("botstates cannot be null");
+        }
+        for (BotState botState : botstates) {
+            this.use(new RegisterClassMiddleware<BotState>(botState));
+        }
         return this;
     }
 
@@ -148,6 +186,9 @@ public class TestAdapter extends BotAdapter {
             // Assume Default DateTime : DateTime(0)
             if (activity.getTimestamp() == null || activity.getTimestamp().toEpochSecond() == 0)
                 activity.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
+
+            if (activity.getLocalTimestamp() == null || activity.getLocalTimestamp().toEpochSecond() == 0)
+                activity.setLocalTimestamp(OffsetDateTime.now());
 
             return activity;
         }).thenCompose(activity1 -> {
@@ -209,6 +250,12 @@ public class TestAdapter extends BotAdapter {
                 try {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException e) {
+                }
+            } else if (activity.getType() == ActivityTypes.TRACE) {
+                if (sendTraceActivity) {
+                    synchronized (botReplies) {
+                        botReplies.add(activity);
+                    }
                 }
             } else {
                 synchronized (botReplies) {
@@ -451,5 +498,32 @@ public class TestAdapter extends BotAdapter {
         String userId
     ) {
         return CompletableFuture.completedFuture(new HashMap<>());
+    }
+
+    public static ConversationReference createConversationReference(String name, String user, String bot) {
+        ConversationReference reference = new ConversationReference();
+        reference.setChannelId("test");
+        reference.setServiceUrl("https://test.com");
+        reference.setConversation(new ConversationAccount(false, name, name, null, null, null, null));
+        reference.setUser(new ChannelAccount(user.toLowerCase(), user.toLowerCase()));
+        reference.setBot(new ChannelAccount(bot.toLowerCase(), bot.toLowerCase()));
+        reference.setLocale("en-us");
+        return reference;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setSendTraceActivity(boolean sendTraceActivity) {
+        this.sendTraceActivity = sendTraceActivity;
+    }
+
+    public boolean getSendTraceActivity() {
+        return sendTraceActivity;
     }
 }

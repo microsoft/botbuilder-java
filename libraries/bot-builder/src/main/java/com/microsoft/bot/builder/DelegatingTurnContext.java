@@ -30,6 +30,24 @@ public class DelegatingTurnContext implements TurnContext {
     }
 
     /**
+     * Gets the locale on this context object.
+     * @return The string of locale on this context object.
+     */
+    @Override
+    public String getLocale() {
+        return innerTurnContext.getLocale();
+    }
+
+    /**
+     * Set  the locale on this context object.
+     * @param withLocale The string of locale on this context object.
+     */
+    @Override
+    public void setLocale(String withLocale) {
+        innerTurnContext.setLocale(withLocale);
+    }
+
+    /**
      * Gets the inner context's activity.
      * 
      * @return The inner {@link TurnContext#getAdapter()}.

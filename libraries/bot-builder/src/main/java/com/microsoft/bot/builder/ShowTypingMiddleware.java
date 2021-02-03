@@ -48,8 +48,9 @@ public class ShowTypingMiddleware implements Middleware {
      *
      * @param withDelay  Initial delay before sending first typing indicator.
      * @param withPeriod Rate at which additional typing indicators will be sent.
+     * @throws IllegalArgumentException delay and period must be greater than zero
      */
-    public ShowTypingMiddleware(long withDelay, long withPeriod) {
+    public ShowTypingMiddleware(long withDelay, long withPeriod) throws IllegalArgumentException {
         if (withDelay < 0) {
             throw new IllegalArgumentException("Delay must be greater than or equal to zero");
         }

@@ -98,8 +98,8 @@ public class JwtTokenValidationTests {
                 "",
                 null).join();
             Assert.fail("Should have thrown IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("authHeader"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("authHeader"));
         }
     }
 

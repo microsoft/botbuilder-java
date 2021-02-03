@@ -170,9 +170,10 @@ public class Entity implements EntitySerialization {
      * @param obj of type T
      * @param <T> The type of the value.
      * @return This Entity with the properties from the passed sub-Entity.
+     * @throws IllegalArgumentException For arguments that can't be converted.
      */
     @JsonIgnore
-    public <T extends EntitySerialization> Entity setAs(T obj) {
+    public <T extends EntitySerialization> Entity setAs(T obj) throws IllegalArgumentException {
         // Serialize
         String tempJson;
         try {

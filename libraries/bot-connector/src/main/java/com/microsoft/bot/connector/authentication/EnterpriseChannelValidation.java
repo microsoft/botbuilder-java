@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import com.microsoft.bot.connector.Async;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -79,8 +80,6 @@ public final class EnterpriseChannelValidation {
      * @param channelId       The ID of the channel to validate.
      * @param authConfig      The authentication configuration.
      * @return A valid ClaimsIdentity.
-     *
-     *         On join:
      * @throws AuthenticationException A token issued by the Bot Framework will FAIL
      *                                 this check. Only Emulator tokens will pass.
      */
@@ -93,7 +92,7 @@ public final class EnterpriseChannelValidation {
         AuthenticationConfiguration authConfig
     ) {
         if (authConfig == null) {
-            throw new IllegalArgumentException("Missing AuthenticationConfiguration");
+            return Async.completeExceptionally(new IllegalArgumentException("Missing AuthenticationConfiguration"));
         }
 
         return channelProvider.getChannelService()
