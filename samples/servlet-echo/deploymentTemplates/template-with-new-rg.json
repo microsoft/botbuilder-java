@@ -76,13 +76,14 @@
         }
     },
     "variables": {
-        "resourcesLocation": "[deployment().location]",
+        "resourcesLocation": "[if(empty(parameters('newAppServicePlanLocation')), deployment().location, parameters('newAppServicePlanLocation'))]",
         "effectiveGroupLocation": "[if(empty(parameters('groupLocation')), variables('resourcesLocation'), parameters('groupLocation'))]",
-        "effectivePlanLocation": "[if(empty(parameters('newAppServicePlanLocation')), variables('resourcesLocation'), parameters('newAppServicePlanLocation'))]",
+        "effectivePlanLocation": "[if(empty(parameters('newAppServicePlanLocation')), deployment().location, parameters('newAppServicePlanLocation'))]",
         "appServicePlanName": "[if(empty(parameters('newAppServicePlanName')), concat(parameters('botId'), 'ServicePlan'), parameters('newAppServicePlanName'))]",
         "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
         "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
-        "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]"
+        "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]",
+        "resourceGroupId": "[concat(subscription().id, '/resourceGroups/', parameters('groupName'))]"
     },
     "resources": [
         {
@@ -114,11 +115,12 @@
                             "type": "Microsoft.Web/serverfarms",
                             "name": "[variables('appServicePlanName')]",
                             "apiVersion": "2018-02-01",
-                            "location": "[variables('effectivePlanLocation')]",
+                            "location": "[variables('resourcesLocation')]",
                             "sku": "[parameters('newAppServicePlanSku')]",
-                            "kind": "app",
+                            "kind": "linux",
                             "properties": {
-                                "name": "[variables('appServicePlanName')]"
+                                "name": "[variables('appServicePlanName')]",
+                                "reserved":true
                             }
                         },
                         {
@@ -128,7 +130,7 @@
                             "location": "[variables('resourcesLocation')]",
                             "kind": "app",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Web/serverfarms/', variables('appServicePlanName'))]"
+                                "[concat(variables('resourceGroupId'), '/providers/Microsoft.Web/serverfarms/', variables('appServicePlanName'))]"
                             ],
                             "name": "[variables('webAppName')]",
                             "properties": {
@@ -178,7 +180,7 @@
                                 "storageResourceId": null
                             },
                             "dependsOn": [
-                                "[resourceId('Microsoft.Web/sites/', variables('webAppName'))]"
+                                "[concat(variables('resourceGroupId'), '/providers/Microsoft.Web/sites/', variables('webAppName'))]"
                             ]
                         }
                     ],
