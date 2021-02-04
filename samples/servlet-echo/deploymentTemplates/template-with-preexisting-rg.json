@@ -72,39 +72,70 @@
     "variables": {
         "defaultAppServicePlanName": "[if(empty(parameters('existingAppServicePlan')), 'createNewAppServicePlan', parameters('existingAppServicePlan'))]",
         "useExistingAppServicePlan": "[not(equals(variables('defaultAppServicePlanName'), 'createNewAppServicePlan'))]",
-        "servicePlanName": "[if(variables('useExistingAppServicePlan'), parameters('existingAppServicePlan'), if(empty(parameters('newAppServicePlanName')),concat(parameters('botId'), 'ServicePlan'),parameters('newAppServicePlanName')))]",
-        "resourcesLocation": "[if(empty(parameters('appServicePlanLocation')), resourceGroup().location, parameters('appServicePlanLocation'))]",
+        "servicePlanName": "[if(variables('useExistingAppServicePlan'), parameters('existingAppServicePlan'), parameters('newAppServicePlanName'))]",
+        "publishingUsername": "[concat('$', parameters('newWebAppName'))]",
+        "resourcesLocation": "[parameters('appServicePlanLocation')]",
         "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
         "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
         "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]"
     },
     "resources": [
         {
-            "comments": "Create a new App Service Plan if no existing App Service Plan name was passed in.",
+            "comments": "Create a new Linux App Service Plan if no existing App Service Plan name was passed in.",
             "type": "Microsoft.Web/serverfarms",
             "condition": "[not(variables('useExistingAppServicePlan'))]",
             "name": "[variables('servicePlanName')]",
             "apiVersion": "2018-02-01",
             "location": "[variables('resourcesLocation')]",
             "sku": "[parameters('newAppServicePlanSku')]",
-            "kind": "app",
+            "kind": "linux",
             "properties": {
-                "name": "[variables('servicePlanName')]"
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
             }
         },
         {
-            "comments": "Create a Web App using an App Service Plan",
+            "comments": "Create a Web App using a Linux App Service Plan",
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[variables('resourcesLocation')]",
-            "kind": "app",
+            "kind": "app,linux",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]"
             ],
             "name": "[variables('webAppName')]",
             "properties": {
                 "name": "[variables('webAppName')]",
-                "serverFarmId": "[variables('servicePlanName')]",
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('newWebAppName'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('newWebAppName'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -127,6 +158,78 @@
                         ]
                     }
                 }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('webAppName'), '/web')]",
+            "location": "[variables('resourcesLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/', variables('webAppName'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "JAVA|8-jre8",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "[variables('publishingUsername')]",
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
             }
         },
         {
