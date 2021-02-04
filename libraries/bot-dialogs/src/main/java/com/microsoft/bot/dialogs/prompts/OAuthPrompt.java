@@ -3,13 +3,11 @@
 
 package com.microsoft.bot.dialogs.prompts;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,12 +44,9 @@ import com.microsoft.bot.schema.SigninCard;
 import com.microsoft.bot.schema.TokenExchangeInvokeRequest;
 import com.microsoft.bot.schema.TokenExchangeInvokeResponse;
 import com.microsoft.bot.schema.TokenExchangeRequest;
-import com.microsoft.bot.schema.TokenExchangeResource;
 import com.microsoft.bot.schema.TokenResponse;
 
 import org.apache.commons.lang3.StringUtils;
-
-import io.netty.util.internal.logging.CommonsLoggerFactory;
 
 /**
  * Creates a new prompt that asks the user to sign in using the Bot Frameworks
@@ -77,13 +72,13 @@ import io.netty.util.internal.logging.CommonsLoggerFactory;
  */
 public class OAuthPrompt extends Dialog {
 
-    private static final String PersistedOptions = "options";
-    private static final String PersistedState = "state";
-    private static final String PersistedExpires = "expires";
-    private static final String PersistedCaller = "caller";
+    private static final String PERSISTED_OPTIONS = "options";
+    private static final String PERSISTED_STATE = "state";
+    private static final String PERSISTED_EXPIRES = "expires";
+    private static final String PERSISTED_CALLER = "caller";
 
-    private final OAuthPromptSettings _settings;
-    private final PromptValidator<TokenResponse> _validator;
+    private final OAuthPromptSettings settings;
+    private final PromptValidator<TokenResponse> validator;
 
     /**
      * Initializes a new instance of the {@link OAuthPrompt} class.
@@ -109,8 +104,8 @@ public class OAuthPrompt extends Dialog {
             throw new IllegalArgumentException("settings cannot be null.");
         }
 
-        _settings = settings;
-        _validator = validator;
+        this.settings = settings;
+        this.validator = validator;
     }
 
     /**
@@ -148,7 +143,7 @@ public class OAuthPrompt extends Dialog {
         }
 
         // Append appropriate card if missing
-        if (!ChannelSupportsOAuthCard(turnContext.getActivity().getChannelId())) {
+        if (!channelSupportsOAuthCard(turnContext.getActivity().getChannelId())) {
             if (!prompt.getAttachments().stream().anyMatch(s -> s.getContent() instanceof SigninCard)) {
                 SignInResource signInResource = tokenAdapter
                         .getSignInResource(turnContext, settings.getOAuthAppCredentials(), settings.getConnectionName(),
@@ -200,7 +195,7 @@ public class OAuthPrompt extends Dialog {
                 if (turnContext.getActivity().getChannelId() == Channels.EMULATOR) {
                     cardActionType = ActionTypes.OPEN_URL;
                 }
-            } else if (!ChannelRequiresSignInLink(turnContext.getActivity().getChannelId())) {
+            } else if (!channelRequiresSignInLink(turnContext.getActivity().getChannelId())) {
                 value = null;
             }
 
@@ -260,6 +255,7 @@ public class OAuthPrompt extends Dialog {
      *
      * @return   PromptRecognizerResult.
      */
+    @SuppressWarnings("checkstyle:MethodLength")
     public static CompletableFuture<PromptRecognizerResult<TokenResponse>> recognizeToken(
                                                                                 OAuthPromptSettings settings,
                                                                                 DialogContext dc) {
@@ -275,7 +271,7 @@ public class OAuthPrompt extends Dialog {
             result.setValue(token);
 
             // fixup the turnContext's state context if this was received from a skill host caller
-            CallerInfo callerInfo = (CallerInfo) dc.getActiveDialog().getState().get(PersistedCaller);
+            CallerInfo callerInfo = (CallerInfo) dc.getActiveDialog().getState().get(PERSISTED_CALLER);
             if (callerInfo != null) {
                 // set the ServiceUrl to the skill host's Url
                 dc.getContext().getActivity().setServiceUrl(callerInfo.getCallerServiceUrl());
@@ -338,8 +334,7 @@ public class OAuthPrompt extends Dialog {
                 } else {
                      sendInvokeResponse(turnContext, HttpURLConnection.HTTP_NOT_FOUND, null);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                  sendInvokeResponse(turnContext, HttpURLConnection.HTTP_INTERNAL_ERROR, null);
             }
         } else if (isTokenExchangeRequestInvoke(turnContext)) {
@@ -351,40 +346,40 @@ public class OAuthPrompt extends Dialog {
                  sendInvokeResponse(
                     turnContext,
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    new TokenExchangeInvokeResponse () {
+                    new TokenExchangeInvokeResponse() {
                         {
                         setId(null);
                         setConnectionName(settings.getConnectionName());
-                        setFailureDetail("The bot received an InvokeActivity that is missing a " +
-                                         "TokenExchangeInvokeRequest value. This is required to be " +
-                                         "sent with the InvokeActivity.");
+                        setFailureDetail("The bot received an InvokeActivity that is missing a "
+                                       + "TokenExchangeInvokeRequest value. This is required to be "
+                                       + "sent with the InvokeActivity.");
                         }
                     });
             } else if (tokenExchangeRequest.getConnectionName() != settings.getConnectionName()) {
                 sendInvokeResponse(
                     turnContext,
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    new TokenExchangeInvokeResponse () {
+                    new TokenExchangeInvokeResponse() {
                         {
                         setId(tokenExchangeRequest.getId());
                         setConnectionName(settings.getConnectionName());
-                        setFailureDetail("The bot received an InvokeActivity with a TokenExchangeInvokeRequest " +
-                                         "containing a ConnectionName that does not match the ConnectionName " +
-                                         "expected by the bot's active OAuthPrompt. Ensure these names match " +
-                                         "when sending the InvokeActivityInvalid ConnectionName in the " +
-                                         "TokenExchangeInvokeRequest");
+                        setFailureDetail("The bot received an InvokeActivity with a TokenExchangeInvokeRequest "
+                                       + "containing a ConnectionName that does not match the ConnectionName "
+                                       + "expected by the bot's active OAuthPrompt. Ensure these names match "
+                                       + "when sending the InvokeActivityInvalid ConnectionName in the "
+                                       + "TokenExchangeInvokeRequest");
                         }
                     });
             } else if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
                 sendInvokeResponse(
                     turnContext,
                     HttpURLConnection.HTTP_BAD_REQUEST,
-                    new TokenExchangeInvokeResponse () {
+                    new TokenExchangeInvokeResponse() {
                         {
                         setId(tokenExchangeRequest.getId());
                         setConnectionName(settings.getConnectionName());
-                        setFailureDetail("The bot's BotAdapter does not support token exchange operations. Ensure " +
-                                         "the bot's Adapter supports the UserTokenProvider interface.");
+                        setFailureDetail("The bot's BotAdapter does not support token exchange operations. Ensure "
+                                        + "the bot's Adapter supports the UserTokenProvider interface.");
                         }
                     });
                     return Async.completeExceptionally(
@@ -399,13 +394,12 @@ public class OAuthPrompt extends Dialog {
                         turnContext,
                         settings.getConnectionName(),
                         turnContext.getActivity().getFrom().getId(),
-                        new TokenExchangeRequest () {
+                        new TokenExchangeRequest() {
                             {
                                 setToken(tokenExchangeRequest.getToken());
                             }
                         }).join();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     // Ignore Exceptions
                     // If token exchange failed for any reason, tokenExchangeResponse above stays null, and
                     // hence we send back a failure invoke response to the caller.
@@ -416,7 +410,7 @@ public class OAuthPrompt extends Dialog {
                      sendInvokeResponse(
                         turnContext,
                         HttpURLConnection.HTTP_PRECON_FAILED,
-                        new TokenExchangeInvokeResponse(){ {
+                        new TokenExchangeInvokeResponse() { {
                             setId(tokenExchangeRequest.getId());
                             setConnectionName(settings.getConnectionName());
                             setFailureDetail("The bot is unable to exchange token. Proceed with regular login.");
@@ -435,7 +429,7 @@ public class OAuthPrompt extends Dialog {
 
                     result.setSucceeded(true);
                     TokenResponse finalResponse = tokenExchangeResponse;
-                    result.setValue(new TokenResponse(){ {
+                    result.setValue(new TokenResponse() { {
                         setChannelId(finalResponse.getChannelId());
                         setConnectionName(finalResponse.getConnectionName());
                         setToken(finalResponse.getToken());
@@ -480,7 +474,7 @@ public class OAuthPrompt extends Dialog {
      * @param context TurnContext.
      */
     public static void setCallerInfoInDialogState(Map<String, Object> state, TurnContext context) {
-        state.put(PersistedCaller, createCallerInfo(context));
+        state.put(PERSISTED_CALLER, createCallerInfo(context));
     }
 
     /**
@@ -523,17 +517,17 @@ public class OAuthPrompt extends Dialog {
         }
 
         // Initialize state
-        int timeout = _settings.getTimeout() != null ? _settings.getTimeout()
+        int timeout = settings.getTimeout() != null ? settings.getTimeout()
                                                      : (int) TurnStateConstants.OAUTH_LOGIN_TIMEOUT_VALUE.toMillis();
         Map<String, Object> state = dc.getActiveDialog().getState();
-        state.put(PersistedOptions, opt);
-        state.put(PersistedState, new HashMap<String, Object>() {
+        state.put(PERSISTED_OPTIONS, opt);
+        state.put(PERSISTED_STATE, new HashMap<String, Object>() {
             {
-                { put(Prompt.ATTEMPTCOUNTKEY, 0); }
+                put(Prompt.ATTEMPTCOUNTKEY, 0);
             }
         });
 
-        state.put(PersistedExpires, OffsetDateTime.now(ZoneId.of("UTC")).plus(timeout, ChronoUnit.MILLIS));
+        state.put(PERSISTED_EXPIRES, OffsetDateTime.now(ZoneId.of("UTC")).plus(timeout, ChronoUnit.MILLIS));
         setCallerInfoInDialogState(state, dc.getContext());
 
         // Attempt to get the users token
@@ -546,8 +540,8 @@ public class OAuthPrompt extends Dialog {
 
         UserTokenProvider adapter = (UserTokenProvider) dc.getContext().getAdapter();
         TokenResponse output =  adapter.getUserToken(dc.getContext(),
-                                                     _settings.getOAuthAppCredentials(),
-                                                     _settings.getConnectionName(),
+                                                     settings.getOAuthAppCredentials(),
+                                                     settings.getConnectionName(),
                                                      null).join();
         if (output != null) {
             // Return token
@@ -555,7 +549,7 @@ public class OAuthPrompt extends Dialog {
         }
 
         // Prompt user to login
-        sendOAuthCard(_settings, dc.getContext(), opt != null ? opt.getPrompt() : null);
+        sendOAuthCard(settings, dc.getContext(), opt != null ? opt.getPrompt() : null);
         return CompletableFuture.completedFuture(END_OF_TURN);
     }
 
@@ -581,7 +575,7 @@ public class OAuthPrompt extends Dialog {
 
         // Check for timeout
         Map<String, Object> state = dc.getActiveDialog().getState();
-        OffsetDateTime expires = (OffsetDateTime) state.get(PersistedExpires);
+        OffsetDateTime expires = (OffsetDateTime) state.get(PERSISTED_EXPIRES);
         boolean isMessage = dc.getContext().getActivity().getType() == ActivityTypes.MESSAGE;
 
         // If the incoming Activity is a message, or an Activity Type normally handled by OAuthPrompt,
@@ -600,24 +594,24 @@ public class OAuthPrompt extends Dialog {
         }
 
         // Recognize token
-        PromptRecognizerResult<TokenResponse> recognized =  recognizeToken(_settings, dc).join();
+        PromptRecognizerResult<TokenResponse> recognized =  recognizeToken(settings, dc).join();
 
-        Map<String, Object> promptState = (Map<String, Object>) state.get(PersistedState);
-        PromptOptions promptOptions = (PromptOptions) state.get(PersistedOptions);
+        Map<String, Object> promptState = (Map<String, Object>) state.get(PERSISTED_STATE);
+        PromptOptions promptOptions = (PromptOptions) state.get(PERSISTED_OPTIONS);
 
         // Increment attempt count
         // Convert.ToInt32 For issue https://github.com/Microsoft/botbuilder-dotnet/issues/1859
-        promptState.put(Prompt.ATTEMPTCOUNTKEY, (int) promptState.get(Prompt.ATTEMPTCOUNTKEY) + 1);;
+        promptState.put(Prompt.ATTEMPTCOUNTKEY, (int) promptState.get(Prompt.ATTEMPTCOUNTKEY) + 1);
 
         // Validate the return value
         boolean isValid = false;
-        if (_validator != null) {
+        if (validator != null) {
             PromptValidatorContext<TokenResponse> promptContext = new PromptValidatorContext<TokenResponse>(
                                                                                 dc.getContext(),
                                                                                 recognized,
                                                                                 promptState,
                                                                                 promptOptions);
-            isValid =  _validator.promptValidator(promptContext).join();
+            isValid =  validator.promptValidator(promptContext).join();
         } else if (recognized.getSucceeded()) {
             isValid = true;
         }
@@ -625,7 +619,7 @@ public class OAuthPrompt extends Dialog {
         // Return recognized value or re-prompt
         if (isValid) {
             return  dc.endDialog(recognized.getValue());
-        } else if (isMessage && _settings.getEndOnInvalidMessage()) {
+        } else if (isMessage && settings.getEndOnInvalidMessage()) {
             // If EndOnInvalidMessage is set, complete the prompt with no result.
             return  dc.endDialog();
         }
@@ -651,7 +645,7 @@ public class OAuthPrompt extends Dialog {
      *         If the task is successful and user already has a token or the user
      *         successfully signs in, the result contains the user's token.
      */
-    public CompletableFuture<TokenResponse> GetUserToken(TurnContext turnContext) {
+    public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext) {
         if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
             return Async.completeExceptionally(
                 new UnsupportedOperationException(
@@ -659,8 +653,8 @@ public class OAuthPrompt extends Dialog {
             ));
         }
         return ((UserTokenProvider) turnContext.getAdapter()).getUserToken(turnContext,
-                                                                           _settings.getOAuthAppCredentials(),
-                                                                           _settings.getConnectionName(), null);
+                                                                           settings.getOAuthAppCredentials(),
+                                                                           settings.getConnectionName(), null);
     }
 
     /**
@@ -686,16 +680,16 @@ public class OAuthPrompt extends Dialog {
 
         // Sign out user
         return ((UserTokenProvider) turnContext.getAdapter()).signOutUser(turnContext,
-                                                                          _settings.getOAuthAppCredentials(),
-                                                                          _settings.getConnectionName(),
+                                                                          settings.getOAuthAppCredentials(),
+                                                                          settings.getConnectionName(),
                                                                           id);
     }
 
     private static CallerInfo createCallerInfo(TurnContext turnContext) {
         ClaimsIdentity botIdentity =
-            turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY) instanceof ClaimsIdentity ?
-            (ClaimsIdentity) turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY) :
-            null;
+            turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY) instanceof ClaimsIdentity
+            ? (ClaimsIdentity) turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY)
+            : null;
 
         if (botIdentity != null && SkillValidation.isSkillClaim(botIdentity.claims())) {
             return new CallerInfo() {
@@ -727,22 +721,24 @@ public class OAuthPrompt extends Dialog {
                 && activity.getName() == SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME;
     }
 
-    private static boolean ChannelSupportsOAuthCard(String channelId) {
+    private static boolean channelSupportsOAuthCard(String channelId) {
         switch (channelId) {
             case Channels.CORTANA:
             case Channels.SKYPE:
             case Channels.SKYPEFORBUSINESS:
                 return false;
+            default:
+                return true;
         }
-        return true;
     }
 
-    private static boolean ChannelRequiresSignInLink(String channelId) {
+    private static boolean channelRequiresSignInLink(String channelId) {
         switch (channelId) {
             case Channels.MSTEAMS:
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     private static CompletableFuture<Void> sendInvokeResponse(TurnContext turnContext, int statusCode,
@@ -754,6 +750,9 @@ public class OAuthPrompt extends Dialog {
         }).thenApply(result -> null);
     }
 
+    /**
+     * Class to contain CallerInfo data including callerServiceUrl and scope.
+     */
     private static class CallerInfo {
 
         private String callerServiceUrl;

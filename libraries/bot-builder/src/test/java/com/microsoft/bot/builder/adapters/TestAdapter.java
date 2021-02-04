@@ -390,7 +390,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
         return signOutUser(turnContext, null, connectionName, userId);
     }
 
-    public CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, String userId,
+    public CompletableFuture<List<TokenStatus>> getTokenStatus(TurnContext turnContext, String userId,
             String includeFilter) {
         return getTokenStatus(turnContext, null, userId, includeFilter);
     }
@@ -501,25 +501,28 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
         }
 
     @Override
-    public CompletableFuture<TokenStatus[]> getTokenStatus(TurnContext turnContext, AppCredentials oAuthAppCredentials,
-            String userId, String includeFilter) {
-                String[] filter = includeFilter == null ? null : includeFilter.split(",");
-                List<TokenStatus> records = userTokens.keySet().stream()
-                        .filter(x -> StringUtils.equals(x.channelId, turnContext.getActivity().getChannelId())
-                                && StringUtils.equals(x.userId, turnContext.getActivity().getFrom().getId())
-                                && (includeFilter == null || Arrays.binarySearch(filter, x.connectionName) != -1))
-                        .map(r -> new TokenStatus() {
-                            {
-                                setConnectionName(r.connectionName);
-                                setHasToken(true);
-                                setServiceProviderDisplayName(r.connectionName);
-                            }
-                        }).collect(Collectors.toList());
+    public CompletableFuture<List<TokenStatus>> getTokenStatus(TurnContext turnContext,
+                                                               AppCredentials oAuthAppCredentials,
+                                                               String userId,
+                                                               String includeFilter) {
+        String[] filter = includeFilter == null ? null : includeFilter.split(",");
+        List<TokenStatus> records = userTokens.keySet().stream()
+                .filter(x -> StringUtils.equals(x.channelId, turnContext.getActivity().getChannelId())
+                        && StringUtils.equals(x.userId, turnContext.getActivity().getFrom().getId())
+                        && (includeFilter == null || Arrays.binarySearch(filter, x.connectionName) != -1))
+                .map(r -> new TokenStatus() {
+                    {
+                        setConnectionName(r.connectionName);
+                        setHasToken(true);
+                        setServiceProviderDisplayName(r.connectionName);
+                    }
+                }).collect(Collectors.toList());
 
-                if (records.size() > 0)
-                    return CompletableFuture.completedFuture(records.toArray(new TokenStatus[0]));
-                return CompletableFuture.completedFuture(null);
-            }
+        if (records.size() > 0) {
+            return CompletableFuture.completedFuture(records);
+        }
+        return CompletableFuture.completedFuture(null);
+    }
 
     @Override
     public CompletableFuture<Map<String, TokenResponse>> getAadTokens(TurnContext context,
