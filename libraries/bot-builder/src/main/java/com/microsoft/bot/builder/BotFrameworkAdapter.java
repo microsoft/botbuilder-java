@@ -37,7 +37,6 @@ import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationsResult;
-import com.microsoft.bot.schema.ErrorResponse;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.SignInResource;
@@ -838,8 +837,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context, String connectionName) {
-        return getOauthSignInLink(context, null, connectionName);
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext context, String connectionName) {
+        return getOAuthSignInLink(context, null, connectionName);
     }
 
     /**
@@ -854,7 +853,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
      * @return A task that represents the work queued to execute.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context, String connectionName, String userId,
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext context, String connectionName, String userId,
             String finalRedirect) {
         return getOauthSignInLink(context, null, connectionName, userId, finalRedirect);
     }
@@ -1317,8 +1316,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
                                                                   AppCredentials oAuthAppCredentials) {
 
         if (!OAuthClientConfig.emulateOAuthCards
-            && (turnContext.getActivity().getChannelId().equals(Channels.EMULATOR))
-            && (credentialProvider.isAuthenticationDisabled().join())) {
+            && turnContext.getActivity().getChannelId().equals(Channels.EMULATOR)
+            && credentialProvider.isAuthenticationDisabled().join()) {
             OAuthClientConfig.emulateOAuthCards = true;
         }
 
@@ -1428,7 +1427,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
      * link.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context, AppCredentials oAuthAppCredentials,
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext context, AppCredentials oAuthAppCredentials,
             String connectionName) {
 
         if (context == null) {
@@ -1492,7 +1491,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
      * link.
      */
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext context, AppCredentials oAuthAppCredentials,
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext context, AppCredentials oAuthAppCredentials,
         String connectionName, String userId, String finalRedirect) {
             if (context == null) {
                 return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));

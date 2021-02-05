@@ -101,11 +101,11 @@ public abstract class Prompt<T> extends Dialog {
         // Ensure prompts have input hint set
         PromptOptions opt = (PromptOptions) options;
 
-        if (opt.getPrompt() != null && (opt.getPrompt().getInputHint() == null)) {
+        if (opt.getPrompt() != null && opt.getPrompt().getInputHint() == null) {
             opt.getPrompt().setInputHint(InputHints.EXPECTING_INPUT);
         }
 
-        if (opt.getRetryPrompt() != null && (opt.getRetryPrompt().getInputHint() == null)) {
+        if (opt.getRetryPrompt() != null && opt.getRetryPrompt().getInputHint() == null) {
             opt.getRetryPrompt().setInputHint(InputHints.EXPECTING_INPUT);
         }
 

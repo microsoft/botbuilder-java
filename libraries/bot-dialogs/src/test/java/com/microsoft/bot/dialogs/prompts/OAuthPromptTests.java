@@ -3,21 +3,40 @@
 
 package com.microsoft.bot.dialogs.prompts;
 
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.builder.AutoSaveStateMiddleware;
+import com.microsoft.bot.builder.BotCallbackHandler;
 import com.microsoft.bot.builder.ConversationState;
+import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.MemoryStorage;
+import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.StatePropertyAccessor;
-import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.TurnContextImpl;
 import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogSet;
 import com.microsoft.bot.dialogs.DialogState;
+import com.microsoft.bot.dialogs.DialogTurnResult;
+import com.microsoft.bot.dialogs.DialogTurnStatus;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
+import com.microsoft.bot.schema.InputHints;
+import com.microsoft.bot.schema.OAuthCard;
+import com.microsoft.bot.schema.SignInConstants;
+import com.microsoft.bot.schema.TokenExchangeInvokeRequest;
+import com.microsoft.bot.schema.TokenExchangeInvokeResponse;
+import com.microsoft.bot.schema.TokenExchangeRequest;
+import com.microsoft.bot.schema.TokenResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,10 +53,10 @@ public class OAuthPromptTests {
         Assert.assertThrows(IllegalArgumentException.class, () -> new OAuthPrompt("", new OAuthPromptSettings(), null));
     }
 
-    // @Test
-    // public void OAuthPromptWithDefaultTypeHandlingForStorage() {
-    // OAuthPrompt(new MemoryStorage());
-    // }
+    @Test
+    public void OAuthPromptWithDefaultTypeHandlingForStorage() {
+        OAuthPrompt(new MemoryStorage());
+    }
 
     @Test
     public void OAuthPromptBeginDialogWithNoDialogContext() {
@@ -53,13 +72,12 @@ public class OAuthPromptTests {
 
     @Test
     public void OAuthPromptBeginDialogWithWrongOptions() {
-        Assert.assertThrows(IllegalArgumentException.class, () -> {
+        Assert.assertThrows(NullPointerException.class, () -> {
             OAuthPrompt prompt = new OAuthPrompt("abc", new OAuthPromptSettings(), null);
             ConversationState convoState = new ConversationState(new MemoryStorage());
             StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-            TestAdapter adapter = new TestAdapter()
-            .use(new AutoSaveStateMiddleware(convoState));
+            TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
 
             // Create new DialogSet.
             DialogSet dialogs = new DialogSet(dialogState);
@@ -73,205 +91,237 @@ public class OAuthPromptTests {
                 }
             });
 
-            DialogContext dc =  dialogs.createContext(tc).join();
+            DialogContext dc = dialogs.createContext(tc).join();
 
             prompt.beginDialog(dc).join();
         });
     }
 
-    // @Test
-    // public void OAuthPromptWithNoneTypeHandlingForStorage() {
-    // OAuthPrompt(new MemoryStorage(new JsonSerializer() { TypeNameHandling = TypeNameHandling.None }));
-    // }
+    @Test
+    public void OAuthPromptWithNoneTypeHandlingForStorage() {
+        OAuthPrompt(new MemoryStorage(new HashMap<String, JsonNode>()));
+    }
 
-    // @Test
-    // public void OAuthPromptWithMagicCode() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void OAuthPromptWithMagicCode() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // var connectionName = "myConnection";
-    // var token = "abc123";
-    // var magicCode = "888999";
+        String connectionName = "myConnection";
+        String token = "abc123";
+        String magicCode = "888999";
 
-    // // Create new DialogSet.
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
+        OAuthPrompt oAuthPrompt = new OAuthPrompt("OAuthPrompt", settings);
+        dialogs.add(oAuthPrompt);
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // var dc =  dialogs.CreateContext(turnContext);
+        BotCallbackHandler botCallbackHandler =  (turnContext) -> {
+            DialogContext dc =  dialogs.createContext(turnContext).join();
 
-    // var results =  dc.ContinueDialog(cancellationToken);
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // } else if (results.Status == DialogTurnStatus.Complete) {
-    // if (results.Result is TokenResponse) {
-    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    // } else {
-    // turnContext.SendActivity(MessageFactory.Text("Failed."));
-    // }
-    // }
-    // };
+            DialogTurnResult results =  dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions());
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
 
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+        // Add a magic code to the adapter
+            adapter.addUserToken(connectionName, activity.getChannelId(), activity.getRecipient().getId(), token, magicCode);
+        })
+        .send(magicCode)
+        .assertReply("Logged in.")
+        .startTest()
+        .join();
+    }
 
-    // // Add a magic code to the adapter
-    // adapter.AddUserToken(connectionName, activity.ChannelId, activity.Recipient.Id, token, magicCode);
-    // })
-    // .send(magicCode)
-    // .assertReply("Logged in.")
-    // .startTest();
-    // }
+    @Test
+    public void OAuthPromptTimesOut_Message() {
+        PromptTimeoutEndsDialogTest(MessageFactory.text("hi"));
+    }
 
-    // @Test
-    // public void OAuthPromptTimesOut_Message() {
-    //     PromptTimeoutEndsDialogTest(MessageFactory.Text("hi"));
-    // }
+    @Test
+    public void OAuthPromptTimesOut_TokenResponseEvent() {
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setName(SignInConstants.TOKEN_RESPONSE_EVENT_NAME);
+        activity.setValue(new TokenResponse(Channels.MSTEAMS, "connectionName", "token", null));
+        PromptTimeoutEndsDialogTest(activity);
+    }
 
-    // @Test
-    // public void OAuthPromptTimesOut_TokenResponseEvent() {
-    // var activity = new Activity() { Type = ActivityTypes.Event, Name = SignInConstants.TokenResponseEventName };
-    // activity.Value = JObject.FromObject(new TokenResponse(Channels.Msteams, "connectionName", "token", null));
-    // PromptTimeoutEndsDialogTest(activity);
-    // }
+    @Test
+    public void OAuthPromptTimesOut_VerifyStateOperation() {
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName(SignInConstants.VERIFY_STATE_OPERATION_NAME);
+        activity.setValue("888999");
+        PromptTimeoutEndsDialogTest(activity);
+    }
 
-    // @Test
-    // public void OAuthPromptTimesOut_VerifyStateOperation() {
-    // var activity = new Activity() { Type = ActivityTypes.Invoke, Name = SignInConstants.VerifyStateOperationName };
-    // activity.Value = JObject.FromObject(new { state = "888999" });
+    @Test
+    public void OAuthPromptTimesOut_TokenExchangeOperation() {
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
 
-    // PromptTimeoutEndsDialogTest(activity);
-    // }
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
 
-    // @Test
-    // public void OAuthPromptTimesOut_TokenExchangeOperation() {
-    // var activity = new Activity() { Type = ActivityTypes.Invoke, Name = SignInConstants.TokenExchangeOperationName };
+        TokenExchangeInvokeRequest tokenExchangeRequest = new TokenExchangeInvokeRequest();
+        tokenExchangeRequest.setConnectionName(connectionName);
+        tokenExchangeRequest.setToken(exchangeToken);
 
-    // var connectionName = "myConnection";
-    // var exchangeToken = "exch123";
+        activity.setValue(tokenExchangeRequest);
 
-    // activity.Value = JObject.FromObject(new TokenExchangeInvokeRequest() {
-    // ConnectionName = connectionName,
-    // Token = exchangeToken
-    // });
+        PromptTimeoutEndsDialogTest(activity);
+    }
 
-    // PromptTimeoutEndsDialogTest(activity);
-    // }
+    @Test
+    public void OAuthPromptDoesNotDetectCodeInBeginDialog() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // @Test
-    // public void OAuthPromptDoesNotDetectCodeInBeginDialog() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+        String connectionName = "myConnection";
+        String token = "abc123";
+        String magicCode = "888999";
 
-    // var connectionName = "myConnection";
-    // var token = "abc123";
-    // var magicCode = "888999";
+        // Create new DialogSet
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    // // Create new DialogSet
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // // Add a magic code to the adapter preemptively so that we can test if the message that triggers BeginDialogAsync uses magic code detection
-    // adapter.AddUserToken(connectionName, turnContext.Activity.ChannelId, turnContext.Activity.From.Id, token, magicCode);
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    // var dc =  dialogs.CreateContext(turnContext);
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            // Add a magic code to the adapter preemptively so that we can test if the
+            // message that triggers BeginDialogAsync uses magic code detection
+            adapter.addUserToken(connectionName, turnContext.getActivity().getChannelId(),
+                                 turnContext.getActivity().getFrom().getId(), token, magicCode);
 
-    // var results =  dc.ContinueDialog(cancellationToken);
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // // If magicCode is detected when prompting, this will end the dialog and return the token in tokenResult
-    // var tokenResult =  dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // if (tokenResult.Result is TokenResponse) {
-    // throw new XunitException();
-    // }
-    // }
-    // };
+            DialogTurnResult results = dc.continueDialog().join();
 
-    // // Call BeginDialogAsync by sending the magic code as the first message. It SHOULD respond with an OAuthPrompt since we haven't authenticated yet
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send(magicCode)
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                // If magicCode is detected when prompting, this will end the dialog and
+                // return the token in tokenResult
+                DialogTurnResult tokenResult = dc.prompt("OAuthPrompt", new PromptOptions()).join();
+                if (tokenResult.getResult() instanceof TokenResponse) {
+                    throw new RuntimeException();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
-    // })
-    // .startTest();
-    // }
+        // Call BeginDialogAsync by sending the magic code as the first message. It
+        // SHOULD respond with an OAuthPrompt since we haven't authenticated yet
+        new TestFlow(adapter, botCallbackHandler)
+        .send(magicCode)
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity)activity).getInputHint());
+        })
+        .startTest()
+        .join();
+        }
 
-    // @Test
-    // public void OAuthPromptWithTokenExchangeInvoke() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void OAuthPromptWithTokenExchangeInvoke() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // var connectionName = "myConnection";
-    // var exchangeToken = "exch123";
-    // var token = "abc123";
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
+        String token = "abc123";
 
-    // // Create new DialogSet.
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        // Create new DialogSet
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // var dc =  dialogs.CreateContext(turnContext);
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
 
-    // var results =  dc.ContinueDialog(cancellationToken);
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // } else if (results.Status == DialogTurnStatus.Complete) {
-    // if (results.Result is TokenResponse) {
-    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    // } else {
-    // turnContext.SendActivity(MessageFactory.Text("Failed."));
-    // }
-    // }
-    // };
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    // // Add an exchangable token to the adapter
-    // adapter.AddExchangeableToken(connectionName, activity.ChannelId, activity.Recipient.Id, exchangeToken, token);
-    // })
-    // .send(new Activity() {
-    // Type = ActivityTypes.Invoke,
-    // Name = SignInConstants.TokenExchangeOperationName,
-    // Value = JObject.FromObject(new TokenExchangeInvokeRequest() {
-    // ConnectionName = connectionName,
-    // Token = exchangeToken
-    // })
-    // })
-    // .assertReply(a -> {
-    // Assert.Equal("invokeResponse", a.Type);
-    // var response = ((Activity)a).Value as InvokeResponse;
-    // Assert.NotNull(response);
-    // Assert.Equal(200, response.Status);
-    // var body = response.Body as TokenExchangeInvokeResponse;
-    // Assert.Equal(connectionName, body.ConnectionName);
-    // Assert.Null(body.FailureDetail);
-    // })
-    // .assertReply("Logged in.")
-    // .startTest();
-    // }
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions()).join();
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
+
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity)activity).getInputHint());
+
+        // Add an exchangable token to the adapter
+            adapter.addExchangeableToken(connectionName, activity.getChannelId(),
+            activity.getRecipient().getId(), exchangeToken, token);
+        })
+        .send(new Activity(ActivityTypes.INVOKE)
+        {
+            {
+            setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
+            setValue(new TokenExchangeInvokeRequest() {
+                {
+                    setConnectionName(connectionName);
+                    setToken(exchangeToken);
+                }
+            });
+        }})
+        .assertReply(a -> {
+            Assert.assertEquals("invokeResponse", a.getType());
+            InvokeResponse response = (InvokeResponse) ((Activity)a).getValue();
+            Assert.assertNotNull(response);
+            Assert.assertEquals(200, response.getStatus());
+            TokenExchangeInvokeResponse body = (TokenExchangeInvokeResponse) response.getBody();
+            Assert.assertEquals(connectionName, body.getConnectionName());
+            Assert.assertNull(body.getFailureDetail());
+        })
+        .assertReply("Logged in.")
+        .startTest()
+        .join();
+    }
 
     // @Test
     // public void OAuthPromptWithTokenExchangeFail() {
@@ -286,12 +336,13 @@ public class OAuthPromptTests {
 
     // // Create new DialogSet.
     // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
+    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // var dc =  dialogs.CreateContext(turnContext);
+    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
+    // var dc = dialogs.CreateContext(turnContext);
 
-    // var results =  dc.ContinueDialog(cancellationToken);
+    // var results = dc.ContinueDialog(cancellationToken);
     // if (results.Status == DialogTurnStatus.Empty) {
     // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
     // } else if (results.Status == DialogTurnStatus.Complete) {
@@ -307,7 +358,8 @@ public class OAuthPromptTests {
     // .send("hello")
     // .assertReply(activity -> {
     // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+    // Assert.Equal(OAuthCard.ContentType,
+    // ((Activity)activity).Attachments[0].ContentType);
     // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
 
     // // No exchangable token is added to the adapter
@@ -344,12 +396,13 @@ public class OAuthPromptTests {
 
     // // Create new DialogSet.
     // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
+    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // var dc =  dialogs.CreateContext(turnContext);
+    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
+    // var dc = dialogs.CreateContext(turnContext);
 
-    // var results =  dc.ContinueDialog(cancellationToken);
+    // var results = dc.ContinueDialog(cancellationToken);
     // if (results.Status == DialogTurnStatus.Empty) {
     // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
     // } else if (results.Status == DialogTurnStatus.Complete) {
@@ -365,7 +418,8 @@ public class OAuthPromptTests {
     // .send("hello")
     // .assertReply(activity -> {
     // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+    // Assert.Equal(OAuthCard.ContentType,
+    // ((Activity)activity).Attachments[0].ContentType);
     // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
 
     // // No exchangable token is added to the adapter
@@ -401,12 +455,13 @@ public class OAuthPromptTests {
 
     // // Create new DialogSet.
     // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
+    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    // var dc =  dialogs.CreateContext(turnContext);
+    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
+    // var dc = dialogs.CreateContext(turnContext);
 
-    // var results =  dc.ContinueDialog(cancellationToken);
+    // var results = dc.ContinueDialog(cancellationToken);
     // if (results.Status == DialogTurnStatus.Empty) {
     // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
     // } else if (results.Status == DialogTurnStatus.Complete) {
@@ -422,7 +477,8 @@ public class OAuthPromptTests {
     // .send("hello")
     // .assertReply(activity -> {
     // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+    // Assert.Equal(OAuthCard.ContentType,
+    // ((Activity)activity).Attachments[0].ContentType);
     // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
 
     // // No exchangable token is added to the adapter
@@ -458,190 +514,213 @@ public class OAuthPromptTests {
     // var exchangeToken = "exch123";
     // var token = "abc123";
 
-    // BotCallbackHandler botCallbackHandler =  (turnContext) -> {
+    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
     // var userId = "fred";
-    // adapter.AddExchangeableToken(connectionName, turnContext.Activity.ChannelId, userId, exchangeToken, token);
+    // adapter.AddExchangeableToken(connectionName, turnContext.Activity.ChannelId,
+    // userId, exchangeToken, token);
 
     // // Positive case: Token
-    // var result =  adapter.ExchangeToken(turnContext, connectionName, userId, new TokenExchangeRequest() { Token = exchangeToken });
+    // var result = adapter.ExchangeToken(turnContext, connectionName, userId, new
+    // TokenExchangeRequest() { Token = exchangeToken });
     // Assert.NotNull(result);
     // Assert.Equal(token, result.Token);
     // Assert.Equal(connectionName, result.ConnectionName);
 
-    //             // Positive case: URI
-    //             result =  adapter.ExchangeToken(turnContext, connectionName, userId, new TokenExchangeRequest() { Uri = exchangeToken });
-    //             Assert.NotNull(result);
-    //             Assert.Equal(token, result.Token);
-    //             Assert.Equal(connectionName, result.ConnectionName);
+    // // Positive case: URI
+    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
+    // TokenExchangeRequest() { Uri = exchangeToken });
+    // Assert.NotNull(result);
+    // Assert.Equal(token, result.Token);
+    // Assert.Equal(connectionName, result.ConnectionName);
 
-    //             // Negative case: Token
-    //             result =  adapter.ExchangeToken(turnContext, connectionName, userId, new TokenExchangeRequest() { Token = "beeboop" });
-    //             Assert.Null(result);
+    // // Negative case: Token
+    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
+    // TokenExchangeRequest() { Token = "beeboop" });
+    // Assert.Null(result);
 
-    //             // Negative case: URI
-    //             result =  adapter.ExchangeToken(turnContext, connectionName, userId, new TokenExchangeRequest() { Uri = "beeboop" });
-    //             Assert.Null(result);
-    //         };
+    // // Negative case: URI
+    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
+    // TokenExchangeRequest() { Uri = "beeboop" });
+    // Assert.Null(result);
+    // };
 
-    //          new TestFlow(adapter, botCallbackHandler)
-    //         .send("hello")
-    //         .startTest();
-    //     }
+    // new TestFlow(adapter, botCallbackHandler)
+    // .send("hello")
+    // .startTest();
+    // }
 
-    // private void OAuthPrompt(IStorage storage) {
-    //         var convoState = new ConversationState(storage);
-    //         var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    private void OAuthPrompt(Storage storage) {
+        ConversationState convoState = new ConversationState(storage);
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    //         var adapter = new TestAdapter()
-    //             .Use(new AutoSaveStateMiddleware(convoState));
+        String connectionName = "myConnection";
+        String token = "abc123";
 
-    //         var connectionName = "myConnection";
-    //         var token = "abc123";
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
+        OAuthPromptSettings oauthPromptSettings = new OAuthPromptSettings();
+        oauthPromptSettings.setText("Please sign in");
+        oauthPromptSettings.setConnectionName(connectionName);
+        oauthPromptSettings.setTitle("Sign in");
+        dialogs.add(new OAuthPrompt("OAuthPrompt", oauthPromptSettings));
 
-    //         // Create new DialogSet.
-    //         var dialogs = new DialogSet(dialogState);
-    //         dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    //         BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions());
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    //             } else if (results.Status == DialogTurnStatus.Complete) {
-    //                 if (results.Result is TokenResponse) {
-    //                      turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    //                 } else {
-    //                      turnContext.SendActivity(MessageFactory.Text("Failed."));
-    //                 }
-    //             }
-    //         };
+        new TestFlow(adapter, botCallbackHandler).send("hello").assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
 
-    //          new TestFlow(adapter, botCallbackHandler)
-    //         .send("hello")
-    //         .assertReply(activity -> {
-    //             Assert.Single(((Activity)activity).Attachments);
-    //             Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+            // Prepare an EventActivity with a TokenResponse and send it to the
+            // botCallbackHandler
+            Activity eventActivity = createEventResponse(adapter, activity, connectionName, token);
+            TurnContextImpl ctx = new TurnContextImpl(adapter, (Activity) eventActivity);
+            botCallbackHandler.invoke(ctx);
+        }).assertReply("Logged in.").startTest().join();
+    }
 
-    //             Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+    private void PromptTimeoutEndsDialogTest(Activity oauthPromptActivity) {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    //             // Prepare an EventActivity with a TokenResponse and send it to the botCallbackHandler
-    //             var eventActivity = CreateEventResponse(adapter, activity, connectionName, token);
-    //             var ctx = new TurnContext(adapter, (Activity)eventActivity);
-    //             botCallbackHandler(ctx, CancellationToken.None);
-    //         })
-    //         .assertReply("Logged in.")
-    //         .startTest();
-    //     }
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
+        String magicCode = "888999";
+        String token = "abc123";
 
-    // private void PromptTimeoutEndsDialogTest(IActivity oauthPromptActivity) {
-    //         var convoState = new ConversationState(new MemoryStorage());
-    //         var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        // Create new DialogSet.
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    //         var adapter = new TestAdapter()
-    //             .Use(new AutoSaveStateMiddleware(convoState));
+        // Set timeout to zero, so the prompt will end immediately.
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
+        settings.setTimeout(0);
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    //         var connectionName = "myConnection";
-    //         var exchangeToken = "exch123";
-    //         var magicCode = "888999";
-    //         var token = "abc123";
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    //         // Create new DialogSet.
-    //         var dialogs = new DialogSet(dialogState);
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions()).join();
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+            // If the TokenResponse comes back, the timeout did not occur.
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity("failed").join();
+                } else {
+                    turnContext.sendActivity("ended").join();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    //         // Set timeout to zero, so the prompt will end immediately.
-    //         dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in", Timeout = 0 }));
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
 
-    //         BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+            // Add a magic code to the adapter
+            adapter.addUserToken(connectionName,
+                                 activity.getChannelId(),
+                                 activity.getRecipient().getId(),
+                                 token,
+                                 magicCode);
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    //             } else if (results.Status == DialogTurnStatus.Complete) {
-    //                 // If the TokenResponse comes back, the timeout did not occur.
-    //                 if (results.Result is TokenResponse) {
-    //                      turnContext.SendActivity("failed": cancellationToken);
-    //                 } else {
-    //                      turnContext.SendActivity("ended": cancellationToken);
-    //                 }
-    //             }
-    //         };
+            // Add an exchangable token to the adapter
+            adapter.addExchangeableToken(connectionName,
+                                         activity.getChannelId(),
+                                         activity.getRecipient().getId(),
+                                         exchangeToken,
+                                         token);
+        })
+        .send(oauthPromptActivity)
+        .assertReply("ended")
+        .startTest()
+        .join();
+    }
 
-    //          new TestFlow(adapter, botCallbackHandler)
-    //         .send("hello")
-    //         .assertReply(activity -> {
-    //             Assert.Single(((Activity)activity).Attachments);
-    //             Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
+    private Activity createEventResponse(TestAdapter adapter, Activity activity, String connectionName, String token) {
+        // add the token to the TestAdapter
+        adapter.addUserToken(connectionName, activity.getChannelId(), activity.getRecipient().getId(), token, null);
 
-    //             // Add a magic code to the adapter
-    //             adapter.AddUserToken(connectionName, activity.ChannelId, activity.Recipient.Id, token, magicCode);
+        // send an event TokenResponse activity to the botCallback handler
+        Activity eventActivity = ((Activity) activity).createReply();
+        eventActivity.setType(ActivityTypes.EVENT);
+        ChannelAccount from = eventActivity.getFrom();
+        eventActivity.setFrom(eventActivity.getRecipient());
+        eventActivity.setRecipient(from);
+        eventActivity.setName(SignInConstants.TOKEN_RESPONSE_EVENT_NAME);
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setConnectionName(connectionName);
+        tokenResponse.setToken(token);
+        eventActivity.setValue(tokenResponse);
 
-    //             // Add an exchangable token to the adapter
-    //             adapter.AddExchangeableToken(connectionName, activity.ChannelId, activity.Recipient.Id, exchangeToken, token);
-    //         })
-    //         .send(oauthPromptActivity)
-    //         .assertReply("ended")
-    //         .startTest();
-    //     }
-
-    // private Activity CreateEventResponse(TestAdapter adapter, IActivity activity, String connectionName, String token) {
-    //         // add the token to the TestAdapter
-    //         adapter.AddUserToken(connectionName, activity.ChannelId, activity.Recipient.Id, token);
-
-    //         // send an event TokenResponse activity to the botCallback handler
-    //         var eventActivity = ((Activity)activity).CreateReply();
-    //         eventActivity.Type = ActivityTypes.Event;
-    //         var from = eventActivity.From;
-    //         eventActivity.From = eventActivity.Recipient;
-    //         eventActivity.Recipient = from;
-    //         eventActivity.Name = SignInConstants.TokenResponseEventName;
-    //         eventActivity.Value = JObject.FromObject(new TokenResponse() {
-    //             ConnectionName = connectionName,
-    //             Token = token,
-    //         });
-
-    //         return eventActivity;
-    //     }
+        return eventActivity;
+    }
 
     // private void OAuthPromptEndOnInvalidMessageSetting() {
-    //         var convoState = new ConversationState(new MemoryStorage());
-    //         var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    // var convoState = new ConversationState(new MemoryStorage());
+    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
 
-    //         var adapter = new TestAdapter()
-    //             .Use(new AutoSaveStateMiddleware(convoState));
+    // var adapter = new TestAdapter()
+    // .Use(new AutoSaveStateMiddleware(convoState));
 
-    //         var connectionName = "myConnection";
+    // var connectionName = "myConnection";
 
-    //         // Create new DialogSet.
-    //         var dialogs = new DialogSet(dialogState);
-    //         dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text = "Please sign in", ConnectionName = connectionName, Title = "Sign in", EndOnInvalidMessage = true }));
+    // // Create new DialogSet.
+    // var dialogs = new DialogSet(dialogState);
+    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
+    // "Please sign in", ConnectionName = connectionName, Title = "Sign in",
+    // EndOnInvalidMessage = true }));
 
-    //         BotCallbackHandler botCallbackHandler =  (turnContext) -> {
-    //             var dc =  dialogs.CreateContext(turnContext);
+    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
+    // var dc = dialogs.CreateContext(turnContext);
 
-    //             var results =  dc.ContinueDialog(cancellationToken);
-    //             if (results.Status == DialogTurnStatus.Empty) {
-    //                  dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    //             } else if (results.Status == DialogTurnStatus.Waiting) {
-    //                 throw new InvalidOperationException("Test OAuthPromptEndOnInvalidMessageSetting expected DialogTurnStatus.Complete");
-    //             } else if (results.Status == DialogTurnStatus.Complete) {
-    //                 if (results.Result is TokenResponse) {
-    //                      turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    //                 } else {
-    //                      turnContext.SendActivity(MessageFactory.Text("Ended."));
-    //                 }
-    //             }
-    //         };
+    // var results = dc.ContinueDialog(cancellationToken);
+    // if (results.Status == DialogTurnStatus.Empty) {
+    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
+    // } else if (results.Status == DialogTurnStatus.Waiting) {
+    // throw new InvalidOperationException("Test
+    // OAuthPromptEndOnInvalidMessageSetting expected DialogTurnStatus.Complete");
+    // } else if (results.Status == DialogTurnStatus.Complete) {
+    // if (results.Result is TokenResponse) {
+    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
+    // } else {
+    // turnContext.SendActivity(MessageFactory.Text("Ended."));
+    // }
+    // }
+    // };
 
-    //          new TestFlow(adapter, botCallbackHandler)
-    //         .send("hello")
-    //         .assertReply(activity -> {
-    //             Assert.Single(((Activity)activity).Attachments);
-    //             Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
-    //         })
-    //         .send("blah")
-    //         .assertReply("Ended.")
-    //         .startTest();
-    //     }
+    // new TestFlow(adapter, botCallbackHandler)
+    // .send("hello")
+    // .assertReply(activity -> {
+    // Assert.Single(((Activity)activity).Attachments);
+    // Assert.Equal(OAuthCard.ContentType,
+    // ((Activity)activity).Attachments[0].ContentType);
+    // })
+    // .send("blah")
+    // .assertReply("Ended.")
+    // .startTest();
+    // }
 }

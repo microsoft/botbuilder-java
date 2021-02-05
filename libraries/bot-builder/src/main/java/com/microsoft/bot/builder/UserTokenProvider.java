@@ -42,7 +42,7 @@ public interface UserTokenProvider {
      * @return A task that represents the work queued to execute. If the task
      *         completes successfully, the result contains the raw signin link.
      */
-    CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName);
+    CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName);
 
     /**
      * Get the raw signin link to be sent to the user for signin for a connection
@@ -56,7 +56,7 @@ public interface UserTokenProvider {
      * @return A task that represents the work queued to execute. If the task
      *         completes successfully, the result contains the raw signin link.
      */
-    CompletableFuture<String> getOauthSignInLink(
+    CompletableFuture<String> getOAuthSignInLink(
         TurnContext turnContext,
         String connectionName,
         String userId,
@@ -194,7 +194,7 @@ public interface UserTokenProvider {
      * If the CompletableFuture completes successfully, the result contains the raw signin
      * link.
      */
-    CompletableFuture<String> getOauthSignInLink(
+    CompletableFuture<String> getOAuthSignInLink(
         TurnContext turnContext,
         AppCredentials oAuthAppCredentials,
         String connectionName);
@@ -217,7 +217,7 @@ public interface UserTokenProvider {
      * If the CompletableFuture completes successfully, the result contains the raw signin
      * link.
      */
-    CompletableFuture<String> getOauthSignInLink(
+    CompletableFuture<String> getOAuthSignInLink(
         TurnContext turnContext,
         AppCredentials oAuthAppCredentials,
         String connectionName,

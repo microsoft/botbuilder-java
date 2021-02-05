@@ -6,12 +6,10 @@ package com.microsoft.bot.builder.adapters;
 import com.microsoft.bot.builder.*;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
-import com.microsoft.bot.connector.UserToken;
 import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
 
-import static org.mockito.ArgumentMatchers.nullable;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -31,9 +29,35 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
 
     private static class UserTokenKey {
-        public String connectionName;
-        public String userId;
-        public String channelId;
+        private String connectionName;
+        private String userId;
+        private String channelId;
+
+        public String getConnectionName() {
+            return connectionName;
+        }
+
+        public void setConnectionName(String withConnectionName) {
+            connectionName = withConnectionName;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String withUserId) {
+            userId = withUserId;
+        }
+
+        public String getChannelId() {
+            return channelId;
+        }
+
+        public void setChannelId(String withChannelId) {
+            channelId = withChannelId;
+        }
+
+
 
         @Override
         public boolean equals(Object rhs) {
@@ -371,21 +395,9 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
     public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext, String connectionName,
             String magicCode) {
-        return getUserToken(turnContext, connectionName, magicCode);
+        return getUserToken(turnContext, null, connectionName, magicCode);
 
     }
-
-    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName) {
-        return getOAuthSignInLink(turnContext, connectionName, turnContext.getActivity().getFrom().getId(), null);
-    }
-
-    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName, String userId,
-            String finalRedirect) {
-        String link = String.format("https://fake.com/oauthsignin/%s/{turnContext.Activity.ChannelId}/%s",
-                connectionName, userId == null ? "" : userId);
-        return CompletableFuture.completedFuture(link);
-    }
-
     public CompletableFuture<Void> signOutUser(TurnContext turnContext, String connectionName, String userId) {
         return signOutUser(turnContext, null, connectionName, userId);
     }
@@ -427,15 +439,31 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
         return sendTraceActivity;
     }
 
-    @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName) {
-        return getOauthSignInLink(turnContext, null, connectionName);
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName) {
+        return getOAuthSignInLink(turnContext, null, connectionName);
+    }
+
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, String connectionName, String userId,
+            String finalRedirect) {
+        return getOAuthSignInLink(turnContext, null, connectionName, userId, finalRedirect);
     }
 
     @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, String connectionName, String userId,
-            String finalRedirect) {
-        return getOauthSignInLink(turnContext, null, connectionName, userId, finalRedirect);
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+            String connectionName) {
+        return CompletableFuture.completedFuture(
+            String.format("https://fake.com/oauthsignin/%s/%s",
+                            connectionName,
+                            turnContext.getActivity().getChannelId()));
+    }
+
+    public CompletableFuture<String> getOAuthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
+        String connectionName, String userId, String finalRedirect) {
+        return CompletableFuture.completedFuture(
+            String.format("https://fake.com/oauthsignin/%s/%s/%s",
+                            connectionName,
+                            turnContext.getActivity().getChannelId(),
+                            userId));
     }
 
     @Override
@@ -466,24 +494,32 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                 return CompletableFuture.completedFuture(null);
      }
 
-    @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
-            String connectionName) {
-                return CompletableFuture.completedFuture(
-                    String.format("https://fake.com/oauthsignin/%s/%s",
-                                  connectionName,
-                                  turnContext.getActivity().getChannelId()));
-            }
+    /**
+     * Adds a fake exchangeable token so it can be exchanged later.
+     * @param connectionName he connection name.
+     * @param channelId The channel ID.
+     * @param userId The user ID.
+     * @param exchangableItem The exchangeable token or resource URI.
+     * @param token The token to store.
+     */
+    public void addExchangeableToken(String connectionName,
+                                        String channelId,
+                                        String userId,
+                                        String exchangableItem,
+                                        String token)
+    {
+        ExchangableTokenKey key = new ExchangableTokenKey();
+        key.setConnectionName(connectionName);
+        key.setChannelId(channelId);
+        key.setUserId(userId);
+        key.setExchangableItem(exchangableItem);
 
-    @Override
-    public CompletableFuture<String> getOauthSignInLink(TurnContext turnContext, AppCredentials oAuthAppCredentials,
-            String connectionName, String userId, String finalRedirect) {
-        return CompletableFuture.completedFuture(
-            String.format("https://fake.com/oauthsignin/%s/%s/%s",
-                          connectionName,
-                          turnContext.getActivity().getChannelId(),
-                          userId));
-}
+        if (exchangableToken.containsKey(key)) {
+            exchangableToken.replace(key, token);
+        } else {
+            exchangableToken.put(key, token);
+        }
+    }
 
     @Override
     public CompletableFuture<Void> signOutUser(TurnContext turnContext, AppCredentials oAuthAppCredentials,
@@ -578,7 +614,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             String connectionName, String userId, TokenExchangeRequest exchangeRequest) {
 
             String exchangableValue = null;
-            if (exchangeRequest.getToken() == null) {
+            if (exchangeRequest.getToken() != null) {
                 if (StringUtils.isNotBlank(exchangeRequest.getToken())) {
                     exchangableValue = exchangeRequest.getToken();
                 } else {
@@ -590,11 +626,11 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             if (turnContext != null
                 && turnContext.getActivity() != null
                 && turnContext.getActivity().getChannelId() != null) {
-                key.channelId = turnContext.getActivity().getChannelId();
+                key.setChannelId(turnContext.getActivity().getChannelId());
             }
-            key.connectionName = connectionName;
-            key.exchangableItem = exchangableValue;
-            key.userId = userId;
+            key.setConnectionName(connectionName);
+            key.setExchangableItem(exchangableValue);
+            key.setUserId(userId);
 
             String token = exchangableToken.get(key);
             if (token != null) {
@@ -603,12 +639,11 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                         new RuntimeException("Exception occurred during exchanging tokens")
                     );
                 }
-
                 return CompletableFuture.completedFuture(new TokenResponse() {
                     {
-                    setChannelId(key.channelId);
-                    setConnectionName(key.connectionName);
-                    setToken(token);
+                        setChannelId(key.getChannelId());
+                        setConnectionName(key.getConnectionName());
+                        setToken(token);
                     }
                 });
             } else {
@@ -621,6 +656,14 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
         private String exchangableItem = "";
 
+        public String getExchangableItem() {
+            return exchangableItem;
+        }
+
+        public void setExchangableItem(String withExchangableItem) {
+            exchangableItem = withExchangableItem;
+        }
+
         @Override
         public boolean equals(Object rhs) {
             if (!(rhs instanceof ExchangableTokenKey)) {
@@ -632,7 +675,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
         @Override
         public int hashCode() {
-            return Objects.hash(exchangableItem) + super.hashCode();
+            return Objects.hash(exchangableItem != null ? exchangableItem : "") + super.hashCode();
         }
 
 
