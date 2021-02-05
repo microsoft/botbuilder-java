@@ -855,7 +855,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
     @Override
     public CompletableFuture<String> getOAuthSignInLink(TurnContext context, String connectionName, String userId,
             String finalRedirect) {
-        return getOauthSignInLink(context, null, connectionName, userId, finalRedirect);
+        return getOAuthSignInLink(context, null, connectionName, userId, finalRedirect);
     }
 
     /**

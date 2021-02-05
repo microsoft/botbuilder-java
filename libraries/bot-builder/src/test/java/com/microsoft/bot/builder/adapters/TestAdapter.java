@@ -617,7 +617,9 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             if (exchangeRequest.getToken() != null) {
                 if (StringUtils.isNotBlank(exchangeRequest.getToken())) {
                     exchangableValue = exchangeRequest.getToken();
-                } else {
+                }
+            } else {
+                if (exchangeRequest.getUri() != null) {
                     exchangableValue = exchangeRequest.getUri();
                 }
             }

@@ -19,7 +19,6 @@ import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.TurnContextImpl;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogSet;
@@ -147,7 +146,10 @@ public class OAuthPromptTests {
             Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
 
         // Add a magic code to the adapter
-            adapter.addUserToken(connectionName, activity.getChannelId(), activity.getRecipient().getId(), token, magicCode);
+            adapter.addUserToken(connectionName, activity.getChannelId(),
+                                                 activity.getRecipient().getId(),
+                                                 token,
+                                                 magicCode);
         })
         .send(magicCode)
         .assertReply("Logged in.")
@@ -243,7 +245,7 @@ public class OAuthPromptTests {
         .assertReply(activity -> {
             Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
             Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
-            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity)activity).getInputHint());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
         })
         .startTest()
         .join();
@@ -279,9 +281,9 @@ public class OAuthPromptTests {
                 dc.prompt("OAuthPrompt", new PromptOptions()).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if (results.getResult() instanceof TokenResponse) {
-                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
                 } else {
-                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
                 }
             }
             return CompletableFuture.completedFuture(null);
@@ -292,17 +294,16 @@ public class OAuthPromptTests {
         .assertReply(activity -> {
             Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
             Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
-            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity)activity).getInputHint());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
 
         // Add an exchangable token to the adapter
             adapter.addExchangeableToken(connectionName, activity.getChannelId(),
-            activity.getRecipient().getId(), exchangeToken, token);
+                                         activity.getRecipient().getId(), exchangeToken, token);
         })
-        .send(new Activity(ActivityTypes.INVOKE)
-        {
+        .send(new Activity(ActivityTypes.INVOKE) {
             {
-            setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
-            setValue(new TokenExchangeInvokeRequest() {
+                setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
+                setValue(new TokenExchangeInvokeRequest() {
                 {
                     setConnectionName(connectionName);
                     setToken(exchangeToken);
@@ -323,231 +324,255 @@ public class OAuthPromptTests {
         .join();
     }
 
-    // @Test
-    // public void OAuthPromptWithTokenExchangeFail() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+    @Test
+    public void OAuthPromptWithTokenExchangeFail() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // var connectionName = "myConnection";
-    // var exchangeToken = "exch123";
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
 
-    // // Create new DialogSet.
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
-    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        // Create new DialogSet
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
-    // var dc = dialogs.CreateContext(turnContext);
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
 
-    // var results = dc.ContinueDialog(cancellationToken);
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // } else if (results.Status == DialogTurnStatus.Complete) {
-    // if (results.Result is TokenResponse) {
-    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    // } else {
-    // turnContext.SendActivity(MessageFactory.Text("Failed."));
-    // }
-    // }
-    // };
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType,
-    // ((Activity)activity).Attachments[0].ContentType);
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    // // No exchangable token is added to the adapter
-    // })
-    // .send(new Activity() {
-    // Type = ActivityTypes.Invoke,
-    // Name = SignInConstants.TokenExchangeOperationName,
-    // Value = JObject.FromObject(new TokenExchangeInvokeRequest() {
-    // ConnectionName = connectionName,
-    // Token = exchangeToken
-    // })
-    // })
-    // .assertReply(a -> {
-    // Assert.Equal("invokeResponse", a.Type);
-    // var response = ((Activity)a).Value as InvokeResponse;
-    // Assert.NotNull(response);
-    // Assert.Equal(412, response.Status);
-    // var body = response.Body as TokenExchangeInvokeResponse;
-    // Assert.Equal(connectionName, body.ConnectionName);
-    // Assert.NotNull(body.FailureDetail);
-    // })
-    // .startTest();
-    // }
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions()).join();
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    // @Test
-    // public void OAuthPromptWithTokenExchangeNoBodyFails() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
+            // No exchangable token is added to the adapter
+        })
+        .send(new Activity(ActivityTypes.INVOKE) {
+            {
+                setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
+                setValue(new TokenExchangeInvokeRequest() {
+                {
+                    setConnectionName(connectionName);
+                    setToken(exchangeToken);
+                }
+            });
+        }})
+        .assertReply(a -> {
+            Assert.assertEquals("invokeResponse", a.getType());
+            InvokeResponse response = (InvokeResponse) ((Activity) a).getValue();
+            Assert.assertNotNull(response);
+            Assert.assertEquals(412, response.getStatus());
+            TokenExchangeInvokeResponse body = (TokenExchangeInvokeResponse) response.getBody();
+            Assert.assertEquals(connectionName, body.getConnectionName());
+            Assert.assertNotNull(body.getFailureDetail());
+        })
+        .startTest()
+        .join();
+    }
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+    @Test
+    public void OAuthPromptWithTokenExchangeNoBodyFails() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // var connectionName = "myConnection";
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // // Create new DialogSet.
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
-    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        String connectionName = "myConnection";
 
-    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
-    // var dc = dialogs.CreateContext(turnContext);
+        // Create new DialogSet
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    // var results = dc.ContinueDialog(cancellationToken);
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // } else if (results.Status == DialogTurnStatus.Complete) {
-    // if (results.Result is TokenResponse) {
-    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    // } else {
-    // turnContext.SendActivity(MessageFactory.Text("Failed."));
-    // }
-    // }
-    // };
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType,
-    // ((Activity)activity).Attachments[0].ContentType);
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    // // No exchangable token is added to the adapter
-    // })
-    // .send(new Activity() {
-    // Type = ActivityTypes.Invoke,
-    // Name = SignInConstants.TokenExchangeOperationName,
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    // // send no body
-    // })
-    // .assertReply(a -> {
-    // Assert.Equal("invokeResponse", a.Type);
-    // var response = ((Activity)a).Value as InvokeResponse;
-    // Assert.NotNull(response);
-    // Assert.Equal(400, response.Status);
-    // var body = response.Body as TokenExchangeInvokeResponse;
-    // Assert.Equal(connectionName, body.ConnectionName);
-    // Assert.NotNull(body.FailureDetail);
-    // })
-    // .startTest();
-    // }
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions()).join();
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    // @Test
-    // public void OAuthPromptWithTokenExchangeWrongConnectionNameFail() {
-    // var convoState = new ConversationState(new MemoryStorage());
-    // var dialogState = convoState.CreateProperty<DialogState>("dialogState");
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
+            // No exchangable token is added to the adapter
+        })
+        .send(new Activity(ActivityTypes.INVOKE) {
+            {
+                setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
+            }
+        })
+        .assertReply(a -> {
+            Assert.assertEquals("invokeResponse", a.getType());
+            InvokeResponse response = (InvokeResponse) ((Activity) a).getValue();
+            Assert.assertNotNull(response);
+            Assert.assertEquals(400, response.getStatus());
+            TokenExchangeInvokeResponse body = (TokenExchangeInvokeResponse) response.getBody();
+            Assert.assertEquals(connectionName, body.getConnectionName());
+            Assert.assertNotNull(body.getFailureDetail());
+        })
+        .startTest()
+        .join();
+    }
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+    @Test
+    public void OAuthPromptWithTokenExchangeWrongConnectionNameFail() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
 
-    // var connectionName = "myConnection";
-    // var exchangeToken = "exch123";
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // // Create new DialogSet.
-    // var dialogs = new DialogSet(dialogState);
-    // dialogs.Add(new OAuthPrompt("OAuthPrompt", new OAuthPromptSettings() { Text =
-    // "Please sign in", ConnectionName = connectionName, Title = "Sign in" }));
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
 
-    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
-    // var dc = dialogs.CreateContext(turnContext);
+        // Create new DialogSet
+        DialogSet dialogs = new DialogSet(dialogState);
 
-    // var results = dc.ContinueDialog(cancellationToken);
-    // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
-    // } else if (results.Status == DialogTurnStatus.Complete) {
-    // if (results.Result is TokenResponse) {
-    // turnContext.SendActivity(MessageFactory.Text("Logged in."));
-    // } else {
-    // turnContext.SendActivity(MessageFactory.Text("Failed."));
-    // }
-    // }
-    // };
+        OAuthPromptSettings settings = new OAuthPromptSettings();
+        settings.setText("Please sign in");
+        settings.setConnectionName(connectionName);
+        settings.setTitle("Sign in");
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .assertReply(activity -> {
-    // Assert.Single(((Activity)activity).Attachments);
-    // Assert.Equal(OAuthCard.ContentType,
-    // ((Activity)activity).Attachments[0].ContentType);
-    // Assert.Equal(InputHints.AcceptingInput, ((Activity)activity).InputHint);
+        dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
-    // // No exchangable token is added to the adapter
-    // })
-    // .send(new Activity() {
-    // Type = ActivityTypes.Invoke,
-    // Name = SignInConstants.TokenExchangeOperationName,
-    // Value = JObject.FromObject(new TokenExchangeInvokeRequest() {
-    // ConnectionName = "beepboop",
-    // Token = exchangeToken
-    // })
-    // })
-    // .assertReply(a -> {
-    // Assert.Equal("invokeResponse", a.Type);
-    // var response = ((Activity)a).Value as InvokeResponse;
-    // Assert.NotNull(response);
-    // Assert.Equal(400, response.Status);
-    // var body = response.Body as TokenExchangeInvokeResponse;
-    // Assert.Equal(connectionName, body.ConnectionName);
-    // Assert.NotNull(body.FailureDetail);
-    // })
-    // .startTest();
-    // }
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            DialogContext dc = dialogs.createContext(turnContext).join();
 
-    // @Test
-    // public void TestAdapterTokenExchange() {
-    // var convoState = new ConversationState(new MemoryStorage());
+            DialogTurnResult results = dc.continueDialog().join();
+            if (results.getStatus() == DialogTurnStatus.EMPTY) {
+                dc.prompt("OAuthPrompt", new PromptOptions()).join();
+            } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
+                if (results.getResult() instanceof TokenResponse) {
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
+                } else {
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
+                }
+            }
+            return CompletableFuture.completedFuture(null);
+        };
 
-    // var adapter = new TestAdapter()
-    // .Use(new AutoSaveStateMiddleware(convoState));
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .assertReply(activity -> {
+            Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
+            Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
+            Assert.assertEquals(InputHints.ACCEPTING_INPUT, ((Activity) activity).getInputHint());
+            // No exchangable token is added to the adapter
+        })
+        .send(new Activity(ActivityTypes.INVOKE) {
+            {
+                setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
+                setValue(new TokenExchangeInvokeRequest() {
+                {
+                    setConnectionName("beepboop");
+                    setToken(exchangeToken);
+                }
+            });
+        }})
+        .assertReply(a -> {
+            Assert.assertEquals("invokeResponse", a.getType());
+            InvokeResponse response = (InvokeResponse) ((Activity) a).getValue();
+            Assert.assertNotNull(response);
+            Assert.assertEquals(400, response.getStatus());
+            TokenExchangeInvokeResponse body = (TokenExchangeInvokeResponse) response.getBody();
+            Assert.assertEquals(connectionName, body.getConnectionName());
+            Assert.assertNotNull(body.getFailureDetail());
+        })
+        .startTest()
+        .join();
+    }
 
-    // var connectionName = "myConnection";
-    // var exchangeToken = "exch123";
-    // var token = "abc123";
+    @Test
+    public void TestAdapterTokenExchange() {
+        ConversationState convoState = new ConversationState(new MemoryStorage());
 
-    // BotCallbackHandler botCallbackHandler = (turnContext) -> {
-    // var userId = "fred";
-    // adapter.AddExchangeableToken(connectionName, turnContext.Activity.ChannelId,
-    // userId, exchangeToken, token);
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(convoState));
 
-    // // Positive case: Token
-    // var result = adapter.ExchangeToken(turnContext, connectionName, userId, new
-    // TokenExchangeRequest() { Token = exchangeToken });
-    // Assert.NotNull(result);
-    // Assert.Equal(token, result.Token);
-    // Assert.Equal(connectionName, result.ConnectionName);
+        String connectionName = "myConnection";
+        String exchangeToken = "exch123";
+        String token = "abc123";
 
-    // // Positive case: URI
-    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
-    // TokenExchangeRequest() { Uri = exchangeToken });
-    // Assert.NotNull(result);
-    // Assert.Equal(token, result.Token);
-    // Assert.Equal(connectionName, result.ConnectionName);
+        BotCallbackHandler botCallbackHandler = (turnContext) -> {
+            String userId = "fred";
+            adapter.addExchangeableToken(connectionName,
+                                        turnContext.getActivity().getChannelId(),
+                                        userId,
+                                        exchangeToken,
+                                        token);
 
-    // // Negative case: Token
-    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
-    // TokenExchangeRequest() { Token = "beeboop" });
-    // Assert.Null(result);
+            // Positive case: Token
+            TokenResponse result = adapter.exchangeToken(turnContext, connectionName, userId,
+                                            new TokenExchangeRequest() {{ setToken(exchangeToken); }}).join();
+            Assert.assertNotNull(result);
+            Assert.assertEquals(token, result.getToken());
+            Assert.assertEquals(connectionName, result.getConnectionName());
 
-    // // Negative case: URI
-    // result = adapter.ExchangeToken(turnContext, connectionName, userId, new
-    // TokenExchangeRequest() { Uri = "beeboop" });
-    // Assert.Null(result);
-    // };
+            // Positive case: URI
+            result = adapter.exchangeToken(turnContext, connectionName, userId,
+                                            new TokenExchangeRequest() { { setUri(exchangeToken); }}).join();
+            Assert.assertNotNull(result);
+            Assert.assertEquals(token, result.getToken());
+            Assert.assertEquals(connectionName, result.getConnectionName());
 
-    // new TestFlow(adapter, botCallbackHandler)
-    // .send("hello")
-    // .startTest();
-    // }
+            // Negative case: Token
+            result = adapter.exchangeToken(turnContext, connectionName, userId,
+                                            new TokenExchangeRequest() {{ setToken("beeboop"); }}).join();
+            Assert.assertNull(result);
+
+            // Negative case: URI
+            result = adapter.exchangeToken(turnContext, connectionName, userId,
+                                            new TokenExchangeRequest() {{ setUri("beeboop"); }}).join();
+            Assert.assertNull(result);
+
+            return CompletableFuture.completedFuture(null);
+        };
+
+        new TestFlow(adapter, botCallbackHandler)
+        .send("hello")
+        .startTest()
+        .join();
+    }
 
     private void OAuthPrompt(Storage storage) {
         ConversationState convoState = new ConversationState(storage);
@@ -697,9 +722,9 @@ public class OAuthPromptTests {
     // BotCallbackHandler botCallbackHandler = (turnContext) -> {
     // var dc = dialogs.CreateContext(turnContext);
 
-    // var results = dc.ContinueDialog(cancellationToken);
+    // var results = dc.ContinueDialog();
     // if (results.Status == DialogTurnStatus.Empty) {
-    // dc.Prompt("OAuthPrompt", new PromptOptions(): cancellationToken);
+    // dc.Prompt("OAuthPrompt", new PromptOptions());
     // } else if (results.Status == DialogTurnStatus.Waiting) {
     // throw new InvalidOperationException("Test
     // OAuthPromptEndOnInvalidMessageSetting expected DialogTurnStatus.Complete");

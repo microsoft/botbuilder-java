@@ -343,7 +343,7 @@ public class OAuthPrompt extends Dialog {
             if (tokenExchangeRequest == null) {
                 TokenExchangeInvokeResponse response = new TokenExchangeInvokeResponse();
                 response.setId(null);
-                response.setId(settings.getConnectionName());
+                response.setConnectionName(settings.getConnectionName());
                 response.setFailureDetail("The bot received an InvokeActivity that is missing a "
                                             + "TokenExchangeInvokeRequest value. This is required to be "
                                             + "sent with the InvokeActivity.");
@@ -351,7 +351,7 @@ public class OAuthPrompt extends Dialog {
             } else if (tokenExchangeRequest.getConnectionName() != settings.getConnectionName()) {
                 TokenExchangeInvokeResponse response = new TokenExchangeInvokeResponse();
                 response.setId(tokenExchangeRequest.getId());
-                response.setId(settings.getConnectionName());
+                response.setConnectionName(settings.getConnectionName());
                 response.setFailureDetail("The bot received an InvokeActivity with a "
                                 + "TokenExchangeInvokeRequest containing a ConnectionName that does not match the "
                                 + "ConnectionName expected by the bot's active OAuthPrompt. Ensure these names match "
@@ -361,7 +361,7 @@ public class OAuthPrompt extends Dialog {
             } else if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
                 TokenExchangeInvokeResponse response = new TokenExchangeInvokeResponse();
                 response.setId(tokenExchangeRequest.getId());
-                response.setId(settings.getConnectionName());
+                response.setConnectionName(settings.getConnectionName());
                 response.setFailureDetail("The bot's BotAdapter does not support token exchange "
                                 + "operations. Ensure the bot's Adapter supports the UserTokenProvider interface.");
 
@@ -398,6 +398,7 @@ public class OAuthPrompt extends Dialog {
                     TokenExchangeInvokeResponse tokenEIR = new TokenExchangeInvokeResponse();
                     tokenEIR.setId(tokenExchangeRequest.getId());
                     tokenEIR.setConnectionName(settings.getConnectionName());
+                    sendInvokeResponse(turnContext, HttpURLConnection.HTTP_OK, tokenEIR);
 
                     result.setSucceeded(true);
                     TokenResponse finalResponse = tokenExchangeResponse;
@@ -519,7 +520,7 @@ public class OAuthPrompt extends Dialog {
         }
 
         // Prompt user to login
-        sendOAuthCard(settings, dc.getContext(), opt != null ? opt.getPrompt() : null);
+        sendOAuthCard(settings, dc.getContext(), opt != null ? opt.getPrompt() : null).join();
         return CompletableFuture.completedFuture(END_OF_TURN);
     }
 
