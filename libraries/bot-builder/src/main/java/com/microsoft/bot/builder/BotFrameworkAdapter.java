@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.integration.AdapterIntegration;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
@@ -36,6 +37,8 @@ import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationsResult;
+import com.microsoft.bot.schema.DeliveryModes;
+import com.microsoft.bot.schema.ExpectedReplies;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.TokenExchangeState;
@@ -154,7 +157,6 @@ public class BotFrameworkAdapter extends BotAdapter
         RetryStrategy withRetryStrategy,
         Middleware withMiddleware
     ) {
-
         this(
             withCredentialProvider,
             new AuthenticationConfiguration(),
@@ -181,7 +183,6 @@ public class BotFrameworkAdapter extends BotAdapter
         RetryStrategy withRetryStrategy,
         Middleware withMiddleware
     ) {
-
         if (withCredentialProvider == null) {
             throw new IllegalArgumentException("CredentialProvider cannot be null");
         }
@@ -226,7 +227,6 @@ public class BotFrameworkAdapter extends BotAdapter
         RetryStrategy withRetryStrategy,
         Middleware withMiddleware
     ) {
-
         if (withCredentials == null) {
             throw new IllegalArgumentException("credentials");
         }
@@ -287,11 +287,11 @@ public class BotFrameworkAdapter extends BotAdapter
         BotCallbackHandler callback
     ) {
         if (reference == null) {
-            throw new IllegalArgumentException("reference");
+            return Async.completeExceptionally(new IllegalArgumentException("reference"));
         }
 
         if (callback == null) {
-            throw new IllegalArgumentException("callback");
+            return Async.completeExceptionally(new IllegalArgumentException("callback"));
         }
 
         botAppId = botAppId == null ? "" : botAppId;
@@ -303,7 +303,6 @@ public class BotFrameworkAdapter extends BotAdapter
         claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
 
         ClaimsIdentity claimsIdentity = new ClaimsIdentity("ExternalBearer", claims);
-
         String audience = getBotFrameworkOAuthScope();
 
         return continueConversation(claimsIdentity, reference, audience, callback);
@@ -356,19 +355,21 @@ public class BotFrameworkAdapter extends BotAdapter
         BotCallbackHandler callback
     ) {
         if (claimsIdentity == null) {
-            throw new IllegalArgumentException("claimsIdentity");
+            return Async.completeExceptionally(new IllegalArgumentException("claimsIdentity"));
         }
 
         if (reference == null) {
-            throw new IllegalArgumentException("reference");
+            return Async.completeExceptionally(new IllegalArgumentException("reference"));
         }
 
         if (callback == null) {
-            throw new IllegalArgumentException("callback");
+            return Async.completeExceptionally(new IllegalArgumentException("callback"));
         }
 
         if (StringUtils.isEmpty(audience)) {
-            throw new IllegalArgumentException("audience cannot be null or empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "audience cannot be null or empty"
+            ));
         }
 
         CompletableFuture<Void> pipelineResult = new CompletableFuture<>();
@@ -434,7 +435,9 @@ public class BotFrameworkAdapter extends BotAdapter
         Activity activity,
         BotCallbackHandler callback
     ) {
-        BotAssert.activityNotNull(activity);
+        if (activity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         return JwtTokenValidation.authenticateRequest(
             activity, authHeader, credentialProvider, channelProvider, authConfiguration
@@ -460,7 +463,9 @@ public class BotFrameworkAdapter extends BotAdapter
         Activity activity,
         BotCallbackHandler callback
     ) {
-        BotAssert.activityNotNull(activity);
+        if (activity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         CompletableFuture<InvokeResponse> pipelineResult = new CompletableFuture<>();
 
@@ -480,10 +485,20 @@ public class BotFrameworkAdapter extends BotAdapter
                     context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
                     return runPipeline(context, callback);
                 })
-
-                // Handle Invoke scenarios, which deviate from the request/response model in
-                // that the Bot will return a specific body and return code.
                 .thenCompose(result -> {
+                    // Handle ExpectedReplies scenarios where the all the activities have been
+                    // buffered and sent back at once in an invoke response.
+                    if (DeliveryModes.fromString(
+                        context.getActivity().getDeliveryMode()) == DeliveryModes.EXPECT_REPLIES
+                    ) {
+                        return CompletableFuture.completedFuture(new InvokeResponse(
+                            HttpURLConnection.HTTP_OK,
+                            new ExpectedReplies(context.getBufferedReplyActivities())
+                        ));
+                    }
+
+                    // Handle Invoke scenarios, which deviate from the request/response model in
+                    // that the Bot will return a specific body and return code.
                     if (activity.isType(ActivityTypes.INVOKE)) {
                         Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
                         if (invokeResponse == null) {
@@ -552,17 +567,17 @@ public class BotFrameworkAdapter extends BotAdapter
         List<Activity> activities
     ) {
         if (context == null) {
-            throw new IllegalArgumentException("context");
+            return Async.completeExceptionally(new IllegalArgumentException("context"));
         }
 
         if (activities == null) {
-            throw new IllegalArgumentException("activities");
+            return Async.completeExceptionally(new IllegalArgumentException("activities"));
         }
 
         if (activities.size() == 0) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Expecting one or more activities, but the array was empty."
-            );
+            ));
         }
 
         return CompletableFuture.supplyAsync(() -> {
@@ -690,15 +705,15 @@ public class BotFrameworkAdapter extends BotAdapter
         String memberId
     ) {
         if (context.getActivity().getConversation() == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.deleteConversationMember(): missing conversation"
-            );
+            ));
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.deleteConversationMember(): missing conversation.id"
-            );
+            ));
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
@@ -735,15 +750,15 @@ public class BotFrameworkAdapter extends BotAdapter
         }
 
         if (context.getActivity().getConversation() == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.GetActivityMembers(): missing conversation"
-            );
+            ));
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.GetActivityMembers(): missing conversation.id"
-            );
+            ));
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
@@ -760,15 +775,15 @@ public class BotFrameworkAdapter extends BotAdapter
      */
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(TurnContextImpl context) {
         if (context.getActivity().getConversation() == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.GetActivityMembers(): missing conversation"
-            );
+            ));
         }
 
         if (StringUtils.isEmpty(context.getActivity().getConversation().getId())) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.GetActivityMembers(): missing conversation.id"
-            );
+            ));
         }
 
         ConnectorClient connectorClient = context.getTurnState().get(CONNECTOR_CLIENT_KEY);
@@ -823,11 +838,11 @@ public class BotFrameworkAdapter extends BotAdapter
         String continuationToken
     ) {
         if (StringUtils.isEmpty(serviceUrl)) {
-            throw new IllegalArgumentException("serviceUrl");
+            return Async.completeExceptionally(new IllegalArgumentException("serviceUrl"));
         }
 
         if (credentials == null) {
-            throw new IllegalArgumentException("credentials");
+            return Async.completeExceptionally(new IllegalArgumentException("credentials"));
         }
 
         return getOrCreateConnectorClient(serviceUrl, credentials)
@@ -893,28 +908,27 @@ public class BotFrameworkAdapter extends BotAdapter
         String connectionName,
         String magicCode
     ) {
-        BotAssert.contextNotNull(context);
-
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
         if (
             context.getActivity().getFrom() == null
                 || StringUtils.isEmpty(context.getActivity().getFrom().getId())
         ) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "BotFrameworkAdapter.getUserToken(): missing from or from.id"
-            );
+            ));
         }
 
         if (StringUtils.isEmpty(connectionName)) {
-            throw new IllegalArgumentException("connectionName");
+            return Async.completeExceptionally(new IllegalArgumentException("connectionName"));
         }
 
-        return createOAuthClient(context, null).thenCompose(oAuthClient -> {
-            return oAuthClient.getUserToken()
-                .getToken(
-                    context.getActivity().getFrom().getId(), connectionName,
-                    context.getActivity().getChannelId(), magicCode
-                );
-        });
+        return createOAuthClient(context, null).thenCompose(oAuthClient -> oAuthClient.getUserToken()
+            .getToken(
+                context.getActivity().getFrom().getId(), connectionName,
+                context.getActivity().getChannelId(), magicCode
+            ));
     }
 
     /**
@@ -931,9 +945,12 @@ public class BotFrameworkAdapter extends BotAdapter
         TurnContext context,
         String connectionName
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
+
         if (StringUtils.isEmpty(connectionName)) {
-            throw new IllegalArgumentException("connectionName");
+            return Async.completeExceptionally(new IllegalArgumentException("connectionName"));
         }
 
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
@@ -988,12 +1005,14 @@ public class BotFrameworkAdapter extends BotAdapter
         String userId,
         String finalRedirect
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
         if (StringUtils.isEmpty(connectionName)) {
-            throw new IllegalArgumentException("connectionName");
+            return Async.completeExceptionally(new IllegalArgumentException("connectionName"));
         }
         if (StringUtils.isEmpty(userId)) {
-            throw new IllegalArgumentException("userId");
+            return Async.completeExceptionally(new IllegalArgumentException("userId"));
         }
 
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
@@ -1044,9 +1063,11 @@ public class BotFrameworkAdapter extends BotAdapter
         String connectionName,
         String userId
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
         if (StringUtils.isEmpty(connectionName)) {
-            throw new IllegalArgumentException("connectionName");
+            return Async.completeExceptionally(new IllegalArgumentException("connectionName"));
         }
 
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
@@ -1075,9 +1096,11 @@ public class BotFrameworkAdapter extends BotAdapter
         String userId,
         String includeFilter
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
         if (StringUtils.isEmpty(userId)) {
-            throw new IllegalArgumentException("userId");
+            return Async.completeExceptionally(new IllegalArgumentException("userId"));
         }
 
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
@@ -1107,13 +1130,14 @@ public class BotFrameworkAdapter extends BotAdapter
         String[] resourceUrls,
         String userId
     ) {
-        BotAssert.contextNotNull(context);
-        if (StringUtils.isEmpty(connectionName)) {
-            throw new IllegalArgumentException("connectionName");
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
         }
-
+        if (StringUtils.isEmpty(connectionName)) {
+            return Async.completeExceptionally(new IllegalArgumentException("connectionName"));
+        }
         if (resourceUrls == null) {
-            throw new IllegalArgumentException("resourceUrls");
+            return Async.completeExceptionally(new IllegalArgumentException("resourceUrls"));
         }
 
         return createOAuthClient(context, null).thenCompose(oAuthClient -> {
@@ -1348,9 +1372,9 @@ public class BotFrameworkAdapter extends BotAdapter
         String audience
     ) {
         if (claimsIdentity == null) {
-            throw new UnsupportedOperationException(
+            return Async.completeExceptionally(new UnsupportedOperationException(
                 "ClaimsIdentity cannot be null. Pass Anonymous ClaimsIdentity if authentication is turned off."
-            );
+            ));
         }
 
         // For requests from channel App Id is in Audience claim of JWT token. For
@@ -1470,14 +1494,14 @@ public class BotFrameworkAdapter extends BotAdapter
 
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
             AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
-                ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
+                ? new MicrosoftGovernmentAppCredentials(appId, appPassword, scope)
                 : new MicrosoftAppCredentials(appId, appPassword);
             appCredentialMap.put(cacheKey, credentials);
             return credentials;
         });
     }
 
-    private String getBotAppId(TurnContext turnContext) {
+    private String getBotAppId(TurnContext turnContext) throws IllegalStateException {
         ClaimsIdentity botIdentity = turnContext.getTurnState().get(BOT_IDENTITY_KEY);
         if (botIdentity == null) {
             throw new IllegalStateException(
@@ -1569,11 +1593,23 @@ public class BotFrameworkAdapter extends BotAdapter
     }
 
     /**
-     * Get the ConnectorClient cache. For unit testing.
+     * Get the ConnectorClient cache. FOR UNIT TESTING.
      *
      * @return The ConnectorClient cache.
      */
     protected Map<String, ConnectorClient> getConnectorClientCache() {
         return Collections.unmodifiableMap(connectorClients);
+    }
+
+    /**
+     * Inserts a ConnectorClient into the cache.  FOR UNIT TESTING ONLY.
+     * @param serviceUrl The service url
+     * @param appId      The app did
+     * @param scope      The scope
+     * @param client     The ConnectorClient to insert.
+     */
+    protected void addConnectorClientToCache(String serviceUrl, String appId, String scope, ConnectorClient client) {
+        String key = BotFrameworkAdapter.keyForConnectorClient(serviceUrl, appId, scope);
+        connectorClients.put(key, client);
     }
 }

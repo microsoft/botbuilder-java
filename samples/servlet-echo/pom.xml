@@ -122,7 +122,7 @@
             <plugin>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-webapp-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>1.12.0</version>
                 <configuration>
                     <schemaVersion>V2</schemaVersion>
                     <resourceGroup>${groupname}</resourceGroup>
@@ -135,7 +135,7 @@
                     </appSettings>
                     <runtime>
                         <os>windows</os>
-                        <javaVersion>1.8</javaVersion>
+                        <javaVersion>Java 8</javaVersion>
                         <webContainer>tomcat 9.0</webContainer>
                     </runtime>
                     <deployment>

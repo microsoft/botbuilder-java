@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,12 +19,18 @@ import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.SimpleChannelProvider;
 import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.CallerIdConstants;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationResourceResponse;
+import com.microsoft.bot.schema.DeliveryModes;
+import com.microsoft.bot.schema.ExpectedReplies;
+import com.microsoft.bot.schema.ResourceResponse;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -360,5 +369,96 @@ public class BotFrameworkAdapterTests {
             creds == null ? null : creds.oAuthScope()
         );
         Assert.assertEquals("Unexpected base url", expectedUrl, client.baseUrl());
+    }
+
+    @Test
+    public void DeliveryModeExpectReplies() {
+        BotFrameworkAdapter adapter = new BotFrameworkAdapter(new SimpleCredentialProvider());
+
+        MockConnectorClient mockConnector = new MockConnectorClient("Windows/3.1", new MockAppCredentials("awesome"));
+        adapter.addConnectorClientToCache("http://tempuri.org/whatever", null, null, mockConnector);
+
+        BotCallbackHandler callback = turnContext -> {
+            turnContext.sendActivity(MessageFactory.text("activity 1")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 2")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 3")).join();
+            return CompletableFuture.completedFuture(null);
+        };
+
+        Activity inboundActivity = new Activity() {{
+            setType(ActivityTypes.MESSAGE);
+            setChannelId(Channels.EMULATOR);
+            setServiceUrl("http://tempuri.org/whatever");
+            setDeliveryMode(DeliveryModes.EXPECT_REPLIES.toString());
+            setText("hello world");
+        }};
+
+        InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
+
+        Assert.assertEquals((int) HttpURLConnection.HTTP_OK, invokeResponse.getStatus());
+        List<Activity> activities = ((ExpectedReplies)invokeResponse.getBody()).getActivities();
+        Assert.assertEquals(3, activities.size());
+        Assert.assertEquals("activity 1", activities.get(0).getText());
+        Assert.assertEquals("activity 2", activities.get(1).getText());
+        Assert.assertEquals("activity 3", activities.get(2).getText());
+        Assert.assertEquals(0, ((MemoryConversations) mockConnector.getConversations()).getSentActivities().size());
+    }
+
+    @Test
+    public void DeliveryModeNormal() {
+        BotFrameworkAdapter adapter = new BotFrameworkAdapter(new SimpleCredentialProvider());
+
+        MockConnectorClient mockConnector = new MockConnectorClient("Windows/3.1", new MockAppCredentials("awesome"));
+        adapter.addConnectorClientToCache("http://tempuri.org/whatever", null, null, mockConnector);
+
+        BotCallbackHandler callback = turnContext -> {
+            turnContext.sendActivity(MessageFactory.text("activity 1")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 2")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 3")).join();
+            return CompletableFuture.completedFuture(null);
+        };
+
+        Activity inboundActivity = new Activity() {{
+            setType(ActivityTypes.MESSAGE);
+            setChannelId(Channels.EMULATOR);
+            setServiceUrl("http://tempuri.org/whatever");
+            setDeliveryMode(DeliveryModes.NORMAL.toString());
+            setText("hello world");
+            setConversation(new ConversationAccount("conversationId"));
+        }};
+
+        InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
+
+        Assert.assertNull(invokeResponse);
+        Assert.assertEquals(3, ((MemoryConversations) mockConnector.getConversations()).getSentActivities().size());
+    }
+
+    // should be same as DeliverModes.NORMAL
+    @Test
+    public void DeliveryModeNull() {
+        BotFrameworkAdapter adapter = new BotFrameworkAdapter(new SimpleCredentialProvider());
+
+        MockConnectorClient mockConnector = new MockConnectorClient("Windows/3.1", new MockAppCredentials("awesome"));
+        adapter.addConnectorClientToCache("http://tempuri.org/whatever", null, null, mockConnector);
+
+        BotCallbackHandler callback = turnContext -> {
+            turnContext.sendActivity(MessageFactory.text("activity 1")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 2")).join();
+            turnContext.sendActivity(MessageFactory.text("activity 3")).join();
+            return CompletableFuture.completedFuture(null);
+        };
+
+        Activity inboundActivity = new Activity() {{
+            setType(ActivityTypes.MESSAGE);
+            setChannelId(Channels.EMULATOR);
+            setServiceUrl("http://tempuri.org/whatever");
+            setText("hello world");
+            setConversation(new ConversationAccount("conversationId"));
+        }};
+
+        InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
+
+        Assert.assertNull(invokeResponse);
+        Assert.assertEquals(3, ((MemoryConversations) mockConnector.getConversations()).getSentActivities().size());
     }
 }

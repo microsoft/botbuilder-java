@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * MicrosoftGovernmentAppCredentials auth implementation.
  */
@@ -14,7 +16,30 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
      * @param password The Microsoft app password.
      */
     public MicrosoftGovernmentAppCredentials(String appId, String password) {
-        super(appId, password);
+        super(
+            appId,
+            password,
+            null,
+            GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+        );
+    }
+
+    /**
+     * Initializes a new instance of the MicrosoftGovernmentAppCredentials class.
+     *
+     * @param appId      The Microsoft app ID.
+     * @param password   The Microsoft app password.
+     * @param oAuthScope The scope for the token.
+     */
+    public MicrosoftGovernmentAppCredentials(String appId, String password, String oAuthScope) {
+        super(
+            appId,
+            password,
+            null,
+            StringUtils.isEmpty(oAuthScope)
+                ? GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                : oAuthScope
+        );
     }
 
     /**
@@ -34,15 +59,5 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
     @Override
     public String oAuthEndpoint() {
         return GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL;
-    }
-
-    /**
-     * Gets the Gov OAuth scope to use.
-     *
-     * @return The OAuth scope to use.
-     */
-    @Override
-    public String oAuthScope() {
-        return GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
     }
 }

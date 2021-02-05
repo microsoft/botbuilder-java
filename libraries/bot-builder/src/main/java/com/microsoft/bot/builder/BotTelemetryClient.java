@@ -154,6 +154,18 @@ public interface BotTelemetryClient {
     void trackTrace(String message, Severity severityLevel, Map<String, String> properties);
 
     /**
+     * Log a DialogView using the TrackPageView method on the IBotTelemetryClient if
+     * IBotPageViewTelemetryClient has been implemented. Alternatively log the information out via
+     * TrackTrace.
+     *
+     * @param dialogName       The name of the dialog to log the entry / start for.
+     * @param properties       Named string values you can use to search and classify
+     *                         events.
+     * @param metrics          Measurements associated with this event.
+     */
+    void trackDialogView(String dialogName, Map<String, String> properties, Map<String, Double> metrics);
+
+    /**
      * Flushes the in-memory buffer and any metrics being pre-aggregated.
      */
     void flush();

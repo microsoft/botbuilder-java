@@ -61,7 +61,7 @@ public class InspectionTests {
         // (1) send the /INSPECT open command from the emulator to the middleware
         Activity openActivity = MessageFactory.text("/INSPECT open");
 
-        TestAdapter inspectionAdapter = new TestAdapter(Channels.TEST);
+        TestAdapter inspectionAdapter = new TestAdapter(Channels.TEST, true);
         inspectionAdapter.processActivity(openActivity, turnContext -> {
             inspectionMiddleware.processCommand(turnContext).join();
             return CompletableFuture.completedFuture(null);
@@ -164,7 +164,7 @@ public class InspectionTests {
         // (1) send the /INSPECT open command from the emulator to the middleware
         Activity openActivity = MessageFactory.text("/INSPECT open");
 
-        TestAdapter inspectionAdapter = new TestAdapter(Channels.TEST);
+        TestAdapter inspectionAdapter = new TestAdapter(Channels.TEST, true);
         inspectionAdapter.processActivity(openActivity, turnContext -> {
             inspectionMiddleware.processCommand(turnContext).join();
             return CompletableFuture.completedFuture(null);

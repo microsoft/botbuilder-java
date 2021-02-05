@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -109,6 +110,15 @@ public class ReceiptCard {
     }
 
     /**
+     * Set the facts value.
+     *
+     * @param withFacts the facts value to set
+     */
+    public void setFacts(Fact... withFacts) {
+        this.facts = Arrays.asList(withFacts);
+    }
+
+    /**
      * Get the items value.
      *
      * @return the items value
@@ -124,6 +134,15 @@ public class ReceiptCard {
      */
     public void setItems(List<ReceiptItem> withItems) {
         this.items = withItems;
+    }
+
+    /**
+     * Set the items value.
+     *
+     * @param withItems the items value to set
+     */
+    public void setItems(ReceiptItem... withItems) {
+        this.items = Arrays.asList(withItems);
     }
 
     /**
@@ -214,6 +233,15 @@ public class ReceiptCard {
      */
     public void setButtons(List<CardAction> withButtons) {
         this.buttons = withButtons;
+    }
+
+    /**
+     * Set the buttons value.
+     *
+     * @param withButtons the buttons value to set
+     */
+    public void setButtons(CardAction... withButtons) {
+        this.buttons = Arrays.asList(withButtons);
     }
 
     /**

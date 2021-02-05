@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.*;
@@ -9,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+import org.mockito.internal.matchers.Not;
 
 public class ActivityHandlerTests {
     @Test
@@ -33,6 +37,82 @@ public class ActivityHandlerTests {
 
         Assert.assertEquals(1, bot.getRecord().size());
         Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+    }
+
+    @Test
+    public void TestInstallationUpdateAdd() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("add");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateAdd", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateAddUpgrade() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("add-upgrade");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateAdd", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateRemove() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("remove");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateRemove", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateRemoveUpgrade() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("remove-upgrade");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateRemove", bot.getRecord().get(1));
     }
 
     @Test
@@ -565,6 +645,18 @@ public class ActivityHandlerTests {
         protected CompletableFuture onInstallationUpdate(TurnContext turnContext) {
             record.add("onInstallationUpdate");
             return super.onInstallationUpdate(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onInstallationUpdateAdd(TurnContext turnContext) {
+            record.add("onInstallationUpdateAdd");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+            record.add("onInstallationUpdateRemove");
+            return CompletableFuture.completedFuture(null);
         }
 
         @Override

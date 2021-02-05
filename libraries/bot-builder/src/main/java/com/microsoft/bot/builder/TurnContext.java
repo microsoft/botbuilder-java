@@ -50,10 +50,30 @@ public interface TurnContext {
         String valueType,
         String label
     ) {
-
         return turnContext
             .sendActivity(turnContext.getActivity().createTrace(name, value, valueType, label));
     }
+
+    /**
+     * @param turnContext The turnContext.
+     * @param name The name of the activity.
+     * @return A future with the ResourceReponse.
+     */
+    static CompletableFuture<ResourceResponse> traceActivity(TurnContext turnContext, String name) {
+        return traceActivity(turnContext, name, null, null, null);
+    }
+
+    /**
+     * Gets the locale on this context object.
+     * @return The string of locale on this context object.
+     */
+    String getLocale();
+
+    /**
+     * Set  the locale on this context object.
+     * @param withLocale The string of locale on this context object.
+     */
+    void setLocale(String withLocale);
 
     /**
      * Gets the bot adapter that created this context object.

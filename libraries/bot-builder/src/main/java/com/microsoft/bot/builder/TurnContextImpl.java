@@ -3,11 +3,15 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.DeliveryModes;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.ResourceResponse;
+import java.util.Locale;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -36,6 +40,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     private final Activity activity;
 
+    private List<Activity> bufferedReplyActivities = new ArrayList<>();
+
     /**
      * Response handlers for send activity operations.
      */
@@ -60,6 +66,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      * Indicates whether at least one response was sent for the current turn.
      */
     private Boolean responded = false;
+
+    private static final String STATE_TURN_LOCALE = "turn.locale";
 
     /**
      * Creates a context object.
@@ -187,6 +195,40 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     }
 
     /**
+     * Gets the locale on this context object.
+     * @return The string of locale on this context object.
+     */
+    @Override
+    public String getLocale() {
+        return getTurnState().get(STATE_TURN_LOCALE);
+    }
+
+    /**
+     * Set  the locale on this context object.
+     * @param withLocale The string of locale on this context object.
+     */
+    @Override
+    public void setLocale(String withLocale) {
+        if (StringUtils.isEmpty(withLocale)) {
+            getTurnState().remove(STATE_TURN_LOCALE);
+        } else if (
+            LocaleUtils.isAvailableLocale(new Locale.Builder().setLanguageTag(withLocale).build())
+        ) {
+            getTurnState().replace(STATE_TURN_LOCALE, withLocale);
+        } else {
+            getTurnState().replace(STATE_TURN_LOCALE, Locale.ENGLISH.getCountry());
+        }
+    }
+
+    /**
+     * Gets a list of activities to send when `context.Activity.DeliveryMode == 'expectReplies'.
+     * @return A list of activities.
+     */
+    public List<Activity> getBufferedReplyActivities() {
+        return bufferedReplyActivities;
+    }
+
+    /**
      * Sends a message activity to the sender of the incoming activity.
      *
      * <p>
@@ -269,7 +311,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         InputHints inputHint
     ) {
         if (StringUtils.isEmpty(textReplyToSend)) {
-            throw new IllegalArgumentException("textReplyToSend");
+            return Async.completeExceptionally(new IllegalArgumentException("textReplyToSend"));
         }
 
         Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {
@@ -302,7 +344,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> sendActivity(Activity activityToSend) {
-        BotAssert.activityNotNull(activityToSend);
+        if (activityToSend == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         return sendActivities(Collections.singletonList(activityToSend))
             .thenApply(resourceResponses -> {
@@ -327,7 +371,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     @Override
     public CompletableFuture<ResourceResponse[]> sendActivities(List<Activity> activities) {
         if (activities == null || activities.size() == 0) {
-            throw new IllegalArgumentException("activities");
+            return Async.completeExceptionally(new IllegalArgumentException("activities"));
         }
 
         // Bind the relevant Conversation Reference properties, such as URLs and
@@ -352,12 +396,21 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     private CompletableFuture<ResourceResponse[]> sendActivitiesThroughAdapter(
         List<Activity> activities
     ) {
-        return adapter.sendActivities(this, activities).thenApply(responses -> {
+        if (DeliveryModes.fromString(getActivity().getDeliveryMode()) == DeliveryModes.EXPECT_REPLIES) {
+            ResourceResponse[] responses = new ResourceResponse[activities.size()];
             boolean sentNonTraceActivity = false;
 
             for (int index = 0; index < responses.length; index++) {
                 Activity sendActivity = activities.get(index);
-                sendActivity.setId(responses[index].getId());
+                bufferedReplyActivities.add(sendActivity);
+
+                // Ensure the TurnState has the InvokeResponseKey, since this activity
+                // is not being sent through the adapter, where it would be added to TurnState.
+                if (activity.isType(ActivityTypes.INVOKE_RESPONSE)) {
+                    getTurnState().add(BotFrameworkAdapter.INVOKE_RESPONSE_KEY, activity);
+                }
+
+                responses[index] = new ResourceResponse();
                 sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
             }
 
@@ -365,15 +418,30 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
                 responded = true;
             }
 
-            return responses;
-        });
+            return CompletableFuture.completedFuture(responses);
+        } else {
+            return adapter.sendActivities(this, activities).thenApply(responses -> {
+                boolean sentNonTraceActivity = false;
+
+                for (int index = 0; index < responses.length; index++) {
+                    Activity sendActivity = activities.get(index);
+                    sendActivity.setId(responses[index].getId());
+                    sentNonTraceActivity |= !sendActivity.isType(ActivityTypes.TRACE);
+                }
+
+                if (sentNonTraceActivity) {
+                    responded = true;
+                }
+
+                return responses;
+            });
+        }
     }
 
     private CompletableFuture<ResourceResponse[]> sendActivitiesThroughCallbackPipeline(
         List<Activity> activities,
         int nextCallbackIndex
     ) {
-
         if (nextCallbackIndex == onSendActivities.size()) {
             return sendActivitiesThroughAdapter(activities);
         }
@@ -400,7 +468,9 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     @Override
     public CompletableFuture<ResourceResponse> updateActivity(Activity withActivity) {
-        BotAssert.activityNotNull(withActivity);
+        if (withActivity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
 
         ConversationReference conversationReference = activity.getConversationReference();
         withActivity.applyConversationReference(conversationReference);
@@ -418,10 +488,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Iterator<UpdateActivityHandler> updateHandlers,
         Supplier<CompletableFuture<ResourceResponse>> callAtBottom
     ) {
-
-        BotAssert.activityNotNull(updateActivity);
+        if (updateActivity == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("Activity"));
+        }
         if (updateHandlers == null) {
-            throw new IllegalArgumentException("updateHandlers");
+            return Async.completeExceptionally(new IllegalArgumentException("updateHandlers"));
         }
 
         // No middleware to run.
@@ -461,7 +532,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     public CompletableFuture<Void> deleteActivity(String activityId) {
         if (StringUtils.isWhitespace(activityId) || StringUtils.isEmpty(activityId)) {
-            throw new IllegalArgumentException("activityId");
+            return Async.completeExceptionally(new IllegalArgumentException("activityId"));
         }
 
         ConversationReference cr = activity.getConversationReference();
@@ -486,7 +557,7 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
     @Override
     public CompletableFuture<Void> deleteActivity(ConversationReference conversationReference) {
         if (conversationReference == null) {
-            throw new IllegalArgumentException("conversationReference");
+            return Async.completeExceptionally(new IllegalArgumentException("conversationReference"));
         }
 
         Supplier<CompletableFuture<Void>> actuallyDeleteStuff = () -> getAdapter()
@@ -502,9 +573,11 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
         Iterator<DeleteActivityHandler> deleteHandlers,
         Supplier<CompletableFuture<Void>> callAtBottom
     ) {
-        BotAssert.conversationReferenceNotNull(cr);
+        if (cr == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("ConversationReference"));
+        }
         if (deleteHandlers == null) {
-            throw new IllegalArgumentException("deleteHandlers");
+            return Async.completeExceptionally(new IllegalArgumentException("deleteHandlers"));
         }
 
         // No middleware to run.

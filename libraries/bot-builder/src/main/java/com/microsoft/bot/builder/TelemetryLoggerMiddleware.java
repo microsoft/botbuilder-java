@@ -4,6 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
@@ -69,7 +70,9 @@ public class TelemetryLoggerMiddleware implements Middleware {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
 
         // log incoming activity at beginning of turn
         return onReceiveActivity(context.getActivity()).thenCompose(receiveResult -> {

@@ -68,4 +68,9 @@ public class NullBotTelemetryClient implements BotTelemetryClient {
     public void flush() {
 
     }
+
+    @Override
+    public void trackDialogView(String dialogName, Map<String, String> properties, Map<String, Double> metrics) {
+
+    }
 }

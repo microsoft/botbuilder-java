@@ -194,7 +194,9 @@ public interface Conversations {
      */
     default CompletableFuture<ResourceResponse> replyToActivity(Activity activity) {
         if (StringUtils.isEmpty(activity.getReplyToId())) {
-            throw new IllegalArgumentException("ReplyToId cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "ReplyToId cannot be empty"
+            ));
         }
 
         return replyToActivity(
@@ -228,7 +230,7 @@ public interface Conversations {
 
     /**
      * Retrieves a single member of a conversation by ID.
-     * 
+     *
      * @param userId         The user id.
      * @param conversationId The conversation id.
      * @return The ChannelAccount for the user.
