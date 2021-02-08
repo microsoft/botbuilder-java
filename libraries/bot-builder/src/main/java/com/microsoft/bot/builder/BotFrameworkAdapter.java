@@ -37,6 +37,8 @@ import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationsResult;
+import com.microsoft.bot.schema.DeliveryModes;
+import com.microsoft.bot.schema.ExpectedReplies;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.SignInResource;
@@ -441,29 +443,41 @@ public class BotFrameworkAdapter extends BotAdapter implements
 
             pipelineResult = createConnectorClient(activity.getServiceUrl(), identity, scope)
 
-                    // run pipeline
-                    .thenCompose(connectorClient -> {
-                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-                        return runPipeline(context, callback);
-                    })
+                // run pipeline
+                .thenCompose(connectorClient -> {
+                    context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
+                    return runPipeline(context, callback);
+                })
+                .thenCompose(result -> {
+                    // Handle ExpectedReplies scenarios where the all the activities have been
+                    // buffered and sent back at once in an invoke response.
+                    if (DeliveryModes.fromString(
+                        context.getActivity().getDeliveryMode()) == DeliveryModes.EXPECT_REPLIES
+                    ) {
+                        return CompletableFuture.completedFuture(new InvokeResponse(
+                            HttpURLConnection.HTTP_OK,
+                            new ExpectedReplies(context.getBufferedReplyActivities())
+                        ));
+                    }
 
                     // Handle Invoke scenarios, which deviate from the request/response model in
                     // that the Bot will return a specific body and return code.
-                    .thenCompose(result -> {
-                        if (activity.isType(ActivityTypes.INVOKE)) {
-                            Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
-                            if (invokeResponse == null) {
-                                return CompletableFuture.completedFuture(
-                                        new InvokeResponse(HttpURLConnection.HTTP_NOT_IMPLEMENTED, null));
-                            } else {
-                                return CompletableFuture.completedFuture((InvokeResponse) invokeResponse.getValue());
-                            }
+                    if (activity.isType(ActivityTypes.INVOKE)) {
+                        Activity invokeResponse = context.getTurnState().get(INVOKE_RESPONSE_KEY);
+                        if (invokeResponse == null) {
+                            return CompletableFuture.completedFuture(
+                                new InvokeResponse(HttpURLConnection.HTTP_NOT_IMPLEMENTED, null)
+                            );
+                        } else {
+                            return CompletableFuture
+                                .completedFuture((InvokeResponse) invokeResponse.getValue());
                         }
+                    }
 
-                        // For all non-invoke scenarios, the HTTP layers above don't have to mess
-                        // with the Body and return codes.
-                        return CompletableFuture.completedFuture(null);
-                    });
+                    // For all non-invoke scenarios, the HTTP layers above don't have to mess
+                    // with the Body and return codes.
+                    return CompletableFuture.completedFuture(null);
+                });
         } catch (Exception e) {
             pipelineResult.completeExceptionally(e);
         }
@@ -471,7 +485,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
         return pipelineResult;
     }
 
-    @SuppressWarnings({ "PMD" })
+    @SuppressWarnings("PMD")
     private CompletableFuture<String> generateCallerId(ClaimsIdentity claimsIdentity) {
         return credentialProvider.isAuthenticationDisabled().thenApply(is_auth_disabled -> {
             // Is the bot accepting all incoming messages?
@@ -1205,8 +1219,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
 
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
             AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
-                    ? new MicrosoftGovernmentAppCredentials(appId, appPassword)
-                    : new MicrosoftAppCredentials(appId, appPassword);
+                ? new MicrosoftGovernmentAppCredentials(appId, appPassword, scope)
+                : new MicrosoftAppCredentials(appId, appPassword);
             appCredentialMap.put(cacheKey, credentials);
             return credentials;
         });
@@ -1295,7 +1309,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
     }
 
     /**
-     * Get the ConnectorClient cache. For unit testing.
+     * Get the ConnectorClient cache. FOR UNIT TESTING.
      *
      * @return The ConnectorClient cache.
      */
@@ -1304,6 +1318,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
     }
 
     /**
+<<<<<<< HEAD
      * Creates an OAuth client for the bot with the credentials.
      *
      * @param turnContext          The context Object for the current
@@ -1814,5 +1829,17 @@ public class BotFrameworkAdapter extends BotAdapter implements
                                                              exchangeRequest);
 
         });
+    }
+
+    /**
+     * Inserts a ConnectorClient into the cache.  FOR UNIT TESTING ONLY.
+     * @param serviceUrl The service url
+     * @param appId      The app did
+     * @param scope      The scope
+     * @param client     The ConnectorClient to insert.
+     */
+    protected void addConnectorClientToCache(String serviceUrl, String appId, String scope, ConnectorClient client) {
+        String key = BotFrameworkAdapter.keyForConnectorClient(serviceUrl, appId, scope);
+        connectorClients.put(key, client);
     }
 }

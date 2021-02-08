@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -94,6 +95,15 @@ public class OAuthCard {
      */
     public void setButtons(List<CardAction> withButtons) {
         this.buttons = withButtons;
+    }
+
+    /**
+     * Set the buttons value.
+     *
+     * @param withButtons the buttons value to set
+     */
+    public void setButtons(CardAction... withButtons) {
+        this.buttons = Arrays.asList(withButtons);
     }
 
     /**
