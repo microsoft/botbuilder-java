@@ -1318,7 +1318,6 @@ public class BotFrameworkAdapter extends BotAdapter implements
     }
 
     /**
-<<<<<<< HEAD
      * Creates an OAuth client for the bot with the credentials.
      *
      * @param turnContext          The context Object for the current
