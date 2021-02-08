@@ -128,11 +128,11 @@
             <plugin>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-webapp-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>1.12.0</version>
                 <configuration>
                     <schemaVersion>V2</schemaVersion>
-                    <resourceGroup>{groupname}</resourceGroup>
-                    <appName>{botname}</appName>
+                    <resourceGroup>${groupname}</resourceGroup>
+                    <appName>${botname}</appName>
                     <appSettings>
                         <property>
                             <name>JAVA_OPTS</name>
@@ -141,8 +141,8 @@
                     </appSettings>
                     <runtime>
                         <os>linux</os>
-                        <javaVersion>jre8</javaVersion>
-                        <webContainer>jre8</webContainer>
+                        <javaVersion>Java 8</javaVersion>
+                        <webContainer>Java SE</webContainer>
                     </runtime>
                     <deployment>
                         <resources>
