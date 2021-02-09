@@ -22,6 +22,10 @@ public class LuisRecognizer extends TelemetryRecognizer {
      */
     private  LuisRecognizerOptions luisRecognizerOptions;
 
+    /**
+     * Initializes a new instance of the Luis Recognizer .
+     * @param recognizerOptions Luis Recognizer options to use when calling th LUIS Service
+     */
     public LuisRecognizer(LuisRecognizerOptions recognizerOptions) {
         this.luisRecognizerOptions = recognizerOptions;
         this.setLogPersonalInformation(recognizerOptions.isLogPersonalInformation());
