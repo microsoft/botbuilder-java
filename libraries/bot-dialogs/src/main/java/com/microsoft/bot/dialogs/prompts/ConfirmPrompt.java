@@ -345,7 +345,7 @@ public class ConfirmPrompt extends Prompt<Boolean> {
         }
 
         String culture = PromptCultureModels.mapToNearestLanguage(locale);
-        if (StringUtils.isBlank(culture) || !choiceDefaults.containsKey(culture)) {
+        if (StringUtils.isEmpty(culture) || !choiceDefaults.containsKey(culture)) {
             culture = PromptCultureModels.ENGLISH_CULTURE;
         }
         return culture;
