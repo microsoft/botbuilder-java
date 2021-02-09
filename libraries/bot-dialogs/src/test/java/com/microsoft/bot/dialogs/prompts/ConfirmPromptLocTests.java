@@ -146,15 +146,13 @@ public class ConfirmPromptLocTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("Prompt.");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("Prompt."));
                 dc.prompt("ConfirmPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if ((Boolean) results.getResult()) {
-                    turnContext.sendActivity(MessageFactory.text("1"));
+                    turnContext.sendActivity(MessageFactory.text("1")).join();
                 } else {
-                    turnContext.sendActivity(MessageFactory.text("0"));
+                    turnContext.sendActivity(MessageFactory.text("0")).join();
                 }
             }
             return CompletableFuture.completedFuture(null);
@@ -175,26 +173,26 @@ public class ConfirmPromptLocTests {
         DialogSet dialogs = new DialogSet(dialogState);
 
         // Prompt should default to English if locale is a non-supported value
-        dialogs.add(new ConfirmPrompt("ConfirmPrompt", null, null, defaultLocale));
+        dialogs.add(new ConfirmPrompt("ConfirmPrompt", null, defaultLocale));
 
         new TestFlow(adapter, (turnContext) -> {
+            turnContext.getActivity().setLocale(activityLocale);
+
             DialogContext dc = dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("Prompt.");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("Prompt."));
                 dc.prompt("ConfirmPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if ((Boolean) results.getResult()) {
-                    turnContext.sendActivity(MessageFactory.text("1"));
+                    turnContext.sendActivity(MessageFactory.text("1")).join();
                 } else {
-                    turnContext.sendActivity(MessageFactory.text("0"));
+                    turnContext.sendActivity(MessageFactory.text("0")).join();
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).send("hello").assertReply("Prompt. " + prompt).send(utterance).assertReply(expectedResponse).startTest();
+        }).send("hello").assertReply("Prompt. " + prompt).send(utterance).assertReply(expectedResponse).startTest().join();
     }
 }

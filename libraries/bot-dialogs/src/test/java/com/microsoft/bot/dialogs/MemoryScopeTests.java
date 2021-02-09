@@ -45,7 +45,7 @@ public class MemoryScopeTests {
                 .useBotState(new ConversationState(new MemoryStorage()));
         DialogManager dm = new DialogManager(new LamdbaDialog(testName.getMethodName(), handler), null);
         return new TestFlow(adapter, (turnContext) -> {
-            return dm.onTurn(turnContext).thenAccept(null);
+            return dm.onTurn(turnContext).thenApply(dialogManagerResult -> null);
         }).sendConverationUpdate();
     }
 
@@ -77,7 +77,7 @@ public class MemoryScopeTests {
             }
             return CompletableFuture.completedFuture(null);
         };
-        CreateDialogContext(testFunction).startTest();
+        CreateDialogContext(testFunction).startTest().join();
     }
 
     @Test
@@ -100,7 +100,7 @@ public class MemoryScopeTests {
             for (Pair<BotState, MemoryScope> stateScope : stateScopes) {
                 final String name = "test-name";
                 final String value = "test-value";
-                stateScope.getValue0().createProperty(name).set(dc.getContext(), value);
+                stateScope.getValue0().createProperty(name).set(dc.getContext(), value).join();
 
                 Object memory = stateScope.getValue1().getMemory(dc);
 
@@ -108,7 +108,7 @@ public class MemoryScopeTests {
             }
             return CompletableFuture.completedFuture(null);
         };
-        CreateDialogContext(testFunction).startTest();
+        CreateDialogContext(testFunction).startTest().join();
     }
 
     public class CustomState extends BotState {

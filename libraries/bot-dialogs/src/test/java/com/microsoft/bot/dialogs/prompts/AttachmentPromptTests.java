@@ -76,8 +76,7 @@ public class AttachmentPromptTests {
             DialogTurnResult results =  dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("please add an attachment.");
+                options.setPrompt(MessageFactory.text("please add an attachment."));
                 dc.prompt("AttachmentPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 ArrayList<Attachment> attachments = (ArrayList<Attachment>) results.getResult();
@@ -94,7 +93,8 @@ public class AttachmentPromptTests {
         .assertReply("please add an attachment.")
         .send(activityWithAttachment)
         .assertReply("some content")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     @Test
@@ -130,8 +130,7 @@ public class AttachmentPromptTests {
             DialogTurnResult results =  dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("please add an attachment.");
+                options.setPrompt(MessageFactory.text("please add an attachment."));
                 dc.prompt("AttachmentPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 ArrayList<Attachment> attachments = (ArrayList<Attachment>) results.getResult();
@@ -148,6 +147,7 @@ public class AttachmentPromptTests {
         .assertReply("please add an attachment.")
         .send(activityWithAttachment)
         .assertReply("some content")
-        .startTest();
+        .startTest()
+         .join();
     }
 }
