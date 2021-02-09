@@ -10,7 +10,6 @@ import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserState;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.stereotype.Component;
 
 /**
  * This IBot implementation can run any type of Dialog. The use of type parameterization is to

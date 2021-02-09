@@ -12,18 +12,13 @@ import com.microsoft.bot.dialogs.WaterfallStep;
 import com.microsoft.bot.dialogs.WaterfallStepContext;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MainDialog extends ComponentDialog {
     private UserState userState;
-
-    private StatePropertyAccessor<UserProfile> userProfileAccessor;
 
     public MainDialog(UserState withUserState) {
         super("MainDialog");
 
-        //userProfileAccessor = withUserState.createProperty("UserProfile");
         userState = withUserState;
 
         addDialog(new TopLevelDialog("TopLevelDialog"));

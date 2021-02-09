@@ -8,20 +8,19 @@ import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ChannelAccount;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
-@Component
 public class DialogAndWelcome extends DialogBot {
 
     public DialogAndWelcome(
         ConversationState withConversationState,
         UserState withUserState,
-        MainDialog withDialog
+        Dialog withDialog
     ) {
         super(withConversationState, withUserState, withDialog);
     }
