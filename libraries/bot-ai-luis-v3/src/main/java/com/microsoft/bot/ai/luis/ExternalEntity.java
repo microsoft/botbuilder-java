@@ -1,19 +1,25 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.ai.luis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.microsoft.applicationinsights.core.dependencies.google.gson.JsonSyntaxException;
 
 public class ExternalEntity {
 
     public ExternalEntity() {
     }
 
+    /**
+     * Initializes a new instance of ExternalEntity
+     *
+     */
     public ExternalEntity(String entity, int start, int length, JsonNode resolution) {
-        entity = entity;
-        start = start;
-        length = length;
-        resolution = resolution;
+        this.entity = entity;
+        this.start = start;
+        this.length = length;
+        this.resolution = resolution;
     }
 
     @JsonProperty(value = "entityName")
@@ -30,71 +36,69 @@ public class ExternalEntity {
     @JsonProperty(value = "resolution")
     private JsonNode resolution;
 
-    /// <summary>
-    /// Gets or sets the start character index of the predicted entity.
-    /// </summary>
-    /// <value>
-    /// The start character index of the predicted entity.
-    /// </value>
+    /**
+     * Gets the start character index of the predicted entity
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * Sets the start character index of the predicted entity
+     */
     public void setStart(int start) {
         this.start = start;
     }
 
-    /// <summary>
-    /// Gets or sets the name of the entity to extend.
-    /// </summary>
-    /// <value>
-    /// The name of the entity to extend.
-    /// </value>
+    /**
+     * Gets the name of the entity to extend
+     */
     public String getEntity() {
         return entity;
     }
 
+    /**
+     * Sets the name of the entity to extend
+     */
     public void setEntity(String entity) {
         this.entity = entity;
     }
 
-    /// <summary>
-    /// Gets or sets the length of the predicted entity.
-    /// </summary>
-    /// <value>
-    /// The length of the predicted entity.
-    /// </value>
+    /**
+     * Gets the length of the predicted entity.
+     */
     public int getLength() {
         return length;
     }
 
+    /**
+     * Sets the length of the predicted entity.
+     */
     public void setLength(int length) {
         this.length = length;
     }
 
-    /// <summary>
-    /// Gets or sets a user supplied custom resolution to return as the entity's prediction.
-    /// </summary>
-    /// <value>
-    /// A user supplied custom resolution to return as the entity's prediction.
-    /// </value>
+    /**
+     * Gets a user supplied custom resolution to return as the entity's prediction.
+     */
     public JsonNode getResolution() {
         return resolution;
     }
 
+    /**
+     * Sets External entities to be recognized in query
+     */
     public void setResolution(JsonNode resolution) {
         this.resolution = resolution;
     }
 
-    /// <summary>
-    /// Validate the object.
-    /// </summary>
-    /// <exception cref="Microsoft.Rest.ValidationException">
-    /// Thrown if validation fails.
-    /// </exception>
-    public void validate() throws JsonSyntaxException {
+    /**
+     * Validate the object
+     * @throws IllegalArgumentException on null or invalid values
+     */
+    public void validate() throws IllegalArgumentException {
         if (entity == null || length == -1) {
-            throw new JsonSyntaxException("ExternalEntity requires an EntityName and EntityLength > 0");
+            throw new IllegalArgumentException("ExternalEntity requires an EntityName and EntityLength > 0");
         }
     }
 }

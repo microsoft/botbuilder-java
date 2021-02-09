@@ -1,58 +1,70 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.ai.luis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.applicationinsights.core.dependencies.google.gson.JsonSyntaxException;
 
 import java.util.List;
 
 public class DynamicList {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DynamicList"/> class.
-    /// </summary>
-    public DynamicList()
-    {
+
+    /**
+     * Initializes a new instance of the DynamicList class.
+     */
+    public DynamicList() {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DynamicList"/> class.
-    /// </summary>
-    /// <param name="entity">The name of the list entity to extend.</param>
-    /// <param name="requestLists">The lists to append on the extended list entity.</param>
-    public DynamicList(String entity, List<ListElement> requestLists)
-    {
-        entity = entity;
-        list = requestLists;
+    /**
+     * Initializes a new instance of the DynamicList class.
+     */
+    public DynamicList(String entity, List<ListElement> requestLists) {
+        this.entity = entity;
+        this.list = requestLists;
     }
 
-    /// <summary>
-    /// Gets or sets the name of the list entity to extend.
-    /// </summary>
-    /// <value>
-    /// The name of the list entity to extend.
-    /// </value>
     @JsonProperty(value = "listEntityName")
-    public String entity;
+    private String entity;
 
-    /// <summary>
-    /// Gets or sets the lists to append on the extended list entity.
-    /// </summary>
-    /// <value>
-    /// The lists to append on the extended list entity.
-    /// </value>
     @JsonProperty(value = "requestLists")
-    public List<ListElement> list;
+    private List<ListElement> list;
 
-    /// <summary>
-    /// Validate the object.
-    /// </summary>
-    /// <exception cref="Microsoft.Rest.ValidationException">
-    /// Thrown if validation fails.
-    /// </exception>
-    public void validate()
-    {
+    /**
+     * Gets the entity
+     */
+    public String getEntity() {
+        return entity;
+    }
+
+    /**
+     * Sets the entity name
+     */
+    public void setEntity(String entity) {
+        this.entity = entity;
+    }
+
+    /**
+     * Gets the List
+     */
+    public List<ListElement> getList() {
+        return list;
+    }
+
+    /**
+     * Sets the List
+     */
+    public void setList(List<ListElement> list) {
+        this.list = list;
+    }
+
+    /**
+     * Validate the object
+     * @throws IllegalArgumentException on null or invalid values
+     */
+    public void validate() throws IllegalArgumentException {
         // Required: ListEntityName, RequestLists
         if (entity == null || list == null) {
-            throw new JsonSyntaxException("ExternalEntity requires an EntityName and EntityLength > 0");
+            throw new IllegalArgumentException("ExternalEntity requires an EntityName and EntityLength > 0");
         }
 
         for (ListElement e: list)

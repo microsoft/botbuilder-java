@@ -1,48 +1,77 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.ai.luis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.applicationinsights.core.dependencies.google.gson.JsonSyntaxException;
 
 import java.util.List;
 
 public class ListElement {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ListElement"/> class.
-    /// </summary>
+
+    /**
+     * Initializes a new instance of the ListElement class.
+     */
     public ListElement() {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ListElement"/> class.
-    /// </summary>
-    /// <param name="canonicalForm">The canonical form of the sub-list.</param>
-    /// <param name="synonyms">The synonyms of the canonical form.</param>
+    /**
+     * Initializes a new instance of the ListElement class.
+     * @param canonicalForm The canonical form of the sub-list.
+     * @param synonyms The synonyms of the canonical form.
+     */
     public ListElement(String canonicalForm, List<String> synonyms) {
-        canonicalForm = canonicalForm;
-        synonyms = synonyms;
+        this.canonicalForm = canonicalForm;
+        this.synonyms = synonyms;
     }
 
-    /// <summary>
-    /// Gets or sets the canonical form of the sub-list.
-    /// </summary>
-    /// <value>
-    /// The canonical form of the sub-list.
-    /// </value>
+    /**
+     * The canonical form of the sub-list.
+     */
     @JsonProperty(value = "canonicalForm")
-    public String canonicalForm;
+    private String canonicalForm;
 
-    /// <summary>
-    /// Gets or sets the synonyms of the canonical form.
-    /// </summary>
-    /// <value>
-    /// The synonyms of the canonical form.
-    /// </value>
+    /**
+     * The synonyms of the canonical form.
+     */
     @JsonProperty(value = "synonyms")
-    public List<String> synonyms;
+    private List<String> synonyms;
 
-    public void validate() {
+    /**
+     * Gets the canonical form of the sub-list.
+     */
+    public String getCanonicalForm() {
+        return canonicalForm;
+    }
+
+    /**
+     * Sets the canonical form of the sub-list.
+     */
+    public void setCanonicalForm(String canonicalForm) {
+        this.canonicalForm = canonicalForm;
+    }
+
+    /**
+     * Gets the synonyms of the canonical form.
+     */
+    public List<String> getSynonyms() {
+        return synonyms;
+    }
+
+    /**
+     * Sets the synonyms of the canonical form.
+     */
+    public void setSynonyms(List<String> synonyms) {
+        this.synonyms = synonyms;
+    }
+
+    /**
+     * Validate the object.
+     * @throws IllegalArgumentException if canonicalForm is null.
+     */
+    public void validate() throws IllegalArgumentException {
         if (canonicalForm == null) {
-            throw new JsonSyntaxException("RequestList requires CanonicalForm to be defined.");
+            throw new IllegalArgumentException("RequestList requires CanonicalForm to be defined.");
         }
     }
 
