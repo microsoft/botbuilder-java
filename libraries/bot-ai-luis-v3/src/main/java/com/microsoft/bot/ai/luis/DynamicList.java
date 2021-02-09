@@ -16,6 +16,8 @@ public class DynamicList {
 
     /**
      * Initializes a new instance of the DynamicList class.
+     * @param entity Entity field.
+     * @param requestLists List Elements to use when querying Luis Service.
      */
     public DynamicList(String entity, List<ListElement> requestLists) {
         this.entity = entity;
@@ -29,36 +31,40 @@ public class DynamicList {
     private List<ListElement> list;
 
     /**
-     * Gets the entity
+     * Gets the entity.
+     * @return Entity name.
      */
     public String getEntity() {
         return entity;
     }
 
     /**
-     * Sets the entity name
+     * Sets the entity name.
+     * @param entity entity name.
      */
     public void setEntity(String entity) {
         this.entity = entity;
     }
 
     /**
-     * Gets the List
+     * Gets the List.
+     * @return Element list of the Dynamic List.
      */
     public List<ListElement> getList() {
         return list;
     }
 
     /**
-     * Sets the List
+     * Sets the List.
+     * @param list Element list of the Dynamic List.
      */
     public void setList(List<ListElement> list) {
         this.list = list;
     }
 
     /**
-     * Validate the object
-     * @throws IllegalArgumentException on null or invalid values
+     * Validate the object.
+     * @throws IllegalArgumentException on null or invalid values.
      */
     public void validate() throws IllegalArgumentException {
         // Required: ListEntityName, RequestLists
@@ -66,8 +72,7 @@ public class DynamicList {
             throw new IllegalArgumentException("ExternalEntity requires an EntityName and EntityLength > 0");
         }
 
-        for (ListElement e: list)
-        {
+        for (ListElement e: list) {
             e.validate();
         }
     }

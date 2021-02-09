@@ -8,7 +8,12 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class LuisRecognizer extends TelemetryRecognizer {
@@ -17,7 +22,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
      */
     private  LuisRecognizerOptions luisRecognizerOptions;
 
-    public LuisRecognizer (LuisRecognizerOptions recognizerOptions) {
+    public LuisRecognizer(LuisRecognizerOptions recognizerOptions) {
         this.luisRecognizerOptions = recognizerOptions;
         this.setLogPersonalInformation(recognizerOptions.isLogPersonalInformation());
         this.setTelemetryClient(recognizerOptions.getTelemetryClient());
@@ -106,7 +111,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null,
             null);
     }
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Return results of the analysis (Suggested actions and intents).
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -125,8 +130,9 @@ public class LuisRecognizer extends TelemetryRecognizer {
 //    }
 
     /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result.
      * @param turnContext Context object containing information for a single turn of conversation with a user.
+     * @param <T> type of result.
      * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
@@ -138,10 +144,10 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null,
             null,
             null)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -182,7 +188,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             telemetryMetrics);
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Return results of the analysis (Suggested actions and intents).
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -207,10 +213,11 @@ public class LuisRecognizer extends TelemetryRecognizer {
 
 
     /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result.
      * @param turnContext Context object containing information for a single turn of conversation with a user.
      * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
      * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+     * @param <T> type of result.
      * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
@@ -224,10 +231,10 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null,
             telemetryProperties,
             telemetryMetrics)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -269,7 +276,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null);
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Return results of the analysis (Suggested actions and intents).
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -291,10 +298,11 @@ public class LuisRecognizer extends TelemetryRecognizer {
 //    }
 
     /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result.
      * @param turnContext Context object containing information for a single turn of conversation with a user.
      * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
      *                          default LuisRecognizerOptions passed in the constructor.
+     * @param <T> type of result.
      * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
@@ -307,10 +315,10 @@ public class LuisRecognizer extends TelemetryRecognizer {
             recognizerOptions,
             null,
             null)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -355,7 +363,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             telemetryMetrics);
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Return results of the analysis (Suggested actions and intents).
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -381,12 +389,13 @@ public class LuisRecognizer extends TelemetryRecognizer {
 //    }
 
     /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result.
      * @param turnContext Context object containing information for a single turn of conversation with a user.
      * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
      *                          default LuisRecognizerOptions passed in the constructor.
      * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
      * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+     * @param <T> type of result.
      * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
@@ -401,10 +410,10 @@ public class LuisRecognizer extends TelemetryRecognizer {
             recognizerOptions,
             telemetryProperties,
             telemetryMetrics)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
 //     * @param dialogContext Context object containing information for a single turn of conversation with a user.
@@ -450,12 +459,12 @@ public class LuisRecognizer extends TelemetryRecognizer {
             telemetryProperties);
         // Track the event
         this.getTelemetryClient().trackEvent(
-            LuisTelemetryConstants.LuisResult,
+            LuisTelemetryConstants.LUIS_RESULT,
             properties,
             telemetryMetrics);
     }
 
-    protected Map<String, String> fillLuisEventPropertiesAsync(
+    private Map<String, String> fillLuisEventPropertiesAsync(
         RecognizerResult recognizerResult,
         TurnContext turnContext,
         Map<String, String> telemetryProperties) {
@@ -464,8 +473,8 @@ public class LuisRecognizer extends TelemetryRecognizer {
         ArrayList<String> topTwoIntents = new ArrayList<>();
         Iterator<Map.Entry<String, IntentScore>> iterator = sortedIntents.entrySet().iterator();
         int intentCounter = 0;
-        while(iterator.hasNext()
-            && intentCounter < 2){
+        while (iterator.hasNext()
+            && intentCounter < 2) {
             intentCounter++;
             Map.Entry<String, IntentScore> intent = iterator.next();
             topTwoIntents.add(intent.getKey());
@@ -474,40 +483,44 @@ public class LuisRecognizer extends TelemetryRecognizer {
         // Add the intent score and conversation id properties
         Map<String, String> properties = new HashMap<>();
         properties.put(
-            LuisTelemetryConstants.ApplicationIdProperty,
+            LuisTelemetryConstants.APPLICATION_ID_PROPERTY,
             luisRecognizerOptions.getApplication().getApplicationId());
         properties.put(
-            LuisTelemetryConstants.IntentProperty,
+            LuisTelemetryConstants.INTENT_PROPERTY,
             topTwoIntents.size() > 0 ? topTwoIntents.get(0) : "");
         properties.put(
-            LuisTelemetryConstants.IntentScoreProperty,
-            topTwoIntents.size() > 0 ? "" + recognizerResult.getIntents().get(topTwoIntents.get(0)).getScore() : "0.00" );
+            LuisTelemetryConstants.INTENT_SCORE_PROPERTY,
+            topTwoIntents.size() > 0
+                ? "" + recognizerResult.getIntents().get(topTwoIntents.get(0)).getScore()
+                : "0.00");
         properties.put(
-            LuisTelemetryConstants.Intent2Property,
+            LuisTelemetryConstants.INTENT_2_PROPERTY,
             topTwoIntents.size() > 1 ? topTwoIntents.get(1) : "");
         properties.put(
-            LuisTelemetryConstants.IntentScore2Property,
-            topTwoIntents.size() > 1 ? "" + recognizerResult.getIntents().get(topTwoIntents.get(1)).getScore() : "0.00");
+            LuisTelemetryConstants.INTENT_SCORE_2_PROPERTY,
+            topTwoIntents.size() > 1
+                ? "" + recognizerResult.getIntents().get(topTwoIntents.get(1)).getScore()
+                : "0.00");
         properties.put(
-            LuisTelemetryConstants.FromIdProperty, turnContext.getActivity().getFrom().getId());
+            LuisTelemetryConstants.FROM_ID_PROPERTY, turnContext.getActivity().getFrom().getId());
 
         if (recognizerResult.getProperties().containsKey("sentiment")) {
             JsonNode sentiment = recognizerResult.getProperties().get("sentiment");
             if (sentiment.has("label")) {
                 properties.put(
-                    LuisTelemetryConstants.SentimentLabelProperty,
+                    LuisTelemetryConstants.SENTIMENT_LABEL_PROPERTY,
                     sentiment.get("label").textValue());
             }
 
             if (sentiment.has("score")) {
                 properties.put(
-                    LuisTelemetryConstants.SentimentScoreProperty,
+                    LuisTelemetryConstants.SENTIMENT_SCORE_PROPERTY,
                     sentiment.get("score").textValue());
             }
         }
 
         properties.put(
-            LuisTelemetryConstants.EntitiesProperty,
+            LuisTelemetryConstants.ENTITIES_PROPERTY,
             recognizerResult.getEntities().toString());
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text is a common example
@@ -515,7 +528,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             && turnContext.getActivity().getText() != null
             && !turnContext.getActivity().getText().equals("")) {
             properties.put(
-                LuisTelemetryConstants.QuestionProperty,
+                LuisTelemetryConstants.QUESTION_PROPERTY,
                 turnContext.getActivity().getText());
         }
 
@@ -529,7 +542,9 @@ public class LuisRecognizer extends TelemetryRecognizer {
         return properties;
     }
 
-    private <T extends RecognizerConvert> T convertRecognizerResult(RecognizerResult recognizerResult, Class<T> clazz) {
+    private <T extends RecognizerConvert> T convertRecognizerResult(
+        RecognizerResult recognizerResult,
+        Class<T> clazz) {
         T result = null;
         try {
             result = clazz.newInstance();
@@ -561,7 +576,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             });
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Returns a RecognizerResult object. This method will call the internal recognize implementation of the
 //     * Luis Recognizer Options.
@@ -586,7 +601,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
 //            });
 //    }
 
-    private Map<String, IntentScore> sortIntents(RecognizerResult recognizerResult){
+    private Map<String, IntentScore> sortIntents(RecognizerResult recognizerResult) {
         Map<String, IntentScore> sortedIntents = new LinkedHashMap<>();
         recognizerResult.getIntents().entrySet()
             .stream()

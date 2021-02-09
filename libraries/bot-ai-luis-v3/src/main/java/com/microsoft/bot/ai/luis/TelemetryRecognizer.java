@@ -3,7 +3,11 @@
 
 package com.microsoft.bot.ai.luis;
 
-import com.microsoft.bot.builder.*;
+import com.microsoft.bot.builder.BotTelemetryClient;
+import com.microsoft.bot.builder.Recognizer;
+import com.microsoft.bot.builder.RecognizerConvert;
+import com.microsoft.bot.builder.RecognizerResult;
+import com.microsoft.bot.builder.TurnContext;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -63,6 +67,7 @@ public abstract class TelemetryRecognizer implements Recognizer {
      * @param turnContext Context object containing information for a single turn of conversation with a user.
      * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
      * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+     * @param <T> Result type.
      * @param c The recognition result type class
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */

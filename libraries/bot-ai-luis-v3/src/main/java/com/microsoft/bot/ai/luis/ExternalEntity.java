@@ -12,8 +12,11 @@ public class ExternalEntity {
     }
 
     /**
-     * Initializes a new instance of ExternalEntity
-     *
+     * Initializes a new instance of ExternalEntity.
+     * @param entity name of the entity to extend.
+     * @param start start character index of the predicted entity.
+     * @param length length of the predicted entity.
+     * @param resolution supplied custom resolution to return as the entity's prediction.
      */
     public ExternalEntity(String entity, int start, int length, JsonNode resolution) {
         this.entity = entity;
@@ -37,28 +40,32 @@ public class ExternalEntity {
     private JsonNode resolution;
 
     /**
-     * Gets the start character index of the predicted entity
+     * Gets the start character index of the predicted entity.
+     * @return start character index of the predicted entity.
      */
     public int getStart() {
         return start;
     }
 
     /**
-     * Sets the start character index of the predicted entity
+     * Sets the start character index of the predicted entity.
+     * @param start character index of the predicted entity.
      */
     public void setStart(int start) {
         this.start = start;
     }
 
     /**
-     * Gets the name of the entity to extend
+     * Gets the name of the entity to extend.
+     * @return name of the entity to extend.
      */
     public String getEntity() {
         return entity;
     }
 
     /**
-     * Sets the name of the entity to extend
+     * Sets the name of the entity to extend.
+     * @param entity name of the entity to extend.
      */
     public void setEntity(String entity) {
         this.entity = entity;
@@ -66,6 +73,7 @@ public class ExternalEntity {
 
     /**
      * Gets the length of the predicted entity.
+     * @return length of the predicted entity.
      */
     public int getLength() {
         return length;
@@ -73,6 +81,7 @@ public class ExternalEntity {
 
     /**
      * Sets the length of the predicted entity.
+     * @param length of the predicted entity.
      */
     public void setLength(int length) {
         this.length = length;
@@ -80,20 +89,22 @@ public class ExternalEntity {
 
     /**
      * Gets a user supplied custom resolution to return as the entity's prediction.
+     * @return custom resolution to return as the entity's prediction.
      */
     public JsonNode getResolution() {
         return resolution;
     }
 
     /**
-     * Sets External entities to be recognized in query
+     * Sets External entities to be recognized in query.
+     * @param resolution custom resolution to return as the entity's prediction.
      */
     public void setResolution(JsonNode resolution) {
         this.resolution = resolution;
     }
 
     /**
-     * Validate the object
+     * Validate the object.
      * @throws IllegalArgumentException on null or invalid values
      */
     public void validate() throws IllegalArgumentException {

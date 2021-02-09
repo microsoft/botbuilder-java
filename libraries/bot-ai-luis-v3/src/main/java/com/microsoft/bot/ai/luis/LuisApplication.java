@@ -61,6 +61,7 @@ public class LuisApplication {
 
     /**
      * Sets Luis application ID to query.
+     * @param applicationId Luis application ID to query.
      */
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
@@ -76,6 +77,7 @@ public class LuisApplication {
 
     /**
      * Sets the LUIS subscription or endpoint key.
+     * @param endpointKey LUIS subscription or endpoint key.
      */
     public void setEndpointKey(String endpointKey) {
         this.endpointKey = endpointKey;
@@ -91,6 +93,7 @@ public class LuisApplication {
 
     /**
      * Sets Luis endpoint like https://westus.api.cognitive.microsoft.com.
+     * @param endpoint endpoint like https://westus.api.cognitive.microsoft.com.
      */
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
@@ -107,7 +110,7 @@ public class LuisApplication {
     /**
      * Helper method to set and validate Luis arguments passed.
      */
-    private void setLuisApplication (
+    private void setLuisApplication(
         String applicationId,
         String endpointKey,
         String endpoint) {
@@ -138,14 +141,14 @@ public class LuisApplication {
      * Helper method to parse validate and set Luis application members from the full application full endpoint.
      */
     private void parse(String applicationEndpoint) {
-        String applicationId = "";
+        String appId = "";
         try {
-            String [] segments = new URL(applicationEndpoint)
+            String[] segments = new URL(applicationEndpoint)
                 .getPath()
                 .split("/");
             for (int segment = 0; segment < segments.length - 1; segment++) {
                 if (segments[segment].equals("apps")) {
-                    applicationId = segments[segment + 1].trim();
+                    appId = segments[segment + 1].trim();
                     break;
                 }
             }
@@ -159,7 +162,7 @@ public class LuisApplication {
         }
 
 
-        if (applicationId.isEmpty()) {
+        if (appId.isEmpty()) {
             throw new IllegalArgumentException(
                 String.format(
                     "Could not find application Id in %s",
@@ -170,7 +173,7 @@ public class LuisApplication {
 
         try {
 
-            String endpointKey = new URIBuilder(applicationEndpoint)
+            String endpointKeyParsed = new URIBuilder(applicationEndpoint)
                 .getQueryParams()
                 .stream()
                 .filter(param -> param.getName()
@@ -179,13 +182,13 @@ public class LuisApplication {
                 .findFirst()
                 .orElse("");
 
-            String endpoint = String.format(
+            String endpointPared = String.format(
                 "%s://%s",
                 new URL(applicationEndpoint).getProtocol(),
                 new URL(applicationEndpoint).toURI().getHost()
             );
 
-            setLuisApplication(applicationId, endpointKey, endpoint);
+            setLuisApplication(appId, endpointKeyParsed, endpointPared);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new IllegalArgumentException(
                 String.format(
@@ -196,7 +199,7 @@ public class LuisApplication {
 
     }
 
-    private boolean isValidUUID (String uuid) {
+    private boolean isValidUUID(String uuid) {
         try {
             if (!uuid.contains("-")) {
                 uuid = uuid.replaceAll(
@@ -211,7 +214,7 @@ public class LuisApplication {
         }
     }
 
-    private boolean isValidURL (String uri) {
+    private boolean isValidURL(String uri) {
         try {
             return new URL(uri).toURI().isAbsolute();
         } catch (URISyntaxException | MalformedURLException exception) {

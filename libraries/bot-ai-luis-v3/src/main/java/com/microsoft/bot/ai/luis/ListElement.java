@@ -38,6 +38,7 @@ public class ListElement {
 
     /**
      * Gets the canonical form of the sub-list.
+     * @return String canonical form of the sub-list.
      */
     public String getCanonicalForm() {
         return canonicalForm;
@@ -45,6 +46,7 @@ public class ListElement {
 
     /**
      * Sets the canonical form of the sub-list.
+     * @param canonicalForm the canonical form of the sub-list.
      */
     public void setCanonicalForm(String canonicalForm) {
         this.canonicalForm = canonicalForm;
@@ -52,6 +54,7 @@ public class ListElement {
 
     /**
      * Gets the synonyms of the canonical form.
+     * @return the synonyms List of the canonical form.
      */
     public List<String> getSynonyms() {
         return synonyms;
@@ -59,6 +62,7 @@ public class ListElement {
 
     /**
      * Sets the synonyms of the canonical form.
+     * @param synonyms List of synonyms of the canonical form.
      */
     public void setSynonyms(List<String> synonyms) {
         this.synonyms = synonyms;

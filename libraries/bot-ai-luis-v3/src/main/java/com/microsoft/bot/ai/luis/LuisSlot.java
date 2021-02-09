@@ -3,14 +3,20 @@
 
 package com.microsoft.bot.ai.luis;
 
-public class LuisSlot {
+public final class LuisSlot {
+
+    //Not Called
+    private LuisSlot() {
+
+    }
+
     /**
     * Production slot on LUIS.
     */
-    public final static String production = "production";
+    public static final String PRODUCTION = "production";
 
     /**
      * Staging slot on LUIS.
      */
-    public final static String staging = "staging";
+    public static final String STAGING = "staging";
 }

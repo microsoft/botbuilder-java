@@ -13,24 +13,24 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
+import okhttp3.MediaType;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.MediaType;
-import okhttp3.HttpUrl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
-    private final HashSet<String> dateSubtypes = new HashSet<> (
+    private final HashSet<String> dateSubtypes = new HashSet<>(
         Arrays.asList(
             "date",
             "daterange",
@@ -42,7 +42,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             "timerange"
         ));
 
-    private final HashSet<String> geographySubtypes = new HashSet<> (
+    private final HashSet<String> geographySubtypes = new HashSet<>(
         Arrays.asList(
             "poi",
             "city",
@@ -59,16 +59,16 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private String dateTimeReference = null;
 
     /**
-     * Dynamic lists used to recognize entities for a particular query
+     * Dynamic lists used to recognize entities for a particular query.
      */
     private List<DynamicList> dynamicLists = null;
 
     /**
-     * External entities recognized in query
+     * External entities recognized in query.
      */
     private List<ExternalEntity> externalEntities = null;
 
-    //TODO: Change type once the class Dialog Recognizer is ported
+    // TO-DO: Change type once the class Dialog Recognizer is ported
 //    /**
 //     * External entity recognizer to recognize external entities to pass to LUIS.
 //     */
@@ -100,7 +100,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
      * The LUIS slot to use for the application. By default this uses the production slot. You can find other standard
      * slots in LuisSlot. If you specify a Version, then a private version of the application is used instead of a slot.
      */
-    private String slot = LuisSlot.production;
+    private String slot = LuisSlot.PRODUCTION;
 
     /**
      * The specific version of the application to access. LUIS supports versions and this is the version to use instead
@@ -116,14 +116,14 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     /**
      * The value type for a LUIS trace activity.
      */
-    public static final String luisTraceType = "https://www.luis.ai/schemas/trace";
+    public static final String LUIS_TRACE_TYPE = "https://www.luis.ai/schemas/trace";
 
     /**
      * The context label for a LUIS trace activity.
      */
-    public static final String LuisTraceLabel = "LuisV3 Trace";
+    public static final String LUIS_TRACE_LABEL = "LuisV3 Trace";
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    // TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Gets External entity recognizer to recognize external entities to pass to LUIS.
 //     * @return externalEntityRecognizer
@@ -142,6 +142,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets indicating whether all intents come back or only the top one. True for returning all intents.
+     * @return True for returning all intents.
      */
     public boolean isIncludeAllIntents() {
         return includeAllIntents;
@@ -157,6 +158,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets value indicating whether or not instance data should be included in response.
+     * @return True if instance data should be included in response.
      */
     public boolean isIncludeInstanceData() {
         return includeInstanceData;
@@ -164,6 +166,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets value indicating whether or not instance data should be included in response.
+     * @param includeInstanceData True if instance data should be included in response.
      */
     public void setIncludeInstanceData(boolean includeInstanceData) {
         this.includeInstanceData = includeInstanceData;
@@ -172,6 +175,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     /**
      * Value indicating whether queries should be logged in LUIS. If queries should be logged in LUIS in order to help
      * build better models through active learning
+     * @return True if queries should be logged in LUIS.
      */
     public boolean isLog() {
         return log;
@@ -179,7 +183,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Value indicating whether queries should be logged in LUIS. If queries should be logged in LUIS in order to help
-     * build better models through active learning
+     * build better models through active learning.
      * @param log True if queries should be logged in LUIS.
      */
     public void setLog(boolean log) {
@@ -187,36 +191,40 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Returns Dynamic lists used to recognize entities for a particular query
+     * Returns Dynamic lists used to recognize entities for a particular query.
+     * @return Dynamic lists used to recognize entities for a particular query
      */
     public List<DynamicList> getDynamicLists() {
         return dynamicLists;
     }
 
     /**
-     * Sets Dynamic lists used to recognize entities for a particular query
+     * Sets Dynamic lists used to recognize entities for a particular query.
+     * @param dynamicLists to recognize entities for a particular query.
      */
     public void setDynamicLists(List<DynamicList> dynamicLists) {
         this.dynamicLists = dynamicLists;
     }
 
     /**
-     * Gets External entities to be recognized in query
+     * Gets External entities to be recognized in query.
+     * @return External entities to be recognized in query.
      */
     public List<ExternalEntity> getExternalEntities() {
         return externalEntities;
     }
 
     /**
-     * Sets External entities to be recognized in query
+     * Sets External entities to be recognized in query.
+     * @param externalEntities External entities to be recognized in query.
      */
     public void setExternalEntities(List<ExternalEntity> externalEntities) {
         this.externalEntities = externalEntities;
     }
 
     /**
-     * Gets value indicating whether external entities should override other means of recognizing entities. True if external
-     * entities should be preferred to the results from LUIS models
+     * Gets value indicating whether external entities should override other means of recognizing entities.
+     * @return True if external entities should be preferred to the results from LUIS models.
      */
     public boolean isPreferExternalEntities() {
         return preferExternalEntities;
@@ -224,14 +232,15 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets value indicating whether external entities should override other means of recognizing entities.
-     * @param preferExternalEntities True if external entities should be preferred to the results from LUIS models
+     * @param preferExternalEntities True if external entities should be preferred to the results from LUIS models.
      */
     public void setPreferExternalEntities(boolean preferExternalEntities) {
         this.preferExternalEntities = preferExternalEntities;
     }
 
     /**
-     * Gets datetimeV2 offset. The format for the datetimeReference is ISO 8601
+     * Gets datetimeV2 offset. The format for the datetimeReference is ISO 8601.
+     * @return The format for the datetimeReference in ISO 8601.
      */
     public String getDateTimeReference() {
         return dateTimeReference;
@@ -246,16 +255,19 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets the LUIS slot to use for the application. By default this uses the production slot. You can find other standard
-     * slots in LuisSlot. If you specify a Version, then a private version of the application is used instead of a slot.
+     * Gets the LUIS slot to use for the application. By default this uses the production slot.
+     * You can find other standard slots in LuisSlot. If you specify a Version,
+     * then a private version of the application is used instead of a slot.
+     * @return LuisSlot constant.
      */
     public String getSlot() {
         return slot;
     }
 
     /**
-     * Sets the LUIS slot to use for the application. By default this uses the production slot. You can find other standard
-     * slots in LuisSlot. If you specify a Version, then a private version of the application is used instead of a slot.
+     * Sets the LUIS slot to use for the application. By default this uses the production slot.
+     * You can find other standard slots in LuisSlot. If you specify a Version,
+     * then a private version of the application is used instead of a slot.
      * @param slot LuisSlot value to use.
      */
     public void setSlot(String slot) {
@@ -263,16 +275,18 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets the specific version of the application to access. LUIS supports versions and this is the version to use instead
-     * of a slot. If this is specified, then the Slot is ignored.
+     * Gets the specific version of the application to access.
+     * LUIS supports versions and this is the version to use instead of a slot.
+     * If this is specified, then the Slot is ignored.
+     * @return Luis application version to Query.
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * Sets the specific version of the application to access. LUIS supports versions and this is the version to use instead
-     * of a slot.
+     * Sets the specific version of the application to access.
+     * LUIS supports versions and this is the version to use instead of a slot.
      * @param version Luis Application version. If this is specified, then the Slot is ignored.
      */
     public void setVersion(String version) {
@@ -281,13 +295,14 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets whether the http client.
+     * @return OkHttpClient used to query the Luis Service.
      */
     public OkHttpClient getHttpClient() {
         return httpClient;
     }
 
     /**
-     * Sets whether the http client.
+     * Sets the http client.
      * @param httpClient to use for Luis Service http calls.
      */
     public void setHttpClient(OkHttpClient httpClient) {
@@ -302,7 +317,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         super(application);
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    //TO-DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Internal implementation of the http request to the LUIS service and parsing of the response to a
 //     * Recognizer Result instance.
@@ -401,7 +416,31 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             turnContext.getActivity().getText());
     }
 
-    private RequestBody BuildRequestBody(String utterance) throws JsonProcessingException {
+    private Request buildRequest(RequestBody body) {
+        StringBuilder path = new StringBuilder(getApplication().getEndpoint());
+        path.append(String.format(
+            "/luis/prediction/v3.0/apps/%s",
+            getApplication().getApplicationId()));
+
+        if (version == null) {
+            path.append(String.format("/slots/%s/predict", slot));
+        } else {
+            path.append(String.format("/versions/%s/predict", version));
+        }
+
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(path.toString()).newBuilder();
+
+        httpBuilder.addQueryParameter("verbose", Boolean.toString(includeInstanceData));
+        httpBuilder.addQueryParameter("log", Boolean.toString(log));
+        httpBuilder.addQueryParameter("show-all-intents", Boolean.toString(includeAllIntents));
+
+        Request.Builder requestBuilder = new Request.Builder()
+            .url(httpBuilder.build())
+            .addHeader("Ocp-Apim-Subscription-Key", getApplication().getEndpointKey()).post(body);
+        return requestBuilder.build();
+    }
+
+    private RequestBody buildRequestBody(String utterance) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode content = JsonNodeFactory.instance.objectNode().put("query", utterance);
@@ -447,7 +486,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             }};
         } else {
             try {
-                Request request = buildRequest(BuildRequestBody(utterance));
+                Request request = buildRequest(buildRequestBody(utterance));
                 Response response = httpClient.newCall(request).execute();
                 luisResponse = mapper.readTree(response.body().string());
 
@@ -474,7 +513,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
             if (includeInstanceData
                 && recognizerResult.getEntities().get(metadataKey) == null) {
-                ((ObjectNode)recognizerResult.getEntities()).putObject(metadataKey);
+                ((ObjectNode) recognizerResult.getEntities()).putObject(metadataKey);
             }
         }
 
@@ -483,40 +522,15 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         return CompletableFuture.completedFuture(recognizerResult);
     }
 
-    private Request buildRequest(RequestBody body) {
-        StringBuilder path = new StringBuilder(getApplication().getEndpoint());
-        path.append(String.format(
-            "/luis/prediction/v3.0/apps/%s",
-            getApplication().getApplicationId()));
-
-        if (version == null) {
-            path.append(String.format("/slots/%s/predict", slot));
-        }
-        else {
-            path.append(String.format("/versions/%s/predict", version));
-        }
-
-        HttpUrl.Builder httpBuilder = HttpUrl.parse(path.toString()).newBuilder();
-
-        httpBuilder.addQueryParameter("verbose", Boolean.toString(includeInstanceData));
-        httpBuilder.addQueryParameter("log", Boolean.toString(log));
-        httpBuilder.addQueryParameter("show-all-intents", Boolean.toString(includeAllIntents));
-
-        Request.Builder requestBuilder = new Request.Builder()
-            .url(httpBuilder.build())
-            .addHeader("Ocp-Apim-Subscription-Key", getApplication().getEndpointKey()).post(body);
-        return requestBuilder.build();
-    }
-
     private Map<String, IntentScore> getIntents(JsonNode prediction) {
         Map<String, IntentScore> intents = new LinkedHashMap<>();
 
-        JsonNode intentsObject= prediction.get("intents");
+        JsonNode intentsObject = prediction.get("intents");
         if (intentsObject == null) {
             return intents;
         }
 
-        for (Iterator<Map.Entry<String, JsonNode>> it = intentsObject.fields(); it.hasNext(); ) {
+        for (Iterator<Map.Entry<String, JsonNode>> it = intentsObject.fields(); it.hasNext();) {
             Map.Entry<String, JsonNode> intent = it.next();
             double score = intent.getValue()
                 .get("score")
@@ -524,7 +538,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             String intentName = intent.getKey()
                 .replace(".", "_")
                 .replace(" ", "_");
-            intents.put(intentName, new IntentScore(){{
+            intents.put(intentName, new IntentScore() {{
                 setScore(score);
             }});
         }
@@ -535,7 +549,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private String normalizeEntity(String entity) {
     // Type::Role -> Role
         String[] type = entity.split(":");
-        return type[type.length-1]
+        return type[type.length - 1]
             .replace(".", "_")
             .replace(" ", "_");
     }
@@ -545,11 +559,11 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             return JsonNodeFactory.instance.objectNode();
         }
 
-        return  MapEntitiesRecursive(prediction.get("entities"), false);
+        return  mapEntitiesRecursive(prediction.get("entities"), false);
     }
 
     // Exact Port from C#
-    private JsonNode MapEntitiesRecursive(
+    private JsonNode mapEntitiesRecursive(
         JsonNode source,
         boolean inInstance) {
         JsonNode result = source;
@@ -566,7 +580,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 JsonNode timexs = obj.get("values");
                 ArrayNode arr = JsonNodeFactory.instance.arrayNode();
                 if (timexs != null) {
-                    Set<String> unique = new HashSet<String>();
+                    Set<String> unique = new HashSet<>();
 
                     for (JsonNode elt: timexs) {
                         unique.add(elt.get("timex").textValue());
@@ -580,8 +594,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 }
 
                 nobj.set("type", type);
-            }
-            else {
+            } else {
                 // Map or remove properties
                 Iterator<Map.Entry<String, JsonNode>> nodes = obj.fields();
                 while (nodes.hasNext()) {
@@ -590,19 +603,17 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                     boolean isArray = property.getValue().isArray();
                     boolean isString = property.getValue().isTextual();
                     boolean isInt = property.getValue().isInt();
-                    JsonNode val = MapEntitiesRecursive(
+                    JsonNode val = mapEntitiesRecursive(
                         property.getValue(),
                         inInstance || name.equals(metadataKey));
 
                     if (name.equals("datetime")
                         && isArray) {
                         nobj.set("datetimeV1", val);
-                    }
-                    else if (name.equals("datetimeV2")
+                    } else if (name.equals("datetimeV2")
                         && isArray) {
                         nobj.set("datetime", val);
-                    }
-                    else if (inInstance) {
+                    } else if (inInstance) {
                         // Correct $instance issues
                         if (name.equals("length") && isInt) {
                             int value = property.getValue().intValue();
@@ -610,18 +621,15 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                                 value += obj.get("startIndex").intValue();
                             }
                             nobj.put("endIndex", value);
-                        }
-                        else if (!((isInt && name.equals("modelTypeId")) ||        //NOPMD
-                            (isString && name.equals("role")))) {                  //NOPMD
+                        } else if (!((isInt && name.equals("modelTypeId")) ||        //NOPMD
+                            (isString && name.equals("role")))) {                    //NOPMD
                             nobj.set(name, val);
                         }
-                    }
-                    else {
+                    } else {
                         // Correct non-$instance values
                         if (name.equals("unit") && isString) {
                             nobj.set("units", val);
-                        }
-                        else {
+                        } else {
                             nobj.set(name, val);
                         }
                     }
@@ -629,8 +637,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             }
 
             result = nobj;
-        }
-        else if (source.isArray()) {
+        } else if (source.isArray()) {
             JsonNode arr = source;
             ArrayNode narr = JsonNodeFactory.instance.arrayNode();
             for (JsonNode elt : arr) {
@@ -645,8 +652,8 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                         break;
                     }
 
-                    if (props.getKey().contains("type") &&
-                        geographySubtypes.contains(props.getValue().textValue())) {
+                    if (props.getKey().contains("type")
+                        && geographySubtypes.contains(props.getValue().textValue())) {
                         isGeographyV2 = props.getValue().textValue();
                         break;
                     }
@@ -665,9 +672,8 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
                     geoEntity.put("type", isGeographyV2);
                     narr.add(geoEntity);
-                }
-                else {
-                    narr.add(MapEntitiesRecursive(elt, inInstance));
+                } else {
+                    narr.add(mapEntitiesRecursive(elt, inInstance));
                 }
             }
             result = narr;
@@ -678,7 +684,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     private void addProperties(
         JsonNode prediction,
-        RecognizerResult result){
+        RecognizerResult result) {
         JsonNode sentiment = prediction.get("sentiment");
         if (sentiment != null) {
             ObjectNode sentimentNode = JsonNodeFactory.instance.objectNode();
@@ -725,7 +731,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 luisOptions.put("externalEntities", externalEntitiesNode);
             }
 
-            if (dynamicLists!=null) {
+            if (dynamicLists != null) {
                 ArrayNode dynamicListNode = JsonNodeFactory.instance.arrayNode();
                 for (DynamicList e : dynamicLists) {
                     dynamicListNode.add(mapper.valueToTree(e));
@@ -738,9 +744,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             turnContext.sendActivity(
                 Activity.createTraceActivity(
                     "LuisRecognizer",
-                    luisTraceType,
+                    LUIS_TRACE_TYPE,
                     traceInfo,
-                    LuisTraceLabel))
+                    LUIS_TRACE_LABEL))
                 .thenApply(resourceResponse -> null);
         } catch (IOException e) {
             e.printStackTrace();
