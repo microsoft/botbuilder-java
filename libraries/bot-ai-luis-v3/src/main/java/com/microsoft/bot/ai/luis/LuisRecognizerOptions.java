@@ -51,7 +51,7 @@ public abstract class LuisRecognizerOptions {
     }
 
     /**
-     * Sets the Luis Application
+     * Sets the Luis Application.
      *
      * @param application A Luis Application instance which sets the Luis specifics to work with
      */
@@ -70,7 +70,7 @@ public abstract class LuisRecognizerOptions {
     }
 
     /**
-     * Sets the Bot Telemetry Client to log telemetry with
+     * Sets the Bot Telemetry Client to log telemetry with.
      *
      * @param telemetryClient A Bot Telemetry Client instance
      */
@@ -123,7 +123,7 @@ public abstract class LuisRecognizerOptions {
     abstract CompletableFuture<RecognizerResult> recognizeInternal(
         TurnContext turnContext);
 
-    //TODO: Enable once the class Dialog Recognizer is ported
+    // TO DO: Enable once the class Dialog Recognizer is ported
 //    /**
 //     * Implementation of the Luis API http call and result processing.
 //     * This is intended to follow a Strategy pattern and

@@ -4,6 +4,7 @@
 package com.microsoft.bot.ai.luis;
 
 import com.microsoft.bot.builder.*;
+
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -52,7 +53,10 @@ public abstract class TelemetryRecognizer implements Recognizer {
      * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
-    abstract CompletableFuture<RecognizerResult>  recognize(TurnContext turnContext, Map<String, String> telemetryProperties, Map<String, Double> telemetryMetrics);
+    abstract CompletableFuture<RecognizerResult>  recognize(
+        TurnContext turnContext,
+        Map<String, String> telemetryProperties,
+        Map<String, Double> telemetryMetrics);
 
     /**
      * Return results of the analysis (Suggested actions and intents).
@@ -62,6 +66,10 @@ public abstract class TelemetryRecognizer implements Recognizer {
      * @param c The recognition result type class
      * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
      */
-    abstract <T extends RecognizerConvert> CompletableFuture<T>  recognize(TurnContext turnContext, Map<String, String> telemetryProperties, Map<String, Double> telemetryMetrics, Class<T> c);
+    abstract <T extends RecognizerConvert> CompletableFuture<T>  recognize(
+        TurnContext turnContext,
+        Map<String, String> telemetryProperties,
+        Map<String, Double> telemetryMetrics,
+        Class<T> c);
 
 }

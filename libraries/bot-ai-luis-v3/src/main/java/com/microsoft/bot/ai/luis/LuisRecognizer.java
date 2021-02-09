@@ -74,7 +74,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
             throw new IllegalArgumentException("RecognizerResult");
         }
 
-        defaultIntent = (defaultIntent == null || defaultIntent.equals("")) ? "None" : defaultIntent;
+        defaultIntent = defaultIntent == null || defaultIntent.equals("") ? "None" : defaultIntent;
 
         String topIntent = null;
         double topScore = -1.0;

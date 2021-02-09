@@ -10,12 +10,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.IntentScore;
-import com.microsoft.bot.builder.Recognizer;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.schema.Activity;
 import okhttp3.*;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -61,10 +60,10 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
     private List<ExternalEntity> externalEntities = null;
 
     //TODO: Change type once the class Dialog Recognizer is ported
-    /**
-     * External entity recognizer to recognize external entities to pass to LUIS.
-     */
-    private Recognizer externalEntityRecognizer = null;
+//    /**
+//     * External entity recognizer to recognize external entities to pass to LUIS.
+//     */
+//    private Recognizer externalEntityRecognizer = null;
 
     /**
      * Value indicating whether all intents come back or only the top one. True for returning all intents.
@@ -464,10 +463,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
                 recognizerResult.getProperties().put("luisResult", luisResponse);
             }
 
-            if (includeInstanceData) {
-                if (recognizerResult.getEntities().get(metadataKey) == null) {
-                    ((ObjectNode)recognizerResult.getEntities()).putObject(metadataKey);
-                }
+            if (includeInstanceData
+                && recognizerResult.getEntities().get(metadataKey) == null) {
+                ((ObjectNode)recognizerResult.getEntities()).putObject(metadataKey);
             }
         }
 
