@@ -11,14 +11,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum DeliveryModes {
     /**
-     * Enum value normal.
+     * The mode value for normal delivery modes.
      */
     NORMAL("normal"),
 
     /**
-     * Enum value notification.
+     * The mode value for notification delivery modes.
      */
-    NOTIFICATION("notification");
+    NOTIFICATION("notification"),
+
+    /**
+     * The value for expected replies delivery modes.
+     */
+    EXPECT_REPLIES("expectReplies");
 
     /**
      * The actual serialized value for a DeliveryModes instance.

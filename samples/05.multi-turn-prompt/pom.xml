@@ -134,7 +134,7 @@
             <plugin>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-webapp-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>1.12.0</version>
                 <configuration>
                     <schemaVersion>V2</schemaVersion>
                     <resourceGroup>${groupname}</resourceGroup>
@@ -147,9 +147,9 @@
                     </appSettings>
                     <runtime>
                         <os>linux</os>
-                        <javaVersion>jre8</javaVersion>
-                        <webContainer>jre8</webContainer>
-                    </runtime>
+                        <javaVersion>Java 8</javaVersion>
+                        <webContainer>Java SE</webContainer>
+                  </runtime>
                     <deployment>
                         <resources>
                             <resource>

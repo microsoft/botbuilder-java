@@ -51,16 +51,17 @@ public class ComponentDialogTests {
 
             class Step1 implements WaterfallStep {
                 public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-                    stepContext.getContext().sendActivity("Child started.").join();
-                    return stepContext.beginDialog("parentDialog", "test");
+                    return stepContext.getContext()
+                        .sendActivity("Child started.")
+                        .thenCompose(resourceResponse -> stepContext.beginDialog("parentDialog", "test"));
                 }
             }
 
             class Step2 implements WaterfallStep {
                 public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-                    stepContext.getContext()
-                            .sendActivity(String.format("Child finished. Value: %s", stepContext.getResult()));
-                    return stepContext.endDialog();
+                    return stepContext.getContext()
+                        .sendActivity(String.format("Child finished. Value: %s", stepContext.getResult()))
+                        .thenCompose(resourceResponse -> stepContext.endDialog());
                 }
             }
 
@@ -73,8 +74,9 @@ public class ComponentDialogTests {
 
             class ParentStep implements WaterfallStep {
                 public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-                    stepContext.getContext().sendActivity(String.format("Parent called.", stepContext.getResult()));
-                    return stepContext.endDialog(stepContext.getOptions());
+                    return stepContext.getContext()
+                        .sendActivity(String.format("Parent called.", stepContext.getResult()))
+                        .thenCompose(resourceResponse -> stepContext.endDialog(stepContext.getOptions()));
                 }
             }
             WaterfallStep[] parentStep = new WaterfallStep[] {new ParentStep() };
@@ -90,7 +92,7 @@ public class ComponentDialogTests {
                 dc.beginDialog("parentComponent", null).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int value = (int) results.getResult();
-                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value)));
+                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value))).join();
             }
 
             return CompletableFuture.completedFuture(null);
@@ -122,10 +124,10 @@ public class ComponentDialogTests {
 
             DialogTurnResult results = dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
-                dc.beginDialog("test-waterfall", null);
+                dc.beginDialog("test-waterfall", null).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int value = (int) results.getResult();
-                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value)));
+                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -238,10 +240,10 @@ public class ComponentDialogTests {
 
             DialogTurnResult results = dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
-                dc.beginDialog("TestComponentDialog", null);
+                dc.beginDialog("TestComponentDialog", null).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int value = (int) results.getResult();
-                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value)));
+                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -280,10 +282,10 @@ public class ComponentDialogTests {
 
             DialogTurnResult results = dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
-                dc.beginDialog("TestNestedComponentDialog", null);
+                dc.beginDialog("TestNestedComponentDialog", null).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int value = (int) results.getResult();
-                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value)));
+                turnContext.sendActivity(MessageFactory.text(String.format("Bot received the number '%d'.", value))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -328,16 +330,16 @@ public class ComponentDialogTests {
 
         class Step1 implements WaterfallStep {
             public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-                stepContext.getContext().sendActivity("Child started.");
-                return  stepContext.beginDialog("parentDialog", options);
+                return stepContext.getContext().sendActivity("Child started.")
+                    .thenCompose(resourceResponse -> stepContext.beginDialog("parentDialog", options));
             }
         }
 
         class Step2 implements WaterfallStep {
             public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
                 Assert.assertEquals("test", (String) stepContext.getResult());
-                 stepContext.getContext().sendActivity("Child finished.");
-                return  stepContext.endDialog();
+                return stepContext.getContext().sendActivity("Child finished.")
+                    .thenCompose(resourceResponse -> stepContext.endDialog());
             }
         }
 
@@ -353,9 +355,9 @@ public class ComponentDialogTests {
                 Map<String, String> stepOptions = (Map<String, String>) stepContext.getOptions();
                 Assert.assertNotNull(stepOptions);
                 Assert.assertTrue(stepOptions.containsKey("value"));
-                stepContext.getContext().sendActivity(
-                        String.format("Parent called with: {%s}", stepOptions.get("value")));
-                return stepContext.endDialog(stepOptions.get("value"));
+                return stepContext.getContext()
+                    .sendActivity(String.format("Parent called with: %s", stepOptions.get("value")))
+                    .thenCompose(resourceResponse -> stepContext.endDialog(stepOptions.get("value")));
             }
         }
 
@@ -374,7 +376,7 @@ public class ComponentDialogTests {
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                  dc.beginDialog("parentComponent", null).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
-                 turnContext.sendActivity(MessageFactory.text("Done"));
+                 turnContext.sendActivity(MessageFactory.text("Done")).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -382,7 +384,8 @@ public class ComponentDialogTests {
         .assertReply("Child started.")
         .assertReply("Parent called with: test")
         .assertReply("Child finished.")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     // private static TestFlow CreateTestFlow(WaterfallDialog waterfallDialog) {

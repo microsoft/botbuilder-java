@@ -3,6 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "groupLocation": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "Specifies the location of the Resource Group."
@@ -33,12 +34,14 @@
             }
         },
         "botSku": {
+            "defaultValue": "S1",
             "type": "string",
             "metadata": {
                 "description": "The pricing tier of the Bot Service Registration. Acceptable values are F0 and S1."
             }
         },
         "newAppServicePlanName": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "The name of the App Service Plan."
@@ -47,10 +50,10 @@
         "newAppServicePlanSku": {
             "type": "object",
             "defaultValue": {
-                "name": "S1",
-                "tier": "Standard",
-                "size": "S1",
-                "family": "S",
+                "name": "P1v2",
+                "tier": "PremiumV2",
+                "size": "P1v2",
+                "family": "Pv2",
                 "capacity": 1
             },
             "metadata": {
@@ -58,6 +61,7 @@
             }
         },
         "newAppServicePlanLocation": {
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "The location of the App Service Plan. Defaults to \"westus\"."
@@ -77,6 +81,7 @@
         "webAppName": "[if(empty(parameters('newWebAppName')), parameters('botId'), parameters('newWebAppName'))]",
         "siteHost": "[concat(variables('webAppName'), '.azurewebsites.net')]",
         "botEndpoint": "[concat('https://', variables('siteHost'), '/api/messages')]",
+        "publishingUsername": "[concat('$', parameters('newWebAppName'))]",
         "resourceGroupId": "[concat(subscription().id, '/resourceGroups/', parameters('groupName'))]"
     },
     "resources": [
@@ -104,34 +109,65 @@
                     "variables": {},
                     "resources": [
                         {
-                            "comments": "Create a new App Service Plan",
+                            "comments": "Create a new Linux App Service Plan if no existing App Service Plan name was passed in.",
                             "type": "Microsoft.Web/serverfarms",
                             "name": "[variables('appServicePlanName')]",
                             "apiVersion": "2018-02-01",
                             "location": "[variables('resourcesLocation')]",
                             "sku": "[parameters('newAppServicePlanSku')]",
+                            "kind": "linux",
                             "properties": {
-                                "name": "[variables('appServicePlanName')]"
+                                "perSiteScaling": false,
+                                "maximumElasticWorkerCount": 1,
+                                "isSpot": false,
+                                "reserved": true,
+                                "isXenon": false,
+                                "hyperV": false,
+                                "targetWorkerCount": 0,
+                                "targetWorkerSizeId": 0
                             }
                         },
                         {
-                            "comments": "Create a Web App using the new App Service Plan",
+                            "comments": "Create a Web App using a Linux App Service Plan",
                             "type": "Microsoft.Web/sites",
-                            "apiVersion": "2015-08-01",
+                            "apiVersion": "2018-11-01",
                             "location": "[variables('resourcesLocation')]",
-                            "kind": "app",
+                            "kind": "app,linux",
                             "dependsOn": [
                                 "[concat(variables('resourceGroupId'), '/providers/Microsoft.Web/serverfarms/', variables('appServicePlanName'))]"
                             ],
                             "name": "[variables('webAppName')]",
                             "properties": {
                                 "name": "[variables('webAppName')]",
+                                "hostNameSslStates": [
+                                    {
+                                        "name": "[concat(parameters('newWebAppName'), '.azurewebsites.net')]",
+                                        "sslState": "Disabled",
+                                        "hostType": "Standard"
+                                    },
+                                    {
+                                        "name": "[concat(parameters('newWebAppName'), '.scm.azurewebsites.net')]",
+                                        "sslState": "Disabled",
+                                        "hostType": "Repository"
+                                    }
+                                ],
                                 "serverFarmId": "[variables('appServicePlanName')]",
+                                "reserved": true,
+                                "isXenon": false,
+                                "hyperV": false,
+                                "scmSiteAlsoStopped": false,
+                                "clientAffinityEnabled": true,
+                                "clientCertEnabled": false,
+                                "hostNamesDisabled": false,
+                                "containerSize": 0,
+                                "dailyMemoryTimeQuota": 0,
+                                "httpsOnly": false,
+                                "redundancyMode": "None",
                                 "siteConfig": {
                                     "appSettings": [
                                         {
-                                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                                            "value": "10.14.1"
+                                            "name": "JAVA_OPTS",
+                                            "value": "-Dserver.port=80"
                                         },
                                         {
                                             "name": "MicrosoftAppId",
@@ -149,6 +185,78 @@
                                         ]
                                     }
                                 }
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Web/sites/config",
+                            "apiVersion": "2018-11-01",
+                            "name": "[concat(variables('webAppName'), '/web')]",
+                            "location": "[variables('resourcesLocation')]",
+                            "dependsOn": [
+                                "[concat(variables('resourceGroupId'), '/providers/Microsoft.Web/sites/', variables('webAppName'))]"
+                            ],
+                            "properties": {
+                                "numberOfWorkers": 1,
+                                "defaultDocuments": [
+                                    "Default.htm",
+                                    "Default.html",
+                                    "Default.asp",
+                                    "index.htm",
+                                    "index.html",
+                                    "iisstart.htm",
+                                    "default.aspx",
+                                    "index.php",
+                                    "hostingstart.html"
+                                ],
+                                "netFrameworkVersion": "v4.0",
+                                "linuxFxVersion": "JAVA|8-jre8",
+                                "requestTracingEnabled": false,
+                                "remoteDebuggingEnabled": false,
+                                "httpLoggingEnabled": false,
+                                "logsDirectorySizeLimit": 35,
+                                "detailedErrorLoggingEnabled": false,
+                                "publishingUsername": "[variables('publishingUsername')]",
+                                "scmType": "None",
+                                "use32BitWorkerProcess": true,
+                                "webSocketsEnabled": false,
+                                "alwaysOn": true,
+                                "managedPipelineMode": "Integrated",
+                                "virtualApplications": [
+                                    {
+                                        "virtualPath": "/",
+                                        "physicalPath": "site\\wwwroot",
+                                        "preloadEnabled": true
+                                    }
+                                ],
+                                "loadBalancing": "LeastRequests",
+                                "experiments": {
+                                    "rampUpRules": []
+                                },
+                                "autoHealEnabled": false,
+                                "localMySqlEnabled": false,
+                                "ipSecurityRestrictions": [
+                                    {
+                                        "ipAddress": "Any",
+                                        "action": "Allow",
+                                        "priority": 1,
+                                        "name": "Allow all",
+                                        "description": "Allow all access"
+                                    }
+                                ],
+                                "scmIpSecurityRestrictions": [
+                                    {
+                                        "ipAddress": "Any",
+                                        "action": "Allow",
+                                        "priority": 1,
+                                        "name": "Allow all",
+                                        "description": "Allow all access"
+                                    }
+                                ],
+                                "scmIpSecurityRestrictionsUseMain": false,
+                                "http20Enabled": false,
+                                "minTlsVersion": "1.2",
+                                "ftpsState": "AllAllowed",
+                                "reservedInstanceCount": 0
                             }
                         },
                         {

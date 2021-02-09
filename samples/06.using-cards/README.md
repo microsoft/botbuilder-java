@@ -67,10 +67,10 @@ Record the `appid` from the returned JSON
 Replace the values for `<appid>`, `<appsecret>`, `<botname>`, and `<groupname>` in the following commands:
 
 #### To a new Resource Group
-`az deployment create --name "stateBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters groupName="<groupname>" botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
+`az deployment sub create --name "usingCardsBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" botSku=S1 newAppServicePlanName="usingCardsBotPlan" newWebAppName="usingCardsBot" groupLocation="westus" newAppServicePlanLocation="westus"`
 
 #### To an existing Resource Group
-`az group deployment create --name "stateBotDeploy" --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters botId="<botname>" appId="<appid>" appSecret="<appsecret>"`
+`az deployment group create --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" newWebAppName="usingCardsBot" newAppServicePlanName="usingCardsBotPlan" appServicePlanLocation="westus" --name "usingCardsBot"`
 
 ### 5. Update app id and password
 In src/main/resources/application.properties update 
