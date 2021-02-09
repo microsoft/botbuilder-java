@@ -118,9 +118,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -151,9 +149,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -186,9 +182,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -196,7 +190,8 @@ public class ChoicePromptTests {
             })
             .send("hello")
             .assertReply("favorite color?\n\n   1. red\n   2. green\n   3. blue")
-            .startTest();
+            .startTest()
+            .join();
     }
 
     @Test
@@ -220,9 +215,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -279,9 +272,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -347,9 +338,8 @@ public class ChoicePromptTests {
                 attachment.setContentType("text/plain");
 
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                activity.setAttachments(new ArrayList<Attachment>() { { add(attachment); } });
+                Activity activity = MessageFactory.text("favorite color?");
+                activity.setAttachments(Arrays.asList(attachment));
                 options.setPrompt(activity);
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
@@ -412,9 +402,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -447,8 +435,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
+                Activity activity = MessageFactory.text("favorite color?");
                 activity.setSpeak("spoken prompt");
                 options.setPrompt(activity);
                 options.setChoices(colorChoices);
@@ -483,9 +470,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
@@ -524,13 +509,9 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
+                options.setRetryPrompt(MessageFactory.text("your favorite color, please?"));
                 options.setChoices(colorChoices);
-                Activity retryActivity = new Activity(ActivityTypes.MESSAGE);
-                retryActivity.setText("your favorite color, please?");
-                options.setRetryPrompt(retryActivity);
                 dc.prompt("ChoicePrompt", options).join();
             }
             return CompletableFuture.completedFuture(null);
@@ -571,9 +552,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -608,9 +587,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 options.setStyle(ListStyle.SUGGESTED_ACTION);
                 dc.prompt("ChoicePrompt", options).join();
@@ -690,9 +667,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }
@@ -749,8 +724,7 @@ public class ChoicePromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
+                Activity activity = MessageFactory.text("favorite color?");
                 activity.setLocale(culture.getLocale());
                 options.setPrompt(activity);
                 options.setChoices(colorChoices);

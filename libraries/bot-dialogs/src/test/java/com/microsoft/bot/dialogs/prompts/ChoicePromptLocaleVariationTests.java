@@ -120,9 +120,7 @@ public class ChoicePromptLocaleVariationTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("favorite color?");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("favorite color?"));
                 options.setChoices(colorChoices);
                 dc.prompt("ChoicePrompt", options).join();
             }

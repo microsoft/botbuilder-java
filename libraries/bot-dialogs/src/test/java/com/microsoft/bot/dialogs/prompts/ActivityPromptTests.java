@@ -113,18 +113,14 @@ public class ActivityPromptTests {
             DialogTurnResult results =  dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("please send an event.");
-                Activity retryActivity = new Activity(ActivityTypes.MESSAGE);
-                retryActivity.setText("Retrying - please send an event.");
-                options.setPrompt(activity);
-                options.setRetryPrompt(retryActivity);
+                options.setPrompt(MessageFactory.text("please send an event."));
+                options.setRetryPrompt(MessageFactory.text("Retrying - please send an event."));
                 dc.prompt("EventActivityPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Activity content = (Activity) results.getResult();
                  turnContext.sendActivity(content).join();
             } else if (results.getStatus() == DialogTurnStatus.WAITING) {
-                 turnContext.sendActivity("Test complete.");
+                 turnContext.sendActivity("Test complete.").join();
             }
             return CompletableFuture.completedFuture(null);
         });
@@ -134,7 +130,8 @@ public class ActivityPromptTests {
         .assertReply("please send an event.")
         .send("test")
         .assertReply("Retrying - please send an event.")
-        .startTest();
+        .startTest()
+         .join();
     }
 
     @Test
@@ -156,12 +153,8 @@ public class ActivityPromptTests {
             switch (turnContext.getActivity().getText()) {
                 case "begin":
                     PromptOptions options = new PromptOptions();
-                    Activity activity = new Activity(ActivityTypes.MESSAGE);
-                    activity.setText("please send an event.");
-                    Activity retryActivity = new Activity(ActivityTypes.MESSAGE);
-                    retryActivity.setText("Retrying - please send an event.");
-                    options.setPrompt(activity);
-                    options.setRetryPrompt(retryActivity);
+                    options.setPrompt(MessageFactory.text("please send an event."));
+                    options.setRetryPrompt(MessageFactory.text("Retrying - please send an event."));
                     dc.prompt("EventActivityPrompt", options).join();
                     break;
                 case "continue":
@@ -183,7 +176,8 @@ public class ActivityPromptTests {
         .send("resume")
         // 'ResumeDialogAsync' of ActivityPrompt does NOT cause a Retry
         .assertReply("please send an event.")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     @Test
@@ -208,9 +202,7 @@ public class ActivityPromptTests {
             DialogTurnResult results = dc.continueDialog().join();
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("please send an event.");
-                options.setPrompt(activity);
+                options.setPrompt(MessageFactory.text("please send an event."));
                 dc.prompt("EventActivityWithoutRetryPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Activity content = (Activity) results.getResult();
@@ -223,7 +215,8 @@ public class ActivityPromptTests {
         .assertReply("please send an event.")
         .send(eventActivity)
         .assertReply("2")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     @Test
