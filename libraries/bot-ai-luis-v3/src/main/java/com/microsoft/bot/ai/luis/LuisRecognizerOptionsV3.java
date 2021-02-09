@@ -13,14 +13,23 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
-import okhttp3.*;
-
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.MediaType;
+import okhttp3.HttpUrl;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
-{
+public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private final HashSet<String> dateSubtypes = new HashSet<> (
         Arrays.asList(
             "date",
@@ -578,7 +587,6 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
                 while (nodes.hasNext()) {
                     Map.Entry<String, JsonNode> property = (Map.Entry<String, JsonNode>) nodes.next();
                     String name = normalizeEntity(property.getKey());
-                    boolean isObj = property.getValue().isObject();
                     boolean isArray = property.getValue().isArray();
                     boolean isString = property.getValue().isTextual();
                     boolean isInt = property.getValue().isInt();
@@ -603,8 +611,8 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
                             }
                             nobj.put("endIndex", value);
                         }
-                        else if (!((isInt && name.equals("modelTypeId")) ||
-                            (isString && name.equals("role")))) {
+                        else if (!((isInt && name.equals("modelTypeId")) ||        //NOPMD
+                            (isString && name.equals("role")))) {                  //NOPMD
                             nobj.set(name, val);
                         }
                     }
