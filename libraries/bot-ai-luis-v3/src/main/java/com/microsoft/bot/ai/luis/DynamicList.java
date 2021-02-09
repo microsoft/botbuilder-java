@@ -4,7 +4,6 @@
 package com.microsoft.bot.ai.luis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class DynamicList {

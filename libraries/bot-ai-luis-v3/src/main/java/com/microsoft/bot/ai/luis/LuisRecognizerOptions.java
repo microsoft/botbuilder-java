@@ -6,7 +6,6 @@ package com.microsoft.bot.ai.luis;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
-
 import java.util.concurrent.CompletableFuture;
 
 public abstract class LuisRecognizerOptions {

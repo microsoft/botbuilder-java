@@ -187,7 +187,11 @@ public class LuisApplication {
 
             setLuisApplication(applicationId, endpointKey, endpoint);
         } catch (URISyntaxException | MalformedURLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(
+                String.format(
+                "Unable to create the LUIS endpoint with the given %s.",
+                applicationEndpoint
+            ));
         }
 
     }

@@ -8,7 +8,6 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
-
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 

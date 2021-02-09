@@ -4,7 +4,6 @@
 package com.microsoft.bot.ai.luis;
 
 import com.microsoft.bot.builder.*;
-
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
