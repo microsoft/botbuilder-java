@@ -60,6 +60,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
      */
     private List<ExternalEntity> externalEntities = null;
 
+    //TODO: Change type once the class Dialog Recognizer is ported
     /**
      * External entity recognizer to recognize external entities to pass to LUIS.
      */
@@ -114,21 +115,22 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
      */
     public static final String LuisTraceLabel = "LuisV3 Trace";
 
-    /**
-     * Gets External entity recognizer to recognize external entities to pass to LUIS.
-     * @return externalEntityRecognizer
-     */
-    public Recognizer getExternalEntityRecognizer() {
-        return externalEntityRecognizer;
-    }
-
-    /**
-     * Sets External entity recognizer to recognize external entities to pass to LUIS.
-     * @param externalEntityRecognizer External Recognizer instance.
-     */
-    public void setExternalEntityRecognizer(Recognizer externalEntityRecognizer) {
-        this.externalEntityRecognizer = externalEntityRecognizer;
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Gets External entity recognizer to recognize external entities to pass to LUIS.
+//     * @return externalEntityRecognizer
+//     */
+//    public Recognizer getExternalEntityRecognizer() {
+//        return externalEntityRecognizer;
+//    }
+//
+//    /**
+//     * Sets External entity recognizer to recognize external entities to pass to LUIS.
+//     * @param externalEntityRecognizer External Recognizer instance.
+//     */
+//    public void setExternalEntityRecognizer(Recognizer externalEntityRecognizer) {
+//        this.externalEntityRecognizer = externalEntityRecognizer;
+//    }
 
     /**
      * Gets indicating whether all intents come back or only the top one. True for returning all intents.
@@ -292,89 +294,90 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions
         super(application);
     }
 
-    /**
-     * Internal implementation of the http request to the LUIS service and parsing of the response to a
-     * Recognizer Result instance.
-     * @param dialogContext Context Object.
-     * @param activity Activity object to extract the utterance.
-     */
-    @Override
-    CompletableFuture<RecognizerResult> recognizeInternal(
-        DialogContext dialogContext,
-        Activity activity) {
-        if (externalEntityRecognizer == null) {
-            return recognizeInternal(
-                dialogContext.getContext(),
-                activity.getText());
-        }
-        // call external entity recognizer
-        List<ExternalEntity> originalExternalEntities = externalEntities;
-        return externalEntityRecognizer.recognize(
-            dialogContext.getContext()).thenCompose(
-                matches -> {
-                    if (matches.getEntities() == null
-                        || matches.getEntities().toString().equals("{}")) {
-                        return recognizeInternal(
-                            dialogContext.getContext(),
-                            activity.getText());
-                    }
-
-                    List<ExternalEntity> recognizerExternalEntities = new ArrayList<>();
-                    JsonNode entities = matches.getEntities();
-                    JsonNode instance = entities.get("$instance");
-
-                    if (instance == null) {
-                        return recognizeInternal(
-                            dialogContext.getContext(),
-                            activity.getText());
-                    }
-
-                    Iterator<Map.Entry<String, JsonNode>> instanceEntitiesIterator = instance.fields();
-
-                    while (instanceEntitiesIterator.hasNext()) {
-                        Map.Entry<String, JsonNode> property = instanceEntitiesIterator.next();
-
-                        if (property.getKey().equals("text")
-                            || property.getKey().equals("$instance")) {
-                            continue;
-                        }
-
-                        ArrayNode instances = (ArrayNode) instance.get(property.getKey());
-                        ArrayNode values = (ArrayNode) property.getValue();
-
-                        if (instances == null
-                            || values == null
-                            || instances.size() != values.size()) {
-                            continue;
-                        }
-
-                        for (JsonNode childInstance : values) {
-                            if (childInstance != null
-                                && childInstance.has("startIndex")
-                                && childInstance.has("endIndex")) {
-                                int start = childInstance.get("startIndex").asInt();
-                                int end = childInstance.get("endIndex").asInt();
-                                recognizerExternalEntities.add(new ExternalEntity(
-                                    property.getKey(),
-                                    start,
-                                    end - start,
-                                    property.getValue()));
-                            }
-                        }
-                        recognizerExternalEntities.addAll(
-                            originalExternalEntities == null ?
-                                new ArrayList<ExternalEntity>() : originalExternalEntities);
-                        externalEntities = recognizerExternalEntities;
-                    }
-
-                    return recognizeInternal(
-                        dialogContext.getContext(),
-                        activity.getText()).thenApply(recognizerResult -> {
-                        externalEntities = originalExternalEntities;
-                        return recognizerResult;
-                    });
-        });
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Internal implementation of the http request to the LUIS service and parsing of the response to a
+//     * Recognizer Result instance.
+//     * @param dialogContext Context Object.
+//     * @param activity Activity object to extract the utterance.
+//     */
+//    @Override
+//    CompletableFuture<RecognizerResult> recognizeInternal(
+//        DialogContext dialogContext,
+//        Activity activity) {
+//        if (externalEntityRecognizer == null) {
+//            return recognizeInternal(
+//                dialogContext.getContext(),
+//                activity.getText());
+//        }
+//        // call external entity recognizer
+//        List<ExternalEntity> originalExternalEntities = externalEntities;
+//        return externalEntityRecognizer.recognize(
+//            dialogContext.getContext()).thenCompose(
+//                matches -> {
+//                    if (matches.getEntities() == null
+//                        || matches.getEntities().toString().equals("{}")) {
+//                        return recognizeInternal(
+//                            dialogContext.getContext(),
+//                            activity.getText());
+//                    }
+//
+//                    List<ExternalEntity> recognizerExternalEntities = new ArrayList<>();
+//                    JsonNode entities = matches.getEntities();
+//                    JsonNode instance = entities.get("$instance");
+//
+//                    if (instance == null) {
+//                        return recognizeInternal(
+//                            dialogContext.getContext(),
+//                            activity.getText());
+//                    }
+//
+//                    Iterator<Map.Entry<String, JsonNode>> instanceEntitiesIterator = instance.fields();
+//
+//                    while (instanceEntitiesIterator.hasNext()) {
+//                        Map.Entry<String, JsonNode> property = instanceEntitiesIterator.next();
+//
+//                        if (property.getKey().equals("text")
+//                            || property.getKey().equals("$instance")) {
+//                            continue;
+//                        }
+//
+//                        ArrayNode instances = (ArrayNode) instance.get(property.getKey());
+//                        ArrayNode values = (ArrayNode) property.getValue();
+//
+//                        if (instances == null
+//                            || values == null
+//                            || instances.size() != values.size()) {
+//                            continue;
+//                        }
+//
+//                        for (JsonNode childInstance : values) {
+//                            if (childInstance != null
+//                                && childInstance.has("startIndex")
+//                                && childInstance.has("endIndex")) {
+//                                int start = childInstance.get("startIndex").asInt();
+//                                int end = childInstance.get("endIndex").asInt();
+//                                recognizerExternalEntities.add(new ExternalEntity(
+//                                    property.getKey(),
+//                                    start,
+//                                    end - start,
+//                                    property.getValue()));
+//                            }
+//                        }
+//                        recognizerExternalEntities.addAll(
+//                            originalExternalEntities == null ?
+//                                new ArrayList<ExternalEntity>() : originalExternalEntities);
+//                        externalEntities = recognizerExternalEntities;
+//                    }
+//
+//                    return recognizeInternal(
+//                        dialogContext.getContext(),
+//                        activity.getText()).thenApply(recognizerResult -> {
+//                        externalEntities = originalExternalEntities;
+//                        return recognizerResult;
+//                    });
+//        });
+//    }
 
 
     /**

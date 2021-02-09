@@ -2484,7 +2484,7 @@
       "entities": []
     }
   ],
-  "versionId": "0.1",
+  "versionId": "0.2",
   "name": "Contoso App V3",
   "desc": "Default Intents for Azure Bot Service V2",
   "culture": "en-us",

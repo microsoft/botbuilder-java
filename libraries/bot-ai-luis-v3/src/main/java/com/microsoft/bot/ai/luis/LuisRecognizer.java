@@ -8,8 +8,7 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.schema.Activity;
+
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -108,23 +107,23 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null,
             null);
     }
-
-    /**
-     * Return results of the analysis (Suggested actions and intents).
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public CompletableFuture<RecognizerResult> recognize(
-        DialogContext dialogContext,
-        Activity activity) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            null,
-            null,
-            null);
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Return results of the analysis (Suggested actions and intents).
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public CompletableFuture<RecognizerResult> recognize(
+//        DialogContext dialogContext,
+//        Activity activity) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            null,
+//            null,
+//            null);
+//    }
 
     /**
      * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
@@ -143,25 +142,26 @@ public class LuisRecognizer extends TelemetryRecognizer {
             .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        Class<T> c) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            null,
-            null,
-            null)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        Class<T> c) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            null,
+//            null,
+//            null)
+//            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+//    }
 
 
     /**
@@ -183,27 +183,27 @@ public class LuisRecognizer extends TelemetryRecognizer {
             telemetryMetrics);
     }
 
-
-    /**
-     * Return results of the analysis (Suggested actions and intents).
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
-     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public CompletableFuture<RecognizerResult> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        Map<String, String> telemetryProperties,
-        Map<String, Double> telemetryMetrics) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            null,
-            telemetryProperties,
-            telemetryMetrics);
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Return results of the analysis (Suggested actions and intents).
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
+//     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public CompletableFuture<RecognizerResult> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        Map<String, String> telemetryProperties,
+//        Map<String, Double> telemetryMetrics) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            null,
+//            telemetryProperties,
+//            telemetryMetrics);
+//    }
 
 
 
@@ -228,29 +228,30 @@ public class LuisRecognizer extends TelemetryRecognizer {
             .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
-     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
-     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        Map<String, String> telemetryProperties,
-        Map<String, Double> telemetryMetrics,
-        Class<T> c) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            null,
-            telemetryProperties,
-            telemetryMetrics)
-            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
+//     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+//     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        Map<String, String> telemetryProperties,
+//        Map<String, Double> telemetryMetrics,
+//        Class<T> c) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            null,
+//            telemetryProperties,
+//            telemetryMetrics)
+//            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
+//    }
 
     /**
      * Return results of the analysis (Suggested actions and intents).
@@ -269,25 +270,26 @@ public class LuisRecognizer extends TelemetryRecognizer {
             null);
     }
 
-    /**
-     * Return results of the analysis (Suggested actions and intents).
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
-     *                          default LuisRecognizerOptions passed in the constructor.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public CompletableFuture<RecognizerResult> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        LuisRecognizerOptions recognizerOptions) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            recognizerOptions,
-            null,
-            null);
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Return results of the analysis (Suggested actions and intents).
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
+//     *                          default LuisRecognizerOptions passed in the constructor.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public CompletableFuture<RecognizerResult> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        LuisRecognizerOptions recognizerOptions) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            recognizerOptions,
+//            null,
+//            null);
+//    }
 
     /**
      * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
@@ -309,28 +311,29 @@ public class LuisRecognizer extends TelemetryRecognizer {
             .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
-     *                          default LuisRecognizerOptions passed in the constructor.
-     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        LuisRecognizerOptions recognizerOptions,
-        Class<T> c) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            recognizerOptions,
-            null,
-            null)
-            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
+//     *                          default LuisRecognizerOptions passed in the constructor.
+//     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        LuisRecognizerOptions recognizerOptions,
+//        Class<T> c) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            recognizerOptions,
+//            null,
+//            null)
+//            .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
+//    }
 
     /**
      * Return results of the analysis (Suggested actions and intents).
@@ -353,29 +356,30 @@ public class LuisRecognizer extends TelemetryRecognizer {
             telemetryMetrics);
     }
 
-    /**
-     * Return results of the analysis (Suggested actions and intents).
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
-     *                          default LuisRecognizerOptions passed in the constructor.
-     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
-     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public CompletableFuture<RecognizerResult> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        LuisRecognizerOptions recognizerOptions,
-        Map<String, String> telemetryProperties,
-        Map<String, Double> telemetryMetrics) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            recognizerOptions,
-            telemetryProperties,
-            telemetryMetrics);
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Return results of the analysis (Suggested actions and intents).
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
+//     *                          default LuisRecognizerOptions passed in the constructor.
+//     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
+//     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public CompletableFuture<RecognizerResult> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        LuisRecognizerOptions recognizerOptions,
+//        Map<String, String> telemetryProperties,
+//        Map<String, Double> telemetryMetrics) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            recognizerOptions,
+//            telemetryProperties,
+//            telemetryMetrics);
+//    }
 
     /**
      * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
@@ -401,32 +405,33 @@ public class LuisRecognizer extends TelemetryRecognizer {
             .thenApply( recognizerResult -> convertRecognizerResult(recognizerResult, c));
     }
 
-    /**
-     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
-     * @param dialogContext Context object containing information for a single turn of conversation with a user.
-     * @param activity Activity to recognize.
-     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
-     *                          default LuisRecognizerOptions passed in the constructor.
-     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
-     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
-     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
-     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
-     */
-    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
-        DialogContext dialogContext,
-        Activity activity,
-        LuisRecognizerOptions recognizerOptions,
-        Map<String, String> telemetryProperties,
-        Map<String, Double> telemetryMetrics,
-        Class<T> c) {
-        return recognizeInternal(
-            dialogContext,
-            activity,
-            recognizerOptions,
-            telemetryProperties,
-            telemetryMetrics)
-            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Runs an utterance through a recognizer and returns a strongly-typed recognizer result
+//     * @param dialogContext Context object containing information for a single turn of conversation with a user.
+//     * @param activity Activity to recognize.
+//     * @param recognizerOptions A LuisRecognizerOptions instance to be used by the call. This parameter overrides the
+//     *                          default LuisRecognizerOptions passed in the constructor.
+//     * @param telemetryProperties Additional properties to be logged to telemetry with the LuisResult event.
+//     * @param telemetryMetrics Additional metrics to be logged to telemetry with the LuisResult event.
+//     * @param c RecognizerConvert implemented class to convert the Recognizer Result into.
+//     * @return The LUIS results of the analysis of the current message text in the current turn's context activity.
+//     */
+//    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        LuisRecognizerOptions recognizerOptions,
+//        Map<String, String> telemetryProperties,
+//        Map<String, Double> telemetryMetrics,
+//        Class<T> c) {
+//        return recognizeInternal(
+//            dialogContext,
+//            activity,
+//            recognizerOptions,
+//            telemetryProperties,
+//            telemetryMetrics)
+//            .thenApply(recognizerResult -> convertRecognizerResult(recognizerResult, c));
+//    }
 
     /**
      * Invoked prior to a LuisResult being logged.
@@ -557,29 +562,30 @@ public class LuisRecognizer extends TelemetryRecognizer {
             });
     }
 
-    /**
-     * Returns a RecognizerResult object. This method will call the internal recognize implementation of the
-     * Luis Recognizer Options.
-     */
-    private CompletableFuture<RecognizerResult> recognizeInternal(
-        DialogContext dialogContext,
-        Activity activity,
-        LuisRecognizerOptions options,
-        Map<String, String> telemetryProperties,
-        Map<String, Double> telemetryMetrics) {
-        LuisRecognizerOptions predictionOptionsToRun = options == null ? luisRecognizerOptions : options;
-        return predictionOptionsToRun.recognizeInternal(
-            dialogContext,
-            activity)
-            .thenApply(recognizerResult -> {
-                onRecognizerResult(
-                    recognizerResult,
-                    dialogContext.getContext(),
-                    telemetryProperties,
-                    telemetryMetrics);
-                return recognizerResult;
-            });
-    }
+    //TODO: Enable once the class Dialog Recognizer is ported
+//    /**
+//     * Returns a RecognizerResult object. This method will call the internal recognize implementation of the
+//     * Luis Recognizer Options.
+//     */
+//    private CompletableFuture<RecognizerResult> recognizeInternal(
+//        DialogContext dialogContext,
+//        Activity activity,
+//        LuisRecognizerOptions options,
+//        Map<String, String> telemetryProperties,
+//        Map<String, Double> telemetryMetrics) {
+//        LuisRecognizerOptions predictionOptionsToRun = options == null ? luisRecognizerOptions : options;
+//        return predictionOptionsToRun.recognizeInternal(
+//            dialogContext,
+//            activity)
+//            .thenApply(recognizerResult -> {
+//                onRecognizerResult(
+//                    recognizerResult,
+//                    dialogContext.getContext(),
+//                    telemetryProperties,
+//                    telemetryMetrics);
+//                return recognizerResult;
+//            });
+//    }
 
     private Map<String, IntentScore> sortIntents(RecognizerResult recognizerResult){
         Map<String, IntentScore> sortedIntents = new LinkedHashMap<>();

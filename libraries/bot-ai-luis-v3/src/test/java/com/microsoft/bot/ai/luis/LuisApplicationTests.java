@@ -77,7 +77,7 @@ public class LuisApplicationTests {
 
     @Test
     public void CreatesNewLuisApplicationFromURL() {
-        String url = "https://westus.api.cognitive.microsoft.com/luis/prediction/v3.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b/slots/production/predict?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291&q=";
+        String url = "https://westus.api.cognitive.microsoft.com/luis/prediction/v3.0/apps/b31aeaf3-3511-495b-a07f-571fc873214b/slots/production/predict?verbose=true&timezoneOffset=-360&subscription-key=048ec46dc58e495482b0c447cfdbd291";
         LuisApplication lA = new LuisApplication(url);
 
         assertTrue(lA.getApplicationId().equals("b31aeaf3-3511-495b-a07f-571fc873214b"));
