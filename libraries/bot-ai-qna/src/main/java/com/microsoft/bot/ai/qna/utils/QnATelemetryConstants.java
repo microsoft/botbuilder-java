@@ -6,7 +6,10 @@ package com.microsoft.bot.ai.qna.utils;
 /**
  * Default QnA event and property names logged using IBotTelemetryClient.
  */
-public class QnATelemetryConstants {
+public final class QnATelemetryConstants {
+
+    private QnATelemetryConstants() { }
+
     /**
      * The Key used for the custom event type within telemetry.
      */

@@ -5,7 +5,7 @@ package com.microsoft.bot.ai.qna.utils;
 
 import com.microsoft.bot.ai.qna.QnAMakerEndpoint;
 import com.microsoft.bot.ai.qna.models.FeedbackRecords;
-import com.microsoft.bot.rest.serializer.JacksonAdapter;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +30,7 @@ public class TrainUtils {
      *
      * @param feedbackRecords Feedback record list.
      * @return A Task representing the asynchronous operation.
+     * @throws IOException IOException
      */
     public CompletableFuture<Void> callTrain(FeedbackRecords feedbackRecords) throws IOException {
         if (feedbackRecords == null) {

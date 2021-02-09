@@ -6,7 +6,7 @@ package com.microsoft.bot.ai.qna.models;
 /**
  * Enumeration of types of ranking.
  */
-public class RankerTypes {
+public final class RankerTypes {
     /**
      * Default Ranker Behaviour. i.e. Ranking based on Questions and Answer.
      */
@@ -21,4 +21,6 @@ public class RankerTypes {
      * Ranker based on Autosuggest for question field Only.
      */
     public static final String AUTO_SUGGEST_QUESTION = "AutoSuggestQuestion";
+
+    private RankerTypes() { }
 }

@@ -14,7 +14,7 @@ import com.microsoft.bot.ai.qna.utils.TrainUtils;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.rest.serializer.JacksonAdapter;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.Pair;
@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
-import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * Provides access to a QnA Maker knowledge base.
  */
 public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
-    private OkHttpClient httpClient;
 
     private QnAMakerEndpoint endpoint;
 
@@ -61,10 +59,6 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      * The label used when logging QnA Maker trace.
      */
     public static final String QNA_MAKER_TRACE_LABEL = "QnAMaker Trace";
-    /**
-     * HttpClient to be used when calling the QnA Maker API.
-     */
-    public static OkHttpClient DEFAULT_HTTP_CLIENT = new OkHttpClient();
 
     /**
      * Initializes a new instance of the QnAMaker class.
@@ -73,16 +67,13 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      *                                   query.
      * @param options                    The options for the QnA Maker knowledge
      *                                   base.
-     * @param withHttpClient             An alternate client with which to talk to
-     *                                   QnAMaker. If null, a default client is used
-     *                                   for this instance.
      * @param withTelemetryClient        The IBotTelemetryClient used for logging
      *                                   telemetry events.
      * @param withLogPersonalInformation Set to true to include personally
      *                                   identifiable information in telemetry
      *                                   events.
      */
-    public QnAMaker(QnAMakerEndpoint withEndpoint, QnAMakerOptions options, OkHttpClient withHttpClient,
+    public QnAMaker(QnAMakerEndpoint withEndpoint, QnAMakerOptions options,
             BotTelemetryClient withTelemetryClient, Boolean withLogPersonalInformation) {
         if (withLogPersonalInformation == null) {
             withLogPersonalInformation = false;
@@ -110,12 +101,10 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
                     "v2.0 and v3.0 of QnA Maker service" + " is no longer supported in the QnA Maker.");
         }
 
-        this.httpClient = withHttpClient != null ? withHttpClient : QnAMaker.DEFAULT_HTTP_CLIENT;
-
         this.telemetryClient = withTelemetryClient != null ? withTelemetryClient : new NullBotTelemetryClient();
         this.logPersonalInformation = withLogPersonalInformation;
 
-        this.generateAnswerHelper = new GenerateAnswerUtils(this.telemetryClient, this.endpoint, options);
+        this.generateAnswerHelper = new GenerateAnswerUtils(this.endpoint, options);
         this.activeLearningTrainHelper = new TrainUtils(this.endpoint);
     }
 
@@ -124,12 +113,9 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      *
      * @param withEndpoint   The endpoint of the knowledge base to query.
      * @param options        The options for the QnA Maker knowledge base.
-     * @param withHttpClient An alternate client with which to talk to QnAMaker. If
-     *                       null, a default client is used for this instance.
      */
-    public QnAMaker(QnAMakerEndpoint withEndpoint, @Nullable QnAMakerOptions options,
-            @Nullable OkHttpClient withHttpClient) {
-        this(withEndpoint, options, withHttpClient, null, null);
+    public QnAMaker(QnAMakerEndpoint withEndpoint, @Nullable QnAMakerOptions options) {
+        this(withEndpoint, options, null, null);
     }
 
     /**
@@ -246,6 +232,7 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      *
      * @param feedbackRecords Feedback records.
      * @return Representing the asynchronous operation.
+     * @throws IOException Throws an IOException if there is any.
      */
     public CompletableFuture<Void> callTrain(FeedbackRecords feedbackRecords) throws IOException {
         return this.activeLearningTrainHelper.callTrain(feedbackRecords);
@@ -261,6 +248,7 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      * @param telemetryMetrics    Additional metrics to be logged to telemetry with
      *                            the LuisResult event.
      * @return A Task representing the work to be executed.
+     * @throws IOException Throws an IOException if there is any.
      */
     protected CompletableFuture<Void> onQnaResults(QueryResult[] queryResults, TurnContext turnContext,
             @Nullable Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics)
@@ -286,6 +274,7 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      *         IBotTelemetryClient. TrackEvent method for the QnAMessage event. The
      *         properties and metrics returned the standard properties logged with
      *         any properties passed from the GetAnswersAsync method.
+     * @throws IOException Throws an IOException if there is any.
      */
     protected CompletableFuture<Pair<Map<String, String>, Map<String, Double>>> fillQnAEvent(QueryResult[] queryResults,
             TurnContext turnContext, @Nullable Map<String, String> telemetryProperties,

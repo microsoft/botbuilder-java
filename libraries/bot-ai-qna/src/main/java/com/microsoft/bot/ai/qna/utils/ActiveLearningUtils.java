@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * Active learning helper class.
  */
-public class ActiveLearningUtils {
+public final class ActiveLearningUtils {
     /**
-     * Previous Low Score Variation Multiplier.ActiveLearningUtils
+     * Previous Low Score Variation Multiplier.ActiveLearningUtils.
      */
     private static final Float PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER = 0.7f;
 
@@ -22,9 +22,17 @@ public class ActiveLearningUtils {
      */
     private static final Float MAX_LOW_SCORE_VARIATION_MULTIPLIER = 1.0f;
 
-    private static Float MAXIMUM_SCORE_FOR_LOW_SCORE_VARIATION = 95.0f;
+    private static final Integer PERCENTAGE_DIVISOR = 100;
 
-    private static Float MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION = 20.0f;
+    private static final Float MAXIMUM_SCORE_VARIATION = 95.0F;
+
+    private static final Float MINIMUM_SCORE_VARIATION = 20.0F;
+
+    private static Float maximumScoreForLowScoreVariation = MAXIMUM_SCORE_VARIATION;
+
+    private static Float minimumScoreForLowScoreVariation = MINIMUM_SCORE_VARIATION;
+
+    private ActiveLearningUtils() { }
 
     /**
      * Gets maximum Score For Low Score Variation.
@@ -32,17 +40,17 @@ public class ActiveLearningUtils {
      * @return Maximum Score For Low Score Variation.
      */
     public static Float getMaximumScoreForLowScoreVariation() {
-        return ActiveLearningUtils.MAXIMUM_SCORE_FOR_LOW_SCORE_VARIATION;
+        return ActiveLearningUtils.maximumScoreForLowScoreVariation;
     }
 
     /**
      * Sets maximum Score For Low Score Variation.
      *
-     * @param maximumScoreForLowScoreVariation Maximum Score For Low Score
+     * @param withMaximumScoreForLowScoreVariation Maximum Score For Low Score
      *                                         Variation.
      */
-    public static void setMaximumScoreForLowScoreVariation(Float maximumScoreForLowScoreVariation) {
-        ActiveLearningUtils.MAXIMUM_SCORE_FOR_LOW_SCORE_VARIATION = maximumScoreForLowScoreVariation;
+    public static void setMaximumScoreForLowScoreVariation(Float withMaximumScoreForLowScoreVariation) {
+        ActiveLearningUtils.maximumScoreForLowScoreVariation = withMaximumScoreForLowScoreVariation;
     }
 
     /**
@@ -51,17 +59,17 @@ public class ActiveLearningUtils {
      * @return Minimum Score For Low Score Variation.
      */
     public static Float getMinimumScoreForLowScoreVariation() {
-        return ActiveLearningUtils.MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION;
+        return ActiveLearningUtils.minimumScoreForLowScoreVariation;
     }
 
     /**
      * Sets minimum Score For Low Score Variation.
      *
-     * @param minimumScoreForLowScoreVariation Minimum Score For Low Score
+     * @param withMinimumScoreForLowScoreVariation Minimum Score For Low Score
      *                                         Variation.
      */
-    public static void setMinimumScoreForLowScoreVariation(Float minimumScoreForLowScoreVariation) {
-        ActiveLearningUtils.MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION = minimumScoreForLowScoreVariation;
+    public static void setMinimumScoreForLowScoreVariation(Float withMinimumScoreForLowScoreVariation) {
+        ActiveLearningUtils.minimumScoreForLowScoreVariation = withMinimumScoreForLowScoreVariation;
     }
 
     /**
@@ -81,24 +89,25 @@ public class ActiveLearningUtils {
             return qnaSearchResults;
         }
 
-        Float topAnswerScore = qnaSearchResults.get(0).getScore() * 100;
-        if (topAnswerScore > ActiveLearningUtils.MAXIMUM_SCORE_FOR_LOW_SCORE_VARIATION) {
+        Float topAnswerScore = qnaSearchResults.get(0).getScore() * PERCENTAGE_DIVISOR;
+        if (topAnswerScore > ActiveLearningUtils.maximumScoreForLowScoreVariation) {
             filteredQnaSearchResult.add(qnaSearchResults.get(0));
             return filteredQnaSearchResult;
         }
 
         Float prevScore = topAnswerScore;
 
-        if (topAnswerScore > ActiveLearningUtils.MINIMUM_SCORE_FOR_LOW_SCORE_VARIATION) {
+        if (topAnswerScore > ActiveLearningUtils.minimumScoreForLowScoreVariation) {
             filteredQnaSearchResult.add(qnaSearchResults.get(0));
 
             for (int i = 1; i < qnaSearchResults.size(); i++) {
-                if (ActiveLearningUtils.includeForClustering(prevScore, qnaSearchResults.get(i).getScore() * 100,
+                if (ActiveLearningUtils
+                    .includeForClustering(prevScore, qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
                         ActiveLearningUtils.PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER)
                         && ActiveLearningUtils.includeForClustering(topAnswerScore,
-                                qnaSearchResults.get(i).getScore() * 100,
+                                qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
                                 ActiveLearningUtils.MAX_LOW_SCORE_VARIATION_MULTIPLIER)) {
-                    prevScore = qnaSearchResults.get(i).getScore() * 100;
+                    prevScore = qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR;
                     filteredQnaSearchResult.add(qnaSearchResults.get(i));
                 }
             }

@@ -6,7 +6,6 @@ package com.microsoft.bot.ai.qna.dialogs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -32,6 +31,15 @@ import com.microsoft.bot.ai.qna.utils.ActiveLearningUtils;
 import com.microsoft.bot.ai.qna.utils.BindToActivity;
 import com.microsoft.bot.ai.qna.utils.QnACardBuilder;
 import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.dialogs.DialogContext;
+import com.microsoft.bot.dialogs.DialogEvent;
+import com.microsoft.bot.dialogs.DialogReason;
+import com.microsoft.bot.dialogs.DialogTurnResult;
+import com.microsoft.bot.dialogs.DialogTurnStatus;
+import com.microsoft.bot.dialogs.ObjectPath;
+import com.microsoft.bot.dialogs.TurnPath;
+import com.microsoft.bot.dialogs.WaterfallDialog;
+import com.microsoft.bot.dialogs.WaterfallStepContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 
@@ -44,9 +52,6 @@ import org.slf4j.LoggerFactory;
  * supports knowledge bases that include follow-up prompt and active learning
  * features.
  */
-// TODO: missing WaterfallDialog, StringExpression, NumberExpression,
-// IntExpression, ITemplate,
-// ArrayExpression, BoolExpression, WaterfallStepContext
 public class QnAMakerDialog extends WaterfallDialog {
     @JsonProperty("$kind")
     private final String kind = "Microsoft.QnAMakerDialog";
@@ -55,44 +60,44 @@ public class QnAMakerDialog extends WaterfallDialog {
     private OkHttpClient httpClient;
 
     @JsonProperty("knowledgeBaseId")
-    private StringExpression knowledgeBaseId;
+    private String knowledgeBaseId;
 
     @JsonProperty("hostName")
-    private StringExpression hostName;
+    private String hostName;
 
     @JsonProperty("endpointKey")
-    private StringExpression endpointKey;
+    private String endpointKey;
 
     @JsonProperty("threshold")
-    private NumberExpression threshold = DEFAULT_THRESHOLD;
+    private Float threshold = DEFAULT_THRESHOLD;
 
     @JsonProperty("top")
-    private IntExpression top = DEFAULT_TOP_N;
+    private Integer top = DEFAULT_TOP_N;
 
     @JsonProperty("noAnswer")
-    private ITemplate<Activity> noAnswer = new BindToActivity(MessageFactory.text(DEFAULT_NO_ANSWER));
+    private BindToActivity noAnswer = new BindToActivity(MessageFactory.text(DEFAULT_NO_ANSWER));
 
     @JsonProperty("activeLearningCardTitle")
-    private StringExpression activeLearningCardTitle;
+    private String activeLearningCardTitle;
 
     @JsonProperty("cardNoMatchText")
-    private StringExpression cardNoMatchText;
+    private String cardNoMatchText;
 
     @JsonProperty("cardNoMatchResponse")
-    private ITemplate<Activity> cardNoMatchResponse = new BindToActivity(
+    private BindToActivity cardNoMatchResponse = new BindToActivity(
             MessageFactory.text(DEFAULT_CARD_NO_MATCH_RESPONSE));
 
     @JsonProperty("strictFilters")
-    private ArrayExpression<Metadata> strictFilters;
+    private Metadata[] strictFilters;
 
     @JsonProperty("logPersonalInformation")
-    private BoolExpression logPersonalInformation = "=settings.telemetry.logPersonalInformation";
+    private Boolean logPersonalInformation = false;
 
     @JsonProperty("isTest")
     private Boolean isTest;
 
     @JsonProperty("rankerType")
-    private StringExpression rankerType = new StringExpression(RankerTypes.DEFAULT_RANKER_TYPE);
+    private String rankerType = RankerTypes.DEFAULT_RANKER_TYPE;
 
     /**
      * The path for storing and retrieving QnA Maker context data. This represents
@@ -137,6 +142,7 @@ public class QnAMakerDialog extends WaterfallDialog {
     private static final String DEFAULT_CARD_TITLE = "Did you mean:";
     private static final String DEFAULT_CARD_NO_MATCH_TEXT = "None of the above.";
     private static final String DEFAULT_CARD_NO_MATCH_RESPONSE = "Thanks for the feedback.";
+    private static final Integer PERCENTAGE_DIVISOR = 100;
 
     /**
      * The declarative name for this type. Used by the framework to serialize and
@@ -172,7 +178,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The knowledge base ID or an expression which evaluates to the
      *         knowledge base ID.
      */
-    public StringExpression getKnowledgeBaseId() {
+    public String getKnowledgeBaseId() {
         return this.knowledgeBaseId;
     }
 
@@ -182,7 +188,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withKnowledgeBaseId The knowledge base ID or an expression which
      *                            evaluates to the knowledge base ID.
      */
-    public void setKnowledgeBaseId(StringExpression withKnowledgeBaseId) {
+    public void setKnowledgeBaseId(String withKnowledgeBaseId) {
         this.knowledgeBaseId = withKnowledgeBaseId;
     }
 
@@ -192,7 +198,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The QnA Maker host URL or an expression which evaluates to the host
      *         URL.
      */
-    public StringExpression getHostName() {
+    public String getHostName() {
         return this.hostName;
     }
 
@@ -202,8 +208,8 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withHostName The QnA Maker host URL or an expression which evaluates
      *                     to the host URL.
      */
-    public void setHostName(StringExpression withHostName) {
-        this.hostname = withHostName;
+    public void setHostName(String withHostName) {
+        this.hostName = withHostName;
     }
 
     /**
@@ -212,7 +218,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The QnA Maker endpoint key to use or an expression which evaluates to
      *         the endpoint key.
      */
-    public StringExpression getEndpointKey() {
+    public String getEndpointKey() {
         return this.endpointKey;
     }
 
@@ -222,7 +228,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withEndpointKey The QnA Maker endpoint key to use or an expression
      *                        which evaluates to the endpoint key.
      */
-    public void setEndpointKey(StringExpression withEndpointKey) {
+    public void setEndpointKey(String withEndpointKey) {
         this.endpointKey = withEndpointKey;
     }
 
@@ -232,7 +238,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The threshold for answers returned or an expression which evaluates
      *         to the threshold.
      */
-    public NumberExpression getThreshold() {
+    public Float getThreshold() {
         return this.threshold;
     }
 
@@ -242,7 +248,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withThreshold The threshold for answers returned or an expression
      *                      which evaluates to the threshold.
      */
-    public void setThreshold(NumberExpression withThreshold) {
+    public void setThreshold(Float withThreshold) {
         this.threshold = withThreshold;
     }
 
@@ -252,7 +258,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The maximum number of answers to return from the knowledge base or an
      *         expression which evaluates to the maximum number to return.
      */
-    public IntExpression getTop() {
+    public Integer getTop() {
         return this.top;
     }
 
@@ -263,7 +269,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                base or an expression which evaluates to the maximum number to
      *                return.
      */
-    public void setTop(IntExpression withTop) {
+    public void setTop(Integer withTop) {
         this.top = withTop;
     }
 
@@ -272,7 +278,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *
      * @return The template to send the user when QnA Maker does not find an answer.
      */
-    public ITemplate<Activity> getNoAnswer() {
+    public BindToActivity getNoAnswer() {
         return this.noAnswer;
     }
 
@@ -282,7 +288,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withNoAnswer The template to send the user when QnA Maker does not
      *                     find an answer.
      */
-    public void setNoAnswer(ITemplate<Activity> withNoAnswer) {
+    public void setNoAnswer(BindToActivity withNoAnswer) {
         this.noAnswer = withNoAnswer;
     }
 
@@ -293,7 +299,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The path card title to use when showing active learning options to
      *         the user or an expression which evaluates to the card title.
      */
-    public StringExpression getActiveLearningCardTitle() {
+    public String getActiveLearningCardTitle() {
         return this.activeLearningCardTitle;
     }
 
@@ -306,7 +312,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                                    expression which evaluates to the card
      *                                    title.
      */
-    public void setActiveLearningCardTitle(StringExpression withActiveLearningCardTitle) {
+    public void setActiveLearningCardTitle(String withActiveLearningCardTitle) {
         this.activeLearningCardTitle = withActiveLearningCardTitle;
     }
 
@@ -317,7 +323,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The button text to use with active learning options or an expression
      *         which evaluates to the button text.
      */
-    public StringExpression getCardNoMatchText() {
+    public String getCardNoMatchText() {
         return this.cardNoMatchText;
     }
 
@@ -329,7 +335,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                            options or an expression which evaluates to the
      *                            button text.
      */
-    public void setCardNoMatchText(StringExpression withCardNoMatchText) {
+    public void setCardNoMatchText(String withCardNoMatchText) {
         this.cardNoMatchText = withCardNoMatchText;
     }
 
@@ -340,7 +346,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The template to send the user if they select the no match option on
      *         an active learning card.
      */
-    public ITemplate<Activity> getCardNoMatchResponse() {
+    public BindToActivity getCardNoMatchResponse() {
         return this.cardNoMatchResponse;
     }
 
@@ -352,7 +358,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                                the no match option on an active learning
      *                                card.
      */
-    public void setCardNoMatchResponse(ITemplate<Activity> withCardNoMatchResponse) {
+    public void setCardNoMatchResponse(BindToActivity withCardNoMatchResponse) {
         this.cardNoMatchResponse = withCardNoMatchResponse;
     }
 
@@ -364,7 +370,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *         knowledge base or an expression which evaluates to the QnA Maker
      *         metadata.
      */
-    public ArrayExpression<Metadata> getStrictFilters() {
+    public Metadata[] getStrictFilters() {
         return this.strictFilters;
     }
 
@@ -376,7 +382,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                          queries to the knowledge base or an expression which
      *                          evaluates to the QnA Maker metadata.
      */
-    public void setStrictFilters(ArrayExpression<Metadata> withStrictFilters) {
+    public void setStrictFilters(Metadata[] withStrictFilters) {
         this.strictFilters = withStrictFilters;
     }
 
@@ -387,7 +393,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The flag to indicate in personal information should be logged in
      *         telemetry.
      */
-    public BoolExpression getLogPersonalInformation() {
+    public Boolean getLogPersonalInformation() {
         return this.logPersonalInformation;
     }
 
@@ -398,7 +404,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withLogPersonalInformation The flag to indicate in personal
      *                                   information should be logged in telemetry.
      */
-    public void setLogPersonalInformation(BoolExpression withLogPersonalInformation) {
+    public void setLogPersonalInformation(Boolean withLogPersonalInformation) {
         this.logPersonalInformation = withLogPersonalInformation;
     }
 
@@ -430,7 +436,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @return The QnA Maker ranker type to use or an expression which evaluates to
      *         the ranker type.
      */
-    public StringExpression getRankerType() {
+    public String getRankerType() {
         return this.rankerType;
     }
 
@@ -440,7 +446,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withRankerType The QnA Maker ranker type to use or an expression which
      *                       evaluates to the ranker type.
      */
-    public void setRankerType(StringExpression withRankerType) {
+    public void setRankerType(String withRankerType) {
         this.rankerType = withRankerType;
     }
 
@@ -484,15 +490,15 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                                    to the line number in the source file at
      *                                    which the method is called.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public QnAMakerDialog(String dialogId, String withKnowledgeBaseId, String withEndpointKey, String withHostName,
-            @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
-            String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
-            @Nullable Metadata[] withStrictFilters, @Nullable OkHttpClient withHttpClient, String sourceFilePath,
-            Integer sourceLineNumber) {
-        super(dialogId);
+                          @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
+                          String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
+                          @Nullable Metadata[] withStrictFilters, @Nullable OkHttpClient withHttpClient,
+                          String sourceFilePath, Integer sourceLineNumber) {
+        super(dialogId, null);
         sourceFilePath = sourceFilePath != null ? sourceFilePath : "";
         sourceLineNumber = sourceLineNumber != null ? sourceLineNumber : 0;
-        this.registerSourceLocation(sourceFilePath, sourceLineNumber);
         if (knowledgeBaseId == null) {
             throw new IllegalArgumentException("knowledgeBaseId");
         }
@@ -518,10 +524,10 @@ public class QnAMakerDialog extends WaterfallDialog {
         this.httpClient = withHttpClient;
 
         // add waterfall steps
-        this.addStep(QnAMakerDialog::callGenerateAnswer);
-        this.addStep(QnAMakerDialog::callTrain);
-        this.addStep(QnAMakerDialog::checkForMultiTurnPrompt);
-        this.addStep(QnAMakerDialog::displayQnAResult);
+        this.addStep(this::callGenerateAnswer);
+        this.addStep(this::callTrain);
+        this.addStep(this::checkForMultiTurnPrompt);
+        this.addStep(this::displayQnAResult);
     }
 
     /**
@@ -563,11 +569,13 @@ public class QnAMakerDialog extends WaterfallDialog {
      *                                    to the line number in the source file at
      *                                    which the method is called.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public QnAMakerDialog(String withKnowledgeBaseId, String withEndpointKey, String withHostName,
-            @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
-            String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
-            @Nullable Metadata[] withStrictFilters, @Nullable OkHttpClient withHttpClient, String sourceFilePath,
-            Integer sourceLineNumber) {
+                          @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
+                          String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
+                          @Nullable Metadata[] withStrictFilters,
+                          @Nullable OkHttpClient withHttpClient, String sourceFilePath,
+                          Integer sourceLineNumber) {
         this(QnAMakerDialog.class.getName(), withKnowledgeBaseId, withEndpointKey, withHostName, withNoAnswer,
                 withThreshold, withActiveLearningCardTitle, withCardNoMatchText, withTop, withCardNoMatchResponse,
                 withStrictFilters, withHttpClient, sourceFilePath, sourceLineNumber);
@@ -586,16 +594,15 @@ public class QnAMakerDialog extends WaterfallDialog {
      */
     @JsonCreator
     public QnAMakerDialog(String sourceFilePath, Integer sourceLineNumber) {
-        super(QnAMakerDialog.class.getName());
+        super(QnAMakerDialog.class.getName(), null);
         sourceFilePath = sourceFilePath != null ? sourceFilePath : "";
         sourceLineNumber = sourceLineNumber != null ? sourceLineNumber : 0;
-        this.registerSourceLocation(sourceFilePath, sourceLineNumber);
 
         // add waterfall steps
-        this.addStep(QnAMakerDialog::callGenerateAnswer);
-        this.addStep(QnAMakerDialog::callTrain);
-        this.addStep(QnAMakerDialog::checkForMultiTurnPrompt);
-        this.addStep(QnAMakerDialog::displayQnAResult);
+        this.addStep(this::callGenerateAnswer);
+        this.addStep(this::callTrain);
+        this.addStep(this::checkForMultiTurnPrompt);
+        this.addStep(this::displayQnAResult);
     }
 
     /**
@@ -620,13 +627,16 @@ public class QnAMakerDialog extends WaterfallDialog {
         }
 
         if (dc.getContext().getActivity().getType() != ActivityTypes.MESSAGE) {
-            return EndOfTurn;
+            return CompletableFuture.completedFuture(END_OF_TURN);
         }
+
+        QnAMakerOptions qnAMakerOptions = this.getQnAMakerOptions(dc).join();
+        QnADialogResponseOptions qnADialogResponseOptions = this.getQnAResponseOptions(dc).join();
 
         QnAMakerDialogOptions dialogOptions = new QnAMakerDialogOptions() {
             {
-                setQnAMakerOptions(getQnAMakerOptions(dc));
-                setResponseOptions(getQnAResponseOptions(dc));
+                setQnAMakerOptions(qnAMakerOptions);
+                setResponseOptions(qnADialogResponseOptions);
             }
         };
 
@@ -634,7 +644,7 @@ public class QnAMakerDialog extends WaterfallDialog {
             dialogOptions = (QnAMakerDialogOptions) ObjectPath.assign(dialogOptions, options);
         }
 
-        ObjectPath.setPathValue(dc.getActiveDialog().getState(), options);
+        ObjectPath.setPathValue(dc.getActiveDialog().getState(), OPTIONS, dialogOptions);
 
         return super.beginDialog(dc, dialogOptions);
     }
@@ -644,7 +654,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
-        Boolean interrupted = dc.getState().getValue(TurnPath.Interrupted, () -> false);
+        Boolean interrupted = dc.getState().getValue(TurnPath.INTERRUPTED, false, Boolean.class);
         if (interrupted) {
             // if qnamaker was interrupted then end the qnamaker dialog
             return dc.endDialog();
@@ -665,14 +675,14 @@ public class QnAMakerDialog extends WaterfallDialog {
 
             String reply = dc.getContext().getActivity().getText();
             QnAMakerDialogOptions dialogOptions = (QnAMakerDialogOptions) ObjectPath
-                    .getPathValue(dc.getActiveDialog().getState(), OPTIONS);
+                    .getPathValue(dc.getActiveDialog().getState(), OPTIONS, QnAMakerDialogOptions.class);
 
             if (reply.equalsIgnoreCase(dialogOptions.getResponseOptions().getCardNoMatchText())) {
                 // it matches nomatch text, we like that.
                 return CompletableFuture.completedFuture(true);
             }
 
-            List<String> suggestedQuestions = (List<String>) dc.getState().getValue("this.suggestedQuestions");
+            List<String> suggestedQuestions = (List<String>) dc.getState().get("this.suggestedQuestions");
             if (suggestedQuestions != null && suggestedQuestions.stream()
                     .anyMatch(question -> question.compareToIgnoreCase(reply.trim()) == 0)) {
                 // it matches one of the suggested actions, we like that.
@@ -683,11 +693,12 @@ public class QnAMakerDialog extends WaterfallDialog {
             return this.getQnAMakerClient(dc).thenCompose(qnaClient -> {
                 QnAMakerDialog.resetOptions(dc, dialogOptions);
 
-                return qnaClient.getAnswersRaw(dc.getContext(), dialogOptions.getQnAMakerOptions())
+                return qnaClient.getAnswersRaw(dc.getContext(), dialogOptions.getQnAMakerOptions(),
+                    null, null)
                         .thenApply(response -> {
                             // cache result so step doesn't have to do it again, this is a turn cache and we
                             // use hashcode so we don't conflict with any other qnamakerdialogs out there.
-                            dc.getState().setValue(String.format("turn.qnaresult%s", this.getHashCode()), response);
+                            dc.getState().setValue(String.format("turn.qnaresult%s", this.hashCode()), response);
 
                             // disable interruption if we have answers.
                             return !(response.getAnswers().length == 0);
@@ -707,27 +718,22 @@ public class QnAMakerDialog extends WaterfallDialog {
      *         successful, the result contains the QnA Maker client to use.
      */
     protected CompletableFuture<IQnAMakerClient> getQnAMakerClient(DialogContext dc) {
-        IQnAMakerClient qnaClient = (IQnAMakerClient) dc.getContext().getTurnState().join();
+        IQnAMakerClient qnaClient = (IQnAMakerClient) dc.getContext().getTurnState();
         if (qnaClient != null) {
             // return mock client
             return CompletableFuture.completedFuture(qnaClient);
         }
 
-        OkHttpClient httpClient = (OkHttpClient) dc.getContext().getTurnState().join();
-        if (httpClient == null) {
-            httpClient = this.httpClient;
-        }
-
         QnAMakerEndpoint endpoint = new QnAMakerEndpoint() {
             {
-                setEndpointKey(endpointKey.getValue(dc.getState()));
-                setHost(hostName.getValue(dc.getState()));
-                setKnowledgeBaseId(knowledgeBaseId.getValue(dc.getState()));
+                setEndpointKey(endpointKey);
+                setHost(hostName);
+                setKnowledgeBaseId(knowledgeBaseId);
             }
         };
 
-        return this.getQnAMakerOptions(dc).thenApply(options -> new QnAMaker(endpoint, options, httpClient,
-                this.telemetryClient, this.logPersonalInformation.getValue(dc.getState())));
+        return this.getQnAMakerOptions(dc).thenApply(options -> new QnAMaker(endpoint, options,
+                this.getTelemetryClient(), this.logPersonalInformation));
     }
 
     /**
@@ -742,12 +748,12 @@ public class QnAMakerDialog extends WaterfallDialog {
     protected CompletableFuture<QnAMakerOptions> getQnAMakerOptions(DialogContext dc) {
         return CompletableFuture.completedFuture(new QnAMakerOptions() {
             {
-                setScoreThreshold(threshold.getValue(dc.getState()));
-                setStrictFilters(strictFilters.getValue(dc.getState()).toArray());
-                setTop(top.getValue(dc.getState()));
+                setScoreThreshold(threshold);
+                setStrictFilters(strictFilters);
+                setTop(top);
                 setContext(new QnARequestContext());
                 setQnAId(0);
-                setRankerType(rankerType.getValue(dc.getState()));
+                setRankerType(rankerType);
                 setIsTest(isTest);
             }
         });
@@ -764,13 +770,13 @@ public class QnAMakerDialog extends WaterfallDialog {
         return CompletableFuture.completedFuture(new QnADialogResponseOptions() {
             {
                 setNoAnswer(noAnswer.bind(dc, dc.getState()).join());
-                setActiveLearningCardTitle(activeLearningCardTitle.getValue(dc.getState()) != null
-                        ? activeLearningCardTitle.getValue(dc.getState())
+                setActiveLearningCardTitle(activeLearningCardTitle != null
+                        ? activeLearningCardTitle
                         : DEFAULT_CARD_TITLE);
                 setCardNoMatchText(
-                        cardNoMatchText.getValue(dc.getState()) != null ? cardNoMatchText.getValue(dc.getState())
+                        cardNoMatchText != null ? cardNoMatchText
                                 : DEFAULT_CARD_NO_MATCH_TEXT);
-                setCardNoMatchResponse(cardNoMatchResponse.bind(dc).join());
+                setCardNoMatchResponse(cardNoMatchResponse.bind(dc, null).join());
             }
         });
     }
@@ -784,7 +790,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      */
     protected CompletableFuture<DialogTurnResult> displayQnAResult(WaterfallStepContext stepContext) {
         QnAMakerDialogOptions dialogOptions = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(),
-                OPTIONS);
+                OPTIONS, QnAMakerDialogOptions.class);
         String reply = stepContext.getContext().getActivity().getText();
         if (reply.compareToIgnoreCase(dialogOptions.getResponseOptions().getCardNoMatchText()) == 0) {
             Activity activity = dialogOptions.getResponseOptions().getCardNoMatchResponse();
@@ -798,7 +804,8 @@ public class QnAMakerDialog extends WaterfallDialog {
         }
 
         // If previous QnAId is present, replace the dialog
-        Integer previousQnAId = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), PREVIOUS_QNA_ID, 0);
+        Integer previousQnAId = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), PREVIOUS_QNA_ID,
+            Integer.class, 0);
         if (previousQnAId > 0) {
             // restart the waterfall to step 0
             return this.runStep(stepContext, 0, DialogReason.BEGIN_CALLED, null);
@@ -828,11 +835,12 @@ public class QnAMakerDialog extends WaterfallDialog {
         // -Check if previous context is present, if yes then put it with the query
         // -Check for id if query is present in reverse index.
         Map<String, Integer> previousContextData = ObjectPath.getPathValue(dc.getActiveDialog().getState(),
-                QNA_CONTEXT_DATA, new HashMap<String, Integer>());
-        Integer previousQnAId = ObjectPath.getPathValue(dc.getActiveDialog().getState(), PREVIOUS_QNA_ID, 0);
+                QNA_CONTEXT_DATA, Map.class);
+        Integer previousQnAId = ObjectPath.getPathValue(dc.getActiveDialog().getState(), PREVIOUS_QNA_ID,
+            Integer.class, 0);
 
         if (previousQnAId > 0) {
-            dialogOptions.getQnAMakerOptions.setContext(new QnARequestContext() {
+            dialogOptions.getQnAMakerOptions().setContext(new QnARequestContext() {
                 {
                     setPreviousQnAId(previousQnAId);
                 }
@@ -840,7 +848,7 @@ public class QnAMakerDialog extends WaterfallDialog {
 
             Integer currentQnAId = previousContextData.get(dc.getContext().getActivity().getText());
             if (currentQnAId != null) {
-                dialogOptions.getQnAMakerOptions.setQnAId(currentQnAId);
+                dialogOptions.getQnAMakerOptions().setQnAId(currentQnAId);
             }
         }
     }
@@ -850,18 +858,19 @@ public class QnAMakerDialog extends WaterfallDialog {
         stepContext.getState().removeValue("this.suggestedQuestions");
 
         QnAMakerDialogOptions dialogOptions = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(),
-                options);
+                OPTIONS, QnAMakerDialogOptions.class);
         QnAMakerDialog.resetOptions(stepContext, dialogOptions);
 
         // Storing the context info
-        stepContext.setValue(ValueProperty.CURRENT_QUERY, stepContext.getContext().getActivity().getText());
+        stepContext.getValues().put(ValueProperty.CURRENT_QUERY, stepContext.getContext().getActivity().getText());
 
         // Calling QnAMaker to get response.
         return this.getQnAMakerClient(stepContext).thenApply(qnaMakerClient -> {
-            QueryResults response = stepContext.getState()
-                    .getValue(String.format("turn.qnaresult%s", this.getHashCode()));
+            QueryResults response = (QueryResults) stepContext.getState()
+                    .get(String.format("turn.qnaresult%s", this.hashCode()));
             if (response == null) {
-                response = qnaMakerClient.getAnswersRaw(stepContext.getContext(), dialogOptions.getQnAMakerOptions())
+                response = qnaMakerClient.getAnswersRaw(stepContext.getContext(), dialogOptions.getQnAMakerOptions(),
+                    null, null)
                         .join();
             }
 
@@ -872,13 +881,13 @@ public class QnAMakerDialog extends WaterfallDialog {
             // Take this value from GetAnswerResponse
             Boolean isActiveLearningEnabled = response.getActiveLearningEnabled();
 
-            stepContext.setValue(ValueProperty.QNA_DATA, Arrays.asList(response.getAnswers()));
+            stepContext.getValues().put(ValueProperty.QNA_DATA, Arrays.asList(response.getAnswers()));
 
             // Check if active learning is enabled.
             // MaximumScoreForLowScoreVariation is the score above which no need to check
             // for feedback.
-            if (!response.getAnswer().isEmpty() && response.getAnswers()[0]
-                    .getScore() <= (ActiveLearningUtils.getMaximumScoreForLowScoreVariation() / 100)) {
+            if (response.getAnswers().length > 0 && response.getAnswers()[0]
+                    .getScore() <= (ActiveLearningUtils.getMaximumScoreForLowScoreVariation() / PERCENTAGE_DIVISOR)) {
                 // Get filtered list of the response that support low score variation criteria.
                 response.setAnswers(qnaMakerClient.getLowScoreVariation(response.getAnswers()));
 
@@ -896,7 +905,7 @@ public class QnAMakerDialog extends WaterfallDialog {
 
                     ObjectPath.setPathValue(stepContext.getActiveDialog().getState(), OPTIONS, dialogOptions);
                     stepContext.getState().setValue("this.suggestedQuestions", suggestedQuestions);
-                    return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnResult.WAITING));
+                    return new DialogTurnResult(DialogTurnStatus.WAITING);
                 }
             }
 
@@ -905,27 +914,29 @@ public class QnAMakerDialog extends WaterfallDialog {
                 result.add(response.getAnswers()[0]);
             }
 
-            stepContext.setValue(ValueProperty.QNA_DATA, result);
+            stepContext.getValues().put(ValueProperty.QNA_DATA, result);
             ObjectPath.setPathValue(stepContext.getActiveDialog().getState(), OPTIONS, dialogOptions);
 
             // If card is not shown, move to next step with top QnA response.
-            return stepContext.next(result);
+            return stepContext.next(result).join();
         });
     }
 
     private CompletableFuture<DialogTurnResult> callTrain(WaterfallStepContext stepContext) {
-        QnAMakerDialogOptions dialogOptions = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), OPTIONS);
-        List<QueryResult> trainResponses = (List<QueryResult>) stepContext.getValue(ValueProperty.QNA_DATA);
-        String currentQuery = (String) stepContext.getValue(ValueProperty.CURRENT_QUERY);
+        QnAMakerDialogOptions dialogOptions = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), OPTIONS,
+            QnAMakerDialogOptions.class);
+        List<QueryResult> trainResponses = (List<QueryResult>) stepContext.getValues().get(ValueProperty.QNA_DATA);
+        String currentQuery = (String) stepContext.getValues().get(ValueProperty.CURRENT_QUERY);
 
         String reply = stepContext.getContext().getActivity().getText();
 
         if (trainResponses.size() > 1) {
-            QueryResult qnaResult = trainResponses.stream().filter(kvp -> kvp.getQuestions()[0] == reply).findFirst().orElse(null);
+            QueryResult qnaResult = trainResponses
+                .stream().filter(kvp -> kvp.getQuestions()[0] == reply).findFirst().orElse(null);
             if (qnaResult != null) {
                 List<QueryResult> queryResultArr = new ArrayList<QueryResult>();
-                stepContext.setValue(ValueProperty.QNA_DATA, queryResultArr.add(qnaResult));
-                FeedbackRecord record = new FeedbackRecord(){{
+                stepContext.getValues().put(ValueProperty.QNA_DATA, queryResultArr.add(qnaResult));
+                FeedbackRecord record = new FeedbackRecord() {{
                     setUserId(stepContext.getContext().getActivity().getId());
                     setUserQuestion(currentQuery);
                     setQnaId(qnaResult.getId());
@@ -938,11 +949,13 @@ public class QnAMakerDialog extends WaterfallDialog {
                 // Call Active Learning Train API
                 return this.getQnAMakerClient(stepContext).thenCompose(qnaClient -> {
                     try {
-                        return qnaClient.callTrain(feedbackRecords);
+                        return qnaClient.callTrain(feedbackRecords).thenCompose(task ->
+                            stepContext.next(new ArrayList<QueryResult>().add(qnaResult)));
                     } catch (IOException e) {
                         LoggerFactory.getLogger(QnAMakerDialog.class).error("callTrain");
                     }
-                }).thenCompose(task -> stepContext.next(new ArrayList<QueryResult>(){{qnaResult}}));
+                    return CompletableFuture.completedFuture(null);
+                });
             } else if (reply.compareToIgnoreCase(dialogOptions.getResponseOptions().getCardNoMatchText()) == 0) {
                 Activity activity = dialogOptions.getResponseOptions().getCardNoMatchResponse();
                 if (activity == null) {
@@ -963,7 +976,7 @@ public class QnAMakerDialog extends WaterfallDialog {
 
     private CompletableFuture<DialogTurnResult> checkForMultiTurnPrompt(WaterfallStepContext stepContext) {
         QnAMakerDialogOptions dialogOptions = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(),
-                OPTIONS);
+                OPTIONS, QnAMakerDialogOptions.class);
         List<QueryResult> response = (List<QueryResult>) stepContext.getResult();
         if (response != null && response.size() > 0) {
             // -Check if context is present and prompt exists
@@ -978,32 +991,36 @@ public class QnAMakerDialog extends WaterfallDialog {
 
             if (answer.getContext() != null && answer.getContext().getPrompts().length > 0) {
                 Map<String, Integer> previousContextData = ObjectPath.getPathValue(
-                        stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, new HashMap<String, Integer>());
-                Integer previousQnAId = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(),
-                        PREVIOUS_QNA_ID, 0);
+                        stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, Map.class);
 
                 for (QnAMakerPrompt prompt : answer.getContext().getPrompts()) {
                     previousContextData.put(prompt.getDisplayText(), prompt.getQnaId());
                 }
 
-                Object.setPathValue(stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, previousContextData);
-                Object.setPathValue(stepContext.getActiveDialog().getState(), PREVIOUS_QNA_ID, answer.getId());
-                Object.setPathValue(stepContext.getActiveDialog().getState(), OPTIONS, dialogOptions);
+                ObjectPath.setPathValue(stepContext.getActiveDialog().getState(),
+                    QNA_CONTEXT_DATA, previousContextData);
+                ObjectPath.setPathValue(stepContext.getActiveDialog().getState(), PREVIOUS_QNA_ID, answer.getId());
+                ObjectPath.setPathValue(stepContext.getActiveDialog().getState(), OPTIONS, dialogOptions);
 
                 // Get multi-turn prompts card activity.
                 Activity message = QnACardBuilder.getQnAPromptsCard(answer,
                         dialogOptions.getResponseOptions().getCardNoMatchText());
                 stepContext.getContext().sendActivity(message).join();
 
-                return CompletableFuture.completedFuture(DialogTurnResult(DialogTurnStatus.WAITING));
+                return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
             }
         }
 
         return stepContext.next(stepContext.getResult());
     }
 
-    class ValueProperty {
+    /**
+     * Helper class.
+     */
+    final class ValueProperty {
         public static final String CURRENT_QUERY = "currentQuery";
         public static final String QNA_DATA = "qnaData";
+
+        private ValueProperty() { }
     }
 }

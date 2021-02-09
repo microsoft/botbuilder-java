@@ -67,6 +67,7 @@ public interface IQnAMakerClient {
      *
      * @param feedbackRecords Feedback records.
      * @return A Task representing the asynchronous operation.
+     * @throws IOException Throws an IOException if there is any.
      */
     CompletableFuture<Void> callTrain(FeedbackRecords feedbackRecords) throws IOException;
 }

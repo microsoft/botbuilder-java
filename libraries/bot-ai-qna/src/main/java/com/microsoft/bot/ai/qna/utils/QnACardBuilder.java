@@ -17,7 +17,10 @@ import com.microsoft.bot.schema.HeroCard;
 /**
  * Message activity card builder for QnAMaker dialogs.
  */
-public class QnACardBuilder {
+public final class QnACardBuilder {
+
+    private QnACardBuilder() { }
+
     /**
      * Get active learning suggestions card.
      *

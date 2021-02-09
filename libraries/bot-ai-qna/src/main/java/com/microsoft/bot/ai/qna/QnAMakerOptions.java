@@ -43,6 +43,8 @@ public class QnAMakerOptions {
     @JsonProperty("strictFiltersJoinOperator")
     private JoinOperator strictFiltersJoinOperator;
 
+    private static final Float SCORE_THRESHOLD = 0.3f;
+
     /**
      * Gets the minimum score threshold, used to filter returned results. Scores are
      * normalized to the range of 0.0 to 1.0 before filtering.
@@ -228,6 +230,6 @@ public class QnAMakerOptions {
      * Initializes a new instance of the {@link QnAMakerOptions} class.
      */
     public QnAMakerOptions() {
-        this.scoreThreshold = 0.3f;
+        this.scoreThreshold = SCORE_THRESHOLD;
     }
 }
