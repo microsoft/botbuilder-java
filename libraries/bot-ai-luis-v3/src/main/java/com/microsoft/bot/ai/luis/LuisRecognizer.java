@@ -16,6 +16,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Luis Recognizer class to query the LUIS Service using the configuration set by the LuisRecognizeroptions.
+ *
+ */
 public class LuisRecognizer extends TelemetryRecognizer {
     /**
      * Luis Recognizer options to query the Luis Service.
@@ -24,7 +28,7 @@ public class LuisRecognizer extends TelemetryRecognizer {
 
     /**
      * Initializes a new instance of the Luis Recognizer .
-     * @param recognizerOptions Luis Recognizer options to use when calling th LUIS Service
+     * @param recognizerOptions Luis Recognizer options to use when calling th LUIS Service.
      */
     public LuisRecognizer(LuisRecognizerOptions recognizerOptions) {
         this.luisRecognizerOptions = recognizerOptions;

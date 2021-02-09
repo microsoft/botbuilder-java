@@ -3,6 +3,10 @@
 
 package com.microsoft.bot.ai.luis;
 
+/**
+ * Utility class to set the telemetry values for the Luis Recognizer.
+ *
+ */
 public  final class LuisTelemetryConstants {
 
     private LuisTelemetryConstants() {

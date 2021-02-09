@@ -6,13 +6,11 @@ package com.microsoft.bot.ai.luis;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
+/**
+ * Request Body element to use when passing Dynamic lists to the Luis Service call.
+ *
+ */
 public class DynamicList {
-
-    /**
-     * Initializes a new instance of the DynamicList class.
-     */
-    public DynamicList() {
-    }
 
     /**
      * Initializes a new instance of the DynamicList class.

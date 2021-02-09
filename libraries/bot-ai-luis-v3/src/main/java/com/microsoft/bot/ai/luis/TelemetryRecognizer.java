@@ -12,6 +12,10 @@ import com.microsoft.bot.builder.TurnContext;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Telemetry Recognizer to enforce controls and properties on telemetry logged.
+ *
+ */
 public abstract class TelemetryRecognizer implements Recognizer {
 
     private boolean logPersonalInformation;

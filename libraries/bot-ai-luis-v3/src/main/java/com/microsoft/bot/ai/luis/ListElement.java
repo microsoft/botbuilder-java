@@ -6,6 +6,10 @@ package com.microsoft.bot.ai.luis;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
+/**
+ * List Element for Dynamic Lists.
+ *
+ */
 public class ListElement {
 
     /**

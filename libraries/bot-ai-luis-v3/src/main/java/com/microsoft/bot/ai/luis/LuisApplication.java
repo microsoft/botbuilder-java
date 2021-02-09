@@ -10,6 +10,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 
+/**
+ * Luis Application representation with information necessary to query the specific Luis Application.
+ *
+ */
 public class LuisApplication {
 
     /**

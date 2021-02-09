@@ -29,6 +29,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Luis Recognizer Options for V3 LUIS Runtime.
+ *
+ */
 public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private final HashSet<String> dateSubtypes = new HashSet<>(
         Arrays.asList(

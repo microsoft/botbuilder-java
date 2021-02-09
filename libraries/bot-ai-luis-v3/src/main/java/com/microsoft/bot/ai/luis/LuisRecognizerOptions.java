@@ -8,6 +8,10 @@ import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Abstract class to enforce the Strategy pattern consumed by the Luis Recognizer through the options selected.
+ *
+ */
 public abstract class LuisRecognizerOptions {
 
     /**

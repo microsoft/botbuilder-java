@@ -6,10 +6,11 @@ package com.microsoft.bot.ai.luis;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Request Body element to use when passing External Entities to the Luis Service call.
+ *
+ */
 public class ExternalEntity {
-
-    public ExternalEntity() {
-    }
 
     /**
      * Initializes a new instance of ExternalEntity.

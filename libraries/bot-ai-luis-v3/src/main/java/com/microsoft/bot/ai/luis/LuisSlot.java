@@ -3,6 +3,10 @@
 
 package com.microsoft.bot.ai.luis;
 
+/**
+ * Utility class to set the Luis endpoint Slot.
+ *
+ */
 public final class LuisSlot {
 
     //Not Called
