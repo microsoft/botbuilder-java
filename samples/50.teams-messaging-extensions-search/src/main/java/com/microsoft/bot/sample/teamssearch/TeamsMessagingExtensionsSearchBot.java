@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
  * added.  This sample illustrates how to build a Search-based Messaging Extension.</p>
  */
 
-@Component
 public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
 
     @Override

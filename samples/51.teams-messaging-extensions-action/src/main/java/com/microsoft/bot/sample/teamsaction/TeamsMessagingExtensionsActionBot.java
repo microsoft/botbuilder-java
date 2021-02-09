@@ -8,7 +8,6 @@ import com.microsoft.bot.builder.teams.TeamsActivityHandler;
 import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.teams.*;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
  * added.  There are two basic types of Messaging Extension in Teams: Search-based and Action-based.
  * This sample illustrates how to build an Action-based Messaging Extension.</p>
  */
-@Component
 public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
     @Override
     protected CompletableFuture<MessagingExtensionActionResponse> onTeamsMessagingExtensionSubmitAction(

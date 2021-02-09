@@ -27,9 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
-@Component
 public class UserProfileDialog extends ComponentDialog {
     private StatePropertyAccessor<UserProfile> userProfileAccessor;
 

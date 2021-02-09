@@ -26,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
  * See README.md for details on using the InspectionMiddleware.
  * </p>
  */
-@Component
 public class EchoBot extends ActivityHandler {
     private ConversationState conversationState;
     private UserState userState;
