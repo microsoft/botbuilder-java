@@ -130,22 +130,21 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
      */
     public static final String LUIS_TRACE_LABEL = "LuisV3 Trace";
 
-    // TO-DO: Enable once the class Dialog Recognizer is ported
-//    /**
-//     * Gets External entity recognizer to recognize external entities to pass to LUIS.
-//     * @return externalEntityRecognizer
-//     */
-//    public Recognizer getExternalEntityRecognizer() {
-//        return externalEntityRecognizer;
-//    }
-//
-//    /**
-//     * Sets External entity recognizer to recognize external entities to pass to LUIS.
-//     * @param externalEntityRecognizer External Recognizer instance.
-//     */
-//    public void setExternalEntityRecognizer(Recognizer externalEntityRecognizer) {
-//        this.externalEntityRecognizer = externalEntityRecognizer;
-//    }
+    /**
+     * Gets External entity recognizer to recognize external entities to pass to LUIS.
+     * @return externalEntityRecognizer
+     */
+    public Recognizer getExternalEntityRecognizer() {
+        return externalEntityRecognizer;
+    }
+
+    /**
+     * Sets External entity recognizer to recognize external entities to pass to LUIS.
+     * @param externalEntityRecognizer External Recognizer instance.
+     */
+    public void setExternalEntityRecognizer(Recognizer externalEntityRecognizer) {
+        this.externalEntityRecognizer = externalEntityRecognizer;
+    }
 
     /**
      * Gets indicating whether all intents come back or only the top one. True for returning all intents.
