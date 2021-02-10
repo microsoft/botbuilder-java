@@ -13,7 +13,6 @@ import com.microsoft.bot.restclient.ServiceResponse;
 import com.microsoft.bot.schema.SignInResource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.ResponseBody;
@@ -58,8 +57,8 @@ public class RestBotSignIn implements BotSignIn {
             @Query("finalRedirect") String finalRedirect
         );
         @Headers({"Content-Type: application/json; charset=utf-8",
-            "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns getSignInUrl"})
-        @GET("api/botsignin/GetSignInResrouce")
+            "x-ms-logging-context: com.microsoft.bot.schema.BotSignIns GetSignInResource"})
+        @GET("api/botsignin/GetSignInResource")
         CompletableFuture<Response<ResponseBody>> getSignInResource(
             @Query("state") String state,
             @Query("code_challenge") String codeChallenge,
@@ -198,7 +197,7 @@ public class RestBotSignIn implements BotSignIn {
         return this.client.restClient()
             .responseBuilderFactory()
             .<SignInResource, ErrorResponseException>newInstance(client.serializerAdapter())
-            .register(HttpURLConnection.HTTP_OK, new TypeToken<InputStream>() {
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<SignInResource>() {
             }.getType())
             .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() {
             }.getType())

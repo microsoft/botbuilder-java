@@ -1318,73 +1318,6 @@ public class BotFrameworkAdapter extends BotAdapter implements
     }
 
     /**
-     * Creates an OAuth client for the bot with the credentials.
-     *
-     * @param turnContext          The context Object for the current
-     *                             turn.
-     * @param oAuthAppCredentials  AppCredentials for OAuth.
-     *
-     * @return   An OAuth client for the bot.
-     */
-    protected CompletableFuture<OAuthClient> createOAuthApiClient(TurnContext turnContext,
-                                                                  AppCredentials oAuthAppCredentials) {
-
-        if (!OAuthClientConfig.emulateOAuthCards
-            && turnContext.getActivity().getChannelId().equals(Channels.EMULATOR)
-            && credentialProvider.isAuthenticationDisabled().join()) {
-            OAuthClientConfig.emulateOAuthCards = true;
-        }
-
-        String appId = getBotAppId(turnContext);
-
-        String clientKey = String.format("%s:%s",
-                                         appId,
-                                         oAuthAppCredentials.getAppId());
-        String oAuthScope = getBotFrameworkOAuthScope();
-
-        AppCredentials localAppCredentials = oAuthAppCredentials != null  ? oAuthAppCredentials
-                                                                    : getAppCredentials(appId, oAuthScope).join();
-
-        OAuthClient oAuthClientInner;
-        if (OAuthClientConfig.emulateOAuthCards) {
-            oAuthClientInner = new RestOAuthClient(
-                                    turnContext.getActivity().getServiceUrl(),
-                                    localAppCredentials);
-            // we want this to run in the background
-            Runnable r = new Runnable() {
-                public void run() {
-                    OAuthClientConfig.sendEmulateOAuthCards(oAuthClientInner, OAuthClientConfig.emulateOAuthCards);
-                }
-            };
-            Thread t = new Thread(r);
-            t.start();
-
-        } else {
-            oAuthClientInner = new RestOAuthClient(OAuthClientConfig.OAUTHENDPOINT, appCredentials);
-        }
-        OAuthClient oAuthClient = oAuthClients.putIfAbsent(clientKey, oAuthClientInner);
-
-        // adding the oAuthClient into the TurnState
-        // TokenResolver.cs will use it get the correct credentials to poll for token for streaming scenario
-        if (turnContext.getTurnState().get(OAuthClient.class) == null) {
-            turnContext.getTurnState().add(oAuthClient);
-        }
-
-        return CompletableFuture.completedFuture(oAuthClient);
-    }
-
-    /**
-     * Creates an OAuth client for the bot.
-     *
-     * @param turnContext  The context Object for the current turn.
-     *
-     * @return   An OAuth client for the bot.
-     */
-    protected CompletableFuture<OAuthClient> createOAuthApiClient(TurnContext turnContext) {
-        return  createOAuthApiClient(turnContext, null);
-    }
-
-    /**
      * Attempts to retrieve the token for a user that's in a login flow, using
      * customized AppCredentials.
      *
@@ -1418,7 +1351,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
             ));
         }
 
-        OAuthClient client =  createOAuthApiClient(context, oAuthAppCredentials).join();
+        OAuthClient client =  createOAuthAPIClient(context, oAuthAppCredentials).join();
         return client.getUserToken().getToken(
                 context.getActivity().getFrom().getId(),
                 connectionName,
@@ -1741,6 +1674,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
                                 setBot(activity.getRecipient());
                                 setChannelId(activity.getChannelId());
                                 setConversation(activity.getConversation());
+                                setLocale(activity.getLocale());
                                 setServiceUrl(activity.getServiceUrl());
                                 setUser(activity.getFrom());
                             }

@@ -200,7 +200,7 @@ public class OAuthPrompt extends Dialog {
             if (turnContext.getActivity().isFromStreamingConnection()
                     || botIdentity != null && SkillValidation.isSkillClaim(botIdentity.claims())
                     || settings.getOAuthAppCredentials() != null) {
-                if (turnContext.getActivity().getChannelId() == Channels.EMULATOR) {
+                if (turnContext.getActivity().getChannelId().equals(Channels.EMULATOR)) {
                     cardActionType = ActionTypes.OPEN_URL;
                 }
             } else if (!channelRequiresSignInLink(turnContext.getActivity().getChannelId())) {
@@ -209,7 +209,7 @@ public class OAuthPrompt extends Dialog {
 
             CardAction cardAction = new CardAction();
             cardAction.setTitle(settings.getTitle());
-            cardAction.setValue(signInResource.getSignInLink());
+            cardAction.setText(settings.getText());
             cardAction.setType(cardActionType);
             cardAction.setValue(value);
 
@@ -219,6 +219,8 @@ public class OAuthPrompt extends Dialog {
             OAuthCard oAuthCard = new OAuthCard();
             oAuthCard.setText(settings.getText());
             oAuthCard.setButtons(cardList);
+            oAuthCard.setConnectionName(settings.getConnectionName());
+            oAuthCard.setTokenExchangeResource(signInResource.getTokenExchangeResource());
 
             Attachment attachment = new Attachment();
             attachment.setContentType(OAuthCard.CONTENTTYPE);
@@ -409,7 +411,7 @@ public class OAuthPrompt extends Dialog {
                     }});
                 }
             }
-        } else if (turnContext.getActivity().getType() == ActivityTypes.MESSAGE) {
+        } else if (turnContext.getActivity().getType().equals(ActivityTypes.MESSAGE)) {
             // regex to check if code supplied is a 6 digit numerical code (hence, a magic code).
             String pattern = "(\\d{6})";
             Pattern r = Pattern.compile(pattern);
@@ -547,7 +549,7 @@ public class OAuthPrompt extends Dialog {
         // Check for timeout
         Map<String, Object> state = dc.getActiveDialog().getState();
         OffsetDateTime expires = (OffsetDateTime) state.get(PERSISTED_EXPIRES);
-        boolean isMessage = dc.getContext().getActivity().getType() == ActivityTypes.MESSAGE;
+        boolean isMessage = dc.getContext().getActivity().getType().equals(ActivityTypes.MESSAGE);
 
         // If the incoming Activity is a message, or an Activity Type normally handled by OAuthPrompt,
         // check to see if this OAuthPrompt Expiration has elapsed, and end the dialog if so.
@@ -675,20 +677,20 @@ public class OAuthPrompt extends Dialog {
 
     private static boolean isTokenResponseEvent(TurnContext turnContext) {
         Activity activity = turnContext.getActivity();
-        return activity.getType() == ActivityTypes.EVENT
-                && activity.getName() == SignInConstants.TOKEN_RESPONSE_EVENT_NAME;
+        return activity.getType().equals(ActivityTypes.EVENT)
+                && activity.getName().equals(SignInConstants.TOKEN_RESPONSE_EVENT_NAME);
     }
 
     private static boolean isTeamsVerificationInvoke(TurnContext turnContext) {
         Activity activity = turnContext.getActivity();
-        return activity.getType() == ActivityTypes.INVOKE
-                && activity.getName() == SignInConstants.VERIFY_STATE_OPERATION_NAME;
+        return activity.getType().equals(ActivityTypes.INVOKE)
+                && activity.getName().equals(SignInConstants.VERIFY_STATE_OPERATION_NAME);
     }
 
     private static boolean isTokenExchangeRequestInvoke(TurnContext turnContext) {
         Activity activity = turnContext.getActivity();
-        return activity.getType() == ActivityTypes.INVOKE
-                && activity.getName() == SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME;
+        return activity.getType().equals(ActivityTypes.INVOKE)
+                && activity.getName().equals(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
     }
 
     private static boolean channelSupportsOAuthCard(String channelId) {
