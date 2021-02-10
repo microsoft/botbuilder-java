@@ -18,7 +18,6 @@ import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +35,6 @@ import java.util.concurrent.CompletableFuture;
  *
  * @see WelcomeUserState
  */
-@Component
 public class WelcomeUserBot extends ActivityHandler {
     // Messages sent to the user.
     private static final String WELCOMEMESSAGE =

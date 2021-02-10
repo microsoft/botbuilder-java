@@ -60,10 +60,7 @@ public class ConfirmPromptTests {
 
             if (results.getStatus() == DialogTurnStatus.EMPTY) {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("Please confirm.");
-                options.setPrompt(activity);
-
+                options.setPrompt(MessageFactory.text("Please confirm."));
                 dc.prompt("ConfirmPrompt", options).join();
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if ((Boolean) results.getResult()) {

@@ -156,16 +156,14 @@ public class PromptValidatorContextTests {
         PromptValidator<String> validator = (promptContext) -> {
             String result = promptContext.getRecognized().getValue();
             if (result.length() > 3) {
-                Activity succeededMessage = MessageFactory.text(String.format("You got it at the %nth try!",
+                Activity succeededMessage = MessageFactory.text(String.format("You got it at the %dth try!",
                                                                 promptContext.getAttemptCount()));
-                promptContext.getContext().sendActivity(succeededMessage);
-                return CompletableFuture.completedFuture(true);
+                return promptContext.getContext().sendActivity(succeededMessage).thenApply(resourceResponse -> true);
             } else {
-                    promptContext.getContext().sendActivity(
-                        MessageFactory.text("Please send a name that is longer than 3 characters."));
+                    return promptContext.getContext()
+                        .sendActivity(MessageFactory.text(String.format("Please send a name that is longer than 3 characters. %d", promptContext.getAttemptCount())))
+                        .thenApply(resourceResponse -> false);
             }
-
-            return CompletableFuture.completedFuture(false);
         };
 
         dialogs.add(new TextPrompt("namePrompt", validator));
@@ -197,7 +195,8 @@ public class PromptValidatorContextTests {
         .send("John")
         .assertReply("You got it at the 4th try!")
         .assertReply("John is a great name!")
-        .startTest();
+        .startTest()
+        .join();
     }
 }
 
