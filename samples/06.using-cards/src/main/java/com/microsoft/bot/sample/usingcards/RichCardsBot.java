@@ -8,22 +8,21 @@ import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ChannelAccount;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 // RichCardsBot prompts a user to select a Rich Card and then returns the card
 // that matches the user's selection.
-@Component
-public class RichCardsBot extends DialogBot<MainDialog> {
+public class RichCardsBot extends DialogBot<Dialog> {
 
     public RichCardsBot(
         ConversationState withConversationState,
         UserState withUserState,
-        MainDialog withDialog
+        Dialog withDialog
     ) {
         super(withConversationState, withUserState, withDialog);
     }

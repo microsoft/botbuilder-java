@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
  * endpoints within the same project. This can be achieved by defining distinct
  * Controller types each with dependency on distinct Bot types.
  */
-@Component
 public class CustomPromptBot extends ActivityHandler {
 
     private final BotState userState;

@@ -16,7 +16,6 @@ import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.teams.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +33,6 @@ import java.util.stream.Collectors;
  * parameters entered by the user from a Task Module.
  * </p>
  */
-@Component
 public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandler {
 
     @Override

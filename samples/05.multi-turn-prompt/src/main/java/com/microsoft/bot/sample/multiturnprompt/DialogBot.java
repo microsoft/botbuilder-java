@@ -10,7 +10,6 @@ import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserState;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.stereotype.Component;
 
 /**
  * This IBot implementation can run any type of Dialog. The use of type parameterization is to
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
  * been used in a Dialog implementation, and the requirement is that all BotState objects are
  * saved at the end of a turn.
  */
-@Component
 public class DialogBot extends ActivityHandler {
     protected Dialog dialog;
     protected BotState conversationState;

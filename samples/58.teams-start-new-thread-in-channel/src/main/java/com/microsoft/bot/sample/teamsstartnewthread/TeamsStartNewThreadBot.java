@@ -14,7 +14,6 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -25,7 +24,6 @@ import java.util.concurrent.CompletableFuture;
  * added.  For this sample, the {@link #onMessageActivity(TurnContext)} creates a thread in a Teams channel.
  * </p>
  */
-@Component
 public class TeamsStartNewThreadBot extends TeamsActivityHandler {
 
     private String appId;
