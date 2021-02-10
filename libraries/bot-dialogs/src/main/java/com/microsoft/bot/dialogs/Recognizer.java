@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
+import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
+import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Serialization;
@@ -99,6 +101,35 @@ public class Recognizer {
         Map<String, Double> telemetryMetrics
     ) {
         return Async.completeExceptionally(new NotImplementedException("recognize"));
+    }
+
+    /**
+     * Runs current DialogContext.TurnContext.Activity through a recognizer and returns a
+     * strongly-typed recognizer result using RecognizerConvert.
+     *
+     * @param dialogContext Dialog Context.
+     * @param activity activity to recognize.
+     * @param telemetryProperties The properties to be included as part of the event tracking.
+     * @param telemetryMetrics The metrics to be included as part of the event tracking.
+     * @param c Class of type T
+     * @param <T> The RecognizerConvert
+     * @return
+     */
+    public <T extends RecognizerConvert> CompletableFuture<T> recognize(
+        DialogContext dialogContext,
+        Activity activity,
+        Map<String, String> telemetryProperties,
+        Map<String, Double> telemetryMetrics,
+        Class<T> c
+    ) {
+        return Async.tryCompletable(() -> {
+            T result = c.newInstance();
+            return recognize(dialogContext, activity, telemetryProperties, telemetryMetrics)
+                .thenApply(recognizerResult -> {
+                    result.convert(recognizerResult);
+                    return result;
+                });
+        });
     }
 
     /**
