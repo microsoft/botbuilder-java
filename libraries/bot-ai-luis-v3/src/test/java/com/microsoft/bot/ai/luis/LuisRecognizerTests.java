@@ -11,6 +11,7 @@ import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -39,6 +40,9 @@ public class LuisRecognizerTests {
 
     @Mock
     TurnContext turnContext;
+
+    @Mock
+    DialogContext dialogContext;
 
     @Mock
     LuisApplication luisApplication;
@@ -129,6 +133,64 @@ public class LuisRecognizerTests {
         RecognizerResult actual = null;
         try {
             actual = recognizer.recognize(turnContext).get();
+            ObjectMapper mapper = new ObjectMapper();
+            assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
+        } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void recognizerResultDialogContext() {
+        RecognizerResult expected  = new RecognizerResult(){{
+            setText("Random Message");
+            setIntents(new HashMap<String, IntentScore>(){{
+                put("Test",
+                    new IntentScore(){{
+                        setScore(0.2);
+                    }});
+                put("Greeting",
+                    new IntentScore(){{
+                        setScore(0.4);
+                    }});
+            }});
+            setEntities(JsonNodeFactory.instance.objectNode());
+            setProperties(
+                "sentiment",
+                JsonNodeFactory.instance.objectNode()
+                    .put(
+                        "label",
+                        "neutral"));
+        }};
+        RecognizerResult actual = null;
+        when(turnContext.getActivity())
+            .thenReturn(new Activity() {{
+                setText("Random Message");
+                setType(ActivityTypes.MESSAGE);
+                setChannelId("EmptyContext");
+                setFrom(new ChannelAccount(){{
+                    setId("Activity-from-ID");
+                }});
+            }});
+
+        when(luisApplication.getApplicationId())
+            .thenReturn("b31aeaf3-3511-495b-a07f-571fc873214b");
+
+        when(options.getTelemetryClient()).thenReturn(telemetryClient);
+
+        when(options.getApplication())
+            .thenReturn(luisApplication);
+        mockedResult.setText("Random Message");
+        when(dialogContext.getContext())
+            .thenReturn(turnContext);
+
+        doReturn(CompletableFuture.supplyAsync(() -> mockedResult))
+            .when(options)
+            .recognizeInternal(
+                any(DialogContext.class), any(Activity.class));
+        LuisRecognizer recognizer = new LuisRecognizer(options);
+        try {
+            actual = recognizer.recognize(dialogContext, turnContext.getActivity()).get();
             ObjectMapper mapper = new ObjectMapper();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
@@ -295,7 +357,6 @@ public class LuisRecognizerTests {
             .thenReturn("b31aeaf3-3511-495b-a07f-571fc873214b");
 
         when(options.getTelemetryClient()).thenReturn(telemetryClient);
-
 
         when(options.getApplication())
             .thenReturn(luisApplication);

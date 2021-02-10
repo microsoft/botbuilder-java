@@ -16,14 +16,15 @@ import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.Recognizer;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ResourceResponse;
-import java.util.ArrayList;
-import okhttp3.MediaType;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -397,7 +398,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                         }
                         recognizerExternalEntities.addAll(
                             originalExternalEntities == null
-                                ? new ArrayList<ExternalEntity>()
+                                ? new ArrayList<>()
                                 : originalExternalEntities
                         );
                         externalEntities = recognizerExternalEntities;
@@ -526,7 +527,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         }
 
         return sendTraceActivity(recognizerResult, luisResponse, turnContext)
-            .thenCompose(v -> CompletableFuture.completedFuture(recognizerResult));
+            .thenApply(v -> recognizerResult);
 
     }
 

@@ -7,8 +7,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.microsoft.bot.builder.*;
+import com.microsoft.bot.builder.BotAdapter;
+import com.microsoft.bot.builder.RecognizerResult;
+import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.TurnContextImpl;
 import com.microsoft.bot.dialogs.DialogContext;
+import com.microsoft.bot.dialogs.Recognizer;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
@@ -18,11 +22,13 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -155,68 +161,80 @@ public class LuisRecognizerOptionsV3Tests {
         }
     }
 
-    //TODO: Enable once the class Dialog Recognizer is ported
-//    @Test
-//    public void shouldBuildExternalEntities_DialogContextPassed_ExternalRecognizer() {
-//        MockWebServer mockWebServer = new MockWebServer();
-//
-//        try {
-//            // Get Oracle file
-//            String content = readFileContent("/src/test/java/com/microsoft/bot/ai/luis/testdata/ExternalRecognizer.json");
-//
-//            //Extract V3 response
-//            ObjectMapper mapper = new ObjectMapper();
-//            JsonNode testData = mapper.readTree(content);
-//            JsonNode v3SettingsAndResponse = testData.get("v3");
-//            JsonNode v3Response = v3SettingsAndResponse.get("response");
-//
-//            //Extract V3 Test Settings
-//            JsonNode testSettings = v3SettingsAndResponse.get("options");
-//
-//            // Set mock response in MockWebServer
-//            StringBuilder pathToMock = new StringBuilder("/luis/prediction/v3.0/apps/");
-//            String url = buildUrl(pathToMock, testSettings);
-//            String endpoint = String.format(
-//                "http://localhost:%s",
-//                initializeMockServer(
-//                    mockWebServer,
-//                    v3Response,
-//                    url).port());
-//
-//            // Set LuisRecognizerOptions data
-//            LuisRecognizerOptionsV3 v3 = buildTestRecognizer(endpoint, testSettings);
-//            v3.setExternalEntityRecognizer(recognizer);
-//            TurnContext tC = createContext(testData.get("text").asText());
-//            when(dC.getContext()).thenReturn(tC);
-//
-//            doReturn(CompletableFuture.supplyAsync(() -> new RecognizerResult(){{
-//                setEntities(testSettings.get("ExternalRecognizerResult"));
-//            }}))
-//                .when(recognizer)
-//                .recognize(any(TurnContext.class));
-//
-//            v3.recognizeInternal(dC, tC.getActivity()).get();
-//
-//            RecordedRequest request = mockWebServer.takeRequest();
-//            String resultBody = request.getBody().readUtf8();
-//            assertEquals("{\"query\":\"deliver 35 WA to repent harelquin\"," +
-//                    "\"options\":{\"preferExternalEntities\":true}," +
-//                    "\"externalEntities\":[{\"entityName\":\"Address\",\"startIndex\":17,\"entityLength\":16," +
-//                    "\"resolution\":[{\"endIndex\":33,\"modelType\":\"Composite Entity Extractor\"," +
-//                    "\"resolution\":{\"number\":[3],\"State\":[\"France\"]}," +
-//                    "\"startIndex\":17,\"text\":\"repent harelquin\",\"type\":\"Address\"}]}]}",
-//                resultBody);
-//
-//        } catch (InterruptedException | ExecutionException | IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                mockWebServer.shutdown();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    @Test
+    public void shouldBuildExternalEntities_DialogContextPassed_ExternalRecognizer() {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        try {
+            // Get Oracle file
+            String content = readFileContent("/src/test/java/com/microsoft/bot/ai/luis/testdata/ExternalRecognizer.json");
+
+            //Extract V3 response
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode testData = mapper.readTree(content);
+            JsonNode v3SettingsAndResponse = testData.get("v3");
+            JsonNode v3Response = v3SettingsAndResponse.get("response");
+
+            //Extract V3 Test Settings
+            JsonNode testSettings = v3SettingsAndResponse.get("options");
+
+            // Set mock response in MockWebServer
+            StringBuilder pathToMock = new StringBuilder("/luis/prediction/v3.0/apps/");
+            String url = buildUrl(pathToMock, testSettings);
+            String endpoint = String.format(
+                "http://localhost:%s",
+                initializeMockServer(
+                    mockWebServer,
+                    v3Response,
+                    url).port());
+
+            // Set LuisRecognizerOptions data
+            LuisRecognizerOptionsV3 v3 = buildTestRecognizer(endpoint, testSettings);
+            v3.setExternalEntityRecognizer(recognizer);
+
+            Activity activity = new Activity() {
+                {
+                    setText(testData.get("text").asText());
+                    setType(ActivityTypes.MESSAGE);
+                    setChannelId("EmptyContext");
+                }
+            };
+
+            doReturn(CompletableFuture.completedFuture(new ResourceResponse()))
+                .when(turnContext)
+                .sendActivity(any(Activity.class));
+
+            when(dC.getContext()).thenReturn(turnContext);
+
+            doReturn(CompletableFuture.supplyAsync(() -> new RecognizerResult(){{
+                setEntities(testSettings.get("ExternalRecognizerResult"));
+            }}))
+                .when(recognizer)
+                .recognize(any(DialogContext.class), any(Activity.class));
+
+            v3.recognizeInternal(dC, activity).get();
+
+            RecordedRequest request = mockWebServer.takeRequest();
+            String resultBody = request.getBody().readUtf8();
+            assertEquals("{\"query\":\"deliver 35 WA to repent harelquin\"," +
+                    "\"options\":{\"preferExternalEntities\":true}," +
+                    "\"externalEntities\":[{\"entityName\":\"Address\",\"startIndex\":17,\"entityLength\":16," +
+                    "\"resolution\":[{\"endIndex\":33,\"modelType\":\"Composite Entity Extractor\"," +
+                    "\"resolution\":{\"number\":[3],\"State\":[\"France\"]}," +
+                    "\"startIndex\":17,\"text\":\"repent harelquin\",\"type\":\"Address\"}]}]}",
+                resultBody);
+
+        } catch (InterruptedException | ExecutionException | IOException e) {
+            e.printStackTrace();
+            assertFalse(true);
+        } finally {
+            try {
+                mockWebServer.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static TurnContext createContext(String message) {
 
