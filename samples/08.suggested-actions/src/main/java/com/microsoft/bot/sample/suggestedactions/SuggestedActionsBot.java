@@ -13,7 +13,6 @@ import com.microsoft.bot.schema.CardAction;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.SuggestedActions;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
  * conversation participants.
  * </p>
  */
-@Component
 public class SuggestedActionsBot extends ActivityHandler {
     public static final String WELCOMETEXT =
         "This bot will introduce you to suggestedActions." + " Please answer the question:";

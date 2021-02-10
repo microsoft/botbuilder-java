@@ -20,9 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MainDialog extends ComponentDialog {
     public MainDialog() {
         super("MainDialog");

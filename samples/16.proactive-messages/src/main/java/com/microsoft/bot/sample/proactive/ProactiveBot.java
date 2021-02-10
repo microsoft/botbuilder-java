@@ -10,8 +10,8 @@ import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationReference;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
  * conversation participants with instructions for sending a proactive message.
  * </p>
  */
-@Component
 public class ProactiveBot extends ActivityHandler {
     @Value("${server.port:3978}")
     private int port;
@@ -57,6 +56,10 @@ public class ProactiveBot extends ActivityHandler {
         TurnContext turnContext
     ) {
         return membersAdded.stream()
+            .filter(
+                member -> !StringUtils
+                    .equals(member.getId(), turnContext.getActivity().getRecipient().getId())
+            )
             .map(
                 channel -> turnContext
                     .sendActivity(MessageFactory.text(String.format(WELCOMEMESSAGE, port)))

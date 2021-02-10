@@ -32,13 +32,14 @@ import org.apache.commons.lang3.StringUtils;
  * Defines the core behavior of prompt dialogs.
  *
  * When the prompt ends, it should return a Object that represents the value
- * that was prompted for. Use {@link DialogSet#add(Dialog)} or
- * {@link ComponentDialog#addDialog(Dialog)} to add a prompt to a dialog set or
- * component dialog, respectively. Use
+ * that was prompted for. Use {@link com.microsoft.bot.dialogs.DialogSet#add(Dialog)} or
+ * {@link com.microsoft.bot.dialogs.ComponentDialog#addDialog(Dialog)} to add a prompt to
+ * a dialog set or component dialog, respectively. Use
  * {@link DialogContext#prompt(String, PromptOptions)} or
  * {@link DialogContext#beginDialog(String, Object)} to start the prompt. If you
- * start a prompt from a {@link WaterfallStep} in a {@link WaterfallDialog} ,
- * then the prompt result will be available in the next step of the waterfall.
+ * start a prompt from a {@link com.microsoft.bot.dialogs.WaterfallStep} in a
+ * {@link com.microsoft.bot.dialogs.WaterfallDialog}, then the prompt result will be
+ * available in the next step of the waterfall.
  *
  * @param <T> Type the prompt is created for.
  */
@@ -46,8 +47,8 @@ public abstract class Prompt<T> extends Dialog {
 
     public static final String ATTEMPTCOUNTKEY = "AttemptCount";
 
-    private final String persistedOptions = "options";
-    private final String persistedState = "state";
+    private static final String PERSISTED_OPTIONS = "options";
+    private static final String PERSISTED_STATE = "state";
     private final PromptValidator<T> validator;
 
     /**
@@ -58,8 +59,9 @@ public abstract class Prompt<T> extends Dialog {
      * @param validator Optional, a {@link PromptValidator{T}} that contains
      *                  additional, custom validation for this prompt.
      *
-     *                  The value of {@link dialogId} must be unique within the
-     *                  {@link DialogSet} or {@link ComponentDialog} to which the
+     *                  The value of dialogId must be unique within the
+     *                  {@link com.microsoft.bot.dialogs.DialogSet} or
+     *                  {@link com.microsoft.bot.dialogs.ComponentDialog} to which the
      *                  prompt is added.
      */
     public Prompt(String dialogId, PromptValidator<T> validator) {
@@ -114,16 +116,16 @@ public abstract class Prompt<T> extends Dialog {
 
         // Initialize prompt state
         Map<String, Object> state = dc.getActiveDialog().getState();
-        state.put(persistedOptions, opt);
+        state.put(PERSISTED_OPTIONS, opt);
 
         HashMap<String, Object> pState = new HashMap<String, Object>();
         pState.put(ATTEMPTCOUNTKEY, 0);
-        state.put(persistedState, pState);
+        state.put(PERSISTED_STATE, pState);
 
         // Send initial prompt
         onPrompt(dc.getContext(),
-                 (Map<String, Object>) state.get(persistedState),
-                 (PromptOptions) state.get(persistedOptions),
+                 (Map<String, Object>) state.get(PERSISTED_STATE),
+                 (PromptOptions) state.get(PERSISTED_OPTIONS),
                  false);
         return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
     }
@@ -157,8 +159,8 @@ public abstract class Prompt<T> extends Dialog {
 
         // Perform base recognition
         DialogInstance instance = dc.getActiveDialog();
-        Map<String, Object> state = (Map<String, Object>) instance.getState().get(persistedState);
-        PromptOptions options = (PromptOptions) instance.getState().get(persistedOptions);
+        Map<String, Object> state = (Map<String, Object>) instance.getState().get(PERSISTED_STATE);
+        PromptOptions options = (PromptOptions) instance.getState().get(PERSISTED_OPTIONS);
         PromptRecognizerResult<T> recognized = onRecognize(dc.getContext(), state, options).join();
 
         state.put(ATTEMPTCOUNTKEY, (int) state.get(ATTEMPTCOUNTKEY) + 1);
@@ -226,8 +228,8 @@ public abstract class Prompt<T> extends Dialog {
      */
     @Override
     public CompletableFuture<Void> repromptDialog(TurnContext turnContext, DialogInstance instance) {
-        Map<String, Object> state = (Map<String, Object>) instance.getState().get(persistedState);
-        PromptOptions options = (PromptOptions) instance.getState().get(persistedOptions);
+        Map<String, Object> state = (Map<String, Object>) instance.getState().get(PERSISTED_STATE);
+        PromptOptions options = (PromptOptions) instance.getState().get(PERSISTED_OPTIONS);
         onPrompt(turnContext, state, options, false).join();
         return CompletableFuture.completedFuture(null);
     }
@@ -252,7 +254,7 @@ public abstract class Prompt<T> extends Dialog {
             // Perform base recognition
             Map<String, Object> state = dc.getActiveDialog().getState();
             PromptRecognizerResult<T> recognized =  onRecognize(dc.getContext(),
-                (Map<String, Object>) state.get(persistedState), (PromptOptions) state.get(persistedOptions)).join();
+                (Map<String, Object>) state.get(PERSISTED_STATE), (PromptOptions) state.get(PERSISTED_OPTIONS)).join();
             return CompletableFuture.completedFuture(recognized.getSucceeded());
         }
 
@@ -272,8 +274,8 @@ public abstract class Prompt<T> extends Dialog {
      * @param isRetry     true if this is the first time this prompt dialog instance
      *                    is on the stack is prompting the user for input;
      *                    otherwise, false. Determines whether
-     *                    {@link PromptOptions#prompt} or
-     *                    {@link PromptOptions#retryPrompt} should be used.
+     *                    {@link PromptOptions#getPrompt()} or
+     *                    {@link PromptOptions#getRetryPrompt()} should be used.
      *
      * @return A {@link CompletableFuture} representing the asynchronous operation.
      */
