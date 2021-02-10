@@ -6,6 +6,8 @@ package com.microsoft.bot.ai.luis;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.dialogs.DialogContext;
+import com.microsoft.bot.schema.Activity;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -127,17 +129,15 @@ public abstract class LuisRecognizerOptions {
     abstract CompletableFuture<RecognizerResult> recognizeInternal(
         TurnContext turnContext);
 
-    // TO DO: Enable once the class Dialog Recognizer is ported
-//    /**
-//     * Implementation of the Luis API http call and result processing.
-//     * This is intended to follow a Strategy pattern and
-//     * should only be consumed through the LuisRecognizer class.
-//     * @param context Dialog Context to extract turn context.
-//     * @param activity to extract the text utterance to be sent to Luis.
-//     * @return Recognizer Result populated by the Luis response.
-//     */
-//    abstract CompletableFuture<RecognizerResult> recognizeInternal(
-//        DialogContext context,
-//        Activity activity);
-
+    /**
+     * Implementation of the Luis API http call and result processing.
+     * This is intended to follow a Strategy pattern and
+     * should only be consumed through the LuisRecognizer class.
+     * @param context Dialog Context to extract turn context.
+     * @param activity to extract the text utterance to be sent to Luis.
+     * @return Recognizer Result populated by the Luis response.
+     */
+    abstract CompletableFuture<RecognizerResult> recognizeInternal(
+        DialogContext context,
+        Activity activity);
 }
