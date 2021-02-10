@@ -13,16 +13,10 @@ import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.schema.ChannelAccount;
 
-import org.springframework.stereotype.Component;
 import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.microsoft.bot.schema.Activity;
 import org.apache.commons.lang3.StringUtils;
 
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
-@Component
 public class AuthBot extends DialogBot<MainDialog> {
 
     public AuthBot(ConversationState conversationState, UserState userState, MainDialog dialog) {
@@ -49,7 +43,7 @@ public class AuthBot extends DialogBot<MainDialog> {
     @Override
     protected CompletableFuture<Void> onTokenResponseEvent(TurnContext turnContext) {
         // Run the Dialog with the new Token Response Event Activity.
-         return Dialog.run(dialog, turnContext, conversationState.createProperty("DialogState"));
+        return Dialog.run(dialog, turnContext, conversationState.createProperty("DialogState"));
     }
 
 }

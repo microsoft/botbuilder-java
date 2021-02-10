@@ -12,15 +12,16 @@ import com.microsoft.bot.builder.UserState;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This Bot implementation can run any type of Dialog. The use of type parameterization is to
- * allows multiple different bots to be run at different endpoints within the same project. This
- * can be achieved by defining distinct Controller types each with dependency on distinct IBot
- * types, this way ASP Dependency Injection can glue everything together without ambiguity. The
- * ConversationState is used by the Dialog system. The UserState isn't, however, it might have
- * been used in a Dialog implementation, and the requirement is that all BotState objects are
- * saved at the end of a turn.
+ * This Bot implementation can run any type of Dialog. The use of type parameterization is to allows
+ * multiple different bots to be run at different endpoints within the same project. This can be
+ * achieved by defining distinct Controller types each with dependency on distinct IBot types, this
+ * way ASP Dependency Injection can glue everything together without ambiguity. The
+ * ConversationState is used by the Dialog system. The UserState isn't, however, it might have been
+ * used in a Dialog implementation, and the requirement is that all BotState objects are saved at
+ * the end of a turn.
  */
 public class DialogBot<T extends Dialog> extends ActivityHandler {
+
     protected Dialog dialog;
     protected BotState conversationState;
     protected BotState userState;

@@ -23,8 +23,10 @@ public class LogoutDialog extends ComponentDialog {
 
 
     @Override
-    protected CompletableFuture<DialogTurnResult> onBeginDialog(DialogContext innerDc, Object options) {
-        DialogTurnResult result =  interrupt(innerDc).join();
+    protected CompletableFuture<DialogTurnResult> onBeginDialog(
+        DialogContext innerDc, Object options
+    ) {
+        DialogTurnResult result = interrupt(innerDc).join();
         if (result != null) {
             return CompletableFuture.completedFuture(result);
         }
@@ -34,7 +36,7 @@ public class LogoutDialog extends ComponentDialog {
 
     @Override
     protected CompletableFuture<DialogTurnResult> onContinueDialog(DialogContext innerDc) {
-        DialogTurnResult result =  interrupt(innerDc).join();
+        DialogTurnResult result = interrupt(innerDc).join();
         if (result != null) {
             return CompletableFuture.completedFuture(result);
         }
@@ -48,10 +50,12 @@ public class LogoutDialog extends ComponentDialog {
 
             if (text.equals("logout")) {
                 // The bot adapter encapsulates the authentication processes.
-                BotFrameworkAdapter botAdapter = (BotFrameworkAdapter) innerDc.getContext().getAdapter();
+                BotFrameworkAdapter botAdapter = (BotFrameworkAdapter) innerDc.getContext()
+                    .getAdapter();
                 botAdapter.signOutUser(innerDc.getContext(), getConnectionName(), null).join();
-                innerDc.getContext().sendActivity(MessageFactory.text("You have been signed out.")).join();
-                return  innerDc.cancelAllDialogs();
+                innerDc.getContext().sendActivity(MessageFactory.text("You have been signed out."))
+                    .join();
+                return innerDc.cancelAllDialogs();
             }
         }
 
