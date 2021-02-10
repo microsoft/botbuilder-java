@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +45,9 @@ public class LuisRecognizerOptionsV3Tests {
 
     @Mock
     Recognizer recognizer;
+
+    @Mock
+    TurnContext turnContext;
 
     // Set this values to test against the service
     String applicationId = "b31aeaf3-3511-495b-a07f-571fc873214b";
@@ -107,7 +112,22 @@ public class LuisRecognizerOptionsV3Tests {
             LuisRecognizerOptionsV3 v3 = buildTestRecognizer(endpoint, testSettings);
 
             // Run test
-            result = v3.recognizeInternal(createContext(testData.get("text").asText())).get();
+            Activity activity = new Activity() {
+                {
+                    setText(testData.get("text").asText());
+                    setType(ActivityTypes.MESSAGE);
+                    setChannelId("EmptyContext");
+                }
+            };
+            doReturn(activity)
+                .when(turnContext)
+                .getActivity();
+
+            doReturn(CompletableFuture.completedFuture(new ResourceResponse()))
+                .when(turnContext)
+                .sendActivity(any(Activity.class));
+
+            result = v3.recognizeInternal(turnContext).get();
 
             // Build expected result
             expected = mapper.readValue(content, RecognizerResult.class);
@@ -120,6 +140,8 @@ public class LuisRecognizerOptionsV3Tests {
             RecordedRequest request = mockWebServer.takeRequest();
             assertEquals(String.format("POST %s HTTP/1.1", pathToMock.toString()), request.getRequestLine());
             assertEquals(pathToMock.toString(), request.getPath());
+
+            verify(turnContext, times(1)).sendActivity(any (Activity.class));
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
