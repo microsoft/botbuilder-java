@@ -23,6 +23,9 @@ import com.microsoft.bot.schema.teams.MessagingExtensionActionResponse;
 import com.microsoft.bot.schema.teams.MessagingExtensionQuery;
 import com.microsoft.bot.schema.teams.MessagingExtensionResponse;
 import com.microsoft.bot.schema.teams.O365ConnectorCardActionQuery;
+import com.microsoft.bot.schema.teams.TabRequest;
+import com.microsoft.bot.schema.teams.TabResponse;
+import com.microsoft.bot.schema.teams.TabSubmit;
 import com.microsoft.bot.schema.teams.TaskModuleRequest;
 import com.microsoft.bot.schema.teams.TaskModuleResponse;
 import com.microsoft.bot.schema.teams.TeamInfo;
@@ -42,7 +45,7 @@ import java.util.concurrent.CompletionException;
  * Pre and post processing of Activities can be plugged in by deriving and
  * calling the base class implementation.
  */
-@SuppressWarnings({ "checkstyle:JavadocMethod", "checkstyle:DesignForExtension" })
+@SuppressWarnings({ "checkstyle:JavadocMethod", "checkstyle:DesignForExtension", "checkstyle:MethodLength" })
 public class TeamsActivityHandler extends ActivityHandler {
     /**
      * Invoked when an invoke activity is received from the connector when the base
@@ -170,6 +173,26 @@ public class TeamsActivityHandler extends ActivityHandler {
                             Serialization.safeGetAs(
                                 turnContext.getActivity().getValue(),
                                 TaskModuleRequest.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        break;
+
+                    case "tab/fetch":
+                        result = onTeamsTabFetch(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                TabRequest.class
+                            )
+                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        break;
+
+                    case "tab/submit":
+                        result = onTeamsTabSubmit(
+                            turnContext,
+                            Serialization.safeGetAs(
+                                turnContext.getActivity().getValue(),
+                                TabSubmit.class
                             )
                         ).thenApply(ActivityHandler::createInvokeResponse);
                         break;
@@ -484,7 +507,8 @@ public class TeamsActivityHandler extends ActivityHandler {
     }
 
     /**
-     * Override this in a derived class to provide logic for when a card button is clicked in a messaging extension.
+     * Override this in a derived class to provide logic for when a card button
+     * is clicked in a messaging extension.
      *
      * @param turnContext The current TurnContext.
      * @param cardData Object representing the card data.
@@ -676,8 +700,8 @@ public class TeamsActivityHandler extends ActivityHandler {
                 }
 
                 if (teamsChannelAccount == null) {
-                    // unable to find the member added in ConversationUpdate Activity in the response from the
-                    // getMember call
+                    // unable to find the member added in ConversationUpdate Activity in
+                    // the response from the getMember call
                     teamsChannelAccount = new TeamsChannelAccount();
                     teamsChannelAccount.setId(memberAdded.getId());
                     teamsChannelAccount.setName(memberAdded.getName());
@@ -917,6 +941,26 @@ public class TeamsActivityHandler extends ActivityHandler {
         TurnContext turnContext
     ) {
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic for when a tab is fetched.
+     * @param turnContext The context object for this turn.
+     * @param tabRequest The tab invoke request value payload.
+     * @return A Tab Response for the request.
+     */
+    protected CompletableFuture<TabResponse> onTeamsTabFetch(TurnContext turnContext, TabRequest tabRequest) {
+        return withException(new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
+    }
+
+    /**
+     * Override this in a derived class to provide logic for when a tab is submitted.
+     * @param turnContext The context object for this turn.
+     * @param tabSubmit The tab submit invoke request value payload.
+     * @return A Tab Response for the request.
+     */
+    protected CompletableFuture<TabResponse> onTeamsTabSubmit(TurnContext turnContext, TabSubmit tabSubmit) {
+        return withException(new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
     }
 
     /**
