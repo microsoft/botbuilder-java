@@ -1215,6 +1215,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
         // moving forward
         if (appCredentials != null) {
             appCredentialMap.put(cacheKey, appCredentials);
+            return CompletableFuture.completedFuture(appCredentials);
         }
 
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
