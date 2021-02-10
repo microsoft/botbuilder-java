@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DialogState {
     @JsonProperty(value = "dialogStack")
-    private List<DialogInstance> dialogStack = new ArrayList<DialogInstance>();
+    private List<DialogInstance> dialogStack;
 
     /**
      * Initializes a new instance of the class with an empty stack.
