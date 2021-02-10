@@ -13,6 +13,7 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ResourceResponse;
 import okhttp3.MediaType;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -496,7 +497,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
             } catch (IOException e) {
                CompletableFuture<RecognizerResult> exceptionResult = new CompletableFuture<>();
-               exceptionResult.completeExceptionally(new IOException(""));
+               exceptionResult.completeExceptionally(e);
                return exceptionResult;
             }
 
@@ -521,9 +522,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             }
         }
 
-        sendTraceActivity(recognizerResult, luisResponse, turnContext);
+        return sendTraceActivity(recognizerResult, luisResponse, turnContext)
+            .thenCompose(v -> CompletableFuture.completedFuture(recognizerResult));
 
-        return CompletableFuture.completedFuture(recognizerResult);
     }
 
     private Map<String, IntentScore> getIntents(JsonNode prediction) {
@@ -698,7 +699,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         }
     }
 
-    private void sendTraceActivity(
+    private CompletableFuture<ResourceResponse> sendTraceActivity(
         RecognizerResult recognizerResult,
         JsonNode luisResponse,
         TurnContext turnContext) {
@@ -745,15 +746,17 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
             traceInfo.set("luisOptions", luisOptions);
 
-            turnContext.sendActivity(
+            return turnContext.sendActivity(
                 Activity.createTraceActivity(
                     "LuisRecognizer",
                     LUIS_TRACE_TYPE,
                     traceInfo,
-                    LUIS_TRACE_LABEL))
-                .thenApply(resourceResponse -> null);
+                    LUIS_TRACE_LABEL));
+
         } catch (IOException e) {
-            e.printStackTrace();
+            CompletableFuture<ResourceResponse> exceptionResult = new CompletableFuture<>();
+            exceptionResult.completeExceptionally(e);
+            return exceptionResult;
         }
     }
 }

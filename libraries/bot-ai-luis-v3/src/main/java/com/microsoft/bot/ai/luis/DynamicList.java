@@ -14,6 +14,12 @@ public class DynamicList {
 
     /**
      * Initializes a new instance of the DynamicList class.
+     */
+    public DynamicList() {
+    }
+
+    /**
+     * Initializes a new instance of the DynamicList class.
      * @param entity Entity field.
      * @param requestLists List Elements to use when querying Luis Service.
      */

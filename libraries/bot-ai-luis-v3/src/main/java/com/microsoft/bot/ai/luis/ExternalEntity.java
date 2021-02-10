@@ -14,6 +14,12 @@ public class ExternalEntity {
 
     /**
      * Initializes a new instance of ExternalEntity.
+     */
+    public ExternalEntity() {
+    }
+
+    /**
+     * Initializes a new instance of ExternalEntity.
      * @param entity name of the entity to extend.
      * @param start start character index of the predicted entity.
      * @param length length of the predicted entity.
