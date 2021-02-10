@@ -14,7 +14,6 @@ import com.microsoft.bot.schema.teams.MessagingExtensionQuery;
 import com.microsoft.bot.schema.teams.MessagingExtensionResponse;
 import com.microsoft.bot.schema.teams.MessagingExtensionResult;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +24,6 @@ import java.util.concurrent.CompletableFuture;
  * <p>This is where application specific logic for interacting with the users would be
  * added.</p>
  */
-@Component
 public class LinkUnfurlingBot extends TeamsActivityHandler {
 
     @Override

@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
  * More information can be found
  * here https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview.
  */
-@Component
 public class MultiLingualBot extends ActivityHandler {
     private static final String WELCOME_TEXT =
         new StringBuilder("This bot will introduce you to translation middleware. ")
