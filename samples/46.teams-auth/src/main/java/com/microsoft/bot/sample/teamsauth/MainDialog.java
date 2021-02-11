@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.authentication;
+package com.microsoft.bot.sample.teamsauth;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
@@ -17,10 +17,10 @@ import com.microsoft.bot.dialogs.prompts.OAuthPromptSettings;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.TokenResponse;
+import com.microsoft.graph.models.extensions.User;
 
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 
-@Component
  class MainDialog extends LogoutDialog {
 
     public MainDialog(Configuration configuration) {
@@ -57,8 +57,14 @@ import org.springframework.stereotype.Component;
         // Get the token from the previous step. Note that we could also have gotten the
         // token directly from the prompt itself. There instanceof an example of this in the next method.
         TokenResponse tokenResponse = (TokenResponse)stepContext.getResult();
-        if (tokenResponse != null) {
-            stepContext.getContext().sendActivity(MessageFactory.text("You are now logged in."));
+        if (tokenResponse != null && tokenResponse.getToken() != null) {
+            SimpleGraphClient client = new SimpleGraphClient(tokenResponse.getToken());
+            User me = client.getMe();
+            String title = !StringUtils.isEmpty(me.jobTitle) ? me.jobTitle :  "Unknown";
+
+            stepContext.getContext().sendActivity(
+                MessageFactory.text(String.format("You're logged in as %s (%s); your job title is: %s",
+                                    me.displayName, me.userPrincipalName, title)));
             PromptOptions options = new PromptOptions();
             options.setPrompt(MessageFactory.text("Would you like to view your token?"));
             return stepContext.prompt("ConfirmPrompt", options);
@@ -69,19 +75,21 @@ import org.springframework.stereotype.Component;
     }
 
     private CompletableFuture<DialogTurnResult> displayTokenPhase1(WaterfallStepContext stepContext) {
-         stepContext.getContext().sendActivity(MessageFactory.text("Thank you."));
+        stepContext.getContext().sendActivity(MessageFactory.text("Thank you."));
 
-        boolean result = (boolean)stepContext.getResult();
-        if (result) {
-            // Call the prompt again because we need the token. The reasons for this are:
-            // 1. If the user instanceof already logged in we do not need to store the token locally in the bot and worry
-            // about refreshing it. We can always just call the prompt again to get the token.
-            // 2. We never know how long it will take a user to respond. By the time the
-            // user responds the token may have expired. The user would then be prompted to login again.
-            //
-            // There instanceof no reason to store the token locally in the bot because we can always just call
-            // the OAuth prompt to get the token or get a new token if needed.
-            return  stepContext.beginDialog("OAuthPrompt");
+        if (stepContext.getResult() != null){
+            boolean result = (boolean)stepContext.getResult();
+            if (result) {
+                // Call the prompt again because we need the token. The reasons for this are:
+                // 1. If the user instanceof already logged in we do not need to store the token locally in the bot and worry
+                // about refreshing it. We can always just call the prompt again to get the token.
+                // 2. We never know how long it will take a user to respond. By the time the
+                // user responds the token may have expired. The user would then be prompted to login again.
+                //
+                // There instanceof no reason to store the token locally in the bot because we can always just call
+                // the OAuth prompt to get the token or get a new token if needed.
+                return  stepContext.beginDialog("OAuthPrompt");
+            }
         }
 
         return  stepContext.endDialog();
