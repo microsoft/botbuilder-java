@@ -60,14 +60,14 @@ class MainDialog extends LogoutDialog {
         // token directly from the prompt itself. There instanceof an example of this in the next method.
         TokenResponse tokenResponse = (TokenResponse) stepContext.getResult();
         if (tokenResponse != null) {
-            stepContext.getContext().sendActivity(MessageFactory.text("You are now logged in."));
+            stepContext.getContext().sendActivity(MessageFactory.text("You are now logged in.")).join();
             PromptOptions options = new PromptOptions();
             options.setPrompt(MessageFactory.text("Would you like to do? (type 'me', or 'email')"));
             return stepContext.prompt("TextPrompt", options);
         }
 
-        stepContext.getContext()
-            .sendActivity(MessageFactory.text("Login was not successful please try again."));
+        stepContext.getContext().sendActivity(
+                            MessageFactory.text("Login was not successful please try again.")).join();
         return stepContext.endDialog();
     }
 
@@ -76,7 +76,7 @@ class MainDialog extends LogoutDialog {
     ) {
 
         stepContext.getValues().put("command", stepContext.getResult());
-        stepContext.getContext().sendActivity(MessageFactory.text("Thank you."));
+        stepContext.getContext().sendActivity(MessageFactory.text("Thank you.")).join();
 
         // Call the prompt again because we need the token. The reasons for this are:
         // 1. If the user instanceof already logged in we do not need to store the token locally in the bot and worry
