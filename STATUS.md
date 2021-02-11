@@ -1,29 +1,29 @@
 # Java Bot Framework
 
-The current release is **Preview 6**.
+The current release is **Preview 8**.
 
 ## Core Packages
 
-| Package                         | Status        
+| Package                         | Status
 | :-------------                  |:-------------
 | bot-schema                      | Preview 2
-| bot-connector                   | Preview 2     
-| bot-integration-core            | Preview 2     
+| bot-connector                   | Preview 2
+| bot-integration-core            | Preview 2
 | bot-builder                     | Preview 3
 | bot-builder-teams               | Preview 5
 | bot-schema-teams                | Preview 5
 | bot-connector-teams             | Preview 5
 | bot-dialog                      | Preview 8
-| bot-dialog-adaptive             | Not Started
-| bot-dialog-declarative          | Not Started
-| bot-streaming-extensions        | Not Started
-| bot-ai-luis                     | Preview 8
-| bot-ai-qna                      | Not Started
+| bot-dialog-adaptive             | TBD
+| bot-dialog-declarative          | TBD
+| bot-streaming-extensions        | TBD
+| bot-ai-luis-v3                     | Preview 8
+| bot-ai-qna                      | In Progress
 | bot-applicationinsights         | Not Started
-| bot-azure                       | Dev Branch - CosmosDBPartionedStorage
+| bot-azure                       | In Progress
 
 ## Samples
-| Package                         | Status        
+| Package                         | Status
 | -------------                   |:-------------
 | 02.echo-bot                     | Preview 3
 | 03.welcome-user                 | Preview 3
@@ -38,7 +38,7 @@ The current release is **Preview 6**.
 | 16.proactive-messages           | Preview 3
 | 17.multilingual-bot             | Preview 8
 | 18.bot-authentication           |
-| 19.custom-dialogs               |
+| 19.custom-dialogs               | Preview 8
 | 21.corebot-app-insights         |
 | 23.facebook-events              |
 | 24.bot-authentication-msgraph   |
