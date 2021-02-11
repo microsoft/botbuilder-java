@@ -550,12 +550,16 @@ public class LuisRecognizer extends TelemetryRecognizer {
     private <T extends RecognizerConvert> T convertRecognizerResult(
         RecognizerResult recognizerResult,
         Class<T> clazz) {
-        T result = null;
+        T result;
         try {
             result = clazz.newInstance();
             result.convert(recognizerResult);
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException(
+                String.format("Exception thrown when converting " +
+                    "Recgonizer Result to strongly typed: %s : %s",
+                    clazz.getName(),
+                    e.getMessage() ));
         }
         return result;
     }
