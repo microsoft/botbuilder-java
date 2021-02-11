@@ -327,6 +327,7 @@ public class LuisRecognizerOptionsV3Tests {
             setVersion(testSettings.get("Version") == null ? null : testSettings.get("Version").asText());
             setDynamicLists(testSettings.get("DynamicLists") == null ? null : readerDynamicList.readValue(testSettings.get("DynamicLists")));
             setExternalEntities(testSettings.get("ExternalEntities") == null ? null : readerExternalentities.readValue(testSettings.get("ExternalEntities")));
+            setDateTimeReference(testSettings.get("DateTimeReference") == null ? null : testSettings.get("DateTimeReference").asText());
         }};
     }
 

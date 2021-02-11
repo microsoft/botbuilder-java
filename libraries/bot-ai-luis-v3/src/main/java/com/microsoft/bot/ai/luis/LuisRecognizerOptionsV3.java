@@ -498,6 +498,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 Request request = buildRequest(buildRequestBody(utterance));
                 Response response = httpClient.newCall(request).execute();
                 luisResponse = mapper.readTree(response.body().string());
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + luisResponse.toString());
+                }
 
             } catch (IOException e) {
                CompletableFuture<RecognizerResult> exceptionResult = new CompletableFuture<>();

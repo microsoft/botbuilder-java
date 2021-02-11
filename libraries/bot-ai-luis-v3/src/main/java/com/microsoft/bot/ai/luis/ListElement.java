@@ -3,7 +3,9 @@
 
 package com.microsoft.bot.ai.luis;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
@@ -38,6 +40,7 @@ public class ListElement {
      * The synonyms of the canonical form.
      */
     @JsonProperty(value = "synonyms")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> synonyms;
 
     /**
