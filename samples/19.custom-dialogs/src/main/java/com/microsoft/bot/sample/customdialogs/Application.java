@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.authentication;
+package com.microsoft.bot.sample.customdialogs;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.builder.ConversationState;
@@ -51,12 +51,26 @@ public class Application extends BotDependencyConfiguration {
      */
     @Bean
     public Bot getBot(
-        Configuration configuration,
         ConversationState conversationState,
         UserState userState,
-        MainDialog dialog
+        Dialog dialog
     ) {
-        return new AuthBot(conversationState, userState, new MainDialog(configuration));
+        return new DialogBot(conversationState, userState, dialog);
+    }
+
+    /**
+     * Returns the starting Dialog for this application.
+     *
+     * <p>
+     *     The @Component annotation could be used on the Dialog class instead of this method
+     *     with the @Bean annotation.
+     * </p>
+     *
+     * @return The Dialog implementation for this application.
+     */
+    @Bean
+    public Dialog getRootDialog(UserState userState) {
+        return new RootDialog(userState);
     }
 
     /**

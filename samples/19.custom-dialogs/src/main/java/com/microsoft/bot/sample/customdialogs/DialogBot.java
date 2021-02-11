@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.authentication;
+package com.microsoft.bot.sample.customdialogs;
 
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.BotState;
@@ -12,16 +12,15 @@ import com.microsoft.bot.builder.UserState;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This Bot implementation can run any type of Dialog. The use of type parameterization is to allows
- * multiple different bots to be run at different endpoints within the same project. This can be
- * achieved by defining distinct Controller types each with dependency on distinct IBot types, this
- * way ASP Dependency Injection can glue everything together without ambiguity. The
- * ConversationState is used by the Dialog system. The UserState isn't, however, it might have been
- * used in a Dialog implementation, and the requirement is that all BotState objects are saved at
- * the end of a turn.
+ * This IBot implementation can run any type of Dialog. The use of type parameterization is to
+ * allows multiple different bots to be run at different endpoints within the same project. This
+ * can be achieved by defining distinct Controller types each with dependency on distinct IBot
+ * types, this way ASP Dependency Injection can glue everything together without ambiguity. The
+ * ConversationState is used by the Dialog system. The UserState isn't, however, it might have
+ * been used in a Dialog implementation, and the requirement is that all BotState objects are
+ * saved at the end of a turn.
  */
-public class DialogBot<T extends Dialog> extends ActivityHandler {
-
+public class DialogBot extends ActivityHandler {
     protected Dialog dialog;
     protected BotState conversationState;
     protected BotState userState;
@@ -29,7 +28,7 @@ public class DialogBot<T extends Dialog> extends ActivityHandler {
     public DialogBot(
         ConversationState withConversationState,
         UserState withUserState,
-        T withDialog
+        Dialog withDialog
     ) {
         dialog = withDialog;
         conversationState = withConversationState;

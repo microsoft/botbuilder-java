@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -154,6 +155,21 @@ public final class Serialization {
     }
 
     /**
+     * Convert an object to a JSON string.
+     *
+     * @param source The object to convert.
+     * @return The JSON string value.
+     * @throws JsonProcessingException Error converting to JSON
+     */
+    public static String toStringSilent(Object source) {
+        try {
+            return objectMapper.writeValueAsString(source);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
      * Parses a JSON document.
      *
      * @param json The JSON to parse.
@@ -234,6 +250,14 @@ public final class Serialization {
      */
     public static JsonNode asNode(byte b) {
         return objectMapper.getNodeFactory().numberNode(b);
+    }
+
+    /**
+     * Creates an ObjectNode.
+     * @return ObjectNode.
+     */
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
     }
 }
 
