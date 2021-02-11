@@ -11,13 +11,17 @@ import com.microsoft.bot.dialogs.DialogTurnResult;
 import com.microsoft.bot.dialogs.WaterfallDialog;
 import com.microsoft.bot.dialogs.WaterfallStep;
 import com.microsoft.bot.dialogs.WaterfallStepContext;
-import com.microsoft.bot.dialogs.prompts.ConfirmPrompt;
+import com.microsoft.bot.dialogs.prompts.ChoicePrompt;
 import com.microsoft.bot.dialogs.prompts.OAuthPrompt;
 import com.microsoft.bot.dialogs.prompts.OAuthPromptSettings;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
+import com.microsoft.bot.dialogs.prompts.TextPrompt;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.schema.TokenResponse;
 
+import org.springframework.stereotype.Component;
+
+@Component
 class MainDialog extends LogoutDialog {
 
     public MainDialog(Configuration configuration) {
@@ -32,7 +36,7 @@ class MainDialog extends LogoutDialog {
 
         addDialog(new OAuthPrompt("OAuthPrompt", settings));
 
-        addDialog(new ConfirmPrompt("ConfirmPrompt"));
+        addDialog(new TextPrompt("TextPrompt"));
 
         WaterfallStep[] waterfallSteps = {
             this::promptStep,
@@ -107,9 +111,9 @@ class MainDialog extends LogoutDialog {
                 };
 
                 if (command.equals("me")) {
-                    OAuthHelpers.ListMeAsync(stepContext.getContext(), tokenResponse);
+                    OAuthHelpers.ListMeAsync(stepContext.getContext(), tokenResponse).join();
                 } else if (command.startsWith("email")) {
-                    OAuthHelpers.ListEmailAddressAsync(stepContext.getContext(), tokenResponse);
+                    OAuthHelpers.ListEmailAddressAsync(stepContext.getContext(), tokenResponse).join();
                 } else {
                     stepContext.getContext().sendActivity(
                         MessageFactory.text(String.format("Your token is: %s", tokenResponse.getToken()))).join();
