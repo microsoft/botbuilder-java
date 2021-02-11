@@ -1,0 +1,166 @@
+{
+  "entities": {
+    "$instance": {
+      "Part": [
+        {
+          "endIndex": 5,
+          "modelType": "Regex Entity Extractor",
+          "recognitionSources": [
+            "externalEntities"
+          ],
+          "startIndex": 0,
+          "text": "42ski",
+          "type": "Part"
+        },
+        {
+          "endIndex": 26,
+          "modelType": "Regex Entity Extractor",
+          "recognitionSources": [
+            "model"
+          ],
+          "startIndex": 21,
+          "text": "kb423",
+          "type": "Part"
+        }
+      ]
+    },
+    "Part": [
+      "42ski",
+      "kb423"
+    ]
+  },
+  "intents": {
+    "Cancel": {
+      "score": 0.0128021352
+    },
+    "Delivery": {
+      "score": 0.004558195
+    },
+    "EntityTests": {
+      "score": 0.009367461
+    },
+    "Greeting": {
+      "score": 0.0025622393
+    },
+    "Help": {
+      "score": 0.0021368505
+    },
+    "None": {
+      "score": 0.2778768
+    },
+    "Roles": {
+      "score": 0.0273504611
+    },
+    "search": {
+      "score": 0.000832980848
+    },
+    "SpecifyName": {
+      "score": 0.00770643726
+    },
+    "Travel": {
+      "score": 0.00204822514
+    },
+    "Weather_GetForecast": {
+      "score": 0.009585343
+    }
+  },
+  "sentiment": {
+    "label": "neutral",
+    "score": 0.5
+  },
+  "text": "42ski is a part like kb423",
+  "v3": {
+    "options": {
+      "ExternalEntities": [
+        {
+          "entityLength": 5,
+          "entityName": "Part",
+          "startIndex": 0
+        }
+      ],
+      "IncludeAllIntents": true,
+      "IncludeAPIResults": true,
+      "IncludeInstanceData": true,
+      "Log": true,
+      "PreferExternalEntities": true,
+      "Slot": "production"
+    },
+    "response": {
+      "prediction": {
+        "entities": {
+          "$instance": {
+            "Part": [
+              {
+                "length": 5,
+                "modelType": "Regex Entity Extractor",
+                "modelTypeId": 8,
+                "recognitionSources": [
+                  "externalEntities"
+                ],
+                "startIndex": 0,
+                "text": "42ski",
+                "type": "Part"
+              },
+              {
+                "length": 5,
+                "modelType": "Regex Entity Extractor",
+                "modelTypeId": 8,
+                "recognitionSources": [
+                  "model"
+                ],
+                "startIndex": 21,
+                "text": "kb423",
+                "type": "Part"
+              }
+            ]
+          },
+          "Part": [
+            "42ski",
+            "kb423"
+          ]
+        },
+        "intents": {
+          "Cancel": {
+            "score": 0.0128021352
+          },
+          "Delivery": {
+            "score": 0.004558195
+          },
+          "EntityTests": {
+            "score": 0.009367461
+          },
+          "Greeting": {
+            "score": 0.0025622393
+          },
+          "Help": {
+            "score": 0.0021368505
+          },
+          "None": {
+            "score": 0.2778768
+          },
+          "Roles": {
+            "score": 0.0273504611
+          },
+          "search": {
+            "score": 0.000832980848
+          },
+          "SpecifyName": {
+            "score": 0.00770643726
+          },
+          "Travel": {
+            "score": 0.00204822514
+          },
+          "Weather.GetForecast": {
+            "score": 0.009585343
+          }
+        },
+        "sentiment": {
+          "label": "neutral",
+          "score": 0.5
+        },
+        "topIntent": "None"
+      },
+      "query": "42ski is a part like kb423"
+    }
+  }
+}
