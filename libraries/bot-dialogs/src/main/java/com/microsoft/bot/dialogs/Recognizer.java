@@ -12,17 +12,17 @@ import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
-import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Serialization;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Recognizer base class.
@@ -111,9 +111,9 @@ public class Recognizer {
      * @param activity activity to recognize.
      * @param telemetryProperties The properties to be included as part of the event tracking.
      * @param telemetryMetrics The metrics to be included as part of the event tracking.
-     * @param c Class of type T
-     * @param <T> The RecognizerConvert
-     * @return
+     * @param c Class of type T.
+     * @param <T> The RecognizerConvert.
+     * @return Analysis of utterance.
      */
     public <T extends RecognizerConvert> CompletableFuture<T> recognize(
         DialogContext dialogContext,
