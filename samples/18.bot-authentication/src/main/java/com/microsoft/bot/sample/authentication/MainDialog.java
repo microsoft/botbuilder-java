@@ -24,7 +24,6 @@ class MainDialog extends LogoutDialog {
         super("MainDialog", configuration.getProperty("ConnectionName"));
 
         OAuthPromptSettings settings = new OAuthPromptSettings();
-        settings.setConnectionName("");
         settings.setText("Please Sign In");
         settings.setTitle("Sign In");
         settings.setConnectionName(configuration.getProperty("ConnectionName"));

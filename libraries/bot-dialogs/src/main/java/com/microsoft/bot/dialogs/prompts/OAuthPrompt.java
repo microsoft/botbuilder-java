@@ -299,8 +299,11 @@ public class OAuthPrompt extends Dialog {
                 }
             }
         } else if (isTeamsVerificationInvoke(turnContext)) {
-            String magicCode = (String) turnContext.getActivity().getValue();
-            //var magicCode = magicCodeObject.GetValue("state", StringComparison.Ordinal)?.toString();
+            HashMap<String, String> values = (HashMap<String, String>) turnContext.getActivity().getValue();
+            String magicCode = "";
+            if (values != null && values instanceof HashMap) {
+                magicCode = (String) values.get("state");
+            }
 
             Object adapterObject = turnContext.getAdapter();
             if (!(adapterObject instanceof UserTokenProvider)) {
