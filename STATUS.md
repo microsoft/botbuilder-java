@@ -17,7 +17,7 @@ The current release is **Preview 8**.
 | bot-dialog-adaptive             | TBD
 | bot-dialog-declarative          | TBD
 | bot-streaming-extensions        | TBD
-| bot-ai-luis-v3                     | Preview 8
+| bot-ai-luis-v3                  | Preview 8
 | bot-ai-qna                      | In Progress
 | bot-applicationinsights         | Not Started
 | bot-azure                       | In Progress
