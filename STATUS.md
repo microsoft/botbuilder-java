@@ -37,17 +37,17 @@ The current release is **Preview 8**.
 | 15.handling-attachments         |
 | 16.proactive-messages           | Preview 3
 | 17.multilingual-bot             | Preview 8
-| 18.bot-authentication           |
+| 18.bot-authentication           | Preview 8
 | 19.custom-dialogs               | Preview 8
 | 21.corebot-app-insights         |
 | 23.facebook-events              |
-| 24.bot-authentication-msgraph   |
+| 24.bot-authentication-msgraph   | Preview 8
 | 40.timex-resolution             |
 | 42.scaleout                     |
 | 43.complex-dialog               | Preview 8
 | 44.prompt-users-for-input       | Preview 8
 | 45.state-management             | Preview 3
-| 46.teams-auth                   |
+| 46.teams-auth                   | Preview 8
 | 47.inspection                   | Preview 3
 | 48.qnamaker-active-learning-bot |
 | 49.qnamaker-all-features        |
