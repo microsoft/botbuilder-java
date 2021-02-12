@@ -3,9 +3,13 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import com.auth0.jwt.JWT;
+import com.microsoft.bot.connector.Async;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,7 +101,104 @@ public final class SkillValidation {
 
         // Skill claims must contain and app ID and the AppID must be different than the
         // audience.
-        return appId != audience.get().getValue();
+        return !StringUtils.equals(appId, audience.get().getValue());
     }
 
+    /**
+     * Determines if a given Auth header is from from a skill to bot or bot to skill request.
+     *
+     * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
+     * @return True, if the token was issued for a skill to bot communication. Otherwise, false.
+     */
+    public static boolean isSkillToken(String authHeader) {
+        if (!JwtTokenValidation.isValidTokenFormat(authHeader)) {
+            return false;
+        }
+
+        // We know is a valid token, split it and work with it:
+        // [0] = "Bearer"
+        // [1] = "[Big Long String]"
+        String bearerToken = authHeader.split(" ")[1];
+
+        // Parse token
+        ClaimsIdentity identity = new ClaimsIdentity(JWT.decode(bearerToken));
+
+        return isSkillClaim(identity.claims());
+    }
+
+    /**
+     * Helper to validate a skills ClaimsIdentity.
+     *
+     * @param identity The ClaimsIdentity to validate.
+     * @param credentials The CredentialProvider.
+     * @return Nothing if success, otherwise a CompletionException
+     */
+    public static CompletableFuture<Void> validateIdentity(
+        ClaimsIdentity identity,
+        CredentialProvider credentials
+    ) {
+        if (identity == null) {
+            // No valid identity. Not Authorized.
+            return Async.completeExceptionally(new AuthenticationException("Invalid Identity"));
+        }
+
+        if (!identity.isAuthenticated()) {
+            // The token is in some way invalid. Not Authorized.
+            return Async.completeExceptionally(new AuthenticationException("Token Not Authenticated"));
+        }
+
+        Optional<Map.Entry<String, String>> versionClaim = identity.claims().entrySet().stream()
+            .filter(item -> StringUtils.equals(AuthenticationConstants.VERSION_CLAIM, item.getKey()))
+            .findFirst();
+        if (!versionClaim.isPresent()) {
+            // No version claim
+            return Async.completeExceptionally(
+                new AuthenticationException(
+                    AuthenticationConstants.VERSION_CLAIM + " claim is required on skill Tokens."
+                )
+            );
+        }
+
+        // Look for the "aud" claim, but only if issued from the Bot Framework
+        Optional<Map.Entry<String, String>> audienceClaim = identity.claims().entrySet().stream()
+            .filter(item -> StringUtils.equals(AuthenticationConstants.AUDIENCE_CLAIM, item.getKey()))
+            .findFirst();
+        if (!audienceClaim.isPresent() || StringUtils.isEmpty(audienceClaim.get().getValue())) {
+            // Claim is not present or doesn't have a value. Not Authorized.
+            return Async.completeExceptionally(
+                new AuthenticationException(
+                    AuthenticationConstants.AUDIENCE_CLAIM + " claim is required on skill Tokens."
+                )
+            );
+        }
+
+        String appId = JwtTokenValidation.getAppIdFromClaims(identity.claims());
+        if (StringUtils.isEmpty(appId)) {
+            return Async.completeExceptionally(new AuthenticationException("Invalid appId."));
+        }
+
+        return credentials.isValidAppId(audienceClaim.get().getValue())
+            .thenApply(isValid -> {
+                if (!isValid) {
+                    throw new AuthenticationException("Invalid audience.");
+                }
+                return null;
+            });
+    }
+
+    /**
+     * Creates a ClaimsIdentity for an anonymous (unauthenticated) skill.
+     *
+     * @return A ClaimsIdentity instance with authentication type set to
+     * AuthenticationConstants.AnonymousAuthType and a reserved
+     * AuthenticationConstants.AnonymousSkillAppId claim.
+     */
+    public static ClaimsIdentity createAnonymousSkillClaim() {
+        Map<String, String> claims = new HashMap<>();
+        claims.put(AuthenticationConstants.APPID_CLAIM, AuthenticationConstants.ANONYMOUS_SKILL_APPID);
+        return new ClaimsIdentity(
+            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+            claims);
+    }
 }
