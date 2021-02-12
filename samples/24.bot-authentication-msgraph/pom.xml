@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.bot.sample</groupId>
-    <artifactId>bot-authentication</artifactId>
+    <artifactId>bot-authentication-msgraph</artifactId>
     <version>sample</version>
     <packaging>jar</packaging>
 

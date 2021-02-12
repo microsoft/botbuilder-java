@@ -20,7 +20,7 @@ NOTE: Microsoft Teams currently differs slightly in the way auth is integrated w
 ## To try this sample locally
 - From the root of this project folder:
   - Build the sample using `mvn package`
-  - Run it by using `java -jar .\target\bot-authentication-sample.jar`
+  - Run it by using `java -jar .\target\bot-authentication-msgraph-sample.jar`
 
 - Test the bot using Bot Framework Emulator
 
@@ -61,10 +61,10 @@ Record the `appid` from the returned JSON
 Replace the values for `<appid>`, `<appsecret>`, `<botname>`, and `<groupname>` in the following commands:
 
 #### To a new Resource Group
-`az deployment sub create --name "authenticationBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" botSku=S1 newAppServicePlanName="authenticationBotPlan" newWebAppName="authenticationBot" groupLocation="westus" newAppServicePlanLocation="westus"` 
+`az deployment sub create --name "authenticationBotDeploy" --location "westus" --template-file ".\deploymentTemplates\template-with-new-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" botSku=S1 newAppServicePlanName="authenticationGraphBotPlan" newWebAppName="authenticationGraphBot" groupLocation="westus" newAppServicePlanLocation="westus"` 
 
 #### To an existing Resource Group
-`az deployment group create --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" newWebAppName="authenticationBot" newAppServicePlanName="authenticationBotPlan" appServicePlanLocation="westus" --name "authenticationBot"`
+`az deployment group create --resource-group "<groupname>" --template-file ".\deploymentTemplates\template-with-preexisting-rg.json" --parameters appId="<appid>" appSecret="<appsecret>" botId="<botname>" newWebAppName="authenticationGraphBot" newAppServicePlanName="authenticationGraphBotPlan" appServicePlanLocation="westus" --name "authenticationGraphBot"`
 
 ### 5. Update app id and password
 In src/main/resources/application.properties update 
