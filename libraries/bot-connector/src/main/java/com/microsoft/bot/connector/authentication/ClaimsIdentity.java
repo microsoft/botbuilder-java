@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class ClaimsIdentity {
     private String issuer;
+    private String type;
     private Map<String, String> claims;
 
     private ClaimsIdentity() {
@@ -35,8 +36,20 @@ public class ClaimsIdentity {
      * @param withClaims     A Map of claims.
      */
     public ClaimsIdentity(String withAuthIssuer, Map<String, String> withClaims) {
-        this.issuer = withAuthIssuer;
-        this.claims = withClaims;
+        this(withAuthIssuer, null, withClaims);
+    }
+
+    /**
+     * Manually construct with issuer and claims.
+     *
+     * @param withAuthIssuer The auth issuer.
+     * @param withType The auth type.
+     * @param withClaims     A Map of claims.
+     */
+    public ClaimsIdentity(String withAuthIssuer, String withType, Map<String, String> withClaims) {
+        issuer = withAuthIssuer;
+        type = withType;
+        claims = withClaims;
     }
 
     /**
@@ -50,6 +63,7 @@ public class ClaimsIdentity {
             jwt.getClaims().forEach((k, v) -> claims.put(k, v.asString()));
         }
         issuer = jwt.getIssuer();
+        type = jwt.getType();
     }
 
     /**
@@ -77,5 +91,14 @@ public class ClaimsIdentity {
      */
     public String getIssuer() {
         return issuer;
+    }
+
+    /**
+     * The type.
+     *
+     * @return The type.
+     */
+    public String getType() {
+        return type;
     }
 }
