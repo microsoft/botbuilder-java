@@ -49,20 +49,52 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-builder</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-dialogs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-builder</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-integration-spring</artifactId>
+      <version>4.6.0-preview8</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>mockwebserver</artifactId>
+      <version>4.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>3.6.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
