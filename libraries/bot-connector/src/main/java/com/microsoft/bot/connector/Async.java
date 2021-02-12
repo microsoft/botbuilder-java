@@ -4,7 +4,6 @@
 package com.microsoft.bot.connector;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 /**
  * Asyc and CompletableFuture helpers methods.
@@ -12,23 +11,6 @@ import java.util.concurrent.CompletionException;
 public final class Async {
     private Async() {
 
-    }
-
-    /**
-     * Executes a block and throws a completion exception if needed.
-     *
-     * @param supplier The block to execute.
-     * @param <T> The type of the return value.
-     * @return The return value.
-     */
-    public static <T> T tryThrow(ThrowSupplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (CompletionException ce) {
-            throw ce;
-        } catch (Throwable t) {
-            throw new CompletionException(t);
-        }
     }
 
     /**

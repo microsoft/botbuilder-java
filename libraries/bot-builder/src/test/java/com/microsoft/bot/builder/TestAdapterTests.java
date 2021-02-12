@@ -14,6 +14,7 @@ import com.microsoft.bot.schema.TokenStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -451,9 +452,9 @@ public class TestAdapterTests {
         adapter.addUserToken("ABC", channelId, userId, token, null);
         adapter.addUserToken("DEF", channelId, userId, token, null);
 
-        TokenStatus[] status = adapter.getTokenStatus(turnContext, userId, null).join();
+        List<TokenStatus> status = adapter.getTokenStatus(turnContext, userId, null).join();
         Assert.assertNotNull(status);
-        Assert.assertEquals(2, status.length);
+        Assert.assertEquals(2, status.size());
     }
 
     @Test
@@ -478,8 +479,8 @@ public class TestAdapterTests {
         adapter.addUserToken("ABC", channelId, userId, token, null);
         adapter.addUserToken("DEF", channelId, userId, token, null);
 
-        TokenStatus[] status = adapter.getTokenStatus(turnContext, userId, "DEF").join();
+        List<TokenStatus> status = adapter.getTokenStatus(turnContext, userId, "DEF").join();
         Assert.assertNotNull(status);
-        Assert.assertEquals(1, status.length);
+        Assert.assertEquals(1, status.size());
     }
 }

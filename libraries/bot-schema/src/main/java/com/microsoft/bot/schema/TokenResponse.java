@@ -10,6 +10,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * A response that includes a user token.
  */
 public class TokenResponse {
+
+    /**
+     * Initializes a new instance of the TokenResponse class.
+     */
+    public TokenResponse() {
+
+    }
+
+    /**
+     * Initializes a new instance of the TokenResponse class.
+     * @param channelId The channelId.
+     * @param connectionName The connectionName.
+     * @param token The token.
+     * @param expiration the expiration.
+     */
+    public TokenResponse(String channelId, String connectionName, String token, String expiration) {
+        this.channelId = channelId;
+        this.connectionName = connectionName;
+        this.token = token;
+        this.expiration = expiration;
+    }
+
     /**
      * The channelId of the TokenResponse.
      */
@@ -40,7 +62,7 @@ public class TokenResponse {
 
     /**
      * Gets the channelId value.
-     * 
+     *
      * @return THe channel id.
      */
     public String getChannelId() {

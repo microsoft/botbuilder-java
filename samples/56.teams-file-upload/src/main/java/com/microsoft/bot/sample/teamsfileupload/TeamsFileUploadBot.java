@@ -16,7 +16,6 @@ import com.microsoft.bot.schema.teams.FileConsentCardResponse;
 import com.microsoft.bot.schema.teams.FileDownloadInfo;
 import com.microsoft.bot.schema.teams.FileInfoCard;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -41,7 +39,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting to new conversation
  * participants.</p>
  */
-@Component
 public class TeamsFileUploadBot extends TeamsActivityHandler {
 
     @Override
