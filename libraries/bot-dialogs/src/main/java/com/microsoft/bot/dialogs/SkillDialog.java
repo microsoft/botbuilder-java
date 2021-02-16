@@ -3,12 +3,15 @@
 
 package com.microsoft.bot.dialogs;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.ctc.wstx.io.CompletelyCloseable;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A specialized {@link Dialog} that can wrap remote calls to a skill.
@@ -134,16 +137,16 @@ public class SkillDialog extends Dialog {
     @Override
     public CompletableFuture<Void> repromptDialog(TurnContext turnContext, DialogInstance instance) {
         // Create and send an envent to the skill so it can resume the dialog.
-        var repromptEvent = Activity.CreateEventActivity();
-        repromptEvent.setName(DialogEvents.getRepromptDialog());
+        Activity repromptEvent = Activity.createEventActivity();
+        repromptEvent.setName(DialogEvents.REPROMPT_DIALOG);
 
         // Apply conversation reference and common properties from incoming activity before sending.
-        repromptEvent.ApplyConversationReference(turnContext.getActivity().GetConversationReference(), true);
+        repromptEvent.applyConversationReference(turnContext.getActivity().getConversationReference(), true);
 
-        var skillConversationId = (String)instance.State[SkillConversationIdStateKey];
+        String skillConversationId = (String)instance.getState().get(SkillConversationIdStateKey);
 
         // connection Name instanceof not applicable for a RePrompt, as we don't expect as OAuthCard in response.
-         SendToSkill(turnContext, (Activity)repromptEvent, skillConversationId);
+        return sendToSkill(turnContext, (Activity)repromptEvent, skillConversationId).thenApply(result -> null);
     }
 
     /**
@@ -161,8 +164,10 @@ public class SkillDialog extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> resumeDialog(DialogContext dc, DialogReason reason, Object result) {
-         RepromptDialog(dc.getContext(), dc.ActiveDialog);
-        return EndOfTurn;
+         return repromptDialog(dc.getContext(), dc.getActiveDialog()).thenCompose( x -> {
+                 return CompletableFuture.completedFuture(END_OF_TURN);
+             }
+         );
     }
 
     /**
@@ -179,21 +184,23 @@ public class SkillDialog extends Dialog {
     @Override
     public CompletableFuture<Void> endDialog(TurnContext turnContext, DialogInstance instance, DialogReason reason) {
         // Send of of conversation to the skill if the dialog has been cancelled.
-        if (reason == DialogReason.CancelCalled || reason == DialogReason.ReplaceCalled) {
-            var activity = (Activity)Activity.CreateEndOfConversationActivity();
+        if (reason == DialogReason.CANCEL_CALLED || reason == DialogReason.REPLACE_CALLED) {
+            Activity activity = Activity.createEndOfConversationActivity();
 
             // Apply conversation reference and common properties from incoming activity before sending.
-            activity.ApplyConversationReference(turnContext.getActivity().GetConversationReference(), true);
+            activity.applyConversationReference(turnContext.getActivity().getConversationReference(), true);
             activity.setChannelData(turnContext.getActivity().getChannelData());
-            activity.setProperties(turnContext.getActivity().getProperties());
-
-            var skillConversationId = (String)instance.State[SkillConversationIdStateKey];
+            for (Map.Entry<String, JsonNode> entry : turnContext.getActivity().getProperties().entrySet()) {
+                activity.setProperties(entry.getKey(), entry.getValue());
+            }
+    
+            String skillConversationId = (String) instance.getState().get(SkillConversationIdStateKey);
 
             // connection Name instanceof not applicable for an EndDialog, as we don't expect as OAuthCard in response.
-             SendToSkill(turnContext, activity, skillConversationId);
+             sendToSkill(turnContext, activity, skillConversationId).join();
         }
 
-         super.EndDialog(turnContext, instance, reason);
+        return super.endDialog(turnContext, instance, reason);
     }
 
     /**
