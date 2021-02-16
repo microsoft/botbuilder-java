@@ -15,6 +15,9 @@ public class TaskModuleRequest {
     @JsonProperty(value = "context")
     private TaskModuleRequestContext context;
 
+    @JsonProperty(value = "tabContext")
+    private TabContext tabContext;
+
     /**
      * Gets user input data. Free payload with key-value pairs.
      * 
@@ -49,5 +52,21 @@ public class TaskModuleRequest {
      */
     public void setContext(TaskModuleRequestContext withContext) {
         context = withContext;
+    }
+
+    /**
+     * Gets current tab request context.
+     * @return Tab request context.
+     */
+    public TabContext getTabContext() {
+        return tabContext;
+    }
+
+    /**
+     * Sets current tab request context.
+     * @param withTabContext Tab request context.
+     */
+    public void setTabContext(TabContext withTabContext) {
+        tabContext = withTabContext;
     }
 }

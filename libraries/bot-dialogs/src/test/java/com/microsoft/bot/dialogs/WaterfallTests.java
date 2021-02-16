@@ -189,9 +189,9 @@ public class WaterfallTests {
 
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc = dialogs.createContext(turnContext).join();
-            dc.continueDialog();
+            dc.continueDialog().join();
             if (!turnContext.getResponded()) {
-                dc.beginDialog("test", null);
+                dc.beginDialog("test", null).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -287,7 +287,8 @@ public class WaterfallTests {
         .assertReply("step2.1")
         .send("hello")
         .assertReply("step2.2")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     @Test
@@ -302,8 +303,7 @@ public class WaterfallTests {
         WaterfallStep[] steps = new WaterfallStep[] {
              (stepContext) -> {
                 PromptOptions options = new PromptOptions();
-                Activity activity = new Activity(ActivityTypes.MESSAGE);
-                activity.setText("Provide a date");
+                options.setPrompt(MessageFactory.text("Provide a date"));
                 return stepContext.prompt("dateTimePrompt", options);
             },
              (stepContext) -> {
@@ -325,7 +325,7 @@ public class WaterfallTests {
              dc.continueDialog().join();
 
             if (!turnContext.getResponded()) {
-                 dc.beginDialog("test-dateTimePrompt", null);
+                 dc.beginDialog("test-dateTimePrompt", null).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -334,7 +334,8 @@ public class WaterfallTests {
         .send("hello again")
         .assertReply("Provide a date")
         .send("Wednesday 4 oclock")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     @Test
@@ -356,7 +357,7 @@ public class WaterfallTests {
          dialog.endDialog(
             new TurnContextImpl(new TestAdapter(), new Activity(ActivityTypes.MESSAGE)),
             dialogInstance,
-            DialogReason.CANCEL_CALLED);
+            DialogReason.CANCEL_CALLED).join();
 
         Assert.assertTrue(telemetryClient.trackEventCallCount > 0);
     }

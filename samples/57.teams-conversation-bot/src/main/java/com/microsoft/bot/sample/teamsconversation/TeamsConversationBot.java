@@ -21,7 +21,6 @@ import com.microsoft.bot.schema.Mention;
 import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import java.util.concurrent.CompletableFuture;
  * will send a greeting to new conversation participants.
  * </p>
  */
-@Component
 public class TeamsConversationBot extends TeamsActivityHandler {
     private String appId;
     private String appPassword;

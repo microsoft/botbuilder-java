@@ -27,7 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 class CachingOpenIdMetadata implements OpenIdMetadata {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingOpenIdMetadata.class);
-    private static final int CACHE_DAYS = 5;
+    private static final int CACHE_DAYS = 1;
+    private static final int CACHE_HOURS = 1;
 
     private String url;
     private long lastUpdated;
@@ -58,13 +59,19 @@ class CachingOpenIdMetadata implements OpenIdMetadata {
     @Override
     public OpenIdMetadataKey getKey(String keyId) {
         synchronized (sync) {
-            // If keys are more than 5 days old, refresh them
+            // If keys are more than CACHE_DAYS days old, refresh them
             if (lastUpdated < System.currentTimeMillis() - Duration.ofDays(CACHE_DAYS).toMillis()) {
                 refreshCache();
             }
 
             // Search the cache even if we failed to refresh
-            return findKey(keyId);
+            OpenIdMetadataKey key = findKey(keyId);
+            if (key == null && lastUpdated < System.currentTimeMillis() - Duration.ofHours(CACHE_HOURS).toMillis()) {
+                // Refresh the cache if a key is not found (max once per CACHE_HOURS)
+                refreshCache();
+                key = findKey(keyId);
+            }
+            return key;
         }
     }
 

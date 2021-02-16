@@ -34,7 +34,6 @@ import java.util.concurrent.CompletableFuture;
  * @see ConversationData
  * @see UserProfile
  */
-@Component
 public class StateManagementBot extends ActivityHandler {
     private ConversationState conversationState;
     private UserState userState;

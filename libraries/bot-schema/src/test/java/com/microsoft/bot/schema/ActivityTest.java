@@ -459,7 +459,6 @@ public class ActivityTest {
 
         activity.setText(null);
         activity.setSummary(null);
-        activity.setAttachments(null);
         activity.setChannelData("test-channelData");
 
         boolean result = activity.hasContent();

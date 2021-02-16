@@ -11,6 +11,7 @@ import retrofit2.Retrofit;
 import com.microsoft.bot.connector.UserToken;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.schema.AadResourceUrls;
+import com.microsoft.bot.schema.TokenExchangeRequest;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
 import com.microsoft.bot.restclient.ServiceResponse;
@@ -67,6 +68,17 @@ public class RestUserToken implements UserToken {
             @Query("channelId") String channelId,
             @Query("code") String code
         );
+
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+        "x-ms-logging-context: com.microsoft.bot.schema.UserTokens exchangeToken" })
+        @GET("api/usertoken/GetToken")
+        CompletableFuture<Response<ResponseBody>> exchangeToken(
+            @Query("userId") String userId,
+            @Query("connectionName") String connectionName,
+            @Query("channelId") String channelId,
+            @Body TokenExchangeRequest exchangeRequest
+        );
+
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
             "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getAadTokens" })
@@ -176,6 +188,71 @@ public class RestUserToken implements UserToken {
     }
 
     private ServiceResponse<TokenResponse> getTokenDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return this.client.restClient()
+            .responseBuilderFactory()
+            .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_NOT_FOUND, new TypeToken<TokenResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     *
+     * @param userId            the String value
+     * @param connectionName    the String value
+     * @param channelId         the String value
+     * @param exchangeRequest   a TokenExchangeRequest
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the TokenResponse object
+     */
+    @Override
+    public CompletableFuture<TokenResponse> exchangeToken(
+        String userId,
+        String connectionName,
+        String channelId,
+        TokenExchangeRequest exchangeRequest
+    ) {
+        if (userId == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
+        }
+        if (connectionName == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            ));
+        }
+        if (channelId == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter channelId is required and cannot be null."
+            ));
+        }
+        if (exchangeRequest == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter exchangeRequest is required and cannot be null."
+            ));
+        }
+
+        return service.exchangeToken(userId, connectionName, channelId, exchangeRequest)
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return exchangeTokenDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("getToken", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<TokenResponse> exchangeTokenDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 

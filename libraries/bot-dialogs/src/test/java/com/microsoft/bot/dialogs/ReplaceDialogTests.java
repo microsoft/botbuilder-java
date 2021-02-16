@@ -94,7 +94,8 @@ public class ReplaceDialogTests {
             return CompletableFuture.completedFuture(null);
         })
         .send("hello")
-        .startTest();
+        .startTest()
+        .join();
     }
 
     private class FirstDialog extends ComponentDialog {

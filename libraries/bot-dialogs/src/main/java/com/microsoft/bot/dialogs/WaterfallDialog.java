@@ -24,15 +24,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class WaterfallDialog extends Dialog {
 
-    private final String persistedOptions = "options";
-    private final String stepIndex = "stepIndex";
-    private final String persistedValues = "values";
-    private final String persistedInstanceId = "instanceId";
+    private static final String PERSISTED_OPTIONS = "options";
+    private static final String PERSISTED_VALUES = "values";
+    private static final String PERSISTED_INSTANCEID = "instanceId";
+    private static final String STEP_INDEX = "stepIndex";
 
     private final List<WaterfallStep> steps;
 
     /**
-     * Initializes a new instance of the {@link waterfallDialog} class.
+     * Initializes a new instance of the {@link WaterfallDialog} class.
      *
      * @param dialogId The dialog ID.
      * @param actions  Optional actions to be defined by the caller.
@@ -90,9 +90,9 @@ public class WaterfallDialog extends Dialog {
         // Initialize waterfall state
         Map<String, Object> state = dc.getActiveDialog().getState();
         String instanceId = UUID.randomUUID().toString();
-        state.put(persistedOptions, options);
-        state.put(persistedValues, new HashMap<String, Object>());
-        state.put(persistedInstanceId, instanceId);
+        state.put(PERSISTED_OPTIONS, options);
+        state.put(PERSISTED_VALUES, new HashMap<String, Object>());
+        state.put(PERSISTED_INSTANCEID, instanceId);
 
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("DialogId", getId());
@@ -156,8 +156,8 @@ public class WaterfallDialog extends Dialog {
         // Increment step index and run step
         Map<String, Object> state = dc.getActiveDialog().getState();
         int index = 0;
-        if (state.containsKey(stepIndex)) {
-            index = (int) state.get(stepIndex);
+        if (state.containsKey(STEP_INDEX)) {
+            index = (int) state.get(STEP_INDEX);
         }
 
         return runStep(dc, index + 1, reason, result);
@@ -178,9 +178,9 @@ public class WaterfallDialog extends Dialog {
             HashMap<String, Object> state = new HashMap<String, Object>((Map<String, Object>) instance.getState());
 
             // Create step context
-            int index = (int) state.get(stepIndex);
+            int index = (int) state.get(STEP_INDEX);
             String stepName = waterfallStepName(index);
-            String instanceId = (String) state.get(persistedInstanceId);
+            String instanceId = (String) state.get(PERSISTED_INSTANCEID);
 
             HashMap<String, String> properties = new HashMap<String, String>();
             properties.put("DialogId", getId());
@@ -190,7 +190,7 @@ public class WaterfallDialog extends Dialog {
             getTelemetryClient().trackEvent("WaterfallCancel", properties);
         } else if (reason == DialogReason.END_CALLED) {
             HashMap<String, Object> state = new HashMap<String, Object>((Map<String, Object>) instance.getState());
-            String instanceId = (String) state.get(persistedInstanceId);
+            String instanceId = (String) state.get(PERSISTED_INSTANCEID);
 
             HashMap<String, String> properties = new HashMap<String, String>();
             properties.put("DialogId", getId());
@@ -210,7 +210,7 @@ public class WaterfallDialog extends Dialog {
      */
     protected CompletableFuture<DialogTurnResult> onStep(WaterfallStepContext stepContext) {
         String stepName = waterfallStepName(stepContext.getIndex());
-        String instanceId = (String) stepContext.getActiveDialog().getState().get(persistedInstanceId);
+        String instanceId = (String) stepContext.getActiveDialog().getState().get(PERSISTED_INSTANCEID);
 
         HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("DialogId", getId());
@@ -245,11 +245,11 @@ public class WaterfallDialog extends Dialog {
             // Update persisted step index
             Map<String, Object> state = (Map<String, Object>) dc.getActiveDialog().getState();
 
-            state.put(stepIndex, index);
+            state.put(STEP_INDEX, index);
 
             // Create step context
-            Object options = state.get(persistedOptions);
-            Map<String, Object> values = (Map<String, Object>) state.get(persistedValues);
+            Object options = state.get(PERSISTED_OPTIONS);
+            Map<String, Object> values = (Map<String, Object>) state.get(PERSISTED_VALUES);
             WaterfallStepContext stepContext =
                 new WaterfallStepContext(this, dc, options, values, index, reason, result);
 
