@@ -86,6 +86,9 @@
     <module name="SuppressWarningsFilter" />
 
     <module name="TreeWalker">
+        <!-- check for usage of literal equality "==" between string -->
+        <module name="StringLiteralEquality"/>
+
         <module name="SuppressWarningsHolder" />
         <module name="SuppressionCommentFilter"/>
 
