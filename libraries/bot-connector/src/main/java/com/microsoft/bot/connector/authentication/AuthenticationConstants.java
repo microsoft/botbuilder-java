@@ -147,6 +147,11 @@ public final class AuthenticationConstants {
     public static final String ANONYMOUS_SKILL_APPID = "AnonymousSkill";
 
     /**
+     * Indicates anonymous (no app Id and password were provided).
+     */
+    public static final String ANONYMOUS_AUTH_TYPE = "anonymous";
+
+    /**
      * The default clock skew in minutes.
      */
     public static final int DEFAULT_CLOCKSKEW_MINUTES = 5;

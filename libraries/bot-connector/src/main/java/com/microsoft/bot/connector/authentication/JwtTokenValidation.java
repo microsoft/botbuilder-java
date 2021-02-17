@@ -202,4 +202,34 @@ public final class JwtTokenValidation {
 
         return appId;
     }
+
+    /**
+     * Internal helper to check if the token has the shape we expect "Bearer [big long string]".
+     *
+     * @param authHeader >A string containing the token header.
+     * @return True if the token is valid, false if not.
+     */
+    public static boolean isValidTokenFormat(String authHeader) {
+        if (StringUtils.isEmpty(authHeader)) {
+            // No token, not valid.
+            return false;
+        }
+
+        String[] parts = authHeader.split(" ");
+        if (parts.length != 2) {
+            // Tokens MUST have exactly 2 parts. If we don't have 2 parts, it's not a valid token
+            return false;
+        }
+
+        // We now have an array that should be:
+        // [0] = "Bearer"
+        // [1] = "[Big Long String]"
+        String authScheme = parts[0];
+        if (!StringUtils.equals(authScheme, "Bearer")) {
+            // The scheme MUST be "Bearer"
+            return false;
+        }
+
+        return true;
+    }
 }
