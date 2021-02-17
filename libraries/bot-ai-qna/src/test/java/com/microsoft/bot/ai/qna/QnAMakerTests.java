@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.ai.qna;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +44,7 @@ import com.microsoft.bot.schema.ConversationAccount;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -1628,7 +1630,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryAdditionalPropsOverride() {
-        //Arrange
+        // Arrange
         MockWebServer mockWebServer = new MockWebServer();
         try {
             this.initializeMockServer(mockWebServer, "QnaMaker_ReturnsAnswer.json", this.getRequestUrl());
@@ -1866,26 +1868,39 @@ public class QnAMakerTests {
         return new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
     }
 
-    private String getResponse(String fileName) {
-        Path path = this.getFilePath(fileName);
+    private String getFileContent(String fileName) {
         try {
-            return Files.readAllBytes(path).toString();
+            // Get Oracle file
+            return readFileContent("/src/test/java/com/microsoft/bot/ai/qna/testdata/" + fileName);
         } catch (IOException e) {
-            LoggerFactory.getLogger(QnAMakerTests.class).error(String.format("Cannot read the file: %s", fileName));
-            return "";
+            LoggerFactory.getLogger(QnAMakerTests.class).error(e.getMessage());
+            return null;
+        }
+    }
+
+    private String readFileContent (String pathToFile) throws IOException {
+        String path = Paths.get("").toAbsolutePath().toString();
+        File file = new File(path + pathToFile);
+        return FileUtils.readFileToString(file, "utf-8");
+    }
+
+    private JsonNode getResponse(String fileName) {
+        String content = this.getFileContent(fileName);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readTree(content);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(QnAMakerTests.class).error(e.getMessage());
+            return null;
         }
     }
 
     private void initializeMockServer(MockWebServer mockWebServer, String fileName, String endpoint) {
         try {
-            String filePath = new StringBuilder("/src/test/java/com/microsoft/bot/ai/qna/testData/")
-                .append(fileName)
-                .toString();
-            String content = getResponse(filePath);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode response = mapper.readTree(content);
+            JsonNode response = getResponse(fileName);
             this.initializeMockServer(mockWebServer, response, endpoint);
         } catch (IOException e) {
+            LoggerFactory.getLogger(QnAMakerTests.class).error(e.getMessage());
         }
     }
 
@@ -1896,12 +1911,8 @@ public class QnAMakerTests {
             .addHeader("Content-Type", "application/json; charset=utf-8")
             .setBody(mockResponse));
 
-        mockWebServer.url(url);
         mockWebServer.start();
-    }
-
-    private Path getFilePath(String fileName) {
-        return Paths.get(System.getProperty("user.dir"), "TestData", fileName);
+        mockWebServer.url(url);
     }
 
     public class OverrideTelemetry extends QnAMaker {

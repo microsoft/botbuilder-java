@@ -48,7 +48,7 @@ public class HttpRequestUtils {
             OkHttpClient client = new OkHttpClient();
             String endpointKey = String.format("%s", endpoint.getEndpointKey());
 
-            Request request = new Request.Builder().url(requestUrl).header("Authorization", endpointKey)
+            Request request = new Request.Builder().url(requestUrl).header("Authorization", String.format("EndpointKey %s", endpointKey))
                     .header("Ocp-Apim-Subscription-Key", endpointKey).header("User-Agent", UserAgent.value())
                     .post(requestBody).build();
 

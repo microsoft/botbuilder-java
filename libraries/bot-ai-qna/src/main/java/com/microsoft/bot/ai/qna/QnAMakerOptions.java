@@ -16,10 +16,10 @@ public class QnAMakerOptions {
     private Float scoreThreshold;
 
     @JsonProperty("timeout")
-    private Double timeout;
+    private Double timeout = 0d;
 
     @JsonProperty("top")
-    private Integer top;
+    private Integer top = 0;
 
     @JsonProperty("context")
     private QnARequestContext context;
