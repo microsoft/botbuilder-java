@@ -5,6 +5,7 @@ package com.microsoft.bot.ai.luis;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.builder.IntentScore;
+import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.RecognizerConvert;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
@@ -32,11 +33,18 @@ public class LuisRecognizer extends TelemetryRecognizer {
     /**
      * Initializes a new instance of the Luis Recognizer .
      * @param recognizerOptions Luis Recognizer options to use when calling th LUIS Service.
+     * @throws IllegalArgumentException if null is passed as recognizerOptions.
      */
     public LuisRecognizer(LuisRecognizerOptions recognizerOptions) {
+        if (recognizerOptions == null) {
+            throw new IllegalArgumentException("Recognizer Options cannot be null");
+        }
+
         this.luisRecognizerOptions = recognizerOptions;
         this.setLogPersonalInformation(recognizerOptions.isLogPersonalInformation());
-        this.setTelemetryClient(recognizerOptions.getTelemetryClient());
+        this.setTelemetryClient(recognizerOptions.getTelemetryClient() != null
+            ? recognizerOptions.getTelemetryClient()
+            : new NullBotTelemetryClient());
     }
 
     /**
