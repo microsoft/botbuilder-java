@@ -107,6 +107,16 @@ public class LuisRecognizerTests {
     }
 
     @Test
+    public void throwExceptionOnNullOptions() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            LuisRecognizer lR = new LuisRecognizer(null);
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Recognizer Options cannot be null"));
+    }
+
+    @Test
     public void recognizerResult() {
         setMockObjectsForTelemetry();
         LuisRecognizer recognizer = new LuisRecognizer(options);
@@ -137,6 +147,62 @@ public class LuisRecognizerTests {
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
+            assertTrue(false);
+        }
+    }
+
+    @Test
+    public void recognizerResult_nullTelemetryClient() {
+        when(turnContext.getActivity())
+            .thenReturn(new Activity() {{
+                setText("Random Message");
+                setType(ActivityTypes.MESSAGE);
+                setChannelId("EmptyContext");
+                setFrom(new ChannelAccount(){{
+                    setId("Activity-from-ID");
+                }});
+            }});
+
+        when(luisApplication.getApplicationId())
+            .thenReturn("b31aeaf3-3511-495b-a07f-571fc873214b");
+
+        when(options.getApplication())
+            .thenReturn(luisApplication);
+        mockedResult.setText("Random Message");
+        doReturn(CompletableFuture.supplyAsync(() -> mockedResult))
+            .when(options)
+            .recognizeInternal(
+                any(TurnContext.class));
+
+        LuisRecognizer recognizer = new LuisRecognizer(options);
+        RecognizerResult expected  = new RecognizerResult(){{
+            setText("Random Message");
+            setIntents(new HashMap<String, IntentScore>(){{
+                put("Test",
+                    new IntentScore(){{
+                        setScore(0.2);
+                    }});
+                put("Greeting",
+                    new IntentScore(){{
+                        setScore(0.4);
+                    }});
+            }});
+            setEntities(JsonNodeFactory.instance.objectNode());
+            setProperties(
+                "sentiment",
+                JsonNodeFactory.instance.objectNode()
+                    .put(
+                        "label",
+                        "neutral"));
+        }};
+        RecognizerResult actual = null;
+        try {
+            actual = recognizer.recognize(turnContext).get();
+            ObjectMapper mapper = new ObjectMapper();
+            assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
+        } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
+            e.printStackTrace();
+            assertTrue(false);
         }
     }
 
@@ -195,6 +261,7 @@ public class LuisRecognizerTests {
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
+            assertTrue(false);
         }
     }
 
