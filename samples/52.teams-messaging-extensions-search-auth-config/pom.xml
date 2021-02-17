@@ -86,7 +86,7 @@
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-integration-spring</artifactId>
-        <version>4.6.0-preview8</version>
+        <version>4.6.0-preview9</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
