@@ -16,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
  * An Authenticator using app id and password.
  */
 public class CredentialsAuthenticator implements Authenticator {
-    private ConfidentialClientApplication app;
-    private ClientCredentialParameters parameters;
+    private final ConfidentialClientApplication app;
+    private final ClientCredentialParameters parameters;
 
     /**
      * Constructs an Authenticator using appId and appPassword.
