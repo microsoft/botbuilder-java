@@ -5,10 +5,21 @@ package com.microsoft.bot.dialogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.skills.SkillConversationReference;
+import com.microsoft.bot.builder.skills.SkillHandler;
+import com.microsoft.bot.connector.authentication.AuthenticationConstants;
+import com.microsoft.bot.connector.authentication.ClaimsIdentity;
+import com.microsoft.bot.connector.authentication.GovernmentAuthenticationConstants;
+import com.microsoft.bot.connector.authentication.SkillValidation;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.EndOfConversationCodes;
+
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 
@@ -295,20 +306,99 @@ public abstract class Dialog {
         dialogSet.setTelemetryClient(dialog.getTelemetryClient());
 
         return dialogSet.createContext(turnContext)
-            .thenCompose(dialogContext -> continueOrStart(dialogContext, dialog))
+            .thenCompose(dialogContext -> continueOrStart(dialogContext, dialog, turnContext))
             .thenApply(result -> null);
     }
 
-    private static CompletableFuture<DialogTurnResult> continueOrStart(
-        DialogContext dialogContext, Dialog dialog
+    private static CompletableFuture<Void> continueOrStart(
+        DialogContext dialogContext, Dialog dialog, TurnContext turnContext
     ) {
+        if (DialogCommon.isFromParentToSkill(turnContext)) {
+            // Handle remote cancellation request from parent.
+            if (turnContext.getActivity().getType() == ActivityTypes.END_OF_CONVERSATION) {
+                if (dialogContext.getStack().size() == 0) {
+                    // No dialogs to cancel, just return.
+                    return CompletableFuture.completedFuture(null);
+                }
+
+                DialogContext activeDialogContext = getActiveDialogContext(dialogContext);
+
+                // Send cancellation message to the top dialog in the stack to ensure all the parents
+                // are canceled in the right order.
+                return activeDialogContext.cancelAllDialogs(true, null, null).thenApply(result -> null);
+            }
+
+            // Handle a reprompt event sent from the parent.
+            if (turnContext.getActivity().getType() == ActivityTypes.EVENT
+                && turnContext.getActivity().getName() == DialogEvents.REPROMPT_DIALOG) {
+                if (dialogContext.getStack().size() == 0) {
+                    // No dialogs to reprompt, just return.
+                    return CompletableFuture.completedFuture(null);
+                }
+
+                return dialogContext.repromptDialog();
+            }
+        }
         return dialogContext.continueDialog()
             .thenCompose(result -> {
                 if (result.getStatus() == DialogTurnStatus.EMPTY) {
-                    return dialogContext.beginDialog(dialog.getId(), null);
+                    return dialogContext.beginDialog(dialog.getId(), null)
+                    .thenCompose(beginResult -> processEOC(beginResult, turnContext));
                 }
-
-                return CompletableFuture.completedFuture(result);
+                return CompletableFuture.completedFuture(null);
             });
+    }
+
+    private static CompletableFuture<Void> processEOC(DialogTurnResult result, TurnContext turnContext) {
+        if (result.getStatus() == DialogTurnStatus.COMPLETE
+            || result.getStatus() == DialogTurnStatus.CANCELLED
+            && sendEoCToParent(turnContext)) {
+                EndOfConversationCodes code = result.getStatus() == DialogTurnStatus.COMPLETE
+                                                ? EndOfConversationCodes.COMPLETED_SUCCESSFULLY
+                                                : EndOfConversationCodes.USER_CANCELLED;
+                Activity activity = new Activity(ActivityTypes.END_OF_CONVERSATION);
+                activity.setValue(result.getResult());
+                activity.setLocalTimeZone(turnContext.getActivity().getLocale());
+                activity.setCode(code);
+                return turnContext.sendActivity(activity).thenApply(finalResult -> null);
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Helper to determine if we should send an EoC to the parent or not.
+     * @param turnContext
+     * @return
+     */
+    private static boolean sendEoCToParent(TurnContext turnContext) {
+
+        ClaimsIdentity claimsIdentity = turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
+
+        if (claimsIdentity != null && SkillValidation.isSkillClaim(claimsIdentity.claims())) {
+            // EoC Activities returned by skills are bounced back to the bot by SkillHandler.
+            // In those cases we will have a SkillConversationReference instance in state.
+            SkillConversationReference skillConversationReference =
+                            turnContext.getTurnState().get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY);
+            if (skillConversationReference != null) {
+                // If the skillConversationReference.OAuthScope is for one of the supported channels,
+                // we are at the root and we should not send an EoC.
+                return skillConversationReference.getOAuthScope()
+                                    !=  AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                                && skillConversationReference.getOAuthScope()
+                                    !=  GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // Recursively walk up the DC stack to find the active DC.
+    private static DialogContext getActiveDialogContext(DialogContext dialogContext) {
+        DialogContext child = dialogContext.getChild();
+        if (child == null) {
+            return dialogContext;
+        }
+
+        return getActiveDialogContext(child);
     }
 }

@@ -17,14 +17,18 @@ import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.builder.UserState;
+import com.microsoft.bot.builder.skills.SkillConversationReference;
+import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.Async;
+import com.microsoft.bot.connector.authentication.AuthenticationConstants;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
+import com.microsoft.bot.connector.authentication.GovernmentAuthenticationConstants;
 import com.microsoft.bot.connector.authentication.SkillValidation;
 import com.microsoft.bot.dialogs.memory.DialogStateManager;
 import com.microsoft.bot.dialogs.memory.DialogStateManagerConfiguration;
 import com.microsoft.bot.schema.Activity;
-
-import org.apache.commons.lang3.NotImplementedException;
+import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.EndOfConversationCodes;
 
 /**
  * Class which runs the dialog system.
@@ -294,7 +298,7 @@ public class DialogManager {
                 ClaimsIdentity claimIdentity = context.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
                 if (claimIdentity != null && SkillValidation.isSkillClaim(claimIdentity.claims())) {
                     // The bot is running as a skill.
-                    turnResult = handleSkillOnTurn().join();
+                    turnResult = handleSkillOnTurn(dc).join();
                 } else {
                     // The bot is running as root bot.
                     turnResult = handleBotOnTurn(dc).join();
@@ -351,12 +355,86 @@ public class DialogManager {
         }
     }
 
-    @SuppressWarnings({"TodoComment"})
-    //TODO: Add Skills support here
-    private CompletableFuture<DialogTurnResult> handleSkillOnTurn() {
-        return Async.completeExceptionally(new NotImplementedException(
-                "Skills are not implemented in this release"
-            ));
+    private CompletableFuture<DialogTurnResult> handleSkillOnTurn(DialogContext dc) {
+        // the bot instanceof running as a skill.
+        TurnContext turnContext = dc.getContext();
+
+        // Process remote cancellation
+        if (turnContext.getActivity().getType() == ActivityTypes.END_OF_CONVERSATION
+            && dc.getActiveDialog() != null
+            && DialogCommon.isFromParentToSkill(turnContext)) {
+            // Handle remote cancellation request from parent.
+            DialogContext activeDialogContext = getActiveDialogContext(dc);
+
+            // Send cancellation message to the top dialog in the stack to ensure all the
+            // parents are canceled in the right order.
+            return  activeDialogContext.cancelAllDialogs();
+        }
+
+        // Handle reprompt
+        // Process a reprompt event sent from the parent.
+        if (turnContext.getActivity().getType() == ActivityTypes.EVENT
+            && turnContext.getActivity().getName() == DialogEvents.REPROMPT_DIALOG) {
+            if (dc.getActiveDialog() == null) {
+                return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.EMPTY));
+            }
+
+             dc.repromptDialog();
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
+        }
+
+        // Continue execution
+        // - This will apply any queued up interruptions and execute the current/next step(s).
+        DialogTurnResult turnResult =  dc.continueDialog().join();
+        if (turnResult.getStatus() == DialogTurnStatus.EMPTY) {
+            // restart root dialog
+            turnResult =  dc.beginDialog(rootDialogId).join();
+        }
+
+        sendStateSnapshotTrace(dc, "Skill State");
+
+        if (shouldSendEndOfConversationToParent(turnContext, turnResult)) {
+            // Send End of conversation at the end.
+            EndOfConversationCodes code = turnResult.getStatus() == DialogTurnStatus.COMPLETE
+                                                                    ? EndOfConversationCodes.COMPLETED_SUCCESSFULLY
+                                                                    : EndOfConversationCodes.USER_CANCELLED;
+            Activity activity = new Activity(ActivityTypes.END_OF_CONVERSATION);
+            activity.setValue(turnResult.getResult());
+            activity.setLocale(turnContext.getActivity().getLocale());
+            activity.setCode(code);
+            turnContext.sendActivity(activity).join();
+        }
+
+        return CompletableFuture.completedFuture(turnResult);
+    }
+
+    /**
+     * Helper to determine if we should send an EndOfConversation to the parent
+     * or not.
+     */
+    private static boolean shouldSendEndOfConversationToParent(TurnContext context, DialogTurnResult turnResult) {
+        if (!(turnResult.getStatus() == DialogTurnStatus.COMPLETE
+            || turnResult.getStatus() == DialogTurnStatus.CANCELLED)) {
+            // The dialog instanceof still going, don't return EoC.
+            return false;
+        }
+        ClaimsIdentity claimsIdentity = context.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
+        if (claimsIdentity != null && SkillValidation.isSkillClaim(claimsIdentity.claims())) {
+            // EoC Activities returned by skills are bounced back to the bot by SkillHandler.
+            // In those cases we will have a SkillConversationReference instance in state.
+            SkillConversationReference skillConversationReference =
+                        context.getTurnState().get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY);
+            if (skillConversationReference != null) {
+                // If the skillConversationReference.OAuthScope instanceof for one of the supported channels,
+                // we are at the root and we should not send an EoC.
+                return skillConversationReference.getOAuthScope()
+                            != AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                       && skillConversationReference.getOAuthScope()
+                            != GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
