@@ -32,6 +32,6 @@ public class O365ConnectorCardHttpPOST extends O365ConnectorCardActionBase {
      * @param withBody The post content.
      */
     public void setBody(String withBody) {
-        body = body;
+        body = withBody;
     }
 }
