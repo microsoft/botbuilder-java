@@ -19,7 +19,6 @@ import retrofit2.Retrofit;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
-import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 import java.io.IOException;
@@ -180,7 +179,7 @@ public class RestTeamsOperations implements TeamsOperations {
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
             "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchTeamDetails" })
-        @POST("v3/teams/{teamId}")
+        @GET("v3/teams/{teamId}")
         CompletableFuture<Response<ResponseBody>> fetchTeamDetails(
             @Path("teamId") String teamId,
             @Header("accept-language") String acceptLanguage,
