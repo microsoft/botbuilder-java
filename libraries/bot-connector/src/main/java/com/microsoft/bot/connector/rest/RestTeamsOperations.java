@@ -180,7 +180,7 @@ public class RestTeamsOperations implements TeamsOperations {
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
             "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchTeamDetails" })
-        @POST("v3/teams/{teamId}")
+        @GET("v3/teams/{teamId}")
         CompletableFuture<Response<ResponseBody>> fetchTeamDetails(
             @Path("teamId") String teamId,
             @Header("accept-language") String acceptLanguage,
