@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.BotAdapter;
-import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.TypedInvokeResponse;
 import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.builder.skills.BotFrameworkSkill;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryOptions;
@@ -275,12 +275,14 @@ public class SkillDialog extends Dialog {
         getDialogOptions().getConversationState().saveChanges(context, true);
 
         BotFrameworkSkill skillInfo = getDialogOptions().getSkill();
-        InvokeResponse response =  getDialogOptions().getSkillClient().postActivity(
-                                        getDialogOptions().getBotId(),
-                                        skillInfo.getAppId(),
-                                        skillInfo.getSkillEndpoint(),
-                                        getDialogOptions().getSkillHostEndpoint(),
-                                        skillConversationId, activity).join();
+        TypedInvokeResponse<Object> response =  getDialogOptions().getSkillClient().postActivity(
+                                                getDialogOptions().getBotId(),
+                                                skillInfo.getAppId(),
+                                                skillInfo.getSkillEndpoint(),
+                                                getDialogOptions().getSkillHostEndpoint(),
+                                                skillConversationId,
+                                                activity,
+                                                Object.class).join();
 
         // Inspect the skill response status
         if (!response.getIsSuccessStatusCode()) {
@@ -432,13 +434,14 @@ public class SkillDialog extends Dialog {
 
         // route the activity to the skill
         BotFrameworkSkill skillInfo = getDialogOptions().getSkill();
-        InvokeResponse response =  getDialogOptions().getSkillClient().postActivity(
-                                            getDialogOptions().getBotId(),
-                                            skillInfo.getAppId(),
-                                            skillInfo.getSkillEndpoint(),
-                                            getDialogOptions().getSkillHostEndpoint(),
-                                            incomingActivity.getConversation().getId(),
-                                            activity).join();
+        TypedInvokeResponse<Object> response =  getDialogOptions().getSkillClient().postActivity(
+                                                getDialogOptions().getBotId(),
+                                                skillInfo.getAppId(),
+                                                skillInfo.getSkillEndpoint(),
+                                                getDialogOptions().getSkillHostEndpoint(),
+                                                incomingActivity.getConversation().getId(),
+                                                activity,
+                                                Object.class).join();
 
         // Check response status: true if success, false if failure
         return CompletableFuture.completedFuture(response.getIsSuccessStatusCode());
