@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
 import com.microsoft.bot.ai.qna.models.Metadata;
@@ -26,7 +26,6 @@ import com.microsoft.bot.ai.qna.models.RankerTypes;
 import com.microsoft.bot.builder.IntentScore;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.dialogs.DialogContext;
-import com.microsoft.bot.dialogs.ObjectPath;
 import com.microsoft.bot.dialogs.Recognizer;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Serialization;
@@ -35,6 +34,9 @@ import com.microsoft.bot.schema.Serialization;
  * IRecognizer implementation which uses QnAMaker KB to identify intents.
  */
 public class QnAMakerRecognizer extends Recognizer {
+
+    private static final Integer TOP_DEFAULT_VALUE = 3;
+    private static final Float THRESHOLD_DEFAULT_VALUE = 0.3f;
 
     @JsonProperty("$kind")
     private final String kind = "Microsoft.QnAMakerRecognizer";
@@ -53,10 +55,10 @@ public class QnAMakerRecognizer extends Recognizer {
     private String endpointKey;
 
     @JsonProperty("top")
-    private Integer top = 3;
+    private Integer top = TOP_DEFAULT_VALUE;
 
     @JsonProperty("threshold")
-    private Float threshold = 0.3f;
+    private Float threshold = THRESHOLD_DEFAULT_VALUE;
 
     @JsonProperty("isTest")
     private Boolean isTest;
@@ -114,10 +116,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the KnowledgeBase Id of your QnA Maker KnowledgeBase.
      *
-     * @param knowledgeBaseId The knowledgebase Id.
+     * @param withKnowledgeBaseId The knowledgebase Id.
      */
-    public void setKnowledgeBaseId(String knowledgeBaseId) {
-        this.knowledgeBaseId = knowledgeBaseId;
+    public void setKnowledgeBaseId(String withKnowledgeBaseId) {
+        this.knowledgeBaseId = withKnowledgeBaseId;
     }
 
     /**
@@ -132,10 +134,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the Hostname for your QnA Maker service.
      *
-     * @param hostName The host name of the QnA Maker knowledgebase.
+     * @param withHostName The host name of the QnA Maker knowledgebase.
      */
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setHostName(String withHostName) {
+        this.hostName = withHostName;
     }
 
     /**
@@ -150,10 +152,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the Endpoint key for the QnA Maker KB.
      *
-     * @param endpointKey The endpoint key for the QnA service.
+     * @param withEndpointKey The endpoint key for the QnA service.
      */
-    public void setEndpointKey(String endpointKey) {
-        this.endpointKey = endpointKey;
+    public void setEndpointKey(String withEndpointKey) {
+        this.endpointKey = withEndpointKey;
     }
 
     /**
@@ -168,10 +170,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the number of results you want.
      *
-     * @param top The number of results you want.
+     * @param withTop The number of results you want.
      */
-    public void setTop(Integer top) {
-        this.top = top;
+    public void setTop(Integer withTop) {
+        this.top = withTop;
     }
 
     /**
@@ -186,10 +188,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the threshold score to filter results.
      *
-     * @param threshold The threshold for the results.
+     * @param withThreshold The threshold for the results.
      */
-    public void setThreshold(Float threshold) {
-        this.threshold = threshold;
+    public void setThreshold(Float withThreshold) {
+        this.threshold = withThreshold;
     }
 
     /**
@@ -207,11 +209,11 @@ public class QnAMakerRecognizer extends Recognizer {
      * Sets a value indicating whether gets or sets environment of knowledgebase to
      * be called.
      *
-     * @param isTest A value indicating whether to call test or prod environment of
+     * @param withIsTest A value indicating whether to call test or prod environment of
      *               knowledgebase.
      */
-    public void setIsTest(Boolean isTest) {
-        this.isTest = isTest;
+    public void setIsTest(Boolean withIsTest) {
+        this.isTest = withIsTest;
     }
 
     /**
@@ -226,10 +228,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets ranker Type.
      *
-     * @param rankerType The desired RankerType.
+     * @param withRankerType The desired RankerType.
      */
-    public void setRankerType(String rankerType) {
-        this.rankerType = rankerType;
+    public void setRankerType(String withRankerType) {
+        this.rankerType = withRankerType;
     }
 
     /**
@@ -244,11 +246,11 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets {@link Metadata} join operator.
      *
-     * @param strictFiltersJoinOperator A value used for Join operation of Metadata
+     * @param withStrictFiltersJoinOperator A value used for Join operation of Metadata
      *                                  {@link Metadata}.
      */
-    public void setStrictFiltersJoinOperator(JoinOperator strictFiltersJoinOperator) {
-        this.strictFiltersJoinOperator = strictFiltersJoinOperator;
+    public void setStrictFiltersJoinOperator(JoinOperator withStrictFiltersJoinOperator) {
+        this.strictFiltersJoinOperator = withStrictFiltersJoinOperator;
     }
 
     /**
@@ -263,10 +265,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets the whether to include the dialog name metadata for QnA context.
      *
-     * @param includeDialogNameInMetadata A bool or boolean expression.
+     * @param withIncludeDialogNameInMetadata A bool or boolean expression.
      */
-    public void setIncludeDialogNameInMetadata(Boolean includeDialogNameInMetadata) {
-        this.includeDialogNameInMetadata = includeDialogNameInMetadata;
+    public void setIncludeDialogNameInMetadata(Boolean withIncludeDialogNameInMetadata) {
+        this.includeDialogNameInMetadata = withIncludeDialogNameInMetadata;
     }
 
     /**
@@ -281,10 +283,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets an expression to evaluate to set additional metadata name value pairs.
      *
-     * @param metadata An expression to evaluate for pairs of metadata.
+     * @param withMetadata An expression to evaluate for pairs of metadata.
      */
-    public void setMetadata(Metadata[] metadata) {
-        this.metadata = metadata;
+    public void setMetadata(Metadata[] withMetadata) {
+        this.metadata = withMetadata;
     }
 
     /**
@@ -299,11 +301,11 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets an expression to evaluate to set the context.
      *
-     * @param context An expression to evaluate to QnARequestContext to pass as
+     * @param withContext An expression to evaluate to QnARequestContext to pass as
      *                context.
      */
-    public void setContext(QnARequestContext context) {
-        this.context = context;
+    public void setContext(QnARequestContext withContext) {
+        this.context = withContext;
     }
 
     /**
@@ -318,10 +320,10 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets an expression or numberto use for the QnAId paratemer.
      *
-     * @param qnAId The expression or number.
+     * @param withQnAId The expression or number.
      */
-    public void setQnAId(Integer qnAId) {
-        this.qnAId = qnAId;
+    public void setQnAId(Integer withQnAId) {
+        this.qnAId = withQnAId;
     }
 
     /**
@@ -339,11 +341,11 @@ public class QnAMakerRecognizer extends Recognizer {
      * Sets the flag to determine if personal information should be logged in
      * telemetry.
      *
-     * @param logPersonalInformation The flag to indicate in personal information
+     * @param withLogPersonalInformation The flag to indicate in personal information
      *                               should be logged in telemetry.
      */
-    public void setLogPersonalInformation(Boolean logPersonalInformation) {
-        this.logPersonalInformation = logPersonalInformation;
+    public void setLogPersonalInformation(Boolean withLogPersonalInformation) {
+        this.logPersonalInformation = withLogPersonalInformation;
     }
 
     /**
@@ -364,20 +366,16 @@ public class QnAMakerRecognizer extends Recognizer {
     public CompletableFuture<RecognizerResult> recognize(DialogContext dialogContext, Activity activity,
             Map<String, String> telemetryProperties, Map<String, Double> telemetryMetrics) {
         // Identify matched intents
-        RecognizerResult recognizerResult = new RecognizerResult() {
-            {
-                setText(activity.getText());
-                setIntents(new HashMap<String, IntentScore>());
-            }
-        };
-
+        RecognizerResult recognizerResult = new RecognizerResult();
+        recognizerResult.setText(activity.getText());
+        recognizerResult.setIntents(new HashMap<String, IntentScore>());
         if (Strings.isNullOrEmpty(activity.getText())) {
             recognizerResult.getIntents().put("None", new IntentScore());
             return CompletableFuture.completedFuture(recognizerResult);
         }
 
         List<Metadata> filters = new ArrayList<Metadata>();
-        // TODO: this should be uncommented as soon as Expression is added in Java
+        // TODO this should be uncommented as soon as Expression is added in Java
         /* if (this.includeDialogNameInMetadata.getValue(dialogContext.getState())) {
             filters.add(new Metadata() {
                 {
@@ -431,16 +429,21 @@ public class QnAMakerRecognizer extends Recognizer {
                         });
                     }
                     ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode entitiesNode = mapper.createObjectNode();
                     List<String> answerArray = new ArrayList<String>();
                     answerArray.add(topAnswer.getAnswer());
-                    ObjectPath.setPathValue(recognizerResult, "entities.answer", answerArray);
+                    ArrayNode entitiesArrayNode = entitiesNode.putArray("answer");
+                    entitiesArrayNode.add(topAnswer.getAnswer());
 
-                    ObjectNode instance = mapper.createObjectNode();
-                    instance.put("startIndex", 0);
-                    instance.put("endIndex", activity.getText().length());
-                    ObjectPath.setPathValue(recognizerResult, "entities.$instance.answer", instance);
+                    ObjectNode instance = entitiesNode.putObject("$instance");
+                    ArrayNode instanceArrayNode = instance.putArray("answer");
+                    ObjectNode data = instanceArrayNode.addObject();
+                    data.setAll((ObjectNode) mapper.valueToTree(topAnswer));
+                    data.put("startIndex", 0);
+                    data.put("endIndex", activity.getText().length());
 
-                    recognizerResult.getProperties().put("answers", mapper.valueToTree(answerArray));
+                    recognizerResult.setEntities(entitiesNode);
+                    recognizerResult.getProperties().put("answers", mapper.valueToTree(answers));
                 } else {
                     recognizerResult.getIntents().put("None", new IntentScore() {
                         {
@@ -502,7 +505,8 @@ public class QnAMakerRecognizer extends Recognizer {
             Map<String, String> telemetryProperties, @Nullable DialogContext dialogContext) {
         if (dialogContext == null) {
             throw new IllegalArgumentException(
-                    "dialogContext: DialogContext needed for state in AdaptiveRecognizer.FillRecognizerResultTelemetryProperties method.");
+                    "dialogContext: DialogContext needed for state in "
+                        + "AdaptiveRecognizer.FillRecognizerResultTelemetryProperties method.");
         }
 
         Map<String, String> properties = new HashMap<String, String>() {

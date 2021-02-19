@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+package com.microsoft.bot.ai.qna;
+
 import java.io.IOException;
 import java.util.UUID;
 

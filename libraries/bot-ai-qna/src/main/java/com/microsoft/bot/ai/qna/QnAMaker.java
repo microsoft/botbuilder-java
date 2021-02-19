@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.ai.qna;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import com.microsoft.bot.ai.qna.models.FeedbackRecords;
 import com.microsoft.bot.ai.qna.models.QueryResult;
 import com.microsoft.bot.ai.qna.models.QueryResults;
@@ -22,12 +24,12 @@ import com.microsoft.bot.schema.Pair;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
@@ -224,7 +226,8 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
      * @return Filtered array of ambiguous question.
      */
     public QueryResult[] getLowScoreVariation(QueryResult[] queryResult) {
-        return (QueryResult[]) ActiveLearningUtils.getLowScoreVariation(Arrays.asList(queryResult)).toArray();
+        List<QueryResult> queryResults = ActiveLearningUtils.getLowScoreVariation(Arrays.asList(queryResult));
+        return queryResults.toArray(new QueryResult[queryResults.size()]);
     }
 
     /**
@@ -285,13 +288,14 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
         properties.put(QnATelemetryConstants.KNOWLEDGE_BASE_ID_PROPERTY, this.endpoint.getKnowledgeBaseId());
 
         String text = turnContext.getActivity().getText();
-        String userName = turnContext.getActivity().getFrom().getName();
+        String userName = turnContext.getActivity().getFrom() != null
+            ? turnContext.getActivity().getFrom().getName() : null;
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text and user
         // name are common examples
         if (this.logPersonalInformation) {
             if (!StringUtils.isBlank(text)) {
-                properties.put(QnATelemetryConstants.QUESTION_ID_PROPERTY, text);
+                properties.put(QnATelemetryConstants.QUESTION_PROPERTY, text);
             }
 
             if (!StringUtils.isBlank(userName)) {
@@ -318,19 +322,30 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
 
         // Additional Properties can override "stock" properties.
         if (telemetryProperties != null) {
-            telemetryProperties.putAll(properties);
-            Map<String, List<String>> telemetryPropertiesMap = telemetryProperties.entrySet().stream().collect(
-                    Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
-            telemetryProperties = telemetryPropertiesMap.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().get(0)));
+            Multimap<String, String> multiMapTelemetryProperties = LinkedListMultimap.create();
+            for (Entry<String, String> entry: telemetryProperties.entrySet()) {
+                multiMapTelemetryProperties.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<String, String> entry: properties.entrySet()) {
+                multiMapTelemetryProperties.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<String, Collection<String>> entry: multiMapTelemetryProperties.asMap().entrySet()) {
+                telemetryProperties.put(entry.getKey(), entry.getValue().iterator().next());
+            }
         }
+
         // Additional Metrics can override "stock" metrics.
         if (telemetryMetrics != null) {
-            telemetryMetrics.putAll(metrics);
-            Map<String, List<Double>> telemetryMetricsMap = telemetryMetrics.entrySet().stream().collect(
-                    Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
-            telemetryMetrics = telemetryMetricsMap.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().get(0)));
+            Multimap<String, Double> multiMapTelemetryMetrics = LinkedListMultimap.create();
+            for (Entry<String, Double> entry: telemetryMetrics.entrySet()) {
+                multiMapTelemetryMetrics.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<String, Double> entry: metrics.entrySet()) {
+                multiMapTelemetryMetrics.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<String, Collection<Double>> entry: multiMapTelemetryMetrics.asMap().entrySet()) {
+                telemetryMetrics.put(entry.getKey(), entry.getValue().iterator().next());
+            }
         }
 
         Map<String, String> telemetryPropertiesResult = telemetryProperties != null ? telemetryProperties : properties;

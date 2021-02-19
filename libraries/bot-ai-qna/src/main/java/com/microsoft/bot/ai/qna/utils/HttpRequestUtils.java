@@ -6,21 +6,25 @@ package com.microsoft.bot.ai.qna.utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.ai.qna.QnAMakerEndpoint;
 import com.microsoft.bot.connector.UserAgent;
 
-import org.slf4j.LoggerFactory;
-
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper for HTTP requests.
  */
 public class HttpRequestUtils {
+    private OkHttpClient httpClient = new OkHttpClient();
     /**
      * Execute Http request.
      *
@@ -29,7 +33,7 @@ public class HttpRequestUtils {
      * @param endpoint    QnA Maker endpoint details.
      * @return Returns http response object.
      */
-    public CompletableFuture<Response> executeHttpRequest(String requestUrl, String payloadBody,
+    public CompletableFuture<JsonNode> executeHttpRequest(String requestUrl, String payloadBody,
             QnAMakerEndpoint endpoint) {
         if (requestUrl == null) {
             throw new IllegalArgumentException("requestUrl: Request url can not be null.");
@@ -43,29 +47,37 @@ public class HttpRequestUtils {
             throw new IllegalArgumentException("endpoint");
         }
 
-        return CompletableFuture.supplyAsync(() -> {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payloadBody);
-            OkHttpClient client = new OkHttpClient();
-            String endpointKey = String.format("%s", endpoint.getEndpointKey());
-
-            Request request = new Request.Builder().url(requestUrl).header("Authorization", String.format("EndpointKey %s", endpointKey))
-                    .header("Ocp-Apim-Subscription-Key", endpointKey).header("User-Agent", UserAgent.value())
-                    .post(requestBody).build();
-
-            Response response;
-            try {
-                response = client.newCall(request).execute();
-                if (!response.isSuccessful()) {
-                    String message = new StringBuilder("The call to the translation service returned HTTP status code ")
-                            .append(response.code()).append(".").toString();
-                    throw new Exception(message);
-                }
-            } catch (Exception e) {
-                LoggerFactory.getLogger(HttpRequestUtils.class).error("findPackages", e);
-                throw new CompletionException(e);
+        ObjectMapper mapper = new ObjectMapper();
+        String endpointKey = endpoint.getEndpointKey();
+        Response response;
+        JsonNode qnaResponse = null;
+        try {
+            Request request = buildRequest(requestUrl, endpointKey, buildRequestBody(payloadBody));
+            response = this.httpClient.newCall(request).execute();
+            qnaResponse = mapper.readTree(response.body().string());
+            if (!response.isSuccessful()) {
+                String message = "Unexpected code " + response.code();
+                throw new Exception(message);
             }
+        } catch (Exception e) {
+            LoggerFactory.getLogger(HttpRequestUtils.class).error("findPackages", e);
+            throw new CompletionException(e);
+        }
 
-            return response;
-        });
+        return CompletableFuture.completedFuture(qnaResponse);
+    }
+
+    private Request buildRequest(String requestUrl, String endpointKey, RequestBody body) {
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(requestUrl).newBuilder();
+        Request.Builder requestBuilder = new Request.Builder()
+            .url(httpBuilder.build())
+            .addHeader("Authorization", String.format("EndpointKey %s", endpointKey))
+            .addHeader("Ocp-Apim-Subscription-Key", endpointKey).addHeader("User-Agent", UserAgent.value())
+            .post(body);
+        return requestBuilder.build();
+    }
+
+    private RequestBody buildRequestBody(String payloadBody) throws JsonProcessingException {
+        return RequestBody.create(payloadBody, MediaType.parse("application/json; charset=utf-8"));
     }
 }

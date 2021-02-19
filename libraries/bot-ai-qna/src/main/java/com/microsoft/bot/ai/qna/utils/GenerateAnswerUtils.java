@@ -5,8 +5,11 @@ package com.microsoft.bot.ai.qna.utils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.ai.qna.QnAMaker;
 import com.microsoft.bot.ai.qna.QnAMakerEndpoint;
 import com.microsoft.bot.ai.qna.QnAMakerOptions;
@@ -20,7 +23,6 @@ import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.schema.Activity;
 
 import net.minidev.json.JSONObject;
-import okhttp3.Response;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -119,24 +121,25 @@ public class GenerateAnswerUtils {
                 return CompletableFuture.completedFuture(result);
             });
         } catch (IOException e) {
-            LoggerFactory.getLogger(GenerateAnswerUtils.class).error("getANswersRaw");
+            LoggerFactory.getLogger(GenerateAnswerUtils.class).error("getAnswersRaw");
             return CompletableFuture.completedFuture(null);
         }
     }
 
-    private static CompletableFuture<QueryResults> formatQnAResult(Response response, QnAMakerOptions options)
+    private static CompletableFuture<QueryResults> formatQnAResult(JsonNode response, QnAMakerOptions options)
             throws IOException {
         String jsonResponse = null;
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         QueryResults results = null;
 
-        jsonResponse = response.body().string();
+        jsonResponse = response.toString();
         results = jacksonAdapter.deserialize(jsonResponse, QueryResults.class);
         for (QueryResult answer : results.getAnswers()) {
             answer.setScore(answer.getScore() / PERCENTAGE_DIVISOR);
         }
-        results.setAnswers((QueryResult[]) Arrays.asList(results.getAnswers()).stream()
-                .filter(answer -> answer.getScore() > options.getScoreThreshold()).toArray());
+        List<QueryResult> answerList = Arrays.asList(results.getAnswers()).
+            stream().filter(answer -> answer.getScore() > options.getScoreThreshold()).collect(Collectors.toList());
+        results.setAnswers(answerList.toArray(new QueryResult[answerList.size()]));
 
         return CompletableFuture.completedFuture(results);
     }
@@ -184,7 +187,7 @@ public class GenerateAnswerUtils {
         QnAMakerOptions hydratedOptions = null;
 
         try {
-            hydratedOptions = jacksonAdapter.<QnAMakerOptions>deserialize(jacksonAdapter.serialize(queryOptions),
+            hydratedOptions = jacksonAdapter.deserialize(jacksonAdapter.serialize(options),
                     QnAMakerOptions.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(GenerateAnswerUtils.class).error("hydrateOptions");
@@ -200,7 +203,7 @@ public class GenerateAnswerUtils {
                 hydratedOptions.setTop(queryOptions.getTop());
             }
 
-            if (queryOptions.getStrictFilters().length > 0) {
+            if (queryOptions.getStrictFilters() != null && queryOptions.getStrictFilters().length > 0) {
                 hydratedOptions.setStrictFilters(queryOptions.getStrictFilters());
             }
 
