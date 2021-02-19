@@ -4,6 +4,7 @@
 package com.microsoft.bot.ai.luis;
 
 import com.microsoft.bot.builder.BotTelemetryClient;
+import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.dialogs.DialogContext;
@@ -35,7 +36,7 @@ public abstract class LuisRecognizerOptions {
     /**
      * Bot Telemetry Client instance.
      */
-    private BotTelemetryClient telemetryClient = null;
+    private BotTelemetryClient telemetryClient = new NullBotTelemetryClient();
 
     /**
      * Controls if personal information should be sent as telemetry.
@@ -54,16 +55,6 @@ public abstract class LuisRecognizerOptions {
      */
     public LuisApplication getApplication() {
         return application;
-    }
-
-    /**
-     * Sets the Luis Application.
-     *
-     * @param application A Luis Application instance which sets the Luis specifics to work with
-     */
-    public void setApplication(
-        LuisApplication application) {
-        this.application = application;
     }
 
     /**
