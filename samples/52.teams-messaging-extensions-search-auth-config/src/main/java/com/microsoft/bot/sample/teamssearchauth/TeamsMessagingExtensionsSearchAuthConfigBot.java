@@ -184,7 +184,7 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
             .thenCompose(response -> {
                 if (response == null || StringUtils.isEmpty(response.getToken())) {
                     // There is no token, so the user has not signed in yet.
-                    return tokenProvider.getOauthSignInLink(turnContext, connectionName)
+                    return tokenProvider.getOAuthSignInLink(turnContext, connectionName)
                         .thenApply(link -> new MessagingExtensionResponse() {{
                             setComposeExtension(new MessagingExtensionResult() {{
                                 setType("auth");
