@@ -3,8 +3,8 @@
 
 package com.microsoft.bot.ai.qna.utils;
 
+import com.microsoft.bot.connector.Async;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpRequestUtils {
     private OkHttpClient httpClient = new OkHttpClient();
+
     /**
      * Execute Http request.
      *
@@ -33,18 +34,23 @@ public class HttpRequestUtils {
      * @param endpoint    QnA Maker endpoint details.
      * @return Returns http response object.
      */
-    public CompletableFuture<JsonNode> executeHttpRequest(String requestUrl, String payloadBody,
-            QnAMakerEndpoint endpoint) {
+    public CompletableFuture<JsonNode> executeHttpRequest(
+        String requestUrl,
+        String payloadBody,
+        QnAMakerEndpoint endpoint
+    ) {
         if (requestUrl == null) {
-            throw new IllegalArgumentException("requestUrl: Request url can not be null.");
+            return Async
+                .completeExceptionally(new IllegalArgumentException("requestUrl: Request url can not be null."));
         }
 
         if (payloadBody == null) {
-            throw new IllegalArgumentException("payloadBody: Payload body can not be null.");
+            return Async
+                .completeExceptionally(new IllegalArgumentException("payloadBody: Payload body can not be null."));
         }
 
         if (endpoint == null) {
-            throw new IllegalArgumentException("endpoint");
+            return Async.completeExceptionally(new IllegalArgumentException("endpoint"));
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -57,11 +63,11 @@ public class HttpRequestUtils {
             qnaResponse = mapper.readTree(response.body().string());
             if (!response.isSuccessful()) {
                 String message = "Unexpected code " + response.code();
-                throw new Exception(message);
+                return Async.completeExceptionally(new Exception(message));
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(HttpRequestUtils.class).error("findPackages", e);
-            throw new CompletionException(e);
+            return Async.completeExceptionally(e);
         }
 
         return CompletableFuture.completedFuture(qnaResponse);
@@ -69,15 +75,15 @@ public class HttpRequestUtils {
 
     private Request buildRequest(String requestUrl, String endpointKey, RequestBody body) {
         HttpUrl.Builder httpBuilder = HttpUrl.parse(requestUrl).newBuilder();
-        Request.Builder requestBuilder = new Request.Builder()
-            .url(httpBuilder.build())
+        Request.Builder requestBuilder = new Request.Builder().url(httpBuilder.build())
             .addHeader("Authorization", String.format("EndpointKey %s", endpointKey))
-            .addHeader("Ocp-Apim-Subscription-Key", endpointKey).addHeader("User-Agent", UserAgent.value())
+            .addHeader("Ocp-Apim-Subscription-Key", endpointKey)
+            .addHeader("User-Agent", UserAgent.value())
             .post(body);
         return requestBuilder.build();
     }
 
     private RequestBody buildRequestBody(String payloadBody) throws JsonProcessingException {
-        return RequestBody.create(payloadBody, MediaType.parse("application/json; charset=utf-8"));
+        return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), payloadBody);
     }
 }

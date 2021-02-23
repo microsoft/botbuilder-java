@@ -98,6 +98,7 @@ public class QnAMakerRecognizerTests {
             Assert.assertEquals(result.getIntents().get("QnAMatch"), null);
             Assert.assertNotEquals(result.getIntents().get("None"), null);
         } catch (Exception e) {
+            e.printStackTrace();
             fail();
         } finally {
             try {

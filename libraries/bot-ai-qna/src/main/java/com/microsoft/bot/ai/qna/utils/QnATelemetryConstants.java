@@ -8,7 +8,8 @@ package com.microsoft.bot.ai.qna.utils;
  */
 public final class QnATelemetryConstants {
 
-    private QnATelemetryConstants() { }
+    private QnATelemetryConstants() {
+    }
 
     /**
      * The Key used for the custom event type within telemetry.

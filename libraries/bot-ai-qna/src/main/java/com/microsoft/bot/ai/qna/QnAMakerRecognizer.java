@@ -197,8 +197,8 @@ public class QnAMakerRecognizer extends Recognizer {
      * Sets a value indicating whether gets or sets environment of knowledgebase to
      * be called.
      *
-     * @param withIsTest A value indicating whether to call test or prod environment of
-     *               knowledgebase.
+     * @param withIsTest A value indicating whether to call test or prod environment
+     *                   of knowledgebase.
      */
     public void setIsTest(Boolean withIsTest) {
         this.isTest = withIsTest;
@@ -234,8 +234,8 @@ public class QnAMakerRecognizer extends Recognizer {
     /**
      * Sets {@link Metadata} join operator.
      *
-     * @param withStrictFiltersJoinOperator A value used for Join operation of Metadata
-     *                                  {@link Metadata}.
+     * @param withStrictFiltersJoinOperator A value used for Join operation of
+     *                                      Metadata {@link Metadata}.
      */
     public void setStrictFiltersJoinOperator(JoinOperator withStrictFiltersJoinOperator) {
         this.strictFiltersJoinOperator = withStrictFiltersJoinOperator;
@@ -290,7 +290,7 @@ public class QnAMakerRecognizer extends Recognizer {
      * Sets an expression to evaluate to set the context.
      *
      * @param withContext An expression to evaluate to QnARequestContext to pass as
-     *                context.
+     *                    context.
      */
     public void setContext(QnARequestContext withContext) {
         this.context = withContext;
@@ -329,8 +329,8 @@ public class QnAMakerRecognizer extends Recognizer {
      * Sets the flag to determine if personal information should be logged in
      * telemetry.
      *
-     * @param withLogPersonalInformation The flag to indicate in personal information
-     *                               should be logged in telemetry.
+     * @param withLogPersonalInformation The flag to indicate in personal
+     *                                   information should be logged in telemetry.
      */
     public void setLogPersonalInformation(Boolean withLogPersonalInformation) {
         this.logPersonalInformation = withLogPersonalInformation;
@@ -351,8 +351,12 @@ public class QnAMakerRecognizer extends Recognizer {
      * @return A {@link RecognizerResult} containing the QnA Maker result.
      */
     @Override
-    public CompletableFuture<RecognizerResult> recognize(DialogContext dialogContext, Activity activity,
-            Map<String, String> telemetryProperties, Map<String, Double> telemetryMetrics) {
+    public CompletableFuture<RecognizerResult> recognize(
+        DialogContext dialogContext,
+        Activity activity,
+        Map<String, String> telemetryProperties,
+        Map<String, Double> telemetryMetrics
+    ) {
         // Identify matched intents
         RecognizerResult recognizerResult = new RecognizerResult();
         recognizerResult.setText(activity.getText());
@@ -364,14 +368,11 @@ public class QnAMakerRecognizer extends Recognizer {
 
         List<Metadata> filters = new ArrayList<Metadata>();
         // TODO this should be uncommented as soon as Expression is added in Java
-        /* if (this.includeDialogNameInMetadata.getValue(dialogContext.getState())) {
-            filters.add(new Metadata() {
-                {
-                    setName("dialogName");
-                    setValue(dialogContext.getActiveDialog().getId());
-                }
-            });
-        } */
+        /*
+         * if (this.includeDialogNameInMetadata.getValue(dialogContext.getState())) {
+         * filters.add(new Metadata() { { setName("dialogName");
+         * setValue(dialogContext.getActiveDialog().getId()); } }); }
+         */
 
         // if there is $qna.metadata set add to filters
         Metadata[] externalMetadata = this.metadata;
@@ -402,13 +403,13 @@ public class QnAMakerRecognizer extends Recognizer {
                     }
                     Float internalTopAnswer = topAnswer.getScore();
                     if (topAnswer.getAnswer().trim().toUpperCase().startsWith(intentPrefix.toUpperCase())) {
-                        recognizerResult.getIntents().put(
-                                topAnswer.getAnswer().trim().substring(intentPrefix.length()).trim(),
-                                new IntentScore() {
-                                    {
-                                        setScore(internalTopAnswer);
-                                    }
-                                });
+                        recognizerResult.getIntents()
+                            .put(topAnswer.getAnswer().trim().substring(
+                                intentPrefix.length()).trim(),
+                                new IntentScore() {{
+                                    setScore(internalTopAnswer);
+                                }}
+                            );
                     } else {
                         recognizerResult.getIntents().put(this.qnAMatchIntent, new IntentScore() {
                             {
@@ -440,9 +441,12 @@ public class QnAMakerRecognizer extends Recognizer {
                     });
                 }
 
-                this.trackRecognizerResult(dialogContext, "QnAMakerRecognizerResult", this
-                        .fillRecognizerResultTelemetryProperties(recognizerResult, telemetryProperties, dialogContext),
-                        telemetryMetrics);
+                this.trackRecognizerResult(
+                    dialogContext,
+                    "QnAMakerRecognizerResult",
+                    this.fillRecognizerResultTelemetryProperties(recognizerResult, telemetryProperties, dialogContext),
+                    telemetryMetrics
+                );
                 return recognizerResult;
             });
         });
@@ -473,8 +477,8 @@ public class QnAMakerRecognizer extends Recognizer {
             }
         };
 
-        return CompletableFuture.completedFuture(
-                new QnAMaker(endpoint, new QnAMakerOptions(), this.getTelemetryClient(), logPersonalInfo));
+        return CompletableFuture
+            .completedFuture(new QnAMaker(endpoint, new QnAMakerOptions(), this.getTelemetryClient(), logPersonalInfo));
     }
 
     /**
@@ -489,37 +493,53 @@ public class QnAMakerRecognizer extends Recognizer {
      *         on the TelemetryClient.
      */
     @Override
-    protected Map<String, String> fillRecognizerResultTelemetryProperties(RecognizerResult recognizerResult,
-            Map<String, String> telemetryProperties, @Nullable DialogContext dialogContext) {
+    protected Map<String, String> fillRecognizerResultTelemetryProperties(
+        RecognizerResult recognizerResult,
+        Map<String, String> telemetryProperties,
+        @Nullable DialogContext dialogContext
+    ) {
         if (dialogContext == null) {
             throw new IllegalArgumentException(
-                    "dialogContext: DialogContext needed for state in "
-                        + "AdaptiveRecognizer.FillRecognizerResultTelemetryProperties method.");
+                "dialogContext: DialogContext needed for state in "
+                    + "AdaptiveRecognizer.FillRecognizerResultTelemetryProperties method."
+            );
         }
 
         Map<String, String> properties = new HashMap<String, String>() {
             {
-                put("TopIntent",
-                        !recognizerResult.getIntents().isEmpty()
-                                ? (String) recognizerResult.getIntents().keySet().toArray()[0]
-                                : null);
-                put("TopIntentScore",
-                        !recognizerResult.getIntents().isEmpty()
-                                ? Double.toString(
-                                        ((IntentScore) recognizerResult.getIntents().values().toArray()[0]).getScore())
-                                : null);
-                put("Intents",
-                        !recognizerResult.getIntents().isEmpty()
-                                ? Serialization.toStringSilent(recognizerResult.getIntents())
-                                : null);
-                put("Entities",
-                        recognizerResult.getEntities() != null
-                                ? Serialization.toStringSilent(recognizerResult.getEntities())
-                                : null);
-                put("AdditionalProperties",
-                        !recognizerResult.getProperties().isEmpty()
-                                ? Serialization.toStringSilent(recognizerResult.getProperties())
-                                : null);
+                put(
+                    "TopIntent",
+                    !recognizerResult.getIntents().isEmpty()
+                        ? (String) recognizerResult.getIntents().keySet().toArray()[0]
+                        : null
+                );
+                put(
+                    "TopIntentScore",
+                    !recognizerResult.getIntents()
+                        .isEmpty()
+                            ? Double.toString(
+                                ((IntentScore) recognizerResult.getIntents().values().toArray()[0]).getScore()
+                            )
+                            : null
+                );
+                put(
+                    "Intents",
+                    !recognizerResult.getIntents().isEmpty()
+                        ? Serialization.toStringSilent(recognizerResult.getIntents())
+                        : null
+                );
+                put(
+                    "Entities",
+                    recognizerResult.getEntities() != null
+                        ? Serialization.toStringSilent(recognizerResult.getEntities())
+                        : null
+                );
+                put(
+                    "AdditionalProperties",
+                    !recognizerResult.getProperties().isEmpty()
+                        ? Serialization.toStringSilent(recognizerResult.getProperties())
+                        : null
+                );
             }
         };
 
@@ -531,10 +551,15 @@ public class QnAMakerRecognizer extends Recognizer {
         // Additional Properties can override "stock properties".
         if (telemetryProperties != null) {
             telemetryProperties.putAll(properties);
-            Map<String, List<String>> telemetryPropertiesMap = telemetryProperties.entrySet().stream().collect(
-                    Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
-            return telemetryPropertiesMap.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().get(0)));
+            Map<String, List<String>> telemetryPropertiesMap =
+                telemetryProperties.entrySet()
+                    .stream()
+                    .collect(
+                        Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList()))
+                    );
+            return telemetryPropertiesMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().get(0)));
         }
 
         return properties;

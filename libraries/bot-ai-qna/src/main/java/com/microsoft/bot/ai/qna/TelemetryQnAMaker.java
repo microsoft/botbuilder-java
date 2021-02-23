@@ -50,6 +50,10 @@ public interface TelemetryQnAMaker {
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    CompletableFuture<QueryResult[]> getAnswers(TurnContext turnContext, QnAMakerOptions options,
-            Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics);
+    CompletableFuture<QueryResult[]> getAnswers(
+        TurnContext turnContext,
+        QnAMakerOptions options,
+        Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    );
 }

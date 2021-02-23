@@ -22,5 +22,6 @@ public final class RankerTypes {
      */
     public static final String AUTO_SUGGEST_QUESTION = "AutoSuggestQuestion";
 
-    private RankerTypes() { }
+    private RankerTypes() {
+    }
 }

@@ -16,6 +16,7 @@ import com.microsoft.bot.ai.qna.utils.TrainUtils;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
@@ -75,8 +76,12 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
      *                                   identifiable information in telemetry
      *                                   events.
      */
-    public QnAMaker(QnAMakerEndpoint withEndpoint, QnAMakerOptions options,
-            BotTelemetryClient withTelemetryClient, Boolean withLogPersonalInformation) {
+    public QnAMaker(
+        QnAMakerEndpoint withEndpoint,
+        QnAMakerOptions options,
+        BotTelemetryClient withTelemetryClient,
+        Boolean withLogPersonalInformation
+    ) {
         if (withLogPersonalInformation == null) {
             withLogPersonalInformation = false;
         }
@@ -100,7 +105,8 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
 
         if (this.endpoint.getHost().endsWith("v2.0") || this.endpoint.getHost().endsWith("v3.0")) {
             throw new UnsupportedOperationException(
-                    "v2.0 and v3.0 of QnA Maker service" + " is no longer supported in the QnA Maker.");
+                "v2.0 and v3.0 of QnA Maker service" + " is no longer supported in the QnA Maker."
+            );
         }
 
         this.telemetryClient = withTelemetryClient != null ? withTelemetryClient : new NullBotTelemetryClient();
@@ -113,8 +119,8 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
     /**
      * Initializes a new instance of the {@link QnAMaker} class.
      *
-     * @param withEndpoint   The endpoint of the knowledge base to query.
-     * @param options        The options for the QnA Maker knowledge base.
+     * @param withEndpoint The endpoint of the knowledge base to query.
+     * @param options      The options for the QnA Maker knowledge base.
      */
     public QnAMaker(QnAMakerEndpoint withEndpoint, @Nullable QnAMakerOptions options) {
         this(withEndpoint, options, null, null);
@@ -170,10 +176,14 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    public CompletableFuture<QueryResult[]> getAnswers(TurnContext turnContext, QnAMakerOptions options,
-            Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics) {
+    public CompletableFuture<QueryResult[]> getAnswers(
+        TurnContext turnContext,
+        QnAMakerOptions options,
+        Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    ) {
         return this.getAnswersRaw(turnContext, options, telemetryProperties, telemetryMetrics)
-                .thenApply(result -> result.getAnswers());
+            .thenApply(result -> result.getAnswers());
     }
 
     /**
@@ -191,22 +201,29 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    public CompletableFuture<QueryResults> getAnswersRaw(TurnContext turnContext, QnAMakerOptions options,
-            @Nullable Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics) {
+    public CompletableFuture<QueryResults> getAnswersRaw(
+        TurnContext turnContext,
+        QnAMakerOptions options,
+        @Nullable Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext");
+            return Async.completeExceptionally(new IllegalArgumentException("turnContext"));
         }
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException(
-                    String.format("The %1$s property for %2$s can't be null.", "Activity", "turnContext"));
+            return Async.completeExceptionally(
+                new IllegalArgumentException(
+                    String.format("The %1$s property for %2$s can't be null.", "Activity", "turnContext")
+                )
+            );
         }
         Activity messageActivity = turnContext.getActivity();
         if (messageActivity == null || !messageActivity.isType(ActivityTypes.MESSAGE)) {
-            throw new IllegalArgumentException("Activity type is not a message");
+            return Async.completeExceptionally(new IllegalArgumentException("Activity type is not a message"));
         }
 
         if (Strings.isNullOrEmpty(turnContext.getActivity().getText())) {
-            throw new IllegalArgumentException("Null or empty text");
+            return Async.completeExceptionally(new IllegalArgumentException("Null or empty text"));
         }
 
         return this.generateAnswerHelper.getAnswersRaw(turnContext, messageActivity, options).thenCompose(result -> {
@@ -253,14 +270,19 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
      * @return A Task representing the work to be executed.
      * @throws IOException Throws an IOException if there is any.
      */
-    protected CompletableFuture<Void> onQnaResults(QueryResult[] queryResults, TurnContext turnContext,
-            @Nullable Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics)
-            throws IOException {
-        return fillQnAEvent(queryResults, turnContext, telemetryProperties, telemetryMetrics).thenAccept(eventData -> {
-            // Track the event
-            this.telemetryClient.trackEvent(QnATelemetryConstants.QNA_MSG_EVENT, eventData.getLeft(),
-                    eventData.getRight());
-        });
+    protected CompletableFuture<Void> onQnaResults(
+        QueryResult[] queryResults,
+        TurnContext turnContext,
+        @Nullable Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    ) throws IOException {
+        return fillQnAEvent(queryResults, turnContext, telemetryProperties, telemetryMetrics).thenAccept(
+            eventData -> {
+                // Track the event
+                this.telemetryClient
+                    .trackEvent(QnATelemetryConstants.QNA_MSG_EVENT, eventData.getLeft(), eventData.getRight());
+            }
+        );
     }
 
     /**
@@ -279,17 +301,20 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
      *         any properties passed from the GetAnswersAsync method.
      * @throws IOException Throws an IOException if there is any.
      */
-    protected CompletableFuture<Pair<Map<String, String>, Map<String, Double>>> fillQnAEvent(QueryResult[] queryResults,
-            TurnContext turnContext, @Nullable Map<String, String> telemetryProperties,
-            @Nullable Map<String, Double> telemetryMetrics) throws IOException {
+    protected CompletableFuture<Pair<Map<String, String>, Map<String, Double>>> fillQnAEvent(
+        QueryResult[] queryResults,
+        TurnContext turnContext,
+        @Nullable Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    ) throws IOException {
         Map<String, String> properties = new HashMap<String, String>();
         Map<String, Double> metrics = new HashMap<String, Double>();
 
         properties.put(QnATelemetryConstants.KNOWLEDGE_BASE_ID_PROPERTY, this.endpoint.getKnowledgeBaseId());
 
         String text = turnContext.getActivity().getText();
-        String userName = turnContext.getActivity().getFrom() != null
-            ? turnContext.getActivity().getFrom().getName() : null;
+        String userName =
+            turnContext.getActivity().getFrom() != null ? turnContext.getActivity().getFrom().getName() : null;
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text and user
         // name are common examples
@@ -307,9 +332,14 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
         if (queryResults.length > 0) {
             JacksonAdapter jacksonAdapter = new JacksonAdapter();
             QueryResult queryResult = queryResults[0];
-            properties.put(QnATelemetryConstants.MATCHED_QUESTION_PROPERTY,
-                    jacksonAdapter.serialize(queryResult.getQuestions()));
-            properties.put(QnATelemetryConstants.QUESTION_ID_PROPERTY, queryResult.getId().toString());
+            properties.put(
+                QnATelemetryConstants.MATCHED_QUESTION_PROPERTY,
+                jacksonAdapter.serialize(queryResult.getQuestions())
+            );
+            properties.put(
+                QnATelemetryConstants.QUESTION_ID_PROPERTY,
+                queryResult.getId() != null ? queryResult.getId().toString() : ""
+            );
             properties.put(QnATelemetryConstants.ANSWER_PROPERTY, queryResult.getAnswer());
             metrics.put(QnATelemetryConstants.SCORE_PROPERTY, queryResult.getScore().doubleValue());
             properties.put(QnATelemetryConstants.ARTICLE_FOUND_PROPERTY, "true");
@@ -323,13 +353,13 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
         // Additional Properties can override "stock" properties.
         if (telemetryProperties != null) {
             Multimap<String, String> multiMapTelemetryProperties = LinkedListMultimap.create();
-            for (Entry<String, String> entry: telemetryProperties.entrySet()) {
+            for (Entry<String, String> entry : telemetryProperties.entrySet()) {
                 multiMapTelemetryProperties.put(entry.getKey(), entry.getValue());
             }
-            for (Entry<String, String> entry: properties.entrySet()) {
+            for (Entry<String, String> entry : properties.entrySet()) {
                 multiMapTelemetryProperties.put(entry.getKey(), entry.getValue());
             }
-            for (Entry<String, Collection<String>> entry: multiMapTelemetryProperties.asMap().entrySet()) {
+            for (Entry<String, Collection<String>> entry : multiMapTelemetryProperties.asMap().entrySet()) {
                 telemetryProperties.put(entry.getKey(), entry.getValue().iterator().next());
             }
         }
@@ -337,13 +367,13 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
         // Additional Metrics can override "stock" metrics.
         if (telemetryMetrics != null) {
             Multimap<String, Double> multiMapTelemetryMetrics = LinkedListMultimap.create();
-            for (Entry<String, Double> entry: telemetryMetrics.entrySet()) {
+            for (Entry<String, Double> entry : telemetryMetrics.entrySet()) {
                 multiMapTelemetryMetrics.put(entry.getKey(), entry.getValue());
             }
-            for (Entry<String, Double> entry: metrics.entrySet()) {
+            for (Entry<String, Double> entry : metrics.entrySet()) {
                 multiMapTelemetryMetrics.put(entry.getKey(), entry.getValue());
             }
-            for (Entry<String, Collection<Double>> entry: multiMapTelemetryMetrics.asMap().entrySet()) {
+            for (Entry<String, Collection<Double>> entry : multiMapTelemetryMetrics.asMap().entrySet()) {
                 telemetryMetrics.put(entry.getKey(), entry.getValue().iterator().next());
             }
         }

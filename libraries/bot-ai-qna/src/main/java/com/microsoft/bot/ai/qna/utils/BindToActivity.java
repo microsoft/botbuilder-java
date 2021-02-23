@@ -18,6 +18,7 @@ public class BindToActivity {
 
     /**
      * Construct to bind an Activity.
+     * 
      * @param withActivity activity to bind.
      */
     public BindToActivity(Activity withActivity) {
@@ -27,7 +28,7 @@ public class BindToActivity {
     /**
      *
      * @param context The context.
-     * @param data The data.
+     * @param data    The data.
      * @return The activity.
      */
     public CompletableFuture<Activity> bind(DialogContext context, @Nullable Object data) {
@@ -36,6 +37,7 @@ public class BindToActivity {
 
     /**
      * Get the activity text.
+     * 
      * @return The activity text.
      */
     public String toString() {

@@ -33,8 +33,12 @@ public interface QnAMakerClient {
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    CompletableFuture<QueryResult[]> getAnswers(TurnContext turnContext, QnAMakerOptions options,
-            Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics);
+    CompletableFuture<QueryResult[]> getAnswers(
+        TurnContext turnContext,
+        QnAMakerOptions options,
+        Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    );
 
     /**
      * Generates an answer from the knowledge base.
@@ -51,8 +55,12 @@ public interface QnAMakerClient {
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    CompletableFuture<QueryResults> getAnswersRaw(TurnContext turnContext, QnAMakerOptions options,
-            @Nullable Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics);
+    CompletableFuture<QueryResults> getAnswersRaw(
+        TurnContext turnContext,
+        QnAMakerOptions options,
+        @Nullable Map<String, String> telemetryProperties,
+        @Nullable Map<String, Double> telemetryMetrics
+    );
 
     /**
      * Filters the ambiguous question for active learning.

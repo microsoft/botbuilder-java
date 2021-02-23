@@ -19,7 +19,8 @@ import com.microsoft.bot.schema.HeroCard;
  */
 public final class QnACardBuilder {
 
-    private QnACardBuilder() { }
+    private QnACardBuilder() {
+    }
 
     /**
      * Get active learning suggestions card.
