@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.ai.qna.utils;
 
+import com.microsoft.bot.connector.Async;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -105,21 +106,23 @@ public class GenerateAnswerUtils {
         QnAMakerOptions withOptions
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext");
+            return Async.completeExceptionally(new IllegalArgumentException("turnContext"));
         }
 
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "The %1$s property for %2$s can't be null: turnContext",
-                    turnContext.getActivity(),
-                    "turnContext"
+            return Async.completeExceptionally(
+                new IllegalArgumentException(
+                    String.format(
+                        "The %1$s property for %2$s can't be null: turnContext",
+                        turnContext.getActivity(),
+                        "turnContext"
+                    )
                 )
             );
         }
 
         if (messageActivity == null) {
-            throw new IllegalArgumentException("Activity type is not a message");
+            return Async.completeExceptionally(new IllegalArgumentException("Activity type is not a message"));
         }
 
         QnAMakerOptions hydratedOptions = this.hydrateOptions(withOptions);

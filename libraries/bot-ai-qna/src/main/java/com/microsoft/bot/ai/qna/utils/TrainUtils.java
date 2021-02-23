@@ -5,6 +5,7 @@ package com.microsoft.bot.ai.qna.utils;
 
 import com.microsoft.bot.ai.qna.QnAMakerEndpoint;
 import com.microsoft.bot.ai.qna.models.FeedbackRecords;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 import java.io.IOException;
@@ -34,7 +35,9 @@ public class TrainUtils {
      */
     public CompletableFuture<Void> callTrain(FeedbackRecords feedbackRecords) throws IOException {
         if (feedbackRecords == null) {
-            throw new IllegalArgumentException("feedbackRecords: Feedback records cannot be null.");
+            return Async.completeExceptionally(
+                new IllegalArgumentException("feedbackRecords: Feedback records cannot be null.")
+            );
         }
 
         if (feedbackRecords.getRecords() == null || feedbackRecords.getRecords().length == 0) {

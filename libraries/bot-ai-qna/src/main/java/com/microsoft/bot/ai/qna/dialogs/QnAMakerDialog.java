@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.ai.qna.dialogs;
 
+import com.microsoft.bot.connector.Async;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -602,7 +603,7 @@ public class QnAMakerDialog extends WaterfallDialog {
     @Override
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, @Nullable Object options) {
         if (dc == null) {
-            throw new IllegalArgumentException("dc");
+            return Async.completeExceptionally(new IllegalArgumentException("dc"));
         }
 
         if (!dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {

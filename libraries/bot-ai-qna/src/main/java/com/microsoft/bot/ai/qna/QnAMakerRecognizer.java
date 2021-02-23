@@ -404,11 +404,12 @@ public class QnAMakerRecognizer extends Recognizer {
                     Float internalTopAnswer = topAnswer.getScore();
                     if (topAnswer.getAnswer().trim().toUpperCase().startsWith(intentPrefix.toUpperCase())) {
                         recognizerResult.getIntents()
-                            .put(topAnswer.getAnswer().trim().substring(intentPrefix.length()).trim(), new IntentScore() {
-                                {
+                            .put(topAnswer.getAnswer().trim().substring(
+                                intentPrefix.length()).trim(),
+                                new IntentScore() {{
                                     setScore(internalTopAnswer);
-                                }
-                            });
+                                }}
+                            );
                     } else {
                         recognizerResult.getIntents().put(this.qnAMatchIntent, new IntentScore() {
                             {
@@ -529,7 +530,9 @@ public class QnAMakerRecognizer extends Recognizer {
                 );
                 put(
                     "Entities",
-                    recognizerResult.getEntities() != null ? Serialization.toStringSilent(recognizerResult.getEntities()) : null
+                    recognizerResult.getEntities() != null
+                        ? Serialization.toStringSilent(recognizerResult.getEntities())
+                        : null
                 );
                 put(
                     "AdditionalProperties",
