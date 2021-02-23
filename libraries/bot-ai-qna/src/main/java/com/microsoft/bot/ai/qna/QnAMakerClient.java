@@ -17,7 +17,7 @@ import com.microsoft.bot.builder.TurnContext;
 /**
  * Client to access a QnA Maker knowledge base.
  */
-public interface IQnAMakerClient {
+public interface QnAMakerClient {
     /**
      * Generates an answer from the knowledge base.
      *

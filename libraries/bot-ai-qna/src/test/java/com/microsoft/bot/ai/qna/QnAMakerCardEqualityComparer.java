@@ -17,7 +17,7 @@ public class QnAMakerCardEqualityComparer {
             return false;
         }
 
-        if(x.getType() == ActivityTypes.MESSAGE && y.getType() == ActivityTypes.MESSAGE) {
+        if(x.isType(ActivityTypes.MESSAGE) && y.isType(ActivityTypes.MESSAGE)) {
             Activity activity1 = x;
             Activity activity2 = y;
 

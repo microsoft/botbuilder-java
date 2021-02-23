@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides access to a QnA Maker knowledge base.
  */
-public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
+public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
 
     private QnAMakerEndpoint endpoint;
 
@@ -201,7 +201,7 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
                     String.format("The %1$s property for %2$s can't be null.", "Activity", "turnContext"));
         }
         Activity messageActivity = turnContext.getActivity();
-        if (messageActivity == null || messageActivity.getType() != ActivityTypes.MESSAGE) {
+        if (messageActivity == null || !messageActivity.isType(ActivityTypes.MESSAGE)) {
             throw new IllegalArgumentException("Activity type is not a message");
         }
 
@@ -350,6 +350,6 @@ public class QnAMaker implements IQnAMakerClient, ITelemetryQnAMaker {
 
         Map<String, String> telemetryPropertiesResult = telemetryProperties != null ? telemetryProperties : properties;
         Map<String, Double> telemetryMetricsResult = telemetryMetrics != null ? telemetryMetrics : metrics;
-        return CompletableFuture.completedFuture(new Pair(telemetryPropertiesResult, telemetryMetricsResult));
+        return CompletableFuture.completedFuture(new Pair<>(telemetryPropertiesResult, telemetryMetricsResult));
     }
 }

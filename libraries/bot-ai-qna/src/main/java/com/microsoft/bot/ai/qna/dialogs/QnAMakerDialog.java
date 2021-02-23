@@ -12,12 +12,11 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.bot.ai.qna.IQnAMakerClient;
 import com.microsoft.bot.ai.qna.QnADialogResponseOptions;
 import com.microsoft.bot.ai.qna.QnAMaker;
+import com.microsoft.bot.ai.qna.QnAMakerClient;
 import com.microsoft.bot.ai.qna.QnAMakerEndpoint;
 import com.microsoft.bot.ai.qna.QnAMakerOptions;
 import com.microsoft.bot.ai.qna.models.FeedbackRecord;
@@ -53,8 +52,6 @@ import org.slf4j.LoggerFactory;
  * features.
  */
 public class QnAMakerDialog extends WaterfallDialog {
-    @JsonProperty("$kind")
-    private final String kind = "Microsoft.QnAMakerDialog";
 
     @JsonIgnore
     private OkHttpClient httpClient;
@@ -143,16 +140,6 @@ public class QnAMakerDialog extends WaterfallDialog {
     private static final String DEFAULT_CARD_NO_MATCH_TEXT = "None of the above.";
     private static final String DEFAULT_CARD_NO_MATCH_RESPONSE = "Thanks for the feedback.";
     private static final Integer PERCENTAGE_DIVISOR = 100;
-
-    /**
-     * The declarative name for this type. Used by the framework to serialize and
-     * deserialize an instance of this type to JSON.
-     *
-     * @return Kind of a QnADialog.
-     */
-    public String getKind() {
-        return this.kind;
-    }
 
     /**
      * Gets the OkHttpClient instance to use for requests to the QnA Maker service.
@@ -483,22 +470,13 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withHttpClient              An HTTP client to use for requests to the
      *                                    QnA Maker Service; or `null` to use a
      *                                    default client.
-     * @param sourceFilePath              The source file path, for debugging.
-     *                                    Defaults to the full path of the source
-     *                                    file that contains the caller.
-     * @param sourceLineNumber            The line number, for debugging. Defaults
-     *                                    to the line number in the source file at
-     *                                    which the method is called.
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
     public QnAMakerDialog(String dialogId, String withKnowledgeBaseId, String withEndpointKey, String withHostName,
                           @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
                           String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
-                          @Nullable Metadata[] withStrictFilters, @Nullable OkHttpClient withHttpClient,
-                          String sourceFilePath, Integer sourceLineNumber) {
+                          @Nullable Metadata[] withStrictFilters, @Nullable OkHttpClient withHttpClient) {
         super(dialogId, null);
-        sourceFilePath = sourceFilePath != null ? sourceFilePath : "";
-        sourceLineNumber = sourceLineNumber != null ? sourceLineNumber : 0;
         if (knowledgeBaseId == null) {
             throw new IllegalArgumentException("knowledgeBaseId");
         }
@@ -562,47 +540,16 @@ public class QnAMakerDialog extends WaterfallDialog {
      * @param withHttpClient              An HTTP client to use for requests to the
      *                                    QnA Maker Service; or `null` to use a
      *                                    default client.
-     * @param sourceFilePath              The source file path, for debugging.
-     *                                    Defaults to the full path of the source
-     *                                    file that contains the caller.
-     * @param sourceLineNumber            The line number, for debugging. Defaults
-     *                                    to the line number in the source file at
-     *                                    which the method is called.
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
     public QnAMakerDialog(String withKnowledgeBaseId, String withEndpointKey, String withHostName,
                           @Nullable Activity withNoAnswer, Float withThreshold, String withActiveLearningCardTitle,
                           String withCardNoMatchText, Integer withTop, @Nullable Activity withCardNoMatchResponse,
                           @Nullable Metadata[] withStrictFilters,
-                          @Nullable OkHttpClient withHttpClient, String sourceFilePath,
-                          Integer sourceLineNumber) {
+                          @Nullable OkHttpClient withHttpClient) {
         this(QnAMakerDialog.class.getName(), withKnowledgeBaseId, withEndpointKey, withHostName, withNoAnswer,
                 withThreshold, withActiveLearningCardTitle, withCardNoMatchText, withTop, withCardNoMatchResponse,
-                withStrictFilters, withHttpClient, sourceFilePath, sourceLineNumber);
-    }
-
-    /**
-     * Initializes a new instance of the {@link QnAMakerDialog} class. The JSON
-     * serializer uses this constructor to deserialize objects of this class.
-     *
-     * @param sourceFilePath   The source file path, for debugging. Defaults to the
-     *                         full path of the source file that contains the
-     *                         caller.
-     * @param sourceLineNumber The line number, for debugging. Defaults to the line
-     *                         number in the source file at which the method is
-     *                         called.
-     */
-    @JsonCreator
-    public QnAMakerDialog(String sourceFilePath, Integer sourceLineNumber) {
-        super(QnAMakerDialog.class.getName(), null);
-        sourceFilePath = sourceFilePath != null ? sourceFilePath : "";
-        sourceLineNumber = sourceLineNumber != null ? sourceLineNumber : 0;
-
-        // add waterfall steps
-        this.addStep(this::callGenerateAnswer);
-        this.addStep(this::callTrain);
-        this.addStep(this::checkForMultiTurnPrompt);
-        this.addStep(this::displayQnAResult);
+                withStrictFilters, withHttpClient);
     }
 
     /**
@@ -626,7 +573,7 @@ public class QnAMakerDialog extends WaterfallDialog {
             throw new IllegalArgumentException("dc");
         }
 
-        if (dc.getContext().getActivity().getType() != ActivityTypes.MESSAGE) {
+        if (!dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             return CompletableFuture.completedFuture(END_OF_TURN);
         }
 
@@ -668,7 +615,7 @@ public class QnAMakerDialog extends WaterfallDialog {
      */
     @Override
     protected CompletableFuture<Boolean> onPreBubbleEvent(DialogContext dc, DialogEvent e) {
-        if (dc.getContext().getActivity().getType() == ActivityTypes.MESSAGE) {
+        if (dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             // decide whether we want to allow interruption or not.
             // if we don't get a response from QnA which signifies we expected it,
             // then we allow interruption.
@@ -710,15 +657,15 @@ public class QnAMakerDialog extends WaterfallDialog {
     }
 
     /**
-     * Gets an {@link IQnAMakerClient} to use to access the QnA Maker knowledge
+     * Gets an {@link QnAMakerClient} to use to access the QnA Maker knowledge
      * base.
      *
      * @param dc The {@link DialogContext} for the current turn of conversation.
      * @return A Task representing the asynchronous operation. If the task is
      *         successful, the result contains the QnA Maker client to use.
      */
-    protected CompletableFuture<IQnAMakerClient> getQnAMakerClient(DialogContext dc) {
-        IQnAMakerClient qnaClient = (IQnAMakerClient) dc.getContext().getTurnState();
+    protected CompletableFuture<QnAMakerClient> getQnAMakerClient(DialogContext dc) {
+        QnAMakerClient qnaClient = (QnAMakerClient) dc.getContext().getTurnState();
         if (qnaClient != null) {
             // return mock client
             return CompletableFuture.completedFuture(qnaClient);
@@ -932,7 +879,7 @@ public class QnAMakerDialog extends WaterfallDialog {
 
         if (trainResponses.size() > 1) {
             QueryResult qnaResult = trainResponses
-                .stream().filter(kvp -> kvp.getQuestions()[0] == reply).findFirst().orElse(null);
+                .stream().filter(kvp -> kvp.getQuestions()[0].equals(reply)).findFirst().orElse(null);
             if (qnaResult != null) {
                 List<QueryResult> queryResultArr = new ArrayList<QueryResult>();
                 stepContext.getValues().put(ValueProperty.QNA_DATA, queryResultArr.add(qnaResult));
@@ -945,7 +892,6 @@ public class QnAMakerDialog extends WaterfallDialog {
                 FeedbackRecords feedbackRecords = new FeedbackRecords() {{
                     setRecords(records);
                 }};
-
                 // Call Active Learning Train API
                 return this.getQnAMakerClient(stepContext).thenCompose(qnaClient -> {
                     try {

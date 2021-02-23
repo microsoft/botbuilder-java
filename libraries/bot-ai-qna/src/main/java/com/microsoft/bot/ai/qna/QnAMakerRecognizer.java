@@ -38,9 +38,6 @@ public class QnAMakerRecognizer extends Recognizer {
     private static final Integer TOP_DEFAULT_VALUE = 3;
     private static final Float THRESHOLD_DEFAULT_VALUE = 0.3f;
 
-    @JsonProperty("$kind")
-    private final String kind = "Microsoft.QnAMakerRecognizer";
-
     private final String qnAMatchIntent = "QnAMatch";
 
     private final String intentPrefix = "intent=";
@@ -83,15 +80,6 @@ public class QnAMakerRecognizer extends Recognizer {
 
     @JsonProperty("logPersonalInformation")
     private Boolean logPersonalInformation = false;
-
-    /**
-     * Gets the declarative type for this recognizer.
-     *
-     * @return The declarative type for this recognizer.
-     */
-    public String getKind() {
-        return kind;
-    }
 
     /**
      * Gets key used when adding the intent to the {@link RecognizerResult} intents
@@ -461,13 +449,13 @@ public class QnAMakerRecognizer extends Recognizer {
     }
 
     /**
-     * Gets an instance of {@link IQnAMakerClient}.
+     * Gets an instance of {@link QnAMakerClient}.
      *
      * @param dc The {@link DialogContext} used to access state.
-     * @return An instance of {@link IQnAMakerClient}.
+     * @return An instance of {@link QnAMakerClient}.
      */
-    protected CompletableFuture<IQnAMakerClient> getQnAMakerClient(DialogContext dc) {
-        IQnAMakerClient qnaClient = dc.getContext().getTurnState().get(IQnAMakerClient.class);
+    protected CompletableFuture<QnAMakerClient> getQnAMakerClient(DialogContext dc) {
+        QnAMakerClient qnaClient = dc.getContext().getTurnState().get(QnAMakerClient.class);
         if (qnaClient != null) {
             // return mock client
             return CompletableFuture.completedFuture(qnaClient);

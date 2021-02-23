@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 /**
  * Interface for adding telemetry logging capabilities to {@link QnAMaker}/>.
  */
-public interface ITelemetryQnAMaker {
+public interface TelemetryQnAMaker {
 
     /**
      * Gets a value indicating whether determines whether to log personal

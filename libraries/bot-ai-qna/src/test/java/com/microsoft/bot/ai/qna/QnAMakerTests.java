@@ -145,11 +145,11 @@ public class QnAMakerTests {
             })
                 .send("how do I clean the stove?")
                     .assertReply(activity -> {
-                        Assert.assertEquals(activity.getType(), ActivityTypes.TYPING);
+                        Assert.assertTrue(activity.isType(ActivityTypes.TYPING));
                     })
                     .assertReply("echo:how do I clean the stove?")
                 .send("bar")
-                    .assertReply(activity -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING))
+                    .assertReply(activity -> Assert.assertTrue(activity.isType(ActivityTypes.TYPING)))
                     .assertReply("echo:bar")
                 .startTest().join();
 
@@ -157,7 +157,7 @@ public class QnAMakerTests {
             PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities("test", conversationId[0]).join();
             Assert.assertEquals(7, pagedResult.getItems().size());
             Assert.assertEquals("how do I clean the stove?", pagedResult.getItems().get(0).getText());
-            Assert.assertEquals(0, pagedResult.getItems().get(1).getType().compareTo(ActivityTypes.TRACE));
+            Assert.assertTrue(pagedResult.getItems().get(1).isType(ActivityTypes.TRACE));
             QnAMakerTraceInfo traceInfo = (QnAMakerTraceInfo) pagedResult.getItems().get(1).getValue();
             Assert.assertNotNull(traceInfo);
             Assert.assertEquals("echo:how do I clean the stove?", pagedResult.getItems().get(3).getText());
@@ -1996,7 +1996,7 @@ public class QnAMakerTests {
             super("QnaMakerTestDialog");
             addDialog(new QnAMakerDialog(knowledgeBaseId, endpointKey, hostName, null,
                 null, null, null, null,
-                null, null, httpClient, null, null));
+                null, null, httpClient));
         }
 
         @Override
