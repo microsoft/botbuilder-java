@@ -9,7 +9,7 @@ import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
-
+import org.junit.rules.ExpectedException;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -506,8 +506,8 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                                         String channelId,
                                         String userId,
                                         String exchangableItem,
-                                        String token)
-    {
+                                        String token
+    ) {
         ExchangableTokenKey key = new ExchangableTokenKey();
         key.setConnectionName(connectionName);
         key.setChannelId(channelId);
@@ -518,6 +518,23 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             exchangableToken.replace(key, token);
         } else {
             exchangableToken.put(key, token);
+        }
+    }
+
+    public void throwOnExchangeRequest(String connectionName,
+    String channelId,
+    String userId,
+    String exchangableItem) {
+        ExchangableTokenKey key = new ExchangableTokenKey();
+        key.setConnectionName(connectionName);
+        key.setChannelId(channelId);
+        key.setUserId(userId);
+        key.setExchangableItem(exchangableItem);
+
+        if (exchangableToken.containsKey(key)) {
+            exchangableToken.replace(key, exceptionExpected);
+        } else {
+            exchangableToken.put(key, exceptionExpected);
         }
     }
 

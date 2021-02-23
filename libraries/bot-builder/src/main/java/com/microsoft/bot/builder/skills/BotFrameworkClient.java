@@ -50,8 +50,8 @@ public abstract class BotFrameworkClient {
      *                        activity.
      * @param toBotId         The MicrosoftAppId of the bot receiving
      *                        the activity.
-     * @param toUrl           The URL of the bot receiving the activity.
-     * @param serviceUrl      The callback Url for the skill host.
+     * @param toUri           The URL of the bot receiving the activity.
+     * @param serviceUri      The callback Url for the skill host.
      * @param conversationId  A conversation ID to use for the
      *                        conversation with the skill.
      * @param activity        The {@link Activity} to send to forward.
@@ -64,8 +64,8 @@ public abstract class BotFrameworkClient {
     public abstract <T extends Object> CompletableFuture<TypedInvokeResponse<T>> postActivity(
         String fromBotId,
         String toBotId,
-        URI toUrl,
-        URI serviceUrl,
+        URI toUri,
+        URI serviceUri,
         String conversationId,
         Activity activity,
         Class<T> type);

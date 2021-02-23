@@ -17,6 +17,7 @@ import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.Attachment;
+import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.DeliveryModes;
 import com.microsoft.bot.schema.ExpectedReplies;
 import com.microsoft.bot.schema.OAuthCard;
@@ -79,10 +80,11 @@ public class SkillDialog extends Dialog {
         BeginSkillDialogOptions dialogArgs = validateBeginDialogArgs(options);
 
         // Create deep clone of the original activity to avoid altering it before forwarding it.
-        Activity skillActivity = ObjectPath.clone(dialogArgs.getActivity());
+        Activity skillActivity = Activity.clone(dialogArgs.getActivity());
 
         // Apply conversation reference and common properties from incoming activity before sending.
-        skillActivity.applyConversationReference(dc.getContext().getActivity().getConversationReference(), true);
+        ConversationReference conversationReference = dc.getContext().getActivity().getConversationReference();
+        skillActivity.applyConversationReference(conversationReference, true);
 
         // Store delivery mode and connection name in dialog state for later use.
         dc.getActiveDialog().getState().put(deliverModeStateKey, dialogArgs.getActivity().getDeliveryMode());
@@ -127,9 +129,10 @@ public class SkillDialog extends Dialog {
         }
 
         // Create deep clone of the original activity to avoid altering it before forwarding it.
-        Activity skillActivity = ObjectPath.clone(dc.getContext().getActivity());
-
-        skillActivity.setDeliveryMode((String) dc.getActiveDialog().getState().get(deliverModeStateKey));
+        Activity skillActivity = Activity.clone(dc.getContext().getActivity());
+        if (dc.getActiveDialog().getState().get(deliverModeStateKey) != null) {
+            skillActivity.setDeliveryMode((String) dc.getActiveDialog().getState().get(deliverModeStateKey));
+        }
 
         String skillConversationId = (String) dc.getActiveDialog().getState().get(skillConversationIdStateKey);
 
