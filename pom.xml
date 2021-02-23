@@ -351,6 +351,11 @@
         <artifactId>bot-applicationinsights</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-ai-qna</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
