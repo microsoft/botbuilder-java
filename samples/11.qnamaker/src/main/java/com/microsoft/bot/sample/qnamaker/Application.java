@@ -6,8 +6,6 @@ package com.microsoft.bot.sample.qnamaker;
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
-import com.microsoft.bot.integration.CredentialProvider;
-import com.microsoft.bot.integration.ConfigurationCredentialProvider;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
@@ -49,8 +47,8 @@ public class Application extends BotDependencyConfiguration {
      * @return The Bot implementation for this application.
      */
     @Bean
-    public Bot getBot() {
-        return new QnABot();
+    public Bot getBot(Configuration configuration) {
+        return new QnABot(configuration);
     }
 
     /**
@@ -62,7 +60,7 @@ public class Application extends BotDependencyConfiguration {
     @Override
     public BotFrameworkHttpAdapter getBotFrameworkHttpAdaptor(Configuration configuration) {
         return new AdapterWithErrorHandler(configuration);
-    }  
+    }
 
 }
 
