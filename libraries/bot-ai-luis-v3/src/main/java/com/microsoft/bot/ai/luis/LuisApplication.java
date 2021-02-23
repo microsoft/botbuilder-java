@@ -11,7 +11,8 @@ import java.net.URL;
 import java.util.UUID;
 
 /**
- * Luis Application representation with information necessary to query the specific Luis Application.
+ * Luis Application representation with information necessary to query the
+ * specific Luis Application.
  *
  */
 public class LuisApplication {
@@ -32,39 +33,37 @@ public class LuisApplication {
     private String endpoint;
 
     /**
-     *  Luis endpoint like https://westus.api.cognitive.microsoft.com.
+     * Luis endpoint like https://westus.api.cognitive.microsoft.com.
      */
     public LuisApplication() {
     }
 
     /**
      * Initializes a new instance of the Luis Application class.
+     * 
      * @param applicationId Luis Application ID to query
-     * @param endpointKey LUIS subscription or endpoint key.
-     * @param endpoint LUIS endpoint to use like https://westus.api.cognitive.microsoft.com
+     * @param endpointKey   LUIS subscription or endpoint key.
+     * @param endpoint      LUIS endpoint to use like
+     *                      https://westus.api.cognitive.microsoft.com
      */
-    public LuisApplication(
-        String applicationId,
-        String endpointKey,
-        String endpoint) {
-        setLuisApplication(
-            applicationId,
-            endpointKey,
-            endpoint);
+    public LuisApplication(String applicationId, String endpointKey, String endpoint) {
+        setLuisApplication(applicationId, endpointKey, endpoint);
     }
 
     /**
      * Initializes a new instance of the Luis Application class.
-     * @param applicationEndpoint LUIS application query endpoint containing subscription key
-     *                            and application id as part of the url.
+     * 
+     * @param applicationEndpoint LUIS application query endpoint containing
+     *                            subscription key and application id as part of the
+     *                            url.
      */
-    public LuisApplication(
-        String applicationEndpoint) {
+    public LuisApplication(String applicationEndpoint) {
         parse(applicationEndpoint);
     }
 
     /**
      * Sets Luis application ID to query.
+     * 
      * @param applicationId Luis application ID to query.
      */
     public void setApplicationId(String applicationId) {
@@ -73,6 +72,7 @@ public class LuisApplication {
 
     /**
      * Gets Luis application ID.
+     * 
      * @return applicationId.
      */
     public String getApplicationId() {
@@ -81,6 +81,7 @@ public class LuisApplication {
 
     /**
      * Sets the LUIS subscription or endpoint key.
+     * 
      * @param endpointKey LUIS subscription or endpoint key.
      */
     public void setEndpointKey(String endpointKey) {
@@ -89,6 +90,7 @@ public class LuisApplication {
 
     /**
      * Gets the LUIS subscription or endpoint key.
+     * 
      * @return endpointKey.
      */
     public String getEndpointKey() {
@@ -97,6 +99,7 @@ public class LuisApplication {
 
     /**
      * Sets Luis endpoint like https://westus.api.cognitive.microsoft.com.
+     * 
      * @param endpoint endpoint like https://westus.api.cognitive.microsoft.com.
      */
     public void setEndpoint(String endpoint) {
@@ -105,6 +108,7 @@ public class LuisApplication {
 
     /**
      * Gets the LUIS endpoint where application is hosted.
+     * 
      * @return endpoint.
      */
     public String getEndpoint() {
@@ -114,15 +118,11 @@ public class LuisApplication {
     /**
      * Helper method to set and validate Luis arguments passed.
      */
-    private void setLuisApplication(
-        String applicationId,
-        String endpointKey,
-        String endpoint) {
+    private void setLuisApplication(String applicationId, String endpointKey, String endpoint) {
 
         if (!isValidUUID(applicationId)) {
             throw new IllegalArgumentException(String.format("%s is not a valid LUIS application id.", applicationId));
         }
-
 
         if (!isValidUUID(endpointKey)) {
             throw new IllegalArgumentException(String.format("%s is not a valid LUIS subscription key.", endpointKey));
@@ -142,14 +142,13 @@ public class LuisApplication {
     }
 
     /**
-     * Helper method to parse validate and set Luis application members from the full application full endpoint.
+     * Helper method to parse validate and set Luis application members from the
+     * full application full endpoint.
      */
     private void parse(String applicationEndpoint) {
         String appId = "";
         try {
-            String[] segments = new URL(applicationEndpoint)
-                .getPath()
-                .split("/");
+            String[] segments = new URL(applicationEndpoint).getPath().split("/");
             for (int segment = 0; segment < segments.length - 1; segment++) {
                 if (segments[segment].equals("apps")) {
                     appId = segments[segment + 1].trim();
@@ -158,30 +157,21 @@ public class LuisApplication {
             }
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(
-                String.format(
-                    "Unable to create the LUIS endpoint with the given %s.",
-                    applicationEndpoint
-                )
+                String.format("Unable to create the LUIS endpoint with the given %s.", applicationEndpoint)
             );
         }
 
-
         if (appId.isEmpty()) {
             throw new IllegalArgumentException(
-                String.format(
-                    "Could not find application Id in %s",
-                    applicationEndpoint
-                )
+                String.format("Could not find application Id in %s", applicationEndpoint)
             );
         }
 
         try {
 
-            String endpointKeyParsed = new URIBuilder(applicationEndpoint)
-                .getQueryParams()
+            String endpointKeyParsed = new URIBuilder(applicationEndpoint).getQueryParams()
                 .stream()
-                .filter(param -> param.getName()
-                    .equalsIgnoreCase("subscription-key"))
+                .filter(param -> param.getName().equalsIgnoreCase("subscription-key"))
                 .map(NameValuePair::getValue)
                 .findFirst()
                 .orElse("");
@@ -195,10 +185,8 @@ public class LuisApplication {
             setLuisApplication(appId, endpointKeyParsed, endpointPared);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new IllegalArgumentException(
-                String.format(
-                "Unable to create the LUIS endpoint with the given %s.",
-                applicationEndpoint
-            ));
+                String.format("Unable to create the LUIS endpoint with the given %s.", applicationEndpoint)
+            );
         }
 
     }
@@ -206,10 +194,7 @@ public class LuisApplication {
     private boolean isValidUUID(String uuid) {
         try {
             if (!uuid.contains("-")) {
-                uuid = uuid.replaceAll(
-                    "(.{8})(.{4})(.{4})(.{4})(.+)",
-                    "$1-$2-$3-$4-$5"
-                );
+                uuid = uuid.replaceAll("(.{8})(.{4})(.{4})(.{4})(.+)", "$1-$2-$3-$4-$5");
             }
 
             return UUID.fromString(uuid).toString().equals(uuid);
