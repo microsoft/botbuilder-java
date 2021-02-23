@@ -46,8 +46,8 @@ public class TrainUtils {
     }
 
     private CompletableFuture<Void> queryTrain(FeedbackRecords feedbackRecords) throws IOException {
-        String requestUrl = String.format("%1$s/knowledgebases/%2$s/train", this.endpoint.getHost(),
-                this.endpoint.getKnowledgeBaseId());
+        String requestUrl = String
+            .format("%1$s/knowledgebases/%2$s/train", this.endpoint.getHost(), this.endpoint.getKnowledgeBaseId());
 
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         String jsonRequest = jacksonAdapter.serialize(feedbackRecords);

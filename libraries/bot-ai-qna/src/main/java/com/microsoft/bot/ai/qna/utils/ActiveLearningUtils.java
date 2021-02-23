@@ -32,7 +32,8 @@ public final class ActiveLearningUtils {
 
     private static Float minimumScoreForLowScoreVariation = MINIMUM_SCORE_VARIATION;
 
-    private ActiveLearningUtils() { }
+    private ActiveLearningUtils() {
+    }
 
     /**
      * Gets maximum Score For Low Score Variation.
@@ -47,7 +48,7 @@ public final class ActiveLearningUtils {
      * Sets maximum Score For Low Score Variation.
      *
      * @param withMaximumScoreForLowScoreVariation Maximum Score For Low Score
-     *                                         Variation.
+     *                                             Variation.
      */
     public static void setMaximumScoreForLowScoreVariation(Float withMaximumScoreForLowScoreVariation) {
         ActiveLearningUtils.maximumScoreForLowScoreVariation = withMaximumScoreForLowScoreVariation;
@@ -66,7 +67,7 @@ public final class ActiveLearningUtils {
      * Sets minimum Score For Low Score Variation.
      *
      * @param withMinimumScoreForLowScoreVariation Minimum Score For Low Score
-     *                                         Variation.
+     *                                             Variation.
      */
     public static void setMinimumScoreForLowScoreVariation(Float withMinimumScoreForLowScoreVariation) {
         ActiveLearningUtils.minimumScoreForLowScoreVariation = withMinimumScoreForLowScoreVariation;
@@ -101,12 +102,17 @@ public final class ActiveLearningUtils {
             filteredQnaSearchResult.add(qnaSearchResults.get(0));
 
             for (int i = 1; i < qnaSearchResults.size(); i++) {
-                if (ActiveLearningUtils
-                    .includeForClustering(prevScore, qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
-                        ActiveLearningUtils.PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER)
-                        && ActiveLearningUtils.includeForClustering(topAnswerScore,
-                                qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
-                                ActiveLearningUtils.MAX_LOW_SCORE_VARIATION_MULTIPLIER)) {
+                if (
+                    ActiveLearningUtils.includeForClustering(
+                        prevScore,
+                        qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
+                        ActiveLearningUtils.PREVIOUS_LOW_SCORE_VARIATION_MULTIPLIER
+                    ) && ActiveLearningUtils.includeForClustering(
+                        topAnswerScore,
+                        qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR,
+                        ActiveLearningUtils.MAX_LOW_SCORE_VARIATION_MULTIPLIER
+                    )
+                ) {
                     prevScore = qnaSearchResults.get(i).getScore() * PERCENTAGE_DIVISOR;
                     filteredQnaSearchResult.add(qnaSearchResults.get(i));
                 }

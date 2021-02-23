@@ -39,11 +39,10 @@ public class GenerateAnswerUtils {
     /**
      * Initializes a new instance of the {@link GenerateAnswerUtils} class.
      *
-     * @param withEndpoint        QnA Maker endpoint details.
-     * @param withOptions         QnA Maker options.
+     * @param withEndpoint QnA Maker endpoint details.
+     * @param withOptions  QnA Maker options.
      */
-    public GenerateAnswerUtils(QnAMakerEndpoint withEndpoint,
-            QnAMakerOptions withOptions) {
+    public GenerateAnswerUtils(QnAMakerEndpoint withEndpoint, QnAMakerOptions withOptions) {
         this.endpoint = withEndpoint;
 
         this.options = withOptions != null ? withOptions : new QnAMakerOptions();
@@ -74,15 +73,18 @@ public class GenerateAnswerUtils {
      * @param turnContext     The Turn Context that contains the user question to be
      *                        queried against your knowledge base.
      * @param messageActivity Message activity of the turn context.
-     * @param withOptions         The options for the QnA Maker knowledge base. If null,
+     * @param withOptions     The options for the QnA Maker knowledge base. If null,
      *                        constructor option is used for this instance.
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      * @throws IOException IOException
      */
     @Deprecated
-    public CompletableFuture<QueryResult[]> getAnswers(TurnContext turnContext, Activity messageActivity,
-            QnAMakerOptions withOptions) throws IOException {
+    public CompletableFuture<QueryResult[]> getAnswers(
+        TurnContext turnContext,
+        Activity messageActivity,
+        QnAMakerOptions withOptions
+    ) throws IOException {
         return this.getAnswersRaw(turnContext, messageActivity, withOptions).thenApply(result -> result.getAnswers());
     }
 
@@ -92,20 +94,28 @@ public class GenerateAnswerUtils {
      * @param turnContext     The Turn Context that contains the user question to be
      *                        queried against your knowledge base.
      * @param messageActivity Message activity of the turn context.
-     * @param withOptions         The options for the QnA Maker knowledge base. If null,
+     * @param withOptions     The options for the QnA Maker knowledge base. If null,
      *                        constructor option is used for this instance.
      * @return A list of answers for the user query, sorted in decreasing order of
      *         ranking score.
      */
-    public CompletableFuture<QueryResults> getAnswersRaw(TurnContext turnContext, Activity messageActivity,
-            QnAMakerOptions withOptions) {
+    public CompletableFuture<QueryResults> getAnswersRaw(
+        TurnContext turnContext,
+        Activity messageActivity,
+        QnAMakerOptions withOptions
+    ) {
         if (turnContext == null) {
             throw new IllegalArgumentException("turnContext");
         }
 
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException(String.format("The %1$s property for %2$s can't be null: turnContext",
-                    turnContext.getActivity(), "turnContext"));
+            throw new IllegalArgumentException(
+                String.format(
+                    "The %1$s property for %2$s can't be null: turnContext",
+                    turnContext.getActivity(),
+                    "turnContext"
+                )
+            );
         }
 
         if (messageActivity == null) {
@@ -126,8 +136,10 @@ public class GenerateAnswerUtils {
         }
     }
 
-    private static CompletableFuture<QueryResults> formatQnAResult(JsonNode response, QnAMakerOptions options)
-            throws IOException {
+    private static CompletableFuture<QueryResults> formatQnAResult(
+        JsonNode response,
+        QnAMakerOptions options
+    ) throws IOException {
         String jsonResponse = null;
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         QueryResults results = null;
@@ -137,8 +149,10 @@ public class GenerateAnswerUtils {
         for (QueryResult answer : results.getAnswers()) {
             answer.setScore(answer.getScore() / PERCENTAGE_DIVISOR);
         }
-        List<QueryResult> answerList = Arrays.asList(results.getAnswers()).
-            stream().filter(answer -> answer.getScore() > options.getScoreThreshold()).collect(Collectors.toList());
+        List<QueryResult> answerList = Arrays.asList(results.getAnswers())
+            .stream()
+            .filter(answer -> answer.getScore() > options.getScoreThreshold())
+            .collect(Collectors.toList());
         results.setAnswers(answerList.toArray(new QueryResult[answerList.size()]));
 
         return CompletableFuture.completedFuture(results);
@@ -154,8 +168,9 @@ public class GenerateAnswerUtils {
         }
 
         if (options.getScoreThreshold() < 0 || options.getScoreThreshold() > 1) {
-            throw new IllegalArgumentException(String
-                    .format("options: The %s property should be a value between 0 and 1", options.getScoreThreshold()));
+            throw new IllegalArgumentException(
+                String.format("options: The %s property should be a value between 0 and 1", options.getScoreThreshold())
+            );
         }
 
         if (options.getTimeout() == 0.0d) {
@@ -187,15 +202,16 @@ public class GenerateAnswerUtils {
         QnAMakerOptions hydratedOptions = null;
 
         try {
-            hydratedOptions = jacksonAdapter.deserialize(jacksonAdapter.serialize(options),
-                    QnAMakerOptions.class);
+            hydratedOptions = jacksonAdapter.deserialize(jacksonAdapter.serialize(options), QnAMakerOptions.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(GenerateAnswerUtils.class).error("hydrateOptions");
         }
 
         if (queryOptions != null) {
-            if (queryOptions.getScoreThreshold() != hydratedOptions.getScoreThreshold()
-                    && queryOptions.getScoreThreshold() != 0) {
+            if (
+                queryOptions.getScoreThreshold() != hydratedOptions.getScoreThreshold()
+                    && queryOptions.getScoreThreshold() != 0
+            ) {
                 hydratedOptions.setScoreThreshold(queryOptions.getScoreThreshold());
             }
 
@@ -210,18 +226,24 @@ public class GenerateAnswerUtils {
             hydratedOptions.setContext(queryOptions.getContext());
             hydratedOptions.setQnAId(queryOptions.getQnAId());
             hydratedOptions.setIsTest(queryOptions.getIsTest());
-            hydratedOptions.setRankerType(queryOptions.getRankerType() != null ? queryOptions.getRankerType()
-                    : RankerTypes.DEFAULT_RANKER_TYPE);
+            hydratedOptions.setRankerType(
+                queryOptions.getRankerType() != null ? queryOptions.getRankerType() : RankerTypes.DEFAULT_RANKER_TYPE
+            );
             hydratedOptions.setStrictFiltersJoinOperator(queryOptions.getStrictFiltersJoinOperator());
         }
 
         return hydratedOptions;
     }
 
-    private CompletableFuture<QueryResults> queryQnaService(Activity messageActivity, QnAMakerOptions withOptions)
-            throws IOException {
-        String requestUrl = String.format("%1$s/knowledgebases/%2$s/generateanswer", this.endpoint.getHost(),
-                this.endpoint.getKnowledgeBaseId());
+    private CompletableFuture<QueryResults> queryQnaService(
+        Activity messageActivity,
+        QnAMakerOptions withOptions
+    ) throws IOException {
+        String requestUrl = String.format(
+            "%1$s/knowledgebases/%2$s/generateanswer",
+            this.endpoint.getHost(),
+            this.endpoint.getKnowledgeBaseId()
+        );
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         String jsonRequest = null;
 
@@ -250,8 +272,12 @@ public class GenerateAnswerUtils {
         });
     }
 
-    private CompletableFuture<Void> emitTraceInfo(TurnContext turnContext, Activity messageActivity,
-            QueryResult[] result, QnAMakerOptions withOptions) {
+    private CompletableFuture<Void> emitTraceInfo(
+        TurnContext turnContext,
+        Activity messageActivity,
+        QueryResult[] result,
+        QnAMakerOptions withOptions
+    ) {
         String knowledgeBaseId = this.endpoint.getKnowledgeBaseId();
         QnAMakerTraceInfo traceInfo = new QnAMakerTraceInfo() {
             {
@@ -267,8 +293,12 @@ public class GenerateAnswerUtils {
                 setRankerType(withOptions.getRankerType());
             }
         };
-        Activity traceActivity = Activity.createTraceActivity(QnAMaker.QNA_MAKER_NAME, QnAMaker.QNA_MAKER_TRACE_TYPE,
-                traceInfo, QnAMaker.QNA_MAKER_TRACE_LABEL);
+        Activity traceActivity = Activity.createTraceActivity(
+            QnAMaker.QNA_MAKER_NAME,
+            QnAMaker.QNA_MAKER_TRACE_TYPE,
+            traceInfo,
+            QnAMaker.QNA_MAKER_TRACE_LABEL
+        );
         return turnContext.sendActivity(traceActivity).thenApply(response -> null);
     }
 }

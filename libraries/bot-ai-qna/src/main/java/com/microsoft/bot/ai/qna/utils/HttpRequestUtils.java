@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpRequestUtils {
     private OkHttpClient httpClient = new OkHttpClient();
+
     /**
      * Execute Http request.
      *
@@ -33,16 +34,19 @@ public class HttpRequestUtils {
      * @param endpoint    QnA Maker endpoint details.
      * @return Returns http response object.
      */
-    public CompletableFuture<JsonNode> executeHttpRequest(String requestUrl, String payloadBody,
-            QnAMakerEndpoint endpoint) {
+    public CompletableFuture<JsonNode> executeHttpRequest(
+        String requestUrl,
+        String payloadBody,
+        QnAMakerEndpoint endpoint
+    ) {
         if (requestUrl == null) {
-            return Async.completeExceptionally(
-                new IllegalArgumentException("requestUrl: Request url can not be null."));
+            return Async
+                .completeExceptionally(new IllegalArgumentException("requestUrl: Request url can not be null."));
         }
 
         if (payloadBody == null) {
-            return Async.completeExceptionally(
-                new IllegalArgumentException("payloadBody: Payload body can not be null."));
+            return Async
+                .completeExceptionally(new IllegalArgumentException("payloadBody: Payload body can not be null."));
         }
 
         if (endpoint == null) {
@@ -71,10 +75,10 @@ public class HttpRequestUtils {
 
     private Request buildRequest(String requestUrl, String endpointKey, RequestBody body) {
         HttpUrl.Builder httpBuilder = HttpUrl.parse(requestUrl).newBuilder();
-        Request.Builder requestBuilder = new Request.Builder()
-            .url(httpBuilder.build())
+        Request.Builder requestBuilder = new Request.Builder().url(httpBuilder.build())
             .addHeader("Authorization", String.format("EndpointKey %s", endpointKey))
-            .addHeader("Ocp-Apim-Subscription-Key", endpointKey).addHeader("User-Agent", UserAgent.value())
+            .addHeader("Ocp-Apim-Subscription-Key", endpointKey)
+            .addHeader("User-Agent", UserAgent.value())
             .post(body);
         return requestBuilder.build();
     }
