@@ -22,12 +22,10 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +41,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LuisRecognizerOptionsV3Tests {
 
     @Mock
@@ -60,31 +58,39 @@ public class LuisRecognizerOptionsV3Tests {
     String subscriptionKey = "b31aeaf3-3511-495b-a07f-571fc873214b";
     boolean mockLuisResponse = true;
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "Composite1.json",
-        "Composite2.json",
-        "Composite3.json",
-        "DateTimeReference.json",
-        "DynamicListsAndList.json",
-        "ExternalEntitiesAndBuiltin.json",
-        "ExternalEntitiesAndComposite.json",
-        "ExternalEntitiesAndList.json",
-        "ExternalEntitiesAndRegex.json",
-        "ExternalEntitiesAndSimple.json",
-        "ExternalEntitiesAndSimpleOverride.json",
-        "GeoPeopleOrdinal.json",
-        "Minimal.json",
+    @Test
+    public void shouldParseLuisResponsesCorrectly_TurnContextPassed() {
+        String[] files = {
+            "Composite1.json",
+            "Composite2.json",
+            "Composite3.json",
+            "DateTimeReference.json",
+            "DynamicListsAndList.json",
+            "ExternalEntitiesAndBuiltin.json",
+            "ExternalEntitiesAndComposite.json",
+            "ExternalEntitiesAndList.json",
+            "ExternalEntitiesAndRegex.json",
+            "ExternalEntitiesAndSimple.json",
+            "ExternalEntitiesAndSimpleOverride.json",
+            "GeoPeopleOrdinal.json",
+            "Minimal.json",
 //        "MinimalWithGeo.json",
-        "NoEntitiesInstanceTrue.json",
-        "Patterns.json",
-        "Prebuilt.json",
-        "roles.json",
-        "TraceActivity.json",
-        "Typed.json",
-        "TypedPrebuilt.json"
-    }) // six numbers
-    public void shouldParseLuisResponsesCorrectly_TurnContextPassed(String fileName) {
+            "NoEntitiesInstanceTrue.json",
+            "Patterns.json",
+            "Prebuilt.json",
+            "roles.json",
+            "TraceActivity.json",
+            "Typed.json",
+            "TypedPrebuilt.json"
+        };
+
+        for (String file : files) {
+            shouldParseLuisResponsesCorrectly_TurnContextPassed(file);
+            reset(turnContext);
+        }
+    }
+
+    private void shouldParseLuisResponsesCorrectly_TurnContextPassed(String fileName) {
         RecognizerResult  result = null, expected  = null;
         MockWebServer mockWebServer = new MockWebServer();
 

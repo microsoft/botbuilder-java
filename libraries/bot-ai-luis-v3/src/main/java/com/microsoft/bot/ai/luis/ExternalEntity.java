@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Request Body element to use when passing External Entities to the Luis Service call.
+ * Request Body element to use when passing External Entities to the Luis
+ * Service call.
  *
  */
 public class ExternalEntity {
@@ -20,10 +21,12 @@ public class ExternalEntity {
 
     /**
      * Initializes a new instance of ExternalEntity.
-     * @param entity name of the entity to extend.
-     * @param start start character index of the predicted entity.
-     * @param length length of the predicted entity.
-     * @param resolution supplied custom resolution to return as the entity's prediction.
+     * 
+     * @param entity     name of the entity to extend.
+     * @param start      start character index of the predicted entity.
+     * @param length     length of the predicted entity.
+     * @param resolution supplied custom resolution to return as the entity's
+     *                   prediction.
      */
     public ExternalEntity(String entity, int start, int length, JsonNode resolution) {
         this.entity = entity;
@@ -35,10 +38,8 @@ public class ExternalEntity {
     @JsonProperty(value = "entityName")
     private String entity;
 
-
     @JsonProperty(value = "startIndex")
     private int start;
-
 
     @JsonProperty(value = "entityLength")
     private int length = -1;
@@ -48,6 +49,7 @@ public class ExternalEntity {
 
     /**
      * Gets the start character index of the predicted entity.
+     * 
      * @return start character index of the predicted entity.
      */
     public int getStart() {
@@ -56,6 +58,7 @@ public class ExternalEntity {
 
     /**
      * Sets the start character index of the predicted entity.
+     * 
      * @param start character index of the predicted entity.
      */
     public void setStart(int start) {
@@ -64,6 +67,7 @@ public class ExternalEntity {
 
     /**
      * Gets the name of the entity to extend.
+     * 
      * @return name of the entity to extend.
      */
     public String getEntity() {
@@ -72,6 +76,7 @@ public class ExternalEntity {
 
     /**
      * Sets the name of the entity to extend.
+     * 
      * @param entity name of the entity to extend.
      */
     public void setEntity(String entity) {
@@ -80,6 +85,7 @@ public class ExternalEntity {
 
     /**
      * Gets the length of the predicted entity.
+     * 
      * @return length of the predicted entity.
      */
     public int getLength() {
@@ -88,6 +94,7 @@ public class ExternalEntity {
 
     /**
      * Sets the length of the predicted entity.
+     * 
      * @param length of the predicted entity.
      */
     public void setLength(int length) {
@@ -96,6 +103,7 @@ public class ExternalEntity {
 
     /**
      * Gets a user supplied custom resolution to return as the entity's prediction.
+     * 
      * @return custom resolution to return as the entity's prediction.
      */
     public JsonNode getResolution() {
@@ -104,6 +112,7 @@ public class ExternalEntity {
 
     /**
      * Sets External entities to be recognized in query.
+     * 
      * @param resolution custom resolution to return as the entity's prediction.
      */
     public void setResolution(JsonNode resolution) {
@@ -112,6 +121,7 @@ public class ExternalEntity {
 
     /**
      * Validate the object.
+     * 
      * @throws IllegalArgumentException on null or invalid values
      */
     public void validate() throws IllegalArgumentException {

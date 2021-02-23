@@ -22,8 +22,9 @@ public class ListElement {
 
     /**
      * Initializes a new instance of the ListElement class.
+     * 
      * @param canonicalForm The canonical form of the sub-list.
-     * @param synonyms The synonyms of the canonical form.
+     * @param synonyms      The synonyms of the canonical form.
      */
     public ListElement(String canonicalForm, List<String> synonyms) {
         this.canonicalForm = canonicalForm;
@@ -45,6 +46,7 @@ public class ListElement {
 
     /**
      * Gets the canonical form of the sub-list.
+     * 
      * @return String canonical form of the sub-list.
      */
     public String getCanonicalForm() {
@@ -53,6 +55,7 @@ public class ListElement {
 
     /**
      * Sets the canonical form of the sub-list.
+     * 
      * @param canonicalForm the canonical form of the sub-list.
      */
     public void setCanonicalForm(String canonicalForm) {
@@ -61,6 +64,7 @@ public class ListElement {
 
     /**
      * Gets the synonyms of the canonical form.
+     * 
      * @return the synonyms List of the canonical form.
      */
     public List<String> getSynonyms() {
@@ -69,6 +73,7 @@ public class ListElement {
 
     /**
      * Sets the synonyms of the canonical form.
+     * 
      * @param synonyms List of synonyms of the canonical form.
      */
     public void setSynonyms(List<String> synonyms) {
@@ -77,6 +82,7 @@ public class ListElement {
 
     /**
      * Validate the object.
+     * 
      * @throws IllegalArgumentException if canonicalForm is null.
      */
     public void validate() throws IllegalArgumentException {
