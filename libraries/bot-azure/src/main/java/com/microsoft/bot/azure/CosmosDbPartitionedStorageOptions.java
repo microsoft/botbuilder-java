@@ -11,16 +11,18 @@ import com.microsoft.bot.integration.Configuration;
  * Cosmos DB Partitioned Storage Options.
  */
 public class CosmosDbPartitionedStorageOptions {
-    private static final int DEFAULT_THROUGHPUT = 400;
+    private static final Integer DEFAULT_THROUGHPUT = 400;
     private static final ConsistencyLevel DEFAULT_CONSISTENCY = ConsistencyLevel.Session;
 
     private String cosmosDbEndpoint;
     private String authKey;
     private String databaseId;
     private String containerId;
-    private int containerThroughput;
+    private String keySuffix;
+    private Integer containerThroughput;
     private ConnectionPolicy connectionPolicy;
     private ConsistencyLevel consistencyLevel;
+    private Boolean compatibilityMode;
 
     /**
      * Constructs an empty options object.
@@ -164,7 +166,7 @@ public class CosmosDbPartitionedStorageOptions {
      * Gets the throughput set when creating the Container. Defaults to 400.
      * @return The container throughput.
      */
-    public int getContainerThroughput() {
+    public Integer getContainerThroughput() {
         return containerThroughput;
     }
 
@@ -172,7 +174,58 @@ public class CosmosDbPartitionedStorageOptions {
      * Sets the throughput set when creating the Container. Defaults to 400.
      * @param withContainerThroughput The desired thoughput.
      */
-    public void setContainerThroughput(int withContainerThroughput) {
+    public void setContainerThroughput(Integer withContainerThroughput) {
         containerThroughput = withContainerThroughput;
+    }
+
+    /**
+     * Gets a value indicating whether or not to run in Compatibility Mode.
+     * Early versions of CosmosDb had a key length limit of 255. Keys longer than this were
+     * truncated in CosmosDbKeyEscape. This remains the default behavior, but
+     * can be overridden by setting CompatibilityMode to false. This setting will also allow
+     * for using older collections where no PartitionKey was specified.
+     *
+     * Note: CompatibilityMode cannot be 'true' if KeySuffix is used.
+     */
+    public Boolean getCompatibilityMode() {
+        return compatibilityMode;
+    }
+
+    /**
+     * Sets a value indicating whether or not to run in Compatibility Mode.
+     * Early versions of CosmosDb had a key length limit of 255. Keys longer than this were
+     * truncated in CosmosDbKeyEscape. This remains the default behavior, but
+     * can be overridden by setting CompatibilityMode to false. This setting will also allow
+     * for using older collections where no PartitionKey was specified.
+     *
+     * Note: CompatibilityMode cannot be 'true' if KeySuffix is used.
+     * @param withCompatibilityMode Currently, max key length for cosmosdb is 1023:
+     * https://docs.microsoft.com/en-us/azure/cosmos-db/concepts-limits#per-item-limits
+     * The default for backwards compatibility is 255, CosmosDbKeyEscape.MaxKeyLength.
+     */
+    public void setCompatibilityMode(Boolean withCompatibilityMode) {
+        this.compatibilityMode = withCompatibilityMode;
+    }
+
+    /**
+     * Gets the suffix to be added to every key. See CosmosDbKeyEscape.EscapeKey(string).
+     * Note:CompatibilityMode must be set to 'false' to use a KeySuffix.
+     * When KeySuffix is used, keys will NOT be truncated but an exception will be thrown if
+     * the key length is longer than allowed by CosmosDb.
+     * @return String containing only valid CosmosDb key characters. (e.g. not: '\\', '?', '/', '#', '*').
+     */
+    public String getKeySuffix() {
+        return keySuffix;
+    }
+
+    /**
+     * Sets the suffix to be added to every key. See CosmosDbKeyEscape.EscapeKey(string).
+     * Note:CompatibilityMode must be set to 'false' to use a KeySuffix.
+     * When KeySuffix is used, keys will NOT be truncated but an exception will be thrown if
+     * the key length is longer than allowed by CosmosDb.
+     * @param withKeySuffix String containing only valid CosmosDb key characters. (e.g. not: '\\', '?', '/', '#', '*').
+     */
+    public void setKeySuffix(String withKeySuffix) {
+        this.keySuffix = withKeySuffix;
     }
 }
