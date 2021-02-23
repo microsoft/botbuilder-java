@@ -197,7 +197,7 @@ public class QnAMakerTests {
                 }
             };
             TurnContext context = new TurnContextImpl(adapter, activity);
-            Assert.assertThrows(IllegalArgumentException.class, () -> qna.getAnswers(context, null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
             fail();
         } finally {
@@ -229,7 +229,7 @@ public class QnAMakerTests {
                 }
             };
             TurnContext context = new TurnContextImpl(adapter, activity);
-            Assert.assertThrows(IllegalArgumentException.class, () -> qna.getAnswers(context, null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
             fail();
         } finally {
@@ -248,7 +248,7 @@ public class QnAMakerTests {
             // Get basic Qna
             QnAMaker qna = this.qnaReturnsAnswer(mockWebServer);
 
-            Assert.assertThrows(IllegalArgumentException.class, () -> qna.getAnswers(null, null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(null, null).join());
         } catch (Exception e) {
             fail();
         } finally {
@@ -281,7 +281,7 @@ public class QnAMakerTests {
             };
 
             TurnContext context = new TurnContextImpl(adapter, activity);
-            Assert.assertThrows(IllegalArgumentException.class, () -> qna.getAnswers(context, null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
             fail();
         } finally {
@@ -304,7 +304,7 @@ public class QnAMakerTests {
             TestAdapter adapter = new TestAdapter(
                 TestAdapter.createConversationReference("QnaMaker_TraceActivity_NullActivity", "User1", "Bot"));
             TurnContext context = new MyTurnContext(adapter, null);
-            Assert.assertThrows(IllegalArgumentException.class, () -> qna.getAnswers(context, null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
             fail();
         } finally {
@@ -1076,7 +1076,7 @@ public class QnAMakerTests {
                 }
             };
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, null);
-            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(getContext("how do I clean the stove?"), null));
+            Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(getContext("how do I clean the stove?"), null).join());
         } catch (Exception e) {
             fail();
         } finally {

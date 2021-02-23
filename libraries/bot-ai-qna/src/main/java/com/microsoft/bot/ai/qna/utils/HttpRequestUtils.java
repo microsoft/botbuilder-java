@@ -3,8 +3,8 @@
 
 package com.microsoft.bot.ai.qna.utils;
 
+import com.microsoft.bot.connector.Async;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,15 +36,17 @@ public class HttpRequestUtils {
     public CompletableFuture<JsonNode> executeHttpRequest(String requestUrl, String payloadBody,
             QnAMakerEndpoint endpoint) {
         if (requestUrl == null) {
-            throw new IllegalArgumentException("requestUrl: Request url can not be null.");
+            return Async.completeExceptionally(
+                new IllegalArgumentException("requestUrl: Request url can not be null."));
         }
 
         if (payloadBody == null) {
-            throw new IllegalArgumentException("payloadBody: Payload body can not be null.");
+            return Async.completeExceptionally(
+                new IllegalArgumentException("payloadBody: Payload body can not be null."));
         }
 
         if (endpoint == null) {
-            throw new IllegalArgumentException("endpoint");
+            return Async.completeExceptionally(new IllegalArgumentException("endpoint"));
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -57,11 +59,11 @@ public class HttpRequestUtils {
             qnaResponse = mapper.readTree(response.body().string());
             if (!response.isSuccessful()) {
                 String message = "Unexpected code " + response.code();
-                throw new Exception(message);
+                return Async.completeExceptionally(new Exception(message));
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(HttpRequestUtils.class).error("findPackages", e);
-            throw new CompletionException(e);
+            return Async.completeExceptionally(e);
         }
 
         return CompletableFuture.completedFuture(qnaResponse);

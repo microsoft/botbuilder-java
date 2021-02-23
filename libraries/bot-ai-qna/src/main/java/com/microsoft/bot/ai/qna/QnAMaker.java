@@ -16,6 +16,7 @@ import com.microsoft.bot.ai.qna.utils.TrainUtils;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.NullBotTelemetryClient;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
@@ -194,19 +195,19 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
     public CompletableFuture<QueryResults> getAnswersRaw(TurnContext turnContext, QnAMakerOptions options,
             @Nullable Map<String, String> telemetryProperties, @Nullable Map<String, Double> telemetryMetrics) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext");
+            return Async.completeExceptionally(new IllegalArgumentException("turnContext"));
         }
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException(
-                    String.format("The %1$s property for %2$s can't be null.", "Activity", "turnContext"));
+            return Async.completeExceptionally(new IllegalArgumentException(
+                    String.format("The %1$s property for %2$s can't be null.", "Activity", "turnContext")));
         }
         Activity messageActivity = turnContext.getActivity();
         if (messageActivity == null || !messageActivity.isType(ActivityTypes.MESSAGE)) {
-            throw new IllegalArgumentException("Activity type is not a message");
+            return Async.completeExceptionally(new IllegalArgumentException("Activity type is not a message"));
         }
 
         if (Strings.isNullOrEmpty(turnContext.getActivity().getText())) {
-            throw new IllegalArgumentException("Null or empty text");
+            return Async.completeExceptionally(new IllegalArgumentException("Null or empty text"));
         }
 
         return this.generateAnswerHelper.getAnswersRaw(turnContext, messageActivity, options).thenCompose(result -> {
@@ -309,7 +310,10 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
             QueryResult queryResult = queryResults[0];
             properties.put(QnATelemetryConstants.MATCHED_QUESTION_PROPERTY,
                     jacksonAdapter.serialize(queryResult.getQuestions()));
-            properties.put(QnATelemetryConstants.QUESTION_ID_PROPERTY, queryResult.getId().toString());
+            properties.put(QnATelemetryConstants.QUESTION_ID_PROPERTY, queryResult.getId() != null
+                ? queryResult.getId().toString()
+                : ""
+            );
             properties.put(QnATelemetryConstants.ANSWER_PROPERTY, queryResult.getAnswer());
             metrics.put(QnATelemetryConstants.SCORE_PROPERTY, queryResult.getScore().doubleValue());
             properties.put(QnATelemetryConstants.ARTICLE_FOUND_PROPERTY, "true");
