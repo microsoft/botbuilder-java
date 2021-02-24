@@ -50,10 +50,11 @@ public class CosmosDbPartitionedStorage implements Storage {
     private DocumentCollection collectionCache;
 
     /**
-     * Initializes a new instance of the CosmosDbPartitionedStorage class.
-     * using the provided CosmosDB credentials, database ID, and container ID.
+     * Initializes a new instance of the CosmosDbPartitionedStorage class. using the
+     * provided CosmosDB credentials, database ID, and container ID.
      *
-     * @param withCosmosDbStorageOptions Cosmos DB partitioned storage configuration options.
+     * @param withCosmosDbStorageOptions Cosmos DB partitioned storage configuration
+     *                                   options.
      */
     public CosmosDbPartitionedStorage(CosmosDbPartitionedStorageOptions withCosmosDbStorageOptions) {
         if (withCosmosDbStorageOptions == null) {
@@ -78,29 +79,27 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         if (StringUtils.isNotBlank(withCosmosDbStorageOptions.getKeySuffix())) {
             if (withCosmosDbStorageOptions.getCompatibilityMode()) {
-                throw new IllegalArgumentException("CompatibilityMode cannot be 'true' while using a KeySuffix: withCosmosDbStorageOptions");
+                throw new IllegalArgumentException(
+                        "CompatibilityMode cannot be 'true' while using a KeySuffix: withCosmosDbStorageOptions");
             }
 
-            // In order to reduce key complexity, we do not allow invalid characters in a KeySuffix
+            // In order to reduce key complexity, we do not allow invalid characters in a
+            // KeySuffix
             // If the KeySuffix has invalid characters, the EscapeKey will not match
             String suffixEscaped = CosmosDbKeyEscape.escapeKey(withCosmosDbStorageOptions.getKeySuffix());
             if (!withCosmosDbStorageOptions.getKeySuffix().equals(suffixEscaped)) {
-                throw new IllegalArgumentException(String.format("Cannot use invalid Row Key characters: %s %s", withCosmosDbStorageOptions.getKeySuffix(), "withCosmosDbStorageOptions"));
+                throw new IllegalArgumentException(String.format("Cannot use invalid Row Key characters: %s %s",
+                        withCosmosDbStorageOptions.getKeySuffix(), "withCosmosDbStorageOptions"));
             }
         }
 
         cosmosDbStorageOptions = withCosmosDbStorageOptions;
 
-        objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .findAndRegisterModules()
-            .enableDefaultTyping();
+        objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .findAndRegisterModules().enableDefaultTyping();
 
-        client = new DocumentClient(
-            cosmosDbStorageOptions.getCosmosDbEndpoint(),
-            cosmosDbStorageOptions.getAuthKey(),
-            cosmosDbStorageOptions.getConnectionPolicy(),
-            cosmosDbStorageOptions.getConsistencyLevel());
+        client = new DocumentClient(cosmosDbStorageOptions.getCosmosDbEndpoint(), cosmosDbStorageOptions.getAuthKey(),
+                cosmosDbStorageOptions.getConnectionPolicy(), cosmosDbStorageOptions.getConsistencyLevel());
     }
 
     /**
@@ -120,47 +119,48 @@ public class CosmosDbPartitionedStorage implements Storage {
             return CompletableFuture.completedFuture(new HashMap<>());
         }
 
-        return getCollection()
-            .thenApplyAsync(collection -> {
-                // Issue all of the reads at once
-                List<CompletableFuture<Document>> documentFutures = new ArrayList<>();
-                for (String key : keys) {
-                    documentFutures.add(getDocumentById(CosmosDbKeyEscape.escapeKey(key, cosmosDbStorageOptions.getKeySuffix(), cosmosDbStorageOptions.getCompatibilityMode())));
-                }
+        return getCollection().thenApplyAsync(collection -> {
+            // Issue all of the reads at once
+            List<CompletableFuture<Document>> documentFutures = new ArrayList<>();
+            for (String key : keys) {
+                documentFutures.add(getDocumentById(CosmosDbKeyEscape.escapeKey(key,
+                        cosmosDbStorageOptions.getKeySuffix(), cosmosDbStorageOptions.getCompatibilityMode())));
+            }
 
-                // Map each returned Document to it's original value.
-                Map<String, Object> storeItems = new HashMap<>();
-                documentFutures.forEach(documentFuture -> {
-                    Document document = documentFuture.join();
-                    if (document != null) {
-                        try {
-                            // We store everything in a DocumentStoreItem. Get that.
-                            JsonNode stateNode = objectMapper.readTree(document.toJson());
-                            DocumentStoreItem storeItem = objectMapper.treeToValue(stateNode, DocumentStoreItem.class);
+            // Map each returned Document to it's original value.
+            Map<String, Object> storeItems = new HashMap<>();
+            documentFutures.forEach(documentFuture -> {
+                Document document = documentFuture.join();
+                if (document != null) {
+                    try {
+                        // We store everything in a DocumentStoreItem. Get that.
+                        JsonNode stateNode = objectMapper.readTree(document.toJson());
+                        DocumentStoreItem storeItem = objectMapper.treeToValue(stateNode, DocumentStoreItem.class);
 
-                            // DocumentStoreItem contains the original object.
-                            JsonNode dataNode = objectMapper.readTree(storeItem.getDocument());
-                            Object item = objectMapper.treeToValue(dataNode, Class.forName(storeItem.getType()));
+                        // DocumentStoreItem contains the original object.
+                        JsonNode dataNode = objectMapper.readTree(storeItem.getDocument());
+                        Object item = objectMapper.treeToValue(dataNode, Class.forName(storeItem.getType()));
 
-                            if (item instanceof StoreItem) {
-                                ((StoreItem) item).setETag(storeItem.getETag());
-                            }
-                            storeItems.put(storeItem.getReadId(), item);
-                        } catch (IOException | ClassNotFoundException e) {
-                            logger.warn("Error reading from container", e);
+                        if (item instanceof StoreItem) {
+                            ((StoreItem) item).setETag(storeItem.getETag());
                         }
+                        storeItems.put(storeItem.getReadId(), item);
+                    } catch (IOException | ClassNotFoundException e) {
+                        logger.warn("Error reading from container", e);
                     }
-                });
+                }
+            });
 
-                return storeItems;
-            }, ExecutorFactory.getExecutor());
+            return storeItems;
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
      * Inserts or updates one or more items into the Cosmos DB container.
      *
-     * @param changes A dictionary of items to be inserted or updated. The dictionary item key
-     * is used as the ID for the inserted / updated item.
+     * @param changes A dictionary of items to be inserted or updated. The
+     *                dictionary item key is used as the ID for the inserted /
+     *                updated item.
      * @return A task that represents the work queued to execute.
      */
     @Override
@@ -173,56 +173,55 @@ public class CosmosDbPartitionedStorage implements Storage {
             return CompletableFuture.completedFuture(null);
         }
 
-        return getCollection()
-            .thenApplyAsync(collection -> {
-                for (Map.Entry<String, Object> change : changes.entrySet()) {
-                    try {
-                        ObjectNode node = objectMapper.valueToTree(change.getValue());
+        return getCollection().thenApplyAsync(collection -> {
+            for (Map.Entry<String, Object> change : changes.entrySet()) {
+                try {
+                    ObjectNode node = objectMapper.valueToTree(change.getValue());
 
-                        // Remove etag from JSON object that was copied from StoreItem.
-                        // The ETag information is updated as an _etag attribute in the document metadata.
-                        node.remove("eTag");
+                    // Remove etag from JSON object that was copied from StoreItem.
+                    // The ETag information is updated as an _etag attribute in the document
+                    // metadata.
+                    node.remove("eTag");
 
-                        DocumentStoreItem documentChange = new DocumentStoreItem() {{
-                            setId(CosmosDbKeyEscape.escapeKey(change.getKey(), cosmosDbStorageOptions.getKeySuffix(), cosmosDbStorageOptions.getCompatibilityMode()));
+                    DocumentStoreItem documentChange = new DocumentStoreItem() {
+                        {
+                            setId(CosmosDbKeyEscape.escapeKey(change.getKey(), cosmosDbStorageOptions.getKeySuffix(),
+                                    cosmosDbStorageOptions.getCompatibilityMode()));
                             setReadId(change.getKey());
                             setDocument(node.toString());
                             setType(change.getValue().getClass().getTypeName());
-                        }};
-
-                        Document document = new Document(objectMapper.writeValueAsString(documentChange));
-
-                        RequestOptions options = new RequestOptions();
-                        options.setPartitionKey(new PartitionKey(documentChange.partitionKey()));
-
-                        if (change.getValue() instanceof StoreItem) {
-                            String etag = ((StoreItem) change.getValue()).getETag();
-                            if (StringUtils.isNotBlank(etag) && !etag.equals("*")) {
-                                // if we have an etag, do opt. concurrency replace
-                                AccessCondition condition = new AccessCondition();
-                                condition.setType(AccessConditionType.IfMatch);
-                                condition.setCondition(etag);
-
-                                options.setAccessCondition(condition);
-                            } else if (etag != null) {
-                                logger.warn("write change, empty eTag: " + change.getKey());
-                                continue;
-                            }
                         }
+                    };
 
-                        client.upsertDocument(
-                            collection.getSelfLink(),
-                            document,
-                            options,
-                            true);
+                    Document document = new Document(objectMapper.writeValueAsString(documentChange));
 
-                    } catch (JsonProcessingException | DocumentClientException e) {
-                        logger.warn("Error upserting document: " + change.getKey(), e);
+                    RequestOptions options = new RequestOptions();
+                    options.setPartitionKey(new PartitionKey(documentChange.partitionKey()));
+
+                    if (change.getValue() instanceof StoreItem) {
+                        String etag = ((StoreItem) change.getValue()).getETag();
+                        if (StringUtils.isNotBlank(etag) && !etag.equals("*")) {
+                            // if we have an etag, do opt. concurrency replace
+                            AccessCondition condition = new AccessCondition();
+                            condition.setType(AccessConditionType.IfMatch);
+                            condition.setCondition(etag);
+
+                            options.setAccessCondition(condition);
+                        } else if (etag != null) {
+                            logger.warn("write change, empty eTag: " + change.getKey());
+                            continue;
+                        }
                     }
-                }
 
-                return null;
-            });
+                    client.upsertDocument(collection.getSelfLink(), document, options, true);
+
+                } catch (JsonProcessingException | DocumentClientException e) {
+                    logger.warn("Error upserting document: " + change.getKey(), e);
+                }
+            }
+
+            return null;
+        });
     }
 
     /**
@@ -238,35 +237,34 @@ public class CosmosDbPartitionedStorage implements Storage {
         }
 
         // issue the deletes in parallel
-        return getCollection()
-            .thenCompose(collection -> Arrays.stream(keys).map(key -> {
-                String escapedKey = CosmosDbKeyEscape.escapeKey(key, cosmosDbStorageOptions.getKeySuffix(), cosmosDbStorageOptions.getCompatibilityMode());
-                return getDocumentById(escapedKey)
-                    .thenApplyAsync(document -> {
-                        if (document != null) {
-                            try {
-                                RequestOptions options = new RequestOptions();
-                                options.setPartitionKey(new PartitionKey(escapedKey));
+        return getCollection().thenCompose(collection -> Arrays.stream(keys).map(key -> {
+            String escapedKey = CosmosDbKeyEscape.escapeKey(key, cosmosDbStorageOptions.getKeySuffix(),
+                    cosmosDbStorageOptions.getCompatibilityMode());
+            return getDocumentById(escapedKey).thenApplyAsync(document -> {
+                if (document != null) {
+                    try {
+                        RequestOptions options = new RequestOptions();
+                        options.setPartitionKey(new PartitionKey(escapedKey));
 
-                                client.deleteDocument(document.getSelfLink(), options);
-                            } catch (DocumentClientException e) {
-                                logger.warn("Unable to delete document", e);
-                                throw new CompletionException(e);
-                            }
-                        }
+                        client.deleteDocument(document.getSelfLink(), options);
+                    } catch (DocumentClientException e) {
+                        logger.warn("Unable to delete document", e);
+                        throw new CompletionException(e);
+                    }
+                }
 
-                        return null;
-                    }, ExecutorFactory.getExecutor());
-            }).collect(CompletableFutures.toFutureList()).thenApply(deleteResponses -> null));
+                return null;
+            }, ExecutorFactory.getExecutor());
+        }).collect(CompletableFutures.toFutureList()).thenApply(deleteResponses -> null));
     }
 
     private Database getDatabase() {
         if (databaseCache == null) {
             // Get the database if it exists
             List<Database> databaseList = client
-                .queryDatabases(
-                    "SELECT * FROM root r WHERE r.id='" + cosmosDbStorageOptions.getDatabaseId()
-                        + "'", null).getQueryIterable().toList();
+                    .queryDatabases("SELECT * FROM root r WHERE r.id='" + cosmosDbStorageOptions.getDatabaseId() + "'",
+                            null)
+                    .getQueryIterable().toList();
 
             if (databaseList.size() > 0) {
                 // Cache the database object so we won't have to query for it
@@ -278,8 +276,7 @@ public class CosmosDbPartitionedStorage implements Storage {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(cosmosDbStorageOptions.getDatabaseId());
 
-                    databaseCache = client.createDatabase(
-                        databaseDefinition, null).getResource();
+                    databaseCache = client.createDatabase(databaseDefinition, null).getResource();
                 } catch (DocumentClientException e) {
                     // able to query or create the collection.
                     // Verify your connection, endpoint, and key.
@@ -304,11 +301,9 @@ public class CosmosDbPartitionedStorage implements Storage {
 
             return CompletableFuture.supplyAsync(() -> {
                 // Get the collection if it exists.
-                List<DocumentCollection> collectionList = client
-                    .queryCollections(
-                        getDatabase().getSelfLink(),
-                        "SELECT * FROM root r WHERE r.id='" + cosmosDbStorageOptions.getContainerId()
-                            + "'", null).getQueryIterable().toList();
+                List<DocumentCollection> collectionList = client.queryCollections(getDatabase().getSelfLink(),
+                        "SELECT * FROM root r WHERE r.id='" + cosmosDbStorageOptions.getContainerId() + "'", null)
+                        .getQueryIterable().toList();
 
                 if (collectionList.size() > 0) {
                     // Cache the collection object so we won't have to query for it
@@ -324,13 +319,15 @@ public class CosmosDbPartitionedStorage implements Storage {
                         partitionKeyDefinition.setPaths(Collections.singleton(DocumentStoreItem.PARTITION_KEY_PATH));
                         collectionDefinition.setPartitionKey(partitionKeyDefinition);
 
-                        RequestOptions options = new RequestOptions() {{
-                            setOfferThroughput(cosmosDbStorageOptions.getContainerThroughput());
-                        }};
+                        RequestOptions options = new RequestOptions() {
+                            {
+                                setOfferThroughput(cosmosDbStorageOptions.getContainerThroughput());
+                            }
+                        };
 
-                        collectionCache = client.createCollection(
-                            getDatabase().getSelfLink(),
-                            collectionDefinition, options).getResource();
+                        collectionCache = client
+                                .createCollection(getDatabase().getSelfLink(), collectionDefinition, options)
+                                .getResource();
                     } catch (DocumentClientException e) {
                         // able to query or create the collection.
                         // Verify your connection, endpoint, and key.
@@ -345,20 +342,18 @@ public class CosmosDbPartitionedStorage implements Storage {
     }
 
     private CompletableFuture<Document> getDocumentById(String id) {
-        return getCollection()
-            .thenApplyAsync(collection -> {
-                // Retrieve the document using the DocumentClient.
-                List<Document> documentList = client
-                    .queryDocuments(collection.getSelfLink(),
-                        "SELECT * FROM root r WHERE r.id='" + id + "'", null)
+        return getCollection().thenApplyAsync(collection -> {
+            // Retrieve the document using the DocumentClient.
+            List<Document> documentList = client
+                    .queryDocuments(collection.getSelfLink(), "SELECT * FROM root r WHERE r.id='" + id + "'", null)
                     .getQueryIterable().toList();
 
-                if (documentList.size() > 0) {
-                    return documentList.get(0);
-                } else {
-                    return null;
-                }
-            }, ExecutorFactory.getExecutor());
+            if (documentList.size() > 0) {
+                return documentList.get(0);
+            } else {
+                return null;
+            }
+        }, ExecutorFactory.getExecutor());
     }
 
     /**
@@ -385,6 +380,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Gets the sanitized Id/Key used as PrimaryKey.
+         *
          * @return The ID.
          */
         public String getId() {
@@ -393,6 +389,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Sets the sanitized Id/Key used as PrimaryKey.
+         *
          * @param withId The ID.
          */
         public void setId(String withId) {
@@ -401,6 +398,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Gets the un-sanitized Id/Key.
+         *
          * @return The ID.
          */
         public String getReadId() {
@@ -409,6 +407,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Sets the un-sanitized Id/Key.
+         *
          * @param withReadId The ID.
          */
         public void setReadId(String withReadId) {
@@ -417,6 +416,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Gets the persisted object.
+         *
          * @return The item data.
          */
         public String getDocument() {
@@ -425,6 +425,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Sets the persisted object.
+         *
          * @param withDocument The item data.
          */
         public void setDocument(String withDocument) {
@@ -433,6 +434,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Get ETag information for handling optimistic concurrency updates.
+         *
          * @return The eTag value.
          */
         @Override
@@ -442,6 +444,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * Set ETag information for handling optimistic concurrency updates.
+         *
          * @param withETag The eTag value.
          */
         @Override
@@ -451,6 +454,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * The type of the document data.
+         *
          * @return The class name of the data being stored.
          */
         public String getType() {
@@ -459,6 +463,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * The fully qualified class name of the data being stored.
+         *
          * @param withType The class name of the data.
          */
         public void setType(String withType) {
@@ -467,6 +472,7 @@ public class CosmosDbPartitionedStorage implements Storage {
 
         /**
          * The value used for the PartitionKey.
+         *
          * @return In this case, the id field.
          */
         public String partitionKey() {
