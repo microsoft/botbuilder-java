@@ -3,8 +3,7 @@
 
 package com.microsoft.bot.ai.luis;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
+import okhttp3.HttpUrl;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -168,11 +167,9 @@ public class LuisApplication {
         }
 
         try {
-
-            String endpointKeyParsed = new URIBuilder(applicationEndpoint).getQueryParams()
+            String endpointKeyParsed = HttpUrl.parse(applicationEndpoint)
+                .queryParameterValues("subscription-key")
                 .stream()
-                .filter(param -> param.getName().equalsIgnoreCase("subscription-key"))
-                .map(NameValuePair::getValue)
                 .findFirst()
                 .orElse("");
 
