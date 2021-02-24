@@ -4,14 +4,30 @@
 package com.microsoft.bot.azure;
 
 import com.microsoft.azure.documentdb.*;
+import com.microsoft.bot.builder.AutoSaveStateMiddleware;
+import com.microsoft.bot.builder.ConversationState;
+import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.StorageBaseTests;
+import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.dialogs.*;
+import com.microsoft.bot.dialogs.prompts.PromptOptions;
+import com.microsoft.bot.dialogs.prompts.PromptValidator;
+import com.microsoft.bot.dialogs.prompts.PromptValidatorContext;
+import com.microsoft.bot.dialogs.prompts.TextPrompt;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The CosmosDB tests require the CosmosDB Emulator to be installed and running.
@@ -144,6 +160,34 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
         } catch (IllegalArgumentException e) {
 
         }
+
+        try {
+            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
+                setAuthKey("testAuthKey");
+                setContainerId("testId");
+                setDatabaseId("testDb");
+                setCosmosDbEndpoint("testEndpoint");
+                setKeySuffix("?#*test");
+                setCompatibilityMode(false);
+            }});
+            Assert.fail("should have thrown for invalid Row Key characters in KeySuffix");
+        } catch (IllegalArgumentException e) {
+
+        }
+
+        try {
+            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
+                setAuthKey("testAuthKey");
+                setContainerId("testId");
+                setDatabaseId("testDb");
+                setCosmosDbEndpoint("testEndpoint");
+                setKeySuffix("thisisatest");
+                setCompatibilityMode(true);
+            }});
+            Assert.fail("should have thrown for CompatibilityMode 'true' while using a KeySuffix");
+        } catch (IllegalArgumentException e) {
+
+        }
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
@@ -181,6 +225,86 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
         super.handleCrazyKeys(storage);
     }
 
+    // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
+    @Test
+    public void WaterfallCosmos() {
+        ConversationState convoState = new ConversationState(storage);
+
+        ConversationReference conversationReference = TestAdapter.createConversationReference("waterfallTest", "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversationReference).use(new AutoSaveStateMiddleware(convoState));
+
+        StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogStateForWaterfallTest");
+        DialogSet dialogs = new DialogSet(dialogState);
+
+        dialogs.add(new TextPrompt("TextPrompt", new PromptValidator<String>() {
+            public CompletableFuture<Boolean> promptValidator(PromptValidatorContext<String> promptContext) {
+                String value = promptContext.getRecognized().getValue();
+                if (value.length() > 3) {
+                    StringBuilder sb = new StringBuilder("You got it at the ").append(promptContext.getAttemptCount()).append("th try!");
+                    Activity succeededMessage = MessageFactory.text(sb.toString());
+                    return promptContext.getContext().sendActivity(succeededMessage).thenApply(resourceResponses -> true);
+                }
+
+                Activity reply = MessageFactory.text("Please send a name that is longer than 3 characters. " + promptContext.getAttemptCount());
+                return promptContext.getContext().sendActivity(reply).thenApply(resourceResponses -> false);
+            }
+        }));
+
+        WaterfallStep[] steps = new WaterfallStep[] {
+            new WaterfallStep() {
+                public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
+                    Assert.assertEquals(Integer.class, stepContext.getActiveDialog().getState().get("stepIndex").getClass());
+                    return stepContext.getContext().sendActivity("step1").thenApply(resourceResponse -> Dialog.END_OF_TURN);
+                }
+            },
+            new WaterfallStep() {
+                public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
+                    Assert.assertEquals(Integer.class, stepContext.getActiveDialog().getState().get("stepIndex").getClass());
+                    PromptOptions promptOptions = new PromptOptions();
+                    promptOptions.setPrompt(MessageFactory.text("Please type your name."));
+                    return stepContext.prompt("TextPrompt", promptOptions);
+                }
+            },
+            new WaterfallStep() {
+                public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
+                    Assert.assertEquals(Integer.class, stepContext.getActiveDialog().getState().get("stepIndex").getClass());
+                    return stepContext.getContext().sendActivity("step3").thenApply(resourceResponse -> Dialog.END_OF_TURN);
+                }
+            }
+        };
+
+        dialogs.add(new WaterfallDialog("WaterfallDialog", Arrays.asList(steps)));
+
+        new TestFlow(adapter, (turnContext -> {
+            if (turnContext.getActivity().getText().equals("reset")) {
+                return dialogState.delete(turnContext);
+            }
+            else {
+                DialogContext dc =  dialogs.createContext(turnContext).join();
+                dc.continueDialog().join();
+
+                if (!turnContext.getResponded()) {
+                    dc.beginDialog("WaterfallDialog").join();
+                }
+                return CompletableFuture.completedFuture(null);
+            }
+        }))
+            .send("reset")
+            .send("hello")
+            .assertReply("step1")
+            .send("hello")
+            .assertReply("Please type your name.")
+            .send("hi")
+            .assertReply("Please send a name that is longer than 3 characters. 1")
+            .send("hi")
+            .assertReply("Please send a name that is longer than 3 characters. 2")
+            .send("hi")
+            .assertReply("Please send a name that is longer than 3 characters. 3")
+            .send("Kyle")
+            .assertReply("You got it at the 4th try!")
+            .assertReply("step3")
+            .startTest().join();
+    }
     @Test
     public void ReadingEmptyKeysReturnsEmptyDictionary() {
         Map<String, Object> state = storage.read(new String[] {}).join();
