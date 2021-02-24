@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -258,6 +259,14 @@ public final class Serialization {
      */
     public static ObjectNode createObjectNode() {
         return objectMapper.createObjectNode();
+    }
+
+    /**
+     * Creates an ArrayNode.
+     * @return ArrayNode.
+     */
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
     }
 }
 

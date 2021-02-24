@@ -72,7 +72,7 @@ public class QnAMakerRecognizerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsNoAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             // Set mock response in MockWebServer
             String url = "/qnamaker/knowledgebases/";
@@ -114,7 +114,7 @@ public class QnAMakerRecognizerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             // Set mock response in MockWebServer
             String url = "/qnamaker/knowledgebases/";
@@ -154,7 +154,7 @@ public class QnAMakerRecognizerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_TopNAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             // Set mock response in MockWebServer
             String url = "/qnamaker/knowledgebases/";
@@ -194,7 +194,7 @@ public class QnAMakerRecognizerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswerWithIntent.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             // Set mock response in MockWebServer
             String url = "/qnamaker/knowledgebases/";
@@ -237,7 +237,7 @@ public class QnAMakerRecognizerTests {
     }
 
     private HttpUrl initializeMockServer(MockWebServer mockWebServer, JsonNode response, String url) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String mockResponse = mapper.writeValueAsString(response);
         mockWebServer.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")

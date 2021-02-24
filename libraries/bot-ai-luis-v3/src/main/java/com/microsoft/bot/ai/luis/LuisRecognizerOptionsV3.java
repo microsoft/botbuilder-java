@@ -452,7 +452,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     private RequestBody buildRequestBody(String utterance) throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         ObjectNode content = JsonNodeFactory.instance.objectNode().put("query", utterance);
         ObjectNode queryOptions =
             JsonNodeFactory.instance.objectNode().put("preferExternalEntities", preferExternalEntities);
@@ -482,7 +482,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
         RecognizerResult recognizerResult;
         JsonNode luisResponse = null;
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         if (utterance == null || utterance.isEmpty()) {
             recognizerResult = new RecognizerResult() {
@@ -691,7 +691,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         JsonNode luisResponse,
         TurnContext turnContext
     ) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         try {
             ObjectNode traceInfo = JsonNodeFactory.instance.objectNode();
             traceInfo

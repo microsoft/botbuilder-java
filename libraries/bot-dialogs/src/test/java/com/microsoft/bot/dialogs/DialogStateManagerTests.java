@@ -180,6 +180,7 @@ public class DialogStateManagerTests {
         DialogTestFunction testFunction = dc -> {
 
             ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
 
             String[] array = new String[] {
                 "test1",

@@ -38,6 +38,8 @@ public abstract class BotState implements PropertyManager {
      */
     private Storage storage;
 
+    private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+
     /**
      * Initializes a new instance of the BotState class.
      *
@@ -221,7 +223,7 @@ public abstract class BotState implements PropertyManager {
 
         String stateKey = getClass().getSimpleName();
         CachedBotState cachedState = turnContext.getTurnState().get(stateKey);
-        return new ObjectMapper().valueToTree(cachedState.state);
+        return mapper.valueToTree(cachedState.state);
     }
 
     /**
@@ -355,7 +357,7 @@ public abstract class BotState implements PropertyManager {
         /**
          * Object-JsonNode converter.
          */
-        private ObjectMapper mapper = new ObjectMapper();
+        private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         /**
          * Construct with empty state.
