@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -10,9 +11,11 @@ import java.util.concurrent.CompletionException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.HealthCheckResponse;
 import com.microsoft.bot.schema.MessageReaction;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.SignInConstants;
@@ -51,17 +54,21 @@ public class ActivityHandler implements Bot {
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("TurnContext cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         if (turnContext.getActivity() == null) {
-            throw new IllegalArgumentException("turnContext must have a non-null Activity.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext must have a non-null Activity."
+            ));
         }
 
         if (turnContext.getActivity().getType() == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "turnContext.getActivity must have a non-null Type."
-            );
+            ));
         }
 
         switch (turnContext.getActivity().getType()) {
@@ -79,6 +86,9 @@ public class ActivityHandler implements Bot {
 
             case ActivityTypes.INSTALLATION_UPDATE:
                 return onInstallationUpdate(turnContext);
+
+            case ActivityTypes.TYPING:
+                return onTypingActivity(turnContext);
 
             case ActivityTypes.INVOKE:
                 return onInvokeActivity(turnContext).thenCompose(invokeResponse -> {
@@ -402,6 +412,10 @@ public class ActivityHandler implements Bot {
                     }
                     return new InvokeResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, null);
                 });
+        } else if (StringUtils.equals(turnContext.getActivity().getName(), "healthCheck")) {
+            CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
+            result.complete(new InvokeResponse(HttpURLConnection.HTTP_OK, onHealthCheck(turnContext)));
+            return result;
         }
 
         CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
@@ -431,6 +445,18 @@ public class ActivityHandler implements Bot {
             new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED)
         );
         return result;
+    }
+
+    /**
+     * Invoked when a 'healthCheck' event is
+     * received when the base behavior of onInvokeActivity is used.
+     *
+     * @param turnContext The current TurnContext.
+     * @return A task that represents a HealthCheckResponse.
+     */
+    protected CompletableFuture<HealthCheckResponse> onHealthCheck(TurnContext turnContext) {
+        ConnectorClient client = turnContext.getTurnState().get(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY);
+        return CompletableFuture.completedFuture(HealthCheck.createHealthCheckResponse(client));
     }
 
     /**
@@ -498,6 +524,55 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onInstallationUpdate(TurnContext turnContext) {
+        String action = turnContext.getActivity().getAction();
+        if (StringUtils.isEmpty(action)) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        switch (action) {
+            case "add":
+            case "add-upgrade":
+                return onInstallationUpdateAdd(turnContext);
+
+            case "remove":
+            case "remove-upgrade":
+                return onInstallationUpdateRemove(turnContext);
+
+            default:
+                return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to ActivityTypes.InstallationUpdate
+     * activities with 'action' set to 'add'.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onInstallationUpdateAdd(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to ActivityTypes.InstallationUpdate
+     * activities with 'action' set to 'remove'.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to
+     * ActivityTypes.Typing activities.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onTypingActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 

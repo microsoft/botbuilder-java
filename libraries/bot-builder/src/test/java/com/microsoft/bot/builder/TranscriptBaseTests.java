@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.codepoetics.protonpack.collectors.CompletableFutures;
@@ -6,6 +9,7 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
+import java.util.concurrent.CompletionException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 
@@ -35,8 +39,8 @@ public class TranscriptBaseTests {
         try {
             store.logActivity(null).join();
             Assert.fail("logActivity Should have thrown on null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail("logActivity Should have thrown ArgumentNull exception on null");
         }
@@ -44,8 +48,8 @@ public class TranscriptBaseTests {
         try {
             store.getTranscriptActivities(null, null).join();
             Assert.fail("getTranscriptActivities Should have thrown on null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail(
                 "getTranscriptActivities Should have thrown ArgumentNull exception on null"
@@ -55,8 +59,8 @@ public class TranscriptBaseTests {
         try {
             store.getTranscriptActivities("asdfds", null).join();
             Assert.fail("getTranscriptActivities Should have thrown on null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail(
                 "getTranscriptActivities Should have thrown ArgumentNull exception on null"
@@ -66,8 +70,8 @@ public class TranscriptBaseTests {
         try {
             store.listTranscripts(null).join();
             Assert.fail("listTranscripts Should have thrown on null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail("listTranscripts Should have thrown ArgumentNull exception on null");
         }
@@ -75,8 +79,8 @@ public class TranscriptBaseTests {
         try {
             store.deleteTranscript(null, null).join();
             Assert.fail("deleteTranscript Should have thrown on null channelId");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail(
                 "deleteTranscript Should have thrown ArgumentNull exception on null channelId"
@@ -86,8 +90,8 @@ public class TranscriptBaseTests {
         try {
             store.deleteTranscript("test", null).join();
             Assert.fail("deleteTranscript Should have thrown on null conversationId");
-        } catch (IllegalArgumentException e) {
-
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
         } catch (Throwable t) {
             Assert.fail(
                 "deleteTranscript Should have thrown ArgumentNull exception on null conversationId"

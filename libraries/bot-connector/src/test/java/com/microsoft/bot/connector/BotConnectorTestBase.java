@@ -1,9 +1,12 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.base.TestBase;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.schema.ChannelAccount;
-import com.microsoft.bot.rest.RestClient;
+import com.microsoft.bot.restclient.RestClient;
 
 public class BotConnectorTestBase extends TestBase {
     protected ConnectorClient connector;

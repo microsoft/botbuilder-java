@@ -12,6 +12,9 @@ public class AppBasedLinkQuery {
     @JsonProperty(value = "url")
     private String url;
 
+    @JsonProperty(value = "state")
+    private String state;
+
     /**
      * Initializes a new empty instance of the AppBasedLinkQuery class.
      */
@@ -44,5 +47,23 @@ public class AppBasedLinkQuery {
      */
     public void setUrl(String withUrl) {
         url = withUrl;
+    }
+
+    /**
+     * Gets the magic code for OAuth Flow.
+     *
+     * @return The state
+     */
+    public String getState() {
+        return state;
+    }
+
+    /**
+     * Sets the magic code for OAuth Flow.
+     *
+     * @param withState The state.
+     */
+    public void setState(String withState) {
+        state = withState;
     }
 }

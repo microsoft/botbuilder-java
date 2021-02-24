@@ -6,6 +6,7 @@ package com.microsoft.bot.builder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.bot.connector.Async;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -37,13 +38,16 @@ public abstract class BotState implements PropertyManager {
      */
     private Storage storage;
 
+    private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+
     /**
      * Initializes a new instance of the BotState class.
      *
      * @param withStorage           The storage provider to use.
      * @param withContextServiceKey The key for the state cache for this BotState.
+     * @throws IllegalArgumentException Null Storage or empty service key arguments.
      */
-    public BotState(Storage withStorage, String withContextServiceKey) {
+    public BotState(Storage withStorage, String withContextServiceKey) throws IllegalArgumentException {
         if (withStorage == null) {
             throw new IllegalArgumentException("Storage cannot be null");
         }
@@ -62,8 +66,9 @@ public abstract class BotState implements PropertyManager {
      * @param name name of property.
      * @param <T>  type of property.
      * @return A {@link StatePropertyAccessor} for the property.
+     * @throws IllegalArgumentException Empty name
      */
-    public <T extends Object> StatePropertyAccessor<T> createProperty(String name) {
+    public <T extends Object> StatePropertyAccessor<T> createProperty(String name) throws IllegalArgumentException {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException("name cannot be empty");
         }
@@ -92,24 +97,26 @@ public abstract class BotState implements PropertyManager {
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> load(TurnContext turnContext, boolean force) {
-        if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
-        }
+        return Async.tryCompletable(() -> {
+            if (turnContext == null) {
+                throw new IllegalArgumentException("turnContext cannot be null");
+            }
 
-        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        String storageKey = getStorageKey(turnContext);
-        if (force || cachedState == null || cachedState.getState() == null) {
-            return storage.read(new String[] {storageKey}).thenApply(val -> {
-                turnContext.getTurnState()
-                    .replace(
-                        contextServiceKey,
-                        new CachedBotState((Map<String, Object>) val.get(storageKey))
-                    );
-                return null;
-            });
-        }
+            CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+            String storageKey = getStorageKey(turnContext);
+            if (force || cachedState == null || cachedState.getState() == null) {
+                return storage.read(new String[]{storageKey}).thenApply(val -> {
+                    turnContext.getTurnState()
+                        .replace(
+                            contextServiceKey,
+                            new CachedBotState((Map<String, Object>) val.get(storageKey))
+                        );
+                    return null;
+                });
+            }
 
-        return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(null);
+        });
     }
 
     /**
@@ -132,26 +139,28 @@ public abstract class BotState implements PropertyManager {
      * @return A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> saveChanges(TurnContext turnContext, boolean force) {
-        if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
-        }
+        return Async.tryCompletable(() -> {
+            if (turnContext == null) {
+                throw new IllegalArgumentException("turnContext cannot be null");
+            }
 
-        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        if (force || cachedState != null && cachedState.isChanged()) {
-            String storageKey = getStorageKey(turnContext);
-            Map<String, Object> changes = new HashMap<String, Object>() {
-                {
-                    put(storageKey, cachedState.state);
-                }
-            };
+            CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+            if (force || cachedState != null && cachedState.isChanged()) {
+                String storageKey = getStorageKey(turnContext);
+                Map<String, Object> changes = new HashMap<String, Object>() {
+                    {
+                        put(storageKey, cachedState.state);
+                    }
+                };
 
-            return storage.write(changes).thenApply(val -> {
-                cachedState.setHash(cachedState.computeHash(cachedState.state));
-                return null;
-            });
-        }
+                return storage.write(changes).thenApply(val -> {
+                    cachedState.setHash(cachedState.computeHash(cachedState.state));
+                    return null;
+                });
+            }
 
-        return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(null);
+        });
     }
 
     /**
@@ -168,7 +177,9 @@ public abstract class BotState implements PropertyManager {
      */
     public CompletableFuture<Void> clearState(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         turnContext.getTurnState().replace(contextServiceKey, new CachedBotState());
@@ -183,7 +194,9 @@ public abstract class BotState implements PropertyManager {
      */
     public CompletableFuture<Void> delete(TurnContext turnContext) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         String storageKey = getStorageKey(turnContext);
@@ -210,7 +223,21 @@ public abstract class BotState implements PropertyManager {
 
         String stateKey = getClass().getSimpleName();
         CachedBotState cachedState = turnContext.getTurnState().get(stateKey);
-        return new ObjectMapper().valueToTree(cachedState.state);
+        return mapper.valueToTree(cachedState.state);
+    }
+
+    /**
+     * Gets the cached bot state instance that wraps the raw cached data for this BotState from the turn context.
+     *
+     * @param turnContext The context object for this turn.
+     * @return The cached bot state instance.
+     */
+    public CachedBotState getCachedState(TurnContext turnContext) {
+        if (turnContext == null) {
+            throw new IllegalArgumentException("turnContext cannot be null");
+        }
+
+        return turnContext.getTurnState().get(contextServiceKey);
     }
 
     /**
@@ -219,8 +246,9 @@ public abstract class BotState implements PropertyManager {
      *
      * @param turnContext The context object for this turn.
      * @return The storage key.
+     * @throws IllegalArgumentException TurnContext doesn't contain all the required data.
      */
-    public abstract String getStorageKey(TurnContext turnContext);
+    public abstract String getStorageKey(TurnContext turnContext) throws IllegalArgumentException;
 
     /**
      * Gets the value of a property from the state cache for this BotState.
@@ -236,16 +264,22 @@ public abstract class BotState implements PropertyManager {
         String propertyName
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null"
+            ));
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            throw new IllegalArgumentException("propertyName cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "propertyName cannot be empty"
+            ));
         }
 
-        CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
-        return (CompletableFuture<T>) CompletableFuture
-            .completedFuture(cachedState.getState().get(propertyName));
+        return Async.tryCompletable(() -> {
+            CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
+            return (CompletableFuture<T>) CompletableFuture
+                .completedFuture(cachedState.getState().get(propertyName));
+        });
     }
 
     /**
@@ -260,11 +294,15 @@ public abstract class BotState implements PropertyManager {
         String propertyName
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "TurnContext cannot be null."
+            ));
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            throw new IllegalArgumentException("propertyName cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "propertyName cannot be empty"
+            ));
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
@@ -286,11 +324,15 @@ public abstract class BotState implements PropertyManager {
         Object value
     ) {
         if (turnContext == null) {
-            throw new IllegalArgumentException("turnContext cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "turnContext cannot be null."
+            ));
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            throw new IllegalArgumentException("propertyName cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "propertyName cannot be empty"
+            ));
         }
 
         CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
@@ -301,7 +343,7 @@ public abstract class BotState implements PropertyManager {
     /**
      * Internal cached bot state.
      */
-    private static class CachedBotState {
+    public static class CachedBotState {
         /**
          * In memory cache of BotState properties.
          */
@@ -315,7 +357,7 @@ public abstract class BotState implements PropertyManager {
         /**
          * Object-JsonNode converter.
          */
-        private ObjectMapper mapper = new ObjectMapper();
+        private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         /**
          * Construct with empty state.
@@ -334,26 +376,46 @@ public abstract class BotState implements PropertyManager {
             hash = computeHash(withState);
         }
 
-        Map<String, Object> getState() {
+        /**
+         * @return The Map of key value pairs which are the state.
+         */
+        public Map<String, Object> getState() {
             return state;
         }
 
+        /**
+         * @param withState The key value pairs to set the state with.
+         */
         void setState(Map<String, Object> withState) {
             state = withState;
         }
 
+        /**
+         * @return The hash value for the state.
+         */
         String getHash() {
             return hash;
         }
 
+        /**
+         * @param witHashCode Set the hash value.
+         */
         void setHash(String witHashCode) {
             hash = witHashCode;
         }
 
+        /**
+         *
+         * @return Boolean to tell if the state has changed.
+         */
         boolean isChanged() {
             return !StringUtils.equals(hash, computeHash(state));
         }
 
+        /**
+         * @param obj The object to compute the hash for.
+         * @return The computed has for the provided object.
+         */
         String computeHash(Object obj) {
             if (obj == null) {
                 return "";

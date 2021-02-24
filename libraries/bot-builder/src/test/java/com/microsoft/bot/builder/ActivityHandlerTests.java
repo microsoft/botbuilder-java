@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.*;
@@ -7,6 +10,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
+import org.mockito.internal.matchers.Not;
 
 public class ActivityHandlerTests {
     @Test
@@ -31,6 +37,94 @@ public class ActivityHandlerTests {
 
         Assert.assertEquals(1, bot.getRecord().size());
         Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+    }
+
+    @Test
+    public void TestInstallationUpdateAdd() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("add");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateAdd", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateAddUpgrade() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("add-upgrade");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateAdd", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateRemove() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("remove");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateRemove", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestInstallationUpdateRemoveUpgrade() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INSTALLATION_UPDATE);
+                setAction("remove-upgrade");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
+        Assert.assertEquals("onInstallationUpdateRemove", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestOnTypingActivity() {
+        Activity activity = new Activity(ActivityTypes.TYPING);
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(1, bot.getRecord().size());
+        Assert.assertEquals("onTypingActivity", bot.getRecord().get(0));
     }
 
     @Test
@@ -334,6 +428,98 @@ public class ActivityHandlerTests {
         Assert.assertEquals("onUnrecognizedActivityType", bot.getRecord().get(0));
     }
 
+    @Test
+    public void TestHealthCheckAsyncOverride() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INVOKE);
+                setName("healthCheck");
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new TestInvokeAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInvokeActivity", bot.getRecord().get(0));
+        Assert.assertEquals("onHealthCheck", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestHealthCheckAsync() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INVOKE);
+                setName("healthCheck");
+            }
+        };
+
+        AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
+        TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(activitiesToSend::set), activity);
+
+        ActivityHandler bot = new ActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertNotNull(activitiesToSend.get());
+        Assert.assertEquals(1, activitiesToSend.get().size());
+        Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
+        Assert.assertEquals(200, ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus());
+        CompletableFuture future = ((CompletableFuture) ((InvokeResponse) activitiesToSend.get().get(0).getValue())
+                .getBody());
+        HealthCheckResponse result = new HealthCheckResponse();
+        result = (HealthCheckResponse) future.join();
+        Assert.assertTrue(result.getHealthResults().getSuccess());
+        String[] messages = result.getHealthResults().getMessages();
+        Assert.assertEquals(messages[0], "Health check succeeded.");
+    }
+
+    @Test
+    public void TestHealthCheckWithConnectorAsync() {
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INVOKE);
+                setName("healthCheck");
+            }
+        };
+
+        AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
+        TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(activitiesToSend::set), activity);
+        MockConnectorClient mockConnector = new MockConnectorClient("Windows/3.1", new MockAppCredentials("awesome"));
+        turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, mockConnector);
+        ActivityHandler bot = new ActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertNotNull(activitiesToSend.get());
+        Assert.assertEquals(1, activitiesToSend.get().size());
+        Assert.assertTrue(activitiesToSend.get().get(0).getValue() instanceof InvokeResponse);
+        Assert.assertEquals(
+            200,
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getStatus()
+        );
+        CompletableFuture<HealthCheckResponse> future =
+            ((CompletableFuture<HealthCheckResponse>)
+            ((InvokeResponse) activitiesToSend.get().get(0).getValue()).getBody());
+        HealthCheckResponse result = new HealthCheckResponse();
+        result = (HealthCheckResponse) future.join();
+        Assert.assertTrue(result.getHealthResults().getSuccess());
+        Assert.assertEquals(result.getHealthResults().getAuthorization(), "awesome");
+        Assert.assertEquals(result.getHealthResults().getUserAgent(), "Windows/3.1");
+        String[] messages = result.getHealthResults().getMessages();
+        Assert.assertEquals(messages[0], "Health check succeeded.");
+    }
+
+    private static class TestInvokeAdapter extends NotImplementedAdapter {
+        @Override
+        public CompletableFuture<ResourceResponse[]> sendActivities(
+            TurnContext context,
+            List<Activity> activities
+        ) {
+            return CompletableFuture.completedFuture(new ResourceResponse[0]);
+        }
+    }
+
     private static class NotImplementedAdapter extends BotAdapter {
         @Override
         public CompletableFuture<ResourceResponse[]> sendActivities(
@@ -444,9 +630,39 @@ public class ActivityHandlerTests {
         }
 
         @Override
+        protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
+            record.add("onInvokeActivity");
+            return super.onInvokeActivity(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<HealthCheckResponse> onHealthCheck(TurnContext turnContext) {
+            record.add("onHealthCheck");
+            return super.onHealthCheck(turnContext);
+        }
+
+        @Override
         protected CompletableFuture onInstallationUpdate(TurnContext turnContext) {
             record.add("onInstallationUpdate");
             return super.onInstallationUpdate(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onInstallationUpdateAdd(TurnContext turnContext) {
+            record.add("onInstallationUpdateAdd");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+            record.add("onInstallationUpdateRemove");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        @Override
+        protected CompletableFuture onTypingActivity(TurnContext turnContext) {
+            record.add("onTypingActivity");
+            return super.onTypingActivity(turnContext);
         }
 
         @Override

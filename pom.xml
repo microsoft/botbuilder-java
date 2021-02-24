@@ -5,7 +5,7 @@
 
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-java</artifactId>
-  <version>4.6.0-preview6</version>
+  <version>4.6.0-preview9</version>
   <packaging>pom</packaging>
 
   <name>Microsoft BotBuilder Java SDK Parent</name>
@@ -19,7 +19,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <checkstyle.version>3.1.0</checkstyle.version>
-    <pmd.version>3.12.0</pmd.version>
+    <pmd.version>3.14.0</pmd.version>
+    <repo.id>MyGet</repo.id>
     <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url>
   </properties>
 
@@ -147,6 +148,19 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>cobertura-maven-plugin</artifactId>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -216,41 +230,35 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>3.0.0</version>
+        <version>3.8.0</version>
         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.microsoft.azure</groupId>
-        <artifactId>msal4j</artifactId>
-        <version>0.5.0-preview</version>
       </dependency>
 
       <dependency>
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-parameter-names</artifactId>
-        <version>2.9.9</version>
+        <version>2.12.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jdk8</artifactId>
-        <version>2.9.9</version>
+        <version>2.12.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>2.9.9</version>
+        <version>2.12.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.9.10.5</version>
+        <version>2.12.1</version>
       </dependency>
 
       <dependency>
@@ -261,12 +269,12 @@
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.8.2</version>
+        <version>3.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>jwks-rsa</artifactId>
-        <version>0.8.3</version>
+        <version>0.15.0</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -281,7 +289,12 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.6</version>
+        <version>2.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>30.1-jre</version>
       </dependency>
 
       <dependency>
@@ -300,6 +313,28 @@
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>
         <version>2.13.2</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>3.12.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>logging-interceptor</artifactId>
+        <version>3.12.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp-urlconnection</artifactId>
+        <version>3.12.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>mockwebserver</artifactId>
+        <version>3.12.2</version>
         <scope>test</scope>
       </dependency>
 
@@ -343,13 +378,24 @@
         <artifactId>bot-applicationinsights</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-ai-qna</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <repositories>
     <repository>
-      <id>MyGet</id>
+      <id>${repo.id}</id>
       <url>${repo.url}</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -357,7 +403,9 @@
     <repository>
 <!--      <id>ossrh</id>-->
 <!--      <url>https://oss.sonatype.org/</url>-->
-      <id>MyGet</id>
+<!--      <id>MyGet</id>-->
+<!--      <url>${repo.url}</url>-->
+      <id>${repo.id}</id>
       <url>${repo.url}</url>
     </repository>
   </distributionManagement>
@@ -470,9 +518,6 @@
               <coberturaReport>
                 ./cobertura-report/bot-connector/coverage.xml
               </coberturaReport>
-              <coberturaReport>
-                ./cobertura-report/bot-connector-sample/coverage.xml
-              </coberturaReport>
             </coberturaReports>
 
             <sourceEncoding>UTF-8</sourceEncoding>
@@ -550,12 +595,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.7.1</version>
+          <version>3.9.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.1</version>
         </plugin>
 
       </plugins>

@@ -194,7 +194,9 @@ public interface Conversations {
      */
     default CompletableFuture<ResourceResponse> replyToActivity(Activity activity) {
         if (StringUtils.isEmpty(activity.getReplyToId())) {
-            throw new IllegalArgumentException("ReplyToId cannot be empty");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "ReplyToId cannot be empty"
+            ));
         }
 
         return replyToActivity(
@@ -210,7 +212,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param activityId     activityId to delete
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if
+     * @return the {@link com.microsoft.bot.restclient.ServiceResponse} object if
      *         successful.
      */
     CompletableFuture<Void> deleteActivity(String conversationId, String activityId);
@@ -228,7 +230,7 @@ public interface Conversations {
 
     /**
      * Retrieves a single member of a conversation by ID.
-     * 
+     *
      * @param userId         The user id.
      * @param conversationId The conversation id.
      * @return The ChannelAccount for the user.
@@ -244,7 +246,7 @@ public interface Conversations {
      * @param conversationId Conversation ID
      * @param memberId       ID of the member to delete from this conversation
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link com.microsoft.bot.rest.ServiceResponse} object if
+     * @return the {@link com.microsoft.bot.restclient.ServiceResponse} object if
      *         successful.
      */
     CompletableFuture<Void> deleteConversationMember(String conversationId, String memberId);

@@ -3,6 +3,9 @@
 
 package com.microsoft.bot.sample.teamssearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
 import com.microsoft.bot.schema.*;
@@ -12,10 +15,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
  * added.  This sample illustrates how to build a Search-based Messaging Extension.</p>
  */
 
-@Component
 public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
 
     @Override
@@ -46,11 +45,14 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
             .thenApply(packages -> {
                 List<MessagingExtensionAttachment> attachments = new ArrayList<>();
                 for (String[] item : packages) {
+                    ObjectNode data = Serialization.createObjectNode();
+                    data.set("data", Serialization.objectToTree(item));
+
                     ThumbnailCard previewCard = new ThumbnailCard() {{
                         setTitle(item[0]);
                         setTap(new CardAction() {{
                             setType(ActionTypes.INVOKE);
-                            setValue(new JSONObject().put("data", item).toString());
+                            setValue(Serialization.toStringSilent(data));
                         }});
                     }};
 
@@ -131,23 +133,22 @@ public class TeamsMessagingExtensionsSearchBot extends TeamsActivityHandler {
                     ))
                 .build();
 
-            List<String[]> filteredItems = new ArrayList<String[]>();
+            List<String[]> filteredItems = new ArrayList<>();
             try {
                 Response response = client.newCall(request).execute();
-                JSONObject obj = new JSONObject(response.body().string());
-                JSONArray dataArray = (JSONArray) obj.get("data");
+                JsonNode obj = Serialization.jsonToTree(response.body().string());
+                ArrayNode dataArray = (ArrayNode) obj.get("data");
 
-                dataArray.forEach(i -> {
-                    JSONObject item = (JSONObject) i;
-                    filteredItems.add(new String[]{
-                        item.getString("id"),
-                        item.getString("version"),
-                        item.getString("description"),
-                        item.has("projectUrl") ? item.getString("projectUrl") : "",
-                        item.has("iconUrl") ? item.getString("iconUrl") : ""
+                for (int i = 0; i < dataArray.size(); i++) {
+                    JsonNode item = dataArray.get(i);
+                    filteredItems.add(new String[] {
+                        item.get("id").asText(),
+                        item.get("version").asText(),
+                        item.get("description").asText(),
+                        item.has("projectUrl") ? item.get("projectUrl").asText() : "",
+                        item.has("iconUrl") ? item.get("iconUrl").asText() : ""
                     });
-                });
-
+                }
             } catch (IOException e) {
                 LoggerFactory.getLogger(TeamsMessagingExtensionsSearchBot.class)
                     .error("findPackages", e);

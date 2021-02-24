@@ -1,6 +1,6 @@
 # ![Bot Framework for Java](./docs/media/BotFrameworkJava_header.png)
 
-This repository contains code for the Java version (currently in preview) of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences. 
+This repository contains code for the Java version (currently in preview) of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
 This SDK enables developers to model conversation and build sophisticated bot applications using JavaScript. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
 
@@ -18,7 +18,7 @@ For more information jump to a section below.
 
  | Branch | Description | Build Status | Coverage Status |
  |--------|-------------|--------------|-----------------|
- |Master | Preview 6 Builds | [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=master)](https://travis-ci.org/Microsoft/botbuilder-java) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
+ |Main | Preview 8 Builds | [![Build Status](https://travis-ci.org/Microsoft/botbuilder-java.svg?branch=main)](https://travis-ci.org/Microsoft/botbuilder-java) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
 
 ## Getting Started
 To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
@@ -81,12 +81,12 @@ CheckStyle is available in different flavours:
 Below are the various channels that are available to you for obtaining support and providing feedback. Please pay carful attention to which channel should be used for which type of content. e.g. general "how do I..." questions should be asked on Stack Overflow, Twitter or Gitter, with GitHub issues being for feature requests and bug reports.
 
 ### Github issues
-[Github issues](https://github.com/Microsoft/botbuilder-python/issues) should be used for bugs and feature requests. 
+[Github issues](https://github.com/Microsoft/botbuilder-python/issues) should be used for bugs and feature requests.
 
 ### Stack overflow
 [Stack Overflow](https://stackoverflow.com/questions/tagged/botframework) is a great place for getting high-quality answers. Our support team, as well as many of our community members are already on Stack Overflow providing answers to 'how-to' questions.
 
-### Azure Support 
+### Azure Support
 If you issues relates to [Azure Bot Service](https://azure.microsoft.com/en-gb/services/bot-service/), you can take advantage of the available [Azure support options](https://azure.microsoft.com/en-us/support/options/).
 
 ### Twitter
@@ -98,15 +98,15 @@ The [Gitter Channel](https://gitter.im/Microsoft/BotBuilder) provides a place wh
 ## Contributing and our code of conduct
 We welcome contributions and suggestions. Please see our [contributing guidelines](./contributing.md) for more information.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
  [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Reporting Security Issues
-Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) 
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC)
 at [secure@microsoft.com](mailto:secure@microsoft.com).  You should receive a response within 24 hours.  If for some
- reason you do not, please follow up via email to ensure we received your original message. Further information, 
- including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the 
+ reason you do not, please follow up via email to ensure we received your original message. Further information,
+ including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the
 [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
 Copyright (c) Microsoft Corporation. All rights reserved.

@@ -159,7 +159,9 @@
         <!-- See http://checkstyle.sourceforge.net/config_coding.html -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
-        <module name="HiddenField"/>
+        <module name="HiddenField">
+          <property name="tokens" value="VARIABLE_DEF"/>
+        </module>
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
@@ -182,6 +184,8 @@
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 
+        <!-- check for usage of literal equality "==" between string -->
+        <module name="StringLiteralEquality"/>
     </module>
 
 </module>

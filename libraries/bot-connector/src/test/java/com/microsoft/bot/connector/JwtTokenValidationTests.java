@@ -98,8 +98,8 @@ public class JwtTokenValidationTests {
                 "",
                 null).join();
             Assert.fail("Should have thrown IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("authHeader"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("authHeader"));
         }
     }
 
@@ -582,27 +582,17 @@ public class JwtTokenValidationTests {
     }
 
     private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String appId, String pwd, String channelService) throws IOException, ExecutionException, InterruptedException {
-        ChannelProvider channel = new SimpleChannelProvider(channelService);
-        String header = channel.isGovernment() ? getGovHeaderToken() : getHeaderToken();
-
-        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(header, appId, pwd, channel);
+        String header = "Bearer " + new MicrosoftAppCredentials(appId, pwd).getToken().join();
+        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(header, appId, pwd, channelService);
     }
 
-    private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String header, String appId, String pwd, ChannelProvider channel) {
+    private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(String header, String appId, String pwd, String channelService) {
         CredentialProvider credentials = new SimpleCredentialProvider(appId, pwd);
+        ChannelProvider channel = new SimpleChannelProvider(channelService);
 
-        try {
-            ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
-                header,
-                credentials,
-                channel,
-                "",
-                "https://webchat.botframework.com/").join();
+        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(header, credentials, channel, null, "https://webchat.botframework.com/").join();
 
-            Assert.assertTrue(identity.isAuthenticated());
-        } catch (Exception e) {
-            Assert.fail("Should not have thrown " + e.getClass().getName());
-        }
+        Assert.assertTrue(identity.isAuthenticated());
     }
 
     private void JwtTokenValidation_ValidateAuthHeader_WithChannelService_Throws(String header, String appId, String pwd, String channelService) throws ExecutionException, InterruptedException {

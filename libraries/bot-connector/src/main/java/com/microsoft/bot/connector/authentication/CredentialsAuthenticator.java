@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.aad.msal4j.ClientCredentialFactory;
@@ -13,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
  * An Authenticator using app id and password.
  */
 public class CredentialsAuthenticator implements Authenticator {
-    private ConfidentialClientApplication app;
-    private ClientCredentialParameters parameters;
+    private final ConfidentialClientApplication app;
+    private final ClientCredentialParameters parameters;
 
     /**
      * Constructs an Authenticator using appId and appPassword.
@@ -28,7 +31,7 @@ public class CredentialsAuthenticator implements Authenticator {
         throws MalformedURLException {
 
         app = ConfidentialClientApplication
-            .builder(appId, ClientCredentialFactory.create(appPassword))
+            .builder(appId, ClientCredentialFactory.createFromSecret(appPassword))
             .authority(configuration.getAuthority())
             .build();
 

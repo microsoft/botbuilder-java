@@ -6,14 +6,16 @@
 
 package com.microsoft.bot.connector.rest;
 
+import com.microsoft.bot.connector.Async;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.UserToken;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.schema.AadResourceUrls;
+import com.microsoft.bot.schema.TokenExchangeRequest;
 import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
-import com.microsoft.bot.rest.ServiceResponse;
-import com.microsoft.bot.rest.Validator;
+import com.microsoft.bot.restclient.ServiceResponse;
+import com.microsoft.bot.restclient.Validator;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -68,6 +70,17 @@ public class RestUserToken implements UserToken {
         );
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
+        "x-ms-logging-context: com.microsoft.bot.schema.UserTokens exchangeToken" })
+        @GET("api/usertoken/GetToken")
+        CompletableFuture<Response<ResponseBody>> exchangeToken(
+            @Query("userId") String userId,
+            @Query("connectionName") String connectionName,
+            @Query("channelId") String channelId,
+            @Body TokenExchangeRequest exchangeRequest
+        );
+
+
+        @Headers({ "Content-Type: application/json; charset=utf-8",
             "x-ms-logging-context: com.microsoft.bot.schema.UserTokens getAadTokens" })
         @POST("api/usertoken/GetAadTokens")
         CompletableFuture<Response<ResponseBody>> getAadTokens(
@@ -111,13 +124,16 @@ public class RestUserToken implements UserToken {
     @Override
     public CompletableFuture<TokenResponse> getToken(String userId, String connectionName) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter connectionName is required and cannot be null."
-            );
+            ));
         }
+
         final String channelId = null;
         final String code = null;
         return service.getToken(userId, connectionName, channelId, code)
@@ -149,13 +165,16 @@ public class RestUserToken implements UserToken {
         String code
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter connectionName is required and cannot be null."
-            );
+            ));
         }
+
         return service.getToken(userId, connectionName, channelId, code)
             .thenApply(responseBodyResponse -> {
                 try {
@@ -186,6 +205,71 @@ public class RestUserToken implements UserToken {
 
     /**
      *
+     * @param userId            the String value
+     * @param connectionName    the String value
+     * @param channelId         the String value
+     * @param exchangeRequest   a TokenExchangeRequest
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the TokenResponse object
+     */
+    @Override
+    public CompletableFuture<TokenResponse> exchangeToken(
+        String userId,
+        String connectionName,
+        String channelId,
+        TokenExchangeRequest exchangeRequest
+    ) {
+        if (userId == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
+        }
+        if (connectionName == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter connectionName is required and cannot be null."
+            ));
+        }
+        if (channelId == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter channelId is required and cannot be null."
+            ));
+        }
+        if (exchangeRequest == null) {
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter exchangeRequest is required and cannot be null."
+            ));
+        }
+
+        return service.exchangeToken(userId, connectionName, channelId, exchangeRequest)
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return exchangeTokenDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("getToken", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<TokenResponse> exchangeTokenDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return this.client.restClient()
+            .responseBuilderFactory()
+            .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_NOT_FOUND, new TypeToken<TokenResponse>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     *
      * @param userId          the String value
      * @param connectionName  the String value
      * @param aadResourceUrls the AadResourceUrls value
@@ -199,18 +283,21 @@ public class RestUserToken implements UserToken {
         AadResourceUrls aadResourceUrls
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter connectionName is required and cannot be null."
-            );
+            ));
         }
         if (aadResourceUrls == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter aadResourceUrls is required and cannot be null."
-            );
+            ));
         }
+
         Validator.validate(aadResourceUrls);
         final String channelId = null;
         return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
@@ -242,29 +329,35 @@ public class RestUserToken implements UserToken {
         String channelId
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter connectionName is required and cannot be null."
-            );
+            ));
         }
         if (aadResourceUrls == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter aadResourceUrls is required and cannot be null."
-            );
+            ));
         }
-        Validator.validate(aadResourceUrls);
-        return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
-            .thenApply(responseBodyResponse -> {
-                try {
-                    return getAadTokensDelegate(responseBodyResponse).body();
-                } catch (ErrorResponseException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new ErrorResponseException("getAadTokens", responseBodyResponse);
-                }
-            });
+
+        return Async.tryCompletable(() -> {
+            Validator.validate(aadResourceUrls);
+            return service.getAadTokens(userId, connectionName, aadResourceUrls, channelId)
+                .thenApply(responseBodyResponse -> {
+                    try {
+                        return getAadTokensDelegate(responseBodyResponse).body();
+                    } catch (ErrorResponseException e) {
+                        throw e;
+                    } catch (Throwable t) {
+                        throw new ErrorResponseException("getAadTokens", responseBodyResponse);
+                    }
+
+                });
+        });
     }
 
     private ServiceResponse<Map<String, TokenResponse>> getAadTokensDelegate(
@@ -292,7 +385,9 @@ public class RestUserToken implements UserToken {
     @Override
     public CompletableFuture<Object> signOut(String userId) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
 
         return service.signOut(userId).thenApply(responseBodyResponse -> {
@@ -321,17 +416,19 @@ public class RestUserToken implements UserToken {
         String channelId
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
         if (connectionName == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter connectionName is required and cannot be null."
-            );
+            ));
         }
         if (channelId == null) {
-            throw new IllegalArgumentException(
+            return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter channelId is required and cannot be null."
-            );
+            ));
         }
 
         return service.signOut(userId, connectionName, channelId)
@@ -371,8 +468,11 @@ public class RestUserToken implements UserToken {
     @Override
     public CompletableFuture<List<TokenStatus>> getTokenStatus(String userId) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
+
         final String channelId = null;
         final String include = null;
         return service.getTokenStatus(userId, channelId, include)
@@ -402,8 +502,11 @@ public class RestUserToken implements UserToken {
         String include
     ) {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is required and cannot be null.");
+            return Async.completeExceptionally(new IllegalArgumentException(
+                "Parameter userId is required and cannot be null."
+            ));
         }
+
         return service.getTokenStatus(userId, channelId, include)
             .thenApply(responseBodyResponse -> {
                 try {

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * State object passed to the bot token service.
  */
 public class TokenExchangeState {
-    @JsonProperty("msAppId")
+    @JsonProperty(value = "msAppId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String msAppId;
 
@@ -22,11 +22,11 @@ public class TokenExchangeState {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference conversation;
 
-    @JsonProperty("botUrl")
+    @JsonProperty(value = "botUrl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String botUrl;
 
-    @JsonProperty("relatesTo")
+    @JsonProperty(value = "relatesTo")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ConversationReference relatesTo;
 

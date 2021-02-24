@@ -9,6 +9,7 @@ import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationAccount;
+import java.util.concurrent.CompletionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -553,7 +554,7 @@ public class BotStateTests {
         }).send(Activity.createConversationUpdateActivity()).startTest().join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void UserState_NullChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         UserState userState = new UserState(new MemoryStorage(dictionary));
@@ -563,7 +564,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void UserState_EmptyChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         UserState userState = new UserState(new MemoryStorage(dictionary));
@@ -573,7 +574,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void UserState_NullFromThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         UserState userState = new UserState(new MemoryStorage(dictionary));
@@ -583,7 +584,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void UserState_NullFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         UserState userState = new UserState(new MemoryStorage(dictionary));
@@ -593,7 +594,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void UserState_EmptyFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         UserState userState = new UserState(new MemoryStorage(dictionary));
@@ -603,7 +604,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void ConversationState_NullConversationThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
@@ -615,7 +616,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void ConversationState_NullConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
@@ -627,7 +628,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void ConversationState_EmptyConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
@@ -639,7 +640,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void ConversationState_NullChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
@@ -651,7 +652,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void ConversationState_EmptyChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         ConversationState conversationState = new ConversationState(new MemoryStorage(dictionary));
@@ -663,7 +664,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_NullChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -675,7 +676,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_EmptyChannelIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -687,7 +688,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_NullFromThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -699,7 +700,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_NullFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -711,7 +712,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_EmptyFromIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -723,7 +724,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_NullConversationThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -735,7 +736,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_NullConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(
@@ -747,7 +748,7 @@ public class BotStateTests {
         TestPocoState value = testProperty.get(context).join();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CompletionException.class)
     public void PrivateConversationState_EmptyConversationIdThrows() {
         Map<String, JsonNode> dictionary = new HashMap<>();
         PrivateConversationState botState = new PrivateConversationState(

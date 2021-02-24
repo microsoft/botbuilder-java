@@ -34,21 +34,35 @@ public class RecognizerResult implements RecognizerConvert {
     private HashMap<String, JsonNode> properties = new HashMap<>();
 
     /**
+     * Holds intent score info.
+     */
+    @SuppressWarnings({ "checkstyle:VisibilityModifier" })
+    public static class NamedIntentScore {
+        /// The intent name
+        public String intent;
+
+        /// The intent score
+        public double score;
+    }
+
+    /**
      * Return the top scoring intent and its score.
      * 
      * @return The top scoring intent and score.
+     * @throws IllegalArgumentException No intents available.
      */
     @JsonIgnore
-    public IntentScore getTopScoringIntent() {
+    public NamedIntentScore getTopScoringIntent() throws IllegalArgumentException {
         if (getIntents() == null) {
             throw new IllegalArgumentException("RecognizerResult.Intents cannot be null");
         }
 
-        IntentScore topIntent = new IntentScore();
+        NamedIntentScore topIntent = new NamedIntentScore();
         for (Map.Entry<String, IntentScore> intent : getIntents().entrySet()) {
             double score = intent.getValue().getScore();
-            if (score > topIntent.getScore()) {
-                topIntent = intent.getValue();
+            if (score > topIntent.score) {
+                topIntent.intent = intent.getKey();
+                topIntent.score = intent.getValue().getScore();
             }
         }
 

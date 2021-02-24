@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ConversationReference;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Represents a bot adapter that can connect a bot to a service endpoint. This
@@ -187,10 +189,16 @@ public abstract class BotAdapter {
         TurnContext context,
         BotCallbackHandler callback
     ) {
-        BotAssert.contextNotNull(context);
+        if (context == null) {
+            return Async.completeExceptionally(new IllegalArgumentException("TurnContext"));
+        }
 
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
+            if (!StringUtils.isEmpty(context.getActivity().getLocale())) {
+                context.setLocale(context.getActivity().getLocale());
+            }
+
             return middlewareSet.receiveActivityWithStatus(context, callback)
                 .exceptionally(exception -> {
                     if (onTurnError != null) {
@@ -261,9 +269,7 @@ public abstract class BotAdapter {
         ConversationReference reference,
         BotCallbackHandler callback
     ) {
-        CompletableFuture<Void> result = new CompletableFuture<>();
-        result.completeExceptionally(new NotImplementedException("continueConversation"));
-        return result;
+        return Async.completeExceptionally(new NotImplementedException("continueConversation"));
     }
 
     /**
@@ -288,8 +294,80 @@ public abstract class BotAdapter {
         String audience,
         BotCallbackHandler callback
     ) {
-        CompletableFuture<Void> result = new CompletableFuture<>();
-        result.completeExceptionally(new NotImplementedException("continueConversation"));
-        return result;
+        return Async.completeExceptionally(new NotImplementedException("continueConversation"));
+    }
+
+    /**
+     * Sends a proactive message to a conversation.
+     *
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     *
+     * @param botId The application ID of the bot. This parameter is ignored in single tenant
+     *              the Adapters (Console, Test, etc) but is critical to the BotFrameworkAdapter
+     *              which is multi-tenant aware.
+     * @param continuationActivity  An Activity with the appropriate ConversationReference with
+     *                              which to continue the conversation.
+     * @param callback       The method to call for the result bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> continueConversation(
+        String botId,
+        Activity continuationActivity,
+        BotCallbackHandler callback
+    ) {
+        return Async.completeExceptionally(new NotImplementedException("continueConversation"));
+    }
+
+    /**
+     * Sends a proactive message to a conversation.
+     *
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     *
+     * @param claimsIdentity A ClaimsIdentity for the conversation.
+     * @param continuationActivity  An Activity with the appropriate ConversationReference with
+     *                              which to continue the conversation.
+     * @param callback       The method to call for the result bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> continueConversation(
+        ClaimsIdentity claimsIdentity,
+        Activity continuationActivity,
+        BotCallbackHandler callback
+    ) {
+        return Async.completeExceptionally(new NotImplementedException("continueConversation"));
+    }
+
+    /**
+     * Sends a proactive message to a conversation.
+     *
+     * <p>
+     * Call this method to proactively send a message to a conversation. Most
+     * channels require a user to initiate a conversation with a bot before the bot
+     * can send activities to the user.
+     * </p>
+     *
+     * @param claimsIdentity A ClaimsIdentity for the conversation.
+     * @param continuationActivity  An Activity with the appropriate ConversationReference with
+     *                              which to continue the conversation.
+     * @param audience       A value signifying the recipient of the proactive
+     *                       message.
+     * @param callback       The method to call for the result bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> continueConversation(
+        ClaimsIdentity claimsIdentity,
+        Activity continuationActivity,
+        String audience,
+        BotCallbackHandler callback
+    ) {
+        return Async.completeExceptionally(new NotImplementedException("continueConversation"));
     }
 }

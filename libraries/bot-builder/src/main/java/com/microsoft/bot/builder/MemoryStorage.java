@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.connector.Async;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +84,7 @@ public class MemoryStorage implements Storage {
     @Override
     public CompletableFuture<Map<String, Object>> read(String[] keys) {
         if (keys == null) {
-            throw new IllegalArgumentException("keys cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException("keys cannot be null"));
         }
 
         Map<String, Object> storeItems = new ConcurrentHashMap<>(keys.length);
@@ -96,10 +97,10 @@ public class MemoryStorage implements Storage {
                             // Check if type info is set for the class
                             if (!(stateNode.hasNonNull(TYPENAMEFORNONENTITY))) {
                                 logger.error("Read failed: Type info not present for " + key);
-                                throw new RuntimeException(
+                                return Async.completeExceptionally(new RuntimeException(
                                     String
                                         .format("Read failed: Type info not present for key " + key)
-                                );
+                                ));
                             }
                             String clsName = stateNode.get(TYPENAMEFORNONENTITY).textValue();
 
@@ -109,18 +110,18 @@ public class MemoryStorage implements Storage {
                                 cls = Class.forName(clsName);
                             } catch (ClassNotFoundException e) {
                                 logger.error("Read failed: Could not load class {}", clsName);
-                                throw new RuntimeException(
+                                return Async.completeExceptionally(new RuntimeException(
                                     String.format("Read failed: Could not load class %s", clsName)
-                                );
+                                ));
                             }
 
                             // Populate dictionary
                             storeItems.put(key, objectMapper.treeToValue(stateNode, cls));
                         } catch (JsonProcessingException e) {
                             logger.error("Read failed: {}", e.toString());
-                            throw new RuntimeException(
+                            return Async.completeExceptionally(new RuntimeException(
                                 String.format("Read failed: %s", e.toString())
-                            );
+                            ));
                         }
                     }
                 }
@@ -164,13 +165,12 @@ public class MemoryStorage implements Storage {
                         oldStateETag != null && !StringUtils.equals(newStoreItem.getETag(), "*")
                             && !StringUtils.equals(newStoreItem.getETag(), oldStateETag)
                     ) {
-
                         String msg = String.format(
                             "eTag conflict. Original: %s, Current: %s", newStoreItem.getETag(),
                             oldStateETag
                         );
                         logger.error(msg);
-                        throw new RuntimeException(msg);
+                        return Async.completeExceptionally(new RuntimeException(msg));
                     }
                     int newTag = eTag++;
                     ((ObjectNode) newState).put("eTag", Integer.toString(newTag));
@@ -192,7 +192,7 @@ public class MemoryStorage implements Storage {
     @Override
     public CompletableFuture<Void> delete(String[] keys) {
         if (keys == null) {
-            throw new IllegalArgumentException("keys cannot be null");
+            return Async.completeExceptionally(new IllegalArgumentException("keys cannot be null"));
         }
 
         synchronized (this.syncroot) {

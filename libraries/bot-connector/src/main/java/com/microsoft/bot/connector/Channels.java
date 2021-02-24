@@ -27,6 +27,11 @@ public final class Channels {
     public static final String DIRECTLINE = "directline";
 
     /**
+     * Direct Line Speech channel.
+     */
+    public static final String DIRECTLINESPEECH = "directlinespeech";
+
+    /**
      * Email channel.
      */
     public static final String EMAIL = "email";

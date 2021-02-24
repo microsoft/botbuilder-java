@@ -123,8 +123,8 @@ public class ConversationsTest extends BotConnectorTestBase {
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -178,8 +178,8 @@ public class ConversationsTest extends BotConnectorTestBase {
         try {
             List<ChannelAccount> members = connector.getConversations().getConversationMembers(null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -328,20 +328,20 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            connector.getConversations().sendToConversation(null, activity);
+            connector.getConversations().sendToConversation(null, activity).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
     @Test
     public void SendToConversationWithNullActivity() {
         try {
-            connector.getConversations().sendToConversation("id",null);
+            connector.getConversations().sendToConversation("id",null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -452,20 +452,20 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetActivityMembersWithNullConversationId() {
         try {
-            connector.getConversations().getActivityMembers(null, "id");
+            connector.getConversations().getActivityMembers(null, "id").join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
     @Test
     public void GetActivityMembersWithNullActivityId() {
         try {
-            connector.getConversations().getActivityMembers("id", null);
+            connector.getConversations().getActivityMembers("id", null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -544,10 +544,10 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            connector.getConversations().replyToActivity(null, "id", activity);
+            connector.getConversations().replyToActivity(null, "id", activity).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -560,20 +560,20 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            connector.getConversations().replyToActivity("id", null, activity);
+            connector.getConversations().replyToActivity("id", null, activity).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
     @Test
     public void ReplyToActivityWithNullActivity() {
         try {
-            connector.getConversations().replyToActivity("id", "id", null);
+            connector.getConversations().replyToActivity("id", "id", null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -597,8 +597,8 @@ public class ConversationsTest extends BotConnectorTestBase {
         try {
             ResourceResponse replyResponse = connector.getConversations().replyToActivity(conversation.getId(), response.getId(), null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -659,8 +659,8 @@ public class ConversationsTest extends BotConnectorTestBase {
         try {
             connector.getConversations().deleteActivity(null, "id").join();
             Assert.fail("expected exception did not occur.");
-        } catch(IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch(CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -669,8 +669,8 @@ public class ConversationsTest extends BotConnectorTestBase {
         try {
             connector.getConversations().deleteActivity("id", null).join();
             Assert.fail("expected exception did not occur.");
-        } catch(IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch(CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -743,10 +743,10 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            connector.getConversations().updateActivity(null, "id", activity);
+            connector.getConversations().updateActivity(null, "id", activity).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
@@ -759,20 +759,20 @@ public class ConversationsTest extends BotConnectorTestBase {
         }};
 
         try {
-            connector.getConversations().updateActivity("id", null, activity);
+            connector.getConversations().updateActivity("id", null, activity).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 
     @Test
     public void UpdateActivityWithNullActivity() {
         try {
-            connector.getConversations().updateActivity("id", "id", null);
+            connector.getConversations().updateActivity("id", "id", null).join();
             Assert.fail("expected exception did not occur.");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(e.getMessage().contains("cannot be null"));
+        } catch (CompletionException e) {
+            Assert.assertTrue(e.getCause().getMessage().contains("cannot be null"));
         }
     }
 

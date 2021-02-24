@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
-import com.microsoft.bot.integration.Async;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.sample.teamstaskmodule.models.AdaptiveCardTaskFetchValue;
 import com.microsoft.bot.sample.teamstaskmodule.models.CardTaskFetchValue;
@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +43,6 @@ import java.util.concurrent.CompletableFuture;
  * user.  The {@link #onMembersAdded(List, TurnContext)} will send a greeting to new conversation
  * participants.</p>
  */
-@Component
 public class TeamsTaskModuleBot extends TeamsActivityHandler {
     private final String baseUrl;
     private final List<UISettings> actions = Arrays.asList(
@@ -79,7 +77,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     ) {
         // Called when the user selects an options from the displayed HeroCard or
         // AdaptiveCard.  The result is the action to perform.
-        return Async.tryCompletion(() -> {
+        return Async.wrapBlock(() -> {
             CardTaskFetchValue<String> value = Serialization
                 .safeGetAs(taskModuleRequest.getData(), CardTaskFetchValue.class);
 
@@ -126,7 +124,7 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
         TaskModuleRequest taskModuleRequest
     ) {
         // Called when data is being returned from the selected option (see `onTeamsTaskModuleFetch').
-        return Async.tryCompletion(() ->
+        return Async.wrapBlock(() ->
             // Echo the users input back.  In a production bot, this is where you'd add behavior in
             // response to the input.
             MessageFactory.text(

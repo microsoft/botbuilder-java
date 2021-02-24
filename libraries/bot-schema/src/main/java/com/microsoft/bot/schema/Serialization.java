@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -26,6 +28,10 @@ public final class Serialization {
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.findAndRegisterModules();
+
+        // NOTE: Undetermined if we should accommodate non-public fields.  The normal
+        // Bean pattern, and Jackson default, is for public fields or accessors.
+        //objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     }
 
     /**
@@ -60,6 +66,48 @@ public final class Serialization {
 
         JsonNode node = objectMapper.valueToTree(obj);
         return objectMapper.treeToValue(node, classType);
+    }
+
+
+    /**
+     * @param obj The Object to clone
+     * @return Object The cloned Object
+     */
+    public static Object clone(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+
+        JsonNode node = objectMapper.valueToTree(obj);
+        try {
+            return objectMapper.treeToValue(node, obj.getClass());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * @param <T> The Type of the Class
+     * @param src The source JsonNode
+     * @param cls The Class to Map
+     * @return the result of the mapping
+     */
+    public static <T> T treeToValue(JsonNode src, Class<T> cls) {
+        try {
+            return objectMapper.treeToValue(src, cls);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Convert Object to JsonNode.
+     * @param obj The object to convert.
+     * @return The JsonNode for the object tree.
+     */
+    public static JsonNode objectToTree(Object obj) {
+        return objectMapper.valueToTree(obj);
     }
 
     /**
@@ -108,6 +156,21 @@ public final class Serialization {
     }
 
     /**
+     * Convert an object to a JSON string.
+     *
+     * @param source The object to convert.
+     * @return The JSON string value.
+     * @throws JsonProcessingException Error converting to JSON
+     */
+    public static String toStringSilent(Object source) {
+        try {
+            return objectMapper.writeValueAsString(source);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
      * Parses a JSON document.
      *
      * @param json The JSON to parse.
@@ -117,4 +180,93 @@ public final class Serialization {
     public static JsonNode jsonToTree(String json) throws IOException {
         return objectMapper.readTree(json);
     }
+
+
+    /**
+     * @param s The string to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(String s) {
+        return objectMapper.getNodeFactory().textNode(s);
+    }
+
+
+    /**
+     * @param i The int to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(int i) {
+        return objectMapper.getNodeFactory().numberNode(i);
+    }
+
+
+    /**
+     * @param l The long to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(long l) {
+        return objectMapper.getNodeFactory().numberNode(l);
+    }
+
+
+    /**
+     * @param f The float to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(float f) {
+        return objectMapper.getNodeFactory().numberNode(f);
+    }
+
+
+    /**
+     * @param d The double to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(double d) {
+        return objectMapper.getNodeFactory().numberNode(d);
+    }
+
+
+    /**
+     * @param s The short to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(short s) {
+        return objectMapper.getNodeFactory().numberNode(s);
+    }
+
+
+    /**
+     * @param b The boolean to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(boolean b) {
+        return objectMapper.getNodeFactory().booleanNode(b);
+    }
+
+
+    /**
+     * @param b The byte to convert to a JsonNode
+     * @return JsonNode
+     */
+    public static JsonNode asNode(byte b) {
+        return objectMapper.getNodeFactory().numberNode(b);
+    }
+
+    /**
+     * Creates an ObjectNode.
+     * @return ObjectNode.
+     */
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+    /**
+     * Creates an ArrayNode.
+     * @return ArrayNode.
+     */
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
+    }
 }
+

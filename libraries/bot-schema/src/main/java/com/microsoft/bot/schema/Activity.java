@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
@@ -50,9 +51,6 @@ public class Activity {
 
     @JsonProperty(value = "localTimestamp")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern =
-    // "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    // 2019-10-07T09:49:37-05:00
     private OffsetDateTime localTimestamp;
 
     @JsonProperty(value = "localTimezone")
@@ -1758,6 +1756,22 @@ public class Activity {
     }
 
     /**
+     * Gets the TeamsChannelData.
+     * @return TeamsChannelData
+     */
+    public TeamsChannelData teamsGetChannelData() {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        return teamsChannelData;
+    }
+
+    /**
      * Get unique identifier representing a team.
      *
      * @return If this is a Teams Activity with valid data, the unique identifier
@@ -1821,128 +1835,40 @@ public class Activity {
     }
 
     /**
-     * Returns this activity as a Message Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a message activity; or null.
+     * Sets the notification of a meeting in the TeamsChannelData.
+     * @param alertInMeeting True if this is a meeting alert.
+     * @param externalResourceUrl The external resource Url.
      */
-    public Activity asMessageActivity() {
-        return isActivity(ActivityTypes.MESSAGE) ? this : null;
+    public void teamsNotifyUser(boolean alertInMeeting, String externalResourceUrl) {
+        TeamsChannelData teamsChannelData;
+
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
+
+        if (teamsChannelData == null) {
+            teamsChannelData = new TeamsChannelData();
+            setChannelData(teamsChannelData);
+        }
+
+        teamsChannelData.setNotification(new NotificationInfo(true, externalResourceUrl));
     }
 
     /**
-     * Returns this activity as a Contact Relation Update Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a contact relation update activity; or null.
+     * Gets the TeamsMeetingInfo object from the current activity.
+     * @return The current activity's team's meeting, or null.
      */
-    public Activity asContactRelationUpdateActivity() {
-        return isActivity(ActivityTypes.CONTACT_RELATION_UPDATE) ? this : null;
-    }
+    public TeamsMeetingInfo teamsGetMeetingInfo() {
+        TeamsChannelData teamsChannelData;
 
-    /**
-     * Returns this activity as an Installation Update Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as an installation update activity; or null.
-     */
-    public Activity asInstallationUpdateActivity() {
-        return isActivity(ActivityTypes.INSTALLATION_UPDATE) ? this : null;
-    }
+        try {
+            teamsChannelData = getChannelData(TeamsChannelData.class);
+        } catch (JsonProcessingException jpe) {
+            teamsChannelData = null;
+        }
 
-    /**
-     * Returns this activity as a Conversation Update Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a conversation update activity; or null.
-     */
-    public Activity asConversationUpdateActivity() {
-        return isActivity(ActivityTypes.CONVERSATION_UPDATE) ? this : null;
-    }
-
-    /**
-     * Returns this activity as a Typing Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a typing activity; or null.
-     */
-    public Activity asTypingActivity() {
-        return isActivity(ActivityTypes.TYPING) ? this : null;
-    }
-
-    /**
-     * Returns this activity an End of Conversation Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as an end of conversation activity; or null.
-     */
-    public Activity asEndOfConversationActivity() {
-        return isActivity(ActivityTypes.END_OF_CONVERSATION) ? this : null;
-    }
-
-    /**
-     * Returns this activity an Event Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as an event activity; or null.
-     */
-    public Activity asEventActivity() {
-        return isActivity(ActivityTypes.EVENT) ? this : null;
-    }
-
-    /**
-     * Returns this activity an Invoke Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as an invoke activity; or null.
-     */
-    public Activity asInvokeActivity() {
-        return isActivity(ActivityTypes.INVOKE) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Message Update Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a message update activity; or null.
-     */
-    public Activity asMessageUpdateActivity() {
-        return isActivity(ActivityTypes.MESSAGE_UPDATE) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Message Delete Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a message delete activity; or null.
-     */
-    public Activity asMessageDeleteActivity() {
-        return isActivity(ActivityTypes.MESSAGE_DELETE) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Message Reaction Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a message reaction activity; or null.
-     */
-    public Activity asMessageReactionActivity() {
-        return isActivity(ActivityTypes.MESSAGE_REACTION) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Suggestion Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a suggestion activity; or null.
-     */
-    public Activity asSuggestionActivity() {
-        return isActivity(ActivityTypes.SUGGESTION) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Trace Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a trace activity; or null.
-     */
-    public Activity asTraceActivity() {
-        return isActivity(ActivityTypes.TRACE) ? this : null;
-    }
-
-    /**
-     * Returns this activity a Handoff Activity; or null, if this is not that type of activity.
-     *
-     * @return This activity as a handoff activity; or null.
-     */
-    public Activity asHandoffActivity() {
-        return isActivity(ActivityTypes.HANDOFF) ? this : null;
+        return teamsChannelData != null ? teamsChannelData.getMeeting() : null;
     }
 }

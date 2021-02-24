@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -130,11 +131,7 @@ public final class JwtTokenValidation {
      * @param serviceUrl      The service URL for the activity.
      * @param authConfig      The authentication configuration.
      * @return A task that represents the work queued to execute.
-     *
-     *         On Call:
      * @throws IllegalArgumentException Incorrect arguments supplied
-     *
-     *                                  On Join:
      * @throws AuthenticationException  Authentication Error
      */
     public static CompletableFuture<ClaimsIdentity> validateAuthHeader(
@@ -146,7 +143,8 @@ public final class JwtTokenValidation {
         AuthenticationConfiguration authConfig
     ) {
         if (StringUtils.isEmpty(authHeader)) {
-            throw new IllegalArgumentException("No authHeader present. Auth is required.");
+            return Async.completeExceptionally(
+                new IllegalArgumentException("No authHeader present. Auth is required."));
         }
 
         boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
@@ -183,8 +181,9 @@ public final class JwtTokenValidation {
      * @param claims The map of claims.
      * @return The value of the appId claim if found (null if it can't find a
      *         suitable claim).
+     * @throws IllegalArgumentException Missing claims
      */
-    public static String getAppIdFromClaims(Map<String, String> claims) {
+    public static String getAppIdFromClaims(Map<String, String> claims) throws IllegalArgumentException {
         if (claims == null) {
             throw new IllegalArgumentException("claims");
         }
@@ -202,5 +201,35 @@ public final class JwtTokenValidation {
         }
 
         return appId;
+    }
+
+    /**
+     * Internal helper to check if the token has the shape we expect "Bearer [big long string]".
+     *
+     * @param authHeader >A string containing the token header.
+     * @return True if the token is valid, false if not.
+     */
+    public static boolean isValidTokenFormat(String authHeader) {
+        if (StringUtils.isEmpty(authHeader)) {
+            // No token, not valid.
+            return false;
+        }
+
+        String[] parts = authHeader.split(" ");
+        if (parts.length != 2) {
+            // Tokens MUST have exactly 2 parts. If we don't have 2 parts, it's not a valid token
+            return false;
+        }
+
+        // We now have an array that should be:
+        // [0] = "Bearer"
+        // [1] = "[Big Long String]"
+        String authScheme = parts[0];
+        if (!StringUtils.equals(authScheme, "Bearer")) {
+            // The scheme MUST be "Bearer"
+            return false;
+        }
+
+        return true;
     }
 }
