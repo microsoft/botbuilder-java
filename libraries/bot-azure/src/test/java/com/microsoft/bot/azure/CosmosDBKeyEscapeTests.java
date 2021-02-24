@@ -118,7 +118,7 @@ public class CosmosDBKeyEscapeTests {
             tooLongKey.append("a");
         }
 
-        String sanitizedKey = CosmosDbKeyEscape.escapeKey(tooLongKey, new String(), false);
+        String sanitizedKey = CosmosDbKeyEscape.escapeKey(tooLongKey.toString(), new String(), false);
         Assert.assertEquals(CosmosDbKeyEscape.MAX_KEY_LENGTH + 1, sanitizedKey.length());
 
         // The resulting key should be identical
