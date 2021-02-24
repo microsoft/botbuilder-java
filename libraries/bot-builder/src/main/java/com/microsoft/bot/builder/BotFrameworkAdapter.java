@@ -1302,7 +1302,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
                     && turnContext.getActivity().getConversation() != null
                     && StringUtils.isEmpty(turnContext.getActivity().getConversation().getTenantId())) {
 
-                JsonNode teamsChannelData = new ObjectMapper().valueToTree(turnContext.getActivity().getChannelData());
+                ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+                JsonNode teamsChannelData = mapper.valueToTree(turnContext.getActivity().getChannelData());
                 if (teamsChannelData != null && teamsChannelData.has("tenant")
                         && teamsChannelData.get("tenant").has("id")) {
 

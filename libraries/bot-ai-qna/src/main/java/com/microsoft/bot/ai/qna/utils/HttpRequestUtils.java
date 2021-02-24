@@ -53,7 +53,7 @@ public class HttpRequestUtils {
             return Async.completeExceptionally(new IllegalArgumentException("endpoint"));
         }
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String endpointKey = endpoint.getEndpointKey();
         Response response;
         JsonNode qnaResponse = null;

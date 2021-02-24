@@ -230,11 +230,7 @@ public class ComponentDialogTests {
         new TestFlow(adapter, (turnContext) -> {
             DialogState state = dialogState.get(turnContext, () -> new DialogState()).join();
             DialogSet dialogs = new DialogSet(dialogState);
-            try {
-                dialogs.add(new TestComponentDialog());
-            } catch (UnsupportedDataTypeException e) {
-                e.printStackTrace();
-            }
+            dialogs.add(new TestComponentDialog());
 
             DialogContext dc = dialogs.createContext(turnContext).join();
 
@@ -272,11 +268,7 @@ public class ComponentDialogTests {
             DialogState state = dialogState.get(turnContext, () -> new DialogState()).join();
             DialogSet dialogs = new DialogSet(dialogState);
 
-            try {
-                dialogs.add(new TestNestedComponentDialog());
-            } catch (UnsupportedDataTypeException e) {
-                e.printStackTrace();
-            }
+            dialogs.add(new TestNestedComponentDialog());
 
             DialogContext dc = dialogs.createContext(turnContext).join();
 
@@ -491,7 +483,7 @@ public class ComponentDialogTests {
     }
 
     private class TestComponentDialog extends ComponentDialog {
-        private TestComponentDialog() throws UnsupportedDataTypeException {
+        private TestComponentDialog() {
             super("TestComponentDialog");
             addDialog(createWaterfall());
             addDialog(new NumberPrompt<Integer>("number", null, PromptCultureModels.ENGLISH_CULTURE, Integer.class));
@@ -499,7 +491,7 @@ public class ComponentDialogTests {
     }
 
     private final class TestNestedComponentDialog extends ComponentDialog {
-        private TestNestedComponentDialog() throws UnsupportedDataTypeException {
+        private TestNestedComponentDialog() {
         super("TestNestedComponentDialog");
             WaterfallStep[] steps = new WaterfallStep[] {
                 new WaterfallStep1(),

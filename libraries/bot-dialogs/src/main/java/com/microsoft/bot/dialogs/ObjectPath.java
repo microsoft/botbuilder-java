@@ -22,72 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
-
-/**
- * Generic Arraylist of Object.
- */
-class Segments extends ArrayList<Object> {
-
-    /**
-     * Returns the first item in the collection.
-     * @return the first object.
-     */
-    public Object first() {
-        return get(0);
-    }
-
-    /**
-     * Returns the last item in the collection.
-     * @return the last object.
-     */
-    public Object last() {
-        return get(size() - 1);
-    }
-
-    /**
-     * Gets the SegmentType at the specified index.
-     * @param index Index of the requested segment.
-     * @return The SegmentType of item at the requested index.
-     */
-    public SegmentType getSegment(int index) {
-        return new SegmentType(get(index));
-    }
-}
-
-/**
- * A class wraps an Object and can assist in determining if it's an integer.
- */
-@SuppressWarnings("checkstyle:VisibilityModifier")
-class SegmentType {
-
-    public boolean isInt;
-    public int intValue;
-    public Segments segmentsValue;
-    public String stringValue;
-
-    /**
-     *
-     * @param value The object to create a SegmentType for.
-     */
-    SegmentType(Object value) {
-        try {
-            intValue = Integer.parseInt((String) value);
-            isInt = true;
-        } catch (NumberFormatException e) {
-            isInt = false;
-        }
-
-        if (!isInt) {
-            if (value instanceof Segments) {
-                segmentsValue = (Segments) value;
-            } else {
-                stringValue = (String) value;
-            }
-        }
-    }
-}
 
 /**
  * Helper methods for working with dynamic json objects.
@@ -307,7 +242,9 @@ public final class ObjectPath {
         } else if (obj instanceof Map) {
             return ((Map<String, Object>) obj).keySet();
         } else if (obj instanceof JsonNode) {
-            return IteratorUtils.toList(((JsonNode) obj).fieldNames());
+            List<String> fields = new ArrayList<>();
+            ((JsonNode) obj).fieldNames().forEachRemaining(fields::add);
+            return fields;
         } else {
             List<String> fields = new ArrayList<>();
             for (Field field : obj.getClass().getDeclaredFields()) {

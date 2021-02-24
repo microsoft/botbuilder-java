@@ -368,7 +368,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_TopNAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -421,7 +421,7 @@ public class QnAMakerTests {
     @Test
     public void qnaMakerCallTrain() {
         MockWebServer mockWebServer = new MockWebServer();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
         String url = this.getTrainRequestUrl();
         String endpoint = "";
         try {
@@ -499,7 +499,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_UsesStrictFilters_ToReturnAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -526,7 +526,7 @@ public class QnAMakerTests {
                 }
             };
             QnAMaker qna = new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), qnaMakerOptions).join();
             Assert.assertNotNull(results);
@@ -563,7 +563,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -608,7 +608,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_TestThreshold.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -686,7 +686,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswerWithContext.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -737,7 +737,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswerWithoutContext.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -780,7 +780,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswerWithContext.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -904,7 +904,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_LegacyEndpointAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getV2LegacyRequestUrl();
             String endpoint = "";
@@ -938,7 +938,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_LegacyEndpointAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getV3LegacyRequestUrl();
             String endpoint = "";
@@ -972,7 +972,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswersWithMetadataBoost.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1015,7 +1015,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer_GivenScoreThresholdQueryOption.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1039,7 +1039,7 @@ public class QnAMakerTests {
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, queryOptionsWithScoreThreshold);
 
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
             QueryResult[] results = qna.getAnswers(getContext("What happens when you hug a porcupine?"), queryOptionsWithScoreThreshold).join();
             RecordedRequest request = mockWebServer.takeRequest();
@@ -1093,7 +1093,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_IsTest_True.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1136,7 +1136,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_RankerType_QuestionOnly.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1181,7 +1181,7 @@ public class QnAMakerTests {
             String url = this.getRequestUrl();
             String endpoint = "";
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             if (this.mockQnAResponse) {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
@@ -1248,7 +1248,7 @@ public class QnAMakerTests {
             // Ensure that options from previous requests do not bleed over to the next,
             // And that the options set in the constructor are not overwritten improperly by options passed into .GetAnswersAsync()
             CapturedRequest[] requestContent = new CapturedRequest[6];
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
             RecordedRequest request;
 
             qna.getAnswers(context, noFiltersOptions).join();
@@ -1315,7 +1315,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1354,7 +1354,7 @@ public class QnAMakerTests {
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, oneFilteredOption);
 
             TurnContext context = getContext("up");
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
             QueryResult[] noFilterResults1 = qna.getAnswers(context, oneFilteredOption).join();
             RecordedRequest request = mockWebServer.takeRequest();
@@ -1378,7 +1378,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1426,7 +1426,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1494,7 +1494,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer_WhenNoAnswerFoundInKb.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1562,7 +1562,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1632,7 +1632,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1706,7 +1706,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1793,7 +1793,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -1876,7 +1876,7 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -2030,7 +2030,7 @@ public class QnAMakerTests {
     private QnAMaker qnaReturnsAnswer(MockWebServer mockWebServer) {
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
             String url = this.getRequestUrl();
             String endpoint = "";
@@ -2065,7 +2065,7 @@ public class QnAMakerTests {
     }
 
     private HttpUrl initializeMockServer(MockWebServer mockWebServer, JsonNode response, String url) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String mockResponse = mapper.writeValueAsString(response);
         mockWebServer.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
@@ -2080,7 +2080,7 @@ public class QnAMakerTests {
     }
 
     private void enqueueResponse(MockWebServer mockWebServer, JsonNode response) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String mockResponse = mapper.writeValueAsString(response);
         mockWebServer.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")

@@ -99,7 +99,7 @@ public class LuisRecognizerOptionsV3Tests {
             String content = readFileContent("/src/test/java/com/microsoft/bot/ai/luis/testdata/" + fileName);
 
             //Extract V3 response
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode testData = mapper.readTree(content);
             JsonNode v3SettingsAndResponse = testData.get("v3");
             JsonNode v3Response = v3SettingsAndResponse.get("response");
@@ -176,7 +176,7 @@ public class LuisRecognizerOptionsV3Tests {
             String content = readFileContent("/src/test/java/com/microsoft/bot/ai/luis/testdata/ExternalRecognizer.json");
 
             //Extract V3 response
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode testData = mapper.readTree(content);
             JsonNode v3SettingsAndResponse = testData.get("v3");
             JsonNode v3Response = v3SettingsAndResponse.get("response");
@@ -308,7 +308,7 @@ public class LuisRecognizerOptionsV3Tests {
     }
 
     private HttpUrl initializeMockServer(MockWebServer mockWebServer, JsonNode v3Response, String url) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         String mockResponse = mapper.writeValueAsString(v3Response);
         mockWebServer.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
@@ -320,7 +320,7 @@ public class LuisRecognizerOptionsV3Tests {
     }
 
     private LuisRecognizerOptionsV3 buildTestRecognizer (String endpoint, JsonNode testSettings) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         ObjectReader readerDynamicList = mapper.readerFor(new TypeReference<List<DynamicList>>() {});
         ObjectReader readerExternalentities = mapper.readerFor(new TypeReference<List<ExternalEntity>>() {});
         return new LuisRecognizerOptionsV3(

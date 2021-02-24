@@ -417,7 +417,7 @@ public class QnAMakerRecognizer extends Recognizer {
                             }
                         });
                     }
-                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
                     ObjectNode entitiesNode = mapper.createObjectNode();
                     List<String> answerArray = new ArrayList<String>();
                     answerArray.add(topAnswer.getAnswer());

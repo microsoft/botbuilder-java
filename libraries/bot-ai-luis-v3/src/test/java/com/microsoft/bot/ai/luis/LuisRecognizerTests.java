@@ -142,7 +142,7 @@ public class LuisRecognizerTests {
         RecognizerResult actual = null;
         try {
             actual = recognizer.recognize(turnContext).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
@@ -197,7 +197,7 @@ public class LuisRecognizerTests {
         RecognizerResult actual = null;
         try {
             actual = recognizer.recognize(turnContext).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
@@ -256,7 +256,7 @@ public class LuisRecognizerTests {
         LuisRecognizer recognizer = new LuisRecognizer(options);
         try {
             actual = recognizer.recognize(dialogContext, turnContext.getActivity()).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();

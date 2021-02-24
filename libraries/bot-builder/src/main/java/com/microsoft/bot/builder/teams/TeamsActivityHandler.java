@@ -663,7 +663,7 @@ public class TeamsActivityHandler extends ActivityHandler {
         TeamInfo teamInfo,
         TurnContext turnContext
     ) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         mapper.findAndRegisterModules();
 
         List<TeamsChannelAccount> teamsMembersAdded = new ArrayList<>();
@@ -731,7 +731,7 @@ public class TeamsActivityHandler extends ActivityHandler {
         TeamInfo teamInfo,
         TurnContext turnContext
     ) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         mapper.findAndRegisterModules();
 
         List<TeamsChannelAccount> teamsMembersRemoved = new ArrayList<>();

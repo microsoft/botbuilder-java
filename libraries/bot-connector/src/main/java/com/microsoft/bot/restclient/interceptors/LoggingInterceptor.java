@@ -34,7 +34,7 @@ import java.util.zip.GZIPInputStream;
 public class LoggingInterceptor implements Interceptor {
     private static final String LOGGING_HEADER = "x-ms-logging-context";
     private static final String BODY_LOGGING = "x-ms-body-logging";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
     private LogLevel logLevel;
 
     /**
