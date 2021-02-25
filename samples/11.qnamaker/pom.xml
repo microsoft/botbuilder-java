@@ -66,6 +66,7 @@
       <dependency>
         <groupId>com.microsoft.bot</groupId>
         <artifactId>bot-ai-qna</artifactId>
+        <version>4.6.0-preview9</version>
       </dependency>
 
       <dependency>
