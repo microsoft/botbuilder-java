@@ -27,23 +27,26 @@ public class QnABot extends ActivityHandler {
                 setKnowledgeBaseId(configuration.getProperty("QnAKnowledgebaseId"));
                 setEndpointKey(configuration.getProperty("QnAEndpointKey"));
                 setHost(configuration.getProperty("QnAEndpointHostName"));
-            }};
+            }
+        };
 
         QnAMaker qnaMaker = new QnAMaker(qnAMakerEndpoint, null);
 
         LoggerFactory.getLogger(QnABot.class).info("Calling QnA Maker");
 
-        QnAMakerOptions options = new QnAMakerOptions() {{
-            setTop(1);
-        }};
+        QnAMakerOptions options = new QnAMakerOptions() {
+        	{
+        		setTop(1);
+        	}
+        };
 
         // The actual call to the QnA Maker service.
         qnaMaker.getAnswers(turnContext, options).thenAccept(response -> {
             if (response != null && response.length > 0) {
-                turnContext.sendActivity(MessageFactory.text(response[0].getAnswer())).thenApply(sendresult -> null);
+                turnContext.sendActivity(MessageFactory.text(response[0].getAnswer())).thenApply(sendResult -> null);
             }
             else {
-                turnContext.sendActivity(MessageFactory.text("No QnA Maker answers were found.")).thenApply(sendresult -> null);
+                turnContext.sendActivity(MessageFactory.text("No QnA Maker answers were found.")).thenApply(sendResult -> null);
             }
         });
 
