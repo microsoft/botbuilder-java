@@ -77,6 +77,9 @@ public class CosmosDbPartitionedStorage implements Storage {
             throw new IllegalArgumentException("ContainerId is required: containerId");
         }
 
+        Boolean compatibilityMode = withCosmosDbStorageOptions.getCompatibilityMode();
+        withCosmosDbStorageOptions.setCompatibilityMode(compatibilityMode == null ? true : compatibilityMode);
+
         if (StringUtils.isNotBlank(withCosmosDbStorageOptions.getKeySuffix())) {
             if (withCosmosDbStorageOptions.getCompatibilityMode()) {
                 throw new IllegalArgumentException(
