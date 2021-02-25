@@ -122,7 +122,7 @@ public class CosmosDBKeyEscapeTests {
         Assert.assertEquals(CosmosDbKeyEscape.MAX_KEY_LENGTH + 1, sanitizedKey.length());
 
         // The resulting key should be identical
-        Assert.assertEquals(tooLongKey, sanitizedKey);
+        Assert.assertEquals(tooLongKey.toString(), sanitizedKey);
     }
 
     @Test
