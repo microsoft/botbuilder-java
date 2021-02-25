@@ -131,7 +131,7 @@ public final class ChoiceRecognizers {
         return result.stream().map(r ->
             new ModelResult<FoundChoice>() {{
             setStart(r.start);
-            setEnd(r.end - 1);  // bug in 1.0-SNAPSHOT, should not have to decrement
+            setEnd(r.end);
             setText(r.text);
             setResolution(new FoundChoice() {{
                 setValue(r.resolution.get("value").toString());
