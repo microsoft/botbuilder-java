@@ -11,16 +11,18 @@ import com.microsoft.bot.integration.Configuration;
  * Cosmos DB Partitioned Storage Options.
  */
 public class CosmosDbPartitionedStorageOptions {
-    private static final int DEFAULT_THROUGHPUT = 400;
+    private static final Integer DEFAULT_THROUGHPUT = 400;
     private static final ConsistencyLevel DEFAULT_CONSISTENCY = ConsistencyLevel.Session;
 
     private String cosmosDbEndpoint;
     private String authKey;
     private String databaseId;
     private String containerId;
-    private int containerThroughput;
+    private String keySuffix;
+    private Integer containerThroughput;
     private ConnectionPolicy connectionPolicy;
     private ConsistencyLevel consistencyLevel;
+    private Boolean compatibilityMode;
 
     /**
      * Constructs an empty options object.
@@ -33,6 +35,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Construct with properties from Configuration.
+     *
      * @param configuration The Configuration object to read properties from.
      */
     public CosmosDbPartitionedStorageOptions(Configuration configuration) {
@@ -56,6 +59,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the CosmosDB endpoint.
+     *
      * @return The DB endpoint.
      */
     public String getCosmosDbEndpoint() {
@@ -64,6 +68,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Sets the CosmosDB endpoint.
+     *
      * @param withCosmosDbEndpoint The DB endpoint to use.
      */
     public void setCosmosDbEndpoint(String withCosmosDbEndpoint) {
@@ -72,6 +77,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the authentication key for Cosmos DB.
+     *
      * @return The auth key for the DB.
      */
     public String getAuthKey() {
@@ -80,6 +86,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Sets the authentication key for Cosmos DB.
+     *
      * @param withAuthKey The auth key to use.
      */
     public void setAuthKey(String withAuthKey) {
@@ -88,6 +95,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the database identifier for Cosmos DB instance.
+     *
      * @return The CosmosDB DB id.
      */
     public String getDatabaseId() {
@@ -96,6 +104,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Sets the database identifier for Cosmos DB instance.
+     *
      * @param withDatabaseId The CosmosDB id.
      */
     public void setDatabaseId(String withDatabaseId) {
@@ -104,6 +113,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the container identifier.
+     *
      * @return The container/collection ID.
      */
     public String getContainerId() {
@@ -112,6 +122,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Sets the container identifier.
+     *
      * @param withContainerId The container/collection ID.
      */
     public void setContainerId(String withContainerId) {
@@ -120,6 +131,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the ConnectionPolicy for the CosmosDB.
+     *
      * @return The ConnectionPolicy settings.
      */
     public ConnectionPolicy getConnectionPolicy() {
@@ -128,6 +140,7 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Sets the ConnectionPolicy for the CosmosDB.
+     *
      * @param withConnectionPolicy The ConnectionPolicy settings.
      */
     public void setConnectionPolicy(ConnectionPolicy withConnectionPolicy) {
@@ -135,11 +148,12 @@ public class CosmosDbPartitionedStorageOptions {
     }
 
     /**
-     * Represents the consistency levels supported for Azure Cosmos DB client operations in the Azure
-     * Cosmos DB database service.
+     * Represents the consistency levels supported for Azure Cosmos DB client
+     * operations in the Azure Cosmos DB database service.
      *
-     * The requested ConsistencyLevel must match or be weaker than that provisioned for the database
-     * account. Consistency levels by order of strength are Strong, BoundedStaleness, Session and Eventual.
+     * The requested ConsistencyLevel must match or be weaker than that provisioned
+     * for the database account. Consistency levels by order of strength are Strong,
+     * BoundedStaleness, Session and Eventual.
      *
      * @return The ConsistencyLevel
      */
@@ -148,11 +162,12 @@ public class CosmosDbPartitionedStorageOptions {
     }
 
     /**
-     * Represents the consistency levels supported for Azure Cosmos DB client operations in the Azure
-     * Cosmos DB database service.
+     * Represents the consistency levels supported for Azure Cosmos DB client
+     * operations in the Azure Cosmos DB database service.
      *
-     * The requested ConsistencyLevel must match or be weaker than that provisioned for the database
-     * account. Consistency levels by order of strength are Strong, BoundedStaleness, Session and Eventual.
+     * The requested ConsistencyLevel must match or be weaker than that provisioned
+     * for the database account. Consistency levels by order of strength are Strong,
+     * BoundedStaleness, Session and Eventual.
      *
      * @param withConsistencyLevel The ConsistencyLevel to use.
      */
@@ -162,17 +177,79 @@ public class CosmosDbPartitionedStorageOptions {
 
     /**
      * Gets the throughput set when creating the Container. Defaults to 400.
+     *
      * @return The container throughput.
      */
-    public int getContainerThroughput() {
+    public Integer getContainerThroughput() {
         return containerThroughput;
     }
 
     /**
      * Sets the throughput set when creating the Container. Defaults to 400.
+     *
      * @param withContainerThroughput The desired thoughput.
      */
-    public void setContainerThroughput(int withContainerThroughput) {
+    public void setContainerThroughput(Integer withContainerThroughput) {
         containerThroughput = withContainerThroughput;
+    }
+
+    /**
+     * Gets a value indicating whether or not to run in Compatibility Mode. Early
+     * versions of CosmosDb had a key length limit of 255. Keys longer than this
+     * were truncated in CosmosDbKeyEscape. This remains the default behavior, but
+     * can be overridden by setting CompatibilityMode to false. This setting will
+     * also allow for using older collections where no PartitionKey was specified.
+     *
+     * Note: CompatibilityMode cannot be 'true' if KeySuffix is used.
+     * @return The compatibilityMode
+     */
+    public Boolean getCompatibilityMode() {
+        return compatibilityMode;
+    }
+
+    /**
+     * Sets a value indicating whether or not to run in Compatibility Mode. Early
+     * versions of CosmosDb had a key length limit of 255. Keys longer than this
+     * were truncated in CosmosDbKeyEscape. This remains the default behavior, but
+     * can be overridden by setting CompatibilityMode to false. This setting will
+     * also allow for using older collections where no PartitionKey was specified.
+     *
+     * Note: CompatibilityMode cannot be 'true' if KeySuffix is used.
+     *
+     * @param withCompatibilityMode Currently, max key length for cosmosdb is 1023:
+     *                              https://docs.microsoft.com/en-us/azure/cosmos-db/concepts-limits#per-item-limits
+     *                              The default for backwards compatibility is 255,
+     *                              CosmosDbKeyEscape.MaxKeyLength.
+     */
+    public void setCompatibilityMode(Boolean withCompatibilityMode) {
+        this.compatibilityMode = withCompatibilityMode;
+    }
+
+    /**
+     * Gets the suffix to be added to every key. See
+     * CosmosDbKeyEscape.EscapeKey(string). Note:CompatibilityMode must be set to
+     * 'false' to use a KeySuffix. When KeySuffix is used, keys will NOT be
+     * truncated but an exception will be thrown if the key length is longer than
+     * allowed by CosmosDb.
+     *
+     * @return String containing only valid CosmosDb key characters. (e.g. not:
+     *         '\\', '?', '/', '#', '*').
+     */
+    public String getKeySuffix() {
+        return keySuffix;
+    }
+
+    /**
+     * Sets the suffix to be added to every key. See
+     * CosmosDbKeyEscape.EscapeKey(string). Note:CompatibilityMode must be set to
+     * 'false' to use a KeySuffix. When KeySuffix is used, keys will NOT be
+     * truncated but an exception will be thrown if the key length is longer than
+     * allowed by CosmosDb.
+     *
+     * @param withKeySuffix String containing only valid CosmosDb key characters.
+     *                      (e.g. not: '\\', '?', '/', '#', '*').
+     */
+    public void setKeySuffix(String withKeySuffix) {
+        this.keySuffix = withKeySuffix;
     }
 }

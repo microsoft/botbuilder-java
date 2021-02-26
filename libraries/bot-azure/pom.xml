@@ -68,6 +68,10 @@
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-integration-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.microsoft.bot</groupId>
+      <artifactId>bot-dialogs</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.microsoft.bot</groupId>
