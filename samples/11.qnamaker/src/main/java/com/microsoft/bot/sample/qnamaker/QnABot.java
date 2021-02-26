@@ -22,26 +22,22 @@ public class QnABot extends ActivityHandler {
 
     @Override
     protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(configuration.getProperty("QnAKnowledgebaseId"));
-                setEndpointKey(configuration.getProperty("QnAEndpointKey"));
-                setHost(configuration.getProperty("QnAEndpointHostName"));
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {{
+            setKnowledgeBaseId(configuration.getProperty("QnAKnowledgebaseId"));
+            setEndpointKey(configuration.getProperty("QnAEndpointKey"));
+            setHost(configuration.getProperty("QnAEndpointHostName"));
+        }};
 
         QnAMaker qnaMaker = new QnAMaker(qnAMakerEndpoint, null);
 
         LoggerFactory.getLogger(QnABot.class).info("Calling QnA Maker");
 
-        QnAMakerOptions options = new QnAMakerOptions() {
-        	{
-        		setTop(1);
-        	}
-        };
+        QnAMakerOptions options = new QnAMakerOptions() {{
+            setTop(1);
+        }};
 
         // The actual call to the QnA Maker service.
-        qnaMaker.getAnswers(turnContext, options)
+        return qnaMaker.getAnswers(turnContext, options)
             .thenCompose(response -> {
                 if (response != null && response.length > 0) {
                     return turnContext.sendActivity(MessageFactory.text(response[0].getAnswer()))
@@ -52,7 +48,5 @@ public class QnABot extends ActivityHandler {
                         .thenApply(sendResult -> null);
                 }
         });
-
-        return CompletableFuture.completedFuture(null);
     }
 }
