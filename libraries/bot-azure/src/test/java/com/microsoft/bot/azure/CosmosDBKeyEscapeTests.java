@@ -8,32 +8,32 @@ import org.junit.Test;
 
 public class CosmosDBKeyEscapeTests {
     @Test(expected = IllegalArgumentException.class)
-    public void Sanitize_Key_Should_Fail_With_Null_Key() {
+    public void sanitizeKeyShouldFailWithNullKey() {
         // Null key should throw
         CosmosDbKeyEscape.escapeKey(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void Sanitize_Key_Should_Fail_With_Empty_Key() {
+    public void sanitizeKeyShouldFailWithEmptyKey() {
         // Empty string should throw
         CosmosDbKeyEscape.escapeKey(new String());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void Sanitize_Key_Should_Fail_With_Whitespace_Key() {
+    public void sanitizeKeyShouldFailWithWhitespaceKey() {
         // Whitespace key should throw
         CosmosDbKeyEscape.escapeKey("    ");
     }
 
     @Test
-    public void Sanitize_Key_Should_Not_Change_A_Valid_Key() {
+    public void sanitizeKeyShouldNotChangeAValidKey() {
         String validKey = "Abc12345";
         String sanitizedKey = CosmosDbKeyEscape.escapeKey(validKey);
         Assert.assertEquals(validKey, sanitizedKey);
     }
 
     @Test
-    public void Long_Key_Should_Be_Truncated() {
+    public void longKeyShouldBeTruncated() {
         StringBuilder tooLongKey = new StringBuilder();
         for (int i = 0; i < CosmosDbKeyEscape.MAX_KEY_LENGTH + 1; i++) {
             tooLongKey.append("a");
@@ -50,7 +50,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void Long_Key_With_Illegal_Characters_Should_Be_Truncated() {
+    public void longKeyWithIllegalCharactersShouldBeTruncated() {
         StringBuilder tooLongKey = new StringBuilder();
         for (int i = 0; i < CosmosDbKeyEscape.MAX_KEY_LENGTH + 1; i++) {
             tooLongKey.append("a");
@@ -67,7 +67,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void Sanitize_Key_Should_Escape_Illegal_Character()
+    public void sanitizeKeyShouldEscapeIllegalCharacter()
     {
         // Ascii code of "?" is "3f".
         String sanitizedKey = CosmosDbKeyEscape.escapeKey("?test?");
@@ -95,7 +95,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void Collisions_Should_Not_Happen()
+    public void collisionsShouldNotHappen()
     {
         String validKey = "*2atest*2a";
         String validKey2 = "*test*";
@@ -112,7 +112,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void Long_Key_Should_Not_Be_Truncated_With_False_CompatibilityMode() {
+    public void longKeyShouldNotBeTruncatedWithFalseCompatibilityMode() {
         StringBuilder tooLongKey = new StringBuilder();
         for (int i = 0; i < CosmosDbKeyEscape.MAX_KEY_LENGTH + 1; i++) {
             tooLongKey.append("a");
@@ -126,7 +126,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void Long_Key_With_Illegal_Characters_Should_Not_Be_Truncated_With_False_CompatibilityMode()
+    public void longKeyWithIllegalCharactersShouldNotBeTruncatedWithFalseCompatibilityMode()
     {
         StringBuilder tooLongKey = new StringBuilder();
         for (int i = 0; i < CosmosDbKeyEscape.MAX_KEY_LENGTH + 1; i++) {
@@ -144,7 +144,7 @@ public class CosmosDBKeyEscapeTests {
     }
 
     @Test
-    public void KeySuffix_Is_Added_To_End_of_Key()
+    public void keySuffixIsAddedToEndOfKey()
     {
         String suffix = "test suffix";
         String key = "this is a test";

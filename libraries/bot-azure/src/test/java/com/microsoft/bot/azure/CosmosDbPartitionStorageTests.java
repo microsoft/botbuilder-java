@@ -91,7 +91,7 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
     }
 
     @Before
-    public void TestInit() {
+    public void testInit() {
         storage = new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
             setAuthKey(CosmosAuthKey);
             setContainerId(CosmosCollectionName);
@@ -101,12 +101,12 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
     }
 
     @After
-    public void TestCleanup() {
+    public void testCleanup() {
         storage = null;
     }
 
     @Test
-    public void Constructor_Should_Throw_On_InvalidOptions() {
+    public void constructorShouldThrowOnInvalidOptions() {
         try {
             new CosmosDbPartitionedStorage(null);
             Assert.fail("should have thrown for null options");
@@ -192,65 +192,65 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void CreateObjectCosmosDBPartitionTest() {
+    public void createObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.createObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void ReadUnknownCosmosDBPartitionTest() {
+    public void readUnknownCosmosDBPartitionTest() {
         assertEmulator();
         super.readUnknownTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void UpdateObjectCosmosDBPartitionTest() {
+    public void updateObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.updateObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void DeleteObjectCosmosDBPartitionTest() {
+    public void deleteObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.deleteObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void DeleteUnknownObjectCosmosDBPartitionTest() {
+    public void deleteUnknownObjectCosmosDBPartitionTest() {
         assertEmulator();
         storage.delete(new String[] {"unknown_delete"});
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void HandleCrazyKeysCosmosDBPartition() {
+    public void handleCrazyKeysCosmosDBPartition() {
         assertEmulator();
         super.handleCrazyKeys(storage);
     }
 
     @Test
-    public void ReadingEmptyKeysReturnsEmptyDictionary() {
+    public void readingEmptyKeysReturnsEmptyDictionary() {
         Map<String, Object> state = storage.read(new String[] {}).join();
         Assert.assertNotNull(state);
         Assert.assertEquals(0, state.size());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void ReadingNullKeysThrowException() {
+    public void readingNullKeysThrowException() {
         storage.read(null).join();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void WritingNullStoreItemsThrowException() {
+    public void writingNullStoreItemsThrowException() {
         storage.write(null);
     }
 
     @Test
-    public void WritingNoStoreItemsDoesntThrow() {
+    public void writingNoStoreItemsDoesntThrow() {
         storage.write(new HashMap<>());
     }
 
