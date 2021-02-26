@@ -41,13 +41,16 @@ public class QnABot extends ActivityHandler {
         };
 
         // The actual call to the QnA Maker service.
-        qnaMaker.getAnswers(turnContext, options).thenAccept(response -> {
-            if (response != null && response.length > 0) {
-                turnContext.sendActivity(MessageFactory.text(response[0].getAnswer())).thenApply(sendResult -> null);
-            }
-            else {
-                turnContext.sendActivity(MessageFactory.text("No QnA Maker answers were found.")).thenApply(sendResult -> null);
-            }
+        qnaMaker.getAnswers(turnContext, options)
+            .thenCompose(response -> {
+                if (response != null && response.length > 0) {
+                    return turnContext.sendActivity(MessageFactory.text(response[0].getAnswer()))
+                        .thenApply(sendResult -> null);
+                }
+                else {
+                    return turnContext.sendActivity(MessageFactory.text("No QnA Maker answers were found."))
+                        .thenApply(sendResult -> null);
+                }
         });
 
         return CompletableFuture.completedFuture(null);
