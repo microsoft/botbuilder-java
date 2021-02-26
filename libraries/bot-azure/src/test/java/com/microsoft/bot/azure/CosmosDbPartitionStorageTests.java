@@ -3,31 +3,24 @@
 
 package com.microsoft.bot.azure;
 
-import com.microsoft.azure.documentdb.*;
-import com.microsoft.bot.builder.AutoSaveStateMiddleware;
-import com.microsoft.bot.builder.ConversationState;
-import com.microsoft.bot.builder.MessageFactory;
-import com.microsoft.bot.builder.StatePropertyAccessor;
+import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.ConsistencyLevel;
+import com.microsoft.azure.documentdb.Database;
+import com.microsoft.azure.documentdb.DocumentClient;
+import com.microsoft.azure.documentdb.DocumentClientException;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.StorageBaseTests;
-import com.microsoft.bot.builder.adapters.TestAdapter;
-import com.microsoft.bot.builder.adapters.TestFlow;
-import com.microsoft.bot.dialogs.*;
-import com.microsoft.bot.dialogs.prompts.PromptOptions;
-import com.microsoft.bot.dialogs.prompts.PromptValidator;
-import com.microsoft.bot.dialogs.prompts.PromptValidatorContext;
-import com.microsoft.bot.dialogs.prompts.TextPrompt;
-import com.microsoft.bot.schema.Activity;
-import com.microsoft.bot.schema.ConversationReference;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * The CosmosDB tests require the CosmosDB Emulator to be installed and running.
