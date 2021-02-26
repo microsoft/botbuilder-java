@@ -43,7 +43,12 @@ public enum EndOfConversationCodes {
     /**
      * Enum value skillError.
      */
-    SKILL_ERROR("skillError");
+    SKILL_ERROR("skillError"),
+
+    /**
+     * Enum value channelFailed.
+     */
+    ROOT_SKILL_ERROR("rootSkillError");
 
     /**
      * The actual serialized value for a EndOfConversationCodes instance.

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.MicrosoftGovernmentAppCredentials;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -20,6 +21,7 @@ import okhttp3.Response;
 
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.TypedInvokeResponse;
 import com.microsoft.bot.builder.skills.BotFrameworkClient;
 import com.microsoft.bot.connector.Async;
@@ -71,6 +73,7 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         }
         this.credentialProvider = credentialProvider;
         this.channelProvider = channelProvider;
+        this.httpClient = new OkHttpClient();
     }
 
     /**
@@ -107,8 +110,17 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         }
 
         // Get token for the skill call
-        String token = appCredentials == MicrosoftAppCredentials.empty() ? null :  appCredentials.getToken().join();
-
+        //String token = appCredentials == MicrosoftAppCredentials.empty() ? null :  appCredentials.getToken().join();
+        String token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.ey"
+        + "JhdWQiOiI3NDU1ZjY2Ni1iMTFkLTRjZTgtOGM4MS0zNjM3MGVhYWU5OWEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGlu"
+        + "ZS5jb20vZDZkNDk0MjAtZjM5Yi00ZGY3LWExZGMtZDU5YTkzNTg3MWRiL3YyLjAiLCJpYXQiOjE2MTQyNjQ0MTgsIm5iZiI6MTYxNDI2NDQ"
+        + "xOCwiZXhwIjoxNjE0MzUxMTE4LCJhaW8iOiJFMlpnWUdDYjR5NVJrUER2Z1ptWDBEVGxqNlZQQVE9PSIsImF6cCI6ImQyY2Y4MDA2LTRjY"
+        + "WItNGJhMS04ODJlLTYwMTFlMjI4MzBkYyIsImF6cGFjciI6IjEiLCJyaCI6IjAuQUFBQUlKVFUxcHZ6OTAyaDNOV2FrMWh4MndhQXo5S3"
+        + "JUS0ZMaUM1Z0VlSW9NTnh1QUFBLiIsInRpZCI6ImQ2ZDQ5NDIwLWYzOWItNGRmNy1hMWRjLWQ1OWE5MzU4NzFkYiIsInV0aSI6Ik5Kc2ky"
+        + "UlcxeEVTdUpZdm5nY29iQUEiLCJ2ZXIiOiIyLjAifQ.Fa_Zqo6OKg0JCj-0VeUazV6A4pli-AMWxlA1MmsSC-_D1R_bY9dlufrz6wkggR"
+        + "UG6Nw33Y3UG3hkO9bO9LPqnCKGm3y7hCaBOHOkrDCrH94McZYFZ26nbAU3Ob-5WaR6axXHpWxoBq3Q4NaXU7m5KWy0r19-8qaOeTyOZ0w"
+        + "etsVUUcPSpBM_sG8VsEdXs52ioUb2AUf3KF4BvAlUR9zx4W7Hk-dczSWBtUhyHEm_im3UBDeCV8r3EIkO1VZCG6s22E1IVIAS2VKuPpGL8"
+        + "0i-phr77L4ZHSR-CnrQIQeESBoQTvx4Wdz5_XEgWKbOeX2k0KgIkeAEBoBaVJU0XpgZ8g";
 
         // Clone the activity so we can modify it before sending without impacting the original Object.
         Activity activityClone = Activity.clone(activity);
@@ -197,7 +209,8 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
     ) {
         String jsonContent = "";
         try {
-            jsonContent = Serialization.toString(activity);
+            ObjectMapper mapper = new JacksonAdapter().serializer();
+            jsonContent = mapper.writeValueAsString(activity);
         } catch (JsonProcessingException e) {
             return Async.completeExceptionally(new RuntimeException(
                 "securePostActivity: Unable to serialize the Activity"
@@ -209,25 +222,21 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
             Request request = buildRequest(toUrl, body, token);
             Response response = httpClient.newCall(request).execute();
 
-            if (response.isSuccessful()) {
-              T result = Serialization.getAs(response.body().toString(), type);
-              TypedInvokeResponse<T> returnValue = new TypedInvokeResponse<T>(response.code(), result);
-              return CompletableFuture.completedFuture(returnValue);
-            }
-
+            T result = Serialization.getAs(response.body().toString(), type);
+            TypedInvokeResponse<T> returnValue = new TypedInvokeResponse<T>(response.code(), result);
+            return CompletableFuture.completedFuture(returnValue);
         } catch (IOException e) {
             return Async.completeExceptionally(e);
         }
-        return CompletableFuture.completedFuture(null);
     }
 
     private Request buildRequest(URI url, RequestBody body, String token) {
 
-        HttpUrl.Builder httpBuilder = HttpUrl.parse(url.getPath()).newBuilder();
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(url.toString()).newBuilder();
 
         Request.Builder requestBuilder = new Request.Builder().url(httpBuilder.build());
         if (token != null) {
-            requestBuilder.addHeader("Bearer", token);
+            requestBuilder.addHeader("Authorization", token);
         }
         requestBuilder.post(body);
         return requestBuilder.build();

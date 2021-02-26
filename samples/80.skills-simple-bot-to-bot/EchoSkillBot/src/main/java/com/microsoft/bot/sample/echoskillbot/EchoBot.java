@@ -28,25 +28,18 @@ public class EchoBot extends ActivityHandler {
         if (turnContext.getActivity().getText().contains("end")
             || turnContext.getActivity().getText().contains("stop")) {
             String messageText = "ending conversation from the skill...";
-            turnContext.sendActivity(MessageFactory.text(messageText, messageText, InputHints.IGNORING_INPUT))
-            .thenCompose(response ->
-            {
-                Activity endOfConversation = Activity.createEndOfConversationActivity();
-                endOfConversation.setCode(EndOfConversationCodes.COMPLETED_SUCCESSFULLY);
-                return turnContext.sendActivity(endOfConversation).thenApply(result -> null);
-            });
+            turnContext.sendActivity(MessageFactory.text(messageText, messageText, InputHints.IGNORING_INPUT)).join();
+            Activity endOfConversation = Activity.createEndOfConversationActivity();
+            endOfConversation.setCode(EndOfConversationCodes.COMPLETED_SUCCESSFULLY);
+            return turnContext.sendActivity(endOfConversation).thenApply(result -> null);
         } else {
             String messageText = String.format("Echo: %s", turnContext.getActivity().getText());
-            turnContext.sendActivity(MessageFactory.text(messageText, messageText, InputHints.IGNORING_INPUT))
-            .thenCompose(response -> {
-                String nextMessageText = 
-                    "Say \"end\" or \"stop\" and I'll end the conversation and back to the parent.";
-                return turnContext.sendActivity(
-                        MessageFactory.text(nextMessageText, nextMessageText, InputHints.EXPECTING_INPUT))
-                        .thenApply(result -> null);
-            });
-
+            turnContext.sendActivity(MessageFactory.text(messageText, messageText, InputHints.IGNORING_INPUT)).join();
+            String nextMessageText =
+                "Say \"end\" or \"stop\" and I'll end the conversation and back to the parent.";
+            return turnContext.sendActivity(
+                    MessageFactory.text(nextMessageText, nextMessageText, InputHints.EXPECTING_INPUT))
+                    .thenApply(result -> null);
         }
-        return CompletableFuture.completedFuture(null);
     }
 }

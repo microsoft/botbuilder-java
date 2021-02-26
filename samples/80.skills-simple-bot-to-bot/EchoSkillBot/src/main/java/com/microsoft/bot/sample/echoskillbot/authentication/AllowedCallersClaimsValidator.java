@@ -3,13 +3,10 @@
 
 package com.microsoft.bot.sample.echoskillbot.authentication;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import javax.naming.ConfigurationException;
 
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.ClaimsValidator;
