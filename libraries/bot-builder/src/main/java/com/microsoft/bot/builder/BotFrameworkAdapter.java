@@ -1218,11 +1218,26 @@ public class BotFrameworkAdapter extends BotAdapter implements
             return CompletableFuture.completedFuture(appCredentials);
         }
 
+        // Create a new AppCredentials and add it to the cache.
+        return buildAppCredentials(appId, scope)
+            .thenApply(credentials -> {
+                appCredentialMap.put(cacheKey, credentials);
+                return credentials;
+            });
+    }
+
+    /**
+     * Creates an AppCredentials object for the specified appId and scope.
+     *
+     * @param appId The appId.
+     * @param scope The scope.
+     * @return An AppCredentials object.
+     */
+    protected CompletableFuture<AppCredentials> buildAppCredentials(String appId, String scope) {
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
             AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
                 ? new MicrosoftGovernmentAppCredentials(appId, appPassword, scope)
                 : new MicrosoftAppCredentials(appId, appPassword);
-            appCredentialMap.put(cacheKey, credentials);
             return credentials;
         });
     }
@@ -1287,7 +1302,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
                     && turnContext.getActivity().getConversation() != null
                     && StringUtils.isEmpty(turnContext.getActivity().getConversation().getTenantId())) {
 
-                JsonNode teamsChannelData = new ObjectMapper().valueToTree(turnContext.getActivity().getChannelData());
+                ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+                JsonNode teamsChannelData = mapper.valueToTree(turnContext.getActivity().getChannelData());
                 if (teamsChannelData != null && teamsChannelData.has("tenant")
                         && teamsChannelData.get("tenant").has("id")) {
 

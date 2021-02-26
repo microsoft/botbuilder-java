@@ -40,25 +40,11 @@ import java.util.concurrent.CompletableFuture;
  */
 public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private final HashSet<String> dateSubtypes = new HashSet<>(
-        Arrays.asList(
-            "date",
-            "daterange",
-            "datetime",
-            "datetimerange",
-            "duration",
-            "set",
-            "time",
-            "timerange"
-        ));
+        Arrays.asList("date", "daterange", "datetime", "datetimerange", "duration", "set", "time", "timerange")
+    );
 
-    private final HashSet<String> geographySubtypes = new HashSet<>(
-        Arrays.asList(
-            "poi",
-            "city",
-            "countryRegion",
-            "continent",
-            "state"
-        ));
+    private final HashSet<String> geographySubtypes =
+        new HashSet<>(Arrays.asList("poi", "city", "countryRegion", "continent", "state"));
 
     private final String metadataKey = "$instance";
 
@@ -83,36 +69,41 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private Recognizer externalEntityRecognizer = null;
 
     /**
-     * Value indicating whether all intents come back or only the top one. True for returning all intents.
+     * Value indicating whether all intents come back or only the top one. True for
+     * returning all intents.
      */
     private boolean includeAllIntents = false;
 
     /**
      * Value indicating whether or not instance data should be included in response.
      */
-    private boolean includeInstanceData  = false;
+    private boolean includeInstanceData = false;
 
     /**
-     * Value indicating whether queries should be logged in LUIS. If queries should be logged in LUIS in order to help
-     * build better models through active learning
+     * Value indicating whether queries should be logged in LUIS. If queries should
+     * be logged in LUIS in order to help build better models through active
+     * learning
      */
-    private boolean log  = true;
+    private boolean log = true;
 
     /**
-     * Value indicating whether external entities should override other means of recognizing entities. True if external
-     * entities should be preferred to the results from LUIS models
+     * Value indicating whether external entities should override other means of
+     * recognizing entities. True if external entities should be preferred to the
+     * results from LUIS models
      */
     private boolean preferExternalEntities = true;
 
     /**
-     * The LUIS slot to use for the application. By default this uses the production slot. You can find other standard
-     * slots in LuisSlot. If you specify a Version, then a private version of the application is used instead of a slot.
+     * The LUIS slot to use for the application. By default this uses the production
+     * slot. You can find other standard slots in LuisSlot. If you specify a
+     * Version, then a private version of the application is used instead of a slot.
      */
     private String slot = LuisSlot.PRODUCTION;
 
     /**
-     * The specific version of the application to access. LUIS supports versions and this is the version to use instead
-     * of a slot. If this is specified, then the Slot is ignored.
+     * The specific version of the application to access. LUIS supports versions and
+     * this is the version to use instead of a slot. If this is specified, then the
+     * Slot is ignored.
      */
     private String version = null;
 
@@ -132,7 +123,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     public static final String LUIS_TRACE_LABEL = "LuisV3 Trace";
 
     /**
-     * Gets External entity recognizer to recognize external entities to pass to LUIS.
+     * Gets External entity recognizer to recognize external entities to pass to
+     * LUIS.
+     * 
      * @return externalEntityRecognizer
      */
     public Recognizer getExternalEntityRecognizer() {
@@ -140,7 +133,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Sets External entity recognizer to recognize external entities to pass to LUIS.
+     * Sets External entity recognizer to recognize external entities to pass to
+     * LUIS.
+     * 
      * @param externalEntityRecognizer External Recognizer instance.
      */
     public void setExternalEntityRecognizer(Recognizer externalEntityRecognizer) {
@@ -148,7 +143,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets indicating whether all intents come back or only the top one. True for returning all intents.
+     * Gets indicating whether all intents come back or only the top one. True for
+     * returning all intents.
+     * 
      * @return True for returning all intents.
      */
     public boolean isIncludeAllIntents() {
@@ -157,6 +154,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets indicating whether all intents come back or only the top one.
+     * 
      * @param includeAllIntents True for returning all intents.
      */
     public void setIncludeAllIntents(boolean includeAllIntents) {
@@ -164,7 +162,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets value indicating whether or not instance data should be included in response.
+     * Gets value indicating whether or not instance data should be included in
+     * response.
+     * 
      * @return True if instance data should be included in response.
      */
     public boolean isIncludeInstanceData() {
@@ -172,16 +172,21 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Sets value indicating whether or not instance data should be included in response.
-     * @param includeInstanceData True if instance data should be included in response.
+     * Sets value indicating whether or not instance data should be included in
+     * response.
+     * 
+     * @param includeInstanceData True if instance data should be included in
+     *                            response.
      */
     public void setIncludeInstanceData(boolean includeInstanceData) {
         this.includeInstanceData = includeInstanceData;
     }
 
     /**
-     * Value indicating whether queries should be logged in LUIS. If queries should be logged in LUIS in order to help
-     * build better models through active learning
+     * Value indicating whether queries should be logged in LUIS. If queries should
+     * be logged in LUIS in order to help build better models through active
+     * learning
+     * 
      * @return True if queries should be logged in LUIS.
      */
     public boolean isLog() {
@@ -189,8 +194,10 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Value indicating whether queries should be logged in LUIS. If queries should be logged in LUIS in order to help
-     * build better models through active learning.
+     * Value indicating whether queries should be logged in LUIS. If queries should
+     * be logged in LUIS in order to help build better models through active
+     * learning.
+     * 
      * @param log True if queries should be logged in LUIS.
      */
     public void setLog(boolean log) {
@@ -199,6 +206,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Returns Dynamic lists used to recognize entities for a particular query.
+     * 
      * @return Dynamic lists used to recognize entities for a particular query
      */
     public List<DynamicList> getDynamicLists() {
@@ -207,6 +215,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets Dynamic lists used to recognize entities for a particular query.
+     * 
      * @param dynamicLists to recognize entities for a particular query.
      */
     public void setDynamicLists(List<DynamicList> dynamicLists) {
@@ -215,6 +224,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets External entities to be recognized in query.
+     * 
      * @return External entities to be recognized in query.
      */
     public List<ExternalEntity> getExternalEntities() {
@@ -223,6 +233,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets External entities to be recognized in query.
+     * 
      * @param externalEntities External entities to be recognized in query.
      */
     public void setExternalEntities(List<ExternalEntity> externalEntities) {
@@ -230,16 +241,22 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets value indicating whether external entities should override other means of recognizing entities.
-     * @return True if external entities should be preferred to the results from LUIS models.
+     * Gets value indicating whether external entities should override other means
+     * of recognizing entities.
+     * 
+     * @return True if external entities should be preferred to the results from
+     *         LUIS models.
      */
     public boolean isPreferExternalEntities() {
         return preferExternalEntities;
     }
 
     /**
-     * Sets value indicating whether external entities should override other means of recognizing entities.
-     * @param preferExternalEntities True if external entities should be preferred to the results from LUIS models.
+     * Sets value indicating whether external entities should override other means
+     * of recognizing entities.
+     * 
+     * @param preferExternalEntities True if external entities should be preferred
+     *                               to the results from LUIS models.
      */
     public void setPreferExternalEntities(boolean preferExternalEntities) {
         this.preferExternalEntities = preferExternalEntities;
@@ -247,6 +264,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets datetimeV2 offset. The format for the datetimeReference is ISO 8601.
+     * 
      * @return The format for the datetimeReference in ISO 8601.
      */
     public String getDateTimeReference() {
@@ -255,6 +273,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets datetimeV2 offset.
+     * 
      * @param dateTimeReference The format for the datetimeReference is ISO 8601.
      */
     public void setDateTimeReference(String dateTimeReference) {
@@ -262,9 +281,11 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets the LUIS slot to use for the application. By default this uses the production slot.
-     * You can find other standard slots in LuisSlot. If you specify a Version,
-     * then a private version of the application is used instead of a slot.
+     * Gets the LUIS slot to use for the application. By default this uses the
+     * production slot. You can find other standard slots in LuisSlot. If you
+     * specify a Version, then a private version of the application is used instead
+     * of a slot.
+     * 
      * @return LuisSlot constant.
      */
     public String getSlot() {
@@ -272,9 +293,11 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Sets the LUIS slot to use for the application. By default this uses the production slot.
-     * You can find other standard slots in LuisSlot. If you specify a Version,
-     * then a private version of the application is used instead of a slot.
+     * Sets the LUIS slot to use for the application. By default this uses the
+     * production slot. You can find other standard slots in LuisSlot. If you
+     * specify a Version, then a private version of the application is used instead
+     * of a slot.
+     * 
      * @param slot LuisSlot value to use.
      */
     public void setSlot(String slot) {
@@ -282,9 +305,10 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Gets the specific version of the application to access.
-     * LUIS supports versions and this is the version to use instead of a slot.
-     * If this is specified, then the Slot is ignored.
+     * Gets the specific version of the application to access. LUIS supports
+     * versions and this is the version to use instead of a slot. If this is
+     * specified, then the Slot is ignored.
+     * 
      * @return Luis application version to Query.
      */
     public String getVersion() {
@@ -292,9 +316,11 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Sets the specific version of the application to access.
-     * LUIS supports versions and this is the version to use instead of a slot.
-     * @param version Luis Application version. If this is specified, then the Slot is ignored.
+     * Sets the specific version of the application to access. LUIS supports
+     * versions and this is the version to use instead of a slot.
+     * 
+     * @param version Luis Application version. If this is specified, then the Slot
+     *                is ignored.
      */
     public void setVersion(String version) {
         this.version = version;
@@ -302,6 +328,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Gets whether the http client.
+     * 
      * @return OkHttpClient used to query the Luis Service.
      */
     public OkHttpClient getHttpClient() {
@@ -310,6 +337,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Sets the http client.
+     * 
      * @param httpClient to use for Luis Service http calls.
      */
     public void setHttpClient(OkHttpClient httpClient) {
@@ -318,6 +346,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
     /**
      * Initializes a new instance of the LuisRecognizerOptionsV3.
+     * 
      * @param application Luis Application instance to query.
      */
     public LuisRecognizerOptionsV3(LuisApplication application) {
@@ -325,111 +354,83 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     }
 
     /**
-     * Internal implementation of the http request to the LUIS service and parsing of the response to a
-     * Recognizer Result instance.
+     * Internal implementation of the http request to the LUIS service and parsing
+     * of the response to a Recognizer Result instance.
+     * 
      * @param dialogContext Context Object.
-     * @param activity Activity object to extract the utterance.
+     * @param activity      Activity object to extract the utterance.
      */
     @Override
-    CompletableFuture<RecognizerResult> recognizeInternal(
-        DialogContext dialogContext,
-        Activity activity
-    ) {
+    CompletableFuture<RecognizerResult> recognizeInternal(DialogContext dialogContext, Activity activity) {
         if (externalEntityRecognizer == null) {
-            return recognizeInternal(
-                dialogContext.getContext(),
-                activity.getText());
+            return recognizeInternal(dialogContext.getContext(), activity.getText());
         }
 
         // call external entity recognizer
         List<ExternalEntity> originalExternalEntities = externalEntities;
-        return externalEntityRecognizer
-            .recognize(dialogContext, activity)
-            .thenCompose(
-                matches -> {
-                    if (matches.getEntities() == null
-                        || matches.getEntities().toString().equals("{}")) {
-                        return recognizeInternal(
-                            dialogContext.getContext(),
-                            activity.getText());
+        return externalEntityRecognizer.recognize(dialogContext, activity).thenCompose(matches -> {
+            if (matches.getEntities() == null || matches.getEntities().toString().equals("{}")) {
+                return recognizeInternal(dialogContext.getContext(), activity.getText());
+            }
+
+            List<ExternalEntity> recognizerExternalEntities = new ArrayList<>();
+            JsonNode entities = matches.getEntities();
+            JsonNode instance = entities.get("$instance");
+
+            if (instance == null) {
+                return recognizeInternal(dialogContext.getContext(), activity.getText());
+            }
+
+            Iterator<Map.Entry<String, JsonNode>> instanceEntitiesIterator = instance.fields();
+
+            while (instanceEntitiesIterator.hasNext()) {
+                Map.Entry<String, JsonNode> property = instanceEntitiesIterator.next();
+
+                if (property.getKey().equals("text") || property.getKey().equals("$instance")) {
+                    continue;
+                }
+
+                ArrayNode instances = (ArrayNode) instance.get(property.getKey());
+                ArrayNode values = (ArrayNode) property.getValue();
+
+                if (instances == null || values == null || instances.size() != values.size()) {
+                    continue;
+                }
+
+                for (JsonNode childInstance : values) {
+                    if (childInstance != null && childInstance.has("startIndex") && childInstance.has("endIndex")) {
+                        int start = childInstance.get("startIndex").asInt();
+                        int end = childInstance.get("endIndex").asInt();
+                        recognizerExternalEntities
+                            .add(new ExternalEntity(property.getKey(), start, end - start, property.getValue()));
                     }
+                }
+                recognizerExternalEntities
+                    .addAll(originalExternalEntities == null ? new ArrayList<>() : originalExternalEntities);
+                externalEntities = recognizerExternalEntities;
+            }
 
-                    List<ExternalEntity> recognizerExternalEntities = new ArrayList<>();
-                    JsonNode entities = matches.getEntities();
-                    JsonNode instance = entities.get("$instance");
-
-                    if (instance == null) {
-                        return recognizeInternal(
-                            dialogContext.getContext(),
-                            activity.getText());
-                    }
-
-                    Iterator<Map.Entry<String, JsonNode>> instanceEntitiesIterator = instance.fields();
-
-                    while (instanceEntitiesIterator.hasNext()) {
-                        Map.Entry<String, JsonNode> property = instanceEntitiesIterator.next();
-
-                        if (property.getKey().equals("text")
-                            || property.getKey().equals("$instance")) {
-                            continue;
-                        }
-
-                        ArrayNode instances = (ArrayNode) instance.get(property.getKey());
-                        ArrayNode values = (ArrayNode) property.getValue();
-
-                        if (instances == null
-                            || values == null
-                            || instances.size() != values.size()) {
-                            continue;
-                        }
-
-                        for (JsonNode childInstance : values) {
-                            if (childInstance != null
-                                && childInstance.has("startIndex")
-                                && childInstance.has("endIndex")) {
-                                int start = childInstance.get("startIndex").asInt();
-                                int end = childInstance.get("endIndex").asInt();
-                                recognizerExternalEntities.add(new ExternalEntity(
-                                    property.getKey(),
-                                    start,
-                                    end - start,
-                                    property.getValue()));
-                            }
-                        }
-                        recognizerExternalEntities.addAll(
-                            originalExternalEntities == null
-                                ? new ArrayList<>()
-                                : originalExternalEntities
-                        );
-                        externalEntities = recognizerExternalEntities;
-                    }
-
-                    return recognizeInternal(dialogContext.getContext(), activity.getText())
-                        .thenApply(recognizerResult -> {
-                            externalEntities = originalExternalEntities;
-                            return recognizerResult;
-                        });
+            return recognizeInternal(dialogContext.getContext(), activity.getText()).thenApply(recognizerResult -> {
+                externalEntities = originalExternalEntities;
+                return recognizerResult;
+            });
         });
     }
 
     /**
-     * Internal implementation of the http request to the LUIS service and parsing of the response to a
-     * Recognizer Result instance.
+     * Internal implementation of the http request to the LUIS service and parsing
+     * of the response to a Recognizer Result instance.
+     * 
      * @param turnContext Context Object.
      */
     @Override
-    CompletableFuture<RecognizerResult> recognizeInternal(
-        TurnContext turnContext) {
-        return recognizeInternal(
-            turnContext,
-            turnContext.getActivity().getText());
+    CompletableFuture<RecognizerResult> recognizeInternal(TurnContext turnContext) {
+        return recognizeInternal(turnContext, turnContext.getActivity().getText());
     }
 
     private Request buildRequest(RequestBody body) {
         StringBuilder path = new StringBuilder(getApplication().getEndpoint());
-        path.append(String.format(
-            "/luis/prediction/v3.0/apps/%s",
-            getApplication().getApplicationId()));
+        path.append(String.format("/luis/prediction/v3.0/apps/%s", getApplication().getApplicationId()));
 
         if (version == null) {
             path.append(String.format("/slots/%s/predict", slot));
@@ -443,25 +444,21 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         httpBuilder.addQueryParameter("log", Boolean.toString(log));
         httpBuilder.addQueryParameter("show-all-intents", Boolean.toString(includeAllIntents));
 
-        Request.Builder requestBuilder = new Request.Builder()
-            .url(httpBuilder.build())
-            .addHeader("Ocp-Apim-Subscription-Key", getApplication().getEndpointKey()).post(body);
+        Request.Builder requestBuilder = new Request.Builder().url(httpBuilder.build())
+            .addHeader("Ocp-Apim-Subscription-Key", getApplication().getEndpointKey())
+            .post(body);
         return requestBuilder.build();
     }
 
     private RequestBody buildRequestBody(String utterance) throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         ObjectNode content = JsonNodeFactory.instance.objectNode().put("query", utterance);
-        ObjectNode queryOptions = JsonNodeFactory.instance.objectNode().put(
-            "preferExternalEntities",
-            preferExternalEntities);
+        ObjectNode queryOptions =
+            JsonNodeFactory.instance.objectNode().put("preferExternalEntities", preferExternalEntities);
 
-        if (dateTimeReference != null
-            && !dateTimeReference.isEmpty()) {
-            queryOptions.put(
-                "datetimeReference",
-                dateTimeReference);
+        if (dateTimeReference != null && !dateTimeReference.isEmpty()) {
+            queryOptions.put("datetimeReference", dateTimeReference);
         }
 
         content.set("options", queryOptions);
@@ -478,21 +475,21 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         }
 
         String contentAsText = mapper.writeValueAsString(content);
-        return RequestBody.create(contentAsText,  MediaType.parse("application/json; charset=utf-8"));
+        return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), contentAsText);
     }
 
-    private CompletableFuture<RecognizerResult> recognizeInternal(
-        TurnContext turnContext,
-        String utterance) {
+    private CompletableFuture<RecognizerResult> recognizeInternal(TurnContext turnContext, String utterance) {
 
         RecognizerResult recognizerResult;
         JsonNode luisResponse = null;
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         if (utterance == null || utterance.isEmpty()) {
-            recognizerResult = new RecognizerResult() {{
-                setText(utterance);
-            }};
+            recognizerResult = new RecognizerResult() {
+                {
+                    setText(utterance);
+                }
+            };
         } else {
             try {
                 Request request = buildRequest(buildRequestBody(utterance));
@@ -503,9 +500,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 }
 
             } catch (IOException e) {
-               CompletableFuture<RecognizerResult> exceptionResult = new CompletableFuture<>();
-               exceptionResult.completeExceptionally(e);
-               return exceptionResult;
+                CompletableFuture<RecognizerResult> exceptionResult = new CompletableFuture<>();
+                exceptionResult.completeExceptionally(e);
+                return exceptionResult;
             }
 
             JsonNode prediction = luisResponse.get("prediction");
@@ -523,14 +520,12 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                 recognizerResult.getProperties().put("luisResult", luisResponse);
             }
 
-            if (includeInstanceData
-                && recognizerResult.getEntities().get(metadataKey) == null) {
+            if (includeInstanceData && recognizerResult.getEntities().get(metadataKey) == null) {
                 ((ObjectNode) recognizerResult.getEntities()).putObject(metadataKey);
             }
         }
 
-        return sendTraceActivity(recognizerResult, luisResponse, turnContext)
-            .thenApply(v -> recognizerResult);
+        return sendTraceActivity(recognizerResult, luisResponse, turnContext).thenApply(v -> recognizerResult);
 
     }
 
@@ -544,26 +539,22 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
 
         for (Iterator<Map.Entry<String, JsonNode>> it = intentsObject.fields(); it.hasNext();) {
             Map.Entry<String, JsonNode> intent = it.next();
-            double score = intent.getValue()
-                .get("score")
-                .asDouble();
-            String intentName = intent.getKey()
-                .replace(".", "_")
-                .replace(" ", "_");
-            intents.put(intentName, new IntentScore() {{
-                setScore(score);
-            }});
+            double score = intent.getValue().get("score").asDouble();
+            String intentName = intent.getKey().replace(".", "_").replace(" ", "_");
+            intents.put(intentName, new IntentScore() {
+                {
+                    setScore(score);
+                }
+            });
         }
 
         return intents;
     }
 
     private String normalizeEntity(String entity) {
-    // Type::Role -> Role
+        // Type::Role -> Role
         String[] type = entity.split(":");
-        return type[type.length - 1]
-            .replace(".", "_")
-            .replace(" ", "_");
+        return type[type.length - 1].replace(".", "_").replace(" ", "_");
     }
 
     private JsonNode getEntities(JsonNode prediction) {
@@ -571,30 +562,25 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             return JsonNodeFactory.instance.objectNode();
         }
 
-        return  mapEntitiesRecursive(prediction.get("entities"), false);
+        return mapEntitiesRecursive(prediction.get("entities"), false);
     }
 
     // Exact Port from C#
-    private JsonNode mapEntitiesRecursive(
-        JsonNode source,
-        boolean inInstance) {
+    private JsonNode mapEntitiesRecursive(JsonNode source, boolean inInstance) {
         JsonNode result = source;
-        if (!source.isArray()
-            && source.isObject()) {
+        if (!source.isArray() && source.isObject()) {
             ObjectNode nobj = JsonNodeFactory.instance.objectNode();
             // Fix datetime by reverting to simple timex
             JsonNode obj = source;
             JsonNode type = source.get("type");
 
-            if (!inInstance
-                && type != null
-                && dateSubtypes.contains(type.asText())) {
+            if (!inInstance && type != null && dateSubtypes.contains(type.asText())) {
                 JsonNode timexs = obj.get("values");
                 ArrayNode arr = JsonNodeFactory.instance.arrayNode();
                 if (timexs != null) {
                     Set<String> unique = new HashSet<>();
 
-                    for (JsonNode elt: timexs) {
+                    for (JsonNode elt : timexs) {
                         unique.add(elt.get("timex").textValue());
                     }
 
@@ -615,15 +601,11 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                     boolean isArray = property.getValue().isArray();
                     boolean isString = property.getValue().isTextual();
                     boolean isInt = property.getValue().isInt();
-                    JsonNode val = mapEntitiesRecursive(
-                        property.getValue(),
-                        inInstance || name.equals(metadataKey));
+                    JsonNode val = mapEntitiesRecursive(property.getValue(), inInstance || name.equals(metadataKey));
 
-                    if (name.equals("datetime")
-                        && isArray) {
+                    if (name.equals("datetime") && isArray) {
                         nobj.set("datetimeV1", val);
-                    } else if (name.equals("datetimeV2")
-                        && isArray) {
+                    } else if (name.equals("datetimeV2") && isArray) {
                         nobj.set("datetime", val);
                     } else if (inInstance) {
                         // Correct $instance issues
@@ -633,8 +615,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                                 value += obj.get("startIndex").intValue();
                             }
                             nobj.put("endIndex", value);
-                        } else if (!((isInt && name.equals("modelTypeId")) ||        //NOPMD
-                            (isString && name.equals("role")))) {                    //NOPMD
+                        } else if (!((isInt && name.equals("modelTypeId")) || // NOPMD
+                            (isString && name.equals("role"))) // NOPMD
+                        ) { // NOPMD
                             nobj.set(name, val);
                         }
                     } else {
@@ -664,8 +647,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
                         break;
                     }
 
-                    if (props.getKey().contains("type")
-                        && geographySubtypes.contains(props.getValue().textValue())) {
+                    if (props.getKey().contains("type") && geographySubtypes.contains(props.getValue().textValue())) {
                         isGeographyV2 = props.getValue().textValue();
                         break;
                     }
@@ -694,9 +676,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         return result;
     }
 
-    private void addProperties(
-        JsonNode prediction,
-        RecognizerResult result) {
+    private void addProperties(JsonNode prediction, RecognizerResult result) {
         JsonNode sentiment = prediction.get("sentiment");
         if (sentiment != null) {
             ObjectNode sentimentNode = JsonNodeFactory.instance.objectNode();
@@ -709,21 +689,18 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     private CompletableFuture<ResourceResponse> sendTraceActivity(
         RecognizerResult recognizerResult,
         JsonNode luisResponse,
-        TurnContext turnContext) {
-        ObjectMapper mapper = new ObjectMapper();
+        TurnContext turnContext
+    ) {
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         try {
             ObjectNode traceInfo = JsonNodeFactory.instance.objectNode();
-            traceInfo.put(
-                "recognizerResult",
-                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recognizerResult));
-            traceInfo.set(
-                "luisResult",
-                luisResponse);
+            traceInfo
+                .put("recognizerResult", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recognizerResult));
+            traceInfo.set("luisResult", luisResponse);
             traceInfo.set(
                 "luisModel",
-                JsonNodeFactory.instance.objectNode()
-                    .put("ModelId",
-                    getApplication().getApplicationId()));
+                JsonNodeFactory.instance.objectNode().put("ModelId", getApplication().getApplicationId())
+            );
 
             ObjectNode luisOptions = JsonNodeFactory.instance.objectNode();
             luisOptions.put("includeAllIntents", includeAllIntents);
@@ -733,7 +710,6 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             luisOptions.put("dateTimeReference", dateTimeReference);
             luisOptions.put("slot", slot);
             luisOptions.put("version", version);
-
 
             if (externalEntities != null) {
                 ArrayNode externalEntitiesNode = JsonNodeFactory.instance.arrayNode();
@@ -754,11 +730,8 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             traceInfo.set("luisOptions", luisOptions);
 
             return turnContext.sendActivity(
-                Activity.createTraceActivity(
-                    "LuisRecognizer",
-                    LUIS_TRACE_TYPE,
-                    traceInfo,
-                    LUIS_TRACE_LABEL));
+                Activity.createTraceActivity("LuisRecognizer", LUIS_TRACE_TYPE, traceInfo, LUIS_TRACE_LABEL)
+            );
 
         } catch (IOException e) {
             CompletableFuture<ResourceResponse> exceptionResult = new CompletableFuture<>();

@@ -52,6 +52,8 @@ public class DialogStateManager implements Map<String, Object> {
     private final DialogContext dialogContext;
     private int version;
 
+    private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+
     /**
      * Initializes a new instance of the
      * {@link com.microsoft.bot.dialogs.memory.DialogStateManager} class.
@@ -147,7 +149,6 @@ public class DialogStateManager implements Map<String, Object> {
         if (key.indexOf(SEPARATORS[0]) == -1 && key.indexOf(SEPARATORS[1]) == -1) {
             MemoryScope scope = getMemoryScope(key);
             if (scope != null) {
-                ObjectMapper mapper = new ObjectMapper();
                 try {
                     scope.setMemory(dialogContext, mapper.writeValueAsString(element));
                 } catch (JsonProcessingException e) {
@@ -398,7 +399,6 @@ public class DialogStateManager implements Map<String, Object> {
         }
 
         if (value != null) {
-            ObjectMapper mapper = new ObjectMapper();
             value = mapper.valueToTree(value);
         }
 
@@ -433,7 +433,6 @@ public class DialogStateManager implements Map<String, Object> {
      * @return JsonNode that which represents all memory scopes.
      */
     public JsonNode getMemorySnapshot() {
-        ObjectMapper mapper = new ObjectMapper();
         ObjectNode result = mapper.createObjectNode();
 
         List<MemoryScope> scopes = configuration.getMemoryScopes().stream().filter((x) -> x.getIncludeInSnapshot())

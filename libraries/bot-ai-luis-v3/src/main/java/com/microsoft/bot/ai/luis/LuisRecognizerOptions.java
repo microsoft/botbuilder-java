@@ -12,13 +12,15 @@ import com.microsoft.bot.schema.Activity;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Abstract class to enforce the Strategy pattern consumed by the Luis Recognizer through the options selected.
+ * Abstract class to enforce the Strategy pattern consumed by the Luis
+ * Recognizer through the options selected.
  *
  */
 public abstract class LuisRecognizerOptions {
 
     /**
      * Initializes an instance of the LuisRecognizerOptions implementation.
+     * 
      * @param application An instance of LuisApplication".
      */
     protected LuisRecognizerOptions(LuisApplication application) {
@@ -44,7 +46,8 @@ public abstract class LuisRecognizerOptions {
     private boolean logPersonalInformation = false;
 
     /**
-     * Controls if full results from the LUIS API should be returned with the recognizer result.
+     * Controls if full results from the LUIS API should be returned with the
+     * recognizer result.
      */
     private boolean includeAPIResults = false;
 
@@ -58,7 +61,8 @@ public abstract class LuisRecognizerOptions {
     }
 
     /**
-     * Gets the currently configured Bot Telemetry Client that logs the LuisResult event.
+     * Gets the currently configured Bot Telemetry Client that logs the LuisResult
+     * event.
      *
      * @return The Bot Telemetry Client.
      */
@@ -71,13 +75,13 @@ public abstract class LuisRecognizerOptions {
      *
      * @param telemetryClient A Bot Telemetry Client instance
      */
-    public void setTelemetryClient(
-        BotTelemetryClient telemetryClient) {
+    public void setTelemetryClient(BotTelemetryClient telemetryClient) {
         this.telemetryClient = telemetryClient;
     }
 
     /**
      * Indicates if personal information should be sent as telemetry.
+     * 
      * @return value boolean value to control personal information logging.
      */
     public boolean isLogPersonalInformation() {
@@ -86,49 +90,53 @@ public abstract class LuisRecognizerOptions {
 
     /**
      * Indicates if personal information should be sent as telemetry.
+     * 
      * @param logPersonalInformation to set personal information logging preference.
      */
-    public void setLogPersonalInformation(
-        boolean logPersonalInformation) {
+    public void setLogPersonalInformation(boolean logPersonalInformation) {
         this.logPersonalInformation = logPersonalInformation;
     }
 
     /**
-     * Indicates if full results from the LUIS API should be returned with the recognizer result.
-     * @return boolean value showing preference on LUIS API full response added to recognizer result.
+     * Indicates if full results from the LUIS API should be returned with the
+     * recognizer result.
+     * 
+     * @return boolean value showing preference on LUIS API full response added to
+     *         recognizer result.
      */
     public boolean isIncludeAPIResults() {
         return includeAPIResults;
     }
 
     /**
-     * Indicates if full results from the LUIS API should be returned with the recognizer result.
-     * @param includeAPIResults to set full Luis API response to be added to the recognizer result.
+     * Indicates if full results from the LUIS API should be returned with the
+     * recognizer result.
+     * 
+     * @param includeAPIResults to set full Luis API response to be added to the
+     *                          recognizer result.
      */
-    public void setIncludeAPIResults(
-        boolean includeAPIResults) {
+    public void setIncludeAPIResults(boolean includeAPIResults) {
         this.includeAPIResults = includeAPIResults;
     }
 
     /**
-     * Implementation of the Luis API http call and result processing.
-     * This is intended to follow a Strategy pattern and
-     * should only be consumed through the LuisRecognizer class.
+     * Implementation of the Luis API http call and result processing. This is
+     * intended to follow a Strategy pattern and should only be consumed through the
+     * LuisRecognizer class.
+     * 
      * @param turnContext used to extract the text utterance to be sent to Luis.
      * @return Recognizer Result populated by the Luis response.
      */
-    abstract CompletableFuture<RecognizerResult> recognizeInternal(
-        TurnContext turnContext);
+    abstract CompletableFuture<RecognizerResult> recognizeInternal(TurnContext turnContext);
 
     /**
-     * Implementation of the Luis API http call and result processing.
-     * This is intended to follow a Strategy pattern and
-     * should only be consumed through the LuisRecognizer class.
-     * @param context Dialog Context to extract turn context.
+     * Implementation of the Luis API http call and result processing. This is
+     * intended to follow a Strategy pattern and should only be consumed through the
+     * LuisRecognizer class.
+     * 
+     * @param context  Dialog Context to extract turn context.
      * @param activity to extract the text utterance to be sent to Luis.
      * @return Recognizer Result populated by the Luis response.
      */
-    abstract CompletableFuture<RecognizerResult> recognizeInternal(
-        DialogContext context,
-        Activity activity);
+    abstract CompletableFuture<RecognizerResult> recognizeInternal(DialogContext context, Activity activity);
 }

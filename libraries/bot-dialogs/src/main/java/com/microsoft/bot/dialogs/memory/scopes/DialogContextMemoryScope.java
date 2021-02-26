@@ -3,14 +3,14 @@
 
 package com.microsoft.bot.dialogs.memory.scopes;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.schema.Serialization;
 import java.util.Optional;
 
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogInstance;
 import com.microsoft.bot.dialogs.ScopePath;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * DialogContextMemoryScope maps "dialogcontext" -> properties.
@@ -39,8 +39,8 @@ public class DialogContextMemoryScope extends MemoryScope {
             throw new IllegalArgumentException("dialogContext cannot be null.");
         }
 
-        JSONObject memory  = new JSONObject();
-        JSONArray stack = new JSONArray();
+        ObjectNode memory  = Serialization.createObjectNode();
+        ArrayNode stack = Serialization.createArrayNode();
         DialogContext currentDc = dialogContext;
 
         // go to leaf node
@@ -52,7 +52,7 @@ public class DialogContextMemoryScope extends MemoryScope {
             // (PORTERS NOTE: javascript stack is reversed with top of stack on end)
             currentDc.getStack().forEach(item -> {
                 if (item.getId().startsWith("ActionScope[")) {
-                    stack.put(item.getId());
+                    stack.add(item.getId());
                 }
 
             });
@@ -61,7 +61,7 @@ public class DialogContextMemoryScope extends MemoryScope {
         }
 
         // top of stack is stack[0].
-        memory.put(stackKey, stack);
+        memory.set(stackKey, stack);
         memory.put(activeDialogKey, Optional.ofNullable(dialogContext)
                                     .map(DialogContext::getActiveDialog)
                                     .map(DialogInstance::getId)
