@@ -4,14 +4,30 @@
 package com.microsoft.bot.azure;
 
 import com.microsoft.azure.documentdb.*;
+import com.microsoft.bot.builder.AutoSaveStateMiddleware;
+import com.microsoft.bot.builder.ConversationState;
+import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.StorageBaseTests;
+import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.dialogs.*;
+import com.microsoft.bot.dialogs.prompts.PromptOptions;
+import com.microsoft.bot.dialogs.prompts.PromptValidator;
+import com.microsoft.bot.dialogs.prompts.PromptValidatorContext;
+import com.microsoft.bot.dialogs.prompts.TextPrompt;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationReference;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The CosmosDB tests require the CosmosDB Emulator to be installed and running.
@@ -144,39 +160,74 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
         } catch (IllegalArgumentException e) {
 
         }
+
+        try {
+            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
+                setAuthKey("testAuthKey");
+                setContainerId("testId");
+                setDatabaseId("testDb");
+                setCosmosDbEndpoint("testEndpoint");
+                setKeySuffix("?#*test");
+                setCompatibilityMode(false);
+            }});
+            Assert.fail("should have thrown for invalid Row Key characters in KeySuffix");
+        } catch (IllegalArgumentException e) {
+
+        }
+
+        try {
+            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
+                setAuthKey("testAuthKey");
+                setContainerId("testId");
+                setDatabaseId("testDb");
+                setCosmosDbEndpoint("testEndpoint");
+                setKeySuffix("thisisatest");
+                setCompatibilityMode(true);
+            }});
+            Assert.fail("should have thrown for CompatibilityMode 'true' while using a KeySuffix");
+        } catch (IllegalArgumentException e) {
+
+        }
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void CreateObjectTest() {
+    public void CreateObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.createObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void ReadUnknownTest() {
+    public void ReadUnknownCosmosDBPartitionTest() {
         assertEmulator();
         super.readUnknownTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void UpdateObjectTest() {
+    public void UpdateObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.updateObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void DeleteObjectTest() {
+    public void DeleteObjectCosmosDBPartitionTest() {
         assertEmulator();
         super.deleteObjectTest(storage);
     }
 
     // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
     @Test
-    public void HandleCrazyKeys() {
+    public void DeleteUnknownObjectCosmosDBPartitionTest() {
+        assertEmulator();
+        storage.delete(new String[] {"unknown_delete"});
+    }
+
+    // NOTE: THESE TESTS REQUIRE THAT THE COSMOS DB EMULATOR IS INSTALLED AND STARTED !!!!!!!!!!!!!!!!!
+    @Test
+    public void HandleCrazyKeysCosmosDBPartition() {
         assertEmulator();
         super.handleCrazyKeys(storage);
     }
