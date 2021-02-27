@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.sample.simplerootbot;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
@@ -16,14 +15,12 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.SkillHttpClient;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
-import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 import com.microsoft.bot.sample.simplerootbot.authentication.AllowedSkillsClaimsValidator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 
 //
 // This is the starting point of the Sprint Boot Bot application.
@@ -45,6 +42,10 @@ import org.springframework.context.annotation.Primary;
 public class Application extends BotDependencyConfiguration {
 
     public static void main(String[] args) {
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "8888");
+        System.setProperty("javax.net.ssl.trustStore","C:\\Users\\leepa\\.keystore\\FiddlerKeystore");
+        System.setProperty("javax.net.ssl.trustStorePassword","password");
         SpringApplication.run(Application.class, args);
     }
 
@@ -112,10 +113,4 @@ public class Application extends BotDependencyConfiguration {
     public SkillConversationIdFactoryBase getSkillConversationIdFactoryBase() {
         return new SkillConversationIdFactory();
     }
-
-    // @Bean
-    // @Primary
-    // public ObjectMapper objectMapper() {
-    //     return new JacksonAdapter().serializer();
-    // }
 }

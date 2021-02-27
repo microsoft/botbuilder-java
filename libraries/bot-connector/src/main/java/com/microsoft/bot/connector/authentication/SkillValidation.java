@@ -52,22 +52,45 @@ public final class SkillValidation {
             true, Duration.ofMinutes(5), true);
 
     /**
-     * Checks if the given list of claims represents a skill. A skill claim should
-     * contain: An AuthenticationConstants.VersionClaim" claim. An
-     * AuthenticationConstants.AudienceClaim claim. An
-     * AuthenticationConstants.AppIdClaim claim (v1) or an a
-     * AuthenticationConstants.AuthorizedParty claim (v2). And the appId claim
-     * should be different than the audience claim. When a channel (webchat, teams,
-     * etc.) invokes a bot, the <see cref="AuthenticationConstants.AudienceClaim"/>
-     * is set to <see cref="AuthenticationConstants.ToBotFromChannelTokenIssuer"/>
-     * but when a bot calls another bot, the audience claim is set to the appId of
-     * the bot being invoked. The protocol supports v1 and v2 tokens: For v1 tokens,
-     * the AuthenticationConstants.AppIdClaim is present and set to the app Id of
-     * the calling bot. For v2 tokens, the AuthenticationConstants.AuthorizedParty
-     * is present and set to the app Id of the calling bot.
+     * Determines if a given Auth header is from from a skill to bot or bot to skill request.
      *
-     * @param claims A map of claims
-     * @return True if the list of claims is a skill claim, false if is not.
+     * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
+     * @return True, if the token was issued for a skill to bot communication. Otherwise, false.
+     */
+    public static boolean isSkillToken(String authHeader) {
+        if (!JwtTokenValidation.isValidTokenFormat(authHeader)) {
+            return false;
+        }
+
+        // We know is a valid token, split it and work with it:
+        // [0] = "Bearer"
+        // [1] = "[Big Long String]"
+        String bearerToken = authHeader.split(" ")[1];
+
+        // Parse token
+        ClaimsIdentity identity = new ClaimsIdentity(JWT.decode(bearerToken));
+
+        return isSkillClaim(identity.claims());
+    }
+
+    /**
+     * Checks if the given list of claims represents a skill.
+     *
+     * A skill claim should contain: An
+     * {@link AuthenticationConstants#versionClaim} claim. An {@link AuthenticationConstants#audienceClaim} claim.
+     * An {@link AuthenticationConstants#appIdClaim} claim (v1) or an a {@link AuthenticationConstants#authorizedParty}
+     * claim (v2). And the appId claim should be different than the audience claim. When a channel (webchat, teams,
+     * etc.) invokes a bot, the {@link AuthenticationConstants#audienceClaim} is set to
+     * {@link AuthenticationConstants#toBotFromChannelTokenIssuer} but when a bot calls another bot,
+     * the audience claim is set to the appId of the bot being invoked. The protocol supports v1 and v2 tokens:
+     * For v1 tokens, the {@link AuthenticationConstants#appIdClaim} is present and set to the app Id of the
+     * calling bot. For v2 tokens, the {@link AuthenticationConstants#authorizedParty} is present and set to
+     * the app Id of the calling bot.
+     *
+     * @param claims  A list of claims.
+     *
+     * @return   True if the list of claims is a skill claim, false if
+     *           is not.
      */
     public static Boolean isSkillClaim(Map<String, String> claims) {
 
@@ -104,26 +127,52 @@ public final class SkillValidation {
         return !StringUtils.equals(appId, audience.get().getValue());
     }
 
-    /**
-     * Determines if a given Auth header is from from a skill to bot or bot to skill request.
+        /**
+     * Validates that the incoming Auth Header is a token sent from a bot to a
+     * skill or from a skill to a bot.
      *
-     * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
-     * @return True, if the token was issued for a skill to bot communication. Otherwise, false.
+     * @param authHeader       The raw HTTP header in the format:
+     *                         "Bearer [longString]".
+     * @param credentials      The user defined set of valid
+     *                         credentials, such as the AppId.
+     * @param channelProvider  The channelService value that
+     *                         distinguishes public Azure from US Government Azure.
+     * @param channelId        The ID of the channel to validate.
+     * @param authConfig       The authentication configuration.
+     *
+     * @return   A {@link ClaimsIdentity} instance if the validation is
+     *           successful.
      */
-    public static boolean isSkillToken(String authHeader) {
-        if (!JwtTokenValidation.isValidTokenFormat(authHeader)) {
-            return false;
+    public static CompletableFuture<ClaimsIdentity> authenticateChannelToken(
+        String authHeader,
+        CredentialProvider credentials,
+        ChannelProvider channelProvider,
+        String channelId,
+        AuthenticationConfiguration authConfig
+    ) {
+        if (authConfig == null) {
+            return Async.completeExceptionally(
+                new IllegalArgumentException("authConfig cannot be null.")
+            );
         }
 
-        // We know is a valid token, split it and work with it:
-        // [0] = "Bearer"
-        // [1] = "[Big Long String]"
-        String bearerToken = authHeader.split(" ")[1];
+        String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment()
+            ? GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
+            : AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
 
-        // Parse token
-        ClaimsIdentity identity = new ClaimsIdentity(JWT.decode(bearerToken));
+        JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
+            TOKENVALIDATIONPARAMETERS,
+            openIdMetadataUrl,
+            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS
+        );
 
-        return isSkillClaim(identity.claims());
+        ClaimsIdentity identity = tokenExtractor
+            .getIdentity(authHeader, channelId, authConfig.requiredEndorsements()).join();
+
+
+         validateIdentity(identity, credentials).join();
+
+        return CompletableFuture.completedFuture(identity);
     }
 
     /**

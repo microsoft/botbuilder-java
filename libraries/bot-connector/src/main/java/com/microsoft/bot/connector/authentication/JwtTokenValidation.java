@@ -182,6 +182,10 @@ public final class JwtTokenValidation {
         String serviceUrl,
         AuthenticationConfiguration authConfig
     ) {
+        if (SkillValidation.isSkillToken(authHeader)) {
+            return SkillValidation.authenticateChannelToken(
+                authHeader, credentials, channelProvider, channelId, authConfig);
+        }
         boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
         if (usingEmulator) {
             return EmulatorValidation

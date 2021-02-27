@@ -43,8 +43,27 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
     }
 
     /**
+     * Initializes a new instance of the MicrosoftGovernmentAppCredentials class.
+     *
+     * @param withAppId             The Microsoft app ID.
+     * @param withAppPassword       The Microsoft app password.
+     * @param withChannelAuthTenant Optional. The oauth token tenant.
+     * @param withOAuthScope        The scope for the token.
+     */
+    public MicrosoftGovernmentAppCredentials(
+        String withAppId,
+        String withAppPassword,
+        String withChannelAuthTenant,
+        String withOAuthScope
+    ) {
+        super(withChannelAuthTenant, withOAuthScope);
+        setAppId(withAppId);
+        setAppPassword(withAppPassword);
+    }
+
+    /**
      * An empty set of credentials.
-     * 
+     *
      * @return An empty Gov credentials.
      */
     public static MicrosoftGovernmentAppCredentials empty() {

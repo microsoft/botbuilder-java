@@ -5,6 +5,7 @@ package com.microsoft.bot.sample.echoskillbot;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
+import com.microsoft.bot.connector.authentication.EmulatorValidation;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
