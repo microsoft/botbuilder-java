@@ -37,10 +37,6 @@ import org.springframework.context.annotation.Import;
 public class Application extends BotDependencyConfiguration {
 
     public static void main(String[] args) {
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
-        System.setProperty("javax.net.ssl.trustStore","C:\\Users\\leepa\\.keystore\\FiddlerKeystore");
-        System.setProperty("javax.net.ssl.trustStorePassword","password");
         SpringApplication.run(Application.class, args);
     }
 
