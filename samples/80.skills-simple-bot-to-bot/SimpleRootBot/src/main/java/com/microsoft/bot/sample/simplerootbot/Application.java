@@ -4,9 +4,12 @@
 package com.microsoft.bot.sample.simplerootbot;
 
 import com.microsoft.bot.builder.Bot;
+import com.microsoft.bot.builder.BotAdapter;
+import com.microsoft.bot.builder.ChannelServiceHandler;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
+import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
@@ -112,5 +115,22 @@ public class Application extends BotDependencyConfiguration {
     @Bean
     public SkillConversationIdFactoryBase getSkillConversationIdFactoryBase() {
         return new SkillConversationIdFactory();
+    }
+
+    @Bean public ChannelServiceHandler getChannelServiceHandler(
+        BotAdapter botAdapter,
+        Bot bot,
+        SkillConversationIdFactoryBase conversationIdFactory,
+        CredentialProvider credentialProvider,
+        AuthenticationConfiguration authConfig,
+        ChannelProvider channelProvider
+    ) {
+        return new SkillHandler(
+            botAdapter,
+            bot,
+            conversationIdFactory,
+            credentialProvider,
+            authConfig,
+            channelProvider);
     }
 }

@@ -92,12 +92,12 @@ public class RootBot extends ActivityHandler {
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
         // Forward all activities except EndOfConversation to the skill.
-        if (turnContext.getActivity().getType() != ActivityTypes.END_OF_CONVERSATION) {
+        if (!turnContext.getActivity().getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
             // Try to get the active skill
             BotFrameworkSkill activeSkill = activeSkillProperty.get(turnContext).join();
             if (activeSkill != null) {
                 // Send the activity to the skill
-                sendToSkill(turnContext, activeSkill);
+                sendToSkill(turnContext, activeSkill).join();
                 return CompletableFuture.completedFuture(null);
             }
         }

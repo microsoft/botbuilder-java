@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.builder.Bot;
@@ -30,6 +28,8 @@ import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Bot Framework Handler for skills.
@@ -45,7 +45,13 @@ public class SkillHandler extends ChannelServiceHandler {
     private final BotAdapter adapter;
     private final Bot bot;
     private final SkillConversationIdFactoryBase conversationIdFactory;
-    private final Logger logger;
+
+    /**
+     * The slf4j Logger to use. Note that slf4j is configured by providing Log4j
+     * dependencies in the POM, and corresponding Log4j configuration in the
+     * 'resources' folder.
+     */
+    private Logger logger = LoggerFactory.getLogger(SkillHandler.class);
 
     /**
      * Initializes a new instance of the {@link SkillHandler} class, using a
@@ -58,8 +64,6 @@ public class SkillHandler extends ChannelServiceHandler {
      * @param credentialProvider     The credential provider.
      * @param authConfig             The authentication configuration.
      * @param channelProvider        The channel provider.
-     * @param logger                 The ILogger implementation this
-     *                               adapter should use.
      *
      * Use a {@link MiddlewareSet} Object to add multiple middleware components
      * in the constructor. Use the Use({@link Middleware} ) method to add
@@ -71,8 +75,8 @@ public class SkillHandler extends ChannelServiceHandler {
         SkillConversationIdFactoryBase conversationIdFactory,
         CredentialProvider credentialProvider,
         AuthenticationConfiguration authConfig,
-        ChannelProvider channelProvider,
-        Logger logger) {
+        ChannelProvider channelProvider
+    ) {
 
         super(credentialProvider, authConfig, channelProvider);
 
@@ -91,7 +95,6 @@ public class SkillHandler extends ChannelServiceHandler {
         this.adapter = adapter;
         this.bot = bot;
         this.conversationIdFactory = conversationIdFactory;
-        this.logger = logger;
     }
 
     /**
@@ -119,7 +122,7 @@ public class SkillHandler extends ChannelServiceHandler {
                 ClaimsIdentity claimsIdentity,
                 String conversationId,
                 Activity activity) {
-        return  processActivity(claimsIdentity, conversationId, null, activity);
+        return processActivity(claimsIdentity, conversationId, null, activity);
     }
 
     /**
@@ -149,7 +152,7 @@ public class SkillHandler extends ChannelServiceHandler {
                     String conversationId,
                     String activityId,
                     Activity activity) {
-        return  processActivity(claimsIdentity, conversationId, activityId, activity);
+        return processActivity(claimsIdentity, conversationId, activityId, activity);
     }
 
     /**
@@ -253,9 +256,9 @@ public class SkillHandler extends ChannelServiceHandler {
             skillConversationReference =  conversationIdFactory.getSkillConversationReference(conversationId).join();
         } catch (NotImplementedException ex) {
             if (logger != null) {
-                logger.log(Level.WARNING, "Got NotImplementedException when trying to call "
-                                         + "GetSkillConversationReference() on the ConversationIdFactory,"
-                                         + " attempting to use deprecated GetConversationReference() method instead.");
+                logger.warn("Got NotImplementedException when trying to call "
+                            + "GetSkillConversationReference() on the ConversationIdFactory,"
+                            + " attempting to use deprecated GetConversationReference() method instead.");
             }
 
             // Attempt to get SkillConversationReference using deprecated method.
@@ -276,8 +279,9 @@ public class SkillHandler extends ChannelServiceHandler {
 
         if (skillConversationReference == null) {
             if (logger != null) {
-                logger.log(Level.SEVERE,
-                    String.format("Unable to get skill conversation reference for conversationId %s.", conversationId));
+                logger.warn(
+                    String.format("Unable to get skill conversation reference for conversationId %s.", conversationId)
+                );
             }
             throw new RuntimeException("Key not found");
         }
@@ -324,7 +328,7 @@ public class SkillHandler extends ChannelServiceHandler {
          adapter.continueConversation(claimsIdentity,
                                        skillConversationReference.getConversationReference(),
                                        skillConversationReference.getOAuthScope(),
-                                       callback);
+                                       callback).join();
 
         if (resourceResponse.get() != null) {
             return CompletableFuture.completedFuture(resourceResponse.get());
