@@ -44,7 +44,7 @@ public class SkillAdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
         @Override
         public CompletableFuture<Void> invoke(TurnContext turnContext, Throwable exception) {
-            return sendErrorMessage(turnContext, exception).thenAccept( result ->{
+            return sendErrorMessage(turnContext, exception).thenAccept(result -> {
                 endSkillConversation(turnContext);
             }).thenAccept(endResult -> {
                 clearConversationState(turnContext);
@@ -57,20 +57,26 @@ public class SkillAdapterWithErrorHandler extends BotFrameworkHttpAdapter {
                 String errorMessageText = "The bot encountered an error or bug.";
                 Activity errorMessage =
                     MessageFactory.text(errorMessageText, errorMessageText, InputHints.IGNORING_INPUT);
-                turnContext.sendActivity(errorMessage).join();
+                return turnContext.sendActivity(errorMessage).thenAccept(result -> {
+                    String secondLineMessageText = "To continue to run this bot, please fix the bot source code.";
+                    Activity secondErrorMessage =
+                        MessageFactory.text(secondLineMessageText, secondLineMessageText, InputHints.EXPECTING_INPUT);
+                    turnContext.sendActivity(secondErrorMessage)
+                        .thenApply(
+                            sendResult -> {
+                                // Send a trace activity, which will be displayed in the Bot Framework Emulator.
+                                // Note: we return the entire exception in the value property to help the
+                                // developer;
+                                // this should not be done in production.
+                                return TurnContext.traceActivity(
+                                    turnContext,
+                                    String.format("OnTurnError Trace %s", exception.toString())
+                                );
+                            }
+                        );
+                }).thenApply(finalResult -> null);
 
-                errorMessageText = "To continue to run this bot, please fix the bot source code.";
-                errorMessage = MessageFactory.text(errorMessageText, errorMessageText, InputHints.EXPECTING_INPUT);
-                turnContext.sendActivity(errorMessage).join();
-
-                // Send a trace activity, which will be displayed in the Bot Framework Emulator.
-                // Note: we return the entire exception in the value property to help the developer;
-                // this should not be done in production.
-                return TurnContext.traceActivity(turnContext,
-                    String.format("OnTurnError Trace %s", exception.toString())
-                    ).thenApply(result -> null);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 return Async.completeExceptionally(ex);
             }
         }
@@ -82,41 +88,42 @@ public class SkillAdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
             // Inform the active skill that the conversation instanceof ended so that it has
             // a chance to clean up.
-            // Note: ActiveSkillPropertyName instanceof set by the RooBot while messages are being
+            // Note: ActiveSkillPropertyName instanceof set by the RooBot while messages are
+            // being
             StatePropertyAccessor<BotFrameworkSkill> skillAccessor =
-                        conversationState.createProperty(RootBot.ActiveSkillPropertyName);
+                conversationState.createProperty(RootBot.ActiveSkillPropertyName);
             // forwarded to a Skill.
-            BotFrameworkSkill activeSkill = skillAccessor.get(turnContext, () -> null).join();
-            if (activeSkill != null) {
-                String botId = configuration.getProperty(MicrosoftAppCredentials.MICROSOFTAPPID);
+            return skillAccessor.get(turnContext, () -> null).thenApply(activeSkill -> {
+                if (activeSkill != null) {
+                    String botId = configuration.getProperty(MicrosoftAppCredentials.MICROSOFTAPPID);
 
-                Activity endOfConversation = Activity.createEndOfConversationActivity();
-                endOfConversation.setCode(EndOfConversationCodes.ROOT_SKILL_ERROR);
-                endOfConversation.applyConversationReference(turnContext.getActivity().getConversationReference(), true);
+                    Activity endOfConversation = Activity.createEndOfConversationActivity();
+                    endOfConversation.setCode(EndOfConversationCodes.ROOT_SKILL_ERROR);
+                    endOfConversation
+                        .applyConversationReference(turnContext.getActivity().getConversationReference(), true);
 
-                conversationState.saveChanges(turnContext, true).join();
+                    return conversationState.saveChanges(turnContext, true).thenCompose(saveResult -> {
+                        return skillHttpClient.postActivity(
+                            botId,
+                            activeSkill,
+                            skillsConfiguration.getSkillHostEndpoint(),
+                            endOfConversation,
+                            Object.class
+                        );
 
-                return skillHttpClient.postActivity(
-                    botId,
-                    activeSkill,
-                    skillsConfiguration.getSkillHostEndpoint(),
-                    endOfConversation,
-                    Object.class).thenApply(result -> null);
-            }
-
-            return CompletableFuture.completedFuture(null);
+                    });
+                }
+                return CompletableFuture.completedFuture(null);
+            }).thenApply(result -> null);
         }
-
 
         private CompletableFuture<Void> clearConversationState(TurnContext turnContext) {
             try {
                 return conversationState.delete(turnContext);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 return Async.completeExceptionally(ex);
             }
         }
 
     }
 }
-

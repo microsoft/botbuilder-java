@@ -39,7 +39,8 @@ public class AllowedSkillsClaimsValidator extends ClaimsValidator {
     public CompletableFuture<Void> validateClaims(Map<String, String> claims) {
         // If _allowedCallers contains an "*", we allow all callers.
         if (SkillValidation.isSkillClaim(claims)) {
-            // Check that the appId claim in the skill request instanceof in the list of callers configured for this bot.
+            // Check that the appId claim in the skill request instanceof in the list of callers
+            // configured for this bot.
             String appId = JwtTokenValidation.getAppIdFromClaims(claims);
             if (!allowedSkills.contains(appId)) {
                 return Async.completeExceptionally(

@@ -27,27 +27,25 @@ public class SkillsConfiguration {
         boolean noMoreEntries = false;
         int indexCount = 0;
         while (!noMoreEntries) {
-            String botID = configuration.getProperty(
-                String.format("BotFrameworkSkills[%d].Id", indexCount));
-            String botAppId = configuration.getProperty(
-                String.format("BotFrameworkSkills[%d].AppId", indexCount));
-            String skillEndPoint = configuration.getProperty(
-                String.format("BotFrameworkSkills[%d].SkillEndpoint", indexCount));
-            if (StringUtils.isNotBlank(botID)
-                && StringUtils.isNotBlank(botAppId)
-                && StringUtils.isNotBlank(skillEndPoint)) {
-                    BotFrameworkSkill newSkill = new BotFrameworkSkill();
-                    newSkill.setId(botID);
-                    newSkill.setAppId(botAppId);
-                    try {
-                        newSkill.setSkillEndpoint(new URI(skillEndPoint));
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    }
-                    skills.put(botID, newSkill);
-                    indexCount++;
-            }
-            else {
+            String botID = configuration.getProperty(String.format("BotFrameworkSkills[%d].Id", indexCount));
+            String botAppId = configuration.getProperty(String.format("BotFrameworkSkills[%d].AppId", indexCount));
+            String skillEndPoint =
+                configuration.getProperty(String.format("BotFrameworkSkills[%d].SkillEndpoint", indexCount));
+            if (
+                StringUtils.isNotBlank(botID) && StringUtils.isNotBlank(botAppId)
+                    && StringUtils.isNotBlank(skillEndPoint)
+            ) {
+                BotFrameworkSkill newSkill = new BotFrameworkSkill();
+                newSkill.setId(botID);
+                newSkill.setAppId(botAppId);
+                try {
+                    newSkill.setSkillEndpoint(new URI(skillEndPoint));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                skills.put(botID, newSkill);
+                indexCount++;
+            } else {
                 noMoreEntries = true;
             }
         }
@@ -61,7 +59,6 @@ public class SkillsConfiguration {
             }
         }
     }
-
 
     /**
      * @return the SkillHostEndpoint value as a Uri.

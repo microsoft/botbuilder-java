@@ -19,7 +19,7 @@ import com.microsoft.bot.builder.skills.SkillConversationReference;
 public class SkillConversationIdFactory extends SkillConversationIdFactoryBase {
 
     private final Map<String, SkillConversationReference> _conversationRefs =
-                                        new HashMap<String, SkillConversationReference>();
+        new HashMap<String, SkillConversationReference>();
 
     @Override
     public CompletableFuture<String> createSkillConversationId(SkillConversationIdFactoryOptions options) {
@@ -27,11 +27,12 @@ public class SkillConversationIdFactory extends SkillConversationIdFactoryBase {
         skillConversationReference.setConversationReference(options.getActivity().getConversationReference());
         skillConversationReference.setOAuthScope(options.getFromBotOAuthScope());
         String key = String.format(
-            "%s-%s-%s-%s-skillconvo"
-            ,options.getFromBotId(),
+            "%s-%s-%s-%s-skillconvo",
+            options.getFromBotId(),
             options.getBotFrameworkSkill().getAppId(),
             skillConversationReference.getConversationReference().getConversation().getId(),
-            skillConversationReference.getConversationReference().getChannelId());
+            skillConversationReference.getConversationReference().getChannelId()
+        );
         _conversationRefs.put(key, skillConversationReference);
         return CompletableFuture.completedFuture(key);
     }
