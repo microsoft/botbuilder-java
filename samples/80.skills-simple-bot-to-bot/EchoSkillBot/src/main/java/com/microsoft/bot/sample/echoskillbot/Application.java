@@ -5,7 +5,6 @@ package com.microsoft.bot.sample.echoskillbot;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
-import com.microsoft.bot.connector.authentication.EmulatorValidation;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
@@ -31,8 +30,8 @@ import org.springframework.context.annotation.Import;
 
 /**
  * This class extends the BotDependencyConfiguration which provides the default
- * implementations for a Bot application.  The Application class should
- * override methods in order to provide custom implementations.
+ * implementations for a Bot application. The Application class should override
+ * methods in order to provide custom implementations.
  */
 public class Application extends BotDependencyConfiguration {
 
@@ -44,8 +43,8 @@ public class Application extends BotDependencyConfiguration {
      * Returns the Bot for this application.
      *
      * <p>
-     *     The @Component annotation could be used on the Bot class instead of this method
-     *     with the @Bean annotation.
+     * The @Component annotation could be used on the Bot class instead of this
+     * method with the @Bean annotation.
      * </p>
      *
      * @return The Bot implementation for this application.

@@ -29,7 +29,7 @@ public class SkillAdapterWithErrorHandler extends BotFrameworkHttpAdapter {
 
         @Override
         public CompletableFuture<Void> invoke(TurnContext turnContext, Throwable exception) {
-            return sendErrorMessage(turnContext, exception).thenAccept( result ->{
+            return sendErrorMessage(turnContext, exception).thenAccept(result -> {
                 sendEoCToParent(turnContext, exception);
             });
         }
@@ -40,38 +40,43 @@ public class SkillAdapterWithErrorHandler extends BotFrameworkHttpAdapter {
                 String errorMessageText = "The skill encountered an error or bug.";
                 Activity errorMessage =
                     MessageFactory.text(errorMessageText, errorMessageText, InputHints.IGNORING_INPUT);
-                turnContext.sendActivity(errorMessage).join();
+                return turnContext.sendActivity(errorMessage).thenAccept(result -> {
+                    String secondLineMessageText = "To continue to run this bot, please fix the bot source code.";
+                    Activity secondErrorMessage =
+                        MessageFactory.text(secondLineMessageText, secondLineMessageText, InputHints.EXPECTING_INPUT);
+                    turnContext.sendActivity(secondErrorMessage)
+                        .thenApply(
+                            sendResult -> {
+                                // Send a trace activity, which will be displayed in the Bot Framework Emulator.
+                                // Note: we return the entire exception in the value property to help the
+                                // developer;
+                                // this should not be done in production.
+                                return TurnContext.traceActivity(
+                                    turnContext,
+                                    String.format("OnTurnError Trace %s", exception.toString())
+                                );
 
-                errorMessageText = "To continue to run this bot, please fix the bot source code.";
-                errorMessage = MessageFactory.text(errorMessageText, errorMessageText, InputHints.EXPECTING_INPUT);
-                turnContext.sendActivity(errorMessage).join();
-
-                // Send a trace activity, which will be displayed in the Bot Framework Emulator.
-                // Note: we return the entire exception in the value property to help the developer;
-                // this should not be done in production.
-                return TurnContext.traceActivity(turnContext,
-                    String.format("OnTurnError Trace %s", exception.toString())
-                    ).thenApply(result -> null);
-            }
-            catch (Exception ex) {
+                            }
+                        );
+                });
+            } catch (Exception ex) {
                 return Async.completeExceptionally(ex);
             }
         }
 
         private CompletableFuture<Void> sendEoCToParent(TurnContext turnContext, Throwable exception) {
             try {
-                // Send an EndOfConversation activity to the skill caller with the error to end the conversation,
+                // Send an EndOfConversation activity to the skill caller with the error to end
+                // the conversation,
                 // and let the caller decide what to do.
                 Activity endOfConversation = Activity.createEndOfConversationActivity();
                 endOfConversation.setCode(EndOfConversationCodes.SKILL_ERROR);
                 endOfConversation.setText(exception.getMessage());
                 return turnContext.sendActivity(endOfConversation).thenApply(result -> null);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 return Async.completeExceptionally(ex);
             }
         }
 
     }
 }
-
