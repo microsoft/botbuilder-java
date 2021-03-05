@@ -79,6 +79,7 @@ public class ConversationReference {
         activity.setConversation(getConversation());
         activity.setRecipient(getBot());
         activity.setLocale(getLocale());
+        activity.setServiceUrl(getServiceUrl());
         activity.setFrom(getUser());
         activity.setRelatesTo(this);
         return activity;

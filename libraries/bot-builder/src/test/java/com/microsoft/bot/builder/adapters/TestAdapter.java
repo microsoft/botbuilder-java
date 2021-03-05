@@ -23,7 +23,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
     private final Queue<Activity> botReplies = new LinkedList<>();
     private int nextId = 0;
     private ConversationReference conversationReference;
-    private String locale;
+    private String locale = "en-us";
     private boolean sendTraceActivity = false;
     private Map<ExchangableTokenKey, String> exchangableToken = new HashMap<ExchangableTokenKey, String>();
 
@@ -349,8 +349,10 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
     public Activity makeActivity(String withText) {
         Integer next = nextId++;
+        String locale = !getLocale().isEmpty() ? getLocale() : "en-us";
         Activity activity = new Activity(ActivityTypes.MESSAGE) {
             {
+                setLocale(locale);
                 setFrom(conversationReference().getUser());
                 setRecipient(conversationReference().getBot());
                 setConversation(conversationReference().getConversation());
@@ -417,8 +419,8 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
         reference.setChannelId("test");
         reference.setServiceUrl("https://test.com");
         reference.setConversation(new ConversationAccount(false, name, name, null, null, null, null));
-        reference.setUser(new ChannelAccount(user.toLowerCase(), user.toLowerCase()));
-        reference.setBot(new ChannelAccount(bot.toLowerCase(), bot.toLowerCase()));
+        reference.setUser(new ChannelAccount(user.toLowerCase(), user));
+        reference.setBot(new ChannelAccount(bot.toLowerCase(), bot));
         reference.setLocale("en-us");
         return reference;
     }
