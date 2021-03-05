@@ -45,7 +45,7 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
         this.skillHttpClient = skillHttpClient;
         this.skillsConfiguration = skillsConfiguration;
         setOnTurnError(new AdapterErrorHandler());
-        //use(new LoggerMiddleware(new ConsoleLogger()));
+        use(new LoggerMiddleware(new ConsoleLogger()));
     }
 
     private class AdapterErrorHandler implements OnTurnErrorHandler {

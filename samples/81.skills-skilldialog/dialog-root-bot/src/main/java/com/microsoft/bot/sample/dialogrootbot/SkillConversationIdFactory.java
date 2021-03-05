@@ -60,15 +60,14 @@ public class SkillConversationIdFactory extends SkillConversationIdFactoryBase {
             Async.completeExceptionally(new IllegalArgumentException("skillConversationId cannot be null."));
         }
 
-        storage.read(new String[] {skillConversationId}).thenCompose(skillConversationInfo -> {
+        return storage.read(new String[] {skillConversationId}).thenCompose(skillConversationInfo -> {
             if (skillConversationInfo.size() > 0) {
                 return CompletableFuture
-                    .completedFuture((SkillConversationReference) skillConversationInfo.values().toArray()[0]);
+                    .completedFuture((SkillConversationReference) skillConversationInfo.get(skillConversationId));
             } else {
                 return CompletableFuture.completedFuture(null);
             }
         });
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MessageFactory;
@@ -100,8 +101,9 @@ public class MainDialog extends ComponentDialog {
         }, ""));
 
         // Add main waterfall dialog for this bot.
-        WaterfallStep[] waterfallSteps = new WaterfallStep[] {new selectSkillStep(), new selectSkillActionStep(),
-            new callSkillActionStep(), new finalStep()};
+        WaterfallStep[] waterfallSteps =
+            {this::selectSkillStep, this::selectSkillActionStep, this::callSkillActionStep, this::finalStep};
+
         addDialog(new WaterfallDialog("WaterfallDialog", Arrays.asList(waterfallSteps)));
 
         // Create state property to track the active skill.
@@ -117,7 +119,9 @@ public class MainDialog extends ComponentDialog {
         // currently in progress from the parent bot.
         BotFrameworkSkill activeSkill = _activeSkillProperty.get(innerDc.getContext(), null).join();
         Activity activity = innerDc.getContext().getActivity();
-        if (activeSkill != null && activity.getType() == ActivityTypes.MESSAGE && activity.getText().equals("abort")) {
+        if (activeSkill != null
+            && activity.getType().equals(ActivityTypes.MESSAGE)
+            && activity.getText().equals("abort")) {
             // Cancel all dialogs when the user says abort.
             // The SkillDialog automatically sends an EndOfConversation message to the skill
             // to let the
@@ -129,126 +133,110 @@ public class MainDialog extends ComponentDialog {
         return super.onContinueDialog(innerDc);
     }
 
-    class selectSkillStep implements WaterfallStep {
-        // Render a prompt to select the skill to call.
-        public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            String messageText = "What skill would you like to call?";
-            // Create the PromptOptions from the skill configuration which contain the list
-            // of configured skills.
-            if (stepContext.getOptions() != null) {
-                messageText = stepContext.getOptions().toString();
-            }
-            String repromptMessageText = "That was not a valid choice, please select a valid skill.";
-            PromptOptions options = new PromptOptions();
-            options.setPrompt(MessageFactory.text(messageText, messageText, InputHints.EXPECTING_INPUT));
-            options.setRetryPrompt(
-                MessageFactory.text(repromptMessageText, repromptMessageText, InputHints.EXPECTING_INPUT)
-            );
-
-            List<Choice> choicesList = new ArrayList<Choice>();
-            for (BotFrameworkSkill skill : _skillsConfig.getSkills().values()) {
-                choicesList.add(new Choice(skill.getId()));
-            }
-            options.setChoices(choicesList);
-
-            // Prompt the user to select a skill.
-            return stepContext.prompt("SkillPrompt", options);
+    // Render a prompt to select the skill to call.
+    public CompletableFuture<DialogTurnResult> selectSkillStep(WaterfallStepContext stepContext) {
+        String messageText = "What skill would you like to call?";
+        // Create the PromptOptions from the skill configuration which contain the list
+        // of configured skills.
+        if (stepContext.getOptions() != null) {
+            messageText = stepContext.getOptions().toString();
         }
+        String repromptMessageText = "That was not a valid choice, please select a valid skill.";
+        PromptOptions options = new PromptOptions();
+        options.setPrompt(MessageFactory.text(messageText, messageText, InputHints.EXPECTING_INPUT));
+        options
+            .setRetryPrompt(MessageFactory.text(repromptMessageText, repromptMessageText, InputHints.EXPECTING_INPUT));
+
+        List<Choice> choicesList = new ArrayList<Choice>();
+        for (BotFrameworkSkill skill : _skillsConfig.getSkills().values()) {
+            choicesList.add(new Choice(skill.getId()));
+        }
+        options.setChoices(choicesList);
+
+        // Prompt the user to select a skill.
+        return stepContext.prompt("SkillPrompt", options);
     }
 
-    class selectSkillActionStep implements WaterfallStep {
+    // Render a prompt to select the action for the skill.
+    public CompletableFuture<DialogTurnResult> selectSkillActionStep(WaterfallStepContext stepContext) {
+        // Get the skill info super. on the selected skill.
+        String selectedSkillId = ((FoundChoice) stepContext.getResult()).getValue();
+        BotFrameworkSkill selectedSkill = _skillsConfig.getSkills()
+            .values()
+            .stream()
+            .filter(x -> x.getId().equals(selectedSkillId))
+            .findFirst()
+            .get();
 
-        // Render a prompt to select the action for the skill.
-        public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            // Get the skill info super. on the selected skill.
-            String selectedSkillId = ((FoundChoice) stepContext.getResult()).getValue();
-            BotFrameworkSkill selectedSkill = _skillsConfig.getSkills()
-                .values()
-                .stream()
-                .filter(x -> x.getId().equals(selectedSkillId))
-                .findFirst()
-                .get();
+        // Remember the skill selected by the user.
+        stepContext.getValues().put(_selectedSkillKey, selectedSkill);
 
-            // Remember the skill selected by the user.
-            stepContext.getValues().put(_selectedSkillKey, selectedSkill);
+        // Create the PromptOptions with the actions supported by the selected skill.
+        String messageText = String.format(
+            "Select an action # to send to **%n** or just type in a " + "message and it will be forwarded to the skill",
+            selectedSkill.getId()
+        );
+        PromptOptions options = new PromptOptions();
+        options.setPrompt(MessageFactory.text(messageText, messageText, InputHints.EXPECTING_INPUT));
+        options.setChoices(getSkillActions(selectedSkill));
 
-            // Create the PromptOptions with the actions supported by the selected skill.
-            String messageText = String.format(
-                "Select an action # to send to **%n** or just type in a "
-                    + "message and it will be forwarded to the skill",
-                selectedSkill.getId()
-            );
-            PromptOptions options = new PromptOptions();
-            options.setPrompt(MessageFactory.text(messageText, messageText, InputHints.EXPECTING_INPUT));
-            options.setChoices(getSkillActions(selectedSkill));
-
-            // Prompt the user to select a skill action.
-            return stepContext.prompt("SkillActionPrompt", options);
-        }
+        // Prompt the user to select a skill action.
+        return stepContext.prompt("SkillActionPrompt", options);
     }
 
-    class callSkillActionStep implements WaterfallStep {
-        // Starts the SkillDialog super. on the user's selections.
-        public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            BotFrameworkSkill selectedSkill = (BotFrameworkSkill) stepContext.getValues().get(_selectedSkillKey);
+    // Starts the SkillDialog super. on the user's selections.
+    public CompletableFuture<DialogTurnResult> callSkillActionStep(WaterfallStepContext stepContext) {
+        BotFrameworkSkill selectedSkill = (BotFrameworkSkill) stepContext.getValues().get(_selectedSkillKey);
 
-            Activity skillActivity;
-            switch (selectedSkill.getId()) {
-                case "DialogSkillBot":
-                    skillActivity = createDialogSkillBotActivity(
-                        ((FoundChoice) stepContext.getResult()).getValue(),
-                        stepContext.getContext()
-                    );
-                    break;
-
-                // We can add other case statements here if we support more than one skill.
-                default:
-                    throw new RuntimeException(String.format("Unknown target skill id: %s.", selectedSkill.getId()));
-            }
-
-            // Create the BeginSkillDialogOptions and assign the activity to send.
-            BeginSkillDialogOptions skillDialogArgs = new BeginSkillDialogOptions();
-            skillDialogArgs.setActivity(skillActivity);
-
-            // Save active skill in state.
-            _activeSkillProperty.set(stepContext.getContext(), selectedSkill);
-
-            // Start the skillDialog instance with the arguments.
-            return stepContext.beginDialog(selectedSkill.getId(), skillDialogArgs);
-        }
-    }
-
-    class finalStep implements WaterfallStep {
-
-        // The SkillDialog has ended, render the results (if any) and restart
-        // MainDialog.
-        public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            BotFrameworkSkill activeSkill = _activeSkillProperty.get(stepContext.getContext(), () -> null).join();
-
-            // Check if the skill returned any results and display them.
-            if (stepContext.getResult() != null) {
-                String message = String.format(
-                    "Skill \"%s\" invocation complete. Result: %s",
-                    activeSkill.getId(),
-                    stepContext.getResult()
+        Activity skillActivity;
+        switch (selectedSkill.getId()) {
+            case "DialogSkillBot":
+                skillActivity = createDialogSkillBotActivity(
+                    ((FoundChoice) stepContext.getResult()).getValue(),
+                    stepContext.getContext()
                 );
-                stepContext.getContext()
-                    .sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT))
-                    .join();
-            }
+                break;
 
-            // Clear the skill selected by the user.
-            stepContext.getValues().put(_selectedSkillKey, null);
-
-            // Clear active skill in state.
-            _activeSkillProperty.delete(stepContext.getContext());
-
-            // Restart the main dialog with a different message the second time around.
-            return stepContext.replaceDialog(
-                getInitialDialogId(),
-                String.format("Done with \"%s\". \n\n What skill would you like to call?", activeSkill.getId())
-            );
+            // We can add other case statements here if we support more than one skill.
+            default:
+                throw new RuntimeException(String.format("Unknown target skill id: %s.", selectedSkill.getId()));
         }
+
+        // Create the BeginSkillDialogOptions and assign the activity to send.
+        BeginSkillDialogOptions skillDialogArgs = new BeginSkillDialogOptions();
+        skillDialogArgs.setActivity(skillActivity);
+
+        // Save active skill in state.
+        _activeSkillProperty.set(stepContext.getContext(), selectedSkill);
+
+        // Start the skillDialog instance with the arguments.
+        return stepContext.beginDialog(selectedSkill.getId(), skillDialogArgs);
+    }
+
+    // The SkillDialog has ended, render the results (if any) and restart
+    // MainDialog.
+    public CompletableFuture<DialogTurnResult> finalStep(WaterfallStepContext stepContext) {
+        BotFrameworkSkill activeSkill = _activeSkillProperty.get(stepContext.getContext(), () -> null).join();
+        // Check if the skill returned any results and display them.
+        if (stepContext.getResult() != null) {
+            String message = String
+                .format("Skill \"%s\" invocation complete. Result: %s", activeSkill.getId(), stepContext.getResult());
+            stepContext.getContext()
+                .sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT))
+                .join();
+        }
+
+        // Clear the skill selected by the user.
+        stepContext.getValues().put(_selectedSkillKey, null);
+
+        // Clear active skill in state.
+        _activeSkillProperty.delete(stepContext.getContext());
+
+        // Restart the main dialog with a different message the second time around.
+        return stepContext.replaceDialog(
+            getInitialDialogId(),
+            String.format("Done with \"%s\". \n\n What skill would you like to call?", activeSkill.getId())
+        );
     }
 
     // Helper method that creates and adds SkillDialog instances for the configured
@@ -323,7 +311,12 @@ public class MainDialog extends ComponentDialog {
         if (selectedOption.equalsIgnoreCase(SkillActionBookFlightWithInputParameters)) {
             activity = Activity.createEventActivity();
             activity.setName(SkillActionBookFlight);
-            activity.setValue(mapper.valueToTree("{ \"origin\": \"New York\", \"destination\": \"Seattle\"}"));
+            try {
+                activity.setValue(mapper.readValue("{ \"origin\": \"New York\", \"destination\": \"Seattle\"}",
+                                  Object.class));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
         // Send an event activity to the skill with "GetWeather" in the name and some
@@ -331,7 +324,12 @@ public class MainDialog extends ComponentDialog {
         if (selectedOption.equalsIgnoreCase(SkillActionGetWeather)) {
             activity = Activity.createEventActivity();
             activity.setName(SkillActionGetWeather);
-            activity.setValue(mapper.valueToTree("{ \"latitude\": 47.get614891(), \"longitude\": -122.195801}"));
+            try {
+                activity.setValue(mapper.readValue("{ \"latitude\": 47.get614891(), \"longitude\": -122.195801}",
+                                  Object.class));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
         if (activity == null) {
