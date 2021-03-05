@@ -14,15 +14,17 @@ import com.microsoft.bot.connector.authentication.OpenIdMetadata;
 import com.microsoft.bot.connector.authentication.OpenIdMetadataKey;
 import com.microsoft.bot.connector.authentication.TokenValidationParameters;
 import java.io.IOException;
-import java.math.BigInteger;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -34,20 +36,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.junit.Before;
 import org.junit.Test;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.CertificateAlgorithmId;
-import sun.security.x509.CertificateSerialNumber;
-import sun.security.x509.CertificateValidity;
-import sun.security.x509.CertificateVersion;
-import sun.security.x509.CertificateX509Key;
-import sun.security.x509.X500Name;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 
+/**
+ * Test Notes:
+ *
+ * The PKCS12 certificates were created using these steps:
+ * https://kb.globalscape.com/Knowledgebase/11039/Generating-a-PKCS12-Private-Key-and-Public-Certificate
+ *
+ * For the expired cert, just specify a negative number of days in step #4.
+ *
+ * For both valid and expired certs, these unit tests expect the alias for both to be "bot-connector-pkcs12"
+ * and the password to be "botframework"
+ */
 public class JwtTokenExtractorTests {
-    private X509Certificate validCertificate;
-    private X509Certificate expiredCertificate;
-    private KeyPair keyPair;
+    private CertInfo valid;
+    private CertInfo expired;
 
     @Before
     public void setup() throws GeneralSecurityException, IOException {
@@ -55,25 +58,15 @@ public class JwtTokenExtractorTests {
         EmulatorValidation.TOKENVALIDATIONPARAMETERS.validateLifetime = false;
         GovernmentChannelValidation.TOKENVALIDATIONPARAMETERS.validateLifetime = false;
 
-        // create keys
-        keyPair = createKeyPair();
-        Date now = new Date();
-        Date from = new Date(now.getTime() - (10 * 86400000L));
-
-        // create expired certificate
-        Date to = new Date(now.getTime() - (9 * 86400000L));
-        expiredCertificate = createSelfSignedCertificate(keyPair, from, to);
-
-        // create valid certificate
-        to = new Date(now.getTime() + (9 * 86400000L));
-        validCertificate = createSelfSignedCertificate(keyPair, from, to);
+        valid = loadCert("bot-connector.pkcs12");
+        expired = loadCert("bot-connector-expired.pkcs12");
     }
 
     @Test(expected = CompletionException.class)
     public void JwtTokenExtractor_WithExpiredCert_ShouldNotAllowCertSigningKey() {
         // this should throw a CompletionException (which contains an AuthenticationException)
         buildExtractorAndValidateToken(
-            expiredCertificate, keyPair.getPrivate()
+            expired.cert, expired.keypair.getPrivate()
         ).join();
     }
 
@@ -81,7 +74,7 @@ public class JwtTokenExtractorTests {
     public void JwtTokenExtractor_WithValidCert_ShouldAllowCertSigningKey() {
         // this should not throw
         buildExtractorAndValidateToken(
-            validCertificate, keyPair.getPrivate()
+            valid.cert, valid.keypair.getPrivate()
         ).join();
     }
 
@@ -92,7 +85,7 @@ public class JwtTokenExtractorTests {
         Date issuedAt = new Date(now.getTime() - 86400000L);
 
         buildExtractorAndValidateToken(
-            expiredCertificate, keyPair.getPrivate(), issuedAt
+            expired.cert, expired.keypair.getPrivate(), issuedAt
         ).join();
     }
 
@@ -161,45 +154,24 @@ public class JwtTokenExtractorTests {
         }};
     }
 
-    private KeyPair createKeyPair() throws NoSuchAlgorithmException {
-        // note that this isn't allowing for a "kid" value
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048);
-        return generator.generateKeyPair();
+    private static class CertInfo {
+        public X509Certificate cert;
+        public KeyPair keypair;
     }
 
-    private static X509Certificate createSelfSignedCertificate(
-        KeyPair pair, Date from, Date to
-    ) throws GeneralSecurityException, IOException {
-        String dn = "CN=Bot, OU=BotFramework, O=Microsoft, C=US";
-        String algorithm = "SHA256withRSA";
+    private static CertInfo loadCert(String pkcs12File)
+        throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException,
+        UnrecoverableKeyException {
+        InputStream fis = ClassLoader.getSystemResourceAsStream(pkcs12File);
+        KeyStore p12 = KeyStore.getInstance("pkcs12");
+        p12.load(fis, "botframework".toCharArray());
 
-        PrivateKey privateKey = pair.getPrivate();
-        X509CertInfo info = new X509CertInfo();
-
-        CertificateValidity interval = new CertificateValidity(from, to);
-        BigInteger sn = new BigInteger(64, new SecureRandom());
-        X500Name owner = new X500Name(dn);
-
-        info.set(X509CertInfo.VALIDITY, interval);
-        info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn));
-        info.set(X509CertInfo.SUBJECT, owner);
-        info.set(X509CertInfo.ISSUER, owner);
-        info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic()));
-        info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
-        AlgorithmId algo = new AlgorithmId(AlgorithmId.sha256WithRSAEncryption_oid);
-        info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algo));
-
-        // Sign the cert to identify the algorithm that's used.
-        X509CertImpl cert = new X509CertImpl(info);
-        cert.sign(privateKey, algorithm);
-
-        // Update the algorithm, and resign.
-        algo = (AlgorithmId)cert.get(X509CertImpl.SIG_ALG);
-        info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algo);
-        cert = new X509CertImpl(info);
-        cert.sign(privateKey, algorithm);
-        return cert;
+        return new CertInfo() {{
+            cert = (X509Certificate) p12.getCertificate("bot-connector-pkcs12");
+            keypair = new KeyPair(cert.getPublicKey(),
+                (PrivateKey) p12.getKey("bot-connector-pkcs12", "botframework".toCharArray())
+            );
+        }};
     }
 
     private static String encodeCertificate(Certificate certificate) {
