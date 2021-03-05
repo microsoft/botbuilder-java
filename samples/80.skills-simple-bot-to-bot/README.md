@@ -4,6 +4,12 @@ Bot Framework v4 skills echo sample.
 
 This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a simple skill consumer (SimpleRootBot) that sends message activities to a skill (EchoSkillBot) that echoes it back.
 
+## Prerequisites
+
+- Java 1.8+
+- Install [Maven](https://maven.apache.org/)
+- An account on [Azure](https://azure.microsoft.com) if you want to deploy to Azure.
+
 ## Key concepts in this sample
 
 The solution includes a parent bot (`SimpleRootBot`) and a skill bot (`EchoSkillBot`) and shows how the parent bot can post activities to the skill bot and returns the skill responses to the user.
