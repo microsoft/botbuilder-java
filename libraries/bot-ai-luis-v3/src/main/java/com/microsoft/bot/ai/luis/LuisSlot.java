@@ -9,14 +9,14 @@ package com.microsoft.bot.ai.luis;
  */
 public final class LuisSlot {
 
-    //Not Called
+    // Not Called
     private LuisSlot() {
 
     }
 
     /**
-    * Production slot on LUIS.
-    */
+     * Production slot on LUIS.
+     */
     public static final String PRODUCTION = "production";
 
     /**

@@ -15,21 +15,20 @@ import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LuisRecognizerTests {
 
     @Mock
@@ -90,14 +89,14 @@ public class LuisRecognizerTests {
 
     @Test
     public void topIntentThrowsIllegalArgumentIfResultIsNull() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> {
             LuisRecognizer.topIntent(null);
         });
 
         String expectedMessage = "RecognizerResult";
         String actualMessage = exception.getMessage();
 
-        assertTrue(actualMessage.contains(expectedMessage));
+        Assert.assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -108,12 +107,12 @@ public class LuisRecognizerTests {
 
     @Test
     public void throwExceptionOnNullOptions() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> {
             LuisRecognizer lR = new LuisRecognizer(null);
         });
 
         String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains("Recognizer Options cannot be null"));
+        Assert.assertTrue(actualMessage.contains("Recognizer Options cannot be null"));
     }
 
     @Test
@@ -143,11 +142,11 @@ public class LuisRecognizerTests {
         RecognizerResult actual = null;
         try {
             actual = recognizer.recognize(turnContext).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
-            assertTrue(false);
+            Assert.assertTrue(false);
         }
     }
 
@@ -198,11 +197,11 @@ public class LuisRecognizerTests {
         RecognizerResult actual = null;
         try {
             actual = recognizer.recognize(turnContext).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
-            assertTrue(false);
+            Assert.assertTrue(false);
         }
     }
 
@@ -257,11 +256,11 @@ public class LuisRecognizerTests {
         LuisRecognizer recognizer = new LuisRecognizer(options);
         try {
             actual = recognizer.recognize(dialogContext, turnContext.getActivity()).get();
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             assertEquals(mapper.writeValueAsString(expected), mapper.writeValueAsString(actual));
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             e.printStackTrace();
-            assertTrue(false);
+            Assert.assertTrue(false);
         }
     }
 

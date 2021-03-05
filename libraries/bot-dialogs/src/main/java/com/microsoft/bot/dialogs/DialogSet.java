@@ -13,16 +13,16 @@ import com.microsoft.bot.connector.Async;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * A collection of Dialog objects that can all call each other.
  */
 public class DialogSet {
-    private Map<String, Dialog> dialogs = new HashedMap<>();
+    private Map<String, Dialog> dialogs = new HashMap<>();
     private StatePropertyAccessor<DialogState> dialogState;
     @JsonIgnore
     private BotTelemetryClient telemetryClient;

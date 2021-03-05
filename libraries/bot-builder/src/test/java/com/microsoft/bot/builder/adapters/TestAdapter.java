@@ -255,7 +255,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             System.out.println(String.format("TestAdapter:SendActivities, Count:%s (tid:%s)", activities.size(),
                     Thread.currentThread().getId()));
             for (Activity act : activities) {
-                System.out.printf(" :--------\n : To:%s\n", act.getRecipient().getName());
+                System.out.printf(" :--------\n : To:%s\n", (act.getRecipient() == null) ? "No recipient set" : act.getRecipient().getName());
                 System.out.printf(" : From:%s\n", (act.getFrom() == null) ? "No from set" : act.getFrom().getName());
                 System.out.printf(" : Text:%s\n :---------\n", (act.getText() == null) ? "No text set" : act.getText());
             }

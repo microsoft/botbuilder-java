@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Request Body element to use when passing Dynamic lists to the Luis Service call.
+ * Request Body element to use when passing Dynamic lists to the Luis Service
+ * call.
  *
  */
 public class DynamicList {
@@ -20,7 +21,8 @@ public class DynamicList {
 
     /**
      * Initializes a new instance of the DynamicList class.
-     * @param entity Entity field.
+     * 
+     * @param entity       Entity field.
      * @param requestLists List Elements to use when querying Luis Service.
      */
     public DynamicList(String entity, List<ListElement> requestLists) {
@@ -36,6 +38,7 @@ public class DynamicList {
 
     /**
      * Gets the entity.
+     * 
      * @return Entity name.
      */
     public String getEntity() {
@@ -44,6 +47,7 @@ public class DynamicList {
 
     /**
      * Sets the entity name.
+     * 
      * @param entity entity name.
      */
     public void setEntity(String entity) {
@@ -52,6 +56,7 @@ public class DynamicList {
 
     /**
      * Gets the List.
+     * 
      * @return Element list of the Dynamic List.
      */
     public List<ListElement> getList() {
@@ -60,6 +65,7 @@ public class DynamicList {
 
     /**
      * Sets the List.
+     * 
      * @param list Element list of the Dynamic List.
      */
     public void setList(List<ListElement> list) {
@@ -68,6 +74,7 @@ public class DynamicList {
 
     /**
      * Validate the object.
+     * 
      * @throws IllegalArgumentException on null or invalid values.
      */
     public void validate() throws IllegalArgumentException {
@@ -76,7 +83,7 @@ public class DynamicList {
             throw new IllegalArgumentException("ExternalEntity requires an EntityName and EntityLength > 0");
         }
 
-        for (ListElement e: list) {
+        for (ListElement e : list) {
             e.validate();
         }
     }

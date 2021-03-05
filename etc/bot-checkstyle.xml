@@ -187,6 +187,8 @@
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 
+        <!-- check for usage of literal equality "==" between string -->
+        <module name="StringLiteralEquality"/>
     </module>
 
 </module>
