@@ -52,10 +52,12 @@ public final class SkillValidation {
             true, Duration.ofMinutes(5), true);
 
     /**
-     * Determines if a given Auth header is from from a skill to bot or bot to skill request.
+     * Determines if a given Auth header is from from a skill to bot or bot to skill
+     * request.
      *
      * @param authHeader Bearer Token, in the "Bearer [Long String]" Format.
-     * @return True, if the token was issued for a skill to bot communication. Otherwise, false.
+     * @return True, if the token was issued for a skill to bot communication.
+     *         Otherwise, false.
      */
     public static boolean isSkillToken(String authHeader) {
         if (!JwtTokenValidation.isValidTokenFormat(authHeader)) {
@@ -76,43 +78,45 @@ public final class SkillValidation {
     /**
      * Checks if the given list of claims represents a skill.
      *
-     * A skill claim should contain: An
-     * {@link AuthenticationConstants#versionClaim} claim. An {@link AuthenticationConstants#audienceClaim} claim.
-     * An {@link AuthenticationConstants#appIdClaim} claim (v1) or an a {@link AuthenticationConstants#authorizedParty}
-     * claim (v2). And the appId claim should be different than the audience claim. When a channel (webchat, teams,
-     * etc.) invokes a bot, the {@link AuthenticationConstants#audienceClaim} is set to
-     * {@link AuthenticationConstants#toBotFromChannelTokenIssuer} but when a bot calls another bot,
-     * the audience claim is set to the appId of the bot being invoked. The protocol supports v1 and v2 tokens:
-     * For v1 tokens, the {@link AuthenticationConstants#appIdClaim} is present and set to the app Id of the
-     * calling bot. For v2 tokens, the {@link AuthenticationConstants#authorizedParty} is present and set to
-     * the app Id of the calling bot.
+     * A skill claim should contain: An {@link AuthenticationConstants#versionClaim}
+     * claim. An {@link AuthenticationConstants#audienceClaim} claim. An
+     * {@link AuthenticationConstants#appIdClaim} claim (v1) or an a
+     * {@link AuthenticationConstants#authorizedParty} claim (v2). And the appId
+     * claim should be different than the audience claim. When a channel (webchat,
+     * teams, etc.) invokes a bot, the {@link AuthenticationConstants#audienceClaim}
+     * is set to {@link AuthenticationConstants#toBotFromChannelTokenIssuer} but
+     * when a bot calls another bot, the audience claim is set to the appId of the
+     * bot being invoked. The protocol supports v1 and v2 tokens: For v1 tokens, the
+     * {@link AuthenticationConstants#appIdClaim} is present and set to the app Id
+     * of the calling bot. For v2 tokens, the
+     * {@link AuthenticationConstants#authorizedParty} is present and set to the app
+     * Id of the calling bot.
      *
-     * @param claims  A list of claims.
+     * @param claims A list of claims.
      *
-     * @return   True if the list of claims is a skill claim, false if
-     *           is not.
+     * @return True if the list of claims is a skill claim, false if is not.
      */
     public static Boolean isSkillClaim(Map<String, String> claims) {
 
         for (Map.Entry<String, String> entry : claims.entrySet()) {
-            if (entry.getValue() == AuthenticationConstants.ANONYMOUS_SKILL_APPID
-                    && entry.getKey() == AuthenticationConstants.APPID_CLAIM) {
+            if (entry.getValue() != null && entry.getValue().equals(AuthenticationConstants.ANONYMOUS_SKILL_APPID)
+                    && entry.getKey().equals(AuthenticationConstants.APPID_CLAIM)) {
                 return true;
             }
         }
 
         Optional<Map.Entry<String, String>> version = claims.entrySet().stream()
-                .filter((x) -> x.getKey() == AuthenticationConstants.VERSION_CLAIM).findFirst();
+                .filter((x) -> x.getKey().equals(AuthenticationConstants.VERSION_CLAIM)).findFirst();
         if (!version.isPresent()) {
             // Must have a version claim.
             return false;
         }
 
         Optional<Map.Entry<String, String>> audience = claims.entrySet().stream()
-                .filter((x) -> x.getKey() == AuthenticationConstants.AUDIENCE_CLAIM).findFirst();
+                .filter((x) -> x.getKey().equals(AuthenticationConstants.AUDIENCE_CLAIM)).findFirst();
 
         if (!audience.isPresent()
-                || AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER == audience.get().getValue()) {
+                || AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER.equals(audience.get().getValue())) {
             // The audience is https://api.botframework.com and not an appId.
             return false;
         }
@@ -127,50 +131,39 @@ public final class SkillValidation {
         return !StringUtils.equals(appId, audience.get().getValue());
     }
 
-        /**
-     * Validates that the incoming Auth Header is a token sent from a bot to a
-     * skill or from a skill to a bot.
+    /**
+     * Validates that the incoming Auth Header is a token sent from a bot to a skill
+     * or from a skill to a bot.
      *
-     * @param authHeader       The raw HTTP header in the format:
-     *                         "Bearer [longString]".
-     * @param credentials      The user defined set of valid
-     *                         credentials, such as the AppId.
-     * @param channelProvider  The channelService value that
-     *                         distinguishes public Azure from US Government Azure.
-     * @param channelId        The ID of the channel to validate.
-     * @param authConfig       The authentication configuration.
+     * @param authHeader      The raw HTTP header in the format: "Bearer
+     *                        [longString]".
+     * @param credentials     The user defined set of valid credentials, such as the
+     *                        AppId.
+     * @param channelProvider The channelService value that distinguishes public
+     *                        Azure from US Government Azure.
+     * @param channelId       The ID of the channel to validate.
+     * @param authConfig      The authentication configuration.
      *
-     * @return   A {@link ClaimsIdentity} instance if the validation is
-     *           successful.
+     * @return A {@link ClaimsIdentity} instance if the validation is successful.
      */
-    public static CompletableFuture<ClaimsIdentity> authenticateChannelToken(
-        String authHeader,
-        CredentialProvider credentials,
-        ChannelProvider channelProvider,
-        String channelId,
-        AuthenticationConfiguration authConfig
-    ) {
+    public static CompletableFuture<ClaimsIdentity> authenticateChannelToken(String authHeader,
+            CredentialProvider credentials, ChannelProvider channelProvider, String channelId,
+            AuthenticationConfiguration authConfig) {
         if (authConfig == null) {
-            return Async.completeExceptionally(
-                new IllegalArgumentException("authConfig cannot be null.")
-            );
+            return Async.completeExceptionally(new IllegalArgumentException("authConfig cannot be null."));
         }
 
         String openIdMetadataUrl = channelProvider != null && channelProvider.isGovernment()
-            ? GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
-            : AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
+                ? GovernmentAuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL
+                : AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPENID_METADATA_URL;
 
-        JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            TOKENVALIDATIONPARAMETERS,
-            openIdMetadataUrl,
-            AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS
-        );
+        JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(TOKENVALIDATIONPARAMETERS, openIdMetadataUrl,
+                AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
-        ClaimsIdentity identity = tokenExtractor
-            .getIdentity(authHeader, channelId, authConfig.requiredEndorsements()).join();
+        ClaimsIdentity identity = tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
+                .join();
 
-
-         validateIdentity(identity, credentials).join();
+        validateIdentity(identity, credentials).join();
 
         return CompletableFuture.completedFuture(identity);
     }
@@ -178,14 +171,11 @@ public final class SkillValidation {
     /**
      * Helper to validate a skills ClaimsIdentity.
      *
-     * @param identity The ClaimsIdentity to validate.
+     * @param identity    The ClaimsIdentity to validate.
      * @param credentials The CredentialProvider.
      * @return Nothing if success, otherwise a CompletionException
      */
-    public static CompletableFuture<Void> validateIdentity(
-        ClaimsIdentity identity,
-        CredentialProvider credentials
-    ) {
+    public static CompletableFuture<Void> validateIdentity(ClaimsIdentity identity, CredentialProvider credentials) {
         if (identity == null) {
             // No valid identity. Not Authorized.
             return Async.completeExceptionally(new AuthenticationException("Invalid Identity"));
@@ -197,28 +187,20 @@ public final class SkillValidation {
         }
 
         Optional<Map.Entry<String, String>> versionClaim = identity.claims().entrySet().stream()
-            .filter(item -> StringUtils.equals(AuthenticationConstants.VERSION_CLAIM, item.getKey()))
-            .findFirst();
+                .filter(item -> StringUtils.equals(AuthenticationConstants.VERSION_CLAIM, item.getKey())).findFirst();
         if (!versionClaim.isPresent()) {
             // No version claim
-            return Async.completeExceptionally(
-                new AuthenticationException(
-                    AuthenticationConstants.VERSION_CLAIM + " claim is required on skill Tokens."
-                )
-            );
+            return Async.completeExceptionally(new AuthenticationException(
+                    AuthenticationConstants.VERSION_CLAIM + " claim is required on skill Tokens."));
         }
 
         // Look for the "aud" claim, but only if issued from the Bot Framework
         Optional<Map.Entry<String, String>> audienceClaim = identity.claims().entrySet().stream()
-            .filter(item -> StringUtils.equals(AuthenticationConstants.AUDIENCE_CLAIM, item.getKey()))
-            .findFirst();
+                .filter(item -> StringUtils.equals(AuthenticationConstants.AUDIENCE_CLAIM, item.getKey())).findFirst();
         if (!audienceClaim.isPresent() || StringUtils.isEmpty(audienceClaim.get().getValue())) {
             // Claim is not present or doesn't have a value. Not Authorized.
-            return Async.completeExceptionally(
-                new AuthenticationException(
-                    AuthenticationConstants.AUDIENCE_CLAIM + " claim is required on skill Tokens."
-                )
-            );
+            return Async.completeExceptionally(new AuthenticationException(
+                    AuthenticationConstants.AUDIENCE_CLAIM + " claim is required on skill Tokens."));
         }
 
         String appId = JwtTokenValidation.getAppIdFromClaims(identity.claims());
@@ -226,28 +208,25 @@ public final class SkillValidation {
             return Async.completeExceptionally(new AuthenticationException("Invalid appId."));
         }
 
-        return credentials.isValidAppId(audienceClaim.get().getValue())
-            .thenApply(isValid -> {
-                if (!isValid) {
-                    throw new AuthenticationException("Invalid audience.");
-                }
-                return null;
-            });
+        return credentials.isValidAppId(audienceClaim.get().getValue()).thenApply(isValid -> {
+            if (!isValid) {
+                throw new AuthenticationException("Invalid audience.");
+            }
+            return null;
+        });
     }
 
     /**
      * Creates a ClaimsIdentity for an anonymous (unauthenticated) skill.
      *
      * @return A ClaimsIdentity instance with authentication type set to
-     * AuthenticationConstants.AnonymousAuthType and a reserved
-     * AuthenticationConstants.AnonymousSkillAppId claim.
+     *         AuthenticationConstants.AnonymousAuthType and a reserved
+     *         AuthenticationConstants.AnonymousSkillAppId claim.
      */
     public static ClaimsIdentity createAnonymousSkillClaim() {
         Map<String, String> claims = new HashMap<>();
         claims.put(AuthenticationConstants.APPID_CLAIM, AuthenticationConstants.ANONYMOUS_SKILL_APPID);
-        return new ClaimsIdentity(
-            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
-            AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
-            claims);
+        return new ClaimsIdentity(AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+                AuthenticationConstants.ANONYMOUS_AUTH_TYPE, claims);
     }
 }

@@ -56,9 +56,7 @@ public class MicrosoftGovernmentAppCredentials extends MicrosoftAppCredentials {
         String withChannelAuthTenant,
         String withOAuthScope
     ) {
-        super(withChannelAuthTenant, withOAuthScope);
-        setAppId(withAppId);
-        setAppPassword(withAppPassword);
+        super(withAppId, withAppPassword, withChannelAuthTenant, withOAuthScope);
     }
 
     /**

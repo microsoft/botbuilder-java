@@ -279,7 +279,7 @@ public class ActivityPromptTests {
             Assert.assertTrue(promptContext.getAttemptCount() > 0);
 
             Activity activity = promptContext.getRecognized().getValue();
-            if (activity.getType() == ActivityTypes.EVENT) {
+            if (activity.getType().equals(ActivityTypes.EVENT)) {
                 if ((int) activity.getValue() == 2) {
                     promptContext.getRecognized().setValue(MessageFactory.text(activity.getValue().toString()));
                     return CompletableFuture.completedFuture(true);

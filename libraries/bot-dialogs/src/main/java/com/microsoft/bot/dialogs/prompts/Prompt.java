@@ -247,7 +247,7 @@ public abstract class Prompt<T> extends Dialog {
      */
     @Override
     protected CompletableFuture<Boolean> onPreBubbleEvent(DialogContext dc, DialogEvent e) {
-        if (e.getName() == DialogEvents.ACTIVITY_RECEIVED
+        if (e.getName().equals(DialogEvents.ACTIVITY_RECEIVED)
             && dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             // Perform base recognition
             Map<String, Object> state = dc.getActiveDialog().getState();

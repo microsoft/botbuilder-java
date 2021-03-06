@@ -360,7 +360,7 @@ public class DialogManager {
         TurnContext turnContext = dc.getContext();
 
         // Process remote cancellation
-        if (turnContext.getActivity().getType() == ActivityTypes.END_OF_CONVERSATION
+        if (turnContext.getActivity().getType().equals(ActivityTypes.END_OF_CONVERSATION)
             && dc.getActiveDialog() != null
             && DialogCommon.isFromParentToSkill(turnContext)) {
             // Handle remote cancellation request from parent.
@@ -373,8 +373,8 @@ public class DialogManager {
 
         // Handle reprompt
         // Process a reprompt event sent from the parent.
-        if (turnContext.getActivity().getType() == ActivityTypes.EVENT
-            && turnContext.getActivity().getName() == DialogEvents.REPROMPT_DIALOG) {
+        if (turnContext.getActivity().getType().equals(ActivityTypes.EVENT)
+            && turnContext.getActivity().getName().equals(DialogEvents.REPROMPT_DIALOG)) {
             if (dc.getActiveDialog() == null) {
                 return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.EMPTY));
             }
@@ -386,7 +386,7 @@ public class DialogManager {
         // Continue execution
         // - This will apply any queued up interruptions and execute the current/next step(s).
         DialogTurnResult turnResult =  dc.continueDialog().join();
-        if (turnResult.getStatus() == DialogTurnStatus.EMPTY) {
+        if (turnResult.getStatus().equals(DialogTurnStatus.EMPTY)) {
             // restart root dialog
             turnResult =  dc.beginDialog(rootDialogId).join();
         }
@@ -395,7 +395,7 @@ public class DialogManager {
 
         if (shouldSendEndOfConversationToParent(turnContext, turnResult)) {
             // Send End of conversation at the end.
-            EndOfConversationCodes code = turnResult.getStatus() == DialogTurnStatus.COMPLETE
+            EndOfConversationCodes code = turnResult.getStatus().equals(DialogTurnStatus.COMPLETE)
                                                                     ? EndOfConversationCodes.COMPLETED_SUCCESSFULLY
                                                                     : EndOfConversationCodes.USER_CANCELLED;
             Activity activity = new Activity(ActivityTypes.END_OF_CONVERSATION);
@@ -413,8 +413,8 @@ public class DialogManager {
      * or not.
      */
     private static boolean shouldSendEndOfConversationToParent(TurnContext context, DialogTurnResult turnResult) {
-        if (!(turnResult.getStatus() == DialogTurnStatus.COMPLETE
-            || turnResult.getStatus() == DialogTurnStatus.CANCELLED)) {
+        if (!(turnResult.getStatus().equals(DialogTurnStatus.COMPLETE)
+            || turnResult.getStatus().equals(DialogTurnStatus.CANCELLED))) {
             // The dialog instanceof still going, don't return EoC.
             return false;
         }
@@ -473,7 +473,7 @@ public class DialogManager {
             // step(s).
             turnResult = dc.continueDialog().join();
 
-            if (turnResult.getStatus() == DialogTurnStatus.EMPTY) {
+            if (turnResult.getStatus().equals(DialogTurnStatus.EMPTY)) {
                 // restart root dialog
                 turnResult = dc.beginDialog(rootDialogId).join();
             }
