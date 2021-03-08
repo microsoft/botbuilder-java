@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MT License.
 
-package com.microsoft.bot.sample.echoskillbot.authentication;
+package com.microsoft.bot.sample.dialogskillbot.authentication;
 
 import java.util.Arrays;
 import java.util.List;

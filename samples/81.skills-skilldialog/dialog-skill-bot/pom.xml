@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.bot.sample</groupId>
-    <artifactId>echoSkillbot</artifactId>
+    <artifactId>dialogSkillbot</artifactId>
     <version>sample</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>This package contains a Java Echo Skill Bot sample using Spring Boot.</description>
+    <description>This package contains a Java Dialog Skill Bot sample using Spring Boot.</description>
     <url>http://maven.apache.org</url>
 
     <parent>
@@ -41,7 +41,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <start-class>com.microsoft.bot.sample.echoskillbot.Application</start-class>
+        <start-class>com.microsoft.bot.sample.dialogskillbot.Application</start-class>
     </properties>
 
     <dependencies>
@@ -84,8 +84,18 @@
         <version>4.6.0-preview9</version>
         <scope>compile</scope>
       </dependency>
-  </dependencies>
-
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-dialogs</artifactId>
+        <version>4.6.0-preview9</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-ai-luis-v3</artifactId>
+        <version>4.6.1-preview8</version>
+      </dependency>
+    </dependencies>
   <profiles>
     <profile>
       <id>build</id>
@@ -120,7 +130,7 @@
                               <goal>repackage</goal>
                           </goals>
                           <configuration>
-                              <mainClass>com.microsoft.bot.sample.echoskillbot.Application</mainClass>
+                              <mainClass>com.microsoft.bot.sample.dialogskillbot.Application</mainClass>
                           </configuration>
                       </execution>
                   </executions>

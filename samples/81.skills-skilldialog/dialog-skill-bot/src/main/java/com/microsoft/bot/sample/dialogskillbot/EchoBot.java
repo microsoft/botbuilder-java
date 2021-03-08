@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.echoskillbot;
+package com.microsoft.bot.sample.dialogskillbot;
 
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.MessageFactory;

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.echoskillbot;
+package com.microsoft.bot.sample.dialogskillbot;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
@@ -9,7 +9,7 @@ import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
-import com.microsoft.bot.sample.echoskillbot.authentication.AllowedCallersClaimsValidator;
+import com.microsoft.bot.sample.dialogskillbot.authentication.AllowedCallersClaimsValidator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
