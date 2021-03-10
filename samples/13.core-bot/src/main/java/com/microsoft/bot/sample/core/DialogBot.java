@@ -14,15 +14,17 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This Bot implementation can run any type of Dialog. The use of type parameterization is to allow multiple
- * different bots to be run at different endpoints within the same project. This can be achieved by defining
- * distinct Controller types each with dependency on distinct Bot types. The ConversationState is used by
- * the Dialog system. The UserState isn't, however, it might have been used in a Dialog implementation,
- * and the requirement is that all BotState objects are saved at the end of a turn.
+ * This Bot implementation can run any type of Dialog. The use of type parameterization is to allow
+ * multiple different bots to be run at different endpoints within the same project. This can be
+ * achieved by defining distinct Controller types each with dependency on distinct Bot types. The
+ * ConversationState is used by the Dialog system. The UserState isn't, however, it might have been
+ * used in a Dialog implementation, and the requirement is that all BotState objects are saved at
+ * the end of a turn.
  *
  * @param <T> parameter of a type inheriting from Dialog
  */
 public class DialogBot<T extends Dialog> extends ActivityHandler {
+
     private Dialog dialog;
     private BotState conversationState;
     private BotState userState;
@@ -83,11 +85,14 @@ public class DialogBot<T extends Dialog> extends ActivityHandler {
 
     /**
      * Creates a DialogBot.
+     *
      * @param withConversationState ConversationState to use in the bot
-     * @param withUserState UserState to use
-     * @param withDialog Param inheriting from Dialog class
+     * @param withUserState         UserState to use
+     * @param withDialog            Param inheriting from Dialog class
      */
-    public DialogBot(ConversationState withConversationState, UserState withUserState, T withDialog) {
+    public DialogBot(
+        ConversationState withConversationState, UserState withUserState, T withDialog
+    ) {
         this.conversationState = withConversationState;
         this.userState = withUserState;
         this.dialog = withDialog;
@@ -95,6 +100,7 @@ public class DialogBot<T extends Dialog> extends ActivityHandler {
 
     /**
      * Saves the BotState objects at the end of each turn.
+     *
      * @param turnContext
      * @return
      */
@@ -107,6 +113,7 @@ public class DialogBot<T extends Dialog> extends ActivityHandler {
 
     /**
      * This method is executed when the turnContext receives a message activity.
+     *
      * @param turnContext
      * @return
      */

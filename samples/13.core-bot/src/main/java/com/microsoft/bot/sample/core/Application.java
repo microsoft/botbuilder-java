@@ -5,9 +5,7 @@ package com.microsoft.bot.sample.core;
 
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.builder.ConversationState;
-import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.UserState;
-import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
@@ -36,8 +34,10 @@ import org.springframework.context.annotation.Import;
  * override methods in order to provide custom implementations.
  */
 public class Application extends BotDependencyConfiguration {
+
     /**
      * The start method.
+     *
      * @param args The args.
      */
     public static void main(String[] args) {
@@ -48,56 +48,21 @@ public class Application extends BotDependencyConfiguration {
      * Returns the Bot for this application.
      *
      * <p>
-     *     The @Component annotation could be used on the Bot class instead of this method
-     *     with the @Bean annotation.
+     * The @Component annotation could be used on the Bot class instead of this method with the
+     * @Bean annotation.
      * </p>
      *
      * @return The Bot implementation for this application.
      */
     @Bean
     public Bot getBot(
+        Configuration configuration,
+        UserState userState,
+        ConversationState conversationState
     ) {
-        Storage storage = this.getStorage();
-        UserState userState = this.getUserState(storage);
-        ConversationState conversationState = this.getConversationState(storage);
-        Dialog rootDialog = this.getRootDialog();
-        return new DialogAndWelcomeBot(conversationState, userState, rootDialog);
-    }
-
-    /**
-     * Returns a FlightBookingRecognizer object.
-     * @return The FlightBookingRecognizer.
-     */
-    @Bean
-    public FlightBookingRecognizer getFlightBookingRecognizer() {
-        Configuration configuration = this.getConfiguration();
-        return new FlightBookingRecognizer(configuration);
-    }
-
-    /**
-     * Returns a BookingDialog object.
-     * @return The BookingDialog.
-     */
-    @Bean
-    public BookingDialog getBookingDialog() {
-        return new BookingDialog();
-    }
-
-    /**
-     * Returns the starting Dialog for this application.
-     *
-     * <p>
-     *     The @Component annotation could be used on the Dialog class instead of this method
-     *     with the @Bean annotation.
-     * </p>
-     *
-     * @return The Dialog implementation for this application.
-     */
-    @Bean
-    public Dialog getRootDialog() {
-        FlightBookingRecognizer flightBookingRecognizer = this.getFlightBookingRecognizer();
-        BookingDialog bookingDialog = this.getBookingDialog();
-        return new MainDialog(flightBookingRecognizer, bookingDialog);
+        FlightBookingRecognizer recognizer =  new FlightBookingRecognizer(configuration);
+        MainDialog dialog = new MainDialog(recognizer, new BookingDialog());
+        return new DialogAndWelcomeBot<>(conversationState, userState, dialog);
     }
 
     /**

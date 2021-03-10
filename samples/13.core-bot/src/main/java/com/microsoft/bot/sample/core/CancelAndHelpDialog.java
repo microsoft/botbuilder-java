@@ -18,11 +18,13 @@ import java.util.concurrent.CompletableFuture;
  * The class in charge of the dialog interruptions.
  */
 public class CancelAndHelpDialog extends ComponentDialog {
+
     private final String helpMsgText = "Show help here";
     private final String cancelMsgText = "Cancelling...";
 
     /**
      * The constructor of the CancelAndHelpDialog class.
+     *
      * @param id The dialog's Id.
      */
     public CancelAndHelpDialog(String id) {
@@ -30,13 +32,13 @@ public class CancelAndHelpDialog extends ComponentDialog {
     }
 
     /**
-     * Called when the dialog is _continued_, where it is the active dialog and the
-     *      user replies with a new activity.
+     * Called when the dialog is _continued_, where it is the active dialog and the user replies
+     * with a new activity.
+     *
      * @param innerDc innerDc The inner {@link DialogContext} for the current turn of conversation.
-     * @return A {@link CompletableFuture} representing the asynchronous operation.
-     * If the task is successful, the result indicates whether the dialog is
-     *      still active after the turn has been processed by the dialog. The
-     *      result may also contain a return value.
+     * @return A {@link CompletableFuture} representing the asynchronous operation. If the task is
+     * successful, the result indicates whether the dialog is still active after the turn has been
+     * processed by the dialog. The result may also contain a return value.
      */
     @Override
     protected CompletableFuture<DialogTurnResult> onContinueDialog(DialogContext innerDc) {
@@ -55,16 +57,19 @@ public class CancelAndHelpDialog extends ComponentDialog {
             switch (text) {
                 case "help":
                 case "?":
-                    Activity helpMessage = MessageFactory.text(helpMsgText, helpMsgText, InputHints.EXPECTING_INPUT);
+                    Activity helpMessage = MessageFactory
+                        .text(helpMsgText, helpMsgText, InputHints.EXPECTING_INPUT);
                     return innerDc.getContext().sendActivity(helpMessage)
                         .thenCompose(sendResult ->
-                            CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING)));
+                            CompletableFuture
+                                .completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING)));
                 case "cancel":
                 case "quit":
                     Activity cancelMessage = MessageFactory
                         .text(cancelMsgText, cancelMsgText, InputHints.IGNORING_INPUT);
                     return innerDc.getContext()
-                        .sendActivity(cancelMessage).thenCompose(sendResult -> innerDc.cancelAllDialogs());
+                        .sendActivity(cancelMessage)
+                        .thenCompose(sendResult -> innerDc.cancelAllDialogs());
                 default:
                     break;
             }
