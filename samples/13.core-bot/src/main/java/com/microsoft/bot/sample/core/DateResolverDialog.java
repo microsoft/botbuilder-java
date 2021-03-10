@@ -75,16 +75,12 @@ public class DateResolverDialog extends CancelAndHelpDialog {
             return stepContext.prompt("DateTimePrompt", promptOptions);
         }
 
-        DateTimeResolution dateTimeResolution = new DateTimeResolution() {
-            {
-                setTimex(timex);
-            }
-        };
-        List<DateTimeResolution> dateTimeResolutions = new ArrayList<DateTimeResolution>() {
-            {
-                add(dateTimeResolution);
-            }
-        };
+        DateTimeResolution dateTimeResolution = new DateTimeResolution() {{
+            setTimex(timex);
+        }};
+        List<DateTimeResolution> dateTimeResolutions = new ArrayList<DateTimeResolution>() {{
+            add(dateTimeResolution);
+        }};
         return stepContext.next(dateTimeResolutions);
     }
 
@@ -93,8 +89,9 @@ public class DateResolverDialog extends CancelAndHelpDialog {
         return stepContext.endDialog(timex);
     }
 
-    private static CompletableFuture<Boolean> dateTimePromptValidator(PromptValidatorContext<List<DateTimeResolution>>
-                                                                          promptContext) {
+    private static CompletableFuture<Boolean> dateTimePromptValidator(
+        PromptValidatorContext<List<DateTimeResolution>> promptContext
+    ) {
         if (promptContext.getRecognized().getSucceeded()) {
             // This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop the
             // Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.

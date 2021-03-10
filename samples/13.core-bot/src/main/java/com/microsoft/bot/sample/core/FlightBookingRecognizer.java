@@ -21,10 +21,12 @@ import java.util.concurrent.CompletableFuture;
  * The class in charge of recognizing the booking information.
  */
 public class FlightBookingRecognizer implements Recognizer {
+
     private LuisRecognizer recognizer;
 
     /**
      * The constructor of the FlightBookingRecognizer class.
+     *
      * @param configuration The Configuration object to use.
      */
     public FlightBookingRecognizer(Configuration configuration) {
@@ -35,11 +37,13 @@ public class FlightBookingRecognizer implements Recognizer {
             LuisApplication luisApplication = new LuisApplication(
                 configuration.getProperty("LuisAppId"),
                 configuration.getProperty("LuisAPIKey"),
-                String.format("https://%s", configuration.getProperty("LuisAPIHostName")));
+                String.format("https://%s", configuration.getProperty("LuisAPIHostName"))
+            );
             // Set the recognizer options depending on which endpoint version you want to use.
             // More details can be found in
             // https://docs.microsoft.com/en-gb/azure/cognitive-services/luis/luis-migration-api-v3
-            LuisRecognizerOptionsV3 recognizerOptions = new LuisRecognizerOptionsV3(luisApplication) {
+            LuisRecognizerOptionsV3 recognizerOptions = new LuisRecognizerOptionsV3(
+                luisApplication) {
                 {
                     setIncludeInstanceData(true);
                 }
@@ -51,6 +55,7 @@ public class FlightBookingRecognizer implements Recognizer {
 
     /**
      * Verify if the recognizer is configured.
+     *
      * @return True if it's configured, False if it's not.
      */
     public Boolean isConfigured() {
@@ -59,6 +64,7 @@ public class FlightBookingRecognizer implements Recognizer {
 
     /**
      * Return an object with preformatted LUIS results for the bot's dialogs to consume.
+     *
      * @param context A {link TurnContext}
      * @return A {link RecognizerResult}
      */
@@ -69,16 +75,20 @@ public class FlightBookingRecognizer implements Recognizer {
 
     /**
      * Gets the From data from the entities which is part of the result.
+     *
      * @param result The recognizer result.
      * @return The object node representing the From data.
      */
     public ObjectNode getFromEntities(RecognizerResult result) {
         String fromValue = "", fromAirportValue = "";
         if (result.getEntities().get("$instance").get("From") != null) {
-            fromValue = result.getEntities().get("$instance").get("From").get(0).get("text").asText();
+            fromValue = result.getEntities().get("$instance").get("From").get(0).get("text")
+                .asText();
         }
-        if (!fromValue.isEmpty() && result.getEntities().get("From").get(0).get("Airport") != null) {
-            fromAirportValue = result.getEntities().get("From").get(0).get("Airport").get(0).get(0).asText();
+        if (!fromValue.isEmpty()
+            && result.getEntities().get("From").get(0).get("Airport") != null) {
+            fromAirportValue = result.getEntities().get("From").get(0).get("Airport").get(0).get(0)
+                .asText();
         }
 
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
@@ -90,6 +100,7 @@ public class FlightBookingRecognizer implements Recognizer {
 
     /**
      * Gets the To data from the entities which is part of the result.
+     *
      * @param result The recognizer result.
      * @return The object node representing the To data.
      */
@@ -99,7 +110,8 @@ public class FlightBookingRecognizer implements Recognizer {
             toValue = result.getEntities().get("$instance").get("To").get(0).get("text").asText();
         }
         if (!toValue.isEmpty() && result.getEntities().get("To").get(0).get("Airport") != null) {
-            toAirportValue = result.getEntities().get("To").get(0).get("Airport").get(0).get(0).asText();
+            toAirportValue = result.getEntities().get("To").get(0).get("Airport").get(0).get(0)
+                .asText();
         }
 
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
@@ -110,8 +122,10 @@ public class FlightBookingRecognizer implements Recognizer {
     }
 
     /**
-     * This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop the Time part.
-     * TIMEX is a format that represents DateTime expressions that include some ambiguity. e.g. missing a Year.
+     * This value will be a TIMEX. And we are only interested in a Date so grab the first result and
+     * drop the Time part. TIMEX is a format that represents DateTime expressions that include some
+     * ambiguity. e.g. missing a Year.
+     *
      * @param result A {link RecognizerResult}
      * @return The Timex value without the Time model
      */
@@ -132,6 +146,7 @@ public class FlightBookingRecognizer implements Recognizer {
 
     /**
      * Runs an utterance through a recognizer and returns a generic recognizer result.
+     *
      * @param turnContext Turn context.
      * @return Analysis of utterance.
      */
