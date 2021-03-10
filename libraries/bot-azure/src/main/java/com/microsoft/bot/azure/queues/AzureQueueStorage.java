@@ -63,14 +63,15 @@ public class AzureQueueStorage extends QueueStorage {
                                                    @Nullable Duration timeToLive) {
         return CompletableFuture.supplyAsync(() -> {
             if (createQueueIfNotExists) {
+                try {
+                    queueClient.create();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
                 // This is an optimization flag to check if the container creation call has been made.
                 // It is okay if this is called more than once.
                 createQueueIfNotExists = false;
-                try {
-                    queueClient.create();
-                } catch (QueueStorageException e) {
-                    e.printStackTrace();
-                }
             }
 
             try {
