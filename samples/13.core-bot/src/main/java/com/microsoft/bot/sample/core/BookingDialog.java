@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
  * The class containing the booking dialogs.
  */
 public class BookingDialog extends CancelAndHelpDialog {
+
     private final String destinationStepMsgText = "Where would you like to travel to?";
     private final String originStepMsgText = "Where are you traveling from?";
 
@@ -54,7 +55,9 @@ public class BookingDialog extends CancelAndHelpDialog {
 
         if (bookingDetails.getDestination().isEmpty()) {
             Activity promptMessage =
-                MessageFactory.text(destinationStepMsgText, destinationStepMsgText, InputHints.EXPECTING_INPUT);
+                MessageFactory.text(destinationStepMsgText, destinationStepMsgText,
+                    InputHints.EXPECTING_INPUT
+                );
             PromptOptions promptOptions = new PromptOptions();
             promptOptions.setPrompt(promptMessage);
             return stepContext.prompt("TextPrompt", promptOptions);
@@ -71,7 +74,8 @@ public class BookingDialog extends CancelAndHelpDialog {
 
         if (bookingDetails.getOrigin().isEmpty()) {
             Activity promptMessage =
-                MessageFactory.text(originStepMsgText, originStepMsgText, InputHints.EXPECTING_INPUT);
+                MessageFactory
+                    .text(originStepMsgText, originStepMsgText, InputHints.EXPECTING_INPUT);
             PromptOptions promptOptions = new PromptOptions();
             promptOptions.setPrompt(promptMessage);
             return stepContext.prompt("TextPrompt", promptOptions);
@@ -100,9 +104,13 @@ public class BookingDialog extends CancelAndHelpDialog {
         bookingDetails.setTravelDate(stepContext.getResult().toString());
 
         String messageText =
-            String.format("Please confirm, I have you traveling to: %s from: %s on: %s. Is this correct?",
-                bookingDetails.getDestination(), bookingDetails.getOrigin(), bookingDetails.getTravelDate());
-        Activity promptMessage = MessageFactory.text(messageText, messageText, InputHints.EXPECTING_INPUT);
+            String.format(
+                "Please confirm, I have you traveling to: %s from: %s on: %s. Is this correct?",
+                bookingDetails.getDestination(), bookingDetails.getOrigin(),
+                bookingDetails.getTravelDate()
+            );
+        Activity promptMessage = MessageFactory
+            .text(messageText, messageText, InputHints.EXPECTING_INPUT);
 
         PromptOptions promptOptions = new PromptOptions();
         promptOptions.setPrompt(promptMessage);
@@ -114,7 +122,6 @@ public class BookingDialog extends CancelAndHelpDialog {
     private CompletableFuture<DialogTurnResult> finalStep(WaterfallStepContext stepContext) {
         if ((Boolean) stepContext.getResult()) {
             BookingDetails bookingDetails = (BookingDetails) stepContext.getOptions();
-
             return stepContext.endDialog(bookingDetails);
         }
 
