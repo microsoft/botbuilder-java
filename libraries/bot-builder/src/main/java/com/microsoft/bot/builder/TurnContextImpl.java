@@ -67,8 +67,6 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
      */
     private Boolean responded = false;
 
-    private static final String STATE_TURN_LOCALE = "turn.locale";
-
     /**
      * Creates a context object.
      *
