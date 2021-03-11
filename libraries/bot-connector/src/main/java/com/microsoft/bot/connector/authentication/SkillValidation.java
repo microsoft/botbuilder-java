@@ -160,12 +160,12 @@ public final class SkillValidation {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(TOKENVALIDATIONPARAMETERS, openIdMetadataUrl,
                 AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
-        ClaimsIdentity identity = tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
-                .join();
-
-        validateIdentity(identity, credentials).join();
-
-        return CompletableFuture.completedFuture(identity);
+        return tokenExtractor.getIdentity(authHeader, channelId, authConfig.requiredEndorsements())
+        .thenCompose(identity -> {
+            return validateIdentity(identity, credentials).thenCompose(result -> {
+                return CompletableFuture.completedFuture(identity);
+            });
+        });
     }
 
     /**

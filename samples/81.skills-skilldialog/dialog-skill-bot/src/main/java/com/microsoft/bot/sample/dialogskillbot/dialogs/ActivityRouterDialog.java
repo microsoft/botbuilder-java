@@ -6,11 +6,11 @@ package com.microsoft.bot.sample.dialogskillbot.dialogs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
-import com.microsoft.bot.builder.IntentScore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.bot.builder.MessageFactory;
+import com.microsoft.bot.builder.RecognizerResult;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.dialogs.ComponentDialog;
 import com.microsoft.bot.dialogs.Dialog;
@@ -20,10 +20,10 @@ import com.microsoft.bot.dialogs.WaterfallDialog;
 import com.microsoft.bot.dialogs.WaterfallStep;
 import com.microsoft.bot.dialogs.WaterfallStepContext;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;
-import com.microsoft.bot.sample.dialogskillbot.cognitivemodels.FlightBooking;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.InputHints;
+import com.microsoft.bot.schema.Serialization;
 
 /**
  * A root dialog that can route activities sent to the skill to different
@@ -31,11 +31,11 @@ import com.microsoft.bot.schema.InputHints;
  */
 public class ActivityRouterDialog extends ComponentDialog {
 
-    private final DialogSkillBotRecognizer _luisRecognizer;
+    private final DialogSkillBotRecognizer luisRecognizer;
 
     public ActivityRouterDialog(DialogSkillBotRecognizer luisRecognizer) {
         super("ActivityRouterDialog");
-        _luisRecognizer = luisRecognizer;
+        this.luisRecognizer = luisRecognizer;
 
         addDialog(new BookingDialog());
         List<WaterfallStep> stepList = new ArrayList<WaterfallStep>();
@@ -48,50 +48,60 @@ public class ActivityRouterDialog extends ComponentDialog {
 
     private CompletableFuture<DialogTurnResult> processActivity(WaterfallStepContext stepContext) {
         // A skill can send trace activities, if needed.
-        TurnContext.traceActivity(stepContext.getContext(), String.format("{%s}.processActivity() Got ActivityType: %s",
-                this.getClass().getName(), stepContext.getContext().getActivity().getType()));
+        TurnContext.traceActivity(
+            stepContext.getContext(),
+            String.format(
+                "{%s}.processActivity() Got ActivityType: %s",
+                this.getClass().getName(),
+                stepContext.getContext().getActivity().getType()
+            )
+        );
 
         switch (stepContext.getContext().getActivity().getType()) {
-        case ActivityTypes.EVENT:
-            return onEventActivity(stepContext);
+            case ActivityTypes.EVENT:
+                return onEventActivity(stepContext);
 
-        case ActivityTypes.MESSAGE:
-            return onMessageActivity(stepContext);
+            case ActivityTypes.MESSAGE:
+                return onMessageActivity(stepContext);
 
-        default:
-            String defaultMessage = String.format("Unrecognized ActivityType: \"%s\".",
-                    stepContext.getContext().getActivity().getType());
-            // We didn't get an activity type we can handle.
-            stepContext.getContext()
+            default:
+                String defaultMessage = String
+                    .format("Unrecognized ActivityType: \"%s\".", stepContext.getContext().getActivity().getType());
+                // We didn't get an activity type we can handle.
+                return stepContext.getContext()
                     .sendActivity(MessageFactory.text(defaultMessage, defaultMessage, InputHints.IGNORING_INPUT))
-                    .join();
-            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
+                    .thenCompose(result -> {
+                        return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
+                    });
+
         }
     }
 
     // This method performs different tasks super. on the event name.
     private CompletableFuture<DialogTurnResult> onEventActivity(WaterfallStepContext stepContext) {
         Activity activity = stepContext.getContext().getActivity();
-        TurnContext.traceActivity(stepContext.getContext(),
-                    String.format("%s.onEventActivity(), label: %s, Value: %s",
-                    this.getClass().getName(),
-                    activity.getName(),
-                    GetObjectAsJsonString(activity.getValue())));
+        TurnContext.traceActivity(
+            stepContext.getContext(),
+            String.format(
+                "%s.onEventActivity(), label: %s, Value: %s",
+                this.getClass().getName(),
+                activity.getName(),
+                GetObjectAsJsonString(activity.getValue())
+            )
+        );
 
         // Resolve what to execute super. on the event name.
         switch (activity.getName()) {
             case "BookFlight":
-                return  BeginBookFlight(stepContext);
+                return beginBookFlight(stepContext);
 
             case "GetWeather":
-                return  BeginGetWeather(stepContext);
+                return beginGetWeather(stepContext);
 
             default:
-            String message = String.format("Unrecognized EventName: \"%s\".", activity.getName());
+                String message = String.format("Unrecognized EventName: \"%s\".", activity.getName());
                 // We didn't get an event name we can handle.
-                 stepContext.getContext().sendActivity(MessageFactory.text(message,
-                                                                           message,
-                                                                           InputHints.IGNORING_INPUT));
+                stepContext.getContext().sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT));
                 return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
         }
     }
@@ -99,88 +109,112 @@ public class ActivityRouterDialog extends ComponentDialog {
     // This method just gets a message activity and runs it through LUS.
     private CompletableFuture<DialogTurnResult> onMessageActivity(WaterfallStepContext stepContext) {
         Activity activity = stepContext.getContext().getActivity();
-        TurnContext.traceActivity(stepContext.getContext(),
-                    String.format("%s.onMessageActivity(), label: %s, Value: %s",
-                    this.getClass().getName(),
-                    activity.getName(),
-                    GetObjectAsJsonString(activity.getValue())));
+        TurnContext.traceActivity(
+            stepContext.getContext(),
+            String.format(
+                "%s.onMessageActivity(), label: %s, Value: %s",
+                this.getClass().getName(),
+                activity.getName(),
+                GetObjectAsJsonString(activity.getValue())
+            )
+        );
 
-        if (!_luisRecognizer.getIsConfigured()) {
+        if (!luisRecognizer.getIsConfigured()) {
             String message = "NOTE: LUIS instanceof not configured. To enable all capabilities, add 'LuisAppId',"
-                             + " 'LuisAPKey' and 'LuisAPHostName' to the appsettings.json file.";
-             stepContext.getContext().sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT));
+                + " 'LuisAPKey' and 'LuisAPHostName' to the appsettings.json file.";
+            return stepContext.getContext()
+                .sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT))
+                .thenCompose(
+                    result -> CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE))
+                );
         } else {
-            // Call LUS with the utterance.
-            FlightBooking luisResult =
-                    _luisRecognizer.recognize(stepContext.getContext(), FlightBooking.class).join();
+            // Call LUIS with the utterance.
+            return luisRecognizer.recognize(stepContext.getContext(), RecognizerResult.class)
+                .thenCompose(luisResult -> {
+                    // Create a message showing the LUS results.
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(String.format("LUIS results for \"%s\":", activity.getText()));
 
-            // Create a message showing the LUS results.
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format("LUIS results for \"%s\":", activity.getText()));
+                    sb.append(
+                        String.format(
+                            "Intent: \"%s\" Score: %s",
+                            luisResult.getTopScoringIntent().intent,
+                            luisResult.getTopScoringIntent().score
+                        )
+                    );
 
-            FlightBooking.Intent intent = FlightBooking.Intent.None;
-            IntentScore intentScore = new IntentScore();
-            intentScore.setScore(0.0);
-            for(Entry<FlightBooking.Intent, IntentScore> item: luisResult.Intents.entrySet()) {
-                if (item.getValue().getScore() > intentScore.getScore()) {
-                    intentScore = item.getValue();
-                    intent = item.getKey();
-                }
-            }
+                    return stepContext.getContext()
+                        .sendActivity(MessageFactory.text(sb.toString(), sb.toString(), InputHints.IGNORING_INPUT))
+                        .thenCompose(result -> {
+                            switch (luisResult.getTopScoringIntent().intent.toLowerCase()) {
+                                case "bookflight":
+                                    return beginBookFlight(stepContext);
 
-            sb.append(String.format("Intent: \"%s\" Score: %s", intent, intentScore.getScore()));
+                                case "getweather":
+                                    return beginGetWeather(stepContext);
 
-            stepContext.getContext().sendActivity(MessageFactory.text(sb.toString(),
-                                                                      sb.toString(),
-                                                                      InputHints.IGNORING_INPUT)).join();
+                                default:
+                                    // Catch all for unhandled intents.
+                                    String didntUnderstandMessageText = String.format(
+                                        "Sorry, I didn't get that. Please try asking in a different "
+                                        + "way (intent was %s)",
+                                        luisResult.getTopScoringIntent().intent
+                                    );
+                                    Activity didntUnderstandMessage = MessageFactory.text(
+                                        didntUnderstandMessageText,
+                                        didntUnderstandMessageText,
+                                        InputHints.IGNORING_INPUT
+                                    );
+                                    return stepContext.getContext()
+                                        .sendActivity(didntUnderstandMessage)
+                                        .thenCompose(
+                                            stepResult -> CompletableFuture
+                                                .completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE))
+                                        );
 
-            // Start a dialog if we recognize the intent.
-            switch (luisResult.TopIntent().getLeft()) {
-                case BookFlight:
-                    return BeginBookFlight(stepContext);
-
-                case GetWeather:
-                    return BeginGetWeather(stepContext);
-
-                default:
-                    // Catch all for unhandled intents.
-                    String didntUnderstandMessageText = String.format(
-                        "Sorry, I didn't get that. Please try asking in a different way (intent was %s)",
-                        luisResult.TopIntent().getLeft());
-                    Activity didntUnderstandMessage = MessageFactory.text(didntUnderstandMessageText,
-                                                                          didntUnderstandMessageText,
-                                                                          InputHints.IGNORING_INPUT);
-                    stepContext.getContext().sendActivity(didntUnderstandMessage).join();
-                    break;
-            }
+                            }
+                        });
+                    // Start a dialog if we recognize the intent.
+                });
         }
-
-        return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
     }
 
-    private static CompletableFuture<DialogTurnResult> BeginGetWeather(WaterfallStepContext stepContext) {
+    private static CompletableFuture<DialogTurnResult> beginGetWeather(WaterfallStepContext stepContext) {
         Activity activity = stepContext.getContext().getActivity();
         Location location = new Location();
-        if (activity.getValue() != null && activity.getValue() instanceof Location) {
-            location = (Location) activity.getValue();
+        if (activity.getValue() != null) {
+            try {
+                location = Serialization.safeGetAs(activity.getValue(), Location.class);
+            } catch (JsonProcessingException e) {
+                // something went wrong, so we create an empty Location so we won't get a null
+                // reference below when we acess location.
+                location = new Location();
+            }
+
         }
 
-        // We haven't implemented the GetWeatherDialog so we just display a TODO message.
-        String getWeatherMessageText = String.format("TODO: get weather for here (lat: %s, long: %s)"
-                                                     ,location.getLatitude(),
-                                                     location.getLongitude());
-        Activity getWeatherMessage = MessageFactory.text(getWeatherMessageText,
-                                                         getWeatherMessageText,
-                                                         InputHints.IGNORING_INPUT);
-         stepContext.getContext().sendActivity(getWeatherMessage);
-        return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
+        // We haven't implemented the GetWeatherDialog so we just display a TODO
+        // message.
+        String getWeatherMessageText = String
+            .format("TODO: get weather for here (lat: %s, long: %s)", location.getLatitude(), location.getLongitude());
+        Activity getWeatherMessage =
+            MessageFactory.text(getWeatherMessageText, getWeatherMessageText, InputHints.IGNORING_INPUT);
+        return stepContext.getContext().sendActivity(getWeatherMessage).thenCompose(result -> {
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.COMPLETE));
+        });
+
     }
 
-    private CompletableFuture<DialogTurnResult> BeginBookFlight(WaterfallStepContext stepContext) {
+    private CompletableFuture<DialogTurnResult> beginBookFlight(WaterfallStepContext stepContext) {
         Activity activity = stepContext.getContext().getActivity();
         BookingDetails bookingDetails = new BookingDetails();
-        if (activity.getValue() != null && activity.getValue() instanceof BookingDetails) {
-            bookingDetails = (BookingDetails) activity.getValue();
+        if (activity.getValue() != null) {
+            try {
+                bookingDetails = Serialization.safeGetAs(activity.getValue(), BookingDetails.class);
+            } catch (JsonProcessingException e) {
+                // we already initialized bookingDetails above, so the flow will run as if
+                // no details were sent.
+            }
         }
 
         // Start the booking dialog.

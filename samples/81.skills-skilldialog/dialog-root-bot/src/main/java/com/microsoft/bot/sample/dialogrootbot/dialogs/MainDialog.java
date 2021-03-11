@@ -15,7 +15,9 @@ import com.microsoft.bot.dialogs.prompts.ChoicePrompt;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.SkillHttpClient;
+import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +49,7 @@ public class MainDialog extends ComponentDialog {
 
     public static final String ActiveSkillPropertyName =
         "com.microsoft.bot.sample.dialogrootbot.dialogs.MainDialog.ActiveSkillProperty";
-    private final StatePropertyAccessor<BotFrameworkSkill> _activeSkillProperty;
+    private final StatePropertyAccessor<BotFrameworkSkill> activeSkillProperty;
     private final String _selectedSkillKey =
         "com.microsoft.bot.sample.dialogrootbot.dialogs.MainDialog.SelectedSkillKey";
     private final SkillsConfiguration _skillsConfig;
@@ -107,7 +109,7 @@ public class MainDialog extends ComponentDialog {
         addDialog(new WaterfallDialog("WaterfallDialog", Arrays.asList(waterfallSteps)));
 
         // Create state property to track the active skill.
-        _activeSkillProperty = conversationState.createProperty(ActiveSkillPropertyName);
+        activeSkillProperty = conversationState.createProperty(ActiveSkillPropertyName);
 
         // The initial child Dialog to run.
         setInitialDialogId("WaterfallDialog");
@@ -117,20 +119,25 @@ public class MainDialog extends ComponentDialog {
     protected CompletableFuture<DialogTurnResult> onContinueDialog(DialogContext innerDc) {
         // This instanceof an example on how to cancel a SkillDialog that instanceof
         // currently in progress from the parent bot.
-        BotFrameworkSkill activeSkill = _activeSkillProperty.get(innerDc.getContext(), null).join();
-        Activity activity = innerDc.getContext().getActivity();
-        if (activeSkill != null
-            && activity.getType().equals(ActivityTypes.MESSAGE)
-            && activity.getText().equals("abort")) {
-            // Cancel all dialogs when the user says abort.
-            // The SkillDialog automatically sends an EndOfConversation message to the skill
-            // to let the
-            // skill know that it needs to end its current dialogs, too.
-            innerDc.cancelAllDialogs().join();
-            return innerDc.replaceDialog(getInitialDialogId(), "Canceled! \n\n What skill would you like to call?");
-        }
+        return activeSkillProperty.get(innerDc.getContext(), null).thenCompose(activeSkill -> {
+            Activity activity = innerDc.getContext().getActivity();
+            if (
+                activeSkill != null && activity.getType().equals(ActivityTypes.MESSAGE)
+                    && activity.getText().equals("abort")
+            ) {
+                // Cancel all dialogs when the user says abort.
+                // The SkillDialog automatically sends an EndOfConversation message to the skill
+                // to let the
+                // skill know that it needs to end its current dialogs, too.
+                return innerDc.cancelAllDialogs()
+                    .thenCompose(
+                        result -> innerDc
+                            .replaceDialog(getInitialDialogId(), "Canceled! \n\n What skill would you like to call?")
+                    );
+            }
 
-        return super.onContinueDialog(innerDc);
+            return super.onContinueDialog(innerDc);
+        });
     }
 
     // Render a prompt to select the skill to call.
@@ -207,7 +214,7 @@ public class MainDialog extends ComponentDialog {
         skillDialogArgs.setActivity(skillActivity);
 
         // Save active skill in state.
-        _activeSkillProperty.set(stepContext.getContext(), selectedSkill);
+        activeSkillProperty.set(stepContext.getContext(), selectedSkill);
 
         // Start the skillDialog instance with the arguments.
         return stepContext.beginDialog(selectedSkill.getId(), skillDialogArgs);
@@ -216,27 +223,33 @@ public class MainDialog extends ComponentDialog {
     // The SkillDialog has ended, render the results (if any) and restart
     // MainDialog.
     public CompletableFuture<DialogTurnResult> finalStep(WaterfallStepContext stepContext) {
-        BotFrameworkSkill activeSkill = _activeSkillProperty.get(stepContext.getContext(), () -> null).join();
+        return activeSkillProperty.get(stepContext.getContext(), () -> null).thenCompose(activeSkill -> {
+            if (stepContext.getResult() != null) {
+                String jsonResult = "";
+                try {
+                    jsonResult =
+                        new JacksonAdapter().serialize(stepContext.getResult()).replace("{", "").replace("}", "");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String message =
+                    String.format("Skill \"%s\" invocation complete. Result: %s", activeSkill.getId(), jsonResult);
+                stepContext.getContext().sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT));
+            }
+
+            // Clear the skill selected by the user.
+            stepContext.getValues().put(_selectedSkillKey, null);
+
+            // Clear active skill in state.
+            activeSkillProperty.delete(stepContext.getContext());
+
+            // Restart the main dialog with a different message the second time around.
+            return stepContext.replaceDialog(
+                getInitialDialogId(),
+                String.format("Done with \"%s\". \n\n What skill would you like to call?", activeSkill.getId())
+            );
+        });
         // Check if the skill returned any results and display them.
-        if (stepContext.getResult() != null) {
-            String message = String
-                .format("Skill \"%s\" invocation complete. Result: %s", activeSkill.getId(), stepContext.getResult());
-            stepContext.getContext()
-                .sendActivity(MessageFactory.text(message, message, InputHints.IGNORING_INPUT))
-                .join();
-        }
-
-        // Clear the skill selected by the user.
-        stepContext.getValues().put(_selectedSkillKey, null);
-
-        // Clear active skill in state.
-        _activeSkillProperty.delete(stepContext.getContext());
-
-        // Restart the main dialog with a different message the second time around.
-        return stepContext.replaceDialog(
-            getInitialDialogId(),
-            String.format("Done with \"%s\". \n\n What skill would you like to call?", activeSkill.getId())
-        );
     }
 
     // Helper method that creates and adds SkillDialog instances for the configured
@@ -312,8 +325,9 @@ public class MainDialog extends ComponentDialog {
             activity = Activity.createEventActivity();
             activity.setName(SkillActionBookFlight);
             try {
-                activity.setValue(mapper.readValue("{ \"origin\": \"New York\", \"destination\": \"Seattle\"}",
-                                  Object.class));
+                activity.setValue(
+                    mapper.readValue("{ \"origin\": \"New York\", \"destination\": \"Seattle\"}", Object.class)
+                );
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -325,8 +339,8 @@ public class MainDialog extends ComponentDialog {
             activity = Activity.createEventActivity();
             activity.setName(SkillActionGetWeather);
             try {
-                activity.setValue(mapper.readValue("{ \"latitude\": 47.get614891(), \"longitude\": -122.195801}",
-                                  Object.class));
+                activity
+                    .setValue(mapper.readValue("{ \"latitude\": 47.614891, \"longitude\": -122.195801}", Object.class));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }

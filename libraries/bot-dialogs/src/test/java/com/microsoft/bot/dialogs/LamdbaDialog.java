@@ -39,8 +39,6 @@ public class LamdbaDialog extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
-        func.runTest(dc).join();
-        return dc.endDialog();
+        return func.runTest(dc).thenCompose(result -> dc.endDialog());
     }
-
 }

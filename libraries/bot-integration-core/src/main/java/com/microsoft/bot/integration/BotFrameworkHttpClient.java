@@ -93,56 +93,60 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
      * @return task with optional invokeResponse.
      */
     @Override
-    public <T extends Object> CompletableFuture<TypedInvokeResponse<T>> postActivity(
-            String fromBotId,
-            String toBotId,
-            URI toUrl,
-            URI serviceUrl,
-            String conversationId,
-            Activity activity,
-            Class<T> type) {
+    public <T extends Object> CompletableFuture<TypedInvokeResponse<T>> postActivity(String fromBotId, String toBotId,
+            URI toUrl, URI serviceUrl, String conversationId, Activity activity, Class<T> type) {
 
-        AppCredentials appCredentials = getAppCredentials(fromBotId, toBotId).join();
-        if (appCredentials == null) {
-            return Async.completeExceptionally(
-                new Exception(String.format("Unable to get appCredentials to connect to the skill"))
-            );
-        }
+        return getAppCredentials(fromBotId, toBotId).thenCompose(appCredentials -> {
+            if (appCredentials == null) {
+                return Async.completeExceptionally(
+                        new Exception(String.format("Unable to get appCredentials to connect to the skill")));
+            }
 
+            // Get token for the skill call
+            return getToken(appCredentials).thenCompose(token -> {
+                // Clone the activity so we can modify it before sending without impacting the
+                // original Object.
+                Activity activityClone = Activity.clone(activity);
+
+                ConversationAccount conversationAccount = new ConversationAccount();
+                conversationAccount.setId(activityClone.getConversation().getId());
+                conversationAccount.setName(activityClone.getConversation().getName());
+                conversationAccount.setConversationType(activityClone.getConversation().getConversationType());
+                conversationAccount.setAadObjectId(activityClone.getConversation().getAadObjectId());
+                conversationAccount.setIsGroup(activityClone.getConversation().isGroup());
+                for (String key : conversationAccount.getProperties().keySet()) {
+                    activityClone.setProperties(key, conversationAccount.getProperties().get(key));
+                }
+                conversationAccount.setRole(activityClone.getConversation().getRole());
+                conversationAccount.setTenantId(activityClone.getConversation().getTenantId());
+
+                ConversationReference conversationReference = new ConversationReference();
+                conversationReference.setServiceUrl(activityClone.getServiceUrl());
+                conversationReference.setActivityId(activityClone.getId());
+                conversationReference.setChannelId(activityClone.getChannelId());
+                conversationReference.setLocale(activityClone.getLocale());
+                conversationReference.setConversation(conversationAccount);
+
+                activityClone.setRelatesTo(conversationReference);
+                activityClone.getConversation().setId(conversationId);
+                activityClone.setServiceUrl(serviceUrl.toString());
+                if (activityClone.getRecipient() == null) {
+                    activityClone.setRecipient(new ChannelAccount());
+                }
+                activityClone.getRecipient().setRole(RoleTypes.SKILL);
+
+                return securePostActivity(toUrl, activityClone, token, type);
+            });
+        });
+    }
+
+    private CompletableFuture<String> getToken(AppCredentials appCredentials) {
         // Get token for the skill call
-        String token = appCredentials == MicrosoftAppCredentials.empty() ? null :  appCredentials.getToken().join();
-
-        // Clone the activity so we can modify it before sending without impacting the original Object.
-        Activity activityClone = Activity.clone(activity);
-
-        ConversationAccount conversationAccount = new ConversationAccount();
-        conversationAccount.setId(activityClone.getConversation().getId());
-        conversationAccount.setName(activityClone.getConversation().getName());
-        conversationAccount.setConversationType(activityClone.getConversation().getConversationType());
-        conversationAccount.setAadObjectId(activityClone.getConversation().getAadObjectId());
-        conversationAccount.setIsGroup(activityClone.getConversation().isGroup());
-        for (String key : conversationAccount.getProperties().keySet()) {
-            activityClone.setProperties(key, conversationAccount.getProperties().get(key));
+        if (appCredentials == MicrosoftAppCredentials.empty()) {
+            return CompletableFuture.completedFuture(null);
+        } else {
+            return appCredentials.getToken();
         }
-        conversationAccount.setRole(activityClone.getConversation().getRole());
-        conversationAccount.setTenantId(activityClone.getConversation().getTenantId());
-
-        ConversationReference conversationReference = new ConversationReference();
-        conversationReference.setServiceUrl(activityClone.getServiceUrl());
-        conversationReference.setActivityId(activityClone.getId());
-        conversationReference.setChannelId(activityClone.getChannelId());
-        conversationReference.setLocale(activityClone.getLocale());
-        conversationReference.setConversation(conversationAccount);
-
-        activityClone.setRelatesTo(conversationReference);
-        activityClone.getConversation().setId(conversationId);
-        activityClone.setServiceUrl(serviceUrl.toString());
-        if (activityClone.getRecipient() == null) {
-            activityClone.setRecipient(new ChannelAccount());
-        }
-        activityClone.getRecipient().setRole(RoleTypes.SKILL);
-
-        return securePostActivity(toUrl, activityClone, token, type);
     }
 
     /**
@@ -160,18 +164,17 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
             Activity activity, Class<T> type) {
 
         // From BotId -> BotId
-        AppCredentials appCredentials = getAppCredentials(botId, botId).join();
-        if (appCredentials == null) {
-            return Async.completeExceptionally(
-                new Exception(String.format("Unable to get appCredentials for the bot Id=%s", botId))
-            );
-        }
+        return getAppCredentials(botId, botId).thenCompose(appCredentials -> {
+            if (appCredentials == null) {
+                return Async.completeExceptionally(
+                        new Exception(String.format("Unable to get appCredentials for the bot Id=%s", botId)));
+            }
 
-        // Get token for the bot to call itself
-        String token = appCredentials == MicrosoftAppCredentials.empty() ? null : appCredentials.getToken().join();
-
-        // post the activity to the url using the bot's credentials.
-        return securePostActivity(botEndpoint, activity, token, type);
+            return getToken(appCredentials).thenCompose(token -> {
+                // post the activity to the url using the bot's credentials.
+                return securePostActivity(botEndpoint, activity, token, type);
+            });
+        });
     }
 
     /**
@@ -184,31 +187,27 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
      * @return The app credentials to be used to acquire tokens.
      */
     protected CompletableFuture<AppCredentials> buildCredentials(String appId, String oAuthScope) {
-        String appPassword = getCredentialProvider().getAppPassword(appId).join();
-        AppCredentials appCredentials = channelProvider != null && getChannelProvider().isGovernment()
+        return getCredentialProvider().getAppPassword(appId).thenCompose(appPassword -> {
+                AppCredentials appCredentials = channelProvider != null && getChannelProvider().isGovernment()
                 ? new MicrosoftGovernmentAppCredentials(appId, appPassword, null, oAuthScope)
                 : new MicrosoftAppCredentials(appId, appPassword, null, oAuthScope);
-        return CompletableFuture.completedFuture(appCredentials);
+            return CompletableFuture.completedFuture(appCredentials);
+        });
     }
 
-    private <T extends Object> CompletableFuture<TypedInvokeResponse<T>> securePostActivity(
-        URI toUrl,
-        Activity activity,
-        String token,
-        Class<T> type
-    ) {
+    private <T extends Object> CompletableFuture<TypedInvokeResponse<T>> securePostActivity(URI toUrl,
+            Activity activity, String token, Class<T> type) {
         String jsonContent = "";
         try {
             ObjectMapper mapper = new JacksonAdapter().serializer();
             jsonContent = mapper.writeValueAsString(activity);
         } catch (JsonProcessingException e) {
-            return Async.completeExceptionally(new RuntimeException(
-                "securePostActivity: Unable to serialize the Activity"
-                ));
+            return Async.completeExceptionally(
+                    new RuntimeException("securePostActivity: Unable to serialize the Activity"));
         }
 
         try {
-            RequestBody body =  RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonContent);
+            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonContent);
             Request request = buildRequest(toUrl, body, token);
             Response response = httpClient.newCall(request).execute();
 
@@ -233,15 +232,13 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
     }
 
     /**
-     * Gets the application credentials. App Credentials are cached so as to
-     * ensure we are not refreshing token every time.
+     * Gets the application credentials. App Credentials are cached so as to ensure
+     * we are not refreshing token every time.
      *
-     * @param appId       The application identifier (AAD Id for the
-     *                    bot).
-     * @param oAuthScope  The scope for the token, skills will use the
-     *                    Skill App Id.
+     * @param appId      The application identifier (AAD Id for the bot).
+     * @param oAuthScope The scope for the token, skills will use the Skill App Id.
      *
-     * @return   App credentials.
+     * @return App credentials.
      */
     private CompletableFuture<AppCredentials> getAppCredentials(String appId, String oAuthScope) {
         if (StringUtils.isEmpty(appId)) {
@@ -257,11 +254,11 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         }
 
         // Credentials not found in cache, build them
-        appCredentials =  buildCredentials(appId, String.format("%s/.default", oAuthScope)).join();
-
-        // Cache the credentials for later use
-        appCredentialMapCache.put(cacheKey, appCredentials);
-        return CompletableFuture.completedFuture(appCredentials);
+        return buildCredentials(appId, String.format("%s/.default", oAuthScope)).thenCompose(credentials -> {
+            // Cache the credentials for later use
+            appCredentialMapCache.put(cacheKey, credentials);
+            return CompletableFuture.completedFuture(credentials);
+        });
     }
 
     /**
@@ -304,4 +301,3 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         return httpClient;
     }
 }
-

@@ -32,14 +32,15 @@ import org.apache.commons.lang3.StringUtils;
  * Defines the core behavior of prompt dialogs.
  *
  * When the prompt ends, it should return a Object that represents the value
- * that was prompted for. Use {@link com.microsoft.bot.dialogs.DialogSet#add(Dialog)} or
- * {@link com.microsoft.bot.dialogs.ComponentDialog#addDialog(Dialog)} to add a prompt to
- * a dialog set or component dialog, respectively. Use
+ * that was prompted for. Use
+ * {@link com.microsoft.bot.dialogs.DialogSet#add(Dialog)} or
+ * {@link com.microsoft.bot.dialogs.ComponentDialog#addDialog(Dialog)} to add a
+ * prompt to a dialog set or component dialog, respectively. Use
  * {@link DialogContext#prompt(String, PromptOptions)} or
  * {@link DialogContext#beginDialog(String, Object)} to start the prompt. If you
  * start a prompt from a {@link com.microsoft.bot.dialogs.WaterfallStep} in a
- * {@link com.microsoft.bot.dialogs.WaterfallDialog}, then the prompt result will be
- * available in the next step of the waterfall.
+ * {@link com.microsoft.bot.dialogs.WaterfallDialog}, then the prompt result
+ * will be available in the next step of the waterfall.
  *
  * @param <T> Type the prompt is created for.
  */
@@ -61,8 +62,8 @@ public abstract class Prompt<T> extends Dialog {
      *
      *                  The value of dialogId must be unique within the
      *                  {@link com.microsoft.bot.dialogs.DialogSet} or
-     *                  {@link com.microsoft.bot.dialogs.ComponentDialog} to which the
-     *                  prompt is added.
+     *                  {@link com.microsoft.bot.dialogs.ComponentDialog} to which
+     *                  the prompt is added.
      */
     public Prompt(String dialogId, PromptValidator<T> validator) {
         super(dialogId);
@@ -89,15 +90,12 @@ public abstract class Prompt<T> extends Dialog {
     public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
 
         if (dc == null) {
-            return Async.completeExceptionally(new IllegalArgumentException(
-                "dc cannot be null."
-            ));
+            return Async.completeExceptionally(new IllegalArgumentException("dc cannot be null."));
         }
 
         if (!(options instanceof PromptOptions)) {
-            return Async.completeExceptionally(new IllegalArgumentException(
-                "Prompt options are required for Prompt dialogs"
-            ));
+            return Async.completeExceptionally(
+                    new IllegalArgumentException("Prompt options are required for Prompt dialogs"));
         }
 
         // Ensure prompts have input hint set
@@ -111,7 +109,6 @@ public abstract class Prompt<T> extends Dialog {
             opt.getRetryPrompt().setInputHint(InputHints.EXPECTING_INPUT);
         }
 
-
         // Initialize prompt state
         Map<String, Object> state = dc.getActiveDialog().getState();
         state.put(PERSISTED_OPTIONS, opt);
@@ -121,10 +118,8 @@ public abstract class Prompt<T> extends Dialog {
         state.put(PERSISTED_STATE, pState);
 
         // Send initial prompt
-        onPrompt(dc.getContext(),
-                 (Map<String, Object>) state.get(PERSISTED_STATE),
-                 (PromptOptions) state.get(PERSISTED_OPTIONS),
-                 false);
+        onPrompt(dc.getContext(), (Map<String, Object>) state.get(PERSISTED_STATE),
+                (PromptOptions) state.get(PERSISTED_OPTIONS), false);
         return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
     }
 
@@ -145,9 +140,7 @@ public abstract class Prompt<T> extends Dialog {
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
 
         if (dc == null) {
-            return Async.completeExceptionally(new IllegalArgumentException(
-                "dc cannot be null."
-            ));
+            return Async.completeExceptionally(new IllegalArgumentException("dc cannot be null."));
         }
 
         // Don't do anything for non-message activities
@@ -159,30 +152,36 @@ public abstract class Prompt<T> extends Dialog {
         DialogInstance instance = dc.getActiveDialog();
         Map<String, Object> state = (Map<String, Object>) instance.getState().get(PERSISTED_STATE);
         PromptOptions options = (PromptOptions) instance.getState().get(PERSISTED_OPTIONS);
-        PromptRecognizerResult<T> recognized = onRecognize(dc.getContext(), state, options).join();
+        return onRecognize(dc.getContext(), state, options).thenCompose(recognized -> {
+            state.put(ATTEMPTCOUNTKEY, (int) state.get(ATTEMPTCOUNTKEY) + 1);
 
-        state.put(ATTEMPTCOUNTKEY, (int) state.get(ATTEMPTCOUNTKEY) + 1);
+            // Validate the return value
+            return validateContext(dc, state, options, recognized).thenCompose(isValid -> {
+                // Return recognized value or re-prompt
+                if (isValid) {
+                    return dc.endDialog(recognized.getValue());
+                }
 
-        // Validate the return value
+                if (!dc.getContext().getResponded()) {
+                    return onPrompt(dc.getContext(), state, options, true).thenApply(result -> Dialog.END_OF_TURN);
+                }
+
+                return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
+            });
+        });
+    }
+
+    private CompletableFuture<Boolean> validateContext(DialogContext dc, Map<String, Object> state,
+            PromptOptions options, PromptRecognizerResult<T> recognized) {
         Boolean isValid = false;
         if (validator != null) {
-            PromptValidatorContext<T> promptContext = new PromptValidatorContext<T>(dc.getContext(),
-                                                                                    recognized, state, options);
-            isValid = validator.promptValidator(promptContext).join();
+            PromptValidatorContext<T> promptContext = new PromptValidatorContext<T>(dc.getContext(), recognized, state,
+                    options);
+            return validator.promptValidator(promptContext);
         } else if (recognized.getSucceeded()) {
             isValid = true;
         }
-
-        // Return recognized value or re-prompt
-        if (isValid) {
-            return dc.endDialog(recognized.getValue());
-        }
-
-        if (!dc.getContext().getResponded()) {
-            onPrompt(dc.getContext(), state, options, true);
-        }
-
-        return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
+        return CompletableFuture.completedFuture(isValid);
     }
 
     /**
@@ -210,8 +209,7 @@ public abstract class Prompt<T> extends Dialog {
         // dialogResume() when the pushed on dialog ends.
         // To avoid the prompt prematurely ending we need to implement this method and
         // simply re-prompt the user.
-        repromptDialog(dc.getContext(), dc.getActiveDialog()).join();
-        return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
+        return repromptDialog(dc.getContext(), dc.getActiveDialog()).thenApply(finalResult -> Dialog.END_OF_TURN);
     }
 
     /**
@@ -228,32 +226,31 @@ public abstract class Prompt<T> extends Dialog {
     public CompletableFuture<Void> repromptDialog(TurnContext turnContext, DialogInstance instance) {
         Map<String, Object> state = (Map<String, Object>) instance.getState().get(PERSISTED_STATE);
         PromptOptions options = (PromptOptions) instance.getState().get(PERSISTED_OPTIONS);
-        onPrompt(turnContext, state, options, false).join();
-        return CompletableFuture.completedFuture(null);
+        return onPrompt(turnContext, state, options, false).thenApply(result -> null);
     }
 
     /**
      * Called before an event is bubbled to its parent.
      *
-     * This is a good place to perform interception of an event as returning `true` will prevent
-     * any further bubbling of the event to the dialogs parents and will also prevent any child
-     * dialogs from performing their default processing.
+     * This is a good place to perform interception of an event as returning `true`
+     * will prevent any further bubbling of the event to the dialogs parents and
+     * will also prevent any child dialogs from performing their default processing.
      *
-     * @param dc  The dialog context for the current turn of conversation.
-     * @param e   The event being raised.
+     * @param dc The dialog context for the current turn of conversation.
+     * @param e  The event being raised.
      *
-     * @return   Whether the event is handled by the current dialog and further processing
-     *           should stop.
+     * @return Whether the event is handled by the current dialog and further
+     *         processing should stop.
      */
     @Override
     protected CompletableFuture<Boolean> onPreBubbleEvent(DialogContext dc, DialogEvent e) {
         if (e.getName().equals(DialogEvents.ACTIVITY_RECEIVED)
-            && dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
+                && dc.getContext().getActivity().isType(ActivityTypes.MESSAGE)) {
             // Perform base recognition
             Map<String, Object> state = dc.getActiveDialog().getState();
-            PromptRecognizerResult<T> recognized =  onRecognize(dc.getContext(),
-                (Map<String, Object>) state.get(PERSISTED_STATE), (PromptOptions) state.get(PERSISTED_OPTIONS)).join();
-            return CompletableFuture.completedFuture(recognized.getSucceeded());
+            return onRecognize(dc.getContext(), (Map<String, Object>) state.get(PERSISTED_STATE),
+                    (PromptOptions) state.get(PERSISTED_OPTIONS))
+                            .thenCompose(recognized -> CompletableFuture.completedFuture(recognized.getSucceeded()));
         }
 
         return CompletableFuture.completedFuture(false);
@@ -311,55 +308,57 @@ public abstract class Prompt<T> extends Dialog {
      *
      * @return A {@link CompletableFuture} representing the asynchronous operation.
      *
-     * If the task is successful, the result contains the updated activity.
+     *         If the task is successful, the result contains the updated activity.
      */
-    protected Activity appendChoices(Activity prompt, String channelId, List<Choice> choices,
-                                            ListStyle style, ChoiceFactoryOptions options) {
+    protected Activity appendChoices(Activity prompt, String channelId, List<Choice> choices, ListStyle style,
+            ChoiceFactoryOptions options) {
         // Get base prompt text (if any)
         String text = "";
         if (prompt != null && prompt.getText() != null && StringUtils.isNotBlank(prompt.getText())) {
-                text = prompt.getText();
+            text = prompt.getText();
         }
 
         // Create temporary msg
         Activity msg;
         switch (style) {
-            case INLINE:
-                msg = ChoiceFactory.inline(choices, text, null, options);
-                break;
+        case INLINE:
+            msg = ChoiceFactory.inline(choices, text, null, options);
+            break;
 
-            case LIST:
-                msg = ChoiceFactory.list(choices, text, null, options);
-                break;
+        case LIST:
+            msg = ChoiceFactory.list(choices, text, null, options);
+            break;
 
-            case SUGGESTED_ACTION:
-                msg = ChoiceFactory.suggestedAction(choices, text);
-                break;
+        case SUGGESTED_ACTION:
+            msg = ChoiceFactory.suggestedAction(choices, text);
+            break;
 
-            case HEROCARD:
-                msg = ChoiceFactory.heroCard(choices, text);
-                break;
+        case HEROCARD:
+            msg = ChoiceFactory.heroCard(choices, text);
+            break;
 
-            case NONE:
-                msg = Activity.createMessageActivity();
-                msg.setText(text);
-                break;
+        case NONE:
+            msg = Activity.createMessageActivity();
+            msg.setText(text);
+            break;
 
-            default:
-                msg = ChoiceFactory.forChannel(channelId, choices, text, null, options);
-                break;
+        default:
+            msg = ChoiceFactory.forChannel(channelId, choices, text, null, options);
+            break;
         }
 
         // Update prompt with text, actions and attachments
         if (prompt != null) {
-            // clone the prompt the set in the options (note ActivityEx has Properties so this is the safest mechanism)
-            //prompt = JsonConvert.DeserializeObject<Activity>(JsonConvert.SerializeObject(prompt));
+            // clone the prompt the set in the options (note ActivityEx has Properties so
+            // this is the safest mechanism)
+            // prompt =
+            // JsonConvert.DeserializeObject<Activity>(JsonConvert.SerializeObject(prompt));
             prompt = Activity.clone(prompt);
 
             prompt.setText(msg.getText());
 
             if (msg.getSuggestedActions() != null && msg.getSuggestedActions().getActions() != null
-                && msg.getSuggestedActions().getActions().size() > 0) {
+                    && msg.getSuggestedActions().getActions().size() > 0) {
                 prompt.setSuggestedActions(msg.getSuggestedActions());
             }
 

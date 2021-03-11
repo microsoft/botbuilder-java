@@ -1385,12 +1385,13 @@ public class BotFrameworkAdapter extends BotAdapter implements
             ));
         }
 
-        OAuthClient client =  createOAuthAPIClient(context, oAuthAppCredentials).join();
-        return client.getUserToken().getToken(
+        return createOAuthAPIClient(context, oAuthAppCredentials).thenCompose(client -> {
+            return client.getUserToken().getToken(
                 context.getActivity().getFrom().getId(),
                 connectionName,
                 context.getActivity().getChannelId(),
                 magicCode);
+        });
     }
 
     /**

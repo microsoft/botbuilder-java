@@ -83,12 +83,20 @@ public class Application extends BotDependencyConfiguration {
         return new MainDialog(conversationState, conversationIdFactory, skillClient, skillsConfig, configuration);
     }
 
-    @Override
-    public AuthenticationConfiguration getAuthenticationConfiguration(Configuration configuration) {
+    @Primary
+    @Bean
+    public AuthenticationConfiguration getAuthenticationConfiguration(
+        Configuration configuration,
+        AllowedSkillsClaimsValidator allowedSkillsClaimsValidator
+    ) {
         AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
-        authenticationConfiguration.setClaimsValidator(
-            new AllowedSkillsClaimsValidator(getSkillsConfiguration(configuration)));
+        authenticationConfiguration.setClaimsValidator(allowedSkillsClaimsValidator);
         return authenticationConfiguration;
+    }
+
+    @Bean
+    public AllowedSkillsClaimsValidator getAllowedSkillsClaimsValidator(SkillsConfiguration skillsConfiguration) {
+        return new AllowedSkillsClaimsValidator(skillsConfiguration);
     }
 
     /**

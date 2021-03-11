@@ -25,12 +25,12 @@ public class CancelAndHelpDialog extends ComponentDialog {
 
     @Override
     protected CompletableFuture<DialogTurnResult> onContinueDialog(DialogContext innerDc) {
-        DialogTurnResult result = interrupt(innerDc).join();
-        if (result != null) {
-            return CompletableFuture.completedFuture(result);
-        }
-
-        return super.onContinueDialog(innerDc);
+        return interrupt(innerDc).thenCompose(result -> {
+            if (result != null && result instanceof DialogTurnResult) {
+                return CompletableFuture.completedFuture((DialogTurnResult) result);
+            }
+            return super.onContinueDialog(innerDc);
+        });
     }
 
     private CompletableFuture<DialogTurnResult> interrupt(DialogContext innerDc) {
@@ -38,19 +38,25 @@ public class CancelAndHelpDialog extends ComponentDialog {
             String text = innerDc.getContext().getActivity().getText().toLowerCase();
 
             switch (text) {
-            case "help":
-            case "?":
-                Activity helpMessage = MessageFactory.text(HelpMsgText, HelpMsgText, InputHints.EXPECTING_INPUT);
-                innerDc.getContext().sendActivity(helpMessage).join();
-                return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
+                case "help":
+                case "?":
+                    Activity helpMessage = MessageFactory.text(HelpMsgText, HelpMsgText, InputHints.EXPECTING_INPUT);
+                    return innerDc.getContext()
+                        .sendActivity(helpMessage)
+                        .thenCompose(
+                            result -> CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING))
+                        );
 
-            case "cancel":
-            case "quit":
-                Activity cancelMessage = MessageFactory.text(CancelMsgText, CancelMsgText, InputHints.IGNORING_INPUT);
-                innerDc.getContext().sendActivity(cancelMessage).join();
-                return innerDc.cancelAllDialogs();
+                case "cancel":
+                case "quit":
+                    Activity cancelMessage =
+                        MessageFactory.text(CancelMsgText, CancelMsgText, InputHints.IGNORING_INPUT);
+                    return innerDc.getContext().sendActivity(cancelMessage).thenCompose(result -> {
+                        return innerDc.cancelAllDialogs();
+                    });
+
             }
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 }

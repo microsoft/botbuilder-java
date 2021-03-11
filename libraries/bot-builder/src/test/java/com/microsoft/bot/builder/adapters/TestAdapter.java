@@ -271,7 +271,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException e) {
                 }
-            } else if (activity.getType() == ActivityTypes.TRACE) {
+            } else if (activity.getType().equals(ActivityTypes.TRACE)) {
                 if (sendTraceActivity) {
                     synchronized (botReplies) {
                         botReplies.add(activity);

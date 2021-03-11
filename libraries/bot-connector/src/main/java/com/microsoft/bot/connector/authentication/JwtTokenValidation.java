@@ -147,11 +147,6 @@ public final class JwtTokenValidation {
                 new IllegalArgumentException("No authHeader present. Auth is required."));
         }
 
-        // ClaimsIdentity identity = authenticateToken(authHeader, credentials, channelProvider,
-        //                                             channelId, serviceUrl, authConfig).join();
-        // validateClaims(authConfig, identity.claims()).join();
-        // return CompletableFuture.completedFuture(identity);
-
         return authenticateToken(authHeader, credentials, channelProvider, channelId, serviceUrl, authConfig)
             .thenApply(identity -> {
                     validateClaims(authConfig, identity.claims());

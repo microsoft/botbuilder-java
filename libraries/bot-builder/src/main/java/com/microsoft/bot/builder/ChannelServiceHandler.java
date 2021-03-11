@@ -3,6 +3,7 @@ package com.microsoft.bot.builder;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.connector.authentication.AuthenticationException;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
@@ -599,17 +600,20 @@ public class ChannelServiceHandler {
      */
     private CompletableFuture<ClaimsIdentity> authenticate(String authHeader) {
         if (StringUtils.isEmpty(authHeader)) {
-            boolean isAuthDisabled =  credentialProvider.isAuthenticationDisabled().join();
-            if (!isAuthDisabled) {
-                // No auth header. Auth is required. Request is not authorized.
-                throw new AuthenticationException("No auth header, Auth is required. Request is no authorized");
-            }
+            return credentialProvider.isAuthenticationDisabled().thenCompose(isAuthDisabled -> {
+                if (!isAuthDisabled) {
+                    return Async.completeExceptionally(
+                    // No auth header. Auth is required. Request is not authorized.
+                        new AuthenticationException("No auth header, Auth is required. Request is not authorized")
+                    );
+                }
 
-            // In the scenario where auth is disabled, we still want to have the
-            // IsAuthenticated flag set in the ClaimsIdentity.
-            // To do this requires adding in an empty claim.
-            // Since ChannelServiceHandler calls are always a skill callback call, we set the skill claim too.
-            return CompletableFuture.completedFuture(SkillValidation.createAnonymousSkillClaim());
+                // In the scenario where auth is disabled, we still want to have the
+                // IsAuthenticated flag set in the ClaimsIdentity.
+                // To do this requires adding in an empty claim.
+                // Since ChannelServiceHandler calls are always a skill callback call, we set the skill claim too.
+                return CompletableFuture.completedFuture(SkillValidation.createAnonymousSkillClaim());
+            });
         }
 
         // Validate the header and extract claims.

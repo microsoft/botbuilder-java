@@ -4,12 +4,16 @@
 package com.microsoft.bot.sample.dialogskillbot;
 
 import com.microsoft.bot.builder.Bot;
+import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 import com.microsoft.bot.sample.dialogskillbot.authentication.AllowedCallersClaimsValidator;
+import com.microsoft.bot.sample.dialogskillbot.bots.SkillBot;
+import com.microsoft.bot.sample.dialogskillbot.dialogs.ActivityRouterDialog;
+import com.microsoft.bot.sample.dialogskillbot.dialogs.DialogSkillBotRecognizer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -50,8 +54,12 @@ public class Application extends BotDependencyConfiguration {
      * @return The Bot implementation for this application.
      */
     @Bean
-    public Bot getBot() {
-        return new EchoBot();
+    public Bot getBot(Configuration configuration, ConversationState converationState) {
+
+        return new SkillBot<ActivityRouterDialog>(
+            converationState,
+            new ActivityRouterDialog(new DialogSkillBotRecognizer(configuration))
+        );
     }
 
     @Override

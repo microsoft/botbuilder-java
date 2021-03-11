@@ -315,7 +315,7 @@ public abstract class Dialog {
     ) {
         if (DialogCommon.isFromParentToSkill(turnContext)) {
             // Handle remote cancellation request from parent.
-            if (turnContext.getActivity().getType() == ActivityTypes.END_OF_CONVERSATION) {
+            if (turnContext.getActivity().getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
                 if (dialogContext.getStack().size() == 0) {
                     // No dialogs to cancel, just return.
                     return CompletableFuture.completedFuture(null);
@@ -329,8 +329,8 @@ public abstract class Dialog {
             }
 
             // Handle a reprompt event sent from the parent.
-            if (turnContext.getActivity().getType() == ActivityTypes.EVENT
-                && turnContext.getActivity().getName() == DialogEvents.REPROMPT_DIALOG) {
+            if (turnContext.getActivity().getType().equals(ActivityTypes.EVENT)
+                && turnContext.getActivity().getName().equals(DialogEvents.REPROMPT_DIALOG)) {
                 if (dialogContext.getStack().size() == 0) {
                     // No dialogs to reprompt, just return.
                     return CompletableFuture.completedFuture(null);
@@ -342,10 +342,11 @@ public abstract class Dialog {
         return dialogContext.continueDialog()
             .thenCompose(result -> {
                 if (result.getStatus() == DialogTurnStatus.EMPTY) {
-                    return dialogContext.beginDialog(dialog.getId(), null)
-                    .thenCompose(beginResult -> processEOC(beginResult, turnContext));
+                    return dialogContext.beginDialog(dialog.getId(), null).thenCompose(finalResult -> {
+                        return processEOC(finalResult, turnContext);
+                    });
                 }
-                return CompletableFuture.completedFuture(null);
+                return processEOC(result, turnContext);
             });
     }
 

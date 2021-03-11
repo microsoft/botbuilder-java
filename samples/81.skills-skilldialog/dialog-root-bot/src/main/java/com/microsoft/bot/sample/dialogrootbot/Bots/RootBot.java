@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.codepoetics.protonpack.collectors.CompletableFutures;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.builder.ActivityHandler;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MessageFactory;
@@ -30,26 +29,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 public class RootBot<T extends Dialog> extends ActivityHandler {
-    private final ConversationState _conversationState;
-    private final Dialog _mainDialog;
+    private final ConversationState conversationState;
+    private final Dialog mainDialog;
 
     public RootBot(ConversationState conversationState, T mainDialog) {
-        _conversationState = conversationState;
-        _mainDialog = mainDialog;
+        this.conversationState = conversationState;
+        this.mainDialog = mainDialog;
     }
 
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext) {
+        return handleTurn(turnContext).thenCompose(result -> conversationState.saveChanges(turnContext, false));
+    }
+
+    private CompletableFuture<Void> handleTurn(TurnContext turnContext) {
         if (!turnContext.getActivity().getType().equals(ActivityTypes.CONVERSATION_UPDATE)) {
             // Run the Dialog with the Activity.
-            Dialog.run(_mainDialog, turnContext, _conversationState.createProperty("DialogState")).join();
+            return Dialog.run(mainDialog, turnContext, conversationState.createProperty("DialogState"));
         } else {
             // Let the super.class handle the activity.
-            super.onTurn(turnContext).join();
+            return super.onTurn(turnContext);
         }
-
-        // Save any state changes that might have occurred during the turn.
-        return _conversationState.saveChanges(turnContext, false);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class RootBot<T extends Dialog> extends ActivityHandler {
 
     private CompletableFuture<Void> runWelcome(TurnContext turnContext, Activity activity) {
         return turnContext.sendActivity(activity).thenAccept(resourceResponses -> {
-            Dialog.run(_mainDialog, turnContext, _conversationState.createProperty("DialogState"));
+            Dialog.run(mainDialog, turnContext, conversationState.createProperty("DialogState"));
         });
     }
 

@@ -21,13 +21,13 @@ public class DialogSkillBotRecognizer implements Recognizer {
     private final LuisRecognizer _recognizer;
     public DialogSkillBotRecognizer(Configuration configuration) {
         boolean luisIsConfigured = !StringUtils.isAllBlank(configuration.getProperty("LuisAppId"))
-                                   && !StringUtils.isAllBlank(configuration.getProperty("LuisAPKey"))
-                                   && !StringUtils.isAllBlank(configuration.getProperty("LuisAPHostName"));
+                                   && !StringUtils.isAllBlank(configuration.getProperty("LuisAPIKey"))
+                                   && !StringUtils.isAllBlank(configuration.getProperty("LuisAPIHostName"));
         if (luisIsConfigured) {
             LuisApplication luisApplication = new LuisApplication(
                 configuration.getProperty("LuisAppId"),
-                configuration.getProperty("LuisAPKey"),
-                                                    "https://" + configuration.getProperty("LuisAPHostName"));
+                configuration.getProperty("LuisAPIKey"),
+                String.format("https://%s", configuration.getProperty("LuisAPIHostName")));
             LuisRecognizerOptionsV3 luisOptions = new LuisRecognizerOptionsV3(luisApplication);
 
             _recognizer = new LuisRecognizer(luisOptions);

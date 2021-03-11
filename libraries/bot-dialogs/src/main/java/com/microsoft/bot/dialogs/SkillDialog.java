@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.TurnContext;
-import com.microsoft.bot.builder.TypedInvokeResponse;
 import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.builder.skills.BotFrameworkSkill;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryOptions;
@@ -24,7 +23,6 @@ import com.microsoft.bot.schema.OAuthCard;
 import com.microsoft.bot.schema.SignInConstants;
 import com.microsoft.bot.schema.TokenExchangeInvokeRequest;
 import com.microsoft.bot.schema.TokenExchangeRequest;
-import com.microsoft.bot.schema.TokenResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,16 +88,18 @@ public class SkillDialog extends Dialog {
 
         // Create the conversationId and store it in the dialog context state so we can
         // use it later
-        String skillConversationId = createSkillConversationId(dc.getContext(), dc.getContext().getActivity()).join();
-        dc.getActiveDialog().getState().put(skillConversationIdStateKey, skillConversationId);
+        return createSkillConversationId(dc.getContext(), dc.getContext().getActivity())
+                .thenCompose(skillConversationId -> {
+                    dc.getActiveDialog().getState().put(skillConversationIdStateKey, skillConversationId);
 
-        // Send the activity to the skill.
-        Activity eocActivity = sendToSkill(dc.getContext(), skillActivity, skillConversationId).join();
-        if (eocActivity != null) {
-            return dc.endDialog(eocActivity.getValue());
-        }
-
-        return CompletableFuture.completedFuture(END_OF_TURN);
+                    // Send the activity to the skill.
+                    return sendToSkill(dc.getContext(), skillActivity, skillConversationId).thenCompose(eocActivity -> {
+                        if (eocActivity != null) {
+                            return dc.endDialog(eocActivity.getValue());
+                        }
+                        return CompletableFuture.completedFuture(END_OF_TURN);
+                    });
+                });
     }
 
     /**
@@ -137,12 +137,13 @@ public class SkillDialog extends Dialog {
         String skillConversationId = (String) dc.getActiveDialog().getState().get(skillConversationIdStateKey);
 
         // Just forward to the remote skill
-        Activity eocActivity = sendToSkill(dc.getContext(), skillActivity, skillConversationId).join();
-        if (eocActivity != null) {
-            return dc.endDialog(eocActivity.getValue());
-        }
+        return sendToSkill(dc.getContext(), skillActivity, skillConversationId).thenCompose(eocActivity -> {
+            if (eocActivity != null) {
+                return dc.endDialog(eocActivity.getValue());
+            }
 
-        return CompletableFuture.completedFuture(END_OF_TURN);
+            return CompletableFuture.completedFuture(END_OF_TURN);
+        });
     }
 
     /**
@@ -201,6 +202,11 @@ public class SkillDialog extends Dialog {
     @Override
     public CompletableFuture<Void> endDialog(TurnContext turnContext, DialogInstance instance, DialogReason reason) {
         // Send of of conversation to the skill if the dialog has been cancelled.
+        return onEndDialog(turnContext, instance, reason)
+                .thenCompose(result -> super.endDialog(turnContext, instance, reason));
+    }
+
+    private CompletableFuture<Void> onEndDialog(TurnContext turnContext, DialogInstance instance, DialogReason reason) {
         if (reason == DialogReason.CANCEL_CALLED || reason == DialogReason.REPLACE_CALLED) {
             Activity activity = Activity.createEndOfConversationActivity();
 
@@ -216,10 +222,11 @@ public class SkillDialog extends Dialog {
 
             // connection Name instanceof not applicable for an EndDialog, as we don't
             // expect as OAuthCard in response.
-            sendToSkill(turnContext, activity, skillConversationId).join();
+            return sendToSkill(turnContext, activity, skillConversationId).thenApply(result -> null);
+        } else {
+            return CompletableFuture.completedFuture(null);
         }
 
-        return super.endDialog(turnContext, instance, reason);
     }
 
     /**
@@ -278,70 +285,71 @@ public class SkillDialog extends Dialog {
         getDialogOptions().getConversationState().saveChanges(context, true);
 
         BotFrameworkSkill skillInfo = getDialogOptions().getSkill();
-        TypedInvokeResponse<Object> response = getDialogOptions().getSkillClient()
+        return getDialogOptions().getSkillClient()
                 .postActivity(getDialogOptions().getBotId(), skillInfo.getAppId(), skillInfo.getSkillEndpoint(),
                         getDialogOptions().getSkillHostEndpoint(), skillConversationId, activity, Object.class)
-                .join();
-
-        // Inspect the skill response status
-        if (!response.getIsSuccessStatusCode()) {
-            return Async.completeExceptionally(new SkillInvokeException(
-                    String.format("Error invoking the skill id: %s at %s  (status is %s).  %s", skillInfo.getId(),
-                            skillInfo.getSkillEndpoint(), response.getStatus(), response.getBody())));
-        }
-
-        ExpectedReplies replies = null;
-        if (response.getBody() instanceof ExpectedReplies) {
-            replies = (ExpectedReplies) response.getBody();
-        }
-
-        Activity eocActivity = null;
-        if (activity.getDeliveryMode() != null
-            && activity.getDeliveryMode().equals(DeliveryModes.EXPECT_REPLIES.toString())
-            && replies.getActivities() != null && replies.getActivities().size() > 0) {
-            // Track sent invoke responses, so more than one instanceof not sent.
-            boolean sentInvokeResponse = false;
-
-            // Process replies in the response.getBody().
-            for (Activity activityFromSkill : replies.getActivities()) {
-                if (activityFromSkill.getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
-                    // Capture the EndOfConversation activity if it was sent from skill
-                    eocActivity = activityFromSkill;
-
-                    // The conversation has ended, so cleanup the conversation id.
-                    getDialogOptions().getConversationIdFactory().deleteConversationReference(skillConversationId);
-                } else if (!sentInvokeResponse
-                        && interceptOAuthCards(context, activityFromSkill, getDialogOptions().getConnectionName())
-                                .join()) {
-                    // do nothing. Token exchange succeeded, so no OAuthCard needs to be shown to
-                    // the user
-                    sentInvokeResponse = true;
-                } else {
-                    if (activityFromSkill.getType().equals(ActivityTypes.INVOKE_RESPONSE)) {
-                        // An invoke respones has already been sent. This instanceof a bug in the skill.
-                        // Multiple invoke responses are not possible.
-                        if (sentInvokeResponse) {
-                            continue;
-                        }
-
-                        sentInvokeResponse = true;
-
-                        // Not sure this is needed in Java, looks like a workaround for some .NET issues
-                        // Ensure the value in the invoke response instanceof of type InvokeResponse
-                        // (it gets deserialized as JObject by default).
-
-                        // if (activityFromSkill.getValue() instanceof JObject jObject) {
-                        // activityFromSkill.setValue(jObject.ToObject<InvokeResponse>());
-                        // }
+                .thenCompose(response -> {
+                    // Inspect the skill response status
+                    if (!response.getIsSuccessStatusCode()) {
+                        return Async.completeExceptionally(new SkillInvokeException(String.format(
+                                "Error invoking the skill id: %s at %s  (status is %s).  %s", skillInfo.getId(),
+                                skillInfo.getSkillEndpoint(), response.getStatus(), response.getBody())));
                     }
 
-                    // Send the response back to the channel.
-                    context.sendActivity(activityFromSkill);
-                }
-            }
-        }
+                    ExpectedReplies replies = null;
+                    if (response.getBody() instanceof ExpectedReplies) {
+                        replies = (ExpectedReplies) response.getBody();
+                    }
 
-        return CompletableFuture.completedFuture(eocActivity);
+                    Activity eocActivity = null;
+                    if (activity.getDeliveryMode() != null
+                            && activity.getDeliveryMode().equals(DeliveryModes.EXPECT_REPLIES.toString())
+                            && replies.getActivities() != null && replies.getActivities().size() > 0) {
+                        // Track sent invoke responses, so more than one instanceof not sent.
+                        boolean sentInvokeResponse = false;
+
+                        // Process replies in the response.getBody().
+                        for (Activity activityFromSkill : replies.getActivities()) {
+                            if (activityFromSkill.getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
+                                // Capture the EndOfConversation activity if it was sent from skill
+                                eocActivity = activityFromSkill;
+
+                                // The conversation has ended, so cleanup the conversation id.
+                                getDialogOptions().getConversationIdFactory()
+                                        .deleteConversationReference(skillConversationId).join();
+                            } else if (!sentInvokeResponse && interceptOAuthCards(context, activityFromSkill,
+                                    getDialogOptions().getConnectionName()).join()) {
+                                // do nothing. Token exchange succeeded, so no OAuthCard needs to be shown to
+                                // the user
+                                sentInvokeResponse = true;
+                            } else {
+                                if (activityFromSkill.getType().equals(ActivityTypes.INVOKE_RESPONSE)) {
+                                    // An invoke respones has already been sent. This instanceof a bug in the skill.
+                                    // Multiple invoke responses are not possible.
+                                    if (sentInvokeResponse) {
+                                        continue;
+                                    }
+
+                                    sentInvokeResponse = true;
+
+                                    // Not sure this is needed in Java, looks like a workaround for some .NET issues
+                                    // Ensure the value in the invoke response instanceof of type InvokeResponse
+                                    // (it gets deserialized as JObject by default).
+
+                                    // if (activityFromSkill.getValue() instanceof JObject jObject) {
+                                    // activityFromSkill.setValue(jObject.ToObject<InvokeResponse>());
+                                    // }
+                                }
+
+                                // Send the response back to the channel.
+                                context.sendActivity(activityFromSkill);
+                            }
+                        }
+                    }
+
+                    return CompletableFuture.completedFuture(eocActivity);
+
+                });
     }
 
     /**
@@ -381,18 +389,22 @@ public class SkillDialog extends Dialog {
             if (oauthCard != null && oauthCard.getTokenExchangeResource() != null
                     && !StringUtils.isEmpty(oauthCard.getTokenExchangeResource().getUri())) {
                 try {
-                    TokenResponse result = tokenExchangeProvider
+                    return tokenExchangeProvider
                             .exchangeToken(turnContext, connectionName, turnContext.getActivity().getFrom().getId(),
                                     new TokenExchangeRequest(oauthCard.getTokenExchangeResource().getUri(), null))
-                            .join();
+                            .thenCompose(result -> {
+                                if (result != null && !StringUtils.isEmpty(result.getToken())) {
+                                    // If token above instanceof null, then SSO has failed and hence we return
+                                    // false.
+                                    // If not, send an invoke to the skill with the token.
+                                    return sendTokenExchangeInvokeToSkill(activity,
+                                        oauthCard.getTokenExchangeResource().getId(), oauthCard.getConnectionName(),
+                                            result.getToken());
+                                } else {
+                                    return CompletableFuture.completedFuture(false);
+                                }
 
-                    if (result != null && !StringUtils.isEmpty(result.getToken())) {
-                        // If token above instanceof null, then SSO has failed and hence we return
-                        // false.
-                        // If not, send an invoke to the skill with the token.
-                        return sendTokenExchangeInvokeToSkill(activity, oauthCard.getTokenExchangeResource().getId(),
-                                oauthCard.getConnectionName(), result.getToken());
-                    }
+                            });
                 } catch (Exception ex) {
                     // Failures in token exchange are not fatal. They simply mean that the user
                     // needs
@@ -401,9 +413,62 @@ public class SkillDialog extends Dialog {
                 }
             }
         }
-
         return CompletableFuture.completedFuture(false);
     }
+
+    // private CompletableFuture<Boolean> interceptOAuthCards(TurnContext turnContext, Activity activity,
+    //         String connectionName) {
+
+    //     UserTokenProvider tokenExchangeProvider;
+
+    //     if (StringUtils.isEmpty(connectionName) || !(turnContext.getAdapter() instanceof UserTokenProvider)) {
+    //         // The adapter may choose not to support token exchange,
+    //         // in which case we fallback to showing an oauth card to the user.
+    //         return CompletableFuture.completedFuture(false);
+    //     } else {
+    //         tokenExchangeProvider = (UserTokenProvider) turnContext.getAdapter();
+    //     }
+
+    //     Attachment oauthCardAttachment = null;
+
+    //     if (activity.getAttachments() != null) {
+    //         Optional<Attachment> optionalAttachment = activity.getAttachments().stream()
+    //                 .filter(a -> a.getContentType() != null && a.getContentType().equals(OAuthCard.CONTENTTYPE))
+    //                 .findFirst();
+    //         if (optionalAttachment.isPresent()) {
+    //             oauthCardAttachment = optionalAttachment.get();
+    //         }
+    //     }
+
+    //     if (oauthCardAttachment != null) {
+    //         OAuthCard oauthCard = (OAuthCard) oauthCardAttachment.getContent();
+    //         if (oauthCard != null && oauthCard.getTokenExchangeResource() != null
+    //                 && !StringUtils.isEmpty(oauthCard.getTokenExchangeResource().getUri())) {
+    //             try {
+    //                 TokenResponse result = tokenExchangeProvider
+    //                         .exchangeToken(turnContext, connectionName, turnContext.getActivity().getFrom().getId(),
+    //                                 new TokenExchangeRequest(oauthCard.getTokenExchangeResource().getUri(), null))
+    //                         .join();
+
+    //                 if (result != null && !StringUtils.isEmpty(result.getToken())) {
+    //                     // If token above instanceof null, then SSO has failed and hence we return
+    //                     // false.
+    //                     // If not, send an invoke to the skill with the token.
+    //                     return sendTokenExchangeInvokeToSkill(activity, oauthCard.getTokenExchangeResource().getId(),
+    //                             oauthCard.getConnectionName(), result.getToken());
+    //                 }
+    //             } catch (Exception ex) {
+    //                 // Failures in token exchange are not fatal. They simply mean that the user
+    //                 // needs
+    //                 // to be shown the OAuth card.
+    //                 return CompletableFuture.completedFuture(false);
+    //             }
+    //         }
+    //     }
+
+    //     return CompletableFuture.completedFuture(false);
+    // }
+
 
     private CompletableFuture<Boolean> sendTokenExchangeInvokeToSkill(Activity incomingActivity, String id,
             String connectionName, String token) {
@@ -418,14 +483,11 @@ public class SkillDialog extends Dialog {
 
         // route the activity to the skill
         BotFrameworkSkill skillInfo = getDialogOptions().getSkill();
-        TypedInvokeResponse<Object> response = getDialogOptions().getSkillClient()
+        return getDialogOptions().getSkillClient()
                 .postActivity(getDialogOptions().getBotId(), skillInfo.getAppId(), skillInfo.getSkillEndpoint(),
                         getDialogOptions().getSkillHostEndpoint(), incomingActivity.getConversation().getId(), activity,
                         Object.class)
-                .join();
-
-        // Check response status: true if success, false if failure
-        return CompletableFuture.completedFuture(response.getIsSuccessStatusCode());
+                .thenApply(response -> response.getIsSuccessStatusCode());
     }
 
     private CompletableFuture<String> createSkillConversationId(TurnContext context, Activity activity) {
