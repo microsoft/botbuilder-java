@@ -4,6 +4,8 @@
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.connector.ExecutorFactory;
+import com.microsoft.bot.connector.authentication.ClaimsIdentity;
+import com.microsoft.bot.connector.authentication.SkillValidation;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
@@ -73,7 +75,7 @@ public class ShowTypingMiddleware implements Middleware {
      */
     @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
-        if (!turnContext.getActivity().isType(ActivityTypes.MESSAGE)) {
+        if (!turnContext.getActivity().isType(ActivityTypes.MESSAGE) || isSkillBot(turnContext)) {
             return next.next();
         }
 
@@ -81,6 +83,16 @@ public class ShowTypingMiddleware implements Middleware {
         // it when its done
         CompletableFuture sendFuture = sendTyping(turnContext, delay, period);
         return next.next().thenAccept(result -> sendFuture.cancel(true));
+    }
+
+    private static Boolean isSkillBot(TurnContext turnContext) {
+        Object identity = turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
+        if (identity instanceof ClaimsIdentity) {
+            ClaimsIdentity claimsIdentity = (ClaimsIdentity) identity;
+            return SkillValidation.isSkillClaim(claimsIdentity.claims());
+        } else {
+            return false;
+        }
     }
 
     private static CompletableFuture<Void> sendTyping(

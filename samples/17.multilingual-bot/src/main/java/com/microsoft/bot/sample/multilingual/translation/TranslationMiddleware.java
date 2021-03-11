@@ -74,7 +74,7 @@ public class TranslationMiddleware implements Middleware  {
                     // Translate messages sent to the user to user language
                     if (shouldTranslate) {
                         ArrayList<CompletableFuture<Void>> tasks = new ArrayList<CompletableFuture<Void>>();
-                        for (Activity activity : activities.stream().filter(a -> a.getType() == ActivityTypes.MESSAGE).collect(Collectors.toList())) {
+                        for (Activity activity : activities.stream().filter(a -> a.getType().equals(ActivityTypes.MESSAGE)).collect(Collectors.toList())) {
                             tasks.add(this.translateMessageActivity(activity, userLanguage));
                         }
 
@@ -92,7 +92,7 @@ public class TranslationMiddleware implements Middleware  {
                     Boolean shouldTranslate = !userLanguage.equals(TranslationSettings.DEFAULT_LANGUAGE);
 
                     // Translate messages sent to the user to user language
-                    if (activity.getType() == ActivityTypes.MESSAGE) {
+                    if (activity.getType().equals(ActivityTypes.MESSAGE)) {
                         if (shouldTranslate) {
                             this.translateMessageActivity(activity, userLanguage);
                         }
@@ -107,7 +107,7 @@ public class TranslationMiddleware implements Middleware  {
     }
 
     private CompletableFuture<Void> translateMessageActivity(Activity activity, String targetLocale) {
-        if (activity.getType() == ActivityTypes.MESSAGE) {
+        if (activity.getType().equals(ActivityTypes.MESSAGE)) {
             return this.translator.translate(activity.getText(), targetLocale).thenAccept(text -> {
                 activity.setText(text);
             });
