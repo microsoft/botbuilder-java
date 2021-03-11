@@ -7,6 +7,7 @@
 package com.microsoft.bot.connector.rest;
 
 import com.microsoft.bot.connector.Async;
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
@@ -35,7 +36,7 @@ public class RestAttachments implements Attachments {
     /** The Retrofit service to perform REST calls. */
     private AttachmentsService service;
     /** The service client containing this operation class. */
-    private RestConnectorClient client;
+    private WeakReference<RestConnectorClient> client;
 
     /**
      * Initializes an instance of AttachmentsImpl.
@@ -45,8 +46,8 @@ public class RestAttachments implements Attachments {
      *                     operation class.
      */
     RestAttachments(Retrofit withRetrofit, RestConnectorClient withClient) {
-        this.service = withRetrofit.create(AttachmentsService.class);
-        this.client = withClient;
+        service = withRetrofit.create(AttachmentsService.class);
+        client = new WeakReference<>(withClient);
     }
 
     /**
@@ -86,6 +87,11 @@ public class RestAttachments implements Attachments {
      * @return the observable to the AttachmentInfo object
      */
     public CompletableFuture<AttachmentInfo> getAttachmentInfo(String attachmentId) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (attachmentId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter attachmentId is required and cannot be null."
@@ -93,10 +99,10 @@ public class RestAttachments implements Attachments {
         }
 
         return service.getAttachmentInfo(
-            attachmentId, this.client.getAcceptLanguage(), this.client.getUserAgent()
+            attachmentId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getAttachmentInfoDelegate(responseBodyResponse).body();
+                return getAttachmentInfoDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -106,12 +112,13 @@ public class RestAttachments implements Attachments {
     }
 
     private ServiceResponse<AttachmentInfo> getAttachmentInfoDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<AttachmentInfo, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<AttachmentInfo, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<AttachmentInfo>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -127,6 +134,11 @@ public class RestAttachments implements Attachments {
      * @return the observable to the InputStream object
      */
     public CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (attachmentId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter attachmentId is required and cannot be null."
@@ -139,10 +151,10 @@ public class RestAttachments implements Attachments {
         }
 
         return service.getAttachment(
-            attachmentId, viewId, this.client.getAcceptLanguage(), this.client.getUserAgent()
+            attachmentId, viewId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getAttachmentDelegate(responseBodyResponse).body();
+                return getAttachmentDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -152,12 +164,13 @@ public class RestAttachments implements Attachments {
     }
 
     private ServiceResponse<InputStream> getAttachmentDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return this.client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<InputStream, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<InputStream, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<InputStream>() {
             }.getType())
             .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() {
@@ -176,6 +189,11 @@ public class RestAttachments implements Attachments {
      */
     @Override
     public String getAttachmentUri(String attachmentId, String viewId) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (StringUtils.isEmpty(attachmentId)) {
             throw new IllegalArgumentException("Must provide an attachmentId");
         }
@@ -184,7 +202,7 @@ public class RestAttachments implements Attachments {
             viewId = "original";
         }
 
-        String baseUrl = client.baseUrl();
+        String baseUrl = localClient.baseUrl();
         String uri = baseUrl
             + (baseUrl.endsWith("/") ? "" : "/")
             + "v3/attachments/{attachmentId}/views/{viewId}";

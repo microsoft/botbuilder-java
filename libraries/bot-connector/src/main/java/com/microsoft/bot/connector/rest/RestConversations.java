@@ -17,6 +17,7 @@ import com.microsoft.bot.schema.ConversationsResult;
 import com.microsoft.bot.schema.PagedMembersResult;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Transcript;
+import java.lang.ref.WeakReference;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.Conversations;
 import com.google.common.reflect.TypeToken;
@@ -52,7 +53,7 @@ public class RestConversations implements Conversations {
     /**
      * The service client containing this operation class.
      */
-    private RestConnectorClient client;
+    private WeakReference<RestConnectorClient> client;
 
     /**
      * Initializes an instance of ConversationsImpl.
@@ -62,8 +63,8 @@ public class RestConversations implements Conversations {
      *                     operation class.
      */
     RestConversations(Retrofit withRetrofit, RestConnectorClient withClient) {
-        this.service = withRetrofit.create(ConversationsService.class);
-        client = withClient;
+        service = withRetrofit.create(ConversationsService.class);
+        client = new WeakReference<>(withClient);
     }
 
     /**
@@ -228,11 +229,16 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<ConversationsResult> getConversations(String continuationToken) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         return service
-            .getConversations(continuationToken, client.getAcceptLanguage(), client.getUserAgent())
+            .getConversations(continuationToken, localClient.getAcceptLanguage(), localClient.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
-                    return getConversationsDelegate(responseBodyResponse).body();
+                    return getConversationsDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -242,12 +248,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ConversationsResult> getConversationsDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ConversationsResult, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ConversationsResult, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationsResult>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -263,6 +270,11 @@ public class RestConversations implements Conversations {
     public CompletableFuture<ConversationResourceResponse> createConversation(
         ConversationParameters parameters
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (parameters == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter parameters is required and cannot be null."
@@ -271,10 +283,10 @@ public class RestConversations implements Conversations {
         Validator.validate(parameters);
 
         return service
-            .createConversation(parameters, client.getAcceptLanguage(), client.getUserAgent())
+            .createConversation(parameters, localClient.getAcceptLanguage(), localClient.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
-                    return createConversationDelegate(responseBodyResponse).body();
+                    return createConversationDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -287,13 +299,14 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ConversationResourceResponse> createConversationDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
             .<ConversationResourceResponse, ErrorResponseException>newInstance(
-                client.serializerAdapter()
+                connectorClient.serializerAdapter()
             )
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationResourceResponse>() {
             }.getType())
@@ -319,6 +332,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         Activity activity
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -332,10 +350,10 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.sendToConversation(
-            conversationId, activity, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, activity, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return sendToConversationDelegate(responseBodyResponse).body();
+                return sendToConversationDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -345,12 +363,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> sendToConversationDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ResourceResponse, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -372,6 +391,11 @@ public class RestConversations implements Conversations {
         String activityId,
         Activity activity
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -391,13 +415,13 @@ public class RestConversations implements Conversations {
         return Async.tryCompletable(() -> {
             Validator.validate(activity);
             return service.updateActivity(
-                conversationId, activityId, activity, client.getAcceptLanguage(),
-                client.getUserAgent()
+                conversationId, activityId, activity, localClient.getAcceptLanguage(),
+                localClient.getUserAgent()
             )
 
                 .thenApply(responseBodyResponse -> {
                     try {
-                        return updateActivityDelegate(responseBodyResponse).body();
+                        return updateActivityDelegate(localClient, responseBodyResponse).body();
                     } catch (ErrorResponseException e) {
                         throw e;
                     } catch (Throwable t) {
@@ -409,12 +433,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> updateActivityDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ResourceResponse, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -436,6 +461,11 @@ public class RestConversations implements Conversations {
         String activityId,
         Activity activity
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -454,12 +484,12 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.replyToActivity(
-            conversationId, activityId, activity, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, activityId, activity, localClient.getAcceptLanguage(), localClient.getUserAgent()
         )
 
             .thenApply(responseBodyResponse -> {
                 try {
-                    return replyToActivityDelegate(responseBodyResponse).body();
+                    return replyToActivityDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -469,12 +499,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> replyToActivityDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ResourceResponse, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -492,6 +523,11 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<Void> deleteActivity(String conversationId, String activityId) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -504,10 +540,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.deleteActivity(
-            conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, activityId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return deleteActivityDelegate(responseBodyResponse).body();
+                return deleteActivityDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -517,12 +553,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<Void> deleteActivityDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<Void, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
             }.getType())
             .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() {
@@ -538,6 +575,11 @@ public class RestConversations implements Conversations {
      */
     @Override
     public CompletableFuture<List<ChannelAccount>> getConversationMembers(String conversationId) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -545,10 +587,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.getConversationMembers(
-            conversationId, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getConversationMembersDelegate(responseBodyResponse).body();
+                return getConversationMembersDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -561,12 +603,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<List<ChannelAccount>> getConversationMembersDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<List<ChannelAccount>, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -583,6 +626,11 @@ public class RestConversations implements Conversations {
         String userId,
         String conversationId
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (userId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter userId is required and cannot be null."
@@ -595,10 +643,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.getConversationMember(
-            userId, conversationId, client.getAcceptLanguage(), client.getUserAgent()
+            userId, conversationId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getConversationMemberDelegate(responseBodyResponse).body();
+                return getConversationMemberDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -611,12 +659,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ChannelAccount> getConversationMemberDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return ((ServiceResponseBuilder<ChannelAccount, ErrorResponseException>) client.restClient()
+        return ((ServiceResponseBuilder<ChannelAccount, ErrorResponseException>) connectorClient.restClient()
             .responseBuilderFactory()
-            .<ChannelAccount, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ChannelAccount, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ChannelAccount>() {
             }.getType())
             .registerError(ErrorResponseException.class))
@@ -634,6 +683,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         String memberId
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -646,12 +700,12 @@ public class RestConversations implements Conversations {
         }
 
         return service.deleteConversationMember(
-            conversationId, memberId, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, memberId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         )
 
             .thenApply(responseBodyResponse -> {
                 try {
-                    return deleteConversationMemberDelegate(responseBodyResponse).body();
+                    return deleteConversationMemberDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -664,12 +718,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<Void> deleteConversationMemberDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<Void, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
             }.getType())
             .register(HttpURLConnection.HTTP_NO_CONTENT, new TypeToken<Void>() {
@@ -688,6 +743,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         String activityId
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -700,10 +760,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.getActivityMembers(
-            conversationId, activityId, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, activityId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getActivityMembersDelegate(responseBodyResponse).body();
+                return getActivityMembersDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -713,12 +773,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<List<ChannelAccount>> getActivityMembersDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<List<ChannelAccount>, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<List<ChannelAccount>, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<ChannelAccount>>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -735,6 +796,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         AttachmentData attachmentUpload
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -748,12 +814,12 @@ public class RestConversations implements Conversations {
         Validator.validate(attachmentUpload);
 
         return service.uploadAttachment(
-            conversationId, attachmentUpload, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, attachmentUpload, localClient.getAcceptLanguage(), localClient.getUserAgent()
         )
 
             .thenApply(responseBodyResponse -> {
                 try {
-                    return uploadAttachmentDelegate(responseBodyResponse).body();
+                    return uploadAttachmentDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -763,12 +829,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> uploadAttachmentDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ResourceResponse, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -789,6 +856,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         Transcript history
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -802,12 +874,12 @@ public class RestConversations implements Conversations {
         Validator.validate(history);
 
         return service.sendConversationHistory(
-            conversationId, history, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, history, localClient.getAcceptLanguage(), localClient.getUserAgent()
         )
 
             .thenApply(responseBodyResponse -> {
                 try {
-                    return sendConversationHistoryDelegate(responseBodyResponse).body();
+                    return sendConversationHistoryDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -820,12 +892,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<ResourceResponse> sendConversationHistoryDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ResourceResponse, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ResourceResponse, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ResourceResponse>() {
             }.getType())
             .register(HttpURLConnection.HTTP_CREATED, new TypeToken<ResourceResponse>() {
@@ -845,6 +918,11 @@ public class RestConversations implements Conversations {
     public CompletableFuture<PagedMembersResult> getConversationPagedMembers(
         String conversationId
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -852,10 +930,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.getConversationPagedMembers(
-            conversationId, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getConversationPagedMembersDelegate(responseBodyResponse).body();
+                return getConversationPagedMembersDelegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -868,12 +946,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<PagedMembersResult> getConversationPagedMembersDelegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<PagedMembersResult, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -897,6 +976,11 @@ public class RestConversations implements Conversations {
         String conversationId,
         String continuationToken
     ) {
+        RestConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (conversationId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter conversationId is required and cannot be null."
@@ -909,10 +993,10 @@ public class RestConversations implements Conversations {
         }
 
         return service.getConversationPagedMembers(
-            conversationId, continuationToken, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId, continuationToken, localClient.getAcceptLanguage(), localClient.getUserAgent()
         ).thenApply(responseBodyResponse -> {
             try {
-                return getConversationPagedMembers2Delegate(responseBodyResponse).body();
+                return getConversationPagedMembers2Delegate(localClient, responseBodyResponse).body();
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
@@ -925,12 +1009,13 @@ public class RestConversations implements Conversations {
     }
 
     private ServiceResponse<PagedMembersResult> getConversationPagedMembers2Delegate(
+        RestConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<PagedMembersResult, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<PagedMembersResult, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<PagedMembersResult>() {
             }.getType())
             .registerError(ErrorResponseException.class)

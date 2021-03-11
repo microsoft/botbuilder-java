@@ -7,6 +7,7 @@
 package com.microsoft.bot.connector.rest;
 
 import com.microsoft.bot.connector.Async;
+import java.lang.ref.WeakReference;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.UserToken;
 import com.google.common.reflect.TypeToken;
@@ -39,7 +40,7 @@ public class RestUserToken implements UserToken {
     /** The Retrofit service to perform REST calls. */
     private UserTokensService service;
     /** The service client containing this operation class. */
-    private RestOAuthClient client;
+    private WeakReference<RestOAuthClient> client;
 
     /**
      * Initializes an instance of UserTokensImpl.
@@ -49,8 +50,8 @@ public class RestUserToken implements UserToken {
      *                     operation class.
      */
     public RestUserToken(Retrofit withRetrofit, RestOAuthClient withClient) {
-        this.service = withRetrofit.create(UserTokensService.class);
-        this.client = withClient;
+        service = withRetrofit.create(UserTokensService.class);
+        client = new WeakReference<>(withClient);
     }
 
     /**
@@ -190,10 +191,14 @@ public class RestUserToken implements UserToken {
     private ServiceResponse<TokenResponse> getTokenDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+            throw new IllegalStateException("OAuthClient ref");
+        }
 
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
-            .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+            .<TokenResponse, ErrorResponseException>newInstance(localClient.serializerAdapter())
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() {
             }.getType())
@@ -255,10 +260,14 @@ public class RestUserToken implements UserToken {
     private ServiceResponse<TokenResponse> exchangeTokenDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+            throw new IllegalStateException("OAuthClient ref");
+        }
 
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
-            .<TokenResponse, ErrorResponseException>newInstance(this.client.serializerAdapter())
+            .<TokenResponse, ErrorResponseException>newInstance(localClient.serializerAdapter())
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<TokenResponse>() {
             }.getType())
@@ -363,11 +372,15 @@ public class RestUserToken implements UserToken {
     private ServiceResponse<Map<String, TokenResponse>> getAadTokensDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+            throw new IllegalStateException("OAuthClient ref");
+        }
 
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
             .<Map<String, TokenResponse>, ErrorResponseException>newInstance(
-                this.client.serializerAdapter()
+                localClient.serializerAdapter()
             )
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Map<String, TokenResponse>>() {
@@ -446,10 +459,14 @@ public class RestUserToken implements UserToken {
     private ServiceResponse<Object> signOutDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+            throw new IllegalStateException("OAuthClient ref");
+        }
 
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
-            .<Object, ErrorResponseException>newInstance(this.client.serializerAdapter())
+            .<Object, ErrorResponseException>newInstance(localClient.serializerAdapter())
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<Object>() {
             }.getType())
@@ -522,10 +539,14 @@ public class RestUserToken implements UserToken {
     private ServiceResponse<List<TokenStatus>> getTokenStatusDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+            throw new IllegalStateException("OAuthClient ref");
+        }
 
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
-            .<List<TokenStatus>, ErrorResponseException>newInstance(this.client.serializerAdapter())
+            .<List<TokenStatus>, ErrorResponseException>newInstance(localClient.serializerAdapter())
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<TokenStatus>>() {
             }.getType())

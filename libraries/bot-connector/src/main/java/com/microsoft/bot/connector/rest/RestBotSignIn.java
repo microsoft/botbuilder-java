@@ -7,6 +7,7 @@ package com.microsoft.bot.connector.rest;
 
 import com.google.common.reflect.TypeToken;
 import com.microsoft.bot.connector.Async;
+import java.lang.ref.WeakReference;
 import retrofit2.Retrofit;
 import com.microsoft.bot.connector.BotSignIn;
 import com.microsoft.bot.restclient.ServiceResponse;
@@ -29,7 +30,7 @@ public class RestBotSignIn implements BotSignIn {
     /** The Retrofit service to perform REST calls. */
     private BotSignInsService service;
     /** The service client containing this operation class. */
-    private RestOAuthClient client;
+    private WeakReference<RestOAuthClient> client;
     /**
      * Initializes an instance of BotSignInsImpl.
      *
@@ -38,8 +39,8 @@ public class RestBotSignIn implements BotSignIn {
      *                     operation class.
      */
     public RestBotSignIn(Retrofit withRetrofit, RestOAuthClient withClient) {
-        this.service = withRetrofit.create(BotSignInsService.class);
-        this.client = withClient;
+        service = withRetrofit.create(BotSignInsService.class);
+        client = new WeakReference<>(withClient);
     }
     /**
      * The interface defining all the services for BotSignIns to be used by Retrofit
@@ -191,12 +192,17 @@ public class RestBotSignIn implements BotSignIn {
     private ServiceResponse<SignInResource> getSignInResourceDelegate(
         Response<ResponseBody> response
     ) throws ErrorResponseException, IllegalArgumentException, IOException {
+        RestOAuthClient localClient = client.get();
+        if (localClient == null) {
+           throw new IllegalStateException("OAuthClient ref");
+        }
+
         if (!response.isSuccessful()) {
             throw new ErrorResponseException("getSignInResource", response);
         }
-        return this.client.restClient()
+        return localClient.restClient()
             .responseBuilderFactory()
-            .<SignInResource, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<SignInResource, ErrorResponseException>newInstance(localClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<SignInResource>() {
             }.getType())
             .register(HttpURLConnection.HTTP_MOVED_PERM, new TypeToken<Void>() {

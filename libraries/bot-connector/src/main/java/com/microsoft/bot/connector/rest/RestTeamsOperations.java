@@ -13,6 +13,7 @@ import com.microsoft.bot.restclient.ServiceResponse;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
+import java.lang.ref.WeakReference;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -34,7 +35,7 @@ public class RestTeamsOperations implements TeamsOperations {
     private TeamsService service;
 
     /** The service client containing this operation class. */
-    private RestTeamsConnectorClient client;
+    private WeakReference<RestTeamsConnectorClient> client;
 
     /**
      * Initializes an instance of ConversationsImpl.
@@ -45,7 +46,7 @@ public class RestTeamsOperations implements TeamsOperations {
      */
     RestTeamsOperations(Retrofit withRetrofit, RestTeamsConnectorClient withClient) {
         service = withRetrofit.create(RestTeamsOperations.TeamsService.class);
-        client = withClient;
+        client = new WeakReference<>(withClient);
     }
 
     /**
@@ -55,16 +56,21 @@ public class RestTeamsOperations implements TeamsOperations {
      */
     @Override
     public CompletableFuture<ConversationList> fetchChannelList(String teamId) {
+        RestTeamsConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (teamId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter teamId is required and cannot be null."
             ));
         }
 
-        return service.fetchChannelList(teamId, client.getAcceptLanguage(), client.getUserAgent())
+        return service.fetchChannelList(teamId, localClient.getAcceptLanguage(), localClient.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
-                    return fetchChannelListDelegate(responseBodyResponse).body();
+                    return fetchChannelListDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -74,12 +80,13 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     private ServiceResponse<ConversationList> fetchChannelListDelegate(
+        RestTeamsConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<ConversationList, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<ConversationList, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<ConversationList>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -93,16 +100,21 @@ public class RestTeamsOperations implements TeamsOperations {
      */
     @Override
     public CompletableFuture<TeamDetails> fetchTeamDetails(String teamId) {
+        RestTeamsConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         if (teamId == null) {
             return Async.completeExceptionally(new IllegalArgumentException(
                 "Parameter teamId is required and cannot be null."
             ));
         }
 
-        return service.fetchTeamDetails(teamId, client.getAcceptLanguage(), client.getUserAgent())
+        return service.fetchTeamDetails(teamId, localClient.getAcceptLanguage(), localClient.getUserAgent())
             .thenApply(responseBodyResponse -> {
                 try {
-                    return fetchTeamDetailsDelegate(responseBodyResponse).body();
+                    return fetchTeamDetailsDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -112,12 +124,13 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     private ServiceResponse<TeamDetails> fetchTeamDetailsDelegate(
+        RestTeamsConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
 
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<TeamDetails, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<TeamDetails, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<TeamDetails>() {
             }.getType())
             .registerError(ErrorResponseException.class)
@@ -136,12 +149,17 @@ public class RestTeamsOperations implements TeamsOperations {
         String participantId,
         String tenantId
     ) {
+        RestTeamsConnectorClient localClient = client.get();
+        if (localClient == null) {
+            return Async.completeExceptionally(new IllegalStateException("ConnectorClient ref"));
+        }
+
         return service.fetchParticipant(
-            meetingId, participantId, tenantId, client.getAcceptLanguage(), client.getUserAgent()
+            meetingId, participantId, tenantId, localClient.getAcceptLanguage(), localClient.getUserAgent()
         )
             .thenApply(responseBodyResponse -> {
                 try {
-                    return fetchParticipantDelegate(responseBodyResponse).body();
+                    return fetchParticipantDelegate(localClient, responseBodyResponse).body();
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
@@ -151,11 +169,12 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     private ServiceResponse<TeamsMeetingParticipant> fetchParticipantDelegate(
+        RestTeamsConnectorClient connectorClient,
         Response<ResponseBody> response
     ) throws ErrorResponseException, IOException, IllegalArgumentException {
-        return client.restClient()
+        return connectorClient.restClient()
             .responseBuilderFactory()
-            .<TeamsMeetingParticipant, ErrorResponseException>newInstance(client.serializerAdapter())
+            .<TeamsMeetingParticipant, ErrorResponseException>newInstance(connectorClient.serializerAdapter())
             .register(HttpURLConnection.HTTP_OK, new TypeToken<TeamsMeetingParticipant>() {
             }.getType())
             .registerError(ErrorResponseException.class)
