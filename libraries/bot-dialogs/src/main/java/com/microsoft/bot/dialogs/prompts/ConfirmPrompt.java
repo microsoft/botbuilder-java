@@ -255,8 +255,7 @@ public class ConfirmPrompt extends Prompt<Boolean> {
         }
 
         // Send prompt
-         turnContext.sendActivity(prompt).join();
-         return CompletableFuture.completedFuture(null);
+         return turnContext.sendActivity(prompt).thenApply(result -> null);
     }
 
     /**

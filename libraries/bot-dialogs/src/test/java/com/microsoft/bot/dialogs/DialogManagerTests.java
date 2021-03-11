@@ -470,7 +470,7 @@ public class DialogManagerTests {
         public CompletableFuture<ResourceResponse[]> invoke(TurnContext context, List<Activity> activities,
                 Supplier<CompletableFuture<ResourceResponse[]>> next) {
             for (Activity activity : activities) {
-                if (activity.getType() == ActivityTypes.END_OF_CONVERSATION) {
+                if (activity.getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
                     _eocSent = activity;
                     break;
                 }

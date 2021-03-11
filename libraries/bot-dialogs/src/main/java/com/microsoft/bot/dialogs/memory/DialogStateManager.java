@@ -47,7 +47,7 @@ public class DialogStateManager implements Map<String, Object> {
      */
     private final String pathTracker = "dialog._tracker.paths";
 
-    private static final char[] SEPARATORS = {',', '['};
+    private static final char[] SEPARATORS = {',', '[' };
 
     private final DialogContext dialogContext;
     private int version;
@@ -324,7 +324,7 @@ public class DialogStateManager implements Map<String, Object> {
         }
 
         ResultPair<T> result = tryGetValue(pathExpression, clsType);
-         if (result.result()) {
+        if (result.result()) {
             return result.value();
         } else {
             return defaultValue;
@@ -487,7 +487,7 @@ public class DialogStateManager implements Map<String, Object> {
             return s.getName().toUpperCase() == uCaseName;
         }).findFirst().get();
         if (scope != null) {
-            scope.delete(dialogContext).join();
+            return scope.delete(dialogContext).thenApply(result -> null);
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -808,7 +808,6 @@ public class DialogStateManager implements Map<String, Object> {
     public final void putAll(Map<? extends String, ? extends Object> m) {
     }
 
-
     @Override
     public final Set<String> keySet() {
         return configuration.getMemoryScopes().stream().map(scope -> scope.getName()).collect(Collectors.toSet());
@@ -817,7 +816,7 @@ public class DialogStateManager implements Map<String, Object> {
     @Override
     public final Collection<Object> values() {
         return configuration.getMemoryScopes().stream().map(scope -> scope.getMemory(dialogContext))
-        .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
     @Override

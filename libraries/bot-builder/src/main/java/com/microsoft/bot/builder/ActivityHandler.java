@@ -87,6 +87,9 @@ public class ActivityHandler implements Bot {
             case ActivityTypes.INSTALLATION_UPDATE:
                 return onInstallationUpdate(turnContext);
 
+            case ActivityTypes.END_OF_CONVERSATION:
+                return onEndOfConversationActivity(turnContext);
+
             case ActivityTypes.TYPING:
                 return onTypingActivity(turnContext);
 
@@ -562,6 +565,17 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to
+     * ActivityTypes.END_OF_CONVERSATION activities.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onEndOfConversationActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 

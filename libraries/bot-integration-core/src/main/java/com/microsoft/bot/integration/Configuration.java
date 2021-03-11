@@ -23,4 +23,11 @@ public interface Configuration {
      * @return The Properties in the Configuration.
      */
     Properties getProperties();
+
+    /**
+     * Returns an Array of Properties that are in the Configuration.
+     * @param key The property name.
+     * @return The property values.
+     */
+    String[] getProperties(String key);
 }
