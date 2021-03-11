@@ -153,6 +153,9 @@ public class AttachmentsBot extends ActivityHandler {
     private Activity handleIncomingAttachment(Activity activity) {
         String replyText = "";
         for (Attachment file : activity.getAttachments()) {
+            ReadableByteChannel remoteChannel = null;
+            FileOutputStream fos = null;
+
             try {
                 // Determine where the file is hosted.
                 URL remoteFileUrl = new URL(file.getContentUrl());
@@ -161,12 +164,18 @@ public class AttachmentsBot extends ActivityHandler {
                 String localFileName = file.getName();
 
                 // Download the actual attachment
-                ReadableByteChannel remoteChannel = Channels.newChannel(remoteFileUrl.openStream());
-                FileOutputStream fos = new FileOutputStream(localFileName);
-
+                remoteChannel = Channels.newChannel(remoteFileUrl.openStream());
+                fos = new FileOutputStream(localFileName);
                 fos.getChannel().transferFrom(remoteChannel, 0, Long.MAX_VALUE);
             } catch (Throwable t) {
                 replyText += "Attachment \"" + file.getName() + "\" failed to download.\r\n";
+            } finally {
+                if (remoteChannel != null) {
+                    try {remoteChannel.close(); } catch (Throwable ignored) {};
+                }
+                if (fos != null) {
+                    try {fos.close(); } catch (Throwable ignored) {};
+                }
             }
         }
 
@@ -237,10 +246,10 @@ public class AttachmentsBot extends ActivityHandler {
     }
 
     private CompletableFuture<byte[]> getFileData(String filename) {
-        return Async.wrapBlock(() -> {
-            InputStream inputStream = Thread.currentThread().
-                getContextClassLoader().getResourceAsStream(filename);
-            return IOUtils.toByteArray(inputStream);
-        });
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename)) {
+            return CompletableFuture.completedFuture(IOUtils.toByteArray(inputStream));
+        } catch (Throwable t) {
+            return Async.completeExceptionally(t);
+        }
     }
 }
