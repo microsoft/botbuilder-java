@@ -35,4 +35,21 @@ public interface Attachments {
      * @throws IllegalArgumentException thrown if parameters fail the validation
      */
     CompletableFuture<InputStream> getAttachment(String attachmentId, String viewId);
+
+    /**
+     * Get the URI of an attachment view.
+     * @param attachmentId id of the attachment.
+     * @param viewId default is "original".
+     * @return URI of the attachment.
+     */
+    String getAttachmentUri(String attachmentId, String viewId);
+
+    /**
+     * Get the URI of an attachment view.
+     * @param attachmentId id of the attachment.
+     * @return URI of the attachment.
+     */
+    default String getAttachmentUri(String attachmentId) {
+        return getAttachmentUri(attachmentId, "original");
+    }
 }
