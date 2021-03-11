@@ -26,6 +26,7 @@ import com.microsoft.bot.connector.authentication.JwtTokenValidation;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.MicrosoftGovernmentAppCredentials;
 import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
+import com.microsoft.bot.connector.authentication.SkillValidation;
 import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.AadResourceUrls;
@@ -438,7 +439,10 @@ public class BotFrameworkAdapter extends BotAdapter implements
 
             // The OAuthScope is also stored on the TurnState to get the correct
             // AppCredentials if fetching a token is required.
-            String scope = getBotFrameworkOAuthScope();
+            String scope = SkillValidation.isSkillClaim(identity.claims())
+                           ? String.format("%s/.default", JwtTokenValidation.getAppIdFromClaims(identity.claims()))
+                           : getBotFrameworkOAuthScope();
+
             context.getTurnState().add(OAUTH_SCOPE_KEY, scope);
 
             pipelineResult = createConnectorClient(activity.getServiceUrl(), identity, scope)
@@ -491,6 +495,13 @@ public class BotFrameworkAdapter extends BotAdapter implements
             // Is the bot accepting all incoming messages?
             if (is_auth_disabled) {
                 return null;
+            }
+
+            // Is the activity from another bot?
+            if (SkillValidation.isSkillClaim(claimsIdentity.claims())) {
+                return String.format("%s%s",
+                                     CallerIdConstants.BOT_TO_BOT_PREFIX,
+                                     JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims()));
             }
 
             // Is the activity from Public Azure?
@@ -1133,7 +1144,13 @@ public class BotFrameworkAdapter extends BotAdapter implements
         }
 
         if (botAppIdClaim != null) {
-            String scope = getBotFrameworkOAuthScope();
+            String scope = audience;
+
+            if (StringUtils.isBlank(audience)) {
+                scope = SkillValidation.isSkillClaim(claimsIdentity.claims())
+                        ? String.format("%s/.default", JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims()))
+                        : getBotFrameworkOAuthScope();
+            }
 
             return getAppCredentials(botAppIdClaim, scope)
                     .thenCompose(credentials -> getOrCreateConnectorClient(serviceUrl, credentials));
@@ -1236,8 +1253,8 @@ public class BotFrameworkAdapter extends BotAdapter implements
     protected CompletableFuture<AppCredentials> buildAppCredentials(String appId, String scope) {
         return credentialProvider.getAppPassword(appId).thenApply(appPassword -> {
             AppCredentials credentials = channelProvider != null && channelProvider.isGovernment()
-                ? new MicrosoftGovernmentAppCredentials(appId, appPassword, scope)
-                : new MicrosoftAppCredentials(appId, appPassword);
+                ? new MicrosoftGovernmentAppCredentials(appId, appPassword, null, scope)
+                : new MicrosoftAppCredentials(appId, appPassword, null, scope);
             return credentials;
         });
     }
@@ -1368,12 +1385,13 @@ public class BotFrameworkAdapter extends BotAdapter implements
             ));
         }
 
-        OAuthClient client =  createOAuthAPIClient(context, oAuthAppCredentials).join();
-        return client.getUserToken().getToken(
+        return createOAuthAPIClient(context, oAuthAppCredentials).thenCompose(client -> {
+            return client.getUserToken().getToken(
                 context.getActivity().getFrom().getId(),
                 connectionName,
                 context.getActivity().getChannelId(),
                 magicCode);
+        });
     }
 
     /**

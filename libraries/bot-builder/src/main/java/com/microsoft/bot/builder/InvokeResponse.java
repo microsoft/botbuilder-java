@@ -10,6 +10,7 @@ package com.microsoft.bot.builder;
  * Serialized content from the Body property.
  */
 public class InvokeResponse {
+
     /**
      * The POST that is generated in response to the incoming Invoke Activity will
      * have the HTTP Status code specified by this field.
@@ -23,7 +24,7 @@ public class InvokeResponse {
 
     /**
      * Initializes new instance of InvokeResponse.
-     * 
+     *
      * @param withStatus The invoke response status.
      * @param withBody   The invoke response body.
      */
@@ -34,7 +35,7 @@ public class InvokeResponse {
 
     /**
      * Gets the HTTP status code for the response.
-     * 
+     *
      * @return The HTTP status code.
      */
     public int getStatus() {
@@ -43,7 +44,7 @@ public class InvokeResponse {
 
     /**
      * Sets the HTTP status code for the response.
-     * 
+     *
      * @param withStatus The HTTP status code.
      */
     public void setStatus(int withStatus) {
@@ -52,7 +53,7 @@ public class InvokeResponse {
 
     /**
      * Gets the body content for the response.
-     * 
+     *
      * @return The body content.
      */
     public Object getBody() {
@@ -61,10 +62,20 @@ public class InvokeResponse {
 
     /**
      * Sets the body content for the response.
-     * 
+     *
      * @param withBody The body content.
      */
     public void setBody(Object withBody) {
         body = withBody;
     }
+
+    /**
+     * Returns if the status of the request was successful.
+     * @return True if the status code is successful, false if not.
+     */
+    @SuppressWarnings("MagicNumber")
+    public boolean getIsSuccessStatusCode() {
+        return status >= 200 && status <= 299;
+    }
+
 }

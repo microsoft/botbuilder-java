@@ -9,6 +9,7 @@ import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.inspection.InspectionState;
 import com.microsoft.bot.connector.ExecutorFactory;
+import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
@@ -62,6 +63,20 @@ public abstract class BotDependencyConfiguration {
     @Bean
     public Configuration getConfiguration() {
         return new ClasspathPropertiesConfiguration();
+    }
+
+
+    /**
+     * Returns the AuthenticationConfiguration for the application.
+     *
+     * By default, it uses the {@link AuthenticationConfiguration} class.
+     * Default scope of Singleton.
+     * @param configuration The Configuration object to read from.
+     * @return An AuthenticationConfiguration object.
+     */
+    @Bean
+    public AuthenticationConfiguration getAuthenticationConfiguration(Configuration configuration) {
+        return new AuthenticationConfiguration();
     }
 
     /**

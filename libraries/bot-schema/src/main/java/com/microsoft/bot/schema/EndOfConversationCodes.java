@@ -38,7 +38,17 @@ public enum EndOfConversationCodes {
     /**
      * Enum value channelFailed.
      */
-    CHANNEL_FAILED("channelFailed");
+    CHANNEL_FAILED("channelFailed"),
+
+    /**
+     * Enum value skillError.
+     */
+    SKILL_ERROR("skillError"),
+
+    /**
+     * Enum value channelFailed.
+     */
+    ROOT_SKILL_ERROR("rootSkillError");
 
     /**
      * The actual serialized value for a EndOfConversationCodes instance.
@@ -47,7 +57,7 @@ public enum EndOfConversationCodes {
 
     /**
      * Creates a ActionTypes enum from a string.
-     * 
+     *
      * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */

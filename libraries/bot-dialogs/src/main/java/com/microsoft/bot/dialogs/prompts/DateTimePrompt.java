@@ -104,9 +104,9 @@ public class DateTimePrompt extends Prompt<List<DateTimeResolution>> {
         }
 
         if (isRetry && options.getRetryPrompt() != null) {
-             turnContext.sendActivity(options.getRetryPrompt()).join();
+             return turnContext.sendActivity(options.getRetryPrompt()).thenApply(result -> null);
         } else if (options.getPrompt() != null) {
-             turnContext.sendActivity(options.getPrompt()).join();
+             return turnContext.sendActivity(options.getPrompt()).thenApply(result -> null);
         }
         return CompletableFuture.completedFuture(null);
     }
