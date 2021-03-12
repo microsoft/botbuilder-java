@@ -4,9 +4,6 @@
 package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.authentication.AuthenticationConstants;
-import org.apache.commons.lang3.NotImplementedException;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * OAuthClient config.
