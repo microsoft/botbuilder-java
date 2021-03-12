@@ -273,12 +273,10 @@ public class Activity {
      * @return A message Activity type.
      */
     public static Activity createMessageActivity() {
-        return new Activity(ActivityTypes.MESSAGE) {
-            {
-                setAttachments(new ArrayList<>());
-                setEntities(new ArrayList<>());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setAttachments(new ArrayList<>());
+        activity.setEntities(new ArrayList<>());
+        return activity;
     }
 
     /**
