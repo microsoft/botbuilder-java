@@ -359,7 +359,7 @@ public abstract class Dialog {
                                                 : EndOfConversationCodes.USER_CANCELLED;
                 Activity activity = new Activity(ActivityTypes.END_OF_CONVERSATION);
                 activity.setValue(result.getResult());
-                activity.setLocalTimeZone(turnContext.getActivity().getLocale());
+                activity.setLocale(turnContext.getActivity().getLocale());
                 activity.setCode(code);
                 return turnContext.sendActivity(activity).thenApply(finalResult -> null);
         }
