@@ -27,19 +27,4 @@ public final class OAuthClientConfig {
      */
     @SuppressWarnings("checkstyle:VisibilityModifier")
     public static boolean emulateOAuthCards = false;
-
-    /**
-     * Send a dummy OAuth card when the bot is being used on the Emulator for
-     * testing without fetching a real token.
-     *
-     * @param client  The OAuth client.
-     * @param emulate Indicates whether the Emulator should emulate the OAuth card.
-     * @return A task that represents the work queued to execute.
-     */
-    public static CompletableFuture<Void> sendEmulateOAuthCards(
-        OAuthClient client,
-        boolean emulate
-    ) {
-        throw new NotImplementedException("sendEmulateOAuthCards");
-    }
 }
