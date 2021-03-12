@@ -11,11 +11,9 @@ import java.util.concurrent.CompletionException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
-import com.microsoft.bot.schema.HealthCheckResponse;
 import com.microsoft.bot.schema.MessageReaction;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.SignInConstants;
@@ -86,6 +84,9 @@ public class ActivityHandler implements Bot {
 
             case ActivityTypes.INSTALLATION_UPDATE:
                 return onInstallationUpdate(turnContext);
+
+            case ActivityTypes.END_OF_CONVERSATION:
+                return onEndOfConversationActivity(turnContext);
 
             case ActivityTypes.TYPING:
                 return onTypingActivity(turnContext);
@@ -412,10 +413,6 @@ public class ActivityHandler implements Bot {
                     }
                     return new InvokeResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, null);
                 });
-        } else if (StringUtils.equals(turnContext.getActivity().getName(), "healthCheck")) {
-            CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
-            result.complete(new InvokeResponse(HttpURLConnection.HTTP_OK, onHealthCheck(turnContext)));
-            return result;
         }
 
         CompletableFuture<InvokeResponse> result = new CompletableFuture<>();
@@ -445,18 +442,6 @@ public class ActivityHandler implements Bot {
             new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED)
         );
         return result;
-    }
-
-    /**
-     * Invoked when a 'healthCheck' event is
-     * received when the base behavior of onInvokeActivity is used.
-     *
-     * @param turnContext The current TurnContext.
-     * @return A task that represents a HealthCheckResponse.
-     */
-    protected CompletableFuture<HealthCheckResponse> onHealthCheck(TurnContext turnContext) {
-        ConnectorClient client = turnContext.getTurnState().get(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY);
-        return CompletableFuture.completedFuture(HealthCheck.createHealthCheckResponse(client));
     }
 
     /**
@@ -562,6 +547,17 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Override this in a derived class to provide logic specific to
+     * ActivityTypes.END_OF_CONVERSATION activities.
+     *
+     * @param turnContext The context object for this turn.
+     * @return A task that represents the work queued to execute.
+     */
+    protected CompletableFuture<Void> onEndOfConversationActivity(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
 

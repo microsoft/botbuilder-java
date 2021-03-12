@@ -9,7 +9,7 @@ import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.schema.*;
 import org.apache.commons.lang3.StringUtils;
-
+import org.junit.rules.ExpectedException;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -93,64 +93,62 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
 
     public TestAdapter(String channelId, boolean sendTraceActivity) {
         this.sendTraceActivity = sendTraceActivity;
-        setConversationReference(new ConversationReference() {
+
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setChannelId(channelId);
+        conversationReference.setServiceUrl("https://test.com");
+        conversationReference.setUser(new ChannelAccount() {
             {
-                setChannelId(channelId);
-                setServiceUrl("https://test.com");
-                setUser(new ChannelAccount() {
-                    {
-                        setId("user1");
-                        setName("User1");
-                    }
-                });
-                setBot(new ChannelAccount() {
-                    {
-                        setId("bot");
-                        setName("Bot");
-                    }
-                });
-                setConversation(new ConversationAccount() {
-                    {
-                        setIsGroup(false);
-                        setConversationType("convo1");
-                        setId("Conversation1");
-                    }
-                });
-                setLocale(this.getLocale());
+                setId("user1");
+                setName("User1");
             }
         });
+        conversationReference.setBot(new ChannelAccount() {
+            {
+                setId("bot");
+                setName("Bot");
+            }
+        });
+        conversationReference.setConversation(new ConversationAccount() {
+            {
+                setIsGroup(false);
+                setConversationType("convo1");
+                setId("Conversation1");
+            }
+        });
+        conversationReference.setLocale(this.getLocale());
+
+        setConversationReference(conversationReference);
     }
 
     public TestAdapter(ConversationReference reference) {
         if (reference != null) {
             setConversationReference(reference);
         } else {
-            setConversationReference(new ConversationReference() {
+            ConversationReference conversationReference = new ConversationReference();
+            conversationReference.setChannelId(Channels.TEST);
+            conversationReference.setServiceUrl("https://test.com");
+            conversationReference.setUser(new ChannelAccount() {
                 {
-                    setChannelId(Channels.TEST);
-                    setServiceUrl("https://test.com");
-                    setUser(new ChannelAccount() {
-                        {
-                            setId("user1");
-                            setName("User1");
-                        }
-                    });
-                    setBot(new ChannelAccount() {
-                        {
-                            setId("bot");
-                            setName("Bot");
-                        }
-                    });
-                    setConversation(new ConversationAccount() {
-                        {
-                            setIsGroup(false);
-                            setConversationType("convo1");
-                            setId("Conversation1");
-                        }
-                    });
-                    setLocale(this.getLocale());
+                    setId("user1");
+                    setName("User1");
                 }
             });
+            conversationReference.setBot(new ChannelAccount() {
+                {
+                    setId("bot");
+                    setName("Bot");
+                }
+            });
+            conversationReference.setConversation(new ConversationAccount() {
+                {
+                    setIsGroup(false);
+                    setConversationType("convo1");
+                    setId("Conversation1");
+                }
+            });
+            conversationReference.setLocale(this.getLocale());
+            setConversationReference(conversationReference);
         }
     }
 
@@ -271,7 +269,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException e) {
                 }
-            } else if (activity.getType() == ActivityTypes.TRACE) {
+            } else if (activity.getType().equals(ActivityTypes.TRACE)) {
                 if (sendTraceActivity) {
                     synchronized (botReplies) {
                         botReplies.add(activity);
@@ -361,6 +359,7 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                 setText(withText);
             }
         };
+        activity.setLocale(getLocale() != null ? getLocale() : "en-us");
 
         return activity;
     }
@@ -508,8 +507,8 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                                         String channelId,
                                         String userId,
                                         String exchangableItem,
-                                        String token)
-    {
+                                        String token
+    ) {
         ExchangableTokenKey key = new ExchangableTokenKey();
         key.setConnectionName(connectionName);
         key.setChannelId(channelId);
@@ -520,6 +519,23 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             exchangableToken.replace(key, token);
         } else {
             exchangableToken.put(key, token);
+        }
+    }
+
+    public void throwOnExchangeRequest(String connectionName,
+    String channelId,
+    String userId,
+    String exchangableItem) {
+        ExchangableTokenKey key = new ExchangableTokenKey();
+        key.setConnectionName(connectionName);
+        key.setChannelId(channelId);
+        key.setUserId(userId);
+        key.setExchangableItem(exchangableItem);
+
+        if (exchangableToken.containsKey(key)) {
+            exchangableToken.replace(key, exceptionExpected);
+        } else {
+            exchangableToken.put(key, exceptionExpected);
         }
     }
 

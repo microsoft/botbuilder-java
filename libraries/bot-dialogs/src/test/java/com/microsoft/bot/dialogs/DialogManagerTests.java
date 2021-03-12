@@ -4,11 +4,14 @@
 package com.microsoft.bot.dialogs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.SendActivitiesHandler;
@@ -16,6 +19,10 @@ import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.TraceTranscriptLogger;
 import com.microsoft.bot.builder.TranscriptLoggerMiddleware;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.skills.SkillConversationReference;
+import com.microsoft.bot.builder.skills.SkillHandler;
+import com.microsoft.bot.connector.authentication.AuthenticationConstants;
+import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
@@ -26,8 +33,8 @@ import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.ResultPair;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DialogManagerTests {
@@ -157,8 +164,7 @@ public class DialogManagerTests {
     }
 
     @Test
-    public void
-    DialogManager_UserState_NestedDialogs_PersistedAcrossConversations() {
+    public void DialogManager_UserState_NestedDialogs_PersistedAcrossConversations() {
         String firstConversationId = UUID.randomUUID().toString();
         String secondConversationId = UUID.randomUUID().toString();
         MemoryStorage storage = new MemoryStorage();
@@ -330,81 +336,109 @@ public class DialogManagerTests {
     //     Assert.DoesNotContain(dm.Dialogs.GetDialogs(), d -> d.GetType() == typeof(SendActivity));
     // }
 
-    // public CompletableFuture<Void> HandlesBotAndSkillsTestCases(SkillFlowTestCase testCase, boolean shouldSendEoc) {
-    //     var firstConversationId = Guid.NewGuid().toString();
-    //     var storage = new MemoryStorage();
+    @Test
+    public void HandleBotAndSkillsTestsCases_RootBotOnly() {
+        HandlesBotAndSkillsTestCases(SkillFlowTestCase.RootBotOnly, false);
+    }
 
-    //     var adaptiveDialog = CreateTestDialog(property: "conversation.name");
-    //      CreateFlow(adaptiveDialog, storage, firstConversationId, testCase: testCase, locale: "en-GB").send("Hi")
-    //         .assertReply("Hello, what is your name?")
-    //         .send("SomeName")
-    //         .assertReply("Hello SomeName, nice to meet you!")
-    //         .startTest();
+    @Test
+    public void HandleBotAndSkillsTestsCases_RootBotConsumingSkill() {
+        HandlesBotAndSkillsTestCases(SkillFlowTestCase.RootBotConsumingSkill, false);
+    }
 
-    //     Assert.Equal(DialogTurnStatus.Complete, _dmTurnResult.TurnResult.Status);
+    @Test
+    public void HandleBotAndSkillsTestsCases_MiddleSkill() {
+        HandlesBotAndSkillsTestCases(SkillFlowTestCase.MiddleSkill, true);
+    }
 
-    //     if (shouldSendEoc) {
-    //         Assert.NotNull(_eocSent);
-    //         Assert.Equal(ActivityTypes.EndOfConversation, _eocSent.Type);
-    //         Assert.Equal("SomeName", _eocSent.Value);
-    //         Assert.Equal("en-GB", _eocSent.Locale);
-    //     } else {
-    //         Assert.Null(_eocSent);
-    //     }
-    // }
+    @Test
+    public void HandleBotAndSkillsTestsCases_LeafSkill() {
+        HandlesBotAndSkillsTestCases(SkillFlowTestCase.LeafSkill, true);
+    }
 
-    // @Test
-    // public CompletableFuture<Void> SkillHandlesEoCFromParent() {
-    //     var firstConversationId = Guid.NewGuid().toString();
-    //     var storage = new MemoryStorage();
 
-    //     var adaptiveDialog = CreateTestDialog(property: "conversation.name");
+    public void HandlesBotAndSkillsTestCases(SkillFlowTestCase testCase, boolean shouldSendEoc) {
+        String firstConversationId = UUID.randomUUID().toString();
+        MemoryStorage storage = new MemoryStorage();
 
-    //     var eocActivity = new Activity(ActivityTypes.EndOfConversation);
+        Dialog adaptiveDialog = CreateTestDialog("conversation.name");
+         CreateFlow(adaptiveDialog, storage, firstConversationId, null, testCase, "en-GB")
+            .send("Hi")
+            .assertReply("Hello, what is your name?")
+            .send("SomeName")
+            .assertReply("Hello SomeName, nice to meet you!")
+            .startTest()
+            .join();
 
-    //      CreateFlow(adaptiveDialog, storage, firstConversationId, testCase: SkillFlowTestCase.LeafSkill)
-    //         .send("hi")
-    //         .assertReply("Hello, what is your name?")
-    //         .send(eocActivity)
-    //         .startTest();
+        Assert.assertEquals(DialogTurnStatus.COMPLETE, _dmTurnResult.getTurnResult().getStatus());
 
-    //     Assert.Equal(DialogTurnStatus.Cancelled, _dmTurnResult.TurnResult.Status);
-    // }
+        if (shouldSendEoc) {
+            Assert.assertNotNull(_eocSent);
+            Assert.assertEquals(ActivityTypes.END_OF_CONVERSATION, _eocSent.getType());
+            Assert.assertEquals("SomeName", _eocSent.getValue());
+            Assert.assertEquals("en-GB", _eocSent.getLocale());
+        } else {
+            Assert.assertNull(_eocSent);
+        }
+    }
 
-    // @Test
-    // public CompletableFuture<Void> SkillHandlesRepromptFromParent() {
-    //     var firstConversationId = Guid.NewGuid().toString();
-    //     var storage = new MemoryStorage();
+    @Test
+    public void SkillHandlesEoCFromParent() {
+        String firstConversationId = UUID.randomUUID().toString();
+        MemoryStorage storage = new MemoryStorage();
 
-    //     var adaptiveDialog = CreateTestDialog(property: "conversation.name");
+        Dialog adaptiveDialog = CreateTestDialog("conversation.name");
 
-    //     var repromptEvent = new Activity(ActivityTypes.Event) { Name = DialogEvents.RepromptDialog };
+        Activity eocActivity = new Activity(ActivityTypes.END_OF_CONVERSATION);
 
-    //      CreateFlow(adaptiveDialog, storage, firstConversationId, testCase: SkillFlowTestCase.LeafSkill)
-    //         .send("hi")
-    //         .assertReply("Hello, what is your name?")
-    //         .send(repromptEvent)
-    //         .assertReply("Hello, what is your name?")
-    //         .startTest();
+         CreateFlow(adaptiveDialog, storage, firstConversationId, null, SkillFlowTestCase.LeafSkill, null)
+            .send("hi")
+            .assertReply("Hello, what is your name?")
+            .send(eocActivity)
+            .startTest()
+            .join();
 
-    //     Assert.Equal(DialogTurnStatus.Waiting, _dmTurnResult.TurnResult.Status);
-    // }
+        Assert.assertEquals(DialogTurnStatus.CANCELLED, _dmTurnResult.getTurnResult().getStatus());
+    }
 
-    // @Test
-    // public CompletableFuture<Void> SkillShouldReturnEmptyOnRepromptWithNoDialog() {
-    //     var firstConversationId = Guid.NewGuid().toString();
-    //     var storage = new MemoryStorage();
+    @Test
+    public void SkillHandlesRepromptFromParent() {
+        String firstConversationId = UUID.randomUUID().toString();
+        MemoryStorage storage = new MemoryStorage();
 
-    //     var adaptiveDialog = CreateTestDialog(property: "conversation.name");
+        Dialog adaptiveDialog = CreateTestDialog("conversation.name");
 
-    //     var repromptEvent = new Activity(ActivityTypes.Event) { Name = DialogEvents.RepromptDialog };
+        Activity repromptEvent = new Activity(ActivityTypes.EVENT);
+        repromptEvent.setName(DialogEvents.REPROMPT_DIALOG);
 
-    //      CreateFlow(adaptiveDialog, storage, firstConversationId, testCase: SkillFlowTestCase.LeafSkill)
-    //         .send(repromptEvent)
-    //         .startTest();
+         CreateFlow(adaptiveDialog, storage, firstConversationId, null, SkillFlowTestCase.LeafSkill, null)
+            .send("hi")
+            .assertReply("Hello, what is your name?")
+            .send(repromptEvent)
+            .assertReply("Hello, what is your name?")
+            .startTest()
+            .join();
 
-    //     Assert.Equal(DialogTurnStatus.Empty, _dmTurnResult.TurnResult.Status);
-    // }
+        Assert.assertEquals(DialogTurnStatus.WAITING, _dmTurnResult.getTurnResult().getStatus());
+    }
+
+    @Test
+    public void SkillShouldReturnEmptyOnRepromptWithNoDialog() {
+        String firstConversationId = UUID.randomUUID().toString();
+        MemoryStorage storage = new MemoryStorage();
+
+        Dialog adaptiveDialog = CreateTestDialog("conversation.name");
+
+        Activity repromptEvent = new Activity(ActivityTypes.EVENT);
+        repromptEvent.setName(DialogEvents.REPROMPT_DIALOG);
+
+         CreateFlow(adaptiveDialog, storage, firstConversationId, null, SkillFlowTestCase.LeafSkill, null)
+            .send(repromptEvent)
+            .startTest()
+            .join();
+
+        Assert.assertEquals(DialogTurnStatus.EMPTY, _dmTurnResult.getTurnResult().getStatus());
+    }
 
     private Dialog CreateTestDialog(String property) {
         return new AskForNameDialog(property.replace(".", ""), property);
@@ -435,31 +469,35 @@ public class DialogManagerTests {
         DialogManager dm = new DialogManager(dialog, dialogStateProperty);
         return new TestFlow(adapter,  (turnContext) -> {
             if (finalTestCase != SkillFlowTestCase.RootBotOnly) {
-                throw new NotImplementedException("CreateFlow is only capable of RootBotOnly test for now.");
                 // Create a skill ClaimsIdentity and put it in TurnState so SkillValidation.IsSkillClaim() returns true.
-                // ClaimsIdentity claimsIdentity = new ClaimsIdentity();
-                // claimsIdentity.AddClaim(new Claim(AuthenticationConstants.VersionClaim, "2.0"));
-                // claimsIdentity.AddClaim(new Claim(AuthenticationConstants.AudienceClaim, _skillBotId));
-                // claimsIdentity.AddClaim(new Claim(AuthenticationConstants.AuthorizedParty, _parentBotId));
-                // turnContext.TurnState.Add(BotAdapter.BotIdentityKey, claimsIdentity);
+                Map<String, String> claims = new HashMap<String, String>();
+                claims.put(AuthenticationConstants.VERSION_CLAIM, "2.0");
+                claims.put(AuthenticationConstants.AUDIENCE_CLAIM, _skillBotId);
+                claims.put(AuthenticationConstants.AUTHORIZED_PARTY, _parentBotId);
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity("testIssuer", claims);
+                turnContext.getTurnState().add(BotAdapter.BOT_IDENTITY_KEY, claimsIdentity);
 
-                // if (testCase == SkillFlowTestCase.RootBotConsumingSkill) {
-                //     // Simulate the SkillConversationReference with a channel OAuthScope stored in TurnState.
-                //     // This emulates a response coming to a root bot through SkillHandler.
-                //     turnContext.TurnState.Add(SkillHandler.SkillConversationReferenceKey, new SkillConversationReference { OAuthScope = AuthenticationConstants.ToChannelFromBotOAuthScope });
-                // }
+                if (finalTestCase == SkillFlowTestCase.RootBotConsumingSkill) {
+                    // Simulate the SkillConversationReference with a channel OAuthScope stored in TurnState.
+                    // This emulates a response coming to a root bot through SkillHandler.
+                    SkillConversationReference reference = new SkillConversationReference();
+                    reference.setOAuthScope(AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE);
+                    turnContext.getTurnState().add(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY, reference);
+                }
 
-                // if (testCase == SkillFlowTestCase.MiddleSkill) {
-                //     // Simulate the SkillConversationReference with a parent Bot D stored in TurnState.
-                //     // This emulates a response coming to a skill from another skill through SkillHandler.
-                //     turnContext.TurnState.Add(SkillHandler.SkillConversationReferenceKey, new SkillConversationReference { OAuthScope = _parentBotId });
-                // }
+                if (finalTestCase == SkillFlowTestCase.MiddleSkill) {
+                    // Simulate the SkillConversationReference with a parent Bot D stored in TurnState.
+                    // This emulates a response coming to a skill from another skill through SkillHandler.
+                    SkillConversationReference reference = new SkillConversationReference();
+                    reference.setOAuthScope(_parentBotId);
+                    turnContext.getTurnState().add(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY, reference);
+                }
             }
 
             turnContext.onSendActivities(new TestSendActivities());
 
             // Capture the last DialogManager turn result for assertions.
-            _dmTurnResult =  dm.onTurn(turnContext).join();
+            _dmTurnResult = dm.onTurn(turnContext).join();
 
             return CompletableFuture.completedFuture(null);
         });
@@ -470,7 +508,7 @@ public class DialogManagerTests {
         public CompletableFuture<ResourceResponse[]> invoke(TurnContext context, List<Activity> activities,
                 Supplier<CompletableFuture<ResourceResponse[]>> next) {
             for (Activity activity : activities) {
-                if (activity.getType() == ActivityTypes.END_OF_CONVERSATION) {
+                if (activity.getType().equals(ActivityTypes.END_OF_CONVERSATION)) {
                     _eocSent = activity;
                     break;
                 }

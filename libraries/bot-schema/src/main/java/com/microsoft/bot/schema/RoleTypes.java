@@ -18,7 +18,12 @@ public enum RoleTypes {
     /**
      * Enum value bot.
      */
-    BOT("bot");
+    BOT("bot"),
+
+    /**
+     * Enum value skill.
+     */
+    SKILL("skill");
 
     /**
      * The actual serialized value for a RoleTypes instance.
@@ -27,7 +32,7 @@ public enum RoleTypes {
 
     /**
      * Creates a ActionTypes enum from a string.
-     * 
+     *
      * @param withValue The string value. Should be a valid enum value.
      * @throws IllegalArgumentException If the string doesn't match a valid value.
      */

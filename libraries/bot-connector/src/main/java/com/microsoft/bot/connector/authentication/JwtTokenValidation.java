@@ -147,6 +147,40 @@ public final class JwtTokenValidation {
                 new IllegalArgumentException("No authHeader present. Auth is required."));
         }
 
+        return authenticateToken(authHeader, credentials, channelProvider, channelId, serviceUrl, authConfig)
+            .thenApply(identity -> {
+                    validateClaims(authConfig, identity.claims());
+                    return identity;
+            }
+        );
+    }
+
+    private static CompletableFuture<Void> validateClaims(
+        AuthenticationConfiguration authConfig,
+        Map<String, String> claims
+    ) {
+        if (authConfig.getClaimsValidator() != null) {
+            return authConfig.getClaimsValidator().validateClaims(claims);
+        } else if (SkillValidation.isSkillClaim(claims)) {
+            return Async.completeExceptionally(
+                new RuntimeException("ClaimValidator is required for validation of Skill Host calls")
+            );
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader,
+        CredentialProvider credentials,
+        ChannelProvider channelProvider,
+        String channelId,
+        String serviceUrl,
+        AuthenticationConfiguration authConfig
+    ) {
+        if (SkillValidation.isSkillToken(authHeader)) {
+            return SkillValidation.authenticateChannelToken(
+                authHeader, credentials, channelProvider, channelId, authConfig);
+        }
         boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
         if (usingEmulator) {
             return EmulatorValidation
@@ -168,6 +202,7 @@ public final class JwtTokenValidation {
                 authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig
             );
         }
+
     }
 
     /**
