@@ -32,7 +32,7 @@ import org.javatuples.Triplet;
 public class ConfirmPrompt extends Prompt<Boolean> {
 
     /**
-     * A dictionary of Default Choices based on {@link GetSupportedCultures} . Can
+     * A map of Default Choices based on {@link GetSupportedCultures} . Can
      * be replaced by user using the constructor that contains choiceDefaults.
      */
     private Map<String, Triplet<Choice, Choice, ChoiceFactoryOptions>> choiceDefaults;

@@ -141,6 +141,7 @@ public class ConfirmPromptLocTests {
         // Prompt should default to English if locale is a non-supported value
         dialogs.add(new ConfirmPrompt("ConfirmPrompt", customDict, null, defaultLocale));
         new TestFlow(adapter, (turnContext) -> {
+            turnContext.getActivity().setLocale(culture.getLocale());
             DialogContext dc = dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
 

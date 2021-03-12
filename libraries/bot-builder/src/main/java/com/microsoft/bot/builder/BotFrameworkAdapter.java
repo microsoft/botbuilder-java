@@ -1499,6 +1499,7 @@ public class BotFrameworkAdapter extends BotAdapter implements
                                     setBot(activity.getRecipient());
                                     setChannelId(activity.getChannelId());
                                     setConversation(activity.getConversation());
+                                    setLocale(activity.getLocale());
                                     setServiceUrl(activity.getServiceUrl());
                                     setUser(activity.getFrom());
                                 }
