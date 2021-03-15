@@ -104,7 +104,7 @@ public class DialogManagerTests {
 
         Dialog adaptiveDialog = CreateTestDialog("conversation.name");
 
-        CreateFlow(adaptiveDialog, storage, firstConversationId, "dialogState", null, null)
+        CreateFlow(adaptiveDialog, storage, firstConversationId, "DialogState", null, null)
         .send("hi")
         .assertReply("Hello, what is your name?")
         .send("Carlos")
