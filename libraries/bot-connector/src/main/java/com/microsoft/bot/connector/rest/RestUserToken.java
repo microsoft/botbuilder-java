@@ -112,6 +112,13 @@ public class RestUserToken implements UserToken {
             @Query("channelId") String channelId,
             @Query("include") String include
         );
+
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.UserTokens sendEmulateOAuthCards" })
+        @POST("api/usertoken/emulateOAuthCards")
+        CompletableFuture<Response<ResponseBody>> sendEmulateOAuthCards(
+            @Query("emulate") boolean emulate
+        );
     }
 
     /**
@@ -528,6 +535,41 @@ public class RestUserToken implements UserToken {
             .<List<TokenStatus>, ErrorResponseException>newInstance(this.client.serializerAdapter())
 
             .register(HttpURLConnection.HTTP_OK, new TypeToken<List<TokenStatus>>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
+     * Send a dummy OAuth card when the bot is being used on the Emulator for testing without fetching a real token.
+     *
+     * @param emulateOAuthCards Indicates whether the Emulator should emulate the OAuth card.
+     * @return A task that represents the work queued to execute.
+     */
+    @Override
+    public CompletableFuture<Void> sendEmulateOAuthCards(boolean emulateOAuthCards) {
+        return service.sendEmulateOAuthCards(emulateOAuthCards)
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return sendEmulateOAuthCardsDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("sendEmulateOAuthCards", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<Void> sendEmulateOAuthCardsDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
+
+        return client.restClient()
+            .responseBuilderFactory()
+            .<Void, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<Void>() {
+            }.getType())
+            .register(HttpURLConnection.HTTP_ACCEPTED, new TypeToken<Void>() {
             }.getType())
             .registerError(ErrorResponseException.class)
             .build(response);

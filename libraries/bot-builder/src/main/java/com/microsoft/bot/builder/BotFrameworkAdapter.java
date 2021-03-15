@@ -49,6 +49,7 @@ import com.microsoft.bot.schema.TokenResponse;
 import com.microsoft.bot.schema.TokenStatus;
 import com.microsoft.bot.restclient.retry.RetryStrategy;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.HttpURLConnection;
@@ -1069,39 +1070,45 @@ public class BotFrameworkAdapter extends BotAdapter implements
      *                            If null, the default credentials will be used.
      * @return An OAuth client for the bot.
      */
-    protected CompletableFuture<OAuthClient> createOAuthAPIClient(TurnContext turnContext,
-            AppCredentials oAuthAppCredentials) {
+    protected CompletableFuture<OAuthClient> createOAuthAPIClient(
+        TurnContext turnContext,
+        AppCredentials oAuthAppCredentials
+    ) {
         if (!OAuthClientConfig.emulateOAuthCards
                 && StringUtils.equalsIgnoreCase(turnContext.getActivity().getChannelId(), Channels.EMULATOR)
-                && credentialProvider.isAuthenticationDisabled().join()) {
+                && credentialProvider.isAuthenticationDisabled().join()
+        ) {
             OAuthClientConfig.emulateOAuthCards = true;
         }
+        AtomicBoolean sendEmulateOAuthCards = new AtomicBoolean(false);
 
         String appId = getBotAppId(turnContext);
         String cacheKey = appId + (oAuthAppCredentials != null ? oAuthAppCredentials.getAppId() : "");
-        String oAuthScope = getBotFrameworkOAuthScope();
-        AppCredentials credentials = oAuthAppCredentials != null ? oAuthAppCredentials
-                : getAppCredentials(appId, oAuthScope).join();
 
         OAuthClient client = oAuthClients.computeIfAbsent(cacheKey, key -> {
-            OAuthClient oAuthClient = new RestOAuthClient(
-                    OAuthClientConfig.emulateOAuthCards ? turnContext.getActivity().getServiceUrl()
-                            : OAuthClientConfig.OAUTHENDPOINT,
-                    credentials);
+            sendEmulateOAuthCards.set(OAuthClientConfig.emulateOAuthCards);
 
-            if (OAuthClientConfig.emulateOAuthCards) {
-                // do not join task - we want this to run in the background.
-                OAuthClientConfig.sendEmulateOAuthCards(oAuthClient, OAuthClientConfig.emulateOAuthCards);
-            }
+            String oAuthScope = getBotFrameworkOAuthScope();
+            AppCredentials credentials = oAuthAppCredentials != null
+                ? oAuthAppCredentials
+                : getAppCredentials(appId, oAuthScope).join();
 
-            return oAuthClient;
+            return new RestOAuthClient(
+                OAuthClientConfig.emulateOAuthCards
+                    ? turnContext.getActivity().getServiceUrl()
+                    : OAuthClientConfig.OAUTHENDPOINT,
+                credentials
+            );
         });
 
         // adding the oAuthClient into the TurnState
-        // TokenResolver.cs will use it get the correct credentials to poll for
-        // token for streaming scenario
         if (turnContext.getTurnState().get(BotAdapter.OAUTH_CLIENT_KEY) == null) {
             turnContext.getTurnState().add(BotAdapter.OAUTH_CLIENT_KEY, client);
+        }
+
+        if (sendEmulateOAuthCards.get()) {
+            return client.getUserToken().sendEmulateOAuthCards(true)
+                .thenApply(voidresult -> client);
         }
 
         return CompletableFuture.completedFuture(client);
