@@ -1000,7 +1000,7 @@ public class Activity {
      * A delivery hint to signal to the recipient alternate delivery paths for the
      * activity.
      * <p>
-     * The default delivery mode is \"default\".
+     * The default delivery mode is \"default\".  See {@link DeliveryModes}.
      *
      * @return The delivery mode hint.
      */
