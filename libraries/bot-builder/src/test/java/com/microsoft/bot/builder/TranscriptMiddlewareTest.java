@@ -282,7 +282,7 @@ public class TranscriptMiddlewareTest {
             // message. As demonstrated by the asserts after this TestFlow block
             // the role attribute is present on the activity as it is passed to
             // the transcript, but still missing inside the flow
-            Assert.assertNull(context.getActivity().getFrom().getRole());
+            Assert.assertNotNull(context.getActivity().getFrom().getRole());
             conversationId[0] = context.getActivity().getConversation().getId();
             context.sendActivity("echo:" + context.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
