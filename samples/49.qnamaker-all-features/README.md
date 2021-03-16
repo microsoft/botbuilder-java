@@ -16,7 +16,7 @@ In this sample, we demonstrate
 - Follow instructions [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/how-to/set-up-qnamaker-service-azure) to create a QnA Maker service.
 - Follow instructions [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/how-to/multiturn-conversation) to create multiturn experience.
 - Follow instructions [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/quickstarts/create-publish-knowledge-base) to import and publish your newly created QnA Maker service.
-- Update [application.properties](application.properties) with your kbid (KnowledgeBase Id), endpointKey and endpointHost. You may also change the default answer by updating `DefaultAnswer` (optional) field. QnA knowledge base setup and application configuration steps can be found [here](https://aka.ms/qna-instructions).
+- Update [application.properties](src/main/resources/application.properties) with your kbid (KnowledgeBase Id), endpointKey and endpointHost. You may also change the default answer by updating `DefaultAnswer` (optional) field. QnA knowledge base setup and application configuration steps can be found [here](https://aka.ms/qna-instructions).
 - (Optional) Follow instructions [here](https://github.com/microsoft/botframework-cli/tree/main/packages/qnamaker) to set up the
   QnA Maker CLI to deploy the model.
 
@@ -84,7 +84,7 @@ QnA knowledge base setup and application configuration steps can be found [here]
 - Enter a Bot URL of `http://localhost:3978/api/messages`
 
 # Deploy the bot to Azure
-See [Deploy your C# bot to Azure][50] for instructions.
+See [Deploy your Java bot to Azure][50] for instructions.
 
 The deployment process assumes you have an account on Microsoft Azure and are able to log into the [Microsoft Azure Portal][60].
 
@@ -120,7 +120,7 @@ If you are new to Microsoft Azure, please refer to [Getting started with Azure][
 [140]: https://portal.azure.com
 [150]: https://www.luis.ai
 [160]: https://spring.io/projects/spring-boot
-[170]: (https://github.com/microsoft/botframework-cli/tree/main/packages/qnamaker)
+[170]: https://github.com/microsoft/botframework-cli/tree/main/packages/qnamaker
 
 [71]: https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/how-to/improve-knowledge-base
 [72]: https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/how-to/multiturn-conversation
