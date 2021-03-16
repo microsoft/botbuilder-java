@@ -72,7 +72,7 @@ public class QnAMakerBaseDialog extends QnAMakerDialog {
     protected CompletableFuture<QnADialogResponseOptions> getQnAResponseOptions(DialogContext dc) {
         Activity defaultAnswerActivity = MessageFactory.text(this.defaultAnswer);
 
-        Activity cardNoMatchResponse = MessageFactory.text((this.defaultCardNoMatchResponse));
+        Activity cardNoMatchResponse = MessageFactory.text(this.defaultCardNoMatchResponse);
 
         QnADialogResponseOptions responseOptions = new QnADialogResponseOptions();
         responseOptions.setActiveLearningCardTitle(this.defaultCardTitle);

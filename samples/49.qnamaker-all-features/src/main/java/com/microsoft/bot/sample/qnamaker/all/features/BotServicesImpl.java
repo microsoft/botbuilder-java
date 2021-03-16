@@ -24,7 +24,7 @@ public class BotServicesImpl implements BotServices {
     public BotServicesImpl(Configuration configuration) {
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(configuration.getProperty("QnAKnowledgebaseId"));
-        qnAMakerEndpoint.setHost(getHostName(configuration.getProperty("QnAEndpointHostName")));
+        qnAMakerEndpoint.setHost(getHostname(configuration.getProperty("QnAEndpointHostName")));
         qnAMakerEndpoint.setEndpointKey(getEndpointKey(configuration));
         QnAMaker qnAMaker = new QnAMaker(qnAMakerEndpoint, null);
         this.qnAMakerService = qnAMaker;
@@ -44,7 +44,7 @@ public class BotServicesImpl implements BotServices {
      * @param hostname The hostname value
      * @return The URL with the hostname value
      */
-    private static String getHostName(String hostname) {
+    private static String getHostname(String hostname) {
         if (!hostname.startsWith("https://")) {
             hostname = "https://".concat(hostname);
         }
