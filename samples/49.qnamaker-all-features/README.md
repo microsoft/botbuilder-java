@@ -1,6 +1,6 @@
 ﻿# QnA Maker
 
-Bot Framework v4 QnA Maker bot sample. This sample shows how to integrate Multiturn and Active learning in a QnA Maker bot with ASP.Net Core-2. Click [here][72] to know more about using follow-up prompts to create multiturn conversation. To know more about how to enable and use active learning, click [here][71].
+Bot Framework v4 QnA Maker bot sample. This sample shows how to integrate Multiturn and Active learning in a QnA Maker bot with Java. Click [here][72] to know more about using follow-up prompts to create multiturn conversation. To know more about how to enable and use active learning, click [here][71].
 
 This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a bot that uses the [QnA Maker Cognitive AI](https://www.qnamaker.ai) service.
 
@@ -10,7 +10,7 @@ The [QnA Maker Service](https://www.qnamaker.ai) enables you to build, train and
 The [QnA Maker Service][7] enables you to build, train and publish a simple question and answer bot based on FAQ URLs, structured documents or editorial content in minutes.
 In this sample, we demonstrate
 - how to use the Active Learning to generate suggestions for knowledge base.
-- how to use the Multiturn experience for the knowledge base .
+- how to use the Multiturn experience for the knowledge base.
 
 # Prerequisites
 - Follow instructions [here](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/how-to/set-up-qnamaker-service-azure) to create a QnA Maker service.
@@ -31,8 +31,7 @@ QnA knowledge base setup and application configuration steps can be found [here]
 - Save and Train the model.
 - Create Bot from Publish page.
 - Test bot with Web Chat.
-- Capture values of settings like "QnAAuthKey" from
-- "Configuration" page of created bot, in Azure Portal.
+- Capture values of settings like "QnAAuthKey" from "Configuration" page of created bot, in Azure Portal.
 - Updated application.properties with values as needed.
 - Use value of "QnAAuthKey" for setting "QnAEndpointKey".
 - Capture KnowledgeBase Id, HostName and EndpointKey current published app

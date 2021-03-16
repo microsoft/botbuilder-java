@@ -37,7 +37,7 @@ public class RootDialog extends ComponentDialog {
         WaterfallStep[] waterfallSteps = {
             this::initialStep
         };
-        WaterfallDialog waterfallDialog = new WaterfallDialog("WaterfallDialog", Arrays.asList(waterfallSteps));
+        WaterfallDialog waterfallDialog = new WaterfallDialog(initialDialog, Arrays.asList(waterfallSteps));
         this.addDialog(waterfallDialog);
 
         // The initial child Dialog to run.
