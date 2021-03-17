@@ -242,6 +242,9 @@ public abstract class AppCredentials implements ServiceClientCredentials {
      * @return true if the auth token should be added to the request.
      */
     boolean shouldSetToken(String url) {
+        if (StringUtils.isBlank(getAppId()) || getAppId().equals(AuthenticationConstants.ANONYMOUS_SKILL_APPID)) {
+            return false;
+        }
         return isTrustedServiceUrl(url);
     }
 
