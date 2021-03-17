@@ -5,6 +5,10 @@ package com.microsoft.bot.connector;
 
 import com.microsoft.bot.connector.authentication.*;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ChannelAccount;
+import com.microsoft.bot.schema.ConversationReference;
+import com.microsoft.bot.schema.RoleTypes;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -208,6 +212,29 @@ public class JwtTokenValidationTests {
             new SimpleChannelProvider()).join();
         Assert.assertEquals("anonymous", identity.getIssuer());
     }
+
+    /**
+     * Tests with no authentication header and makes sure the service URL is not added to the trusted list.
+     */
+    @Test
+    public void ChannelAuthenticationDisabledAndSkillShouldBeAnonymous() throws ExecutionException, InterruptedException {
+        String header = "";
+        CredentialProvider credentials = new SimpleCredentialProvider("", "");
+
+        ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(
+            new Activity() {{
+                setServiceUrl("https://webchat.botframework.com/");
+                setChannelId(Channels.EMULATOR);
+                setRelatesTo(new ConversationReference());
+                setRecipient(new ChannelAccount() { { setRole(RoleTypes.SKILL); } });
+            }},
+            header,
+            credentials,
+            new SimpleChannelProvider()).join();
+        Assert.assertEquals(AuthenticationConstants.ANONYMOUS_AUTH_TYPE, identity.getType());
+        Assert.assertEquals(AuthenticationConstants.ANONYMOUS_SKILL_APPID, JwtTokenValidation.getAppIdFromClaims(identity.claims()));
+    }
+
 
     @Test
     public void ChannelNoHeaderAuthenticationEnabledShouldThrow() throws IOException, ExecutionException, InterruptedException {
