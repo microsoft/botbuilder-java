@@ -3,13 +3,15 @@
 
 package com.microsoft.bot.sample.echoskillbot;
 
+import java.util.Arrays;
+
 import com.microsoft.bot.builder.Bot;
+import com.microsoft.bot.connector.authentication.AllowedCallersClaimsValidator;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
-import com.microsoft.bot.sample.echoskillbot.authentication.AllowedCallersClaimsValidator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,6 +37,8 @@ import org.springframework.context.annotation.Import;
  */
 public class Application extends BotDependencyConfiguration {
 
+    private final String configKey = "AllowedCallers";
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
@@ -57,7 +61,9 @@ public class Application extends BotDependencyConfiguration {
     @Override
     public AuthenticationConfiguration getAuthenticationConfiguration(Configuration configuration) {
         AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
-        authenticationConfiguration.setClaimsValidator(new AllowedCallersClaimsValidator(configuration));
+        authenticationConfiguration.setClaimsValidator(
+            new AllowedCallersClaimsValidator(Arrays.asList(configuration.getProperties(configKey)))
+        );
         return authenticationConfiguration;
     }
 

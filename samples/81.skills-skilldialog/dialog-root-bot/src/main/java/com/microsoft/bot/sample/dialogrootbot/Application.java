@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.ChannelServiceHandler;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.Storage;
+import com.microsoft.bot.builder.skills.SkillConversationIdFactory;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
 import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;

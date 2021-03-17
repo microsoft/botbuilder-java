@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.ChannelServiceHandler;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
+import com.microsoft.bot.builder.skills.SkillConversationIdFactory;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
 import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
@@ -110,7 +111,7 @@ public class Application extends BotDependencyConfiguration {
 
     @Bean
     public SkillConversationIdFactoryBase getSkillConversationIdFactoryBase() {
-        return new SkillConversationIdFactory();
+        return new SkillConversationIdFactory(getStorage());
     }
 
     @Bean public ChannelServiceHandler getChannelServiceHandler(
