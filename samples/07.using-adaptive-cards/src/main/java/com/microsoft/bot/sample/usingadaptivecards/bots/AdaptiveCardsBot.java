@@ -58,7 +58,6 @@ public class AdaptiveCardsBot extends ActivityHandler {
         Random r = new Random();
         Attachment cardAttachment = createAdaptiveCardAttachment(cards[r.nextInt(cards.length)]);
 
-        //turnContext.getActivity().Attachments= new ArrayList<Attachment>() { cardAttachment };
          return turnContext.sendActivity(MessageFactory.attachment(cardAttachment)).thenCompose(result ->{
             return turnContext.sendActivity(MessageFactory.text("Please enter any text to see another card."))
             .thenApply(sendResult -> null);
