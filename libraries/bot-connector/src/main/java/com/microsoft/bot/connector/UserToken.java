@@ -129,4 +129,12 @@ public interface UserToken {
         String channelId,
         String include
     );
+
+    /**
+     * Send a dummy OAuth card when the bot is being used on the Emulator for testing without fetching a real token.
+     *
+     * @param emulateOAuthCards Indicates whether the Emulator should emulate the OAuth card.
+     * @return A task that represents the work queued to execute.
+     */
+    CompletableFuture<Void> sendEmulateOAuthCards(boolean emulateOAuthCards);
 }

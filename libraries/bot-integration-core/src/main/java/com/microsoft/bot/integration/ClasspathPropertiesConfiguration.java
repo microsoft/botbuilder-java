@@ -53,4 +53,20 @@ public class ClasspathPropertiesConfiguration implements Configuration {
     public Properties getProperties() {
         return this.properties;
     }
+
+    /**
+     * Returns an array of values from an entry that is comma delimited.
+     * @param key The property name.
+     * @return The property values as a String array.
+     */
+    @Override
+    public String[] getProperties(String key) {
+        String baseProperty = properties.getProperty(key);
+        if (baseProperty != null) {
+            String[] splitProperties = baseProperty.split(",");
+            return splitProperties;
+        } else {
+            return null;
+        }
+    }
 }

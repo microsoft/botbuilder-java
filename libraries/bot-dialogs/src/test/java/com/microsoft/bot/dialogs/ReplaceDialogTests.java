@@ -137,7 +137,7 @@ public class ReplaceDialogTests {
         private class ReplaceAction implements WaterfallStep {
             @Override
             public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-                if ((String) stepContext.getResult() == "replace") {
+                if (((String)stepContext.getResult()).equals("replace")) {
                     return  stepContext.replaceDialog("SecondDialog");
                 } else {
                     return  stepContext.next(null);
