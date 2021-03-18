@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MT License.
 
-package com.microsoft.bot.sample.dialogrootbot.Bots;
+package com.microsoft.bot.sample.dialogrootbot.bots;
 
 import java.io.IOException;
 import java.io.InputStream;

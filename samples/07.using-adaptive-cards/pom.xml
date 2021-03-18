@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.bot.sample</groupId>
-    <artifactId>simpleRootBot</artifactId>
+    <artifactId>adaptive-cards</artifactId>
     <version>sample</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>This package contains a Java Simple Root Bot sample using Spring Boot.</description>
+    <description>This package contains a Java Adaptive Cards bot sample using Spring Boot.</description>
     <url>http://maven.apache.org</url>
 
     <parent>
@@ -41,7 +41,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <start-class>com.microsoft.bot.sample.simplerootbot.Application</start-class>
+        <start-class>com.microsoft.bot.sample.usingadaptivecards.Application</start-class>
     </properties>
 
     <dependencies>
@@ -86,11 +86,16 @@
       </dependency>
       <dependency>
         <groupId>com.microsoft.bot</groupId>
-        <artifactId>bot-builder</artifactId>
+        <artifactId>bot-dialogs</artifactId>
         <version>4.6.0-preview9</version>
         <scope>compile</scope>
       </dependency>
-  </dependencies>
+      <dependency>
+        <groupId>com.microsoft.bot</groupId>
+        <artifactId>bot-builder</artifactId>
+        <version>4.6.0-preview9</version>
+        <scope>compile</scope>
+      </dependency>  </dependencies>
 
   <profiles>
     <profile>
@@ -126,7 +131,7 @@
                               <goal>repackage</goal>
                           </goals>
                           <configuration>
-                              <mainClass>com.microsoft.bot.sample.simplerootbot.Application</mainClass>
+                              <mainClass>com.microsoft.bot.sample.usingadaptivecards.Application</mainClass>
                           </configuration>
                       </execution>
                   </executions>
