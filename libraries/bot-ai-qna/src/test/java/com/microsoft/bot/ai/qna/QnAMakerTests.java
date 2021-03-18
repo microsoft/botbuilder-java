@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -126,7 +125,7 @@ public class QnAMakerTests {
                     Assert.assertTrue(results.length == 1);
                     Assert.assertEquals("BaseCamp: You can use a damp rag to clean around the Power Pack", results[0].getAnswer());
                 }
-
+                    delay(500);
                     conversationId[0] = turnContext.getActivity().getConversation().getId();
                     Activity typingActivity = new Activity() {
                         {
@@ -135,11 +134,7 @@ public class QnAMakerTests {
                         }
                     };
                     turnContext.sendActivity(typingActivity).join();
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException e) {
-                        // Empty error
-                    }
+                    delay(500);
                     turnContext.sendActivity(String.format("echo:%s", turnContext.getActivity().getText())).join();
                 return CompletableFuture.completedFuture(null);
             })
@@ -2085,6 +2080,18 @@ public class QnAMakerTests {
         mockWebServer.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
             .setBody(mockResponse));
+    }
+
+    /**
+     * Time period delay.
+     * @param milliseconds Time to delay.
+     */
+    private void delay(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public class OverrideTelemetry extends QnAMaker {
