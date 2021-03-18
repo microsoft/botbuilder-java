@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -408,7 +409,24 @@ public class Activity {
             clone.setProperties(entry.getKey(), entry.getValue());
         }
 
+        clone = ensureActivityHasId(clone);
+
         return clone;
+    }
+
+    private static Activity ensureActivityHasId(Activity activity) {
+        Activity activityWithId = activity;
+
+        if (activity == null) {
+            throw new IllegalArgumentException("Cannot check or add Id on a null Activity.");
+        }
+
+        if (activity.getId() == null) {
+            String generatedId = String.format("g_%s", UUID.randomUUID().toString());
+            activity.setId(generatedId);
+        }
+
+        return activityWithId;
     }
 
     /**
