@@ -125,17 +125,17 @@ public class QnAMakerTests {
                     Assert.assertTrue(results.length == 1);
                     Assert.assertEquals("BaseCamp: You can use a damp rag to clean around the Power Pack", results[0].getAnswer());
                 }
-                    delay(500);
-                    conversationId[0] = turnContext.getActivity().getConversation().getId();
-                    Activity typingActivity = new Activity() {
-                        {
-                            setType(ActivityTypes.TYPING);
-                            setRelatesTo(turnContext.getActivity().getRelatesTo());
-                        }
-                    };
-                    turnContext.sendActivity(typingActivity).join();
-                    delay(500);
-                    turnContext.sendActivity(String.format("echo:%s", turnContext.getActivity().getText())).join();
+                delay(500);
+                conversationId[0] = turnContext.getActivity().getConversation().getId();
+                Activity typingActivity = new Activity() {
+                    {
+                        setType(ActivityTypes.TYPING);
+                        setRelatesTo(turnContext.getActivity().getRelatesTo());
+                    }
+                };
+                turnContext.sendActivity(typingActivity).join();
+                delay(500);
+                turnContext.sendActivity(String.format("echo:%s", turnContext.getActivity().getText())).join();
                 return CompletableFuture.completedFuture(null);
             })
                 .send("how do I clean the stove?")

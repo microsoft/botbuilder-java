@@ -11,10 +11,9 @@ import java.time.ZoneId;
  * A customized nanoseconds clock providing access to the current instant, date and time using a time-zone.
  */
 public class NanoClockHelper extends Clock {
+
     private final Clock clock;
-
     private final long initialNanos;
-
     private final Instant initialInstant;
 
     /**

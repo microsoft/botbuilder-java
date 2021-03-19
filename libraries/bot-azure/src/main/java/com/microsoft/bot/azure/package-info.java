@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the classes for bot-integration-core.
+ * This package contains the classes for bot-azure.
  */
 package com.microsoft.bot.azure;
