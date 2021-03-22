@@ -95,9 +95,11 @@ public final class AdditionalPropertiesDeserializer extends StdDeserializer<Obje
             Field[] fields = c.getDeclaredFields();
             for (Field field : fields) {
                 JsonProperty property = field.getAnnotation(JsonProperty.class);
-                String key = property.value().split("((?<!\\\\))\\.")[0];
-                if (!key.isEmpty() && copy.has(key)) {
-                    copy.remove(key);
+                if (property != null) {
+                    String key = property.value().split("((?<!\\\\))\\.")[0];
+                    if (!key.isEmpty() && copy.has(key)) {
+                        copy.remove(key);
+                    }
                 }
             }
         }

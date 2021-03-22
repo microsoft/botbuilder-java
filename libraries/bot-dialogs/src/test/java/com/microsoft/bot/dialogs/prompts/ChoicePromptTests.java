@@ -489,7 +489,7 @@ public class ChoicePromptTests {
 
     // This is being left out for now due to it failing due to an issue in the Text Recognizers library.
     // It should be worked out in the recognizers and then this test should be enabled again.
-    //@Test
+    @Test
     public void ShouldNotRecognizeOtherText() {
         ConversationState convoState = new ConversationState(new MemoryStorage());
         StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
