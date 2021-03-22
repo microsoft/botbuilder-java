@@ -38,6 +38,8 @@ public class BlobsStorageTests extends StorageBaseTests {
 
     private final String connectionString = "AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
 
+    private static boolean emulatorIsRunning = false;
+
     private static final String NO_EMULATOR_MESSAGE = "This test requires Azure STORAGE Emulator! Go to https://docs.microsoft.com/azure/storage/common/storage-use-emulator to download and install.";
 
     public String getContainerName() {
@@ -46,11 +48,17 @@ public class BlobsStorageTests extends StorageBaseTests {
 
     @BeforeClass
     public static void allTestsInit() throws IOException, InterruptedException {
-        assertEmulator();
+        Process p = Runtime.getRuntime().exec
+            ("cmd /C \"" + System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
+        int result = p.waitFor();
+        // status = 0: the service was started.
+        // status = -5: the service is already started. Only one instance of the application
+        // can be run at the same time.
+        emulatorIsRunning = result == 0 || result == -5;
     }
 
     @After
-    public void afterTest() {
+    public void testCleanup() {
         BlobContainerClient containerClient = new BlobContainerClientBuilder()
             .connectionString(connectionString)
             .containerName(getContainerName())
@@ -63,165 +71,174 @@ public class BlobsStorageTests extends StorageBaseTests {
 
     @Test
     public void blobStorageParamTest() {
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(null, getContainerName()));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, null));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(new String(), getContainerName()));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, new String()));
+        if (runIfEmulator()) {
+            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(null, getContainerName()));
+            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, null));
+            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(new String(), getContainerName()));
+            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, new String()));
+        }
     }
 
     @Test
     public void testBlobStorageWriteRead()
     {
-        // Arrange
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
+        if (runIfEmulator()) {
+            // Arrange
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
 
-        Map<String, Object> changes = new HashMap();
-        changes.put("x", "hello");
-        changes.put("y", "world");
+            Map<String, Object> changes = new HashMap();
+            changes.put("x", "hello");
+            changes.put("y", "world");
 
-        // Act
-        storage.write(changes).join();
-        Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
+            // Act
+            storage.write(changes).join();
+            Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
 
-        // Assert
-        Assert.assertEquals(2, result.size());
-        Assert.assertEquals("hello", result.get("x"));
-        Assert.assertEquals("world", result.get("y"));
+            // Assert
+            Assert.assertEquals(2, result.size());
+            Assert.assertEquals("hello", result.get("x"));
+            Assert.assertEquals("world", result.get("y"));
+        }
     }
 
     @Test
     public void testBlobStorageWriteDeleteRead()
     {
-        // Arrange
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
+        if (runIfEmulator()) {
+            // Arrange
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
 
-        Map<String, Object> changes = new HashMap();
-        changes.put("x", "hello");
-        changes.put("y", "world");
+            Map<String, Object> changes = new HashMap();
+            changes.put("x", "hello");
+            changes.put("y", "world");
 
-        // Act
-        storage.write(changes).join();
-        storage.delete(new String[] { "x" }).join();
-        Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
+            // Act
+            storage.write(changes).join();
+            storage.delete(new String[] { "x" }).join();
+            Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
 
-        // Assert
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals("world", result.get("y"));
+            // Assert
+            Assert.assertEquals(1, result.size());
+            Assert.assertEquals("world", result.get("y"));
+        }
     }
 
     @Test
     public void testBlobStorageChanges() {
-        // Arrange
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
+        if (runIfEmulator()) {
+            // Arrange
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
 
-        // Act
-        Map<String, Object> changes = new HashMap();
-        changes.put("a", "1.0");
-        changes.put("b", "2.0");
-        storage.write(changes).join();
+            // Act
+            Map<String, Object> changes = new HashMap();
+            changes.put("a", "1.0");
+            changes.put("b", "2.0");
+            storage.write(changes).join();
 
-        changes.clear();
-        changes.put("c", "3.0");
-        storage.write(changes).join();
-        storage.delete(new String[] { "b" }).join();
+            changes.clear();
+            changes.put("c", "3.0");
+            storage.write(changes).join();
+            storage.delete(new String[] { "b" }).join();
 
-        changes.clear();
-        changes.put("a", "1.1");
-        storage.write(changes).join();
+            changes.clear();
+            changes.put("a", "1.1");
+            storage.write(changes).join();
 
-        Map<String, Object> result = storage.read(new String[] { "a", "b", "c", "d", "e" }).join();
+            Map<String, Object> result = storage.read(new String[] { "a", "b", "c", "d", "e" }).join();
 
-        // Assert
-        Assert.assertEquals(2, result.size());
-        Assert.assertEquals("1.1", result.get("a"));
-        Assert.assertEquals("3.0", result.get("c"));
+            // Assert
+            Assert.assertEquals(2, result.size());
+            Assert.assertEquals("1.1", result.get("a"));
+            Assert.assertEquals("3.0", result.get("c"));
+        }
     }
 
     @Test
     public void testConversationStateBlobStorage() {
-        // Arrange
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
+        if (runIfEmulator()) {
+            // Arrange
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
 
-        ConversationState conversationState = new ConversationState(storage);
-        StatePropertyAccessor<Prop> propAccessor = conversationState.createProperty("prop");
+            ConversationState conversationState = new ConversationState(storage);
+            StatePropertyAccessor<Prop> propAccessor = conversationState.createProperty("prop");
 
-        TestStorageAdapter adapter = new TestStorageAdapter();
-        Activity activity = new Activity(ActivityTypes.MESSAGE);
-        activity.setChannelId("123");
-        ConversationAccount conversationAccount = new ConversationAccount();
-        conversationAccount.setId("abc");
-        activity.setConversation(conversationAccount);
+            TestStorageAdapter adapter = new TestStorageAdapter();
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setChannelId("123");
+            ConversationAccount conversationAccount = new ConversationAccount();
+            conversationAccount.setId("abc");
+            activity.setConversation(conversationAccount);
 
-        // Act
-        TurnContext turnContext1 = new TurnContextImpl(adapter, activity);
-        Prop propValue1 = propAccessor.get(turnContext1, Prop::new).join();
-        propValue1.setX("hello");
-        propValue1.setY("world");
-        conversationState.saveChanges(turnContext1).join();
+            // Act
+            TurnContext turnContext1 = new TurnContextImpl(adapter, activity);
+            Prop propValue1 = propAccessor.get(turnContext1, Prop::new).join();
+            propValue1.setX("hello");
+            propValue1.setY("world");
+            conversationState.saveChanges(turnContext1).join();
 
-        TurnContext turnContext2 = new TurnContextImpl(adapter, activity);
-        Prop propValue2 = propAccessor.get(turnContext2).join();
+            TurnContext turnContext2 = new TurnContextImpl(adapter, activity);
+            Prop propValue2 = propAccessor.get(turnContext2).join();
 
-        // Assert
-        Assert.assertEquals("hello", propValue2.getX());
-        Assert.assertEquals("world", propValue2.getY());
+            // Assert
+            Assert.assertEquals("hello", propValue2.getX());
+            Assert.assertEquals("world", propValue2.getY());
 
-        propAccessor.delete(turnContext1).join();
-        conversationState.saveChanges(turnContext1).join();
+            propAccessor.delete(turnContext1).join();
+            conversationState.saveChanges(turnContext1).join();
+        }
     }
 
     @Test
     public void testConversationStateBlobStorage_TypeNameHandlingDefault() {
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
-        testConversationStateBlobStorage_Method(storage);
+        if (runIfEmulator()) {
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
+            testConversationStateBlobStorage_Method(storage);
+        }
     }
 
     @Test
     public void statePersistsThroughMultiTurn_TypeNameHandlingNone() {
-        Storage storage = new BlobsStorage(connectionString, getContainerName());
-        statePersistsThroughMultiTurn(storage);
-    }
-
-    private void testConversationStateBlobStorage_Method(Storage blobs) {
-        // Arrange
-        ConversationState conversationState = new ConversationState(blobs);
-        StatePropertyAccessor<Prop> propAccessor = conversationState.createProperty("prop");
-        TestStorageAdapter adapter = new TestStorageAdapter();
-        Activity activity = new Activity(ActivityTypes.MESSAGE);
-        activity.setChannelId("123");
-        ConversationAccount conversationAccount = new ConversationAccount();
-        conversationAccount.setId("abc");
-        activity.setConversation(conversationAccount);
-
-        // Act
-        TurnContext turnContext1 = new TurnContextImpl(adapter, activity);
-        Prop propValue1 = propAccessor.get(turnContext1, Prop::new).join();
-        propValue1.setX("hello");
-        propValue1.setY("world");
-        conversationState.saveChanges(turnContext1).join();
-
-        TurnContext turnContext2 = new TurnContextImpl(adapter, activity);
-        Prop propValue2 = propAccessor.get(turnContext2).join();
-
-        // Assert
-        Assert.assertEquals("hello", propValue2.getX());
-        Assert.assertEquals("world", propValue2.getY());
-    }
-
-    private static void assertEmulator() throws IOException, InterruptedException {
-        if (!checkEmulator()) {
-            Assert.fail(NO_EMULATOR_MESSAGE);
+        if (runIfEmulator()) {
+            Storage storage = new BlobsStorage(connectionString, getContainerName());
+            statePersistsThroughMultiTurn(storage);
         }
     }
 
-    private  static Boolean checkEmulator() throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec
-            ("cmd /C \"" + System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
-        int result = p.waitFor();
-        // status = 0: the service was started.
-        // status = -5: the service is already started. Only one instance of the application
-        // can be run at the same time.
-        return result == 0 || result == -5;
+    private void testConversationStateBlobStorage_Method(Storage blobs) {
+        if (runIfEmulator()) {
+            // Arrange
+            ConversationState conversationState = new ConversationState(blobs);
+            StatePropertyAccessor<Prop> propAccessor = conversationState.createProperty("prop");
+            TestStorageAdapter adapter = new TestStorageAdapter();
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setChannelId("123");
+            ConversationAccount conversationAccount = new ConversationAccount();
+            conversationAccount.setId("abc");
+            activity.setConversation(conversationAccount);
+
+            // Act
+            TurnContext turnContext1 = new TurnContextImpl(adapter, activity);
+            Prop propValue1 = propAccessor.get(turnContext1, Prop::new).join();
+            propValue1.setX("hello");
+            propValue1.setY("world");
+            conversationState.saveChanges(turnContext1).join();
+
+            TurnContext turnContext2 = new TurnContextImpl(adapter, activity);
+            Prop propValue2 = propAccessor.get(turnContext2).join();
+
+            // Assert
+            Assert.assertEquals("hello", propValue2.getX());
+            Assert.assertEquals("world", propValue2.getY());
+        }
+    }
+
+    private boolean runIfEmulator() {
+        if (!emulatorIsRunning) {
+            System.out.println(NO_EMULATOR_MESSAGE);
+            return false;
+        }
+
+        return true;
     }
 
     private class TestStorageAdapter extends BotAdapter {
