@@ -48,11 +48,11 @@ public class ChannelServiceHandler {
         ChannelProvider channelProvider) {
 
         if (credentialProvider == null) {
-            throw new IllegalArgumentException("credentialprovider cannot be nul");
+            throw new IllegalArgumentException("credentialprovider cannot be null");
         }
 
         if (authConfiguration == null) {
-            throw new IllegalArgumentException("authConfiguration cannot be nul");
+            throw new IllegalArgumentException("authConfiguration cannot be null");
         }
 
         this.credentialProvider = credentialProvider;
@@ -603,7 +603,7 @@ public class ChannelServiceHandler {
             return credentialProvider.isAuthenticationDisabled().thenCompose(isAuthDisabled -> {
                 if (!isAuthDisabled) {
                     return Async.completeExceptionally(
-                    // No auth header. Auth is required. Request is not authorized.
+                        // No auth header. Auth is required. Request is not authorized.
                         new AuthenticationException("No auth header, Auth is required. Request is not authorized")
                     );
                 }

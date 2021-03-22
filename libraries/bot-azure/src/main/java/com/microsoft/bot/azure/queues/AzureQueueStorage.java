@@ -5,7 +5,6 @@ package com.microsoft.bot.azure.queues;
 
 import com.azure.storage.queue.QueueClient;
 import com.azure.storage.queue.QueueClientBuilder;
-import com.azure.storage.queue.models.QueueStorageException;
 import com.azure.storage.queue.models.SendMessageResult;
 import com.microsoft.bot.builder.QueueStorage;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;

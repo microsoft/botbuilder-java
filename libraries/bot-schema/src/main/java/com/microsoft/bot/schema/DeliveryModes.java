@@ -23,7 +23,12 @@ public enum DeliveryModes {
     /**
      * The value for expected replies delivery modes.
      */
-    EXPECT_REPLIES("expectReplies");
+    EXPECT_REPLIES("expectReplies"),
+
+    /**
+     * The value for ephemeral delivery modes.
+     */
+    EPHEMERAL("ephemeral");
 
     /**
      * The actual serialized value for a DeliveryModes instance.

@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.ChannelServiceHandler;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.Storage;
+import com.microsoft.bot.builder.skills.SkillConversationIdFactory;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
 import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.authentication.AuthenticationConfiguration;
@@ -18,8 +19,8 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.SkillHttpClient;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
-import com.microsoft.bot.sample.dialogrootbot.Bots.RootBot;
 import com.microsoft.bot.sample.dialogrootbot.authentication.AllowedSkillsClaimsValidator;
+import com.microsoft.bot.sample.dialogrootbot.bots.RootBot;
 import com.microsoft.bot.sample.dialogrootbot.dialogs.MainDialog;
 
 import org.springframework.boot.SpringApplication;

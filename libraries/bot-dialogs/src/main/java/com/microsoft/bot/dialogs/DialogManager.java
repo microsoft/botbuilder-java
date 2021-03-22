@@ -9,26 +9,14 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.BotStateSet;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.StatePropertyAccessor;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.builder.UserState;
-import com.microsoft.bot.builder.skills.SkillConversationReference;
-import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.Async;
-import com.microsoft.bot.connector.authentication.AuthenticationConstants;
-import com.microsoft.bot.connector.authentication.ClaimsIdentity;
-import com.microsoft.bot.connector.authentication.GovernmentAuthenticationConstants;
-import com.microsoft.bot.connector.authentication.SkillValidation;
-import com.microsoft.bot.dialogs.memory.DialogStateManager;
 import com.microsoft.bot.dialogs.memory.DialogStateManagerConfiguration;
-import com.microsoft.bot.schema.Activity;
-import com.microsoft.bot.schema.ActivityTypes;
-import com.microsoft.bot.schema.EndOfConversationCodes;
 
 /**
  * Class which runs the dialog system.
@@ -266,175 +254,13 @@ public class DialogManager {
         // Create DialogContext
         DialogContext dc = new DialogContext(dialogs, context, dialogState);
 
-        dc.getServices().getTurnStateServices().forEach((key, value) -> {
-            dc.getServices().add(key, value);
+        return Dialog.innerRun(context, rootDialogId, dc).thenCompose(turnResult -> {
+            return botStateSet.saveAllChanges(dc.getContext(), false).thenCompose(saveResult -> {
+                DialogManagerResult result = new DialogManagerResult();
+                result.setTurnResult(turnResult);
+                return CompletableFuture.completedFuture(result);
+            });
         });
-
-        // map TurnState into root dialog context.services
-        context.getTurnState().getTurnStateServices().forEach((key, value) -> {
-            dc.getServices().add(key, value);
-        });
-
-        // get the DialogStateManager configuration
-        DialogStateManager dialogStateManager = new DialogStateManager(dc, stateManagerConfiguration);
-        dialogStateManager.loadAllScopesAsync().join();
-        dc.getContext().getTurnState().add(dialogStateManager);
-
-        DialogTurnResult turnResult = null;
-
-        // Loop as long as we are getting valid OnError handled we should continue
-        // executing the
-        // actions for the turn.
-        // NOTE: We loop around this block because each pass through we either complete
-        // the turn and
-        // break out of the loop
-        // or we have had an exception AND there was an OnError action which captured
-        // the error.
-        // We need to continue the turn based on the actions the OnError handler
-        // introduced.
-        Boolean endOfTurn = false;
-        while (!endOfTurn) {
-            try {
-                ClaimsIdentity claimIdentity = context.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
-                if (claimIdentity != null && SkillValidation.isSkillClaim(claimIdentity.claims())) {
-                    // The bot is running as a skill.
-                    turnResult = handleSkillOnTurn(dc).join();
-                } else {
-                    // The bot is running as root bot.
-                    turnResult = handleBotOnTurn(dc).join();
-                }
-
-                // turn successfully completed, break the loop
-                endOfTurn = true;
-            } catch (Exception err) {
-                // fire error event, bubbling from the leaf.
-                Boolean handled = dc.emitEvent(DialogEvents.ERROR, err, true, true).join();
-
-                if (!handled) {
-                    // error was NOT handled, throw the exception and end the turn. (This will
-                    // trigger
-                    // the Adapter.OnError handler and end the entire dialog stack)
-                    return Async.completeExceptionally(new RuntimeException(err));
-                }
-            }
-        }
-
-        // save all state scopes to their respective botState locations.
-        dialogStateManager.saveAllChanges();
-
-        // save BotState changes
-        botStateSet.saveAllChanges(dc.getContext(), false);
-
-        DialogManagerResult result = new DialogManagerResult();
-        result.setTurnResult(turnResult);
-        return CompletableFuture.completedFuture(result);
-    }
-
-    /// <summary>
-    /// Helper to send a trace activity with a memory snapshot of the active dialog
-    /// DC.
-    /// </summary>
-    private static CompletableFuture<Void> sendStateSnapshotTrace(DialogContext dc, String traceLabel) {
-        // send trace of memory
-        JsonNode snapshot = getActiveDialogContext(dc).getState().getMemorySnapshot();
-        Activity traceActivity = (Activity) Activity.createTraceActivity("Bot State",
-                "https://www.botframework.com/schemas/botState", snapshot, traceLabel);
-        dc.getContext().sendActivity(traceActivity).join();
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * Recursively walk up the DC stack to find the active DC.
-     */
-    private static DialogContext getActiveDialogContext(DialogContext dialogContext) {
-        DialogContext child = dialogContext.getChild();
-        if (child == null) {
-            return dialogContext;
-        } else {
-            return getActiveDialogContext(child);
-        }
-    }
-
-    private CompletableFuture<DialogTurnResult> handleSkillOnTurn(DialogContext dc) {
-        // the bot instanceof running as a skill.
-        TurnContext turnContext = dc.getContext();
-
-        // Process remote cancellation
-        if (turnContext.getActivity().getType().equals(ActivityTypes.END_OF_CONVERSATION)
-            && dc.getActiveDialog() != null
-            && DialogCommon.isFromParentToSkill(turnContext)) {
-            // Handle remote cancellation request from parent.
-            DialogContext activeDialogContext = getActiveDialogContext(dc);
-
-            // Send cancellation message to the top dialog in the stack to ensure all the
-            // parents are canceled in the right order.
-            return  activeDialogContext.cancelAllDialogs();
-        }
-
-        // Handle reprompt
-        // Process a reprompt event sent from the parent.
-        if (turnContext.getActivity().getType().equals(ActivityTypes.EVENT)
-            && turnContext.getActivity().getName().equals(DialogEvents.REPROMPT_DIALOG)) {
-            if (dc.getActiveDialog() == null) {
-                return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.EMPTY));
-            }
-
-             dc.repromptDialog();
-            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
-        }
-
-        // Continue execution
-        // - This will apply any queued up interruptions and execute the current/next step(s).
-        DialogTurnResult turnResult =  dc.continueDialog().join();
-        if (turnResult.getStatus().equals(DialogTurnStatus.EMPTY)) {
-            // restart root dialog
-            turnResult =  dc.beginDialog(rootDialogId).join();
-        }
-
-        sendStateSnapshotTrace(dc, "Skill State");
-
-        if (shouldSendEndOfConversationToParent(turnContext, turnResult)) {
-            // Send End of conversation at the end.
-            EndOfConversationCodes code = turnResult.getStatus().equals(DialogTurnStatus.COMPLETE)
-                                                                    ? EndOfConversationCodes.COMPLETED_SUCCESSFULLY
-                                                                    : EndOfConversationCodes.USER_CANCELLED;
-            Activity activity = new Activity(ActivityTypes.END_OF_CONVERSATION);
-            activity.setValue(turnResult.getResult());
-            activity.setLocale(turnContext.getActivity().getLocale());
-            activity.setCode(code);
-            turnContext.sendActivity(activity).join();
-        }
-
-        return CompletableFuture.completedFuture(turnResult);
-    }
-
-    /**
-     * Helper to determine if we should send an EndOfConversation to the parent
-     * or not.
-     */
-    private static boolean shouldSendEndOfConversationToParent(TurnContext context, DialogTurnResult turnResult) {
-        if (!(turnResult.getStatus().equals(DialogTurnStatus.COMPLETE)
-            || turnResult.getStatus().equals(DialogTurnStatus.CANCELLED))) {
-            // The dialog instanceof still going, don't return EoC.
-            return false;
-        }
-        ClaimsIdentity claimsIdentity = context.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
-        if (claimsIdentity != null && SkillValidation.isSkillClaim(claimsIdentity.claims())) {
-            // EoC Activities returned by skills are bounced back to the bot by SkillHandler.
-            // In those cases we will have a SkillConversationReference instance in state.
-            SkillConversationReference skillConversationReference =
-                        context.getTurnState().get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY);
-            if (skillConversationReference != null) {
-                // If the skillConversationReference.OAuthScope instanceof for one of the supported channels,
-                // we are at the root and we should not send an EoC.
-                return skillConversationReference.getOAuthScope()
-                            != AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                       && skillConversationReference.getOAuthScope()
-                            != GovernmentAuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE;
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -458,29 +284,5 @@ public class DialogManager {
                 registerContainerDialogs(dlg, true);
             }
         }
-    }
-
-    private CompletableFuture<DialogTurnResult> handleBotOnTurn(DialogContext dc) {
-        DialogTurnResult turnResult;
-
-        // the bot is running as a root bot.
-        if (dc.getActiveDialog() == null) {
-            // start root dialog
-            turnResult = dc.beginDialog(rootDialogId).join();
-        } else {
-            // Continue execution
-            // - This will apply any queued up interruptions and execute the current/next
-            // step(s).
-            turnResult = dc.continueDialog().join();
-
-            if (turnResult.getStatus().equals(DialogTurnStatus.EMPTY)) {
-                // restart root dialog
-                turnResult = dc.beginDialog(rootDialogId).join();
-            }
-        }
-
-        sendStateSnapshotTrace(dc, "BotState").join();
-
-        return CompletableFuture.completedFuture(turnResult);
     }
 }

@@ -4,9 +4,14 @@
 package com.microsoft.bot.schema;
 
 /**
- *  Define values for common event names used by activities of type {@link ActivityTypes.EVENT}.
+ * Define values for common event names used by activities of type
+ * ActivityTypes.Event.
  */
 public final class ActivityEventNames {
+    private ActivityEventNames() {
+
+    }
+
     /**
      * The event name for continuing a conversation.
      */
@@ -16,8 +21,4 @@ public final class ActivityEventNames {
      * The event name for creating a conversation.
      */
     public static final String CREATE_CONVERSATION = "CreateConversation";
-
-    private ActivityEventNames() {
-
-    }
 }

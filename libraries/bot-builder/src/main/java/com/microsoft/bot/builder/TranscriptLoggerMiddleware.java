@@ -4,6 +4,7 @@
 package com.microsoft.bot.builder;
 
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityEventNames;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.RoleTypes;
@@ -13,6 +14,7 @@ import java.time.ZoneId;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * When added, this middleware will log incoming and outgoing activities to a
@@ -57,7 +59,22 @@ public class TranscriptLoggerMiddleware implements Middleware {
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
         // log incoming activity at beginning of turn
         if (context.getActivity() != null) {
-            logActivity(Activity.clone(context.getActivity()), true);
+            if (context.getActivity().getFrom() == null) {
+                context.getActivity().setFrom(new ChannelAccount());
+            }
+
+            if (context.getActivity().getFrom().getProperties().get("role") == null
+                && context.getActivity().getFrom().getRole() == null
+            ) {
+                context.getActivity().getFrom().setRole(RoleTypes.USER);
+            }
+
+            // We should not log ContinueConversation events used by skills to initialize the middleware.
+            if (!(context.getActivity().isType(ActivityTypes.EVENT)
+                && StringUtils.equals(context.getActivity().getName(), ActivityEventNames.CONTINUE_CONVERSATION))
+            ) {
+                logActivity(Activity.clone(context.getActivity()), true);
+            }
         }
 
         // hook up onSend pipeline

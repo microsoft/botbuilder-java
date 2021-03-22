@@ -60,6 +60,17 @@ public class DialogStateManager implements Map<String, Object> {
      *
      * @param dc            The dialog context for the current turn of the
      *                      conversation.
+     */
+    public DialogStateManager(DialogContext dc) {
+        this(dc, null);
+    }
+
+    /**
+     * Initializes a new instance of the
+     * {@link com.microsoft.bot.dialogs.memory.DialogStateManager} class.
+     *
+     * @param dc            The dialog context for the current turn of the
+     *                      conversation.
      * @param configuration Configuration for the dialog state manager.
      */
     public DialogStateManager(DialogContext dc, DialogStateManagerConfiguration configuration) {
@@ -455,7 +466,7 @@ public class DialogStateManager implements Map<String, Object> {
      *
      * @return A Completed Future.
      */
-    public CompletableFuture<Void> loadAllScopesAsync() {
+    public CompletableFuture<Void> loadAllScopes() {
         configuration.getMemoryScopes().forEach((scope) -> {
             scope.load(dialogContext, false).join();
         });
