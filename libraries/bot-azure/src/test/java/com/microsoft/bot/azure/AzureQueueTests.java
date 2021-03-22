@@ -41,7 +41,7 @@ import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 public class AzureQueueTests {
     private static final Integer DEFAULT_DELAY = 2000;
-    private static Boolean EMULATOR_IS_RUNNING = false;
+    private static boolean emulatorIsRunning = false;
     private final String connectionString = "UseDevelopmentStorage=true";
     private static final String NO_EMULATOR_MESSAGE = "This test requires Azure STORAGE Emulator! Go to https://docs.microsoft.com/azure/storage/common/storage-use-emulator to download and install.";
 
@@ -53,7 +53,7 @@ public class AzureQueueTests {
         // status = 0: the service was started.
         // status = -5: the service is already started. Only one instance of the application
         // can be run at the same time.
-        EMULATOR_IS_RUNNING = result == 0 || result == -5;
+        emulatorIsRunning = result == 0 || result == -5;
     }
 
     // These tests require Azure Storage Emulator v5.7
@@ -69,72 +69,77 @@ public class AzureQueueTests {
 
     @Test
     public void continueConversationLaterTests() {
-        assertEmulator();
-        String queueName = "continueconversationlatertests";
-        QueueClient queue = containerInit(queueName);
-        ConversationReference cr = TestAdapter.createConversationReference("ContinueConversationLaterTests", "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(cr)
-            .useStorage(new MemoryStorage())
-            .useBotState(new ConversationState(new MemoryStorage()), new UserState(new MemoryStorage()));
+        if (runIfEmulator()) {
+            String queueName = "continueconversationlatertests";
+            QueueClient queue = containerInit(queueName);
 
-        AzureQueueStorage queueStorage = new AzureQueueStorage(connectionString, queueName);
+            ConversationReference cr = TestAdapter.createConversationReference("ContinueConversationLaterTests", "User1", "Bot");
+            TestAdapter adapter = new TestAdapter(cr)
+                .useStorage(new MemoryStorage())
+                .useBotState(new ConversationState(new MemoryStorage()), new UserState(new MemoryStorage()));
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 2);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            AzureQueueStorage queueStorage = new AzureQueueStorage(connectionString, queueName);
 
-        ContinueConversationLater ccl = new ContinueConversationLater() {
-            {
-                setDate(sdf.format(cal.getTime()));
-                setValue("foo");
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.SECOND, 2);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+            ContinueConversationLater ccl = new ContinueConversationLater() {
+                {
+                    setDate(sdf.format(cal.getTime()));
+                    setValue("foo");
+                }
+            };
+            DialogManager dm = new DialogManager(ccl, "DialogStateProperty");
+            dm.getInitialTurnState().replace("QueueStorage", queueStorage);
+
+            new TestFlow(adapter, turnContext -> CompletableFuture.runAsync(() -> dm.onTurn(turnContext)))
+                .send("hi")
+                .startTest().join();
+
+            try {
+                Thread.sleep(DEFAULT_DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Assert.fail();
             }
-        };
-        DialogManager dm = new DialogManager(ccl, "DialogStateProperty");
-        dm.getInitialTurnState().replace("QueueStorage", queueStorage);
 
-        new TestFlow(adapter, turnContext -> CompletableFuture.runAsync(() -> dm.onTurn(turnContext)))
-            .send("hi")
-            .startTest().join();
+            QueueMessageItem messages = queue.receiveMessage();
+            JacksonAdapter jacksonAdapter = new JacksonAdapter();
+            String messageJson = new String(Base64.decodeBase64(messages.getMessageText()));
+            Activity activity = null;
 
-        try {
-            Thread.sleep(DEFAULT_DELAY);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+            try {
+                activity = jacksonAdapter.deserialize(messageJson, Activity.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
 
-        QueueMessageItem messages = queue.receiveMessage();
-        JacksonAdapter jacksonAdapter = new JacksonAdapter();
-        String messageJson = new String(Base64.decodeBase64(messages.getMessageText()));
-        Activity activity = null;
+            Assert.assertTrue(activity.isType(ActivityTypes.EVENT));
+            Assert.assertEquals(ActivityEventNames.CONTINUE_CONVERSATION, activity.getName());
+            Assert.assertEquals("foo", activity.getValue());
+            Assert.assertNotNull(activity.getRelatesTo());
+            ConversationReference cr2 = activity.getConversationReference();
+            cr.setActivityId(null);
+            cr2.setActivityId(null);
 
-        try {
-            activity = jacksonAdapter.deserialize(messageJson, Activity.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-
-        Assert.assertTrue(activity.isType(ActivityTypes.EVENT));
-        Assert.assertEquals(ActivityEventNames.CONTINUE_CONVERSATION, activity.getName());
-        Assert.assertEquals("foo", activity.getValue());
-        Assert.assertNotNull(activity.getRelatesTo());
-        ConversationReference cr2 = activity.getConversationReference();
-        cr.setActivityId(null);
-        cr2.setActivityId(null);
-
-        try {
-            Assert.assertEquals(jacksonAdapter.serialize(cr), jacksonAdapter.serialize(cr2));
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail();
+            try {
+                Assert.assertEquals(jacksonAdapter.serialize(cr), jacksonAdapter.serialize(cr2));
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assert.fail();
+            }
         }
     }
 
-    private void assertEmulator() {
-        if (!EMULATOR_IS_RUNNING) {
-            Assert.fail(NO_EMULATOR_MESSAGE);
+    private boolean runIfEmulator() {
+        if (!emulatorIsRunning) {
+            System.out.println(NO_EMULATOR_MESSAGE);
+            return false;
         }
+
+        return true;
     }
 
     private class ContinueConversationLater extends Dialog {
