@@ -84,12 +84,9 @@ public class AzureQueueTests {
             cal.add(Calendar.SECOND, 2);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-            ContinueConversationLater ccl = new ContinueConversationLater() {
-                {
-                    setDate(sdf.format(cal.getTime()));
-                    setValue("foo");
-                }
-            };
+            ContinueConversationLater ccl = new ContinueConversationLater();
+            ccl.setDate(sdf.format(cal.getTime()));
+            ccl.setValue("foo");
             DialogManager dm = new DialogManager(ccl, "DialogStateProperty");
             dm.getInitialTurnState().replace("QueueStorage", queueStorage);
 
