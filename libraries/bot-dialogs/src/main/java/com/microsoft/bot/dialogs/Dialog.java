@@ -318,6 +318,7 @@ public abstract class Dialog {
         } else {
             dialogSet.setTelemetryClient(new NullBotTelemetryClient());
         }
+
         dialogSet.add(dialog);
 
         return dialogSet.createContext(turnContext)
