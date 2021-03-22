@@ -3,6 +3,8 @@
 
 package com.microsoft.bot.dialogs;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,13 +14,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import com.microsoft.bot.builder.BotAdapter;
+import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.SendActivitiesHandler;
+import com.microsoft.bot.builder.Severity;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.TraceTranscriptLogger;
 import com.microsoft.bot.builder.TranscriptLoggerMiddleware;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.TurnContextImpl;
 import com.microsoft.bot.builder.skills.SkillConversationReference;
 import com.microsoft.bot.builder.skills.SkillHandler;
 import com.microsoft.bot.connector.authentication.AuthenticationConstants;
@@ -30,6 +35,7 @@ import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.dialogs.prompts.TextPrompt;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.ResultPair;
 
@@ -187,6 +193,22 @@ public class DialogManagerTests {
         .assertReply("Hello Carlos, nice to meet you!")
         .startTest()
         .join();
+    }
+
+    @Test
+    public void RunShouldSetTelemetryClient() {
+        TestAdapter adapter = new TestAdapter();
+        Dialog dialog = CreateTestDialog("conversation.name");
+        ConversationState conversationState = new ConversationState(new MemoryStorage());
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setChannelId("test-channel");
+        ConversationAccount conversation = new ConversationAccount("test-conversation-id");
+        activity.setConversation(conversation);
+        MockBotTelemetryClient telemetryClient = new MockBotTelemetryClient();
+        TurnContext turnContext = new TurnContextImpl(adapter, activity);
+        turnContext.getTurnState().add(BotTelemetryClient.class.getName(), telemetryClient);
+        Dialog.run(dialog, turnContext, conversationState.createProperty("DialogState"));
+        Assert.assertEquals(telemetryClient, dialog.getTelemetryClient());
     }
 
     // @Test
@@ -558,5 +580,62 @@ public class DialogManagerTests {
             outerDc.getContext().sendActivity(String.format("Hello %s, nice to meet you!", result)).join();
             return  outerDc.endDialog(result);
         }
+    }
+
+    private class MockBotTelemetryClient implements BotTelemetryClient {
+
+        @Override
+        public void trackAvailability(
+            String name,
+            OffsetDateTime timeStamp,
+            Duration duration,
+            String runLocation,
+            boolean success,
+            String message,
+            Map<String, String> properties,
+            Map<String, Double> metrics
+        ) {
+
+        }
+
+        @Override
+        public void trackDependency(
+            String dependencyTypeName,
+            String target,
+            String dependencyName,
+            String data,
+            OffsetDateTime startTime,
+            Duration duration,
+            String resultCode,
+            boolean success
+        ) {
+
+        }
+
+        @Override
+        public void trackEvent(String eventName, Map<String, String> properties, Map<String, Double> metrics) {
+
+        }
+
+        @Override
+        public void trackException(Exception exception, Map<String, String> properties, Map<String, Double> metrics) {
+
+        }
+
+        @Override
+        public void trackTrace(String message, Severity severityLevel, Map<String, String> properties) {
+
+        }
+
+        @Override
+        public void trackDialogView(String dialogName, Map<String, String> properties, Map<String, Double> metrics) {
+
+        }
+
+        @Override
+        public void flush() {
+
+        }
+
     }
 }

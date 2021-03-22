@@ -311,13 +311,15 @@ public abstract class Dialog {
     public static CompletableFuture<Void> run(Dialog dialog, TurnContext turnContext,
             StatePropertyAccessor<DialogState> accessor) {
         DialogSet dialogSet = new DialogSet(accessor);
+        if (turnContext.getTurnState().get(BotTelemetryClient.class) != null) {
+            dialogSet.setTelemetryClient(turnContext.getTurnState().get(BotTelemetryClient.class));
+        } else if (dialog.getTelemetryClient() != null) {
+            dialogSet.setTelemetryClient(dialog.getTelemetryClient());
+        } else {
+            dialogSet.setTelemetryClient(new NullBotTelemetryClient());
+        }
         dialogSet.add(dialog);
-        dialogSet.setTelemetryClient(dialog.getTelemetryClient());
 
-        // return dialogSet.createContext(turnContext)
-        // .thenCompose(dialogContext -> continueOrStart(dialogContext, dialog,
-        // turnContext))
-        // .thenApply(result -> null);
         return dialogSet.createContext(turnContext)
                 .thenAccept(dialogContext -> innerRun(turnContext, dialog.getId(), dialogContext));
     }
