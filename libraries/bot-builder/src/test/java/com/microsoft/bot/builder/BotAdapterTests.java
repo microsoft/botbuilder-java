@@ -48,6 +48,27 @@ public class BotAdapterTests {
     }
 
     @Test
+    public void GetLocaleFromActivity() {
+        Consumer<List<Activity>> validateResponse = (activities) -> {
+            // no need to do anything.
+        };
+        SimpleAdapter a = new SimpleAdapter(validateResponse);
+        TurnContextImpl c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE));
+
+        String activityId = UUID.randomUUID().toString();
+        Activity activity = TestMessage.Message();
+        activity.setId(activityId);
+        activity.setLocale("de-DE");
+        BotCallbackHandler callback = (turnContext) -> {
+            Assert.assertEquals("de-DE", turnContext.getActivity().getLocale());
+            return CompletableFuture.completedFuture(null);
+        };
+
+        a.processRequest(activity, callback).join();
+    }
+
+
+    @Test
     public void ContinueConversation_DirectMsgAsync() {
         boolean[] callbackInvoked = new boolean[] { false };
 

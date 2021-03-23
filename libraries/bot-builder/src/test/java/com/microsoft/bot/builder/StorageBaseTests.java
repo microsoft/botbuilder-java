@@ -3,10 +3,13 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
 import org.junit.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class StorageBaseTests {
     protected void readUnknownTest(Storage storage) {
@@ -239,6 +242,32 @@ public class StorageBaseTests {
 
     protected void deleteUnknownObjectTest(Storage storage) {
         storage.delete(new String[] { "unknown_key" }).join();
+    }
+
+    protected void statePersistsThroughMultiTurn(Storage storage) {
+        UserState userState = new UserState(storage);
+        StatePropertyAccessor<TestPocoState> testProperty = userState.createProperty("test");
+        TestAdapter adapter = new TestAdapter()
+            .use(new AutoSaveStateMiddleware(userState));
+
+        new TestFlow(adapter, context -> {
+            TestPocoState state = testProperty.get(context, TestPocoState::new).join();
+            Assert.assertNotNull(state);
+            switch (context.getActivity().getText()) {
+                case "set value":
+                    state.setValue("test");
+                    context.sendActivity("value saved").join();
+                    break;
+                case "get value":
+                    context.sendActivity(state.getValue()).join();
+                    break;
+            }
+
+            return CompletableFuture.completedFuture(null);
+        })
+        .test("set value", "value saved")
+        .test("get value", "test")
+        .startTest().join();
     }
 
     private static class PocoItem {

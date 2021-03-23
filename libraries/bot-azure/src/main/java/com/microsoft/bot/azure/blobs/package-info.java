@@ -5,4 +5,4 @@
 /**
  * This package contains the classes for bot-azure.
  */
-package com.microsoft.bot.azure;
+package com.microsoft.bot.azure.blobs;

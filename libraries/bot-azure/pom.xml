@@ -74,11 +74,23 @@
     </dependency>
 
     <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-storage-queue</artifactId>
+      <version>12.8.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.microsoft.bot</groupId>
       <artifactId>bot-builder</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-storage-blob</artifactId>
+      <version>12.10.0</version>
     </dependency>
   </dependencies>
 

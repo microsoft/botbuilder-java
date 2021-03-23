@@ -19,14 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -212,7 +213,8 @@ public class Activity {
      * normally required.
      */
     protected Activity() {
-        setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
+        final Clock clock = new NanoClockHelper();
+        setTimestamp(OffsetDateTime.now(clock));
     }
 
     /**
@@ -407,7 +409,24 @@ public class Activity {
             clone.setProperties(entry.getKey(), entry.getValue());
         }
 
+        clone = ensureActivityHasId(clone);
+
         return clone;
+    }
+
+    private static Activity ensureActivityHasId(Activity activity) {
+        Activity activityWithId = activity;
+
+        if (activity == null) {
+            throw new IllegalArgumentException("Cannot check or add Id on a null Activity.");
+        }
+
+        if (activity.getId() == null) {
+            String generatedId = String.format("g_%s", UUID.randomUUID().toString());
+            activity.setId(generatedId);
+        }
+
+        return activityWithId;
     }
 
     /**
