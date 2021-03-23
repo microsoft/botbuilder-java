@@ -10,6 +10,7 @@ import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apache.commons.lang3.NotImplementedException;
@@ -196,6 +197,9 @@ public abstract class BotAdapter {
         // Call any registered Middleware Components looking for ReceiveActivity()
         if (context.getActivity() != null) {
             if (!StringUtils.isEmpty(context.getActivity().getLocale())) {
+
+                Locale.setDefault(Locale.forLanguageTag(context.getActivity().getLocale()));
+
                 context.setLocale(context.getActivity().getLocale());
             }
 
