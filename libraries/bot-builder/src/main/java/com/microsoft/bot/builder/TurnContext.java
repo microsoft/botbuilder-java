@@ -24,6 +24,8 @@ import java.util.concurrent.CompletableFuture;
  * {@link Bot} {@link Middleware}
  */
 public interface TurnContext {
+    String STATE_TURN_LOCALE = "turn.locale";
+
     /**
      * Sends a trace activity to the {@link BotAdapter} for logging purposes.
      *
