@@ -10,6 +10,7 @@ import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.connector.Async;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 
@@ -529,13 +530,24 @@ public class DialogContext {
     }
 
     /**
-     * Obtain the CultureInfo in DialogContext.
+     * Obtain the locale in DialogContext.
      * @return A String representing the current locale.
      */
     public String getLocale() {
-        return getContext() != null ? getContext().getLocale() : null;
-    }
+        // turn.locale is the highest precedence.
+        String locale = (String) state.get(TurnContext.STATE_TURN_LOCALE);
+        if (!StringUtils.isEmpty(locale)) {
+            return locale;
+        }
 
+        // If turn.locale was not populated, fall back to activity locale
+        locale = getContext().getActivity().getLocale();
+        if (!StringUtils.isEmpty(locale)) {
+            return locale;
+        }
+
+        return Locale.getDefault().toString();
+    }
 
     /**
      * @param reason
@@ -544,7 +556,6 @@ public class DialogContext {
     private CompletableFuture<Void> endActiveDialog(DialogReason reason) {
         return endActiveDialog(reason, null);
     }
-
 
     /**
      * @param reason
