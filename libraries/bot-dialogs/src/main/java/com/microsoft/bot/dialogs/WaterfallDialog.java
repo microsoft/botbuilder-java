@@ -267,8 +267,8 @@ public class WaterfallDialog extends Dialog {
         String stepName = steps.get(index).getClass().getSimpleName();
 
         // Default stepname for lambdas
-        if (StringUtils.isAllBlank(stepName) || stepName.contains("<")) {
-            stepName = String.format("Step%0of%1", index + 1, steps.size());
+        if (StringUtils.isAllBlank(stepName) || stepName.contains("$Lambda$")) {
+            stepName = String.format("Step%dof%d", index + 1, steps.size());
         }
 
         return stepName;
