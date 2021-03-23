@@ -273,12 +273,10 @@ public class Activity {
      * @return A message Activity type.
      */
     public static Activity createMessageActivity() {
-        return new Activity(ActivityTypes.MESSAGE) {
-            {
-                setAttachments(new ArrayList<>());
-                setEntities(new ArrayList<>());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setAttachments(new ArrayList<>());
+        activity.setEntities(new ArrayList<>());
+        return activity;
     }
 
     /**
@@ -1002,7 +1000,7 @@ public class Activity {
      * A delivery hint to signal to the recipient alternate delivery paths for the
      * activity.
      * <p>
-     * The default delivery mode is \"default\".
+     * The default delivery mode is \"default\".  See {@link DeliveryModes}.
      *
      * @return The delivery mode hint.
      */

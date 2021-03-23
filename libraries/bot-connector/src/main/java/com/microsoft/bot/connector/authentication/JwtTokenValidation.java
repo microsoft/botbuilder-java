@@ -4,7 +4,10 @@
 package com.microsoft.bot.connector.authentication;
 
 import com.microsoft.bot.connector.Async;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.RoleTypes;
+
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,19 +64,31 @@ public final class JwtTokenValidation {
         ChannelProvider channelProvider,
         AuthenticationConfiguration authConfig
     ) {
+        if (authConfig == null) {
+            return Async.completeExceptionally(
+                new IllegalArgumentException("authConfig cannot be null")
+            );
+        }
 
-        if (StringUtils.isEmpty(authHeader)) {
+        if (StringUtils.isBlank(authHeader)) {
             // No auth header was sent. We might be on the anonymous code path.
             return credentials.isAuthenticationDisabled().thenApply(isAuthDisable -> {
-                if (isAuthDisable) {
-                    // In the scenario where Auth is disabled, we still want to have the
-                    // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
-                    // adding in an empty claim.
-                    return new ClaimsIdentity("anonymous");
+                if (!isAuthDisable) {
+                    // No Auth Header. Auth is required. Request is not authorized.
+                    throw new AuthenticationException("No Auth Header. Auth is required.");
                 }
 
-                // No Auth Header. Auth is required. Request is not authorized.
-                throw new AuthenticationException("No Auth Header. Auth is required.");
+                if (activity.getChannelId() != null
+                    && activity.getChannelId().equals(Channels.EMULATOR)
+                    && activity.getRecipient() != null
+                    && activity.getRecipient().getRole().equals(RoleTypes.SKILL)) {
+                    return SkillValidation.createAnonymousSkillClaim();
+                }
+
+                // In the scenario where Auth is disabled, we still want to have the
+                // IsAuthenticated flag set in the ClaimsIdentity. To do this requires
+                // adding in an empty claim.
+                return new ClaimsIdentity(AuthenticationConstants.ANONYMOUS_AUTH_TYPE);
             });
         }
 
@@ -147,6 +162,40 @@ public final class JwtTokenValidation {
                 new IllegalArgumentException("No authHeader present. Auth is required."));
         }
 
+        return authenticateToken(authHeader, credentials, channelProvider, channelId, serviceUrl, authConfig)
+            .thenApply(identity -> {
+                    validateClaims(authConfig, identity.claims());
+                    return identity;
+            }
+        );
+    }
+
+    private static CompletableFuture<Void> validateClaims(
+        AuthenticationConfiguration authConfig,
+        Map<String, String> claims
+    ) {
+        if (authConfig.getClaimsValidator() != null) {
+            return authConfig.getClaimsValidator().validateClaims(claims);
+        } else if (SkillValidation.isSkillClaim(claims)) {
+            return Async.completeExceptionally(
+                new RuntimeException("ClaimValidator is required for validation of Skill Host calls")
+            );
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private static CompletableFuture<ClaimsIdentity> authenticateToken(
+        String authHeader,
+        CredentialProvider credentials,
+        ChannelProvider channelProvider,
+        String channelId,
+        String serviceUrl,
+        AuthenticationConfiguration authConfig
+    ) {
+        if (SkillValidation.isSkillToken(authHeader)) {
+            return SkillValidation.authenticateChannelToken(
+                authHeader, credentials, channelProvider, channelId, authConfig);
+        }
         boolean usingEmulator = EmulatorValidation.isTokenFromEmulator(authHeader);
         if (usingEmulator) {
             return EmulatorValidation
@@ -168,6 +217,7 @@ public final class JwtTokenValidation {
                 authHeader, credentials, channelProvider, serviceUrl, channelId, authConfig
             );
         }
+
     }
 
     /**

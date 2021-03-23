@@ -74,25 +74,6 @@
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.eluder.coveralls</groupId>
-            <artifactId>coveralls-maven-plugin</artifactId>
-            <configuration>
-              <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>cobertura-maven-plugin</artifactId>
-            <configuration>
-              <outputDirectory>../../cobertura-report/bot-applicationinsights</outputDirectory>
-              <format>xml</format>
-              <maxmem>256m</maxmem>
-              <!-- aggregated reports for multi-module projects -->
-              <aggregate>true</aggregate>
-              <check/>
-            </configuration>
-          </plugin>
         </plugins>
       </build>
     </profile>
