@@ -73,7 +73,7 @@ public class ConversationReference {
     @JsonIgnore
     public Activity getContinuationActivity() {
         Activity activity = Activity.createEventActivity();
-        activity.setName(ActivityEventNames.CREATE_CONVERSATION);
+        activity.setName(ActivityEventNames.CONTINUE_CONVERSATION);
         activity.setId(UUID.randomUUID().toString());
         activity.setChannelId(getChannelId());
         activity.setConversation(getConversation());
