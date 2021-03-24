@@ -236,7 +236,7 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("getConversationsAsync", responseBodyResponse);
+                    throw new ErrorResponseException("getConversations", responseBodyResponse);
                 }
             });
     }
@@ -279,7 +279,7 @@ public class RestConversations implements Conversations {
                     throw e;
                 } catch (Throwable t) {
                     throw new ErrorResponseException(
-                        "createConversationAsync",
+                        "createConversation",
                         responseBodyResponse
                     );
                 }
@@ -339,7 +339,7 @@ public class RestConversations implements Conversations {
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ErrorResponseException("sendToConversationAsync", responseBodyResponse);
+                throw new ErrorResponseException("sendToConversation", responseBodyResponse);
             }
         });
     }
@@ -402,7 +402,7 @@ public class RestConversations implements Conversations {
                         throw e;
                     } catch (Throwable t) {
                         throw new ErrorResponseException(
-                            "updateActivityAsync", responseBodyResponse);
+                            "updateActivity", responseBodyResponse);
                     }
                 });
         });
@@ -463,7 +463,7 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("replyToActivityAsync", responseBodyResponse);
+                    throw new ErrorResponseException("replyToActivity", responseBodyResponse);
                 }
             });
     }
@@ -511,7 +511,7 @@ public class RestConversations implements Conversations {
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ErrorResponseException("deleteActivityAsync", responseBodyResponse);
+                throw new ErrorResponseException("deleteActivity", responseBodyResponse);
             }
         });
     }
@@ -553,7 +553,7 @@ public class RestConversations implements Conversations {
                 throw e;
             } catch (Throwable t) {
                 throw new ErrorResponseException(
-                    "getConversationMembersAsync",
+                    "getConversationMembers",
                     responseBodyResponse
                 );
             }
@@ -603,7 +603,7 @@ public class RestConversations implements Conversations {
                 throw e;
             } catch (Throwable t) {
                 throw new ErrorResponseException(
-                    "getConversationMembersAsync",
+                    "getConversationMember",
                     responseBodyResponse
                 );
             }
@@ -656,7 +656,7 @@ public class RestConversations implements Conversations {
                     throw e;
                 } catch (Throwable t) {
                     throw new ErrorResponseException(
-                        "deleteConversationMemberAsync",
+                        "deleteConversationMember",
                         responseBodyResponse
                     );
                 }
@@ -707,7 +707,7 @@ public class RestConversations implements Conversations {
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ErrorResponseException("getActivityMembersAsync", responseBodyResponse);
+                throw new ErrorResponseException("getActivityMembers", responseBodyResponse);
             }
         });
     }
@@ -757,7 +757,7 @@ public class RestConversations implements Conversations {
                 } catch (ErrorResponseException e) {
                     throw e;
                 } catch (Throwable t) {
-                    throw new ErrorResponseException("uploadAttachmentAsync", responseBodyResponse);
+                    throw new ErrorResponseException("uploadAttachment", responseBodyResponse);
                 }
             });
     }
@@ -812,7 +812,7 @@ public class RestConversations implements Conversations {
                     throw e;
                 } catch (Throwable t) {
                     throw new ErrorResponseException(
-                        "sendConversationHistoryAsync",
+                        "sendConversationHistory",
                         responseBodyResponse
                     );
                 }

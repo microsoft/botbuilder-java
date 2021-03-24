@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
@@ -19,6 +21,7 @@ import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.SimpleChannelProvider;
 import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityEventNames;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.CallerIdConstants;
 import com.microsoft.bot.schema.ConversationAccount;
@@ -32,6 +35,8 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +71,7 @@ public class BotFrameworkAdapterTests {
         final String ActivityIdValue = "SendActivityId";
         final String ConversationIdValue = "NewConversationId";
         final String TenantIdValue = "theTenantId";
-        final String EventActivityName = "CreateConversation";
+        final String EventActivityName = ActivityEventNames.CREATE_CONVERSATION;
 
         // so we can provide a mock ConnectorClient.
         class TestBotFrameworkAdapter extends BotFrameworkAdapter {
@@ -317,6 +322,39 @@ public class BotFrameworkAdapterTests {
                 setServiceUrl(serviceUrl);
             }
         }, callback).join();
+    }
+
+    @Test
+    public void ShouldNotLogContinueConversation() {
+        TranscriptStore transcriptStore = new MemoryTranscriptStore();
+        TranscriptLoggerMiddleware sut = new TranscriptLoggerMiddleware(transcriptStore);
+
+        String conversationId = UUID.randomUUID().toString();
+        TestAdapter adapter = new TestAdapter(TestAdapter.createConversationReference(conversationId, "User1", "Bot"))
+            .use(sut);
+
+        Activity continueConversation = new Activity(ActivityTypes.EVENT);
+        continueConversation.setName(ActivityEventNames.CONTINUE_CONVERSATION);
+
+        new TestFlow(adapter, turnContext -> {
+            return turnContext.sendActivity("bar").thenApply(resourceResponse -> null);
+        })
+            .send("foo")
+            .assertReply(activity -> {
+                Assert.assertEquals("bar", activity.getText());
+                PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(activity.getChannelId(), conversationId).join();
+                Assert.assertEquals(2, activities.getItems().size());
+            })
+            .send(continueConversation)
+            .assertReply(activity -> {
+                // Ensure the event hasn't been added to the transcript.
+                PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(activity.getChannelId(), conversationId).join();
+
+                Assert.assertFalse(activities.getItems().stream().anyMatch(a -> a.isType(ActivityTypes.EVENT) && StringUtils
+                    .equals(a.getName(), ActivityEventNames.CONTINUE_CONVERSATION)));
+                Assert.assertEquals(3, activities.getItems().size());
+            })
+            .startTest().join();
     }
 
     private static void getAppCredentialsAndAssertValues(
