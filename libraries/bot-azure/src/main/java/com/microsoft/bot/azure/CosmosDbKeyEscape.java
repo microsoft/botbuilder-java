@@ -48,8 +48,8 @@ public final class CosmosDbKeyEscape {
      * means a key of "?test?" would be escaped as "*3ftest*3f".
      */
     private static final Map<Character, String> ILLEGAL_KEY_CHARACTER_REPLACEMENT_MAP = Arrays
-            .stream(ArrayUtils.toObject(ILLEGAL_KEYS))
-            .collect(Collectors.toMap(c -> c, c -> "*" + String.format("%02x", (int) c)));
+        .stream(ArrayUtils.toObject(ILLEGAL_KEYS))
+        .collect(Collectors.toMap(c -> c, c -> "*" + String.format("%02x", (int) c)));
 
     /**
      * Converts the key into a DocumentID that can be used safely with Cosmos DB.
@@ -94,8 +94,8 @@ public final class CosmosDbKeyEscape {
         // Allocate a builder that assumes that all remaining characters might be
         // replaced
         // to avoid any extra allocations
-        StringBuilder sanitizedKeyBuilder = new StringBuilder(
-                key.length() + ((key.length() - firstIllegalCharIndex) * ESCAPE_LENGTH));
+        StringBuilder sanitizedKeyBuilder =
+            new StringBuilder(key.length() + ((key.length() - firstIllegalCharIndex) * ESCAPE_LENGTH));
 
         // Add all good characters up to the first bad character to the builder first
         for (Integer index = 0; index < firstIllegalCharIndex; index++) {

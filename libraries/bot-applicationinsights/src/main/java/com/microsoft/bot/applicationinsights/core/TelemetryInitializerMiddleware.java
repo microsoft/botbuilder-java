@@ -27,11 +27,15 @@ public class TelemetryInitializerMiddleware implements Middleware {
 
     /**
      * Initializes a new instance of the {@link TelemetryInitializerMiddleware}.
+     * 
      * @param withTelemetryLoggerMiddleware The TelemetryLoggerMiddleware to use.
-     * @param withLogActivityTelemetry Boolean determining if you want to log telemetry activity
+     * @param withLogActivityTelemetry      Boolean determining if you want to log
+     *                                      telemetry activity
      */
-    public TelemetryInitializerMiddleware(TelemetryLoggerMiddleware withTelemetryLoggerMiddleware,
-                                          Boolean withLogActivityTelemetry) {
+    public TelemetryInitializerMiddleware(
+        TelemetryLoggerMiddleware withTelemetryLoggerMiddleware,
+        Boolean withLogActivityTelemetry
+    ) {
         telemetryLoggerMiddleware = withTelemetryLoggerMiddleware;
         if (withLogActivityTelemetry == null) {
             withLogActivityTelemetry = true;
@@ -40,9 +44,11 @@ public class TelemetryInitializerMiddleware implements Middleware {
     }
 
     /**
-     * Stores the incoming activity as JSON in the items collection on the HttpContext.
+     * Stores the incoming activity as JSON in the items collection on the
+     * HttpContext.
+     * 
      * @param context The incoming TurnContext
-     * @param next Delegate to run next on
+     * @param next    Delegate to run next on
      * @return Returns a CompletableFuture with Void value
      */
     public CompletableFuture<Void> onTurn(TurnContext context, NextDelegate next) {
@@ -71,4 +77,3 @@ public class TelemetryInitializerMiddleware implements Middleware {
         }
     }
 }
-

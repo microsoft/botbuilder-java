@@ -68,8 +68,10 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     /**
      * Initializes a new instance of the {@link BlobsTranscriptStore} class.
+     * 
      * @param dataConnectionString Azure Storage connection string.
-     * @param containerName Name of the Blob container where entities will be stored.
+     * @param containerName        Name of the Blob container where entities will be
+     *                             stored.
      */
     public BlobsTranscriptStore(String dataConnectionString, String containerName) {
         if (StringUtils.isBlank(dataConnectionString)) {
@@ -80,8 +82,7 @@ public class BlobsTranscriptStore implements TranscriptStore {
             throw new IllegalArgumentException("containerName");
         }
 
-        jsonSerializer = new ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        jsonSerializer = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .enable(SerializationFeature.INDENT_OUTPUT)
             .findAndRegisterModules();
 
@@ -91,6 +92,7 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     /**
      * Log an activity to the transcript.
+     * 
      * @param activity Activity being logged.
      * @return A CompletableFuture that represents the work queued to execute.
      */
@@ -101,8 +103,8 @@ public class BlobsTranscriptStore implements TranscriptStore {
             case ActivityTypes.MESSAGE_UPDATE:
                 Activity updatedActivity = null;
                 try {
-                    updatedActivity = jsonSerializer
-                        .readValue(jsonSerializer.writeValueAsString(activity), Activity.class);
+                    updatedActivity =
+                        jsonSerializer.readValue(jsonSerializer.writeValueAsString(activity), Activity.class);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -122,6 +124,7 @@ public class BlobsTranscriptStore implements TranscriptStore {
                 });
 
                 return CompletableFuture.completedFuture(null);
+
             case ActivityTypes.MESSAGE_DELETE:
                 innerReadBlob(activity).thenAccept(activityAndBlob -> {
                     if (activityAndBlob != null && activityAndBlob.getLeft() != null) {
@@ -147,19 +150,20 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
                         logActivityToBlobClient(tombstonedActivity, activityAndBlob.getRight(), true)
                             .thenApply(task -> CompletableFuture.completedFuture(null));
-                   }
+                    }
                 });
 
                 return CompletableFuture.completedFuture(null);
+
             default:
-                this.innerLogActivity(activity)
-                    .thenApply(task -> CompletableFuture.completedFuture(null));
+                this.innerLogActivity(activity).thenApply(task -> CompletableFuture.completedFuture(null));
                 return CompletableFuture.completedFuture(null);
         }
     }
 
     /**
      * Get activities for a conversation (Aka the transcript).
+     * 
      * @param channelId         The ID of the channel the conversation is in.
      * @param conversationId    The ID of the conversation.
      * @param continuationToken The continuation token (if available).
@@ -167,9 +171,12 @@ public class BlobsTranscriptStore implements TranscriptStore {
      *                          not included.
      * @return PagedResult of activities.
      */
-    public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(String channelId, String conversationId,
-                                                                            @Nullable String continuationToken,
-                                                                            OffsetDateTime startDate) {
+    public CompletableFuture<PagedResult<Activity>> getTranscriptActivities(
+        String channelId,
+        String conversationId,
+        @Nullable String continuationToken,
+        OffsetDateTime startDate
+    ) {
         if (startDate == null) {
             startDate = OffsetDateTime.MIN;
         }
@@ -194,11 +201,10 @@ public class BlobsTranscriptStore implements TranscriptStore {
                 .listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null)
                 .iterableByPage(token);
             token = null;
-            for (PagedResponse<BlobItem> blobPage: resultSegment) {
-                for (BlobItem blobItem: blobPage.getValue()) {
+            for (PagedResponse<BlobItem> blobPage : resultSegment) {
+                for (BlobItem blobItem : blobPage.getValue()) {
                     OffsetDateTime parseDateTime = OffsetDateTime.parse(blobItem.getMetadata().get("Timestamp"));
-                    if (parseDateTime.isAfter(startDate)
-                        || parseDateTime.isEqual(startDate)) {
+                    if (parseDateTime.isAfter(startDate) || parseDateTime.isEqual(startDate)) {
                         if (continuationToken != null) {
                             if (blobItem.getName().equals(continuationToken)) {
                                 // we found continuation token
@@ -218,14 +224,10 @@ public class BlobsTranscriptStore implements TranscriptStore {
             }
         } while (!StringUtils.isBlank(token) && blobs.size() < pageSize);
 
-        pagedResult.setItems(blobs
-            .stream()
-            .map(bl -> {
-                BlobClient blobClient = containerClient.getBlobClient(bl.getName());
-                return this.getActivityFromBlobClient(blobClient);
-            })
-            .map(t -> t.join())
-            .collect(Collectors.toList()));
+        pagedResult.setItems(blobs.stream().map(bl -> {
+            BlobClient blobClient = containerClient.getBlobClient(bl.getName());
+            return this.getActivityFromBlobClient(blobClient);
+        }).map(t -> t.join()).collect(Collectors.toList()));
 
         if (pagedResult.getItems().size() == pageSize) {
             pagedResult.setContinuationToken(blobs.get(blobs.size() - 1).getName());
@@ -236,12 +238,15 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     /**
      * List conversations in the channelId.
+     * 
      * @param channelId         The ID of the channel.
      * @param continuationToken The continuation token (if available).
      * @return A CompletableFuture that represents the work queued to execute.
      */
-    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(String channelId,
-                                                                          @Nullable String continuationToken) {
+    public CompletableFuture<PagedResult<TranscriptInfo>> listTranscripts(
+        String channelId,
+        @Nullable String continuationToken
+    ) {
         final int pageSize = 20;
 
         if (StringUtils.isBlank(channelId)) {
@@ -253,16 +258,17 @@ public class BlobsTranscriptStore implements TranscriptStore {
         List<TranscriptInfo> conversations = new ArrayList<TranscriptInfo>();
         do {
             String prefix = String.format("%s/", sanitizeKey(channelId));
-            Iterable<PagedResponse<BlobItem>> resultSegment = containerClient.
-                listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null)
+            Iterable<PagedResponse<BlobItem>> resultSegment = containerClient
+                .listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null)
                 .iterableByPage(token);
             token = null;
-            for (PagedResponse<BlobItem> blobPage: resultSegment) {
-                for (BlobItem blobItem: blobPage.getValue()) {
+            for (PagedResponse<BlobItem> blobPage : resultSegment) {
+                for (BlobItem blobItem : blobPage.getValue()) {
                     // Unescape the Id we escaped when we saved it
                     String conversationId = new String();
                     String lastName = Arrays.stream(blobItem.getName().split("/"))
-                        .reduce((first, second) -> second.length() > 0 ? second : first).get();
+                        .reduce((first, second) -> second.length() > 0 ? second : first)
+                        .get();
                     try {
                         conversationId = URLDecoder.decode(lastName, StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException ex) {
@@ -299,6 +305,7 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     /**
      * Delete a specific conversation and all of it's activities.
+     * 
      * @param channelId      The ID of the channel the conversation is in.
      * @param conversationId The ID of the conversation to delete.
      * @return A CompletableFuture that represents the work queued to execute.
@@ -316,11 +323,12 @@ public class BlobsTranscriptStore implements TranscriptStore {
         do {
             String prefix = String.format("%s/%s/", sanitizeKey(channelId), sanitizeKey(conversationId));
             Iterable<PagedResponse<BlobItem>> resultSegment = containerClient
-                .listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null).iterableByPage(token);
+                .listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null)
+                .iterableByPage(token);
             token = null;
 
-            for (PagedResponse<BlobItem> blobPage: resultSegment) {
-                for (BlobItem blobItem: blobPage.getValue()) {
+            for (PagedResponse<BlobItem> blobPage : resultSegment) {
+                for (BlobItem blobItem : blobPage.getValue()) {
                     BlobClient blobClient = containerClient.getBlobClient(blobItem.getName());
                     if (blobClient.exists()) {
                         try {
@@ -345,19 +353,22 @@ public class BlobsTranscriptStore implements TranscriptStore {
             try {
                 String token = null;
                 do {
-                    String prefix = String.format("%s/%s/",
-                        sanitizeKey(activity.getChannelId()), sanitizeKey(activity.getConversation().getId()));
+                    String prefix = String.format(
+                        "%s/%s/",
+                        sanitizeKey(activity.getChannelId()),
+                        sanitizeKey(activity.getConversation().getId())
+                    );
                     Iterable<PagedResponse<BlobItem>> resultSegment = containerClient
-                        .listBlobsByHierarchy("/",
-                            this.getOptionsWithMetadata(prefix), null).iterableByPage(token);
+                        .listBlobsByHierarchy("/", this.getOptionsWithMetadata(prefix), null)
+                        .iterableByPage(token);
                     token = null;
-                    for (PagedResponse<BlobItem> blobPage: resultSegment) {
-                        for (BlobItem blobItem: blobPage.getValue()) {
+                    for (PagedResponse<BlobItem> blobPage : resultSegment) {
+                        for (BlobItem blobItem : blobPage.getValue()) {
                             if (blobItem.getMetadata().get("Id").equals(activity.getId())) {
                                 BlobClient blobClient = containerClient.getBlobClient(blobItem.getName());
-                                return this.getActivityFromBlobClient(blobClient)
-                                    .thenApply(blobActivity ->
-                                        new Pair<Activity, BlobClient>(blobActivity, blobClient));
+                                return this.getActivityFromBlobClient(
+                                    blobClient
+                                ).thenApply(blobActivity -> new Pair<Activity, BlobClient>(blobActivity, blobClient));
                             }
                         }
 
@@ -370,7 +381,8 @@ public class BlobsTranscriptStore implements TranscriptStore {
             } catch (HttpResponseException ex) {
                 if (ex.getResponse().getStatusCode() == HttpStatus.SC_PRECONDITION_FAILED) {
                     // additional retry logic,
-                    // even though this is a read operation blob storage can return 412 if there is contention
+                    // even though this is a read operation blob storage can return 412 if there is
+                    // contention
                     if (i++ < retryTimes) {
                         try {
                             TimeUnit.MILLISECONDS.sleep(milisecondsTimeout);
@@ -405,8 +417,11 @@ public class BlobsTranscriptStore implements TranscriptStore {
         return logActivityToBlobClient(activity, blobClient, null);
     }
 
-    private CompletableFuture<Void> logActivityToBlobClient(Activity activity, BlobClient blobClient,
-                                                            Boolean overwrite) {
+    private CompletableFuture<Void> logActivityToBlobClient(
+        Activity activity,
+        BlobClient blobClient,
+        Boolean overwrite
+    ) {
         if (overwrite == null) {
             overwrite = false;
         }
@@ -440,9 +455,13 @@ public class BlobsTranscriptStore implements TranscriptStore {
     }
 
     private String getBlobName(Activity activity) {
-        String blobName = String.format("%s/%s/%s-%s.json",
-            sanitizeKey(activity.getChannelId()), sanitizeKey(activity.getConversation().getId()),
-            this.formatTicks(activity.getTimestamp()), sanitizeKey(activity.getId()));
+        String blobName = String.format(
+            "%s/%s/%s-%s.json",
+            sanitizeKey(activity.getChannelId()),
+            sanitizeKey(activity.getConversation().getId()),
+            this.formatTicks(activity.getTimestamp()),
+            sanitizeKey(activity.getId())
+        );
 
         return blobName;
     }
@@ -459,8 +478,7 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     private BlobContainerClient getContainerClient(String dataConnectionString, String containerName) {
         containerName = containerName.toLowerCase();
-        containerClient = new BlobContainerClientBuilder()
-            .connectionString(dataConnectionString)
+        containerClient = new BlobContainerClientBuilder().connectionString(dataConnectionString)
             .containerName(containerName)
             .buildClient();
         if (!CHECKED_CONTAINERS.contains(containerName)) {
@@ -478,12 +496,12 @@ public class BlobsTranscriptStore implements TranscriptStore {
 
     /**
      * Formats a timestamp in a way that is consistent with the C# SDK.
+     * 
      * @param dateTime The dateTime used to get the ticks
      * @return The String representing the ticks.
      */
     private String formatTicks(OffsetDateTime dateTime) {
-        final Instant begin = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0,
-            ZoneOffset.UTC).toInstant();
+        final Instant begin = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
         final Instant end = dateTime.toInstant();
         long secsDiff = Math.subtractExact(end.getEpochSecond(), begin.getEpochSecond());
         long totalHundredNanos = Math.multiplyExact(secsDiff, multipleProductValue);
