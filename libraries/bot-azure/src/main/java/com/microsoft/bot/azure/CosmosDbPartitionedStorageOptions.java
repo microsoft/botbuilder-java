@@ -201,6 +201,7 @@ public class CosmosDbPartitionedStorageOptions {
      * also allow for using older collections where no PartitionKey was specified.
      *
      * Note: CompatibilityMode cannot be 'true' if KeySuffix is used.
+     * 
      * @return The compatibilityMode
      */
     public Boolean getCompatibilityMode() {
