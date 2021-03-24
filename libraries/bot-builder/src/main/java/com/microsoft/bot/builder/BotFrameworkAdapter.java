@@ -31,6 +31,7 @@ import com.microsoft.bot.connector.rest.RestConnectorClient;
 import com.microsoft.bot.connector.rest.RestOAuthClient;
 import com.microsoft.bot.schema.AadResourceUrls;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityEventNames;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.CallerIdConstants;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -1040,7 +1041,7 @@ public class BotFrameworkAdapter extends BotAdapter
                 .thenCompose(conversationResourceResponse -> {
                     // Create a event activity to represent the result.
                     Activity eventActivity = Activity.createEventActivity();
-                    eventActivity.setName("CreateConversation");
+                    eventActivity.setName(ActivityEventNames.CREATE_CONVERSATION);
                     eventActivity.setChannelId(channelId);
                     eventActivity.setServiceUrl(serviceUrl);
                     eventActivity.setId(
