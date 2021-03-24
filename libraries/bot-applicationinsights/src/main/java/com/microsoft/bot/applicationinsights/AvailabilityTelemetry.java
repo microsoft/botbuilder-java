@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * We took this class from https://github.com/microsoft/ApplicationInsights-Java/issues/1099
- * as this is not already migrated in ApplicationInsights-Java library.
+ * We took this class from
+ * https://github.com/microsoft/ApplicationInsights-Java/issues/1099 as this is
+ * not already migrated in ApplicationInsights-Java library.
  */
 public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<AvailabilityData> {
     private Double samplingPercentage;
@@ -22,7 +23,6 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
     public static final String ENVELOPE_NAME = "Availability";
 
     public static final String BASE_TYPE = "AvailabilityData";
-
 
     /**
      * Initializes a new instance of the AvailabilityTelemetry class.
@@ -38,19 +38,26 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
     }
 
     /**
-     * Initializes a new instance of the AvailabilityTelemetry class with the given name,
-     * time stamp, duration, HTTP response code and success property values.
-     * @param name A user-friendly name for the request.
-     * @param duration The time of the request.
-     * @param runLocation The duration, in milliseconds, of the request processing.
-     * @param message The HTTP response code.
-     * @param success 'true' if the request was a success, 'false' otherwise.
+     * Initializes a new instance of the AvailabilityTelemetry class with the given
+     * name, time stamp, duration, HTTP response code and success property values.
+     * 
+     * @param name         A user-friendly name for the request.
+     * @param duration     The time of the request.
+     * @param runLocation  The duration, in milliseconds, of the request processing.
+     * @param message      The HTTP response code.
+     * @param success      'true' if the request was a success, 'false' otherwise.
      * @param measurements The measurements.
-     * @param properties The corresponding properties.
+     * @param properties   The corresponding properties.
      */
-    public AvailabilityTelemetry(String name, Duration duration, String runLocation, String message,
-                                 boolean success, ConcurrentMap<String, Double> measurements,
-                                 ConcurrentMap<String, String> properties) {
+    public AvailabilityTelemetry(
+        String name,
+        Duration duration,
+        String runLocation,
+        String message,
+        boolean success,
+        ConcurrentMap<String, Double> measurements,
+        ConcurrentMap<String, String> properties
+    ) {
 
         this.data = new AvailabilityData();
 
@@ -70,9 +77,9 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
         setSuccess(success);
     }
 
-
     /**
      * Gets the ver value from the data object.
+     * 
      * @return The ver value.
      */
     @Override
@@ -82,6 +89,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets a map of application-defined request metrics.
+     * 
      * @return The map of metrics
      */
     public ConcurrentMap<String, Double> getMetrics() {
@@ -89,7 +97,9 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
     }
 
     /**
-     * Sets the StartTime. Uses the default behavior and sets the property on the 'data' start time.
+     * Sets the StartTime. Uses the default behavior and sets the property on the
+     * 'data' start time.
+     * 
      * @param timestamp The timestamp as Date.
      */
     @Override
@@ -103,6 +113,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets or human-readable name of the requested page.
+     * 
      * @return A human-readable name.
      */
     public String getName() {
@@ -111,6 +122,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Sets or human-readable name of the requested page.
+     * 
      * @param name A human-readable name.
      */
     public void setName(String name) {
@@ -119,6 +131,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets or human-readable name of the run location.
+     * 
      * @return A human-readable name.
      */
     public String getRunLocation() {
@@ -127,6 +140,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Sets or human-readable name of the run location.
+     * 
      * @param runLocation A human-readable name
      */
     public void setRunLocation(String runLocation) {
@@ -135,6 +149,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets the unique identifier of the request.
+     * 
      * @return Unique identifier.
      */
     public String getId() {
@@ -143,6 +158,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Sets the unique identifier of the request.
+     * 
      * @param id Unique identifier.
      */
     public void setId(String id) {
@@ -151,6 +167,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets a value indicating whether application handled the request successfully.
+     * 
      * @return Success indication.
      */
     public boolean isSuccess() {
@@ -159,6 +176,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Sets a value indicating whether application handled the request successfully.
+     * 
      * @param success Success indication.
      */
     public void setSuccess(boolean success) {
@@ -167,6 +185,7 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Gets the amount of time it took the application to handle the request.
+     * 
      * @return Amount of time in milliseconds.
      */
     public Duration getDuration() {
@@ -175,7 +194,9 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
 
     /**
      * Sets the amount of time it took the application to handle the request.
-     * @param duration Amount of time in captured in a {@link com.microsoft.applicationinsights.telemetry.Duration}.
+     * 
+     * @param duration Amount of time in captured in a
+     *                 {@link com.microsoft.applicationinsights.telemetry.Duration}.
      */
     public void setDuration(Duration duration) {
         data.setDuration(duration);
@@ -214,4 +235,3 @@ public final class AvailabilityTelemetry extends BaseSampleSourceTelemetry<Avail
         return BASE_TYPE;
     }
 }
-

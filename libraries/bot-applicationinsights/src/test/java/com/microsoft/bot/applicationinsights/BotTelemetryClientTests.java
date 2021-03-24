@@ -38,13 +38,13 @@ public class BotTelemetryClientTests {
         telemetryConfiguration.setChannel(mockTelemetryChannel);
         TelemetryClient telemetryClient = new TelemetryClient(telemetryConfiguration);
 
-        botTelemetryClient = new BotTelemetryClientImpl(telemetryClient);
+        botTelemetryClient = new ApplicationInsightsBotTelemetryClient(telemetryClient);
     }
 
     @Test
     public void nullTelemetryClientThrows() {
         Assert.assertThrows(IllegalArgumentException.class, () -> {
-            new BotTelemetryClientImpl(null);
+            new ApplicationInsightsBotTelemetryClient(null);
         });
     }
 
@@ -52,7 +52,7 @@ public class BotTelemetryClientTests {
     public void nonNullTelemetryClientSucceeds() {
         TelemetryClient telemetryClient = new TelemetryClient();
 
-        BotTelemetryClient botTelemetryClient = new BotTelemetryClientImpl(telemetryClient);
+        BotTelemetryClient botTelemetryClient = new ApplicationInsightsBotTelemetryClient(telemetryClient);
     }
 
     @Test

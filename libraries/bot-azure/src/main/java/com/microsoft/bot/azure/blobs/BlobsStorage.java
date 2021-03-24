@@ -32,13 +32,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implements {@link Storage} using Azure Storage Blobs.
- * This class uses a single Azure Storage Blob Container.
- * Each entity or {@link StoreItem} is serialized into a JSON string and stored in an individual text blob.
- * Each blob is named after the store item key,  which is encoded so that it conforms a valid blob name.
- * an entity is an {@link StoreItem}, the storage object will set the entity's {@link StoreItem}
- * property value to the blob's ETag upon read. Afterward, an {@link BlobRequestConditions} with the ETag value
- * will be generated during Write. New entities start with a null ETag.
+ * Implements {@link Storage} using Azure Storage Blobs. This class uses a
+ * single Azure Storage Blob Container. Each entity or {@link StoreItem} is
+ * serialized into a JSON string and stored in an individual text blob. Each
+ * blob is named after the store item key, which is encoded so that it conforms
+ * a valid blob name. an entity is an {@link StoreItem}, the storage object will
+ * set the entity's {@link StoreItem} property value to the blob's ETag upon
+ * read. Afterward, an {@link BlobRequestConditions} with the ETag value will be
+ * generated during Write. New entities start with a null ETag.
  */
 public class BlobsStorage implements Storage {
 
@@ -50,8 +51,10 @@ public class BlobsStorage implements Storage {
 
     /**
      * Initializes a new instance of the {@link BlobsStorage} class.
+     * 
      * @param dataConnectionString Azure Storage connection string.
-     * @param containerName Name of the Blob container where entities will be stored.
+     * @param containerName        Name of the Blob container where entities will be
+     *                             stored.
      */
     public BlobsStorage(String dataConnectionString, String containerName) {
         if (StringUtils.isBlank(dataConnectionString)) {
@@ -62,19 +65,18 @@ public class BlobsStorage implements Storage {
             throw new IllegalArgumentException("containerName is required.");
         }
 
-        objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .findAndRegisterModules()
             .enableDefaultTyping();
 
-        containerClient = new BlobContainerClientBuilder()
-                            .connectionString(dataConnectionString)
-                            .containerName(containerName)
-                            .buildClient();
+        containerClient = new BlobContainerClientBuilder().connectionString(dataConnectionString)
+            .containerName(containerName)
+            .buildClient();
     }
 
     /**
      * Deletes entity blobs from the configured container.
+     * 
      * @param keys An array of entity keys.
      * @return A task that represents the work queued to execute.
      */
@@ -84,7 +86,7 @@ public class BlobsStorage implements Storage {
             throw new IllegalArgumentException("The 'keys' parameter is required.");
         }
 
-        for (String key: keys) {
+        for (String key : keys) {
             String blobName = getBlobName(key);
             BlobClient blobClient = containerClient.getBlobClient(blobName);
             if (blobClient.exists()) {
@@ -102,6 +104,7 @@ public class BlobsStorage implements Storage {
 
     /**
      * Retrieve entities from the configured blob container.
+     * 
      * @param keys An array of entity keys.
      * @return A task that represents the work queued to execute.
      */
@@ -136,6 +139,7 @@ public class BlobsStorage implements Storage {
 
     /**
      * Stores a new entity in the configured blob container.
+     * 
      * @param changes The changes to write to storage.
      * @return A task that represents the work queued to execute.
      */
@@ -157,28 +161,37 @@ public class BlobsStorage implements Storage {
             StoreItem storeItem = newValue instanceof StoreItem ? (StoreItem) newValue : null;
 
             // "*" eTag in StoreItem converts to null condition for AccessCondition
-            boolean isNullOrEmpty = storeItem == null || StringUtils.isBlank(storeItem.getETag())
-                || storeItem.getETag().equals("*");
-            BlobRequestConditions accessCondition = !isNullOrEmpty
-                ? new BlobRequestConditions().setIfMatch(storeItem.getETag())
-                : null;
+            boolean isNullOrEmpty =
+                storeItem == null || StringUtils.isBlank(storeItem.getETag()) || storeItem.getETag().equals("*");
+            BlobRequestConditions accessCondition =
+                !isNullOrEmpty ? new BlobRequestConditions().setIfMatch(storeItem.getETag()) : null;
 
             String blobName = getBlobName(keyValuePair.getKey());
             BlobClient blobReference = containerClient.getBlobClient(blobName);
             try {
                 String json = objectMapper.writeValueAsString(newValue);
                 InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
-                //verify the corresponding length
-                blobReference.uploadWithResponse(stream, stream.available(),
-                    null, null,
-                    null, null, accessCondition, null, Context.NONE);
+                // verify the corresponding length
+                blobReference.uploadWithResponse(
+                    stream,
+                    stream.available(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    accessCondition,
+                    null,
+                    Context.NONE
+                );
             } catch (HttpResponseException e) {
                 if (e.getResponse().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                     StringBuilder sb =
                         new StringBuilder("An error occurred while trying to write an object. The underlying ");
                     sb.append(BlobErrorCode.INVALID_BLOCK_LIST);
-                    sb.append(" error is commonly caused due to "
-                        + "concurrently uploading an object larger than 128MB in size.");
+                    sb.append(
+                        " error is commonly caused due to "
+                            + "concurrently uploading an object larger than 128MB in size."
+                    );
 
                     throw new HttpResponseException(sb.toString(), e.getResponse());
                 }
@@ -210,12 +223,13 @@ public class BlobsStorage implements Storage {
         while (true) {
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                 blobReference.download(outputStream);
-                String contentString  = outputStream.toString();
+                String contentString = outputStream.toString();
 
                 Object obj;
                 // We are doing this try/catch because we are receiving String or HashMap
                 try {
-                    // We need to deserialize to an Object class since there are contentString which has an Object type
+                    // We need to deserialize to an Object class since there are contentString which
+                    // has an Object type
                     obj = objectMapper.readValue(contentString, Object.class);
                 } catch (MismatchedInputException ex) {
                     // In case of the contentString has the structure of a HashMap,
@@ -232,7 +246,8 @@ public class BlobsStorage implements Storage {
             } catch (HttpResponseException e) {
                 if (e.getResponse().getStatusCode() == HttpStatus.SC_PRECONDITION_FAILED) {
                     // additional retry logic,
-                    // even though this is a read operation blob storage can return 412 if there is contention
+                    // even though this is a read operation blob storage can return 412 if there is
+                    // contention
                     if (i++ < retryTimes) {
                         try {
                             TimeUnit.MILLISECONDS.sleep(millisecondsTimeout);
