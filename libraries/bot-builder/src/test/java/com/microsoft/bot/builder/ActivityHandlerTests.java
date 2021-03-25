@@ -409,6 +409,42 @@ public class ActivityHandlerTests {
     }
 
     @Test
+    public void TestCommandActivityType() {
+        Activity activity = new Activity(ActivityTypes.COMMAND);
+        activity.setName("application/test");
+        CommandValue<Object> commandValue = new CommandValue<Object>();
+        commandValue.setCommandId("Test");
+        commandValue.setData(new Object());
+        activity.setValue(commandValue);
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(bot.getRecord().size(), 1);
+        Assert.assertEquals("onCommandActivity", bot.record.get(0));
+    }
+
+    @Test
+    public void TestCommandResultActivityType() {
+        Activity activity = new Activity(ActivityTypes.COMMAND_RESULT);
+        activity.setName("application/test");
+        CommandResultValue<Object> commandValue = new CommandResultValue<Object>();
+        commandValue.setCommandId("Test");
+        commandValue.setData(new Object());
+        activity.setValue(commandValue);
+
+        TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(bot.getRecord().size(), 1);
+        Assert.assertEquals("onCommandResultActivity", bot.record.get(0));
+    }
+
+    @Test
     public void TestUnrecognizedActivityType() {
         Activity activity = new Activity() {
             {
@@ -568,6 +604,18 @@ public class ActivityHandlerTests {
         protected CompletableFuture onUnrecognizedActivityType(TurnContext turnContext) {
             record.add("onUnrecognizedActivityType");
             return super.onUnrecognizedActivityType(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture onCommandActivity(TurnContext turnContext){
+            record.add("onCommandActivity");
+            return super.onCommandActivity(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture onCommandResultActivity(TurnContext turnContext) {
+            record.add("onCommandResultActivity");
+            return super.onCommandResultActivity(turnContext);
         }
 
     }
