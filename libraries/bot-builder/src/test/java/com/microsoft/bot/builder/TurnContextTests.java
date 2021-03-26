@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Attachments;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
@@ -63,7 +64,7 @@ public class TurnContextTests {
 
                 case "TestResponded":
                     if (turnContext.getResponded()) {
-                        throw new RuntimeException("Responded is true");
+                        return Async.completeExceptionally(new RuntimeException("Responded is true"));
                     }
 
                     return turnContext.sendActivity(
@@ -419,7 +420,7 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, TestMessage.Message());
 
-        c.deleteActivity("12345");
+        c.deleteActivity("12345").join();
         Assert.assertTrue(activityDeleted[0]);
     }
 
@@ -440,7 +441,7 @@ public class TurnContextTests {
             }
         };
 
-        c.deleteActivity(reference);
+        c.deleteActivity(reference).join();
         Assert.assertTrue(activityDeleted[0]);
     }
 

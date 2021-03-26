@@ -130,9 +130,9 @@ public class OAuthPromptTests {
                 dc.prompt("OAuthPrompt", new PromptOptions());
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if (results.getResult() instanceof TokenResponse) {
-                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
                 } else {
-                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
                 }
             }
             return CompletableFuture.completedFuture(null);
@@ -599,9 +599,9 @@ public class OAuthPromptTests {
                 dc.prompt("OAuthPrompt", new PromptOptions());
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 if (results.getResult() instanceof TokenResponse) {
-                    turnContext.sendActivity(MessageFactory.text("Logged in."));
+                    turnContext.sendActivity(MessageFactory.text("Logged in.")).join();
                 } else {
-                    turnContext.sendActivity(MessageFactory.text("Failed."));
+                    turnContext.sendActivity(MessageFactory.text("Failed.")).join();
                 }
             }
             return CompletableFuture.completedFuture(null);

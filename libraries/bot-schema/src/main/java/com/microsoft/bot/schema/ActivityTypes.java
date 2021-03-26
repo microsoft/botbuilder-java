@@ -32,6 +32,16 @@ public final class ActivityTypes {
     public static final String TYPING = "typing";
 
     /**
+     * Enum value for Command Activities.
+     */
+    public static final String COMMAND = "command";
+
+    /**
+     * Enum value for Command Result Activities.
+     */
+    public static final String COMMAND_RESULT = "commandResult";
+
+    /**
      * Enum value endOfConversation.
      */
     public static final String END_OF_CONVERSATION = "endOfConversation";

@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextImpl;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -346,7 +347,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             List<Activity> activities
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -354,7 +355,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             Activity activity
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -362,7 +363,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             ConversationReference reference
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
     }
 

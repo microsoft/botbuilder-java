@@ -5,6 +5,7 @@ package com.microsoft.bot.builder;
 
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
@@ -71,7 +72,7 @@ public class TestAdapterTests {
         try {
 
             new TestFlow(adapter, turnContext -> {
-                throw new RuntimeException(uniqueExceptionId);
+                return Async.completeExceptionally(new RuntimeException(uniqueExceptionId));
             }).test("foo", activity -> {
                 Assert.assertNull(activity);
             }).startTest().join();
