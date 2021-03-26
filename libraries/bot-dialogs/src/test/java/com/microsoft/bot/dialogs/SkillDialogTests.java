@@ -352,7 +352,7 @@ public class SkillDialogTests {
                                         conversationState);
 
         // Send something to the dialog
-        Assert.assertThrows(Exception.class, () -> client.sendActivity("irrelevant"));
+        Assert.assertThrows(Exception.class, () -> client.sendActivity("irrelevant").join());
     }
 
     @Test
@@ -548,7 +548,7 @@ public class SkillDialogTests {
             conversationState);
 
         // Send something to the dialog to start it
-        client.sendActivity("hello");
+        client.sendActivity("hello").join();
 
         SimpleConversationIdFactory factory = null;
         if (dialogOptions.getConversationIdFactory() != null

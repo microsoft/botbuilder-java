@@ -14,6 +14,7 @@ import com.microsoft.bot.builder.QueueStorage;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogManager;
@@ -167,13 +168,13 @@ public class AzureQueueTests {
             try {
                 date = LocalDateTime.parse(dateString);
             } catch (DateTimeParseException ex) {
-                throw new IllegalArgumentException("Date is invalid");
+                return Async.completeExceptionally(new IllegalArgumentException("Date is invalid"));
             }
 
             ZonedDateTime zonedDate = date.atZone(ZoneOffset.UTC);
             ZonedDateTime now = LocalDateTime.now().atZone(ZoneOffset.UTC);
             if (zonedDate.isBefore(now)) {
-                throw new IllegalArgumentException("Date must be in the future");
+                return Async.completeExceptionally(new IllegalArgumentException("Date must be in the future"));
             }
 
             // create ContinuationActivity from the conversation reference.
@@ -185,7 +186,7 @@ public class AzureQueueTests {
 
             QueueStorage queueStorage = dc.getContext().getTurnState().get("QueueStorage");
             if (queueStorage == null) {
-                throw new NullPointerException("Unable to locate QueueStorage in HostContext");
+                return Async.completeExceptionally(new NullPointerException("Unable to locate QueueStorage in HostContext"));
             }
             return queueStorage.queueActivity(activity, visibility, ttl).thenCompose(receipt -> {
                 // return the receipt as the result

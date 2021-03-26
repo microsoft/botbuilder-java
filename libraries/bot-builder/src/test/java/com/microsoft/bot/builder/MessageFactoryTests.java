@@ -545,7 +545,7 @@ public class MessageFactoryTests {
                     null
                 );
 
-                turnContext.sendActivity(activity);
+                turnContext.sendActivity(activity).join();
             }
             return CompletableFuture.completedFuture(null);
         };

@@ -14,6 +14,7 @@ import com.microsoft.bot.builder.TranscriptLoggerMiddleware;
 import com.microsoft.bot.builder.TranscriptStore;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -536,7 +537,7 @@ public class TranscriptStoreTests {
         }
 
         if(pagedResult == null) {
-            throw new TimeoutException("Unable to retrieve pagedResult in time");
+            return Async.completeExceptionally(new TimeoutException("Unable to retrieve pagedResult in time"));
         }
 
         return CompletableFuture.completedFuture(pagedResult);

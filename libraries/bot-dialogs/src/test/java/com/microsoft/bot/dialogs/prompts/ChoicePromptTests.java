@@ -536,7 +536,7 @@ public class ChoicePromptTests {
         DialogSet dialogs = new DialogSet(dialogState);
 
         PromptValidator<FoundChoice> validator =  (promptContext) -> {
-            promptContext.getContext().sendActivity(MessageFactory.text("validator called"));
+            promptContext.getContext().sendActivity(MessageFactory.text("validator called")).join();
            return CompletableFuture.completedFuture(true);
        };
 
