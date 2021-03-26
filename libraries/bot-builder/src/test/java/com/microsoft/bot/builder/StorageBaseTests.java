@@ -19,12 +19,9 @@ public class StorageBaseTests {
     }
 
     protected void createObjectTest(Storage storage) {
-        Map<String, Object> storeItems = new HashMap<String, Object>() {
-            {
-                put("createPoco", new PocoItem("1"));
-                put("createPocoStoreItem", new PocoStoreItem("1"));
-            }
-        };
+        Map<String, Object> storeItems = new HashMap<String, Object>();
+        storeItems.put("createPoco", new PocoItem("1"));
+        storeItems.put("createPocoStoreItem", new PocoStoreItem("1"));
 
         storage.write(storeItems).join();
 
@@ -55,12 +52,8 @@ public class StorageBaseTests {
     protected void handleCrazyKeys(Storage storage) {
         String key = "!@#$%^&*()~/\\><,.?';\"`~";
         PocoStoreItem storeItem = new PocoStoreItem("1");
-        Map<String, Object> dict = new HashMap<String, Object>() {
-            {
-                put(key, storeItem);
-            }
-        };
-
+        Map<String, Object> dict = new HashMap<String, Object>();
+        dict.put(key, storeItem);
         storage.write(dict).join();
         Map<String, Object> storeItems = storage.read(new String[] { key }).join();
 
@@ -71,12 +64,9 @@ public class StorageBaseTests {
     }
 
     protected void updateObjectTest(Storage storage) {
-        Map<String, Object> dict = new HashMap<String, Object>() {
-            {
-                put("pocoItem", new PocoItem("1", 1));
-                put("pocoStoreItem", new PocoStoreItem("1", 1));
-            }
-        };
+        Map<String, Object> dict = new HashMap<String, Object>();
+        dict.put("pocoItem", new PocoItem("1", 1));
+        dict.put("pocoStoreItem", new PocoStoreItem("1", 1));
 
         storage.write(dict).join();
         Map<String, Object> loadedStoreItems = storage.read(
@@ -127,24 +117,18 @@ public class StorageBaseTests {
 
         try {
             updatePocoItem.setCount(123);
-
-            storage.write(new HashMap<String, Object>() {
-                {
-                    put("pocoItem", updatePocoItem);
-                }
-            }).join();
+            HashMap<String, Object> pocoList = new HashMap<String, Object>();
+            pocoList.put("pocoItem", updatePocoItem);
+            storage.write(pocoList).join();
         } catch (Throwable t) {
             Assert.fail("Should not throw exception on write with pocoItem");
         }
 
         try {
             updatePocoStoreItem.setCount(123);
-
-            storage.write(new HashMap<String, Object>() {
-                {
-                    put("pocoStoreItem", updatePocoStoreItem);
-                }
-            }).join();
+            HashMap<String, Object> pocoList = new HashMap<String, Object>();
+            pocoList.put("pocoStoreItem", updatePocoStoreItem);
+            storage.write(pocoList).join();
 
             Assert.fail(
                 "Should have thrown exception on write with store item because of old etag"
@@ -169,13 +153,10 @@ public class StorageBaseTests {
         reloadedPocoItem2.setCount(100);
         reloadedPocoStoreItem2.setCount(100);
         reloadedPocoStoreItem2.setETag("*");
-
-        storage.write(new HashMap<String, Object>() {
-            {
-                put("pocoItem", reloadedPocoItem2);
-                put("pocoStoreItem", reloadedPocoStoreItem2);
-            }
-        }).join();
+        HashMap<String, Object> pocoList = new HashMap<String, Object>();
+        pocoList.put("pocoItem", reloadedPocoItem2);
+        pocoList.put("pocoStoreItem", reloadedPocoStoreItem2);
+        storage.write(pocoList).join();
 
         Map<String, Object> reloadedStoreItems3 = storage.read(
             new String[] { "pocoItem", "pocoStoreItem" }
@@ -195,11 +176,9 @@ public class StorageBaseTests {
 
             reloadedStoreItem4.setETag("");
 
-            storage.write(new HashMap<String, Object>() {
-                {
-                    put("pocoStoreItem", reloadedStoreItem4);
-                }
-            }).join();
+            HashMap<String, Object> pocoList2 = new HashMap<String, Object>();
+            pocoList2.put("pocoStoreItem", reloadedStoreItem4);
+            storage.write(pocoList2).join();
 
             Assert.fail(
                 "Should have thrown exception on write with storeitem because of empty etag"
@@ -216,11 +195,8 @@ public class StorageBaseTests {
     }
 
     protected void deleteObjectTest(Storage storage) {
-        Map<String, Object> dict = new HashMap<String, Object>() {
-            {
-                put("delete1", new PocoStoreItem("1", 1));
-            }
-        };
+        Map<String, Object> dict = new HashMap<String, Object>();
+        dict.put("delete1", new PocoStoreItem("1", 1));
 
         storage.write(dict).join();
 

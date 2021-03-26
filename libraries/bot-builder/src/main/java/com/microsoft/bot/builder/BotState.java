@@ -147,11 +147,8 @@ public abstract class BotState implements PropertyManager {
             CachedBotState cachedState = turnContext.getTurnState().get(contextServiceKey);
             if (force || cachedState != null && cachedState.isChanged()) {
                 String storageKey = getStorageKey(turnContext);
-                Map<String, Object> changes = new HashMap<String, Object>() {
-                    {
-                        put(storageKey, cachedState.state);
-                    }
-                };
+                Map<String, Object> changes = new HashMap<String, Object>();
+                changes.put(storageKey, cachedState.state);
 
                 return storage.write(changes).thenApply(val -> {
                     cachedState.setHash(cachedState.computeHash(cachedState.state));

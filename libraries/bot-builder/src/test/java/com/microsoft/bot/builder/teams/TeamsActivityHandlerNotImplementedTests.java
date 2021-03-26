@@ -30,317 +30,220 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TeamsActivityHandlerNotImplementedTests {
     @Test
     public void TestInvoke() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("gibberish");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("gibberish");
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentAccept() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("accept");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("accept");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentDecline() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("decline");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("decline");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestActionableMessageExecuteAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("actionableMessage/executeAction");
-                setValue(new O365ConnectorCardActionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("actionableMessage/executeAction");
+        activity.setValue(new O365ConnectorCardActionQuery());
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestComposeExtensionQueryLink() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/queryLink");
-                setValue(new AppBasedLinkQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/queryLink");
+        activity.setValue(new AppBasedLinkQuery());
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestComposeExtensionQuery() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/query");
-                setValue(new MessagingExtensionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/query");
+        activity.setValue(new MessagingExtensionQuery());
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSelectItem() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/selectItem");
-                setValue(new O365ConnectorCardActionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/selectItem");
+        activity.setValue(new O365ConnectorCardActionQuery());
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        activity.setValue(new MessagingExtensionQuery());
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEdit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("edit");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("edit");
+        activity.setValue(action);
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSend() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("send");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("send");
+        activity.setValue(action);
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionFetchTask() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/fetchTask");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setCommandId("testCommand");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/fetchTask");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setCommandId("testCommand");
+        activity.setValue(action);
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionConfigurationQuerySettingsUrl() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/querySettingsUrl");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/querySettingsUrl");
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestMessagingExtensionConfigurationSetting() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/setting");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/setting");
 
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestTaskModuleFetch() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("task/fetch");
-                setValue(new TaskModuleRequest() {
-                    {
-                        setData(new HashMap<String, Object>() {
-                            {
-                                put("key", "value");
-                                put("type", "task / fetch");
-                            }
-                        });
-                        setContext(new TaskModuleRequestContext() {
-                            {
-                                setTheme("default");
-                            }
-                        });
-                    }
-                });
-            }
-        };
-
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("task/fetch");
+        HashMap<String, Object> data = new HashMap<String, Object>();
+        data.put("key", "value");
+        data.put("type", "task / fetch");
+        TaskModuleRequestContext context = new TaskModuleRequestContext();
+        context.setTheme("default");
+        TaskModuleRequest request = new TaskModuleRequest();
+        request.setData(data);
+        request.setContext(context);
+        activity.setValue(request);
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestTaskModuleSubmit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("task/submit");
-                setValue(new TaskModuleRequest() {
-                    {
-                        setData(new HashMap<String, Object>() {
-                            {
-                                put("key", "value");
-                                put("type", "task / fetch");
-                            }
-                        });
-                        setContext(new TaskModuleRequestContext() {
-                            {
-                                setTheme("default");
-                            }
-                        });
-                    }
-                });
-            }
-        };
-
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("task/submit");
+        HashMap<String, Object> data = new HashMap<String, Object>();
+        data.put("key", "value");
+        data.put("type", "task / fetch");
+        TaskModuleRequestContext context = new TaskModuleRequestContext();
+        context.setTheme("default");
+        TaskModuleRequest request = new TaskModuleRequest();
+        request.setData(data);
+        request.setContext(context);
+        activity.setValue(request);
         assertNotImplemented(activity);
     }
 
     @Test
     public void TestFileConsentAcceptImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("accept");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("accept");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         assertImplemented(activity, new TestActivityHandlerFileConsent());
     }
 
     @Test
     public void TestFileConsentDeclineImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("decline");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("decline");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         assertImplemented(activity, new TestActivityHandlerFileConsent());
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEditImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("edit");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("edit");
+        activity.setValue(action);
 
         assertImplemented(activity, new TestActivityHandlerPrevieAction());
     }
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSendImplemented() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("send");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+                action.setBotMessagePreviewAction("send");
+        activity.setValue(action);
 
         assertImplemented(activity, new TestActivityHandlerPrevieAction());
     }
