@@ -51,7 +51,7 @@ public class SkillConversationIdFactoryTests {
              skillConversationIdFactory.getSkillConversationReference(skillConversationId).join();
 
         // Delete
-         skillConversationIdFactory.deleteConversationReference(skillConversationId);
+         skillConversationIdFactory.deleteConversationReference(skillConversationId).join();
 
         // Retrieve again
         SkillConversationReference deletedConversationReference =

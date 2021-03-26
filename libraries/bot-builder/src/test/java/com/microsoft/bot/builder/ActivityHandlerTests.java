@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -467,7 +468,7 @@ public class ActivityHandlerTests {
             TurnContext context,
             List<Activity> activities
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -475,7 +476,7 @@ public class ActivityHandlerTests {
             TurnContext context,
             Activity activity
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -483,7 +484,7 @@ public class ActivityHandlerTests {
             TurnContext context,
             ConversationReference reference
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
     }
 

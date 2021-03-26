@@ -176,7 +176,7 @@ public class TextPromptTests {
             String value = promptContext.getRecognized().getValue();
             if (value.length() <= 3) {
                 promptContext.getContext()
-                        .sendActivity(MessageFactory.text("Make sure the text is greater than three characters."));
+                        .sendActivity(MessageFactory.text("Make sure the text is greater than three characters.")).join();
                 return CompletableFuture.completedFuture(false);
             } else {
                 return CompletableFuture.completedFuture(true);
@@ -270,7 +270,7 @@ public class TextPromptTests {
             String value = promptContext.getRecognized().getValue();
             if (value.length() <= 3) {
                 promptContext.getContext()
-                        .sendActivity(MessageFactory.text("The text should be greater than 3 chars."));
+                        .sendActivity(MessageFactory.text("The text should be greater than 3 chars.")).join();
                 return CompletableFuture.completedFuture(false);
             } else {
                 return CompletableFuture.completedFuture(true);

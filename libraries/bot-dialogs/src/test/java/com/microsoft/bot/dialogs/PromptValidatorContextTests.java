@@ -107,7 +107,7 @@ public class PromptValidatorContextTests {
                     return CompletableFuture.completedFuture(true);
                 } else {
                      promptContext.getContext().sendActivity(
-                         MessageFactory.text("Please send a name that is longer than 3 characters."));
+                         MessageFactory.text("Please send a name that is longer than 3 characters.")).join();
                 }
 
                 return CompletableFuture.completedFuture(false);
