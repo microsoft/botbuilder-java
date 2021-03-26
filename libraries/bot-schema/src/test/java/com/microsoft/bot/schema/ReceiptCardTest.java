@@ -11,18 +11,18 @@ import org.junit.Test;
  */
 public class ReceiptCardTest {
 
-    ReceiptCard card = new ReceiptCard() {
-        {
-            setTitle("John Doe");
-        }
-    };
+    ReceiptCard getCard() {
+        ReceiptCard card = new ReceiptCard();
+        card.setTitle("John Doe");
+        return card;
+    }
 
     /**
      * Ensures that the ReceiptCard can be added as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.receipt", attachment.getContentType());
     }

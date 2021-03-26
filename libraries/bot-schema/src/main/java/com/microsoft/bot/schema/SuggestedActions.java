@@ -41,17 +41,16 @@ public class SuggestedActions {
             return null;
         }
 
-        return new SuggestedActions() {
-            {
-                setTo(suggestedActions.getTo());
+        SuggestedActions cloned = new SuggestedActions();
+        cloned.setTo(suggestedActions.getTo());
 
-                List<CardAction> cloned = suggestedActions.getActions()
-                    .stream()
-                    .map(card -> CardAction.clone(card))
-                    .collect(Collectors.toCollection(ArrayList::new));
-                setActions(cloned);
-            }
-        };
+        List<CardAction> actions = suggestedActions.getActions()
+            .stream()
+            .map(card -> CardAction.clone(card))
+            .collect(Collectors.toCollection(ArrayList::new));
+        cloned.setActions(actions);
+
+        return cloned;
     }
 
     /**

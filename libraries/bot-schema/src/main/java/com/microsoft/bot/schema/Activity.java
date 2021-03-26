@@ -253,20 +253,16 @@ public class Activity {
         Object withValue,
         String withLabel
     ) {
-        return new Activity(ActivityTypes.TRACE) {
-            {
-                setName(withName);
-                setLabel(withLabel);
-                if (withValue != null) {
-                    setValueType(
-                        (withValueType == null) ? withValue.getClass().getTypeName() : withValueType
-                    );
-                } else {
-                    setValueType(withValueType);
-                }
-                setValue(withValue);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.TRACE);
+        activity.setName(withName);
+        activity.setLabel(withLabel);
+        if (withValue != null) {
+            activity.setValueType((withValueType == null) ? withValue.getClass().getTypeName() : withValueType);
+        } else {
+            activity.setValueType(withValueType);
+        }
+        activity.setValue(withValue);
+        return activity;
     }
 
     /**
@@ -296,12 +292,10 @@ public class Activity {
      * @return A conversation update type Activity.
      */
     public static Activity createConversationUpdateActivity() {
-        return new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersAdded(new ArrayList<>());
-                setMembersRemoved(new ArrayList<>());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        activity.setMembersAdded(new ArrayList<>());
+        activity.setMembersRemoved(new ArrayList<>());
+        return activity;
     }
 
     /**
@@ -356,62 +350,58 @@ public class Activity {
      * @return new cloned activity
      */
     public static Activity clone(Activity activity) {
-        Activity clone = new Activity(activity.getType()) {
-            {
-                setId(activity.getId());
-                setTimestamp(activity.getTimestamp());
-                setLocalTimestamp(activity.getLocalTimestamp());
-                setLocalTimeZone(activity.getLocalTimezone());
-                setChannelData(activity.getChannelData());
-                setFrom(ChannelAccount.clone(activity.getFrom()));
-                setRecipient(ChannelAccount.clone(activity.getRecipient()));
-                setConversation(ConversationAccount.clone(activity.getConversation()));
-                setChannelId(activity.getChannelId());
-                setServiceUrl(activity.getServiceUrl());
-                setChannelId(activity.getChannelId());
-                setEntities(Entity.cloneList(activity.getEntities()));
-                setReplyToId(activity.getReplyToId());
-                setSpeak(activity.getSpeak());
-                setText(activity.getText());
-                setInputHint(activity.getInputHint());
-                setSummary(activity.getSummary());
-                setSuggestedActions(SuggestedActions.clone(activity.getSuggestedActions()));
-                setAttachments(Attachment.cloneList(activity.getAttachments()));
-                setAction(activity.getAction());
-                setLabel(activity.getLabel());
-                setValueType(activity.getValueType());
-                setValue(activity.getValue());
-                setName(activity.getName());
-                setRelatesTo(ConversationReference.clone(activity.getRelatesTo()));
-                setCode(activity.getCode());
-                setExpiration(activity.getExpiration());
-                setImportance(activity.getImportance());
-                setDeliveryMode(activity.getDeliveryMode());
-                setTextHighlights(activity.getTextHighlights());
-                setCallerId(activity.getCallerId());
-                setHistoryDisclosed(activity.getHistoryDisclosed());
-                setLocale(activity.getLocale());
-                setReactionsAdded(MessageReaction.cloneList(activity.getReactionsAdded()));
-                setReactionsRemoved(MessageReaction.cloneList(activity.getReactionsRemoved()));
-                setExpiration(activity.getExpiration());
-                setMembersAdded(ChannelAccount.cloneList(activity.getMembersAdded()));
-                setMembersRemoved(ChannelAccount.cloneList(activity.getMembersRemoved()));
-                setTextFormat(activity.getTextFormat());
-                setAttachmentLayout(activity.getAttachmentLayout());
-                setTopicName(activity.getTopicName());
-                if (activity.getListenFor() != null) {
-                    setListenFor(new ArrayList<>(activity.getListenFor()));
-                }
-            }
-        };
-
+        Activity cloned = new Activity(activity.getType());
+        cloned.setId(activity.getId());
+        cloned.setTimestamp(activity.getTimestamp());
+        cloned.setLocalTimestamp(activity.getLocalTimestamp());
+        cloned.setLocalTimeZone(activity.getLocalTimezone());
+        cloned.setChannelData(activity.getChannelData());
+        cloned.setFrom(ChannelAccount.clone(activity.getFrom()));
+        cloned.setRecipient(ChannelAccount.clone(activity.getRecipient()));
+        cloned.setConversation(ConversationAccount.clone(activity.getConversation()));
+        cloned.setChannelId(activity.getChannelId());
+        cloned.setServiceUrl(activity.getServiceUrl());
+        cloned.setChannelId(activity.getChannelId());
+        cloned.setEntities(Entity.cloneList(activity.getEntities()));
+        cloned.setReplyToId(activity.getReplyToId());
+        cloned.setSpeak(activity.getSpeak());
+        cloned.setText(activity.getText());
+        cloned.setInputHint(activity.getInputHint());
+        cloned.setSummary(activity.getSummary());
+        cloned.setSuggestedActions(SuggestedActions.clone(activity.getSuggestedActions()));
+        cloned.setAttachments(Attachment.cloneList(activity.getAttachments()));
+        cloned.setAction(activity.getAction());
+        cloned.setLabel(activity.getLabel());
+        cloned.setValueType(activity.getValueType());
+        cloned.setValue(activity.getValue());
+        cloned.setName(activity.getName());
+        cloned.setRelatesTo(ConversationReference.clone(activity.getRelatesTo()));
+        cloned.setCode(activity.getCode());
+        cloned.setExpiration(activity.getExpiration());
+        cloned.setImportance(activity.getImportance());
+        cloned.setDeliveryMode(activity.getDeliveryMode());
+        cloned.setTextHighlights(activity.getTextHighlights());
+        cloned.setCallerId(activity.getCallerId());
+        cloned.setHistoryDisclosed(activity.getHistoryDisclosed());
+        cloned.setLocale(activity.getLocale());
+        cloned.setReactionsAdded(MessageReaction.cloneList(activity.getReactionsAdded()));
+        cloned.setReactionsRemoved(MessageReaction.cloneList(activity.getReactionsRemoved()));
+        cloned.setExpiration(activity.getExpiration());
+        cloned.setMembersAdded(ChannelAccount.cloneList(activity.getMembersAdded()));
+        cloned.setMembersRemoved(ChannelAccount.cloneList(activity.getMembersRemoved()));
+        cloned.setTextFormat(activity.getTextFormat());
+        cloned.setAttachmentLayout(activity.getAttachmentLayout());
+        cloned.setTopicName(activity.getTopicName());
+        if (activity.getListenFor() != null) {
+            cloned.setListenFor(new ArrayList<>(activity.getListenFor()));
+        }
         for (Map.Entry<String, JsonNode> entry : activity.getProperties().entrySet()) {
-            clone.setProperties(entry.getKey(), entry.getValue());
+            cloned.setProperties(entry.getKey(), entry.getValue());
         }
 
-        clone = ensureActivityHasId(clone);
+        cloned = ensureActivityHasId(cloned);
 
-        return clone;
+        return cloned;
     }
 
     private static Activity ensureActivityHasId(Activity activity) {
@@ -1525,17 +1515,15 @@ public class Activity {
      */
     @JsonIgnore
     public ConversationReference getConversationReference() {
-        return new ConversationReference() {
-            {
-                setActivityId(Activity.this.getId());
-                setUser(Activity.this.getFrom());
-                setBot(Activity.this.getRecipient());
-                setConversation(Activity.this.getConversation());
-                setChannelId(Activity.this.getChannelId());
-                setLocale(Activity.this.getLocale());
-                setServiceUrl(Activity.this.getServiceUrl());
-            }
-        };
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setActivityId(getId());
+        conversationReference.setUser(getFrom());
+        conversationReference.setBot(getRecipient());
+        conversationReference.setConversation(getConversation());
+        conversationReference.setChannelId(getChannelId());
+        conversationReference.setLocale(getLocale());
+        conversationReference.setServiceUrl(getServiceUrl());
+        return conversationReference;
     }
 
     /**

@@ -28,11 +28,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetId(){
         String id = "testId";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setId(id);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setId(id);
         String result = messageActionsPayload.getId();
 
         Assert.assertEquals(result, id);
@@ -44,11 +41,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetReplyToId(){
         String replyToId = "testReplyToId";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setReplyToId(replyToId);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setReplyToId(replyToId);
         String result = messageActionsPayload.getReplyToId();
 
         Assert.assertEquals(result, replyToId);
@@ -60,11 +54,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetMessageType(){
         String messageType = "testMessageType";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setMessageType(messageType);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setMessageType(messageType);
         String result = messageActionsPayload.getMessageType();
 
         Assert.assertEquals(result, messageType);
@@ -76,11 +67,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetCreatedDateTime(){
         String createdDateTime = "2000-01-01";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setCreatedDateTime(createdDateTime);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setCreatedDateTime(createdDateTime);
         String result = messageActionsPayload.getCreatedDateTime();
 
         Assert.assertEquals(result, createdDateTime);
@@ -92,11 +80,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetLastModifiedDateTime(){
         String lastModifiedDateTime = "2000-01-01";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setLastModifiedDateTime(lastModifiedDateTime);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setLastModifiedDateTime(lastModifiedDateTime);
         String result = messageActionsPayload.getLastModifiedDateTime();
 
         Assert.assertEquals(result, lastModifiedDateTime);
@@ -108,11 +93,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetDeleted(){
         Boolean deleted = false;
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setDeleted(deleted);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setDeleted(deleted);
         Boolean result = messageActionsPayload.getDeleted();
 
         Assert.assertEquals(result, deleted);
@@ -124,11 +106,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetSubject(){
         String subject = "testSubject";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setSubject(subject);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setSubject(subject);
         String result = messageActionsPayload.getSubject();
 
         Assert.assertEquals(result, subject);
@@ -140,11 +119,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetSummary(){
         String summary = "testSummary";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setSummary(summary);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setSummary(summary);
         String result = messageActionsPayload.getSummary();
 
         Assert.assertEquals(result, summary);
@@ -156,11 +132,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetImportance(){
         String importance = "normal";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setImportance(importance);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setImportance(importance);
         String result = messageActionsPayload.getImportance();
 
         Assert.assertEquals(result, importance);
@@ -172,11 +145,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetLinkToMessage(){
         String linkToMessage = "https://teams.microsoft.com/l/message/testing-id";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setLinkToMessage(linkToMessage);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setLinkToMessage(linkToMessage);
         String result = messageActionsPayload.getLinkToMessage();
 
         Assert.assertEquals(result, linkToMessage);
@@ -188,11 +158,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetLocale(){
         String locale = "US";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setLocale(locale);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setLocale(locale);
         String result = messageActionsPayload.getLocale();
 
         Assert.assertEquals(result, locale);
@@ -204,11 +171,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetFrom(){
         MessageActionsPayloadFrom from = new MessageActionsPayloadFrom();
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setFrom(from);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setFrom(from);
         MessageActionsPayloadFrom result = messageActionsPayload.getFrom();
 
         Assert.assertEquals(result, from);
@@ -220,11 +184,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetBody(){
         MessageActionsPayloadBody body = new MessageActionsPayloadBody();
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setBody(body);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setBody(body);
         MessageActionsPayloadBody result = messageActionsPayload.getBody();
 
         Assert.assertEquals(result, body);
@@ -236,11 +197,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetAttachmentLayout(){
         String attachmentLayout = "testAttachmentLayout";
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setAttachmentLayout(attachmentLayout);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setAttachmentLayout(attachmentLayout);
         String result = messageActionsPayload.getAttachmentLayout();
 
         Assert.assertEquals(result, attachmentLayout);
@@ -252,11 +210,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetAttachments(){
         List<MessageActionsPayloadAttachment> attachments = new ArrayList<MessageActionsPayloadAttachment>();
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setAttachments(attachments);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setAttachments(attachments);
         List<MessageActionsPayloadAttachment> result = messageActionsPayload.getAttachments();
 
         Assert.assertEquals(result, attachments);
@@ -268,11 +223,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetMentions(){
         List<MessageActionsPayloadMention> mentions = new ArrayList<MessageActionsPayloadMention>();
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setMentions(mentions);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setMentions(mentions);
         List<MessageActionsPayloadMention> result = messageActionsPayload.getMentions();
 
         Assert.assertEquals(result, mentions);
@@ -284,11 +236,8 @@ public class MessageActionsPayloadTest {
     @Test
     public void TestGetReactions(){
         List<MessageActionsPayloadReaction> reactions = new ArrayList<MessageActionsPayloadReaction>();
-        MessageActionsPayload messageActionsPayload = new MessageActionsPayload(){
-            {
-                setReactions(reactions);
-            }
-        };
+        MessageActionsPayload messageActionsPayload = new MessageActionsPayload();
+        messageActionsPayload.setReactions(reactions);
         List<MessageActionsPayloadReaction> result = messageActionsPayload.getReactions();
 
         Assert.assertEquals(result, reactions);

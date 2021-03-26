@@ -52,18 +52,17 @@ public class ChannelAccount {
             return null;
         }
 
-        return new ChannelAccount() {
-            {
-                setId(channelAccount.getId());
-                setRole(channelAccount.getRole());
-                setName(channelAccount.getName());
-                setAadObjectId(channelAccount.getAadObjectId());
+        ChannelAccount cloned = new ChannelAccount();
+        cloned.setId(channelAccount.getId());
+        cloned.setRole(channelAccount.getRole());
+        cloned.setName(channelAccount.getName());
+        cloned.setAadObjectId(channelAccount.getAadObjectId());
 
-                for (String key : channelAccount.getProperties().keySet()) {
-                    this.setProperties(key, channelAccount.getProperties().get(key));
-                }
-            }
-        };
+        for (String key : channelAccount.getProperties().keySet()) {
+            cloned.setProperties(key, channelAccount.getProperties().get(key));
+        }
+
+        return cloned;
     }
 
     /**
