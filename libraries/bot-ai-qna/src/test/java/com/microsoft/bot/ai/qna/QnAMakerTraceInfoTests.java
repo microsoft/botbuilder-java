@@ -17,22 +17,17 @@ public class QnAMakerTraceInfoTests {
 
     @Test
     public void qnaMakerTraceInfoSerialization() throws IOException {
-        QueryResult[] queryResults = new QueryResult[] { new QueryResult() {
-            {
-                setQuestions(new String[] { "What's your name?" });
-                setAnswer("My name is Mike");
-                setScore(0.9f);
-            }
-        } };
+        QueryResult queryResult = new QueryResult();
+        queryResult.setQuestions(new String[] { "What's your name?" });
+        queryResult.setAnswer("My name is Mike");
+        queryResult.setScore(0.9f);
+        QueryResult[] queryResults = new QueryResult[] { queryResult };
 
-        QnAMakerTraceInfo qnaMakerTraceInfo = new QnAMakerTraceInfo() {
-            {
-                setQueryResults(queryResults);
-                setKnowledgeBaseId(UUID.randomUUID().toString());
-                setScoreThreshold(0.5f);
-                setTop(1);
-            }
-        };
+        QnAMakerTraceInfo qnaMakerTraceInfo = new QnAMakerTraceInfo();
+        qnaMakerTraceInfo.setQueryResults(queryResults);
+        qnaMakerTraceInfo.setKnowledgeBaseId(UUID.randomUUID().toString());
+        qnaMakerTraceInfo.setScoreThreshold(0.5f);
+        qnaMakerTraceInfo.setTop(1);
 
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         String serialized = jacksonAdapter.serialize(qnaMakerTraceInfo);

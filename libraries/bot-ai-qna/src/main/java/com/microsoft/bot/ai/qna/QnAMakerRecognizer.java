@@ -380,17 +380,15 @@ public class QnAMakerRecognizer extends Recognizer {
             filters.addAll(Arrays.asList(externalMetadata));
         }
 
-        QnAMakerOptions options = new QnAMakerOptions() {
-            {
-                setContext(context);
-                setThreshold(threshold);
-                setStrictFilters(filters.toArray(new Metadata[filters.size()]));
-                setTop(top);
-                setQnAId(qnAId);
-                setIsTest(isTest);
-                setStrictFiltersJoinOperator(strictFiltersJoinOperator);
-            }
-        };
+        QnAMakerOptions options = new QnAMakerOptions();
+        options.setContext(context);
+        options.setScoreThreshold(threshold);
+        options.setStrictFilters(filters.toArray(new Metadata[filters.size()]));
+        options.setTop(top);
+        options.setQnAId(qnAId);
+        options.setIsTest(isTest);
+        options.setStrictFiltersJoinOperator(strictFiltersJoinOperator);
+
         // Calling QnAMaker to get response.
         return this.getQnAMakerClient(dialogContext).thenCompose(qnaClient -> {
             return qnaClient.getAnswers(dialogContext.getContext(), options, null, null).thenApply(answers -> {
@@ -403,19 +401,17 @@ public class QnAMakerRecognizer extends Recognizer {
                     }
                     Float internalTopAnswer = topAnswer.getScore();
                     if (topAnswer.getAnswer().trim().toUpperCase().startsWith(intentPrefix.toUpperCase())) {
+                        IntentScore intentScore = new IntentScore();
+                        intentScore.setScore(internalTopAnswer);
                         recognizerResult.getIntents()
                             .put(topAnswer.getAnswer().trim().substring(
                                 intentPrefix.length()).trim(),
-                                new IntentScore() {{
-                                    setScore(internalTopAnswer);
-                                }}
+                                intentScore
                             );
                     } else {
-                        recognizerResult.getIntents().put(this.qnAMatchIntent, new IntentScore() {
-                            {
-                                setScore(internalTopAnswer);
-                            }
-                        });
+                        IntentScore intentScore = new IntentScore();
+                        intentScore.setScore(internalTopAnswer);
+                        recognizerResult.getIntents().put(this.qnAMatchIntent, intentScore);
                     }
                     ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
                     ObjectNode entitiesNode = mapper.createObjectNode();
@@ -434,11 +430,9 @@ public class QnAMakerRecognizer extends Recognizer {
                     recognizerResult.setEntities(entitiesNode);
                     recognizerResult.getProperties().put("answers", mapper.valueToTree(answers));
                 } else {
-                    recognizerResult.getIntents().put("None", new IntentScore() {
-                        {
-                            setScore(1.0f);
-                        }
-                    });
+                    IntentScore intentScore = new IntentScore();
+                    intentScore.setScore(1.0f);
+                    recognizerResult.getIntents().put("None", intentScore);
                 }
 
                 this.trackRecognizerResult(
@@ -469,13 +463,10 @@ public class QnAMakerRecognizer extends Recognizer {
         String hn = this.hostName;
         String kbId = this.knowledgeBaseId;
         Boolean logPersonalInfo = this.logPersonalInformation;
-        QnAMakerEndpoint endpoint = new QnAMakerEndpoint() {
-            {
-                setEndpointKey(epKey);
-                setHost(hn);
-                setKnowledgeBaseId(kbId);
-            }
-        };
+        QnAMakerEndpoint endpoint = new QnAMakerEndpoint();
+        endpoint.setEndpointKey(epKey);
+        endpoint.setHost(hn);
+        endpoint.setKnowledgeBaseId(kbId);
 
         return CompletableFuture
             .completedFuture(new QnAMaker(endpoint, new QnAMakerOptions(), this.getTelemetryClient(), logPersonalInfo));
@@ -505,44 +496,40 @@ public class QnAMakerRecognizer extends Recognizer {
             );
         }
 
-        Map<String, String> properties = new HashMap<String, String>() {
-            {
-                put(
-                    "TopIntent",
-                    !recognizerResult.getIntents().isEmpty()
-                        ? (String) recognizerResult.getIntents().keySet().toArray()[0]
-                        : null
-                );
-                put(
-                    "TopIntentScore",
-                    !recognizerResult.getIntents()
-                        .isEmpty()
-                            ? Double.toString(
-                                ((IntentScore) recognizerResult.getIntents().values().toArray()[0]).getScore()
-                            )
-                            : null
-                );
-                put(
-                    "Intents",
-                    !recognizerResult.getIntents().isEmpty()
-                        ? Serialization.toStringSilent(recognizerResult.getIntents())
-                        : null
-                );
-                put(
-                    "Entities",
-                    recognizerResult.getEntities() != null
-                        ? Serialization.toStringSilent(recognizerResult.getEntities())
-                        : null
-                );
-                put(
-                    "AdditionalProperties",
-                    !recognizerResult.getProperties().isEmpty()
-                        ? Serialization.toStringSilent(recognizerResult.getProperties())
-                        : null
-                );
-            }
-        };
-
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(
+            "TopIntent",
+            !recognizerResult.getIntents().isEmpty()
+                ? (String) recognizerResult.getIntents().keySet().toArray()[0]
+                : null
+        );
+        properties.put(
+            "TopIntentScore",
+            !recognizerResult.getIntents()
+                .isEmpty()
+                    ? Double.toString(
+                        ((IntentScore) recognizerResult.getIntents().values().toArray()[0]).getScore()
+                    )
+                    : null
+        );
+        properties.put(
+            "Intents",
+            !recognizerResult.getIntents().isEmpty()
+                ? Serialization.toStringSilent(recognizerResult.getIntents())
+                : null
+        );
+        properties.put(
+            "Entities",
+            recognizerResult.getEntities() != null
+                ? Serialization.toStringSilent(recognizerResult.getEntities())
+                : null
+        );
+        properties.put(
+            "AdditionalProperties",
+            !recognizerResult.getProperties().isEmpty()
+                ? Serialization.toStringSilent(recognizerResult.getProperties())
+                : null
+        );
         if (logPersonalInformation && !Strings.isNullOrEmpty(recognizerResult.getText())) {
             properties.put("Text", recognizerResult.getText());
             properties.put("AlteredText", recognizerResult.getAlteredText());
