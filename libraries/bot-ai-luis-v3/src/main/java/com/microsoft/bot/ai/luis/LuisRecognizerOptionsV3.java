@@ -485,11 +485,8 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         if (utterance == null || utterance.isEmpty()) {
-            recognizerResult = new RecognizerResult() {
-                {
-                    setText(utterance);
-                }
-            };
+            recognizerResult = new RecognizerResult();
+            recognizerResult.setText(utterance);
         } else {
             try {
                 Request request = buildRequest(buildRequestBody(utterance));
@@ -541,11 +538,9 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
             Map.Entry<String, JsonNode> intent = it.next();
             double score = intent.getValue().get("score").asDouble();
             String intentName = intent.getKey().replace(".", "_").replace(" ", "_");
-            intents.put(intentName, new IntentScore() {
-                {
-                    setScore(score);
-                }
-            });
+            IntentScore intentScore = new IntentScore();
+            intentScore.setScore(score);
+            intents.put(intentName, intentScore);
         }
 
         return intents;
