@@ -448,7 +448,7 @@ public class WaterfallTests {
     private class Waterfall5_Step1 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step2.1"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step2.1")).join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }
     }
@@ -456,7 +456,7 @@ public class WaterfallTests {
     private class Waterfall5_Step2 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step2.2"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step2.2")).join();
             return  stepContext.endDialog();
             }
     }
