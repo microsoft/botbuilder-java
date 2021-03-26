@@ -70,13 +70,13 @@ public class WaterfallTests {
         DialogSet dialogs = new DialogSet(dialogState);
         WaterfallStep[] steps = new WaterfallStep[]
             {(step) -> {
-                step.getContext().sendActivity("step1");
+                step.getContext().sendActivity("step1").join();
                 return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
             }, (step) -> {
-                step.getContext().sendActivity("step2");
+                step.getContext().sendActivity("step2").join();
                 return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
             }, (step) -> {
-                step.getContext().sendActivity("step3");
+                step.getContext().sendActivity("step3").join();
                 return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
             },
         };
@@ -140,13 +140,13 @@ public class WaterfallTests {
         StatePropertyAccessor<DialogState> dialogState = convoState.createProperty("dialogState");
         DialogSet dialogs = new DialogSet(dialogState);
         WaterfallStep[] steps = new WaterfallStep[] {(step) -> {
-            step.getContext().sendActivity("step1");
+            step.getContext().sendActivity("step1").join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }, (step) -> {
-            step.getContext().sendActivity("step2");
+            step.getContext().sendActivity("step2").join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }, (step) -> {
-            step.getContext().sendActivity("step3");
+            step.getContext().sendActivity("step3").join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }, };
         WaterfallDialog waterfallDialog = new WaterfallDialog("test", Arrays.asList(steps));
@@ -375,7 +375,7 @@ public class WaterfallTests {
     private class Waterfall2_Step1 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity("step1");
+            stepContext.getContext().sendActivity("step1").join();
             PromptOptions options = new PromptOptions();
             options.setPrompt(MessageFactory.text("Enter a number."));
             options.setRetryPrompt(MessageFactory.text("It must be a number"));
@@ -388,10 +388,10 @@ public class WaterfallTests {
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
             if (stepContext.getValues() != null) {
                 int numberResult = (int) stepContext.getResult();
-                stepContext.getContext().sendActivity(String.format("Thanks for '%d'", numberResult));
+                stepContext.getContext().sendActivity(String.format("Thanks for '%d'", numberResult)).join();
             }
 
-            stepContext.getContext().sendActivity("step2");
+            stepContext.getContext().sendActivity("step2").join();
             PromptOptions options = new PromptOptions();
             options.setPrompt(MessageFactory.text("Enter a number."));
             options.setRetryPrompt(MessageFactory.text("It must be a number"));
@@ -404,10 +404,10 @@ public class WaterfallTests {
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
             if (stepContext.getValues() != null) {
                 int numberResult = (int) stepContext.getResult();
-                stepContext.getContext().sendActivity(String.format("Thanks for '%d'", numberResult));
+                stepContext.getContext().sendActivity(String.format("Thanks for '%d'", numberResult)).join();
             }
 
-            stepContext.getContext().sendActivity("step3");
+            stepContext.getContext().sendActivity("step3").join();
             Map<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put("Value", "All Done!");
             return  stepContext.endDialog(resultMap);
@@ -416,7 +416,7 @@ public class WaterfallTests {
     private class Waterfall3_Step1 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step1"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step1")).join();
             return stepContext.beginDialog("test-waterfall-b", null);
         }
     }
@@ -424,7 +424,7 @@ public class WaterfallTests {
     private class Waterfall3_Step2 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step2"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step2")).join();
             return stepContext.beginDialog("test-waterfall-c", null);
         }
     }
@@ -432,7 +432,7 @@ public class WaterfallTests {
     private class Waterfall4_Step1 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step1.1"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step1.1")).join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }
     }
@@ -440,7 +440,7 @@ public class WaterfallTests {
     private class Waterfall4_Step2 implements WaterfallStep {
         @Override
         public CompletableFuture<DialogTurnResult> waterfallStep(WaterfallStepContext stepContext) {
-            stepContext.getContext().sendActivity(MessageFactory.text("step1.2"));
+            stepContext.getContext().sendActivity(MessageFactory.text("step1.2")).join();
             return CompletableFuture.completedFuture(Dialog.END_OF_TURN);
         }
     }

@@ -352,7 +352,7 @@ public class SkillDialogTests {
                                         conversationState);
 
         // Send something to the dialog
-        Assert.assertThrows(Exception.class, () -> client.sendActivity("irrelevant"));
+        Assert.assertThrows(Exception.class, () -> client.sendActivity("irrelevant").join());
     }
 
     @Test
