@@ -64,18 +64,20 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
 
         Attachment adaptiveCardEditor = getAdaptiveCardAttachment("adaptiveCardEditor.json");
 
-        return CompletableFuture.completedFuture(
-            new MessagingExtensionActionResponse(){{
-                setTask(new TaskModuleContinueResponse(){{
-                    setValue(new TaskModuleTaskInfo(){{
-                        setCard(adaptiveCardEditor);
-                        setWidth(500);
-                        setHeight(450);
-                        setTitle("Task Module Fetch Example");
-                    }});
-                    setType("continue");
-                }});
-            }});
+        TaskModuleTaskInfo taskInfo = new TaskModuleTaskInfo();
+        taskInfo.setCard(adaptiveCardEditor);
+        taskInfo.setWidth(500);
+        taskInfo.setHeight(450);
+        taskInfo.setTitle("Task Module Fetch Example");
+
+        TaskModuleContinueResponse continueResponse = new TaskModuleContinueResponse();
+        continueResponse.setValue(taskInfo);
+        continueResponse.setType("continue");
+
+        MessagingExtensionActionResponse actionResponse = new MessagingExtensionActionResponse();
+        actionResponse.setTask(continueResponse);
+
+        return CompletableFuture.completedFuture(actionResponse);
     }
 
     @Override
@@ -87,12 +89,14 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
 
         updateAttachmentAdaptiveCard(adaptiveCard, action);
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
-            setComposeExtension(new MessagingExtensionResult(){{
-                setType("botMessagePreview");
-                setActivityPreview(MessageFactory.attachment(adaptiveCard));
-            }});
-        }});
+        MessagingExtensionResult result = new MessagingExtensionResult();
+        result.setType("botMessagePreview");
+        result.setActivityPreview(MessageFactory.attachment(adaptiveCard));
+
+        MessagingExtensionActionResponse response = new MessagingExtensionActionResponse();
+        response.setComposeExtension(result);
+
+        return CompletableFuture.completedFuture(response);
     }
 
     @Override
@@ -107,17 +111,20 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
         Attachment previewCard = preview.getAttachments().get(0);
         updateAttachmentAdaptiveCardEdit(adaptiveCard, previewCard);
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse(){{
-            setTask(new TaskModuleContinueResponse(){{
-                setValue(new TaskModuleTaskInfo(){{
-                    setCard(adaptiveCard);
-                    setHeight(450);
-                    setWidth(500);
-                    setTitle("Task Module Fetch Example");
-                }});
-                setType("continue");
-            }});
-        }});
+        TaskModuleTaskInfo taskInfo = new TaskModuleTaskInfo();
+        taskInfo.setCard(adaptiveCard);
+        taskInfo.setHeight(450);
+        taskInfo.setWidth(500);
+        taskInfo.setTitle("Task Module Fetch Example");
+
+        TaskModuleContinueResponse continueResponse = new TaskModuleContinueResponse();
+        continueResponse.setValue(taskInfo);
+        continueResponse.setType("continue");
+
+        MessagingExtensionActionResponse actionResponse = new MessagingExtensionActionResponse();
+        actionResponse.setTask(continueResponse);
+
+        return CompletableFuture.completedFuture(actionResponse);
     }
 
     @Override
@@ -153,10 +160,11 @@ public class TeamsMessagingExtensionsActionPreviewBot extends TeamsActivityHandl
                 .getResourceAsStream(fileName);
             String content = IOUtils.toString(input, StandardCharsets.UTF_8);
 
-            return new Attachment(){{
-                setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(new ObjectMapper().readValue(content, AdaptiveCard.class));
-            }};
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/vnd.microsoft.card.adaptive");
+            attachment.setContent(new ObjectMapper().readValue(content, AdaptiveCard.class));
+
+            return attachment;
         } catch (IOException e) {
             LoggerFactory.getLogger(TeamsMessagingExtensionsActionPreviewBot.class)
                 .error("getAdaptiveCardAttachment", e);
