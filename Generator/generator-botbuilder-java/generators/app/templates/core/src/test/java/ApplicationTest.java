@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.core;
+package <%= packageName %>;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

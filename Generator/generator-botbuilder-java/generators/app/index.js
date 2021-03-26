@@ -5,10 +5,9 @@
 const pkg = require('../../package.json');
 const Generator = require('yeoman-generator');
 const path = require('path');
-const _ = require('lodash');
 const chalk = require('chalk');
 const mkdirp = require('mkdirp');
-const camelCase = require('camelcase');
+const _ = require('lodash');
 
 const BOT_TEMPLATE_NAME_EMPTY = 'Empty Bot';
 const BOT_TEMPLATE_NAME_SIMPLE = 'Echo Bot';
@@ -17,6 +16,33 @@ const BOT_TEMPLATE_NAME_CORE = 'Core Bot';
 const BOT_TEMPLATE_NOPROMPT_EMPTY = 'empty';
 const BOT_TEMPLATE_NOPROMPT_SIMPLE = 'echo';
 const BOT_TEMPLATE_NOPROMPT_CORE = 'core';
+
+const bigBot =
+  `               ╭─────────────────────────────╮\n` +
+  `   ` +
+  chalk.blue.bold(`//`) +
+  `     ` +
+  chalk.blue.bold(`\\\\`) +
+  `   │        Welcome to the       │\n` +
+  `  ` +
+  chalk.blue.bold(`//`) +
+  ` () () ` +
+  chalk.blue.bold(`\\\\`) +
+  `  │  Microsoft Java Bot Builder │\n` +
+  `  ` +
+  chalk.blue.bold(`\\\\`) +
+  `       ` +
+  chalk.blue.bold(`//`) +
+  ` /│         generator!          │\n` +
+  `   ` +
+  chalk.blue.bold(`\\\\`) +
+  `     ` +
+  chalk.blue.bold(`//`) +
+  `   ╰─────────────────────────────╯\n` +
+  `                                    v${pkg.version}`;
+
+const tinyBot =
+    ` ` + chalk.blue.bold(`<`) + ` ** ` + chalk.blue.bold(`>`) + ` `;
 
 module.exports = class extends Generator {
     constructor(args, opts) {
@@ -31,7 +57,7 @@ module.exports = class extends Generator {
 
     initializing() {
         // give the user some data before we start asking them questions
-        this.log(`\nWelcome to the Microsoft Java Bot Builder generator v${pkg.version}. `);
+        this.log(bigBot);
     }
 
     prompting() {
@@ -59,8 +85,8 @@ module.exports = class extends Generator {
             const botName = this.templateConfig.botName;
             const packageName = this.templateConfig.packageName.toLowerCase();
             const packageTree = packageName.replace(/\./g, '/');
-            const artifact = camelCase(this.templateConfig.botName);
-            const directoryName = camelCase(this.templateConfig.botName);
+            const artifact =  _.kebabCase(this.templateConfig.botName).replace(/([^a-z0-9-]+)/gi, ``);
+            const directoryName = _.camelCase(this.templateConfig.botName);
             const template = this.templateConfig.template.toLowerCase();
 
             if (path.basename(this.destinationPath()) !== directoryName) {
@@ -104,16 +130,16 @@ module.exports = class extends Generator {
             this.log(chalk.green('------------------------ '));
             this.log(chalk.green(' Your new bot is ready!  '));
             this.log(chalk.green('------------------------ '));
-            this.log(`Your bot should be in a directory named "${camelCase(this.templateConfig.botName)}"`);
+            this.log(`Your bot should be in a directory named "${_.camelCase(this.templateConfig.botName)}"`);
             this.log('Open the ' + chalk.green.bold('README.md') + ' to learn how to run your bot. ');
             this.log('Thank you for using the Microsoft Bot Framework. ');
-            this.log('\n< ** > The Bot Framework Team');
+            this.log(`\n${tinyBot} The Bot Framework Team`);
         } else {
             this.log(chalk.red.bold('-------------------------------- '));
             this.log(chalk.red.bold(' New bot creation was canceled. '));
             this.log(chalk.red.bold('-------------------------------- '));
             this.log('Thank you for using the Microsoft Bot Framework. ');
-            this.log('\n< ** > The Bot Framework Team');
+            this.log(`\n${tinyBot} The Bot Framework Team`);
         }
     }
 
@@ -191,14 +217,11 @@ module.exports = class extends Generator {
                         {
                             name: BOT_TEMPLATE_NAME_EMPTY,
                             value: BOT_TEMPLATE_NOPROMPT_EMPTY
-                        }
-
-                        /*,
+                        },
                         {
                             name: BOT_TEMPLATE_NAME_CORE,
                             value: BOT_TEMPLATE_NOPROMPT_CORE
                         }
-                       */
                     ],
                     default: (this.options.template ? _.toLower(this.options.template) : BOT_TEMPLATE_NOPROMPT_SIMPLE)
                     }).then(answer => {

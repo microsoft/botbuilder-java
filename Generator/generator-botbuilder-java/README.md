@@ -15,6 +15,7 @@ The generator supports three different template options.  The table below can he
 | ---------- |  ---------  |
 | Echo&nbsp;Bot | A good template if you want a little more than "Hello World!", but not much more.  This template handles the very basics of sending messages to a bot, and having the bot process the messages by repeating them back to the user.  This template produces a bot that simply "echoes" back to the user anything the user says to the bot. |
 | Empty&nbsp;Bot | A good template if you are familiar with Bot Framework v4, and simply want a basic skeleton project.  Also a good option if you want to take sample code from the documentation and paste it into a minimal bot in order to learn. |
+| Core Bot | A good template if you want to create advanced bots, as it uses multi-turn dialogs and [LUIS](https://www.luis.ai), an AI based cognitive service, to implement language understanding. This template creates a bot that can extract places and dates to book a flight. |
 
 ### How to Choose a Template
 
@@ -22,16 +23,21 @@ The generator supports three different template options.  The table below can he
 | -------- | -------- |
 | Echo&nbsp;Bot  | You are new to Bot Framework v4 and want a working bot with minimal features. |
 | Empty&nbsp;Bot  | You are a seasoned Bot Framework v4 developer.  You've built bots before, and want the minimum skeleton of a bot. |
+| Core Bot | You are a medium to advanced user of Bot Framework v4 and want to start integrating language understanding as well as multi-turn dialogs in your bots. |
 
 ### Template Overview
 
 #### Echo Bot Template
 
-The Echo Bot template is slightly more than the a classic "Hello World!" example, but not by much.  This template shows the basic structure of a bot, how a bot recieves messages from a user, and how a bot sends messages to a user.  The bot will "echo" back to the user, what the user says to the bot.  It is a good choice for first time, new to Bot Framework v4 developers.
+The Echo Bot template is slightly more than the a classic "Hello World!" example, but not by much.  This template shows the basic structure of a bot, how a bot receives messages from a user, and how a bot sends messages to a user.  The bot will "echo" back to the user, what the user says to the bot.  It is a good choice for first time, new to Bot Framework v4 developers.
 
 #### Empty Bot Template
 
 The Empty Bot template is the minimal skeleton code for a bot.  It provides a stub `onTurn` handler but does not perform any actions.  If you are experienced writing bots with Bot Framework v4 and want the minimum scaffolding, the Empty template is for you.
+
+#### Core Bot Template
+
+The Core Bot template uses [LUIS](https://www.luis.ai) to implement core AI capabilities, a multi-turn conversation using Dialogs, handles user interruptions, and prompts for and validate requests for information from the user. This template implements a basic three-step waterfall dialog, where the first step asks the user for an input to book a flight, then asks the user if the information is correct, and finally confirms the booking with the user.  Choose this template if want to create an advanced bot that can extract information from the user's input.
 
 ## Installation
 
