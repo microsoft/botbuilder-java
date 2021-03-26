@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.*;
 import org.junit.Assert;
@@ -111,6 +112,33 @@ public class ActivityHandlerTests {
         Assert.assertEquals(2, bot.getRecord().size());
         Assert.assertEquals("onInstallationUpdate", bot.getRecord().get(0));
         Assert.assertEquals("onInstallationUpdateRemove", bot.getRecord().get(1));
+    }
+
+    @Test
+    public void TestOnAdaptiveCardInvoke() {
+
+        AdaptiveCardInvokeValue adaptiveCardInvokeValue = new AdaptiveCardInvokeValue();
+        AdaptiveCardInvokeAction adaptiveCardInvokeAction = new AdaptiveCardInvokeAction();
+        adaptiveCardInvokeAction.setType("Action.Execute");
+        adaptiveCardInvokeValue.setAction(adaptiveCardInvokeAction);
+
+        JsonNode node = Serialization.objectToTree(adaptiveCardInvokeValue);
+        Activity activity = new Activity() {
+            {
+                setType(ActivityTypes.INVOKE);
+                setName("adaptiveCard/action");
+                setValue(node);
+            }
+        };
+
+        TurnContext turnContext = new TurnContextImpl(new TestInvokeAdapter(), activity);
+
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        Assert.assertEquals(2, bot.getRecord().size());
+        Assert.assertEquals("onInvokeActivity", bot.getRecord().get(0));
+        Assert.assertEquals("onAdaptiveCardInvoke", bot.getRecord().get(1));
     }
 
     @Test
@@ -462,6 +490,26 @@ public class ActivityHandlerTests {
         Assert.assertEquals("onUnrecognizedActivityType", bot.getRecord().get(0));
     }
 
+    private class TestInvokeAdapter extends NotImplementedAdapter {
+
+        private Activity activity;
+
+        public Activity getActivity() {
+            return activity;
+        }
+
+        public CompletableFuture<ResourceResponse[]> sendActivities(
+            TurnContext context,
+            List<Activity> activities
+        ) {
+            activity = activities.stream()
+                                 .filter(x -> x.getType().equals(ActivityTypes.INVOKE_RESPONSE))
+                                 .findFirst()
+                                 .get();
+            return CompletableFuture.completedFuture(new ResourceResponse[0]);
+        }
+    }
+
     private static class NotImplementedAdapter extends BotAdapter {
         @Override
         public CompletableFuture<ResourceResponse[]> sendActivities(
@@ -617,6 +665,13 @@ public class ActivityHandlerTests {
         protected CompletableFuture onCommandResultActivity(TurnContext turnContext) {
             record.add("onCommandResultActivity");
             return super.onCommandResultActivity(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<AdaptiveCardInvokeResponse> onAdaptiveCardInvoke(
+            TurnContext turnContext, AdaptiveCardInvokeValue invokeValue) {
+            record.add("onAdaptiveCardInvoke");
+            return CompletableFuture.completedFuture(new AdaptiveCardInvokeResponse());
         }
 
     }
