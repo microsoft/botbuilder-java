@@ -85,6 +85,12 @@ public class ActivityHandler implements Bot {
             case ActivityTypes.INSTALLATION_UPDATE:
                 return onInstallationUpdate(turnContext);
 
+            case ActivityTypes.COMMAND:
+                return onCommandActivity(turnContext);
+
+            case ActivityTypes.COMMAND_RESULT:
+                return onCommandResultActivity(turnContext);
+
             case ActivityTypes.END_OF_CONVERSATION:
                 return onEndOfConversationActivity(turnContext);
 
@@ -526,6 +532,62 @@ public class ActivityHandler implements Bot {
             default:
                 return CompletableFuture.completedFuture(null);
         }
+    }
+
+    /**
+     * Invoked when a command activity is received when the base behavior of
+     * {@link ActivityHandler#onTurn(TurnContext)} is used. Commands are requests to perform an
+     * action and receivers typically respond with one or more commandResult
+     * activities. Receivers are also expected to explicitly reject unsupported
+     * command activities.
+     *
+     * @param turnContext  A strongly-typed context Object for this
+     *                     turn.
+     *
+     * @return   A task that represents the work queued to execute.
+     *
+     * When the {@link ActivityHandler#onTurn(TurnContext)} method receives a command activity,
+     * it calls this method. In a derived class, override this method to add
+     * logic that applies to all comand activities. Add logic to apply before
+     * the specific command-handling logic before the call to the base class
+     * {@link ActivityHandler#onCommandActivity(TurnContext)} method. Add
+     * logic to apply after the specific command-handling logic after the call
+     * to the base class
+     * {@link ActivityHandler#onCommandActivity(TurnContext)} method. Command
+     * activities communicate programmatic information from a client or channel
+     * to a bot. The meaning of an command activity is defined by the
+     * name property, which is meaningful within the scope of a channel.
+     */
+    protected CompletableFuture<Void> onCommandActivity(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Invoked when a CommandResult activity is received when the
+     * base behavior of {@link ActivityHandler#onTurn(TurnContext)} is used. CommandResult
+     * activities can be used to communicate the result of a command execution.
+     *
+     * @param turnContext  A strongly-typed context Object for this
+     *                     turn.
+     *
+     * @return   A task that represents the work queued to execute.
+     *
+     * When the {@link ActivityHandler#onTurn(TurnContext)} method receives a CommandResult
+     * activity, it calls this method. In a derived class, override this method
+     * to add logic that applies to all comand activities. Add logic to apply
+     * before the specific CommandResult-handling logic before the call to the
+     * base class
+     * {@link ActivityHandler#onCommandResultActivity(TurnContext)}
+     * method. Add logic to apply after the specific CommandResult-handling
+     * logic after the call to the base class
+     * {@link ActivityHandler#onCommandResultActivity(TurnContext)}
+     * method. CommandResult activities communicate programmatic information
+     * from a client or channel to a bot. The meaning of an CommandResult
+     * activity is defined by the name property,
+     * which is meaningful within the scope of a channel.
+     */
+    protected CompletableFuture<Void> onCommandResultActivity(TurnContext turnContext) {
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
