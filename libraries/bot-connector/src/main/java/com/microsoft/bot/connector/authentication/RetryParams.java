@@ -23,9 +23,9 @@ public class RetryParams {
      * @return A RetryParams that returns false for {@link #getShouldRetry()}.
      */
     public static RetryParams stopRetrying() {
-        return new RetryParams() {{
-            setShouldRetry(false);
-        }};
+        RetryParams retryParams = new RetryParams();
+        retryParams.setShouldRetry(false);
+        return retryParams;
     }
 
     /**

@@ -15,9 +15,8 @@ import java.util.concurrent.CompletionException;
 public class RetryTests {
     @Test
     public void Retry_NoRetryWhenTaskSucceeds() {
-        FaultyClass faultyClass = new FaultyClass() {{
-           exceptionToThrow = null;
-        }};
+        FaultyClass faultyClass = new FaultyClass();
+        faultyClass.exceptionToThrow = null;
 
         Retry.run(() ->
             faultyClass.faultyTask(),
@@ -30,10 +29,9 @@ public class RetryTests {
 
     @Test
     public void Retry_RetryThenSucceed() {
-        FaultyClass faultyClass = new FaultyClass() {{
-            exceptionToThrow = new IllegalArgumentException();
-            triesUntilSuccess = 3;
-        }};
+        FaultyClass faultyClass = new FaultyClass();
+        faultyClass.exceptionToThrow = new IllegalArgumentException();
+        faultyClass.triesUntilSuccess = 3;
 
         Retry.run(() ->
             faultyClass.faultyTask(),
@@ -46,10 +44,9 @@ public class RetryTests {
 
     @Test
     public void Retry_RetryUntilFailure() {
-        FaultyClass faultyClass = new FaultyClass() {{
-            exceptionToThrow = new IllegalArgumentException();
-            triesUntilSuccess = 12;
-        }};
+        FaultyClass faultyClass = new FaultyClass();
+        faultyClass.exceptionToThrow = new IllegalArgumentException();
+        faultyClass.triesUntilSuccess = 12;
 
         try {
             Retry.run(() ->
