@@ -76,18 +76,17 @@ public class AttachmentsBot extends ActivityHandler {
 
     private CompletableFuture<Void> displayOptions(TurnContext turnContext) {
         // Create a HeroCard with options for the user to interact with the bot.
-        HeroCard card = new HeroCard() {{
-            setText("You can upload an image or select one of the following choices");
+        HeroCard card = new HeroCard();
+        card.setText("You can upload an image or select one of the following choices");
 
-            // Note that some channels require different values to be used in order to get buttons to display text.
-            // In this code the emulator is accounted for with the 'title' parameter, but in other channels you may
-            // need to provide a value for other parameters like 'text' or 'displayText'.
-            setButtons(
-                new CardAction(ActionTypes.IM_BACK, "1. Inline Attachment", "1"),
-                new CardAction(ActionTypes.IM_BACK, "2. Internet Attachment", "2"),
-                new CardAction(ActionTypes.IM_BACK, "3. Uploaded Attachment", "3")
-            );
-        }};
+        // Note that some channels require different values to be used in order to get buttons to display text.
+        // In this code the emulator is accounted for with the 'title' parameter, but in other channels you may
+        // need to provide a value for other parameters like 'text' or 'displayText'.
+        card.setButtons(
+            new CardAction(ActionTypes.IM_BACK, "1. Inline Attachment", "1"),
+            new CardAction(ActionTypes.IM_BACK, "2. Internet Attachment", "2"),
+            new CardAction(ActionTypes.IM_BACK, "3. Uploaded Attachment", "3")
+        );
 
         Activity reply = MessageFactory.attachment(card.toAttachment());
         return turnContext.sendActivity(reply).thenApply(resourceResponse -> null);
@@ -200,11 +199,11 @@ public class AttachmentsBot extends ActivityHandler {
 
     // Creates an Attachment to be sent from the bot to the user from a HTTP URL.
     private CompletableFuture<Attachment> getInternetAttachment() {
-        return CompletableFuture.completedFuture(new Attachment() {{
-            setName("architecture-resize.png");
-            setContentType("image/png");
-            setContentUrl("https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png");
-        }});
+        Attachment attachment = new Attachment();
+        attachment.setName("architecture-resize.png");
+        attachment.setContentType("image/png");
+        attachment.setContentUrl("https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png");
+        return CompletableFuture.completedFuture(attachment);
     }
 
     private CompletableFuture<Attachment> getUploadedAttachment(TurnContext turnContext, String serviceUrl, String conversationId) {
