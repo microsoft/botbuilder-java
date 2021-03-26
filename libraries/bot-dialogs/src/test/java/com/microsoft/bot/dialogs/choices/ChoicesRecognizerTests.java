@@ -72,7 +72,9 @@ public class ChoicesRecognizerTests {
 
     @Test
     public void shouldCorrectlyDisambiguateBetweenVerySimilarValues() {
-        List<ModelResult<FoundValue>> found = Find.findValues("option B", similarValues, new FindChoicesOptions() {{ setAllowPartialMatches(true);}});
+        FindChoicesOptions options = new FindChoicesOptions();
+        options.setAllowPartialMatches(true);
+        List<ModelResult<FoundValue>> found = Find.findValues("option B", similarValues, options);
         Assert.assertEquals(1, found.size());
         assertValue(found.get(0), "option B", 1, 1.0f);
     }
@@ -169,19 +171,24 @@ public class ChoicesRecognizerTests {
 
     @Test
     public void shouldNOTFindAChoiceInAnUtteranceByOrdinalPosition_RecognizeOrdinalsFalseAndRecognizeNumbersFalse() {
+        FindChoicesOptions options = new FindChoicesOptions();
+        options.setRecognizeOrdinals(false);
+        options.setRecognizeNumbers(false);
         List<ModelResult<FoundChoice>> found = ChoiceRecognizers.recognizeChoicesFromStrings(
             "the first one please.",
             colorChoices,
-            new FindChoicesOptions() {{ setRecognizeOrdinals(false); setRecognizeNumbers(false);}});
+            options);
         Assert.assertEquals(0, found.size());
     }
 
     @Test
     public void shouldNOTFindAChoiceInAnUtteranceByNumericalIndex_Text_RecognizeNumbersFalse() {
+        FindChoicesOptions options = new FindChoicesOptions();
+        options.setRecognizeNumbers(false);
         List<ModelResult<FoundChoice>> found = ChoiceRecognizers.recognizeChoicesFromStrings(
             "one",
             colorChoices,
-            new FindChoicesOptions() {{ setRecognizeNumbers(false);}});
+            options);
         Assert.assertEquals(0, found.size());
     }
 

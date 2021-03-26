@@ -75,15 +75,12 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
 
         choiceDefaults = new HashMap<String, ChoiceFactoryOptions>();
         for (PromptCultureModel model : PromptCultureModels.getSupportedCultures()) {
-            choiceDefaults.put(model.getLocale(), new ChoiceFactoryOptions() {
-                {
-                    setInlineSeparator(model.getSeparator());
-                    setInlineOr(model.getInlineOr());
-                    setInlineOrMore(model.getInlineOrMore());
-                    setIncludeNumbers(true);
-                }
-            }
-            );
+            ChoiceFactoryOptions options = new ChoiceFactoryOptions();
+            options.setInlineSeparator(model.getSeparator());
+            options.setInlineOr(model.getInlineOr());
+            options.setInlineOrMore(model.getInlineOrMore());
+            options.setIncludeNumbers(true);
+            choiceDefaults.put(model.getLocale(), options);
         }
 
         this.style = ListStyle.AUTO;

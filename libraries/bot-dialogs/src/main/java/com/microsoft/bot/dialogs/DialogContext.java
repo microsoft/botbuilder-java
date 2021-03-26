@@ -495,11 +495,10 @@ public class DialogContext {
      */
     public CompletableFuture<Boolean> emitEvent(String name, Object value, boolean bubble, boolean fromLeaf) {
         // Initialize event
-        DialogEvent dialogEvent = new DialogEvent() {{
-            setBubble(bubble);
-            setName(name);
-            setValue(value);
-        }};
+        DialogEvent dialogEvent = new DialogEvent();
+        dialogEvent.setBubble(bubble);
+        dialogEvent.setName(name);
+        dialogEvent.setValue(value);
 
         DialogContext dc = this;
 

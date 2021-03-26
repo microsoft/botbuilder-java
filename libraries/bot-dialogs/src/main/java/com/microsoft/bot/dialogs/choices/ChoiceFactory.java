@@ -345,12 +345,9 @@ public final class ChoiceFactory {
      * @return The created Activity.
      */
     public static Activity heroCard(List<Choice> choices, String text, String speak) {
-        HeroCard card = new HeroCard() {
-            {
-                setText(text);
-                setButtons(extractActions(choices));
-            }
-        };
+        HeroCard card = new HeroCard();
+        card.setText(text);
+        card.setButtons(extractActions(choices));
 
         List<Attachment> attachments = new ArrayList<Attachment>() {
             /**
@@ -398,13 +395,11 @@ public final class ChoiceFactory {
                 return choice.getAction();
             }
 
-            return new CardAction() {
-                {
-                    setType(ActionTypes.IM_BACK);
-                    setValue(choice.getValue());
-                    setTitle(choice.getValue());
-                }
-            };
+            CardAction card = new CardAction();
+            card.setType(ActionTypes.IM_BACK);
+            card.setValue(choice.getValue());
+            card.setTitle(choice.getValue());
+            return card;
         }).collect(Collectors.toList());
     }
 }

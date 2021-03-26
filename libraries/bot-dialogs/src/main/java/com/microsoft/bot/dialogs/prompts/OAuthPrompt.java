@@ -407,11 +407,11 @@ public class OAuthPrompt extends Dialog {
 
                     result.setSucceeded(true);
                     TokenResponse finalResponse = tokenExchangeResponse;
-                    result.setValue(new TokenResponse() { {
-                        setChannelId(finalResponse.getChannelId());
-                        setConnectionName(finalResponse.getConnectionName());
-                        setToken(finalResponse.getToken());
-                    }});
+                    TokenResponse response = new TokenResponse();
+                    response.setChannelId(finalResponse.getChannelId());
+                    response.setConnectionName(finalResponse.getConnectionName());
+                    response.setToken(finalResponse.getToken());
+                    result.setValue(response);
                 }
             }
         } else if (turnContext.getActivity().getType().equals(ActivityTypes.MESSAGE)) {

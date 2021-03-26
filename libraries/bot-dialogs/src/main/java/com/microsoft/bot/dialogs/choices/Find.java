@@ -104,18 +104,18 @@ public final class Find {
         return findValues(utterance, synonyms, options).stream().map(v -> {
             Choice choice = choices.get(v.getResolution().getIndex());
 
-            return new ModelResult<FoundChoice>() {{
-                setStart(v.getStart());
-                setEnd(v.getEnd());
-                setTypeName("choice");
-                setText(v.getText());
-                setResolution(new FoundChoice() {{
-                    setValue(choice.getValue());
-                    setIndex(v.getResolution().getIndex());
-                    setScore(v.getResolution().getScore());
-                    setSynonym(v.getResolution().getValue());
-                }});
-            }};
+            FoundChoice resolution = new FoundChoice();
+            resolution.setValue(choice.getValue());
+            resolution.setIndex(v.getResolution().getIndex());
+            resolution.setScore(v.getResolution().getScore());
+            resolution.setSynonym(v.getResolution().getValue());
+            ModelResult<FoundChoice> modelResult = new ModelResult<FoundChoice>();
+            modelResult.setStart(v.getStart());
+            modelResult.setEnd(v.getEnd());
+            modelResult.setTypeName("choice");
+            modelResult.setText(v.getText());
+            modelResult.setResolution(resolution);
+            return modelResult;
         }).collect(Collectors.toList());
     }
 
@@ -295,15 +295,15 @@ public final class Find {
             float score = completeness * accuracy;
 
             // Format result
+            FoundValue resolution = new FoundValue();
+            resolution.setValue(value);
+            resolution.setIndex(index);
+            resolution.setScore(score);
             result = new ModelResult<>();
             result.setStart(start);
             result.setEnd(end);
             result.setTypeName("value");
-            result.setResolution(new FoundValue() {{
-                setValue(value);
-                setIndex(index);
-                setScore(score);
-            }});
+            result.setResolution(resolution);
         }
 
         return result;

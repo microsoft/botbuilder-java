@@ -9,6 +9,7 @@ import com.microsoft.bot.builder.TurnContextImpl;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityTypes;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -117,7 +118,8 @@ public class ChoicesChannelTests {
 
     @Test
     public void shouldReturnChannelIdFromContextActivity() {
-        Activity testActivity = new Activity() {{ setChannelId(Channels.FACEBOOK); }};
+        Activity testActivity = new Activity(ActivityTypes.MESSAGE);
+        testActivity.setChannelId(Channels.FACEBOOK);
         TurnContext testContext = new TurnContextImpl(new BotFrameworkAdapter(new SimpleCredentialProvider()), testActivity);
         String channelId = Channel.getChannelId(testContext);
         Assert.assertEquals(Channels.FACEBOOK, channelId);
@@ -125,7 +127,8 @@ public class ChoicesChannelTests {
 
     @Test
     public void shouldReturnEmptyFromContextActivityMissingChannel() {
-        Activity testActivity = new Activity() {{ setChannelId(null); }};
+        Activity testActivity = new Activity(ActivityTypes.MESSAGE);
+        testActivity.setChannelId(null);
         TurnContext testContext = new TurnContextImpl(new BotFrameworkAdapter(new SimpleCredentialProvider()), testActivity);
         String channelId = Channel.getChannelId(testContext);
         Assert.assertNull(channelId);

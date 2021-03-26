@@ -566,6 +566,9 @@ public class NumberPromptTests {
         NumberPrompt<Double> numberPrompt = new NumberPrompt<Double>("NumberPrompt", null,
                                                     PromptCultureModels.DUTCH_CULTURE, Double.class);
         dialogs.add(numberPrompt);
+        Activity activityToSend = new Activity(ActivityTypes.MESSAGE);
+        activityToSend.setText("3,14");
+        activityToSend.setLocale(PromptCultureModels.DUTCH_CULTURE);
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
@@ -584,13 +587,7 @@ public class NumberPromptTests {
         })
         .send("hello")
         .assertReply("Enter a number.")
-        .send(new Activity() {
-                {
-                    setType(ActivityTypes.MESSAGE);
-                    setText("3,14");
-                    setLocale(PromptCultureModels.DUTCH_CULTURE);
-                }
-            })
+        .send(activityToSend)
         .startTest()
         .join();
     }
