@@ -12,7 +12,7 @@ public class AzureEmulatorUtils {
     public static boolean isStorageEmulatorAvailable() {
         if (!hasStorageEmulatorBeenTested) {
             try {
-                File emulator = new File(System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\"");
+                File emulator = new File(System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe");
                 if (emulator.exists()) {
                     Process p = Runtime.getRuntime().exec("cmd /C \"" + System.getenv("ProgramFiles")
                             + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
@@ -26,7 +26,6 @@ public class AzureEmulatorUtils {
                         isStorageEmulatorAvailable = false;
                     }
             } catch (IOException | InterruptedException ex) {
-                // on non-Windows systems we can't run CMD so will get an IOException here.
                 isStorageEmulatorAvailable = false;
                 System.out.println(NO_EMULATOR_MESSAGE);
             }
