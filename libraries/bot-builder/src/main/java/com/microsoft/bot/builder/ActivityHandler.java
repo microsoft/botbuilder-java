@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.builder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.connector.Async;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -13,9 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.AdaptiveCardInvokeResponse;
+import com.microsoft.bot.schema.AdaptiveCardInvokeValue;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.MessageReaction;
 import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.SignInConstants;
 
 /**
@@ -398,6 +402,16 @@ public class ActivityHandler implements Bot {
      * @return A task that represents the work queued to execute.
      */
     protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
+        if (StringUtils.equals(turnContext.getActivity().getName(), "adaptiveCard/action")) {
+            AdaptiveCardInvokeValue invokeValue = null;
+            try {
+                invokeValue = getAdaptiveCardInvokeValue(turnContext.getActivity());
+            } catch (InvokeResponseException e) {
+                return Async.completeExceptionally(e);
+            }
+            return onAdaptiveCardInvoke(turnContext, invokeValue).thenApply(result -> createInvokeResponse(result));
+        }
+
         if (
             StringUtils.equals(
                 turnContext.getActivity().getName(), SignInConstants.VERIFY_STATE_OPERATION_NAME
@@ -613,6 +627,25 @@ public class ActivityHandler implements Bot {
     }
 
     /**
+     * Invoked when the bot is sent an Adaptive Card Action Execute.
+     *
+     * @param turnContext  A strongly-typed context Object for this
+     *                     turn.
+     * @param invokeValue  A stringly-typed Object from the incoming
+     *                     activity's Value.
+     *
+     * @return   A task that represents the work queued to execute.
+     *
+     * When the {@link OnInvokeActivity(TurnContext{InvokeActivity})} method
+     * receives an Invoke with a {@link InvokeActivity#name} of
+     * `adaptiveCard/action`, it calls this method.
+     */
+    protected CompletableFuture<AdaptiveCardInvokeResponse> onAdaptiveCardInvoke(
+        TurnContext turnContext, AdaptiveCardInvokeValue invokeValue) {
+        return Async.completeExceptionally(new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
+    }
+
+    /**
      * Override this in a derived class to provide logic specific to
      * ActivityTypes.END_OF_CONVERSATION activities.
      *
@@ -661,6 +694,62 @@ public class ActivityHandler implements Bot {
     protected CompletableFuture<Void> onUnrecognizedActivityType(TurnContext turnContext) {
         return CompletableFuture.completedFuture(null);
     }
+
+    private AdaptiveCardInvokeValue getAdaptiveCardInvokeValue(Activity activity) throws InvokeResponseException {
+        if (activity.getValue() == null) {
+            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Missing value property");
+            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+        }
+
+        Object obj = activity.getValue();
+        JsonNode node = null;
+        if (obj instanceof JsonNode) {
+            node = (JsonNode) obj;
+        } else {
+            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
+            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+        }
+
+        AdaptiveCardInvokeValue invokeValue = Serialization.treeToValue(node, AdaptiveCardInvokeValue.class);
+        if (invokeValue == null) {
+            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
+            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+        }
+
+        if (invokeValue.getAction() == null) {
+            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Missing action property");
+            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+        }
+
+        if (!invokeValue.getAction().getType().equals("Action.Execute")) {
+            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+                HttpURLConnection.HTTP_BAD_REQUEST, "NotSupported",
+                    String.format("The action '%s'is not supported.", invokeValue.getAction().getType()));
+            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+        }
+
+        return invokeValue;
+    }
+
+    private AdaptiveCardInvokeResponse createAdaptiveCardInvokeErrorResponse(
+        Integer statusCode,
+        String code,
+        String message
+    ) {
+        AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new AdaptiveCardInvokeResponse();
+        adaptiveCardInvokeResponse.setStatusCode(statusCode);
+        adaptiveCardInvokeResponse.setType("application/vnd.getmicrosoft().error");
+        com.microsoft.bot.schema.Error error = new com.microsoft.bot.schema.Error();
+        error.setCode(code);
+        error.setMessage(message);
+        adaptiveCardInvokeResponse.setValue(error);
+        return adaptiveCardInvokeResponse;
+    }
+
 
     /**
      * InvokeResponse Exception.
