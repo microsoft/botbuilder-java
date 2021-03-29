@@ -319,11 +319,9 @@ public class TurnContextTests {
             foundActivity[0] = true;
         });
 
-        TurnContext c = new TurnContextImpl(a, new Activity(ActivityTypes.MESSAGE) {
-            {
-                setConversation(new ConversationAccount(CONVERSATION_ID));
-            }
-        });
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setConversation(new ConversationAccount(CONVERSATION_ID));
+        TurnContext c = new TurnContextImpl(a, activity);
 
         Activity message = MessageFactory.text("test text");
         message.setId(ACTIVITY_ID);
@@ -435,11 +433,8 @@ public class TurnContextTests {
 
         TurnContext c = new TurnContextImpl(a, TestMessage.Message());
 
-        ConversationReference reference = new ConversationReference() {
-            {
-                setActivityId("12345");
-            }
-        };
+        ConversationReference reference = new ConversationReference();
+        reference.setActivityId("12345");
 
         c.deleteActivity(reference).join();
         Assert.assertTrue(activityDeleted[0]);

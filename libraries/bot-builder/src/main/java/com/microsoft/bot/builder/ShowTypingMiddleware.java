@@ -119,11 +119,8 @@ public class ShowTypingMiddleware implements Middleware {
     ) {
         // create a TypingActivity, associate it with the conversation and send
         // immediately
-        Activity typingActivity = new Activity(ActivityTypes.TYPING) {
-            {
-                setRelatesTo(turnContext.getActivity().getRelatesTo());
-            }
-        };
+        Activity typingActivity = new Activity(ActivityTypes.TYPING);
+        typingActivity.setRelatesTo(turnContext.getActivity().getRelatesTo());
 
         // sending the Activity directly on the Adapter avoids other Middleware and
         // avoids setting the Responded

@@ -54,7 +54,10 @@ public class ChoiceFactoryTests {
 
     @Test
     public void shouldRenderUnincludedNumbersChoicesAsAList() {
-        Activity activity = ChoiceFactory.list(colorChoices, "select from:", null, new ChoiceFactoryOptions() {{ setIncludeNumbers(false); }});
+        ChoiceFactoryOptions choiceFactoryOptions  = new ChoiceFactoryOptions();
+        choiceFactoryOptions.setIncludeNumbers(false);
+
+        Activity activity = ChoiceFactory.list(colorChoices, "select from:", null, choiceFactoryOptions);
         Assert.assertEquals("select from:\n\n   - red\n   - green\n   - blue", activity.getText());
     }
 

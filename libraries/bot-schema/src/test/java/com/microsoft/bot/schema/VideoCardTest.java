@@ -10,21 +10,21 @@ import org.junit.Test;
  * Tests to ensure the VideoCard methods work as expected.
  */
 public class VideoCardTest {
-    VideoCard card = new VideoCard(){
-        {
-            setTitle("Test Video Title");
-            setSubtitle("Test Video Subtitle");
-            setText("Test Video Text");
-            setImage(new ThumbnailUrl());
-        }
-    };
+    VideoCard getCard() {
+        VideoCard card = new VideoCard();
+        card.setTitle("Test Video Title");
+        card.setSubtitle("Test Video Subtitle");
+        card.setText("Test Video Text");
+        card.setImage(new ThumbnailUrl());
+        return card;
+    }
 
     /**
      *Ensures that the VideoCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.video", attachment.getContentType());
     }

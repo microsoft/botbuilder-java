@@ -10,18 +10,18 @@ import org.junit.Test;
  * Tests to ensure the SigninCard methods work as expected.
  */
 public class SigninCardTest {
-    SigninCard card = new SigninCard(){
-        {
-            setText("Test Signin Text");
-        }
-    };
+    SigninCard getCard() {
+        SigninCard card = new SigninCard();
+        card.setText("Test Signin Text");
+        return card;
+    }
 
     /**
      *Ensures that the SigninCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.signin", attachment.getContentType());
     }

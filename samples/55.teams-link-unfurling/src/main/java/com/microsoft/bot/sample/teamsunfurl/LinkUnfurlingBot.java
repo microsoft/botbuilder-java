@@ -31,25 +31,22 @@ public class LinkUnfurlingBot extends TeamsActivityHandler {
         TurnContext turnContext,
         AppBasedLinkQuery query
     ) {
-        ThumbnailCard card = new ThumbnailCard() {{
-            setTitle("Thumbnail Card");
-            setText(query.getUrl());
-            setImages(Collections.singletonList(
-                new CardImage(
-                    "https://raw.githubusercontent.com/microsoft/botframework-sdk/master/icon.png")
-            ));
-        }};
+        ThumbnailCard card = new ThumbnailCard();
+        card.setTitle("Thumbnail Card");
+        card.setText(query.getUrl());
+        card.setImages(Collections.singletonList(
+            new CardImage("https://raw.githubusercontent.com/microsoft/botframework-sdk/master/icon.png")
+        ));
 
-        MessagingExtensionAttachment attachments = new MessagingExtensionAttachment() {{
-            setContentType(HeroCard.CONTENTTYPE);
-            setContent(card);
-        }};
 
-        MessagingExtensionResult result = new MessagingExtensionResult() {{
-            setAttachmentLayout("list");
-            setType("result");
-            setAttachments(Collections.singletonList(attachments));
-        }};
+        MessagingExtensionAttachment attachments = new MessagingExtensionAttachment();
+        attachments.setContentType(HeroCard.CONTENTTYPE);
+        attachments.setContent(card);
+
+        MessagingExtensionResult result = new MessagingExtensionResult();
+        result.setAttachmentLayout("list");
+        result.setType("result");
+        result.setAttachments(Collections.singletonList(attachments));
 
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(result));
     }
@@ -63,26 +60,23 @@ public class LinkUnfurlingBot extends TeamsActivityHandler {
 
         // These commandIds are defined in the Teams App Manifest.
         if (StringUtils.equalsIgnoreCase("searchQuery", query.getCommandId())) {
-            HeroCard card = new HeroCard() {{
-                setTitle("This is a Link Unfurling Sample");
-                setSubtitle("It will unfurl links from *.BotFramework.com");
-                setText("This sample demonstrates how to handle link unfurling in Teams.  "
-                    + "Please review the readme for more information.");
-            }};
+            HeroCard card = new HeroCard();
+            card.setTitle("This is a Link Unfurling Sample");
+            card.setSubtitle("It will unfurl links from *.BotFramework.com");
+            card.setText("This sample demonstrates how to handle link unfurling in Teams.  "
+                + "Please review the readme for more information.");
 
-            return CompletableFuture.completedFuture(new MessagingExtensionResponse(
-                new MessagingExtensionResult() {{
-                    setAttachmentLayout("list");
-                    setType("result");
-                    setAttachment(
-                        new MessagingExtensionAttachment() {{
-                            setContent(card);
-                            setContentType(HeroCard.CONTENTTYPE);
-                            setPreview(card.toAttachment());
-                        }}
-                    );
-                }}
-            ));
+            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+            attachment.setContent(card);
+            attachment.setContentType(HeroCard.CONTENTTYPE);
+            attachment.setPreview(card.toAttachment());
+
+            MessagingExtensionResult result = new MessagingExtensionResult();
+            result.setAttachmentLayout("list");
+            result.setType("result");
+            result.setAttachment(attachment);
+
+            return CompletableFuture.completedFuture(new MessagingExtensionResponse(result));
         }
 
         return notImplemented(String.format("Invalid CommandId: %s", query.getCommandId()));

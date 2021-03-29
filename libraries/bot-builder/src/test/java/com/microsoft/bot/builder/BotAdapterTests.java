@@ -73,36 +73,27 @@ public class BotAdapterTests {
         boolean[] callbackInvoked = new boolean[] { false };
 
         TestAdapter adapter = new TestAdapter();
-        ConversationReference cr = new ConversationReference() {
-            {
-                setActivityId("activityId");
-                setBot(new ChannelAccount() {
-                    {
-                        setId("channelId");
-                        setName("testChannelAccount");
-                        setRole(RoleTypes.BOT);
-                    }
-                });
-                setChannelId("testChannel");
-                setServiceUrl("testUrl");
-                setConversation(new ConversationAccount() {
-                    {
-                        setConversationType("");
-                        setId("testConversationId");
-                        setIsGroup(false);
-                        setName("testConversationName");
-                        setRole(RoleTypes.USER);
-                    }
-                });
-                setUser(new ChannelAccount() {
-                    {
-                        setId("channelId");
-                        setName("testChannelAccount");
-                        setRole(RoleTypes.BOT);
-                    }
-                });
-            }
-        };
+        ConversationReference cr = new ConversationReference();
+        cr.setActivityId("activityId");
+        ChannelAccount botAccount = new ChannelAccount();
+        botAccount.setId("channelId");
+        botAccount.setName("testChannelAccount");
+        botAccount.setRole(RoleTypes.BOT);
+        cr.setBot(botAccount);
+        cr.setChannelId("testChannel");
+        cr.setServiceUrl("testUrl");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setConversationType("");
+        conversation.setId("testConversationId");
+        conversation.setIsGroup(false);
+        conversation.setName("testConversationName");
+        conversation.setRole(RoleTypes.USER);
+        cr.setConversation(conversation);
+        ChannelAccount userAccount = new ChannelAccount();
+        userAccount.setId("channelId");
+        userAccount.setName("testChannelAccount");
+        userAccount.setRole(RoleTypes.BOT);
+        cr.setUser(userAccount);
 
         BotCallbackHandler callback = (turnContext) -> {
             callbackInvoked[0] = true;

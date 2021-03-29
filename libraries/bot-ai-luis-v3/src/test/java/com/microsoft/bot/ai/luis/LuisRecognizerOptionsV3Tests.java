@@ -124,13 +124,9 @@ public class LuisRecognizerOptionsV3Tests {
             LuisRecognizerOptionsV3 v3 = buildTestRecognizer(endpoint, testSettings);
 
             // Run test
-            Activity activity = new Activity() {
-                {
-                    setText(testData.get("text").asText());
-                    setType(ActivityTypes.MESSAGE);
-                    setChannelId("EmptyContext");
-                }
-            };
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setText(testData.get("text").asText());
+            activity.setChannelId("EmptyContext");
             doReturn(activity)
                 .when(turnContext)
                 .getActivity();
@@ -198,13 +194,9 @@ public class LuisRecognizerOptionsV3Tests {
             LuisRecognizerOptionsV3 v3 = buildTestRecognizer(endpoint, testSettings);
             v3.setExternalEntityRecognizer(recognizer);
 
-            Activity activity = new Activity() {
-                {
-                    setText(testData.get("text").asText());
-                    setType(ActivityTypes.MESSAGE);
-                    setChannelId("EmptyContext");
-                }
-            };
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setText(testData.get("text").asText());
+            activity.setChannelId("EmptyContext");
 
             doReturn(CompletableFuture.completedFuture(new ResourceResponse()))
                 .when(turnContext)
@@ -212,9 +204,11 @@ public class LuisRecognizerOptionsV3Tests {
 
             when(dC.getContext()).thenReturn(turnContext);
 
-            doReturn(CompletableFuture.supplyAsync(() -> new RecognizerResult(){{
-                setEntities(testSettings.get("ExternalRecognizerResult"));
-            }}))
+            doReturn(CompletableFuture.supplyAsync(() -> {
+                RecognizerResult recognizerResult = new RecognizerResult();
+                recognizerResult.setEntities(testSettings.get("ExternalRecognizerResult"));
+                return recognizerResult;
+            }))
                 .when(recognizer)
                 .recognize(any(DialogContext.class), any(Activity.class));
 
@@ -244,13 +238,9 @@ public class LuisRecognizerOptionsV3Tests {
 
     public static TurnContext createContext(String message) {
 
-        Activity activity = new Activity() {
-            {
-                setText(message);
-                setType(ActivityTypes.MESSAGE);
-                setChannelId("EmptyContext");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText(message);
+        activity.setChannelId("EmptyContext");
 
         return new TurnContextImpl(new NotImplementedAdapter(), activity);
     }
@@ -323,18 +313,18 @@ public class LuisRecognizerOptionsV3Tests {
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         ObjectReader readerDynamicList = mapper.readerFor(new TypeReference<List<DynamicList>>() {});
         ObjectReader readerExternalentities = mapper.readerFor(new TypeReference<List<ExternalEntity>>() {});
-        return new LuisRecognizerOptionsV3(
+        LuisRecognizerOptionsV3 recognizer = new LuisRecognizerOptionsV3(
             new LuisApplication(
                 this.applicationId,
                 this.subscriptionKey,
-                endpoint)) {{
-            setIncludeInstanceData(testSettings.get("IncludeInstanceData").asBoolean());
-            setIncludeAllIntents(testSettings.get("IncludeAllIntents").asBoolean());
-            setVersion(testSettings.get("Version") == null ? null : testSettings.get("Version").asText());
-            setDynamicLists(testSettings.get("DynamicLists") == null ? null : readerDynamicList.readValue(testSettings.get("DynamicLists")));
-            setExternalEntities(testSettings.get("ExternalEntities") == null ? null : readerExternalentities.readValue(testSettings.get("ExternalEntities")));
-            setDateTimeReference(testSettings.get("DateTimeReference") == null ? null : testSettings.get("DateTimeReference").asText());
-        }};
+                endpoint));
+        recognizer.setIncludeInstanceData(testSettings.get("IncludeInstanceData").asBoolean());
+        recognizer.setIncludeAllIntents(testSettings.get("IncludeAllIntents").asBoolean());
+        recognizer.setVersion(testSettings.get("Version") == null ? null : testSettings.get("Version").asText());
+        recognizer.setDynamicLists(testSettings.get("DynamicLists") == null ? null : readerDynamicList.readValue(testSettings.get("DynamicLists")));
+        recognizer.setExternalEntities(testSettings.get("ExternalEntities") == null ? null : readerExternalentities.readValue(testSettings.get("ExternalEntities")));
+        recognizer.setDateTimeReference(testSettings.get("DateTimeReference") == null ? null : testSettings.get("DateTimeReference").asText());
+        return recognizer;
     }
 
 }

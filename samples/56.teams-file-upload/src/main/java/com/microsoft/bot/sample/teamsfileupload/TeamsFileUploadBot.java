@@ -89,18 +89,16 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
         Map<String, String> consentContext = new HashMap<>();
         consentContext.put("filename", filename);
 
-        FileConsentCard fileCard = new FileConsentCard() {{
-            setDescription("This is the file I want to send you");
-            setSizeInBytes(filesize);
-            setAcceptContext(consentContext);
-            setDeclineContext(consentContext);
-        }};
+        FileConsentCard fileCard = new FileConsentCard();
+        fileCard.setDescription("This is the file I want to send you");
+        fileCard.setSizeInBytes(filesize);
+        fileCard.setAcceptContext(consentContext);
+        fileCard.setDeclineContext(consentContext);
 
-        Attachment asAttachment = new Attachment() {{
-            setContent(fileCard);
-            setContentType(FileConsentCard.CONTENT_TYPE);
-            setName(filename);
-        }};
+        Attachment asAttachment = new Attachment();
+        asAttachment.setContent(fileCard);
+        asAttachment.setContentType(FileConsentCard.CONTENT_TYPE);
+        asAttachment.setName(filename);
 
         Activity reply = turnContext.getActivity().createReply();
         reply.setAttachments(Collections.singletonList(asAttachment));
@@ -111,17 +109,15 @@ public class TeamsFileUploadBot extends TeamsActivityHandler {
     private CompletableFuture<Void> fileUploadCompleted(
         TurnContext turnContext, FileConsentCardResponse fileConsentCardResponse
     ) {
-        FileInfoCard downloadCard = new FileInfoCard() {{
-            setUniqueId(fileConsentCardResponse.getUploadInfo().getUniqueId());
-            setFileType(fileConsentCardResponse.getUploadInfo().getFileType());
-        }};
+        FileInfoCard downloadCard = new FileInfoCard();
+        downloadCard.setUniqueId(fileConsentCardResponse.getUploadInfo().getUniqueId());
+        downloadCard.setFileType(fileConsentCardResponse.getUploadInfo().getFileType());
 
-        Attachment asAttachment = new Attachment() {{
-            setContent(downloadCard);
-            setContentType(FileInfoCard.CONTENT_TYPE);
-            setName(fileConsentCardResponse.getUploadInfo().getName());
-            setContentUrl(fileConsentCardResponse.getUploadInfo().getContentUrl());
-        }};
+        Attachment asAttachment = new Attachment();
+        asAttachment.setContent(downloadCard);
+        asAttachment.setContentType(FileInfoCard.CONTENT_TYPE);
+        asAttachment.setName(fileConsentCardResponse.getUploadInfo().getName());
+        asAttachment.setContentUrl(fileConsentCardResponse.getUploadInfo().getContentUrl());
 
         Activity reply = MessageFactory.text(
             String.format(

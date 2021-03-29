@@ -13,19 +13,19 @@ import org.junit.Test;
 public class AudioCardTest {
     ArrayList<MediaUrl> media = new ArrayList<MediaUrl>();
 
-    AudioCard card = new AudioCard(){
-        {
-            setText("Test Audio Text");
-            setMedia(media);
-        };
-    };
+    AudioCard getCard() {
+        AudioCard card = new AudioCard();
+        card.setText("Test Audio Text");
+        card.setMedia(media);
+        return card;
+    }
 
     /**
      *Ensures that the AudioCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.audio", attachment.getContentType());
     }

@@ -250,19 +250,18 @@ public class GenerateAnswerUtils {
         JacksonAdapter jacksonAdapter = new JacksonAdapter();
         String jsonRequest = null;
 
-        jsonRequest = jacksonAdapter.serialize(new JSONObject() {
-            {
-                put("question", messageActivity.getText());
-                put("top", withOptions.getTop());
-                put("strictFilters", withOptions.getStrictFilters());
-                put("scoreThreshold", withOptions.getScoreThreshold());
-                put("context", withOptions.getContext());
-                put("qnaId", withOptions.getQnAId());
-                put("isTest", withOptions.getIsTest());
-                put("rankerType", withOptions.getRankerType());
-                put("StrictFiltersCompoundOperationType", withOptions.getStrictFiltersJoinOperator());
-            }
-        });
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("question", messageActivity.getText());
+        jsonObject.put("top", withOptions.getTop());
+        jsonObject.put("strictFilters", withOptions.getStrictFilters());
+        jsonObject.put("scoreThreshold", withOptions.getScoreThreshold());
+        jsonObject.put("context", withOptions.getContext());
+        jsonObject.put("qnaId", withOptions.getQnAId());
+        jsonObject.put("isTest", withOptions.getIsTest());
+        jsonObject.put("rankerType", withOptions.getRankerType());
+        jsonObject.put("StrictFiltersCompoundOperationType", withOptions.getStrictFiltersJoinOperator());
+
+        jsonRequest = jacksonAdapter.serialize(jsonObject);
 
         HttpRequestUtils httpRequestHelper = new HttpRequestUtils();
         return httpRequestHelper.executeHttpRequest(requestUrl, jsonRequest, this.endpoint).thenCompose(response -> {

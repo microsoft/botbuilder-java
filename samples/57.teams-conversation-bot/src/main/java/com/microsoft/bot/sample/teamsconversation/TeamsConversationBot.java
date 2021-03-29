@@ -72,13 +72,10 @@ public class TeamsConversationBot extends TeamsActivityHandler {
                     int count = 0;
                 };
 
-                HeroCard card = new HeroCard() {
-                    {
-                        setTitle("Welcome Card");
-                        setText("Click the buttons below to update this card");
-                        setButtons(getHeroCardButtons(value));
-                    }
-                };
+                HeroCard card = new HeroCard();
+                card.setTitle("Welcome Card");
+                card.setText("Click the buttons below to update this card");
+                card.setButtons(getHeroCardButtons(value));
 
                 return turnContext.sendActivity(MessageFactory.attachment(card.toAttachment()))
                     .thenApply(resourceResponse -> null);
@@ -130,14 +127,11 @@ public class TeamsConversationBot extends TeamsActivityHandler {
                         + ". I'm a Teams conversation bot."
                 );
 
-                ConversationParameters conversationParameters = new ConversationParameters() {
-                    {
-                        setIsGroup(false);
-                        setBot(turnContext.getActivity().getRecipient());
-                        setMembers(Collections.singletonList(member));
-                        setTenantId(turnContext.getActivity().getConversation().getTenantId());
-                    }
-                };
+                ConversationParameters conversationParameters = new ConversationParameters();
+                conversationParameters.setIsGroup(false);
+                conversationParameters.setBot(turnContext.getActivity().getRecipient());
+                conversationParameters.setMembers(Collections.singletonList(member));
+                conversationParameters.setTenantId(turnContext.getActivity().getConversation().getTenantId());
 
                 conversations.add(
                     ((BotFrameworkAdapter) turnContext.getAdapter()).createConversation(
@@ -170,13 +164,10 @@ public class TeamsConversationBot extends TeamsActivityHandler {
         Map data = (Map) turnContext.getActivity().getValue();
         data.put("count", (int) data.get("count") + 1);
 
-        HeroCard card = new HeroCard() {
-            {
-                setTitle("Welcome Card");
-                setText("Update count - " + data.get("count"));
-                setButtons(getHeroCardButtons(data));
-            }
-        };
+        HeroCard card = new HeroCard();
+        card.setTitle("Welcome Card");
+        card.setText("Update count - " + data.get("count"));
+        card.setButtons(getHeroCardButtons(data));
 
         Activity updatedActivity = MessageFactory.attachment(card.toAttachment());
         updatedActivity.setId(turnContext.getActivity().getReplyToId());
@@ -185,32 +176,28 @@ public class TeamsConversationBot extends TeamsActivityHandler {
     }
 
     private List<CardAction> getHeroCardButtons(Object value) {
-        return Arrays.asList(new CardAction() {
-            {
-                setType(ActionTypes.MESSAGE_BACK);
-                setTitle("Update Card");
-                setText("UpdateCardAction");
-                setValue(value);
-            }
-        }, new CardAction() {
-            {
-                setType(ActionTypes.MESSAGE_BACK);
-                setTitle("Message All Members");
-                setText("MessageAllMembers");
-            }
-        }, new CardAction() {
-            {
-                setType(ActionTypes.MESSAGE_BACK);
-                setTitle("Delete card");
-                setText("Delete");
-            }
-        }, new CardAction() {
-            {
-                setType(ActionTypes.MESSAGE_BACK);
-                setTitle("Who am I?");
-                setText("MentionMe");
-            }
-        });
+        CardAction updateAction = new CardAction();
+        updateAction.setType(ActionTypes.MESSAGE_BACK);
+        updateAction.setTitle("Update Card");
+        updateAction.setText("UpdateCardAction");
+        updateAction.setValue(value);
+
+        CardAction allMembersAction = new CardAction();
+        allMembersAction.setType(ActionTypes.MESSAGE_BACK);
+        allMembersAction.setTitle("Message All Members");
+        allMembersAction.setText("MessageAllMembers");
+
+        CardAction deleteAction = new CardAction();
+        deleteAction.setType(ActionTypes.MESSAGE_BACK);
+        deleteAction.setTitle("Delete card");
+        deleteAction.setText("Delete");
+
+        CardAction mentionAction = new CardAction();
+        mentionAction.setType(ActionTypes.MESSAGE_BACK);
+        mentionAction.setTitle("Who am I?");
+        mentionAction.setText("MentionMe");
+
+        return Arrays.asList(updateAction, allMembersAction, deleteAction, mentionAction);
     }
 
     private CompletableFuture<Void> mentionActivity(TurnContext turnContext) {

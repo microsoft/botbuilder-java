@@ -206,20 +206,17 @@ public class CosmosDbPartitionedStorage implements Storage {
                     // metadata.
                     node.remove("eTag");
 
-                    DocumentStoreItem documentChange = new DocumentStoreItem() {
-                        {
-                            setId(
-                                CosmosDbKeyEscape.escapeKey(
-                                    change.getKey(),
-                                    cosmosDbStorageOptions.getKeySuffix(),
-                                    cosmosDbStorageOptions.getCompatibilityMode()
-                                )
-                            );
-                            setReadId(change.getKey());
-                            setDocument(node.toString());
-                            setType(change.getValue().getClass().getTypeName());
-                        }
-                    };
+                    DocumentStoreItem documentChange = new DocumentStoreItem();
+                    documentChange.setId(
+                        CosmosDbKeyEscape.escapeKey(
+                            change.getKey(),
+                            cosmosDbStorageOptions.getKeySuffix(),
+                            cosmosDbStorageOptions.getCompatibilityMode()
+                        )
+                    );
+                    documentChange.setReadId(change.getKey());
+                    documentChange.setDocument(node.toString());
+                    documentChange.setType(change.getValue().getClass().getTypeName());
 
                     Document document = new Document(objectMapper.writeValueAsString(documentChange));
 
@@ -349,11 +346,8 @@ public class CosmosDbPartitionedStorage implements Storage {
                         partitionKeyDefinition.setPaths(Collections.singleton(DocumentStoreItem.PARTITION_KEY_PATH));
                         collectionDefinition.setPartitionKey(partitionKeyDefinition);
 
-                        RequestOptions options = new RequestOptions() {
-                            {
-                                setOfferThroughput(cosmosDbStorageOptions.getContainerThroughput());
-                            }
-                        };
+                        RequestOptions options = new RequestOptions();
+                        options.setOfferThroughput(cosmosDbStorageOptions.getContainerThroughput());
 
                         collectionCache = client
                             .createCollection(getDatabase().getSelfLink(), collectionDefinition, options)

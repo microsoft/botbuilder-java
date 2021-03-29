@@ -32,11 +32,8 @@ public class TranscriptMiddlewareTest {
                 return null;
             }
         };
-        Activity typingActivity = new Activity(ActivityTypes.TYPING) {
-            {
-                setRelatesTo(context.getActivity().getRelatesTo());
-            }
-        };
+        Activity typingActivity = new Activity(ActivityTypes.TYPING);
+        typingActivity.setRelatesTo(context.getActivity().getRelatesTo());
 
         try {
             context.sendActivity(typingActivity).join();
@@ -58,11 +55,8 @@ public class TranscriptMiddlewareTest {
         new TestFlow(adapter, (context) -> {
             delay(500);
             conversationId[0] = context.getActivity().getConversation().getId();
-            Activity typingActivity = new Activity(ActivityTypes.TYPING) {
-                {
-                    setRelatesTo(context.getActivity().getRelatesTo());
-                }
-            };
+            Activity typingActivity = new Activity(ActivityTypes.TYPING);
+            typingActivity.setRelatesTo(context.getActivity().getRelatesTo());
 
             context.sendActivity(typingActivity).join();
 

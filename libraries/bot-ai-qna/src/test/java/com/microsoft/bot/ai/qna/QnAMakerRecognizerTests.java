@@ -36,13 +36,11 @@ public class QnAMakerRecognizerTests {
 
     @Test
     public void logPiiIsFalseByDefault() {
-        QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-            {
-                setHostName(hostname);
-                setEndpointKey(endpointKey);
-                setKnowledgeBaseId(knowledgeBaseId);
-            }
-        };
+        QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+        recognizer.setHostName(hostname);
+        recognizer.setEndpointKey(endpointKey);
+        recognizer.setKnowledgeBaseId(knowledgeBaseId);
+
         Boolean logPersonalInfo = recognizer.getLogPersonalInformation();
         // Should be false by default, when not specified by user.
         Assert.assertFalse(logPersonalInfo);
@@ -53,13 +51,11 @@ public class QnAMakerRecognizerTests {
         Activity activity = Activity.createMessageActivity();
         TurnContext context = new TurnContextImpl(new TestAdapter(), activity);
         DialogContext dc = new DialogContext(new DialogSet(), context, new DialogState());
-        QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-            {
-                setHostName(hostname);
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(endpointKey);
-            }
-        };
+        QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+        recognizer.setHostName(hostname);
+        recognizer.setKnowledgeBaseId(knowledgeBaseId);
+        recognizer.setEndpointKey(endpointKey);
+
         RecognizerResult result = recognizer.recognize(dc, activity).join();
         Assert.assertEquals(result.getEntities(), null);
         Assert.assertEquals(result.getProperties().get("answers"), null);
@@ -81,13 +77,11 @@ public class QnAMakerRecognizerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer,response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-                {
-                    setHostName(finalEndpoint);
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                }
-            };
+            QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+            recognizer.setHostName(finalEndpoint);
+            recognizer.setKnowledgeBaseId(knowledgeBaseId);
+            recognizer.setEndpointKey(endpointKey);
+
             Activity activity = Activity.createMessageActivity();
             activity.setText("test");
             TurnContext context = new TurnContextImpl(new TestAdapter(), activity);
@@ -123,13 +117,11 @@ public class QnAMakerRecognizerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer,response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-                {
-                    setHostName(finalEndpoint);
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                }
-            };
+            QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+            recognizer.setHostName(finalEndpoint);
+            recognizer.setKnowledgeBaseId(knowledgeBaseId);
+            recognizer.setEndpointKey(endpointKey);
+
             Activity activity = Activity.createMessageActivity();
             activity.setText("test");
             TurnContext context = new TurnContextImpl(new TestAdapter(), activity);
@@ -163,13 +155,11 @@ public class QnAMakerRecognizerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer,response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-                {
-                    setHostName(finalEndpoint);
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                }
-            };
+            QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+            recognizer.setHostName(finalEndpoint);
+            recognizer.setKnowledgeBaseId(knowledgeBaseId);
+            recognizer.setEndpointKey(endpointKey);
+
             Activity activity = Activity.createMessageActivity();
             activity.setText("test");
             TurnContext context = new TurnContextImpl(new TestAdapter(), activity);
@@ -203,13 +193,11 @@ public class QnAMakerRecognizerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer,response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerRecognizer recognizer = new QnAMakerRecognizer() {
-                {
-                    setHostName(finalEndpoint);
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                }
-            };
+            QnAMakerRecognizer recognizer = new QnAMakerRecognizer();
+            recognizer.setHostName(finalEndpoint);
+            recognizer.setKnowledgeBaseId(knowledgeBaseId);
+            recognizer.setEndpointKey(endpointKey);
+
             Activity activity = Activity.createMessageActivity();
             activity.setText("test");
             TurnContext context = new TurnContextImpl(new TestAdapter(), activity);

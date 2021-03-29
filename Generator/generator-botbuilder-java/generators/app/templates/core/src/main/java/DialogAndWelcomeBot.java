@@ -85,10 +85,10 @@ public class DialogAndWelcomeBot<T extends Dialog> extends DialogBot {
             String adaptiveCardJson = IOUtils
                 .toString(inputStream, StandardCharsets.UTF_8.toString());
 
-            return new Attachment() {{
-                setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(Serialization.jsonToTree(adaptiveCardJson));
-            }};
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/vnd.microsoft.card.adaptive");
+            attachment.setContent(Serialization.jsonToTree(adaptiveCardJson));
+            return attachment;
 
         } catch (IOException e) {
             e.printStackTrace();

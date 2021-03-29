@@ -94,14 +94,11 @@ public class AdapterWithErrorHandler extends BotFrameworkHttpAdapter {
         Throwable exception
     ) {
         if (StringUtils.equals(turnContext.getActivity().getChannelId(), Channels.EMULATOR)) {
-            Activity traceActivity = new Activity(ActivityTypes.TRACE) {
-                {
-                    setLabel("TurnError");
-                    setName("OnTurnError Trace");
-                    setValue(ExceptionUtils.getStackTrace(exception));
-                    setValueType("https://www.botframework.com/schemas/error");
-                }
-            };
+            Activity traceActivity = new Activity(ActivityTypes.TRACE);
+            traceActivity.setLabel("TurnError");
+            traceActivity.setName("OnTurnError Trace");
+            traceActivity.setValue(ExceptionUtils.getStackTrace(exception));
+            traceActivity.setValueType("https://www.botframework.com/schemas/error");
 
             return turnContext.sendActivity(traceActivity).thenApply(resourceResponse -> null);
         }

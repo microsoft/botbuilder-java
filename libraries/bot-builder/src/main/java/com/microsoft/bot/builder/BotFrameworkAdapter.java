@@ -1060,13 +1060,10 @@ public class BotFrameworkAdapter extends BotAdapter
                     // run pipeline
                     CompletableFuture<Void> result = new CompletableFuture<>();
                     try (TurnContextImpl context = new TurnContextImpl(this, eventActivity)) {
-                        HashMap<String, String> claims = new HashMap<String, String>() {
-                            {
-                                put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
-                                put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
-                                put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
-                            }
-                        };
+                        HashMap<String, String> claims = new HashMap<String, String>();
+                        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, credentials.getAppId());
+                        claims.put(AuthenticationConstants.APPID_CLAIM, credentials.getAppId());
+                        claims.put(AuthenticationConstants.SERVICE_URL_CLAIM, serviceUrl);
                         ClaimsIdentity claimsIdentity = new ClaimsIdentity("anonymous", claims);
 
                         context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
@@ -1531,24 +1528,19 @@ public class BotFrameworkAdapter extends BotAdapter
             try {
                 Activity activity = context.getActivity();
                 String appId = getBotAppId(context);
+                ConversationReference conversationReference = new ConversationReference();
+                conversationReference.setActivityId(activity.getId());
+                conversationReference.setBot(activity.getRecipient());
+                conversationReference.setChannelId(activity.getChannelId());
+                conversationReference.setConversation(activity.getConversation());
+                conversationReference.setServiceUrl(activity.getServiceUrl());
+                conversationReference.setUser(activity.getFrom());
 
-                TokenExchangeState tokenExchangeState = new TokenExchangeState() {
-                    {
-                        setConnectionName(connectionName);
-                        setConversation(new ConversationReference() {
-                            {
-                                setActivityId(activity.getId());
-                                setBot(activity.getRecipient());
-                                setChannelId(activity.getChannelId());
-                                setConversation(activity.getConversation());
-                                setServiceUrl(activity.getServiceUrl());
-                                setUser(activity.getFrom());
-                            }
-                        });
-                        setRelatesTo(activity.getRelatesTo());
-                        setMsAppId(appId);
-                    }
-                };
+                TokenExchangeState tokenExchangeState = new TokenExchangeState();
+                tokenExchangeState.setConnectionName(connectionName);
+                tokenExchangeState.setConversation(conversationReference);
+                tokenExchangeState.setRelatesTo(activity.getRelatesTo());
+                tokenExchangeState.setMsAppId(appId);
 
                 String serializedState = Serialization.toString(tokenExchangeState);
                 String state = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
@@ -1598,24 +1590,19 @@ public class BotFrameworkAdapter extends BotAdapter
                 Activity activity = context.getActivity();
                 String appId = getBotAppId(context);
 
-                TokenExchangeState tokenExchangeState = new TokenExchangeState() {
-                    {
-                        setConnectionName(connectionName);
-                        setConversation(new ConversationReference() {
-                            {
-                                setActivityId(activity.getId());
-                                setBot(activity.getRecipient());
-                                setChannelId(activity.getChannelId());
-                                setConversation(activity.getConversation());
-                                setLocale(activity.getLocale());
-                                setServiceUrl(activity.getServiceUrl());
-                                setUser(activity.getFrom());
-                            }
-                        });
-                        setRelatesTo(activity.getRelatesTo());
-                        setMsAppId(appId);
-                    }
-                };
+                ConversationReference conversationReference = new ConversationReference();
+                conversationReference.setActivityId(activity.getId());
+                conversationReference.setBot(activity.getRecipient());
+                conversationReference.setChannelId(activity.getChannelId());
+                conversationReference.setConversation(activity.getConversation());
+                conversationReference.setLocale(activity.getLocale());
+                conversationReference.setServiceUrl(activity.getServiceUrl());
+                conversationReference.setUser(activity.getFrom());
+                TokenExchangeState tokenExchangeState = new TokenExchangeState();
+                tokenExchangeState.setConnectionName(connectionName);
+                tokenExchangeState.setConversation(conversationReference);
+                tokenExchangeState.setRelatesTo(activity.getRelatesTo());
+                tokenExchangeState.setMsAppId(appId);
 
                 String serializedState = Serialization.toString(tokenExchangeState);
                 String state = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));
@@ -1827,24 +1814,19 @@ public class BotFrameworkAdapter extends BotAdapter
                 Activity activity = context.getActivity();
                 String appId = getBotAppId(context);
 
-                TokenExchangeState tokenExchangeState = new TokenExchangeState() {
-                    {
-                        setConnectionName(connectionName);
-                        setConversation(new ConversationReference() {
-                            {
-                                setActivityId(activity.getId());
-                                setBot(activity.getRecipient());
-                                setChannelId(activity.getChannelId());
-                                setConversation(activity.getConversation());
-                                setLocale(activity.getLocale());
-                                setServiceUrl(activity.getServiceUrl());
-                                setUser(activity.getFrom());
-                            }
-                        });
-                        setRelatesTo(activity.getRelatesTo());
-                        setMsAppId(appId);
-                    }
-                };
+                ConversationReference conversationReference = new ConversationReference();
+                conversationReference.setActivityId(activity.getId());
+                conversationReference.setBot(activity.getRecipient());
+                conversationReference.setChannelId(activity.getChannelId());
+                conversationReference.setConversation(activity.getConversation());
+                conversationReference.setLocale(activity.getLocale());
+                conversationReference.setServiceUrl(activity.getServiceUrl());
+                conversationReference.setUser(activity.getFrom());
+                TokenExchangeState tokenExchangeState = new TokenExchangeState();
+                tokenExchangeState.setConnectionName(connectionName);
+                tokenExchangeState.setConversation(conversationReference);
+                tokenExchangeState.setRelatesTo(activity.getRelatesTo());
+                tokenExchangeState.setMsAppId(appId);
 
                 String serializedState = Serialization.toString(tokenExchangeState);
                 String state = Base64.getEncoder().encodeToString(serializedState.getBytes(StandardCharsets.UTF_8));

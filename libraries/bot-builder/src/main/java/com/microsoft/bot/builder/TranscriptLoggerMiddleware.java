@@ -113,12 +113,9 @@ public class TranscriptLoggerMiddleware implements Middleware {
                 return nextDel.get().thenApply(nextDelResult -> {
                     // add MessageDelete activity
                     // log as MessageDelete activity
-                    Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {
-                        {
-                            setId(reference.getActivityId());
-                            applyConversationReference(reference, false);
-                        }
-                    };
+                    Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE);
+                    deleteActivity.setId(reference.getActivityId());
+                    deleteActivity.applyConversationReference(reference, false);
 
                     logActivity(deleteActivity, false);
 
