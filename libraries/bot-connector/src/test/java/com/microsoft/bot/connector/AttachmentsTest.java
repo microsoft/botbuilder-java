@@ -16,16 +16,14 @@ public class AttachmentsTest extends BotConnectorTestBase {
     @Test
     public void GetAttachmentInfo() {
 
-        AttachmentData attachment = new AttachmentData() {{
-            setName("bot-framework.png");
-            setType("image/png");
-            setOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
-        }};
+        AttachmentData attachment = new AttachmentData();
+        attachment.setName("bot-framework.png");
+        attachment.setType("image/png");
+        attachment.setOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -49,16 +47,14 @@ public class AttachmentsTest extends BotConnectorTestBase {
             e.printStackTrace();
         }
 
-        AttachmentData attachment = new AttachmentData() {{
-            setName("bot_icon.png");
-            setType("image/png");
-            setOriginalBase64(attachmentPayload);
-        }};
+        AttachmentData attachment = new AttachmentData();
+        attachment.setName("bot_icon.png");
+        attachment.setType("image/png");
+        attachment.setOriginalBase64(attachmentPayload);
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 

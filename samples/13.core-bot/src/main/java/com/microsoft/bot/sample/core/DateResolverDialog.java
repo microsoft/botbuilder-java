@@ -75,12 +75,10 @@ public class DateResolverDialog extends CancelAndHelpDialog {
             return stepContext.prompt("DateTimePrompt", promptOptions);
         }
 
-        DateTimeResolution dateTimeResolution = new DateTimeResolution() {{
-            setTimex(timex);
-        }};
-        List<DateTimeResolution> dateTimeResolutions = new ArrayList<DateTimeResolution>() {{
-            add(dateTimeResolution);
-        }};
+        DateTimeResolution dateTimeResolution = new DateTimeResolution();
+        dateTimeResolution.setTimex(timex);
+        List<DateTimeResolution> dateTimeResolutions = new ArrayList<DateTimeResolution>();
+        dateTimeResolutions.add(dateTimeResolution);
         return stepContext.next(dateTimeResolutions);
     }
 

@@ -42,12 +42,8 @@ public class FlightBookingRecognizer implements Recognizer {
             // Set the recognizer options depending on which endpoint version you want to use.
             // More details can be found in
             // https://docs.microsoft.com/en-gb/azure/cognitive-services/luis/luis-migration-api-v3
-            LuisRecognizerOptionsV3 recognizerOptions = new LuisRecognizerOptionsV3(
-                luisApplication) {
-                {
-                    setIncludeInstanceData(true);
-                }
-            };
+            LuisRecognizerOptionsV3 recognizerOptions = new LuisRecognizerOptionsV3(luisApplication);
+            recognizerOptions.setIncludeInstanceData(true);
 
             this.recognizer = new LuisRecognizer(recognizerOptions);
         }

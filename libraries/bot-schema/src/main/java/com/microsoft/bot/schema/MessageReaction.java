@@ -31,12 +31,9 @@ public class MessageReaction {
         if (messageReaction == null) {
             return null;
         }
-
-        return new MessageReaction() {
-            {
-                setType(messageReaction.getType());
-            }
-        };
+        MessageReaction cloned = new MessageReaction();
+        cloned.setType(messageReaction.getType());
+        return cloned;
     }
 
     /**

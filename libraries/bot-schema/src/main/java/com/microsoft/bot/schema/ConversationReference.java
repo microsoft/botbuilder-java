@@ -52,17 +52,16 @@ public class ConversationReference {
             return null;
         }
 
-        return new ConversationReference() {
-            {
-                setActivityId(conversationReference.getActivityId());
-                setBot(ChannelAccount.clone(conversationReference.getBot()));
-                setUser(ChannelAccount.clone(conversationReference.getUser()));
-                setConversation(ConversationAccount.clone(conversationReference.getConversation()));
-                setServiceUrl(conversationReference.getServiceUrl());
-                setLocale(conversationReference.getLocale());
-                setChannelId(conversationReference.getChannelId());
-            }
-        };
+        ConversationReference cloned = new ConversationReference();
+        cloned.setActivityId(conversationReference.getActivityId());
+        cloned.setBot(ChannelAccount.clone(conversationReference.getBot()));
+        cloned.setUser(ChannelAccount.clone(conversationReference.getUser()));
+        cloned.setConversation(ConversationAccount.clone(conversationReference.getConversation()));
+        cloned.setServiceUrl(conversationReference.getServiceUrl());
+        cloned.setLocale(conversationReference.getLocale());
+        cloned.setChannelId(conversationReference.getChannelId());
+
+        return cloned;
     }
 
     /**

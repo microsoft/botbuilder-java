@@ -102,12 +102,9 @@ public class TelemetryLoggerMiddleware implements Middleware {
             context.onDeleteActivity(
                 (deleteContext, deleteReference, deleteNext) -> deleteNext.get()
                     .thenCompose(nextResult -> {
-                        Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE) {
-                            {
-                                setId(deleteReference.getActivityId());
-                                applyConversationReference(deleteReference, false);
-                            }
-                        };
+                        Activity deleteActivity = new Activity(ActivityTypes.MESSAGE_DELETE);
+                        deleteActivity.setId(deleteReference.getActivityId());
+                        deleteActivity.applyConversationReference(deleteReference, false);
 
                         return onDeleteActivity(deleteActivity);
                     })
@@ -196,18 +193,15 @@ public class TelemetryLoggerMiddleware implements Middleware {
         Map<String, String> additionalProperties
     ) {
 
-        Map<String, String> properties = new HashMap<String, String>() {
-            {
-                put(TelemetryConstants.FROMIDPROPERTY, activity.getFrom().getId());
-                put(
-                    TelemetryConstants.CONVERSATIONNAMEPROPERTY,
-                    activity.getConversation().getName()
-                );
-                put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
-                put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
-                put(TelemetryConstants.RECIPIENTNAMEPROPERTY, activity.getRecipient().getName());
-            }
-        };
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(TelemetryConstants.FROMIDPROPERTY, activity.getFrom().getId());
+        properties.put(
+            TelemetryConstants.CONVERSATIONNAMEPROPERTY,
+            activity.getConversation().getName()
+        );
+        properties.put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
+        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+        properties.put(TelemetryConstants.RECIPIENTNAMEPROPERTY, activity.getRecipient().getName());
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text and user
         // name are common examples
@@ -250,17 +244,14 @@ public class TelemetryLoggerMiddleware implements Middleware {
         Map<String, String> additionalProperties
     ) {
 
-        Map<String, String> properties = new HashMap<String, String>() {
-            {
-                put(TelemetryConstants.REPLYACTIVITYIDPROPERTY, activity.getReplyToId());
-                put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
-                put(
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(TelemetryConstants.REPLYACTIVITYIDPROPERTY, activity.getReplyToId());
+        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+        properties.put(
                     TelemetryConstants.CONVERSATIONNAMEPROPERTY,
                     activity.getConversation().getName()
-                );
-                put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
-            }
-        };
+        );
+        properties.put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text and user
         // name are common examples
@@ -303,17 +294,14 @@ public class TelemetryLoggerMiddleware implements Middleware {
         Map<String, String> additionalProperties
     ) {
 
-        Map<String, String> properties = new HashMap<String, String>() {
-            {
-                put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
-                put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
-                put(
-                    TelemetryConstants.CONVERSATIONNAMEPROPERTY,
-                    activity.getConversation().getName()
-                );
-                put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
-            }
-        };
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+        properties.put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
+        properties.put(
+            TelemetryConstants.CONVERSATIONNAMEPROPERTY,
+            activity.getConversation().getName()
+        );
+        properties.put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text is a
         // common example
@@ -344,16 +332,13 @@ public class TelemetryLoggerMiddleware implements Middleware {
         Map<String, String> additionalProperties
     ) {
 
-        Map<String, String> properties = new HashMap<String, String>() {
-            {
-                put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
-                put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
-                put(
-                    TelemetryConstants.CONVERSATIONNAMEPROPERTY,
-                    activity.getConversation().getName()
-                );
-            }
-        };
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
+        properties.put(TelemetryConstants.CONVERSATIONIDPROPERTY, activity.getConversation().getId());
+        properties.put(
+            TelemetryConstants.CONVERSATIONNAMEPROPERTY,
+            activity.getConversation().getName()
+        );
 
         // Additional Properties can override "stock" properties.
         if (additionalProperties != null) {

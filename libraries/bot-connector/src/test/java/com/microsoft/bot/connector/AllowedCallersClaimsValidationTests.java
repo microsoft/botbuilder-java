@@ -35,14 +35,22 @@ public class AllowedCallersClaimsValidationTests {
         // Empty allowed callers array
         resultList.add(Pair.of(null, new ArrayList<String>()));
         // Allow any caller
-        resultList.add(Pair.of(primaryAppId, new ArrayList<String>() { { add("*"); } }));
+        ArrayList<String> anyCaller = new ArrayList<String>();
+        anyCaller.add("*");
+        resultList.add(Pair.of(primaryAppId, anyCaller));
         // Specify allowed caller
-        resultList.add((Pair.of(primaryAppId, new ArrayList<String>() { { add(primaryAppId); } })));
+        ArrayList<String> allowedCaller = new ArrayList<String>();
+        allowedCaller.add(primaryAppId);
+        resultList.add((Pair.of(primaryAppId, allowedCaller)));
         // Specify multiple callers
-        resultList.add((Pair.of(primaryAppId, new ArrayList<String>() { { add(primaryAppId);
-                                                                          add(secondaryAppId); } })));
+        ArrayList<String> multipleCallers = new ArrayList<String>();
+        multipleCallers.add(primaryAppId);
+        multipleCallers.add(secondaryAppId);
+        resultList.add((Pair.of(primaryAppId, multipleCallers)));
         // Blocked caller throws exception
-        resultList.add((Pair.of(primaryAppId, new ArrayList<String>() { { add(secondaryAppId); } })));
+        ArrayList<String> blockedCallers = new ArrayList<String>();
+        blockedCallers.add(secondaryAppId);
+        resultList.add((Pair.of(primaryAppId, blockedCallers)));
         return resultList;
     }
 

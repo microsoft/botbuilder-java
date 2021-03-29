@@ -233,16 +233,16 @@ public class ObjectPathTests {
 
     @Test
     public void jsonNode_OnlyDefaultTest() {
-        JsonNode defaultOptions = Serialization.objectToTree(new Options() {{
-            lastName = "Smith";
-            firstName = "Fred";
-            age = 22;
-            bool = true;
-            location = new Location() {{
-                latitude = 1.2312312F;
-                longitude = 3.234234F;
-            }};
-        }});
+        Options options = new Options();
+        options.lastName = "Smith";
+        options.firstName = "Fred";
+        options.age = 22;
+        options.bool = true;
+        Location location = new Location();
+        location.latitude = 1.2312312F;
+        location.longitude = 3.234234F;
+        options.location = location;
+        JsonNode defaultOptions = Serialization.objectToTree(options);
 
         JsonNode overlay = Serialization.objectToTree(new Options());
 
@@ -262,16 +262,16 @@ public class ObjectPathTests {
     public void jsonNode_OnlyOverlay() {
         JsonNode defaultOptions = Serialization.objectToTree(new Options());
 
-        JsonNode overlay = Serialization.objectToTree(new Options() {{
-            lastName = "Smith";
-            firstName = "Fred";
-            age = 22;
-            bool = true;
-            location = new Location() {{
-                latitude = 1.2312312F;
-                longitude = 3.234234F;
-            }};
-        }});
+        Options options = new Options();
+        options.lastName = "Smith";
+        options.firstName = "Fred";
+        options.age = 22;
+        options.bool = true;
+        Location location = new Location();
+        location.latitude = 1.2312312F;
+        location.longitude = 3.234234F;
+        options.location = location;
+        JsonNode overlay = Serialization.objectToTree(options);
 
 
         Options result = ObjectPath.assign(defaultOptions, overlay, Options.class);
@@ -288,27 +288,27 @@ public class ObjectPathTests {
 
     @Test
     public void jsonNode_FullOverlay() {
-        JsonNode defaultOptions = Serialization.objectToTree(new Options() {{
-            lastName = "Smith";
-            firstName = "Fred";
-            age = 22;
-            bool = true;
-            location = new Location() {{
-                latitude = 1.2312312F;
-                longitude = 3.234234F;
-            }};
-        }});
+        Options defaultOpts = new Options();
+        defaultOpts.lastName = "Smith";
+        defaultOpts.firstName = "Fred";
+        defaultOpts.age = 22;
+        defaultOpts.bool = true;
+        Location defaultLocation = new Location();
+        defaultLocation.latitude = 1.2312312F;
+        defaultLocation.longitude = 3.234234F;
+        defaultOpts.location = defaultLocation;
+        JsonNode defaultOptions = Serialization.objectToTree(defaultOpts);
 
-        JsonNode overlay = Serialization.objectToTree(new Options() {{
-            lastName = "Grant";
-            firstName = "Eddit";
-            age = 32;
-            bool = false;
-            location = new Location() {{
-                latitude = 2.2312312F;
-                longitude = 2.234234F;
-            }};
-        }});
+        Options overlayOpts = new Options();
+        overlayOpts.lastName = "Grant";
+        overlayOpts.firstName = "Eddit";
+        overlayOpts.age = 32;
+        overlayOpts.bool = false;
+        Location overlayLocation = new Location();
+        overlayLocation.latitude = 2.2312312F;
+        overlayLocation.longitude = 2.234234F;
+        overlayOpts.location = overlayLocation;
+        JsonNode overlay = Serialization.objectToTree(overlayOpts);
 
 
         Options result = ObjectPath.assign(defaultOptions, overlay, Options.class);
@@ -325,20 +325,20 @@ public class ObjectPathTests {
 
     @Test
     public void jsonNode_PartialOverlay() {
-        JsonNode defaultOptions = Serialization.objectToTree(new Options() {{
-            lastName = "Smith";
-            firstName = "Fred";
-            age = 22;
-            bool = true;
-            location = new Location() {{
-                latitude = 1.2312312F;
-                longitude = 3.234234F;
-            }};
-        }});
+        Options defaultOpts = new Options();
+        defaultOpts.lastName = "Smith";
+        defaultOpts.firstName = "Fred";
+        defaultOpts.age = 22;
+        defaultOpts.bool = true;
+        Location defaultLocation = new Location();
+        defaultLocation.latitude = 1.2312312F;
+        defaultLocation.longitude = 3.234234F;
+        defaultOpts.location = defaultLocation;
+        JsonNode defaultOptions = Serialization.objectToTree(defaultOpts);
 
-        JsonNode overlay = Serialization.objectToTree(new Options() {{
-            lastName = "Grant";
-        }});
+        Options overlayOpts = new Options();
+        overlayOpts.lastName = "Grant";
+        JsonNode overlay = Serialization.objectToTree(overlayOpts);
 
 
         Options result = ObjectPath.assign(defaultOptions, overlay, Options.class);

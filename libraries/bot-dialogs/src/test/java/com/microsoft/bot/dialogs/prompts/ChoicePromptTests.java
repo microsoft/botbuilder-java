@@ -209,6 +209,19 @@ public class ChoicePromptTests {
 
         dialogs.add(listPrompt);
 
+        CardAction red = new CardAction();
+        red.setType(ActionTypes.IM_BACK);
+        red.setValue("red");
+        red.setTitle("red");
+        CardAction green = new CardAction();
+        green.setType(ActionTypes.IM_BACK);
+        green.setValue("green");
+        green.setTitle("green");
+        CardAction blue = new CardAction();
+        blue.setType(ActionTypes.IM_BACK);
+        blue.setValue("blue");
+        blue.setTitle("blue");
+        CardAction[] suggestedActions = new CardAction[] { red, green, blue };
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
@@ -222,31 +235,7 @@ public class ChoicePromptTests {
             return CompletableFuture.completedFuture(null);
             })
             .send("hello")
-            .assertReply(new Validators().validateSuggestedActions("favorite color?", new SuggestedActions(new
-            CardAction[]
-            {
-                new CardAction() {
-                    {
-                        setType(ActionTypes.IM_BACK);
-                        setValue("red");
-                        setTitle("red");
-                    }
-                },
-                new CardAction() {
-                    {
-                        setType(ActionTypes.IM_BACK);
-                        setValue("green");
-                        setTitle("green");
-                    }
-                },
-                new CardAction() {
-                    {
-                        setType(ActionTypes.IM_BACK);
-                        setValue("blue");
-                        setTitle("blue");
-                    }
-                }
-            })))
+            .assertReply(new Validators().validateSuggestedActions("favorite color?", new SuggestedActions(suggestedActions)))
             .startTest()
             .join();
     }
@@ -266,6 +255,26 @@ public class ChoicePromptTests {
 
         dialogs.add(listPrompt);
 
+        CardAction red = new CardAction();
+        red.setType(ActionTypes.IM_BACK);
+        red.setValue("red");
+        red.setTitle("red");
+        CardAction green = new CardAction();
+        green.setType(ActionTypes.IM_BACK);
+        green.setValue("green");
+        green.setTitle("green");
+        CardAction blue = new CardAction();
+        blue.setType(ActionTypes.IM_BACK);
+        blue.setValue("blue");
+        blue.setTitle("blue");
+        ArrayList<CardAction> buttons = new ArrayList<CardAction>();
+        buttons.add(red);
+        buttons.add(green);
+        buttons.add(blue);
+        HeroCard card = new HeroCard();
+        card.setText("favorite color?");
+        card.setButtons(buttons);
+
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
@@ -279,37 +288,7 @@ public class ChoicePromptTests {
             return CompletableFuture.completedFuture(null);
             })
             .send("hello")
-            .assertReply(new Validators().validateHeroCard(
-                new HeroCard() {
-                    {
-                        setText("favorite color?");
-                        setButtons(new ArrayList<CardAction>() {
-                            {
-                                add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("red");
-                                            setTitle("red");
-                                        }
-                                    });
-                                    add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("green");
-                                            setTitle("green");
-                                        }
-                                    });
-                                    add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("blue");
-                                            setTitle("blue");
-                                        }
-                                    });
-                            }
-                        });
-                    }
-                }, 0))
+            .assertReply(new Validators().validateHeroCard(card, 0))
             .startTest().join();
     }
 
@@ -327,6 +306,26 @@ public class ChoicePromptTests {
         listPrompt.setStyle(ListStyle.HEROCARD);
 
         dialogs.add(listPrompt);
+        HeroCard card = new HeroCard();
+        card.setText("favorite color?");
+        CardAction red = new CardAction();
+        red.setType(ActionTypes.IM_BACK);
+        red.setValue("red");
+        red.setTitle("red");
+        CardAction green = new CardAction();
+        green.setType(ActionTypes.IM_BACK);
+        green.setValue("green");
+        green.setTitle("green");
+        CardAction blue = new CardAction();
+        blue.setType(ActionTypes.IM_BACK);
+        blue.setValue("blue");
+        blue.setTitle("blue");
+        ArrayList<CardAction> buttons = new ArrayList<CardAction>();
+        buttons.add(red);
+        buttons.add(green);
+        buttons.add(blue);
+        card.setButtons(buttons);
+
 
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
@@ -347,37 +346,7 @@ public class ChoicePromptTests {
             return CompletableFuture.completedFuture(null);
             })
             .send("hello")
-            .assertReply(new Validators().validateHeroCard(
-                new HeroCard() {
-                    {
-                        setText("favorite color?");
-                        setButtons(new ArrayList<CardAction>() {
-                            {
-                                add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("red");
-                                            setTitle("red");
-                                        }
-                                    });
-                                    add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("green");
-                                            setTitle("green");
-                                        }
-                                    });
-                                    add(new CardAction() {
-                                        {
-                                            setType(ActionTypes.IM_BACK);
-                                            setValue("blue");
-                                            setTitle("blue");
-                                        }
-                                    });
-                            }
-                        });
-                    }
-                }, 1))
+            .assertReply(new Validators().validateHeroCard(card, 1))
             .startTest().join();
     }
 
@@ -580,6 +549,19 @@ public class ChoicePromptTests {
         listPrompt.setStyle(ListStyle.HEROCARD);
 
         dialogs.add(listPrompt);
+        CardAction red = new CardAction();
+        red.setType(ActionTypes.IM_BACK);
+        red.setValue("red");
+        red.setTitle("red");
+        CardAction green = new CardAction();
+        green.setType(ActionTypes.IM_BACK);
+        green.setValue("green");
+        green.setTitle("green");
+        CardAction blue = new CardAction();
+        blue.setType(ActionTypes.IM_BACK);
+        blue.setValue("blue");
+        blue.setTitle("blue");
+        CardAction[] suggestedActions = new CardAction[]{red, green, blue};
 
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
@@ -595,31 +577,7 @@ public class ChoicePromptTests {
             return CompletableFuture.completedFuture(null);
         })
         .send("hello")
-        .assertReply(new Validators().validateSuggestedActions("favorite color?", new SuggestedActions(new
-        CardAction[]
-        {
-            new CardAction() {
-                {
-                    setType(ActionTypes.IM_BACK);
-                    setValue("red");
-                    setTitle("red");
-                }
-            },
-            new CardAction() {
-                {
-                    setType(ActionTypes.IM_BACK);
-                    setValue("green");
-                    setTitle("green");
-                }
-            },
-            new CardAction() {
-                {
-                    setType(ActionTypes.IM_BACK);
-                    setValue("blue");
-                    setTitle("blue");
-                }
-            }
-        })))
+        .assertReply(new Validators().validateSuggestedActions("favorite color?", new SuggestedActions(suggestedActions)))
         .startTest()
         .join();
     }
@@ -696,16 +654,13 @@ public class ChoicePromptTests {
         TestAdapter adapter = new TestAdapter().use(new AutoSaveStateMiddleware(convoState));
         // Create new DialogSet.
         DialogSet dialogs = new DialogSet(dialogState);
-        PromptCultureModel culture = new PromptCultureModel() {
-            {
-                setInlineOr(" customOr ");
-                setInlineOrMore(" customOrMore ");
-                setLocale("custom-custom");
-                setSeparator("customSeparator");
-                setNoInLanguage("customNo");
-                setYesInLanguage("customYes");
-            }
-        };
+        PromptCultureModel culture = new PromptCultureModel();
+        culture.setInlineOr(" customOr ");
+        culture.setInlineOrMore(" customOrMore ");
+        culture.setLocale("custom-custom");
+        culture.setSeparator("customSeparator");
+        culture.setNoInLanguage("customNo");
+        culture.setYesInLanguage("customYes");
 
         Map<String, ChoiceFactoryOptions> customDict = new HashMap<String, ChoiceFactoryOptions>();
         ChoiceFactoryOptions choiceOption = new ChoiceFactoryOptions(culture.getSeparator(),

@@ -21,24 +21,24 @@ public final class ChannelValidation {
     }
 
     /**
-     * TO BOT FROM CHANNEL: Token validation parameters when connecting to a bot.
+     * TO BOT FROM CHANNEL.
+     * @return Token validation parameters when connecting to a bot.
      */
-    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
-        new TokenValidationParameters() {
-            {
-                this.validateIssuer = true;
-                this.validIssuers = new ArrayList<String>() {
-                    {
-                        add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
-                    }
-                };
-                this.validateAudience = false;
-                this.validateLifetime = true;
-                this.clockSkew =
-                    Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
-                this.requireSignedTokens = true;
-            }
-        };
+    public static TokenValidationParameters getTokenValidationParameters() {
+        TokenValidationParameters tokenValidationParameters = new TokenValidationParameters();
+        tokenValidationParameters.validateIssuer = true;
+
+        ArrayList<String> validIssuers = new ArrayList<String>();
+        validIssuers.add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
+        tokenValidationParameters.validIssuers = validIssuers;
+
+        tokenValidationParameters.validateAudience = false;
+        tokenValidationParameters.validateLifetime = true;
+        tokenValidationParameters.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
+        tokenValidationParameters.requireSignedTokens = true;
+
+        return tokenValidationParameters;
+    }
 
     /**
      * Gets the OpenID metadata URL.
@@ -104,7 +104,7 @@ public final class ChannelValidation {
         AuthenticationConfiguration authConfig
     ) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            TOKENVALIDATIONPARAMETERS,
+            getTokenValidationParameters(),
             getOpenIdMetaDataUrl(),
             AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS
         );

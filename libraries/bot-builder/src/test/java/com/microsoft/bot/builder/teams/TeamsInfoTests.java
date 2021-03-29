@@ -54,17 +54,12 @@ public class TeamsInfoTests {
         );
         ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText("Test-SendMessageToTeamsChannelAsync");
-                setChannelId(Channels.MSTEAMS);
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+                activity.setText("Test-SendMessageToTeamsChannelAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(data);
 
         TurnContext turnContext = new TurnContextImpl(
             new TestBotFrameworkAdapter(
@@ -89,17 +84,12 @@ public class TeamsInfoTests {
         MicrosoftAppCredentials credentials = MicrosoftAppCredentials.empty();
         ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText("Test-GetTeamDetailsAsync");
-                setChannelId(Channels.MSTEAMS);
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-GetTeamDetailsAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(data);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -119,17 +109,12 @@ public class TeamsInfoTests {
         MicrosoftAppCredentials credentials = MicrosoftAppCredentials.empty();
         ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText("Test-Team-GetMembersAsync");
-                setChannelId(Channels.MSTEAMS);
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-Team-GetMembersAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(data);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -149,13 +134,10 @@ public class TeamsInfoTests {
         MicrosoftAppCredentials credentials = MicrosoftAppCredentials.empty();
         ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText("Test-GroupChat-GetMembersAsync");
-                setChannelId(Channels.MSTEAMS);
-                setConversation(new ConversationAccount("conversation-id"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-GroupChat-GetMembersAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        activity.setConversation(new ConversationAccount("conversation-id"));
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -175,17 +157,12 @@ public class TeamsInfoTests {
         MicrosoftAppCredentials credentials = MicrosoftAppCredentials.empty();
         ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText("Test-GetChannelsAsync");
-                setChannelId(Channels.MSTEAMS);
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-GetChannelsAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(data);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -336,139 +313,68 @@ public class TeamsInfoTests {
     private static ConnectorClient getConnectorClient(String baseUri, AppCredentials credentials) {
         Conversations mockConversations = Mockito.mock(Conversations.class);
 
+        ConversationResourceResponse response = new ConversationResourceResponse();
+        response.setId("team-id");
+        response.setServiceUrl("https://serviceUrl/");
+        response.setActivityId("activityId123");
+
         // createConversation
         Mockito.when(
             mockConversations.createConversation(Mockito.any(ConversationParameters.class))
-        ).thenReturn(CompletableFuture.completedFuture(new ConversationResourceResponse() {
-            {
-                setId("team-id");
-                setServiceUrl("https://serviceUrl/");
-                setActivityId("activityId123");
-            }
-        }));
+        ).thenReturn(CompletableFuture.completedFuture(response));
 
+
+        ArrayList<ChannelAccount> channelAccounts1 = new ArrayList<ChannelAccount>();
+        ChannelAccount channelAccount1 = new ChannelAccount();
+        channelAccount1.setId("id-1");
+        channelAccount1.setName("name-1");
+        channelAccount1.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-1"));
+        channelAccount1.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-1"));
+        channelAccount1.setProperties("surname", JsonNodeFactory.instance.textNode("surname-1"));
+        channelAccount1.setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+        channelAccount1.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-1"));
+        channelAccount1.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-1"));
+        channelAccounts1.add(channelAccount1);
+        ChannelAccount channelAccount2 = new ChannelAccount();
+        channelAccount2.setId("id-2");
+        channelAccount2.setName("name-2");
+        channelAccount2.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-2"));
+        channelAccount2.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-2"));
+        channelAccount2.setProperties("surname", JsonNodeFactory.instance.textNode("surname-2"));
+        channelAccount2.setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
+        channelAccount2.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-2"));
+        channelAccount2.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-2"));
+        channelAccounts1.add(channelAccount2);
         // getConversationMembers (Team)
         Mockito.when(mockConversations.getConversationMembers("team-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
-                {
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-1");
-                            setName("name-1");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-1")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-1")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-1")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-1")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-1")
-                            );
-                        }
-                    });
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-2");
-                            setName("name-2");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-2")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-2")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-2")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-2")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-2")
-                            );
-                        }
-                    });
-                }
-            })
+            CompletableFuture.completedFuture(channelAccounts1)
         );
 
+
+        ArrayList<ChannelAccount> channelAccounts2 = new ArrayList<ChannelAccount>();
+        ChannelAccount channelAccount3 = new ChannelAccount();
+        channelAccount3.setId("id-3");
+        channelAccount3.setName("name-3");
+        channelAccount3.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-3"));
+        channelAccount3.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-3"));
+        channelAccount3.setProperties("surname", JsonNodeFactory.instance.textNode("surname-3"));
+        channelAccount3.setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
+        channelAccount3.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-3"));
+        channelAccount3.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-3"));
+        channelAccounts2.add(channelAccount3);
+        ChannelAccount channelAccount4 = new ChannelAccount();
+        channelAccount4.setId("id-4");
+        channelAccount4.setName("name-4");
+        channelAccount4.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-4"));
+        channelAccount4.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-4"));
+        channelAccount4.setProperties("surname", JsonNodeFactory.instance.textNode("surname-4"));
+        channelAccount4.setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
+        channelAccount4.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-4"));
+        channelAccount4.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-4"));
+        channelAccounts2.add(channelAccount4);
         // getConversationMembers (Group chat)
         Mockito.when(mockConversations.getConversationMembers("conversation-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
-                {
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-3");
-                            setName("name-3");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-3")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-3")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-3")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-3")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-3")
-                            );
-                        }
-                    });
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-4");
-                            setName("name-4");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-4")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-4")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-4")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-4")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-4")
-                            );
-                        }
-                    });
-                }
-            })
+            CompletableFuture.completedFuture(channelAccounts2)
         );
 
         ConnectorClient mockConnectorClient = Mockito.mock(ConnectorClient.class);
@@ -485,30 +391,25 @@ public class TeamsInfoTests {
     ) {
         TeamsOperations mockOperations = Mockito.mock(TeamsOperations.class);
 
+
+        ConversationList list = new ConversationList();
+        ArrayList<ChannelInfo> conversations = new ArrayList<ChannelInfo>();
+        conversations.add(new ChannelInfo("channel-id-1"));
+        conversations.add(new ChannelInfo("channel-id-2", "channel-name-2"));
+        conversations.add(new ChannelInfo("channel-id-3", "channel-name-3"));
+        list.setConversations(conversations);
         // fetchChannelList
         Mockito.when(mockOperations.fetchChannelList(Mockito.anyString())).thenReturn(
-            CompletableFuture.completedFuture(new ConversationList() {
-                {
-                    setConversations(new ArrayList<ChannelInfo>() {
-                        {
-                            add(new ChannelInfo("channel-id-1"));
-                            add(new ChannelInfo("channel-id-2", "channel-name-2"));
-                            add(new ChannelInfo("channel-id-3", "channel-name-3"));
-                        }
-                    });
-                }
-            })
+            CompletableFuture.completedFuture(list)
         );
 
+        TeamDetails details = new TeamDetails();
+        details.setId("team-id");
+        details.setName("team-name");
+        details.setAadGroupId("team-aadgroupid");
         // fetchTeamDetails
         Mockito.when(mockOperations.fetchTeamDetails(Mockito.anyString())).thenReturn(
-            CompletableFuture.completedFuture(new TeamDetails() {
-                {
-                    setId("team-id");
-                    setName("team-name");
-                    setAadGroupId("team-aadgroupid");
-                }
-            })
+            CompletableFuture.completedFuture(details)
         );
 
         TeamsConnectorClient mockConnectorClient = Mockito.mock(TeamsConnectorClient.class);

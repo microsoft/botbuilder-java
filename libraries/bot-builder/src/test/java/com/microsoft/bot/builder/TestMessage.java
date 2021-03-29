@@ -14,22 +14,17 @@ public class TestMessage {
     }
 
     public static Activity Message(String id) {
-        Activity a = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setId(id);
-                setText("test");
-                setFrom(new ChannelAccount("user", "User Name"));
-                setRecipient(new ChannelAccount("bot", "Bot Name"));
-                setConversation(new ConversationAccount() {
-                    {
-                        setId("convo");
-                        setName("Convo Name");
-                    }
-                });
-                setChannelId("UnitTest");
-                setServiceUrl("https://example.org");
-            }
-        };
+        Activity a = new Activity(ActivityTypes.MESSAGE);
+        a.setId(id);
+        a.setText("test");
+        a.setFrom(new ChannelAccount("user", "User Name"));
+        a.setRecipient(new ChannelAccount("bot", "Bot Name"));
+        ConversationAccount conversationAccount = new ConversationAccount();
+        conversationAccount.setId("convo");
+        conversationAccount.setName("Convo Name");
+        a.setConversation(conversationAccount);
+        a.setChannelId("UnitTest");
+        a.setServiceUrl("https://example.org");
         return a;
     }
 }

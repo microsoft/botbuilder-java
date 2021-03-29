@@ -44,26 +44,25 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
     ) {
         Map<String, String> actionData = (Map<String, String>) action.getData();
 
-        HeroCard card = new HeroCard() {{
-            setTitle(actionData.get("title"));
-            setSubtitle(actionData.get("subTitle"));
-            setText(actionData.get("text"));
-        }};
+        HeroCard card = new HeroCard();
+        card.setTitle(actionData.get("title"));
+        card.setSubtitle(actionData.get("subTitle"));
+        card.setText(actionData.get("text"));
 
-        List<MessagingExtensionAttachment> attachments = Arrays
-            .asList(new MessagingExtensionAttachment() {{
-                setContent(card);
-                setContentType(HeroCard.CONTENTTYPE);
-                setPreview(card.toAttachment());
-            }});
+        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+        attachment.setContent(card);
+        attachment.setContentType(HeroCard.CONTENTTYPE);
+        attachment.setPreview(card.toAttachment());
+        List<MessagingExtensionAttachment> attachments = Arrays.asList(attachment);
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse() {{
-            setComposeExtension(new MessagingExtensionResult() {{
-                setAttachments(attachments);
-                setAttachmentLayout("list");
-                setType("result");
-            }});
-        }});
+        MessagingExtensionResult result = new MessagingExtensionResult();
+        result.setAttachments(attachments);
+        result.setAttachmentLayout("list");
+        result.setType("result");
+        MessagingExtensionActionResponse response = new MessagingExtensionActionResponse();
+        response.setComposeExtension(result);
+
+        return CompletableFuture.completedFuture(response);
     }
 
     private CompletableFuture<MessagingExtensionActionResponse> shareMessageCommand(
@@ -72,12 +71,11 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
     ) {
         Map<String, String> actionData = (Map<String, String>) action.getData();
 
-        HeroCard card = new HeroCard() {{
-            setTitle(
-                action.getMessagePayload().getFrom().getUser() != null ? action.getMessagePayload()
-                    .getFrom().getUser().getDisplayName() : "");
-            setText(action.getMessagePayload().getBody().getContent());
-        }};
+        HeroCard card = new HeroCard();
+        card.setTitle(
+            action.getMessagePayload().getFrom().getUser() != null ? action.getMessagePayload()
+                .getFrom().getUser().getDisplayName() : "");
+        card.setText(action.getMessagePayload().getBody().getContent());
 
         if (action.getMessagePayload().getAttachments() != null && !action.getMessagePayload()
             .getAttachments().isEmpty()) {
@@ -88,22 +86,23 @@ public class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
             Boolean.valueOf(actionData.get("includeImage"))
         ) : false;
         if (includeImage) {
-            card.setImages(Arrays.asList(new CardImage() {{
-                setUrl(
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
-            }}));
+            CardImage cardImage = new CardImage();
+            cardImage.setUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtB3AwMUeNoq4gUBGe6Ocj8kyh3bXa9ZbV7u1fVKQoyKFHdkqU");
+            card.setImages(Arrays.asList(cardImage));
         }
 
-        return CompletableFuture.completedFuture(new MessagingExtensionActionResponse() {{
-            setComposeExtension(new MessagingExtensionResult() {{
-                setAttachmentLayout("list");
-                setType("result");
-                setAttachments(Arrays.asList(new MessagingExtensionAttachment() {{
-                    setContent(card);
-                    setContentType(HeroCard.CONTENTTYPE);
-                    setPreview(card.toAttachment());
-                }}));
-            }});
-        }});
+        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+        attachment.setContent(card);
+        attachment.setContentType(HeroCard.CONTENTTYPE);
+        attachment.setPreview(card.toAttachment());
+
+        MessagingExtensionResult result = new MessagingExtensionResult();
+        result.setAttachmentLayout("list");
+        result.setType("result");
+        result.setAttachments(Arrays.asList(attachment));
+
+        MessagingExtensionActionResponse response = new MessagingExtensionActionResponse();
+        response.setComposeExtension(result);
+        return CompletableFuture.completedFuture(response);
     }
 }

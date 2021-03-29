@@ -183,19 +183,11 @@ public class InspectionTests {
         String attachCommand = "<at>" + recipientId + "</at> "
             + inspectionOpenResultActivity.getValue();
         Activity attachActivity = MessageFactory.text(attachCommand);
-        attachActivity.getEntities().add(new Entity() {
-            {
-                setType("mention");
-                getProperties().put(
-                    "text",
-                    JsonNodeFactory.instance.textNode("<at>" + recipientId + "</at>")
-                );
-                getProperties().put(
-                    "mentioned",
-                    JsonNodeFactory.instance.objectNode().put("id", "bot")
-                );
-            }
-        });
+        Entity entity = new Entity();
+        entity.setType("mention");
+        entity.getProperties().put("text", JsonNodeFactory.instance.textNode("<at>" + recipientId + "</at>"));
+        entity.getProperties().put("mentioned", JsonNodeFactory.instance.objectNode().put("id", "bot"));
+        attachActivity.getEntities().add(entity);
 
         applicationAdapter.processActivity(
             attachActivity,

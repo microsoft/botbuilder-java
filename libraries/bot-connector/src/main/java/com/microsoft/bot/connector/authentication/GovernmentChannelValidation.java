@@ -17,25 +17,23 @@ public final class GovernmentChannelValidation {
         GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_OPENID_METADATA_URL;
 
     /**
-     * TO BOT FROM GOVERNMENT CHANNEL: Token validation parameters when connecting
-     * to a bot.
+     * TO BOT FROM GOVERNMENT CHANNEL.
+     * @return Token validation parameters when connecting to a bot.
      */
-    public static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
-        new TokenValidationParameters() {
-            {
-                this.validateIssuer = true;
-                this.validIssuers = new ArrayList<String>() {
-                    {
-                        add(GovernmentAuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
-                    }
-                };
-                this.validateAudience = false;
-                this.validateLifetime = true;
-                this.clockSkew =
-                    Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
-                this.requireSignedTokens = true;
-            }
-        };
+    public static TokenValidationParameters getTokenValidationParameters() {
+        TokenValidationParameters tokenValidationParameters = new TokenValidationParameters();
+
+        ArrayList<String> validIssuers = new ArrayList<String>();
+        tokenValidationParameters.validIssuers = validIssuers;
+
+        tokenValidationParameters.validateIssuer = true;
+        tokenValidationParameters.validateAudience = false;
+        tokenValidationParameters.validateLifetime = true;
+        tokenValidationParameters.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
+        tokenValidationParameters.requireSignedTokens = true;
+
+        return tokenValidationParameters;
+    }
 
     private GovernmentChannelValidation() {
 
@@ -107,7 +105,7 @@ public final class GovernmentChannelValidation {
         AuthenticationConfiguration authConfig
     ) {
         JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-            TOKENVALIDATIONPARAMETERS,
+            getTokenValidationParameters(),
             getOpenIdMetaDataUrl(),
             AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS
         );

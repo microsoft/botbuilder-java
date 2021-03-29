@@ -143,17 +143,16 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     }
 
     private Attachment getTaskModuleHeroCardOptions() {
-        List<CardAction> buttons = actions.stream().map(cardType ->
-            new TaskModuleAction(cardType.getButtonTitle(),
-                new CardTaskFetchValue<String>() {{
-                    setData(cardType.getId());
-                }})
-        ).collect(Collectors.toCollection(ArrayList::new));
+        List<CardAction> buttons = actions.stream().map(cardType -> {
+            CardTaskFetchValue fetchValue = new CardTaskFetchValue<String>();
+            fetchValue.setData(cardType.getId());
+            TaskModuleAction moduleAction = new TaskModuleAction(cardType.getButtonTitle(), fetchValue);
+            return moduleAction;
+            }).collect(Collectors.toCollection(ArrayList::new));
 
-        HeroCard card = new HeroCard() {{
-            setTitle("Task Module Invocation from Hero Card");
-            setButtons(buttons);
-        }};
+        HeroCard card = new HeroCard();
+        card.setTitle("Task Module Invocation from Hero Card");
+        card.setButtons(buttons);
         return card.toAttachment();
     }
 
@@ -164,12 +163,12 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
             String cardTemplate = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
             List<Map<String,Object>> cardActions = actions.stream().map(cardType -> {
+                AdaptiveCardTaskFetchValue fetchValue = new AdaptiveCardTaskFetchValue<String>();
+                fetchValue.setData(cardType.getId());
                 Map<String, Object> a = new HashMap<>();
                 a.put("type", "Action.Submit");
                 a.put("title", cardType.getButtonTitle());
-                a.put("data", new AdaptiveCardTaskFetchValue<String>() {{
-                    setData(cardType.getId());
-                }});
+                a.put("data", fetchValue);
                 return a;
             }).collect(Collectors.toCollection(ArrayList::new));
 
@@ -193,9 +192,9 @@ public class TeamsTaskModuleBot extends TeamsActivityHandler {
     }
 
     private Attachment adaptiveCardAttachmentFromJson(String json) throws IOException {
-        return new Attachment() {{
-            setContentType("application/vnd.microsoft.card.adaptive");
-            setContent(new ObjectMapper().readValue(json, ObjectNode.class));
-        }};
+        Attachment attachment = new Attachment();
+        attachment.setContentType("application/vnd.microsoft.card.adaptive");
+        attachment.setContent(new ObjectMapper().readValue(json, ObjectNode.class));
+        return attachment;
     }
 }

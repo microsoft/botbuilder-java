@@ -59,23 +59,16 @@ public class TeamsActivityHandlerTests {
             MicrosoftAppCredentials.empty()
         );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("botid-1"));
-                    }
-                });
-                setRecipient(new ChannelAccount("botid-1"));
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamMemberAdded");
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("botid-1"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("botid-1"));
+        TeamsChannelData channelData = new TeamsChannelData();
+        channelData.setEventType("teamMemberAdded");
+        channelData.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(channelData);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -96,23 +89,16 @@ public class TeamsActivityHandlerTests {
             MicrosoftAppCredentials.empty()
         );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("id-1"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamMemberAdded");
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("id-1"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
+        TeamsChannelData channelData = new TeamsChannelData();
+        channelData.setEventType("teamMemberAdded");
+        channelData.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(channelData);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -133,18 +119,13 @@ public class TeamsActivityHandlerTests {
             MicrosoftAppCredentials.empty()
         );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("id-1"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-                setConversation(new ConversationAccount("conversation-id"));
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("id-1"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
+        activity.setConversation(new ConversationAccount("conversation-id"));
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
         turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
@@ -165,35 +146,26 @@ public class TeamsActivityHandlerTests {
             MicrosoftAppCredentials.empty()
         );
 
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new TeamsChannelAccount() {
-                            {
-                                setId("id-1");
-                                setName("name-1");
-                                setAadObjectId("aadobject-1");
-                                setEmail("test@microsoft.com");
-                                setGivenName("given-1");
-                                setSurname("surname-1");
-                                setUserPrincipalName("t@microsoft.com");
-                                setTenantId("testTenantId");
-                                setUserRole("guest");
-                            }
-                        });
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamMemberAdded");
-                        setTeam(new TeamInfo("team-id"));
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        TeamsChannelAccount teams = new TeamsChannelAccount();
+        teams.setId("id-1");
+        teams.setName("name-1");
+        teams.setAadObjectId("aadobject-1");
+        teams.setEmail("test@microsoft.com");
+        teams.setGivenName("given-1");
+        teams.setSurname("surname-1");
+        teams.setUserPrincipalName("t@microsoft.com");
+        teams.setTenantId("testTenantId");
+        teams.setUserRole("guest");
+        members.add(teams);
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamMemberAdded");
+        data.setTeam(new TeamInfo("team-id"));
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         // serialize to json and back to verify we can get back to the
         // correct Activity. i.e., In this case, mainly the TeamsChannelAccount.
@@ -218,22 +190,15 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsMemberRemoved() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setMembersRemoved(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("a"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamMemberRemoved");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("a"));
+        activity.setMembersRemoved(members);
+        activity.setRecipient(new ChannelAccount("b"));
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamMemberRemoved");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -247,16 +212,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelCreated() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("channelCreated");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("channelCreated");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -270,16 +230,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelDeleted() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("channelDeleted");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("channelDeleted");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -293,16 +248,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelRenamed() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("channelRenamed");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("channelRenamed");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -316,16 +266,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsChannelRestored() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("channelRestored");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("channelRestored");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -339,16 +284,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamRenamed() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamRenamed");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamRenamed");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -362,16 +302,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamArchived() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamArchived");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamArchived");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -385,16 +320,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamDeleted() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamDeleted");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamDeleted");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -408,16 +338,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamHardDeleted() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamHardDeleted");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamHardDeleted");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -431,16 +356,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamRestored() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamRestored");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamRestored");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -454,16 +374,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestConversationUpdateTeamsTeamUnarchived() {
-        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE) {
-            {
-                setChannelData(new TeamsChannelData() {
-                    {
-                        setEventType("teamUnarchived");
-                    }
-                });
-                setChannelId(Channels.MSTEAMS);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setEventType("teamUnarchived");
+        activity.setChannelData(data);
+        activity.setChannelId(Channels.MSTEAMS);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -477,23 +392,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestFileConsentAccept() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("accept");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("accept");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -520,23 +428,16 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestFileConsentDecline() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("decline");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse response = new FileConsentCardResponse();
+        response.setAction("decline");
+        response.setUploadInfo(fileInfo);
+        activity.setValue(response);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -563,12 +464,9 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestActionableMessageExecuteAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("actionableMessage/executeAction");
-                setValue(new O365ConnectorCardActionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("actionableMessage/executeAction");
+        activity.setValue(new O365ConnectorCardActionQuery());
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -594,12 +492,9 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestComposeExtensionQueryLink() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/queryLink");
-                setValue(new AppBasedLinkQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/queryLink");
+        activity.setValue(new AppBasedLinkQuery());
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -625,12 +520,9 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestComposeExtensionQuery() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/query");
-                setValue(new MessagingExtensionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/query");
+        activity.setValue(new MessagingExtensionQuery());
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -656,12 +548,9 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionSelectItemAsync() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/selectItem");
-                setValue(new MessagingExtensionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/selectItem");
+        activity.setValue(new MessagingExtensionQuery());
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -687,12 +576,9 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionSubmitAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionQuery());
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        activity.setValue(new MessagingExtensionQuery());
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -719,16 +605,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionEdit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("edit");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("edit");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -755,16 +636,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewActionSend() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("send");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("send");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -791,16 +667,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionFetchTask() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/fetchTask");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setCommandId("testCommand");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/fetchTask");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setCommandId("testCommand");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -826,16 +697,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionConfigurationQuerySettingUrl() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/querySettingUrl");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setCommandId("testCommand");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/querySettingUrl");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setCommandId("testCommand");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -864,16 +730,11 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestMessagingExtensionConfigurationSetting() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/setting");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setCommandId("testCommand");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/setting");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setCommandId("testCommand");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -899,26 +760,17 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestTaskModuleFetch() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("task/fetch");
-                setValue(new TaskModuleRequest() {
-                    {
-                        setData(new HashMap<String, Object>() {
-                            {
-                                put("key", "value");
-                                put("type", "task / fetch");
-                            }
-                        });
-                        setContext(new TaskModuleRequestContext() {
-                            {
-                                setTheme("default");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("task/fetch");
+        TaskModuleRequestContext context = new TaskModuleRequestContext();
+        context.setTheme("default");
+        HashMap<String, Object> data = new HashMap<String, Object>();
+        data.put("key", "value");
+        data.put("type", "task / fetch");
+        TaskModuleRequest request = new TaskModuleRequest();
+        request.setData(data);
+        request.setContext(context);
+        activity.setValue(request);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -944,26 +796,17 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestTaskModuleSubmit() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("task/submit");
-                setValue(new TaskModuleRequest() {
-                    {
-                        setData(new HashMap<String, Object>() {
-                            {
-                                put("key", "value");
-                                put("type", "task / fetch");
-                            }
-                        });
-                        setContext(new TaskModuleRequestContext() {
-                            {
-                                setTheme("default");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("task/submit");
+        TaskModuleRequestContext context = new TaskModuleRequestContext();
+        context.setTheme("default");
+        HashMap<String, Object> data = new HashMap<String, Object>();
+        data.put("key", "value");
+        data.put("type", "task / fetch");
+        TaskModuleRequest request = new TaskModuleRequest();
+        request.setData(data);
+        request.setContext(context);
+        activity.setValue(request);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -989,11 +832,8 @@ public class TeamsActivityHandlerTests {
 
     @Test
     public void TestSigninVerifyState() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("signin/verifyState");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("signin/verifyState");
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -1374,205 +1214,99 @@ public class TeamsActivityHandlerTests {
     private static ConnectorClient getConnectorClient(String baseUri, AppCredentials credentials) {
         Conversations mockConversations = Mockito.mock(Conversations.class);
 
+        ConversationResourceResponse response = new ConversationResourceResponse();
+        response.setId("team-id");
+        response.setServiceUrl("https://serviceUrl/");
+        response.setActivityId("activityId123");
+
         // createConversation
         Mockito.when(
             mockConversations.createConversation(Mockito.any(ConversationParameters.class))
-        ).thenReturn(CompletableFuture.completedFuture(new ConversationResourceResponse() {
-            {
-                setId("team-id");
-                setServiceUrl("https://serviceUrl/");
-                setActivityId("activityId123");
-            }
-        }));
+        ).thenReturn(CompletableFuture.completedFuture(response));
 
+
+        ArrayList<ChannelAccount> channelAccount1 = new ArrayList<ChannelAccount>();
+        ChannelAccount account1 = new ChannelAccount();
+        account1.setId("id-1");
+        account1.setName("name-1");
+        account1.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-1"));
+        account1.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-1"));
+        account1.setProperties("surname", JsonNodeFactory.instance.textNode("surname-1"));
+        account1.setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+        account1.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-1"));
+        account1.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-1"));
+        channelAccount1.add(account1);
+
+        ChannelAccount account2 = new ChannelAccount();
+        account2.setId("id-2");
+        account2.setName("name-2");
+        account2.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-2"));
+        account2.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-2"));
+        account2.setProperties("surname",JsonNodeFactory.instance.textNode("surname-2"));
+        account2.setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
+        account2.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-2"));
+        account2.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-2"));
+        channelAccount1.add(account2);
         // getConversationMembers (Team)
         Mockito.when(mockConversations.getConversationMembers("team-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
-                {
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-1");
-                            setName("name-1");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-1")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-1")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-1")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-1")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-1")
-                            );
-                        }
-                    });
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-2");
-                            setName("name-2");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-2")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-2")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-2")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-2"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-2")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-2")
-                            );
-                        }
-                    });
-                }
-            })
+            CompletableFuture.completedFuture(channelAccount1)
         );
 
+
+        ArrayList<ChannelAccount> channelAccount2 = new ArrayList<ChannelAccount>();
+        ChannelAccount channelAccount3 = new ChannelAccount();
+        channelAccount3.setId("id-3");
+        channelAccount3.setName("name-3");
+        channelAccount3.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-3"));
+        channelAccount3.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-3"));
+        channelAccount3.setProperties("surname", JsonNodeFactory.instance.textNode("surname-3"));
+        channelAccount3.setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
+        channelAccount3.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-3"));
+        channelAccount3.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-3"));
+        channelAccount2.add(channelAccount3);
+        ChannelAccount channelAccount4 = new ChannelAccount();
+        channelAccount4.setId("id-4");
+        channelAccount4.setName("name-4");
+        channelAccount4.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-4"));
+        channelAccount4.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-4"));
+        channelAccount4.setProperties("surname", JsonNodeFactory.instance.textNode("surname-4"));
+        channelAccount4.setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
+        channelAccount4.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-4"));
+        channelAccount4.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-4"));
+        channelAccount2.add(channelAccount4);
         // getConversationMembers (Group chat)
         Mockito.when(mockConversations.getConversationMembers("conversation-id")).thenReturn(
-            CompletableFuture.completedFuture(new ArrayList<ChannelAccount>() {
-                {
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-3");
-                            setName("name-3");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-3")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-3")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-3")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-3"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-3")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-3")
-                            );
-                        }
-                    });
-                    add(new ChannelAccount() {
-                        {
-                            setId("id-4");
-                            setName("name-4");
-                            setProperties(
-                                "objectId",
-                                JsonNodeFactory.instance.textNode("objectId-4")
-                            );
-                            setProperties(
-                                "givenName",
-                                JsonNodeFactory.instance.textNode("givenName-4")
-                            );
-                            setProperties(
-                                "surname",
-                                JsonNodeFactory.instance.textNode("surname-4")
-                            );
-                            setProperties("email", JsonNodeFactory.instance.textNode("email-4"));
-                            setProperties(
-                                "userPrincipalName",
-                                JsonNodeFactory.instance.textNode("userPrincipalName-4")
-                            );
-                            setProperties(
-                                "tenantId",
-                                JsonNodeFactory.instance.textNode("tenantId-4")
-                            );
-                        }
-                    });
-                }
-            })
+            CompletableFuture.completedFuture(channelAccount2)
         );
 
+
+        ChannelAccount channelAccount5 = new ChannelAccount();
+        channelAccount5.setId("id-1");
+        channelAccount5.setName("name-1");
+        channelAccount5.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-1"));
+        channelAccount5.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-1"));
+        channelAccount5.setProperties("surname", JsonNodeFactory.instance.textNode("surname-1"));
+        channelAccount5.setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+        channelAccount5.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-1"));
+        channelAccount5.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-1"));
         // getConversationMember (Team)
         Mockito.when(mockConversations.getConversationMember("id-1", "team-id")).thenReturn(
-            CompletableFuture.completedFuture(
-                new ChannelAccount() {
-                    {
-                        setId("id-1");
-                        setName("name-1");
-                        setProperties(
-                            "objectId",
-                            JsonNodeFactory.instance.textNode("objectId-1")
-                        );
-                        setProperties(
-                            "givenName",
-                            JsonNodeFactory.instance.textNode("givenName-1")
-                        );
-                        setProperties(
-                            "surname",
-                            JsonNodeFactory.instance.textNode("surname-1")
-                        );
-                        setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
-                        setProperties(
-                            "userPrincipalName",
-                            JsonNodeFactory.instance.textNode("userPrincipalName-1")
-                        );
-                        setProperties(
-                            "tenantId",
-                            JsonNodeFactory.instance.textNode("tenantId-1")
-                        );
-                    }
-                }
-            )
+            CompletableFuture.completedFuture(channelAccount5)
         );
 
+
+        ChannelAccount channelAccount6 = new ChannelAccount();
+        channelAccount6.setId("id-1");
+        channelAccount6.setName("name-1");
+        channelAccount6.setProperties("objectId", JsonNodeFactory.instance.textNode("objectId-1"));
+        channelAccount6.setProperties("givenName", JsonNodeFactory.instance.textNode("givenName-1"));
+        channelAccount6.setProperties("surname", JsonNodeFactory.instance.textNode("surname-1"));
+        channelAccount6.setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
+        channelAccount6.setProperties("userPrincipalName", JsonNodeFactory.instance.textNode("userPrincipalName-1"));
+        channelAccount6.setProperties("tenantId", JsonNodeFactory.instance.textNode("tenantId-1"));
         // getConversationMember (Group chat)
         Mockito.when(mockConversations.getConversationMember("id-1", "conversation-id")).thenReturn(
-            CompletableFuture.completedFuture(
-                new ChannelAccount() {
-                    {
-                        setId("id-1");
-                        setName("name-1");
-                        setProperties(
-                            "objectId",
-                            JsonNodeFactory.instance.textNode("objectId-1")
-                        );
-                        setProperties(
-                            "givenName",
-                            JsonNodeFactory.instance.textNode("givenName-1")
-                        );
-                        setProperties(
-                            "surname",
-                            JsonNodeFactory.instance.textNode("surname-1")
-                        );
-                        setProperties("email", JsonNodeFactory.instance.textNode("email-1"));
-                        setProperties(
-                            "userPrincipalName",
-                            JsonNodeFactory.instance.textNode("userPrincipalName-1")
-                        );
-                        setProperties(
-                            "tenantId",
-                            JsonNodeFactory.instance.textNode("tenantId-1")
-                        );
-                    }
-                }
-            )
+            CompletableFuture.completedFuture(channelAccount6)
         );
 
         ConnectorClient mockConnectorClient = Mockito.mock(ConnectorClient.class);

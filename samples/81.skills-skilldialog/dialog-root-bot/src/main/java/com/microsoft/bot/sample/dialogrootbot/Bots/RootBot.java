@@ -82,12 +82,11 @@ public class RootBot<T extends Dialog> extends ActivityHandler {
             IOUtils.copy(bomIn, writer, StandardCharsets.UTF_8);
             content = writer.toString();
             bomIn.close();
-            return new Attachment() {
-                {
-                    setContentType("application/vnd.microsoft.card.adaptive");
-                    setContent(new JacksonAdapter().serializer().readValue(content, AdaptiveCard.class));
-                }
-            };
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/vnd.microsoft.card.adaptive");
+            attachment.setContent(new JacksonAdapter().serializer().readValue(content, AdaptiveCard.class));
+
+            return attachment;
         } catch (IOException e) {
             LoggerFactory.getLogger(RootBot.class).error("createAdaptiveCardAttachment", e);
         }

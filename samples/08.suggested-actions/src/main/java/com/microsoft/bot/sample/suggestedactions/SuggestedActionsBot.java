@@ -94,35 +94,30 @@ public class SuggestedActionsBot extends ActivityHandler {
     private Activity createSuggestedActions() {
         Activity reply = MessageFactory.text("What is your favorite color?");
 
-        reply.setSuggestedActions(new SuggestedActions() {
-            {
-                setActions(Arrays.asList(new CardAction() {
-                    {
-                        setTitle("Red");
-                        setType(ActionTypes.IM_BACK);
-                        setValue("Red");
-                        setImage("https://via.placeholder.com/20/FF0000?text=R");
-                        setImageAltText("R");
-                    }
-                }, new CardAction() {
-                    {
-                        setTitle("Yellow");
-                        setType(ActionTypes.IM_BACK);
-                        setValue("Yellow");
-                        setImage("https://via.placeholder.com/20/FFFF00?text=Y");
-                        setImageAltText("Y");
-                    }
-                }, new CardAction() {
-                    {
-                        setTitle("Blue");
-                        setType(ActionTypes.IM_BACK);
-                        setValue("Blue");
-                        setImage("https://via.placeholder.com/20/0000FF?text=B");
-                        setImageAltText("B");
-                    }
-                }));
-            }
-        });
+        CardAction redAction = new CardAction();
+        redAction.setTitle("Red");
+        redAction.setType(ActionTypes.IM_BACK);
+        redAction.setValue("Red");
+        redAction.setImage("https://via.placeholder.com/20/FF0000?text=R");
+        redAction.setImageAltText("R");
+
+        CardAction yellowAction = new CardAction();
+        yellowAction.setTitle("Yellow");
+        yellowAction.setType(ActionTypes.IM_BACK);
+        yellowAction.setValue("Yellow");
+        yellowAction.setImage("https://via.placeholder.com/20/FFFF00?text=Y");
+        yellowAction.setImageAltText("Y");
+
+        CardAction blueAction = new CardAction();
+        blueAction.setTitle("Blue");
+        blueAction.setType(ActionTypes.IM_BACK);
+        blueAction.setValue("Blue");
+        blueAction.setImage("https://via.placeholder.com/20/0000FF?text=B");
+        blueAction.setImageAltText("B");
+
+        SuggestedActions actions = new SuggestedActions();
+        actions.setActions(Arrays.asList(redAction, yellowAction, blueAction));
+        reply.setSuggestedActions(actions);
 
         return reply;
     }

@@ -82,11 +82,9 @@ public class SigninCard {
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
-        return new Attachment() {
-            {
-                setContent(SigninCard.this);
-                setContentType(CONTENTTYPE);
-            }
-        };
+        Attachment attachment = new Attachment();
+        attachment.setContent(this);
+        attachment.setContentType(CONTENTTYPE);
+        return attachment;
     }
 }
