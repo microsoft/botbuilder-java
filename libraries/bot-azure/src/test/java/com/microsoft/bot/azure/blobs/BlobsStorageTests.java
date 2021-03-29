@@ -5,6 +5,7 @@ package com.microsoft.bot.azure.blobs;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
+import com.microsoft.bot.azure.AzureEmulatorUtils;
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.StatePropertyAccessor;
@@ -20,7 +21,7 @@ import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -38,51 +39,37 @@ public class BlobsStorageTests extends StorageBaseTests {
 
     private final String connectionString = "AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
 
-    private static boolean emulatorIsRunning = false;
-
-    private static final String NO_EMULATOR_MESSAGE = "This test requires Azure STORAGE Emulator! Go to https://docs.microsoft.com/azure/storage/common/storage-use-emulator to download and install.";
-
     public String getContainerName() {
         return "blobs" + testName.getMethodName().toLowerCase().replace("_", "");
     }
 
-    @BeforeClass
-    public static void allTestsInit() throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec
-            ("cmd /C \"" + System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
-        int result = p.waitFor();
-        // status = 0: the service was started.
-        // status = -5: the service is already started. Only one instance of the application
-        // can be run at the same time.
-        emulatorIsRunning = result == 0 || result == -5;
+    @Before
+    public void beforeTest() {
+        org.junit.Assume.assumeTrue(AzureEmulatorUtils.isStorageEmulatorAvailable());
     }
 
     @After
     public void testCleanup() {
-        BlobContainerClient containerClient = new BlobContainerClientBuilder()
-            .connectionString(connectionString)
-            .containerName(getContainerName())
-            .buildClient();
+        if (AzureEmulatorUtils.isStorageEmulatorAvailable()) {
+            BlobContainerClient containerClient = new BlobContainerClientBuilder().connectionString(connectionString)
+                    .containerName(getContainerName()).buildClient();
 
-        if (containerClient.exists()) {
-            containerClient.delete();
+            if (containerClient.exists()) {
+                containerClient.delete();
+            }
         }
     }
 
     @Test
     public void blobStorageParamTest() {
-        if (runIfEmulator()) {
-            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(null, getContainerName()));
-            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, null));
-            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(new String(), getContainerName()));
-            Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, new String()));
-        }
+        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(null, getContainerName()));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, null));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(new String(), getContainerName()));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsStorage(connectionString, new String()));
     }
 
     @Test
-    public void testBlobStorageWriteRead()
-    {
-        if (runIfEmulator()) {
+    public void testBlobStorageWriteRead() {
             // Arrange
             Storage storage = new BlobsStorage(connectionString, getContainerName());
 
@@ -92,19 +79,16 @@ public class BlobsStorageTests extends StorageBaseTests {
 
             // Act
             storage.write(changes).join();
-            Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
+            Map<String, Object> result = storage.read(new String[] { "x", "y" }).join();
 
             // Assert
             Assert.assertEquals(2, result.size());
             Assert.assertEquals("hello", result.get("x"));
             Assert.assertEquals("world", result.get("y"));
-        }
     }
 
     @Test
-    public void testBlobStorageWriteDeleteRead()
-    {
-        if (runIfEmulator()) {
+    public void testBlobStorageWriteDeleteRead() {
             // Arrange
             Storage storage = new BlobsStorage(connectionString, getContainerName());
 
@@ -115,17 +99,15 @@ public class BlobsStorageTests extends StorageBaseTests {
             // Act
             storage.write(changes).join();
             storage.delete(new String[] { "x" }).join();
-            Map<String, Object> result = storage.read(new String[] {"x", "y"}).join();
+            Map<String, Object> result = storage.read(new String[] { "x", "y" }).join();
 
             // Assert
             Assert.assertEquals(1, result.size());
             Assert.assertEquals("world", result.get("y"));
-        }
     }
 
     @Test
     public void testBlobStorageChanges() {
-        if (runIfEmulator()) {
             // Arrange
             Storage storage = new BlobsStorage(connectionString, getContainerName());
 
@@ -150,12 +132,10 @@ public class BlobsStorageTests extends StorageBaseTests {
             Assert.assertEquals(2, result.size());
             Assert.assertEquals("1.1", result.get("a"));
             Assert.assertEquals("3.0", result.get("c"));
-        }
     }
 
     @Test
     public void testConversationStateBlobStorage() {
-        if (runIfEmulator()) {
             // Arrange
             Storage storage = new BlobsStorage(connectionString, getContainerName());
 
@@ -185,27 +165,21 @@ public class BlobsStorageTests extends StorageBaseTests {
 
             propAccessor.delete(turnContext1).join();
             conversationState.saveChanges(turnContext1).join();
-        }
     }
 
     @Test
     public void testConversationStateBlobStorage_TypeNameHandlingDefault() {
-        if (runIfEmulator()) {
             Storage storage = new BlobsStorage(connectionString, getContainerName());
             testConversationStateBlobStorage_Method(storage);
-        }
     }
 
     @Test
     public void statePersistsThroughMultiTurn_TypeNameHandlingNone() {
-        if (runIfEmulator()) {
             Storage storage = new BlobsStorage(connectionString, getContainerName());
             statePersistsThroughMultiTurn(storage);
-        }
     }
 
     private void testConversationStateBlobStorage_Method(Storage blobs) {
-        if (runIfEmulator()) {
             // Arrange
             ConversationState conversationState = new ConversationState(blobs);
             StatePropertyAccessor<Prop> propAccessor = conversationState.createProperty("prop");
@@ -229,16 +203,6 @@ public class BlobsStorageTests extends StorageBaseTests {
             // Assert
             Assert.assertEquals("hello", propValue2.getX());
             Assert.assertEquals("world", propValue2.getY());
-        }
-    }
-
-    private boolean runIfEmulator() {
-        if (!emulatorIsRunning) {
-            System.out.println(NO_EMULATOR_MESSAGE);
-            return false;
-        }
-
-        return true;
     }
 
     private class TestStorageAdapter extends BotAdapter {
