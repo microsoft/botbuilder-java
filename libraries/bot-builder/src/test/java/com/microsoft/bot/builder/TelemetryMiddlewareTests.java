@@ -9,6 +9,7 @@ import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
@@ -527,6 +528,45 @@ public class TelemetryMiddlewareTests {
             StringUtils.equals(properties.get(4).get("ImportantProperty"), "ImportantValue")
         );
     }
+
+    @Test
+    public void Telemetry_LogAttachments() throws JsonProcessingException {
+        BotTelemetryClient mockTelemetryClient = mock(BotTelemetryClient.class);
+        TestAdapter adapter = new TestAdapter(Channels.MSTEAMS).use(
+            new TelemetryLoggerMiddleware(mockTelemetryClient, true)
+        );
+
+        TeamInfo teamInfo = new TeamInfo();
+        teamInfo.setId("teamId");
+        teamInfo.setName("teamName");
+
+        Activity activity = MessageFactory.text("test");
+        ChannelAccount from = new ChannelAccount();
+        from.setId("userId");
+        from.setName("userName");
+        from.setAadObjectId("aadId");
+        activity.setFrom(from);
+        Attachment attachment = new Attachment();
+        attachment.setContent("Hello World");
+        attachment.setContentType("test/attachment");
+        attachment.setName("testname");
+        activity.setAttachment(attachment);
+
+        new TestFlow(adapter).send(activity).startTest().join();
+
+        verify(mockTelemetryClient).trackEvent(
+            eventNameCaptor.capture(),
+            propertiesCaptor.capture()
+        );
+        List<String> eventNames = eventNameCaptor.getAllValues();
+        List<Map<String, String>> properties = propertiesCaptor.getAllValues();
+
+        Assert.assertEquals(TelemetryLoggerConstants.BOTMSGRECEIVEEVENT, eventNames.get(0));
+        String loggedAttachment = properties.get(0).get("attachments");
+        String originalAttachment = Serialization.toString(activity.getAttachments());
+        Assert.assertTrue(StringUtils.equals(loggedAttachment, originalAttachment));
+    }
+
 
     @Test
     public void Telemetry_LogTeamsProperties() throws JsonProcessingException {
