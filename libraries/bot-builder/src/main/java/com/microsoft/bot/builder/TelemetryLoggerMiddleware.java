@@ -188,6 +188,7 @@ public class TelemetryLoggerMiddleware implements Middleware {
      *         {@link BotTelemetryClient#trackEvent} method for the
      *         BotMessageReceived event.
      */
+    @SuppressWarnings("PMD.EmptyCatchBlock")
     protected CompletableFuture<Map<String, String>> fillReceiveEventProperties(
         Activity activity,
         Map<String, String> additionalProperties
@@ -216,6 +217,14 @@ public class TelemetryLoggerMiddleware implements Middleware {
 
             if (!StringUtils.isEmpty(activity.getSpeak())) {
                 properties.put(TelemetryConstants.SPEAKPROPERTY, activity.getSpeak());
+            }
+
+            if (activity.getAttachments() != null && activity.getAttachments().size() > 0) {
+                try {
+                    properties.put(TelemetryConstants.ATTACHMENTSPROPERTY,
+                                   Serialization.toString(activity.getAttachments()));
+                } catch (JsonProcessingException e) {
+                }
             }
         }
 
