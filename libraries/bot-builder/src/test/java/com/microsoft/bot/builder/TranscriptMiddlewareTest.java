@@ -65,9 +65,9 @@ public class TranscriptMiddlewareTest {
             context.sendActivity("echo:" + context.getActivity().getText()).join();
             return CompletableFuture.completedFuture(null);
         }
-        ).send("foo").assertReply(
+        ).send("foo").delay(50).assertReply(
             (activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING)
-        ).assertReply("echo:foo").send("bar").assertReply(
+        ).assertReply("echo:foo").send("bar").delay(50).assertReply(
             (activity) -> Assert.assertEquals(activity.getType(), ActivityTypes.TYPING)
         ).assertReply("echo:bar").startTest().join();
 
