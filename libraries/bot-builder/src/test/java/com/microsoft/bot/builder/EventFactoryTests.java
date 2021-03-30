@@ -75,6 +75,33 @@ public class EventFactoryTests {
     }
 
     @Test
+    public void TestCreateHandoffInitiationNoTranscript() {
+        TestAdapter adapter = new TestAdapter(
+                TestAdapter.createConversationReference("TestCreateHandoffInitiation", "User1", "Bot"));
+        String fromD = "test";
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("");
+        activity.setConversation(new ConversationAccount());
+        activity.setRecipient(new ChannelAccount());
+        activity.setFrom(new ChannelAccount(fromD));
+        activity.setChannelId("testchannel");
+        activity.setServiceUrl("http://myservice");
+        TurnContext context = new TurnContextImpl(adapter, activity);
+        List<Activity> activities = new ArrayList<Activity>();
+        activities.add(MessageFactory.text("hello"));
+
+        ObjectNode handoffContext = JsonNodeFactory.instance.objectNode();
+        handoffContext.set("Skill", JsonNodeFactory.instance.textNode("any"));
+
+        Activity handoffEvent = EventFactory.createHandoffInitiation(context, handoffContext);
+        Assert.assertEquals(handoffEvent.getName(), HandoffEventNames.INITIATEHANDOFF);
+        ObjectNode node = (ObjectNode) handoffEvent.getValue();
+        String skill = node.get("Skill").asText();
+        Assert.assertEquals("any", skill);
+        Assert.assertEquals(handoffEvent.getFrom().getId(), fromD);
+    }
+
+    @Test
     public void TestCreateHandoffStatus() throws JsonProcessingException {
         String state = "failed";
         String message = "timed out";
