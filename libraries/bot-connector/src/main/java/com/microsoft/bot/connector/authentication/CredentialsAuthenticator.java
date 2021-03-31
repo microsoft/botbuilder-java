@@ -7,6 +7,7 @@ import com.microsoft.aad.msal4j.ClientCredentialFactory;
 import com.microsoft.aad.msal4j.ClientCredentialParameters;
 import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 import com.microsoft.aad.msal4j.IAuthenticationResult;
+import com.microsoft.aad.msal4j.MsalServiceException;
 
 import java.net.MalformedURLException;
 import java.util.Collections;
@@ -28,16 +29,12 @@ public class CredentialsAuthenticator implements Authenticator {
      * @throws MalformedURLException Invalid endpoint.
      */
     CredentialsAuthenticator(String appId, String appPassword, OAuthConfiguration configuration)
-        throws MalformedURLException {
+            throws MalformedURLException {
 
-        app = ConfidentialClientApplication
-            .builder(appId, ClientCredentialFactory.createFromSecret(appPassword))
-            .authority(configuration.getAuthority())
-            .build();
+        app = ConfidentialClientApplication.builder(appId, ClientCredentialFactory.createFromSecret(appPassword))
+                .authority(configuration.getAuthority()).build();
 
-        parameters = ClientCredentialParameters
-            .builder(Collections.singleton(configuration.getScope()))
-            .build();
+        parameters = ClientCredentialParameters.builder(Collections.singleton(configuration.getScope())).build();
     }
 
     /**
@@ -47,12 +44,19 @@ public class CredentialsAuthenticator implements Authenticator {
      */
     @Override
     public CompletableFuture<IAuthenticationResult> acquireToken() {
-        return app.acquireToken(parameters)
-            .exceptionally(
-                exception -> {
-                    // wrapping whatever msal throws into our own exception
-                    throw new AuthenticationException(exception);
+        return Retry.run(() -> app.acquireToken(parameters).exceptionally(exception -> {
+            // wrapping whatever msal throws into our own exception
+            throw new AuthenticationException(exception);
+        }), (exception, count) -> {
+            if (exception instanceof RetryException && exception.getCause() instanceof MsalServiceException) {
+                MsalServiceException serviceException = (MsalServiceException) exception.getCause();
+                if (serviceException.headers().containsKey("Retry-After")) {
+                    return RetryAfterHelper.processRetry(serviceException.headers().get("Retry-After"), count);
+                } else {
+                    return RetryParams.defaultBackOff(++count);
                 }
-            );
+            }
+            return RetryParams.stopRetrying();
+        });
     }
 }
