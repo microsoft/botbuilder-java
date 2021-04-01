@@ -100,4 +100,9 @@ public final class Channels {
      * Test channel.
      */
     public static final String TEST = "test";
+
+    /**
+     * Telephony channel.
+     */
+    public static final String TELEPHONY = "telephony";
 }

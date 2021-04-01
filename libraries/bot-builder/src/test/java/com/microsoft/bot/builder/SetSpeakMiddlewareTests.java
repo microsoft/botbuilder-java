@@ -17,15 +17,9 @@ import org.junit.Test;
 public class SetSpeakMiddlewareTests {
 
     @Test
-    public void ConstructorValidation() {
-        // no 'lang'
-        Assert.assertThrows(IllegalArgumentException.class, () -> new SetSpeakMiddleware("voice", null, false));
-    }
-
-    @Test
     public void NoFallback() {
         TestAdapter adapter = new TestAdapter(createConversation("NoFallback"))
-                .use(new SetSpeakMiddleware("male", "en-us", false));
+                .use(new SetSpeakMiddleware("male", false));
 
         new TestFlow(adapter, turnContext -> {
             Activity activity = MessageFactory.text("OK");
@@ -43,7 +37,7 @@ public class SetSpeakMiddlewareTests {
     @Test
     public void FallbackNullSpeak() {
         TestAdapter adapter = new TestAdapter(createConversation("NoFallback"))
-                .use(new SetSpeakMiddleware("male", "en-us", true));
+                .use(new SetSpeakMiddleware("male", true));
 
         new TestFlow(adapter, turnContext -> {
             Activity activity = MessageFactory.text("OK");
@@ -61,7 +55,7 @@ public class SetSpeakMiddlewareTests {
     @Test
     public void FallbackWithSpeak() {
         TestAdapter adapter = new TestAdapter(createConversation("Fallback"))
-                .use(new SetSpeakMiddleware("male", "en-us", true));
+                .use(new SetSpeakMiddleware("male", true));
 
         new TestFlow(adapter, turnContext -> {
             Activity activity = MessageFactory.text("OK");
@@ -93,7 +87,7 @@ public class SetSpeakMiddlewareTests {
     // Voice instanceof added to Speak property.
     public void AddVoice(String channelId) {
         TestAdapter adapter = new TestAdapter(createConversation("Fallback", channelId))
-                .use(new SetSpeakMiddleware("male", "en-us", true));
+                .use(new SetSpeakMiddleware("male", true));
 
         new TestFlow(adapter, turnContext -> {
             Activity activity = MessageFactory.text("OK");
@@ -119,14 +113,14 @@ public class SetSpeakMiddlewareTests {
 
     @Test
     public void AddNoVoiceTelephony() {
-        AddNoVoice("telephony");
+        AddNoVoice(Channels.TELEPHONY);
     }
 
 
     // With no 'voice' specified, the Speak property instanceof unchanged.
     public void AddNoVoice(String channelId) {
         TestAdapter adapter = new TestAdapter(createConversation("Fallback", channelId))
-                .use(new SetSpeakMiddleware(null, "en-us", true));
+                .use(new SetSpeakMiddleware(null, true));
 
         new TestFlow(adapter, turnContext -> {
             Activity activity = MessageFactory.text("OK");

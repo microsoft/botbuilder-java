@@ -25,24 +25,17 @@ public class SetSpeakMiddleware implements Middleware {
 
     private final String voiceName;
     private final boolean fallbackToTextForSpeak;
-    private final String lang;
 
     /**
      * Initializes a new instance of the {@link SetSpeakMiddleware} class.
      *
      * @param voiceName              The SSML voice name attribute value.
-     * @param lang                   The xml:lang value.
      * @param fallbackToTextForSpeak true if an empt Activity.Speak is populated
      *                               with Activity.getText().
      */
-    public SetSpeakMiddleware(String voiceName, String lang, boolean fallbackToTextForSpeak) {
+    public SetSpeakMiddleware(String voiceName, boolean fallbackToTextForSpeak) {
         this.voiceName = voiceName;
         this.fallbackToTextForSpeak = fallbackToTextForSpeak;
-        if (lang == null) {
-            throw new IllegalArgumentException("lang cannot be null.");
-        } else {
-            this.lang = lang;
-        }
     }
 
     /**
@@ -73,10 +66,11 @@ public class SetSpeakMiddleware implements Middleware {
                                 activity.setSpeak(
                                         String.format("<voice name='%s'>%s</voice>", voiceName, activity.getSpeak()));
                             }
-
                             activity.setSpeak(String
                                     .format("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
-                                            + "xml:lang='%s'>%s</speak>", lang, activity.getSpeak()));
+                                            + "xml:lang='%s'>%s</speak>",
+                                            activity.getLocale() != null ? activity.getLocale() : "en-US",
+                                            activity.getSpeak()));
                         }
                     }
                 }
