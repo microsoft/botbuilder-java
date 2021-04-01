@@ -51,11 +51,10 @@ public class TeamsStartNewThreadBot extends TeamsActivityHandler {
                 .set("id", JsonNodeFactory.instance.textNode(teamsChannelId))
         );
 
-        ConversationParameters conversationParameters = new ConversationParameters(){{
-            setIsGroup(true);
-            setActivity(message);
-            setChannelData(channelData);
-        }};
+        ConversationParameters conversationParameters = new ConversationParameters();
+        conversationParameters.setIsGroup(true);
+        conversationParameters.setActivity(message);
+        conversationParameters.setChannelData(channelData);
 
         BotFrameworkAdapter adapter = (BotFrameworkAdapter)turnContext.getAdapter();
 

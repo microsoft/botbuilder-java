@@ -104,26 +104,19 @@ public class MultiLingualBot extends ActivityHandler {
             // than the default, then the translation middleware will pick it up from the user state and
             // translate messages both ways, i.e. user to bot and bot to user.
             Activity reply = MessageFactory.text("Choose your language:");
-            CardAction esAction = new CardAction() {
-                {
-                    setTitle("Español");
-                    setType(ActionTypes.POST_BACK);
-                    setValue(ENGLISH_SPANISH);
-                }
-            };
-            CardAction enAction = new CardAction() {
-                {
-                    setTitle("English");
-                    setType(ActionTypes.POST_BACK);
-                    setValue(ENGLISH_ENGLISH);
-                }
-            };
+            CardAction esAction = new CardAction();
+            esAction.setTitle("Español");
+            esAction.setType(ActionTypes.POST_BACK);
+            esAction.setValue(ENGLISH_SPANISH);
+
+            CardAction enAction = new CardAction();
+            enAction.setTitle("English");
+            enAction.setType(ActionTypes.POST_BACK);
+            enAction.setValue(ENGLISH_ENGLISH);
+
             List<CardAction> actions = new ArrayList<>(Arrays.asList(esAction, enAction));
-            SuggestedActions suggestedActions = new SuggestedActions() {
-                {
-                    setActions(actions);
-                }
-            };
+            SuggestedActions suggestedActions = new SuggestedActions();
+            suggestedActions.setActions(actions);
             reply.setSuggestedActions(suggestedActions);
             return turnContext.sendActivity(reply).thenApply(resourceResponse -> null);
         }
@@ -154,10 +147,10 @@ public class MultiLingualBot extends ActivityHandler {
         ) {
             String adaptiveCardJson = IOUtils.toString(input, StandardCharsets.UTF_8.toString());
 
-            return new Attachment() {{
-                setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(Serialization.jsonToTree(adaptiveCardJson));
-            }};
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/vnd.microsoft.card.adaptive");
+            attachment.setContent(Serialization.jsonToTree(adaptiveCardJson));
+            return attachment;
         } catch (IOException e) {
             e.printStackTrace();
             return new Attachment();

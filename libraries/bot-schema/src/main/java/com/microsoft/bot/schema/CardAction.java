@@ -80,18 +80,17 @@ public class CardAction {
             return null;
         }
 
-        return new CardAction() {
-            {
-                setValue(cardAction.getValue());
-                setTitle(cardAction.getTitle());
-                setDisplayText(cardAction.getDisplayText());
-                setImage(cardAction.getImage());
-                setType(cardAction.getType());
-                setText(cardAction.getText());
-                setChannelData(cardAction.getChannelData());
-                setImageAltText(cardAction.getImageAltText());
-            }
-        };
+        CardAction cloned = new CardAction();
+        cloned.setValue(cardAction.getValue());
+        cloned.setTitle(cardAction.getTitle());
+        cloned.setDisplayText(cardAction.getDisplayText());
+        cloned.setImage(cardAction.getImage());
+        cloned.setType(cardAction.getType());
+        cloned.setText(cardAction.getText());
+        cloned.setChannelData(cardAction.getChannelData());
+        cloned.setImageAltText(cardAction.getImageAltText());
+
+        return cloned;
     }
 
     /**

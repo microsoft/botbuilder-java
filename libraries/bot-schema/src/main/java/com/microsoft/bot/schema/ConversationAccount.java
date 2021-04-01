@@ -278,21 +278,19 @@ public class ConversationAccount {
             return null;
         }
 
-        return new ConversationAccount() {
-            {
-                setId(conversationAccount.getId());
-                setName(conversationAccount.getName());
-                setIsGroup(conversationAccount.isGroup());
-                setConversationType(conversationAccount.getConversationType());
-                setAadObjectId(conversationAccount.getAadObjectId());
-                setRole(conversationAccount.getRole());
-                setAadObjectId(conversationAccount.getAadObjectId());
+        ConversationAccount cloned = new ConversationAccount();
+        cloned.setId(conversationAccount.getId());
+        cloned.setName(conversationAccount.getName());
+        cloned.setIsGroup(conversationAccount.isGroup());
+        cloned.setConversationType(conversationAccount.getConversationType());
+        cloned.setAadObjectId(conversationAccount.getAadObjectId());
+        cloned.setRole(conversationAccount.getRole());
+        cloned.setAadObjectId(conversationAccount.getAadObjectId());
+        for (String key : conversationAccount.getProperties().keySet()) {
+            cloned.setProperties(key, conversationAccount.getProperties().get(key));
+        }
 
-                for (String key : conversationAccount.getProperties().keySet()) {
-                    this.setProperties(key, conversationAccount.getProperties().get(key));
-                }
-            }
-        };
+        return cloned;
     }
 
     /**

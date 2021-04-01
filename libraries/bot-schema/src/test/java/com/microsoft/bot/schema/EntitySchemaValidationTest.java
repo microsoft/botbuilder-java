@@ -12,12 +12,9 @@ import org.junit.Test;
 public class EntitySchemaValidationTest {
     @Test
     public void EntityTests_GeoCoordinatesSerializationDeserializationTest() {
-        GeoCoordinates geoCoordinates = new GeoCoordinates() {
-            {
-                setLatitude(22.00);
-                setLongitude(23.00);
-            }
-        };
+        GeoCoordinates geoCoordinates = new GeoCoordinates();
+        geoCoordinates.setLatitude(22.00);
+        geoCoordinates.setLongitude(23.00);
 
         Assert.assertEquals("GeoCoordinates", geoCoordinates.getType());
 
@@ -36,11 +33,8 @@ public class EntitySchemaValidationTest {
 
     @Test
     public void EntityTests_MentionSerializationDeserializationTest() {
-        Mention mentionEntity = new Mention() {
-            {
-                setText("TESTTEST");
-            }
-        };
+        Mention mentionEntity = new Mention();
+        mentionEntity.setText("TESTTEST");
 
         Assert.assertEquals("mention", mentionEntity.getType());
 
@@ -59,11 +53,8 @@ public class EntitySchemaValidationTest {
 
     @Test
     public void EntityTests_PlaceSerializationDeserializationTest() {
-        Place placeEntity = new Place() {
-            {
-                setName("TESTTEST");
-            }
-        };
+        Place placeEntity = new Place();
+        placeEntity.setName("TESTTEST");
 
         Assert.assertEquals("Place", placeEntity.getType());
 

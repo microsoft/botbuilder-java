@@ -160,14 +160,18 @@ public class Recognizer {
 
         if (!candidates.isEmpty()) {
             // return ChooseIntent with candidates array
-            intents.put(CHOOSE_INTENT, new IntentScore() {{ setScore(1.0); }});
+            IntentScore intent = new IntentScore();
+            intent.setScore(1.0);
+            intents.put(CHOOSE_INTENT, intent);
 
             result.setText(text);
             result.setIntents(intents);
             result.setProperties("candidates", Serialization.objectToTree(candidates));
         } else {
             // just return a none intent
-            intents.put(NONE_INTENT, new IntentScore() {{ setScore(1.0); }});
+            IntentScore intent = new IntentScore();
+            intent.setScore(1.0);
+            intents.put(NONE_INTENT, intent);
 
             result.setText(text);
             result.setIntents(intents);

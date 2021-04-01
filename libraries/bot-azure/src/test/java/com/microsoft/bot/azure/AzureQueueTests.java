@@ -14,6 +14,7 @@ import com.microsoft.bot.builder.QueueStorage;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.dialogs.Dialog;
 import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.DialogManager;
@@ -24,6 +25,7 @@ import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ConversationReference;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,20 +43,7 @@ import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 public class AzureQueueTests {
     private static final Integer DEFAULT_DELAY = 2000;
-    private static boolean emulatorIsRunning = false;
     private final String connectionString = "UseDevelopmentStorage=true";
-    private static final String NO_EMULATOR_MESSAGE = "This test requires Azure STORAGE Emulator! Go to https://docs.microsoft.com/azure/storage/common/storage-use-emulator to download and install.";
-
-    @BeforeClass
-    public static void allTestsInit() throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec
-            ("cmd /C \"" + System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
-        int result = p.waitFor();
-        // status = 0: the service was started.
-        // status = -5: the service is already started. Only one instance of the application
-        // can be run at the same time.
-        emulatorIsRunning = result == 0 || result == -5;
-    }
 
     // These tests require Azure Storage Emulator v5.7
     public QueueClient containerInit(String name) {
@@ -67,9 +56,13 @@ public class AzureQueueTests {
         return queue;
     }
 
+    @Before
+    public void beforeTest() {
+        org.junit.Assume.assumeTrue(AzureEmulatorUtils.isStorageEmulatorAvailable());
+    }
+
     @Test
     public void continueConversationLaterTests() {
-        if (runIfEmulator()) {
             String queueName = "continueconversationlatertests";
             QueueClient queue = containerInit(queueName);
 
@@ -127,16 +120,6 @@ public class AzureQueueTests {
                 e.printStackTrace();
                 Assert.fail();
             }
-        }
-    }
-
-    private boolean runIfEmulator() {
-        if (!emulatorIsRunning) {
-            System.out.println(NO_EMULATOR_MESSAGE);
-            return false;
-        }
-
-        return true;
     }
 
     private class ContinueConversationLater extends Dialog {
@@ -167,13 +150,13 @@ public class AzureQueueTests {
             try {
                 date = LocalDateTime.parse(dateString);
             } catch (DateTimeParseException ex) {
-                throw new IllegalArgumentException("Date is invalid");
+                return Async.completeExceptionally(new IllegalArgumentException("Date is invalid"));
             }
 
             ZonedDateTime zonedDate = date.atZone(ZoneOffset.UTC);
             ZonedDateTime now = LocalDateTime.now().atZone(ZoneOffset.UTC);
             if (zonedDate.isBefore(now)) {
-                throw new IllegalArgumentException("Date must be in the future");
+                return Async.completeExceptionally(new IllegalArgumentException("Date must be in the future"));
             }
 
             // create ContinuationActivity from the conversation reference.
@@ -185,7 +168,7 @@ public class AzureQueueTests {
 
             QueueStorage queueStorage = dc.getContext().getTurnState().get("QueueStorage");
             if (queueStorage == null) {
-                throw new NullPointerException("Unable to locate QueueStorage in HostContext");
+                return Async.completeExceptionally(new NullPointerException("Unable to locate QueueStorage in HostContext"));
             }
             return queueStorage.queueActivity(activity, visibility, ttl).thenCompose(receipt -> {
                 // return the receipt as the result

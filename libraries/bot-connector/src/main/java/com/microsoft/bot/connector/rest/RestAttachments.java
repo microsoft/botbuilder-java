@@ -100,7 +100,7 @@ public class RestAttachments implements Attachments {
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ErrorResponseException("getAttachmentInfoAsync", responseBodyResponse);
+                throw new ErrorResponseException("getAttachmentInfo", responseBodyResponse);
             }
         });
     }
@@ -146,7 +146,7 @@ public class RestAttachments implements Attachments {
             } catch (ErrorResponseException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ErrorResponseException("getAttachmentAsync", responseBodyResponse);
+                throw new ErrorResponseException("getAttachment", responseBodyResponse);
             }
         });
     }

@@ -132,7 +132,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int numberResult = (int) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -174,7 +174,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int numberResult = (int) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -229,7 +229,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 int numberResult = (int) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -270,7 +270,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Float numberResult = (Float) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -309,7 +309,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Long numberResult = (Long) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%d'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -348,7 +348,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -387,7 +387,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })        .send("hello")
@@ -425,7 +425,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -464,7 +464,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -503,7 +503,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.0f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })
@@ -566,6 +566,9 @@ public class NumberPromptTests {
         NumberPrompt<Double> numberPrompt = new NumberPrompt<Double>("NumberPrompt", null,
                                                     PromptCultureModels.DUTCH_CULTURE, Double.class);
         dialogs.add(numberPrompt);
+        Activity activityToSend = new Activity(ActivityTypes.MESSAGE);
+        activityToSend.setText("3,14");
+        activityToSend.setLocale(PromptCultureModels.DUTCH_CULTURE);
         new TestFlow(adapter, (turnContext) -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();
             DialogTurnResult results = dc.continueDialog().join();
@@ -584,13 +587,7 @@ public class NumberPromptTests {
         })
         .send("hello")
         .assertReply("Enter a number.")
-        .send(new Activity() {
-                {
-                    setType(ActivityTypes.MESSAGE);
-                    setText("3,14");
-                    setLocale(PromptCultureModels.DUTCH_CULTURE);
-                }
-            })
+        .send(activityToSend)
         .startTest()
         .join();
     }
@@ -621,7 +618,7 @@ public class NumberPromptTests {
             } else if (results.getStatus() == DialogTurnStatus.COMPLETE) {
                 Double numberResult = (Double) results.getResult();
                 turnContext.sendActivity(
-                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult)));
+                    MessageFactory.text(String.format("Bot received the number '%.2f'.", numberResult))).join();
             }
             return CompletableFuture.completedFuture(null);
         })

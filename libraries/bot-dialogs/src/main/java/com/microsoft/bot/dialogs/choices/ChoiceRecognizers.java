@@ -109,17 +109,17 @@ public final class ChoiceRecognizers {
             int index = Integer.parseInt(value) - 1;
             if (index >= 0 && index < list.size()) {
                 Choice choice = list.get(index);
-                matched.add(new ModelResult<FoundChoice>() {{
-                    setStart(match.getStart());
-                    setEnd(match.getEnd());
-                    setTypeName("choice");
-                    setText(match.getText());
-                    setResolution(new FoundChoice() {{
-                        setValue(choice.getValue());
-                        setIndex(index);
-                        setScore(1.0f);
-                    }});
-                }});
+                FoundChoice resolution = new FoundChoice();
+                resolution.setValue(choice.getValue());
+                resolution.setIndex(index);
+                resolution.setScore(1.0f);
+                ModelResult<FoundChoice> modelResult = new ModelResult<FoundChoice>();
+                modelResult.setStart(match.getStart());
+                modelResult.setEnd(match.getEnd());
+                modelResult.setTypeName("choice");
+                modelResult.setText(match.getText());
+                modelResult.setResolution(resolution);
+                matched.add(modelResult);
             }
         } catch (Throwable ignored) {
             // noop here, as in dotnet/node repos
@@ -128,14 +128,15 @@ public final class ChoiceRecognizers {
 
     private static List<ModelResult<FoundChoice>> recognizeNumbers(String utterance, IModel model) {
         List<com.microsoft.recognizers.text.ModelResult> result = model.parse(utterance == null ? "" : utterance);
-        return result.stream().map(r ->
-            new ModelResult<FoundChoice>() {{
-            setStart(r.start);
-            setEnd(r.end);
-            setText(r.text);
-            setResolution(new FoundChoice() {{
-                setValue(r.resolution.get("value").toString());
-            }});
-        }}).collect(Collectors.toList());
+        return result.stream().map(r -> {
+            FoundChoice resolution = new FoundChoice();
+            resolution.setValue(r.resolution.get("value").toString());
+            ModelResult<FoundChoice> modelResult = new ModelResult<FoundChoice>();
+            modelResult.setStart(r.start);
+            modelResult.setEnd(r.end);
+            modelResult.setText(r.text);
+            modelResult.setResolution(resolution);
+            return modelResult;
+        }).collect(Collectors.toList());
     }
 }

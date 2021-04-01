@@ -250,11 +250,9 @@ public class ReceiptCard {
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
-        return new Attachment() {
-            {
-                setContent(ReceiptCard.this);
-                setContentType(CONTENTTYPE);
-            }
-        };
+        Attachment attachment = new Attachment();
+        attachment.setContent(this);
+        attachment.setContentType(CONTENTTYPE);
+        return attachment;
     }
 }

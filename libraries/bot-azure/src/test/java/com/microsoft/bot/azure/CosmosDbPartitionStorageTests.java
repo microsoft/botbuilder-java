@@ -91,12 +91,12 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
     @Before
     public void testInit() {
         if (emulatorIsRunning) {
-            storage = new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey(CosmosAuthKey);
-                setContainerId(CosmosCollectionName);
-                setCosmosDbEndpoint(CosmosServiceEndpoint);
-                setDatabaseId(CosmosDatabaseName);
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey(CosmosAuthKey);
+            options.setContainerId(CosmosCollectionName);
+            options.setCosmosDbEndpoint(CosmosServiceEndpoint);
+            options.setDatabaseId(CosmosDatabaseName);
+            storage = new CosmosDbPartitionedStorage(options);
         }
     }
 
@@ -115,75 +115,75 @@ public class CosmosDbPartitionStorageTests extends StorageBaseTests {
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey("test");
-                setContainerId("testId");
-                setDatabaseId("testDb");
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey("test");
+            options.setContainerId("testId");
+            options.setDatabaseId("testDb");
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for missing end point");
         } catch (IllegalArgumentException e) {
 
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey(null);
-                setContainerId("testId");
-                setDatabaseId("testDb");
-                setCosmosDbEndpoint("testEndpoint");
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey(null);
+            options.setContainerId("testId");
+            options.setDatabaseId("testDb");
+            options.setCosmosDbEndpoint("testEndpoint");
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for missing auth key");
         } catch (IllegalArgumentException e) {
 
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey("testAuthKey");
-                setContainerId("testId");
-                setDatabaseId(null);
-                setCosmosDbEndpoint("testEndpoint");
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey("testAuthKey");
+            options.setContainerId("testId");
+            options.setDatabaseId(null);
+            options.setCosmosDbEndpoint("testEndpoint");
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for missing db id");
         } catch (IllegalArgumentException e) {
 
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey("testAuthKey");
-                setContainerId(null);
-                setDatabaseId("testDb");
-                setCosmosDbEndpoint("testEndpoint");
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey("testAuthKey");
+            options.setContainerId(null);
+            options.setDatabaseId("testDb");
+            options.setCosmosDbEndpoint("testEndpoint");
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for missing collection id");
         } catch (IllegalArgumentException e) {
 
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey("testAuthKey");
-                setContainerId("testId");
-                setDatabaseId("testDb");
-                setCosmosDbEndpoint("testEndpoint");
-                setKeySuffix("?#*test");
-                setCompatibilityMode(false);
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey("testAuthKey");
+            options.setContainerId("testId");
+            options.setDatabaseId("testDb");
+            options.setCosmosDbEndpoint("testEndpoint");
+            options.setKeySuffix("?#*test");
+            options.setCompatibilityMode(false);
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for invalid Row Key characters in KeySuffix");
         } catch (IllegalArgumentException e) {
 
         }
 
         try {
-            new CosmosDbPartitionedStorage(new CosmosDbPartitionedStorageOptions() {{
-                setAuthKey("testAuthKey");
-                setContainerId("testId");
-                setDatabaseId("testDb");
-                setCosmosDbEndpoint("testEndpoint");
-                setKeySuffix("thisisatest");
-                setCompatibilityMode(true);
-            }});
+            CosmosDbPartitionedStorageOptions options = new CosmosDbPartitionedStorageOptions();
+            options.setAuthKey("testAuthKey");
+            options.setContainerId("testId");
+            options.setDatabaseId("testDb");
+            options.setCosmosDbEndpoint("testEndpoint");
+            options.setKeySuffix("thisisatest");
+            options.setCompatibilityMode(true);
+            new CosmosDbPartitionedStorage(options);
             Assert.fail("should have thrown for CompatibilityMode 'true' while using a KeySuffix");
         } catch (IllegalArgumentException e) {
 

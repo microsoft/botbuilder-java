@@ -127,12 +127,8 @@ public class QnAMakerTests {
                 }
                 delay(500);
                 conversationId[0] = turnContext.getActivity().getConversation().getId();
-                Activity typingActivity = new Activity() {
-                    {
-                        setType(ActivityTypes.TYPING);
-                        setRelatesTo(turnContext.getActivity().getRelatesTo());
-                    }
-                };
+                Activity typingActivity = new Activity(ActivityTypes.TYPING);
+                typingActivity.setRelatesTo(turnContext.getActivity().getRelatesTo());
                 turnContext.sendActivity(typingActivity).join();
                 delay(500);
                 turnContext.sendActivity(String.format("echo:%s", turnContext.getActivity().getText())).join();
@@ -182,15 +178,12 @@ public class QnAMakerTests {
             // No text
             TestAdapter adapter = new TestAdapter(
                 TestAdapter.createConversationReference("QnaMaker_TraceActivity_EmptyText", "User1", "Bot"));
-            Activity activity = new Activity() {
-                {
-                    setType(ActivityTypes.MESSAGE);
-                    setText(new String());
-                    setConversation(new ConversationAccount());
-                    setRecipient(new ChannelAccount());
-                    setFrom(new ChannelAccount());
-                }
-            };
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setText(new String());
+            activity.setConversation(new ConversationAccount());
+            activity.setRecipient(new ChannelAccount());
+            activity.setFrom(new ChannelAccount());
+
             TurnContext context = new TurnContextImpl(adapter, activity);
             Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
@@ -214,15 +207,12 @@ public class QnAMakerTests {
             // No text
             TestAdapter adapter = new TestAdapter(
                 TestAdapter.createConversationReference("QnaMaker_TraceActivity_NullText", "User1", "Bot"));
-            Activity activity = new Activity() {
-                {
-                    setType(ActivityTypes.MESSAGE);
-                    setText(null);
-                    setConversation(new ConversationAccount());
-                    setRecipient(new ChannelAccount());
-                    setFrom(new ChannelAccount());
-                }
-            };
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setText(null);
+            activity.setConversation(new ConversationAccount());
+            activity.setRecipient(new ChannelAccount());
+            activity.setFrom(new ChannelAccount());
+
             TurnContext context = new TurnContextImpl(adapter, activity);
             Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
         } catch (Exception e) {
@@ -265,15 +255,11 @@ public class QnAMakerTests {
             // No text
             TestAdapter adapter = new TestAdapter(
                 TestAdapter.createConversationReference("QnaMaker_TraceActivity_BadMessage", "User1", "Bot"));
-            Activity activity = new Activity() {
-                {
-                    setType(ActivityTypes.TRACE);
-                    setText("My Text");
-                    setConversation(new ConversationAccount());
-                    setRecipient(new ChannelAccount());
-                    setFrom(new ChannelAccount());
-                }
-            };
+            Activity activity = new Activity(ActivityTypes.TRACE);
+            activity.setText("My Text");
+            activity.setConversation(new ConversationAccount());
+            activity.setRecipient(new ChannelAccount());
+            activity.setFrom(new ChannelAccount());
 
             TurnContext context = new TurnContextImpl(adapter, activity);
             Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(context, null).join());
@@ -336,11 +322,9 @@ public class QnAMakerTests {
         MockWebServer mockWebServer = new MockWebServer();
         try {
             QnAMaker qna = this.qnaReturnsAnswer(mockWebServer);
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
+
             QueryResults results = qna.getAnswersRaw(getContext("how do I clean the stove?"), options, null, null).join();
             Assert.assertNotNull(results.getAnswers());
             Assert.assertTrue(results.getActiveLearningEnabled());
@@ -371,18 +355,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setTop(5);
-                }
-            };
+            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint();
+            qnaMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnaMakerEndpoint.setEndpointKey(endpointKey);
+            qnaMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setTop(5);
             QnAMaker qna = new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
             QueryResult[] results = qna.getAnswers(getContext("Q11"), null).join();
             Assert.assertNotNull(results);
@@ -429,31 +408,23 @@ public class QnAMakerTests {
                     response,
                     url).port());
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
+            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint();
+            qnaMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnaMakerEndpoint.setEndpointKey(endpointKey);
+            qnaMakerEndpoint.setHost(finalEndpoint);
+
             QnAMaker qna = new QnAMaker(qnaMakerEndpoint, null);
             FeedbackRecords feedbackRecords = new FeedbackRecords();
 
-            FeedbackRecord feedback1 = new FeedbackRecord() {
-                {
-                    setQnaId(1);
-                    setUserId("test");
-                    setUserQuestion("How are you?");
-                }
-            };
+            FeedbackRecord feedback1 = new FeedbackRecord();
+            feedback1.setQnaId(1);
+            feedback1.setUserId("test");
+            feedback1.setUserQuestion("How are you?");
 
-            FeedbackRecord feedback2 = new FeedbackRecord() {
-                {
-                    setQnaId(2);
-                    setUserId("test");
-                    setUserQuestion("What up??");
-                }
-            };
+            FeedbackRecord feedback2 = new FeedbackRecord();
+            feedback2.setQnaId(2);
+            feedback2.setUserId("test");
+            feedback2.setUserQuestion("What up??");
 
             feedbackRecords.setRecords(new FeedbackRecord[] { feedback1, feedback2 });
             qna.callTrain(feedbackRecords);
@@ -502,24 +473,18 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setStrictFilters(new Metadata[] { new Metadata() {
-                        {
-                            setName("topic");
-                            setValue("value");
-                        }
-                    } });
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint();
+            qnaMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnaMakerEndpoint.setEndpointKey(endpointKey);
+            qnaMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            Metadata metadata = new Metadata();
+            metadata.setName("topic");
+            metadata.setValue("value");
+            Metadata[] filters = new Metadata[] { metadata };
+            qnaMakerOptions.setStrictFilters(filters);
+            qnaMakerOptions.setTop(1);
             QnAMaker qna = new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
             ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
@@ -566,25 +531,20 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setScoreThreshold(0.0f);
-                }
-            };
+            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint();
+            qnaMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnaMakerEndpoint.setEndpointKey(endpointKey);
+            qnaMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setScoreThreshold(0.0f);
+
             QnAMaker qnaWithZeroValueThreshold = new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
 
-            QueryResult[] results = qnaWithZeroValueThreshold.getAnswers(getContext("how do I clean the stove?"), new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            }).join();
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
+
+            QueryResult[] results = qnaWithZeroValueThreshold.getAnswers(getContext("how do I clean the stove?"), options).join();
             Assert.assertNotNull(results);
             Assert.assertTrue(results.length == 1);
         } catch (Exception e) {
@@ -611,19 +571,15 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                    setScoreThreshold(0.99F);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setTop(1);
+            qnaMakerOptions.setScoreThreshold(0.99F);
+
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, qnaMakerOptions);
 
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), null).join();
@@ -642,37 +598,29 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestScoreThresholdTooLargeOutOfRange() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(endpointKey);
-                setHost(hostname);
-            }
-        };
-        QnAMakerOptions tooLargeThreshold = new QnAMakerOptions() {
-            {
-                setTop(1);
-                setScoreThreshold(1.1f);
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+        qnAMakerEndpoint.setEndpointKey(endpointKey);
+        qnAMakerEndpoint.setHost(hostname);
+
+        QnAMakerOptions tooLargeThreshold = new QnAMakerOptions();
+        tooLargeThreshold.setTop(1);
+        tooLargeThreshold.setScoreThreshold(1.1f);
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, tooLargeThreshold));
     }
 
     @Test
     public void qnaMakerTestScoreThresholdTooSmallOutOfRange() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(endpointKey);
-                setHost(hostname);
-            }
-        };
-        QnAMakerOptions tooSmallThreshold = new QnAMakerOptions() {
-            {
-                setTop(1);
-                setScoreThreshold(-9000.0f);
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+        qnAMakerEndpoint.setEndpointKey(endpointKey);
+        qnAMakerEndpoint.setHost(hostname);
+
+        QnAMakerOptions tooSmallThreshold = new QnAMakerOptions();
+        tooSmallThreshold.setTop(1);
+        tooSmallThreshold.setScoreThreshold(-9000.0f);
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, tooSmallThreshold));
     }
 
@@ -689,25 +637,18 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnARequestContext context = new QnARequestContext() {
-                {
-                    setPreviousQnAId(5);
-                    setPreviousUserQuery("how do I clean the stove?");
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                    setContext(context);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnARequestContext context = new QnARequestContext();
+            context.setPreviousQnAId(5);
+            context.setPreviousUserQuery("how do I clean the stove?");
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
+            options.setContext(context);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options);
 
@@ -740,18 +681,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(3);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(3);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options);
 
@@ -783,19 +719,14 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                    setQnAId(55);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
+            options.setQnAId(55);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options);
             QueryResult[] results = qna.getAnswers(getContext("Where can I buy?"), options).join();
@@ -816,55 +747,45 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestTopOutOfRange() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(endpointKey);
-                setHost(hostname);
-            }
-        };
-        QnAMakerOptions options = new QnAMakerOptions() {
-            {
-                setTop(-1);
-                setScoreThreshold(0.5f);
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+        qnAMakerEndpoint.setEndpointKey(endpointKey);
+        qnAMakerEndpoint.setHost(hostname);
+
+        QnAMakerOptions options = new QnAMakerOptions();
+        options.setTop(-1);
+        options.setScoreThreshold(0.5f);
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, options));
     }
 
     @Test
     public void qnaMakerTestEndpointEmptyKbId() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(new String());
-                setEndpointKey(endpointKey);
-                setHost(hostname);
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(new String());
+        qnAMakerEndpoint.setEndpointKey(endpointKey);
+        qnAMakerEndpoint.setHost(hostname);
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, null));
     }
 
     @Test
     public void qnaMakerTestEndpointEmptyEndpointKey() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(new String());
-                setHost(hostname);
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+        qnAMakerEndpoint.setEndpointKey(new String());
+        qnAMakerEndpoint.setHost(hostname);
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, null));
     }
 
     @Test
     public void qnaMakerTestEndpointEmptyHost() {
-        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-            {
-                setKnowledgeBaseId(knowledgeBaseId);
-                setEndpointKey(endpointKey);
-                setHost(new String());
-            }
-        };
+        QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+        qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+        qnAMakerEndpoint.setEndpointKey(endpointKey);
+        qnAMakerEndpoint.setHost(new String());
+
         Assert.assertThrows(IllegalArgumentException.class, () -> new QnAMaker(qnAMakerEndpoint, null));
     }
 
@@ -907,13 +828,10 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String host = String.format("{%s}/v2.0", endpoint);
-            QnAMakerEndpoint v2LegacyEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(host);
-                }
-            };
+            QnAMakerEndpoint v2LegacyEndpoint = new QnAMakerEndpoint();
+            v2LegacyEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            v2LegacyEndpoint.setEndpointKey(endpointKey);
+            v2LegacyEndpoint.setHost(host);
 
             Assert.assertThrows(UnsupportedOperationException.class,
                 () -> new QnAMaker(v2LegacyEndpoint,null));
@@ -941,13 +859,10 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String host = String.format("{%s}/v3.0", endpoint);
-            QnAMakerEndpoint v3LegacyEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(host);
-                }
-            };
+            QnAMakerEndpoint v3LegacyEndpoint = new QnAMakerEndpoint();
+            v3LegacyEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            v3LegacyEndpoint.setEndpointKey(endpointKey);
+            v3LegacyEndpoint.setHost(host);
 
             Assert.assertThrows(UnsupportedOperationException.class,
                 () -> new QnAMaker(v3LegacyEndpoint,null));
@@ -975,18 +890,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options);
 
@@ -1018,19 +928,14 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions queryOptionsWithScoreThreshold = new QnAMakerOptions() {
-                {
-                    setScoreThreshold(0.5f);
-                    setTop(2);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions queryOptionsWithScoreThreshold = new QnAMakerOptions();
+            queryOptionsWithScoreThreshold.setScoreThreshold(0.5f);
+            queryOptionsWithScoreThreshold.setTop(2);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, queryOptionsWithScoreThreshold);
 
@@ -1063,13 +968,11 @@ public class QnAMakerTests {
         try {
             String url = this.getRequestUrl();
             String finalEndpoint = String.format("%s:%s", hostname, mockWebServer.url(url).port());
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, null);
             Assert.assertThrows(CompletionException.class, () -> qna.getAnswers(getContext("how do I clean the stove?"), null).join());
         } catch (Exception e) {
@@ -1096,19 +999,14 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                    setIsTest(true);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setTop(1);
+            qnaMakerOptions.setIsTest(true);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, qnaMakerOptions);
 
@@ -1139,19 +1037,14 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                    setRankerType("QuestionOnly");
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setTop(1);
+            qnaMakerOptions.setRankerType("QuestionOnly");
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, qnaMakerOptions);
 
@@ -1183,58 +1076,41 @@ public class QnAMakerTests {
             }
             String finalEndpoint = endpoint;
 
-            QnAMakerOptions noFiltersOptions = new QnAMakerOptions() {
-                {
-                    setTop(30);
-                }
-            };
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            Metadata strictFilterMovie = new Metadata() {
-                {
-                    setName("movie");
-                    setValue("disney");
-                }
-            };
-            Metadata strictFilterHome = new Metadata() {
-                {
-                    setName("home");
-                    setValue("floating");
-                }
-            };
-            Metadata strictFilterDog = new Metadata() {
-                {
-                    setName("dog");
-                    setValue("samoyed");
-                }
-            };
+            QnAMakerOptions noFiltersOptions = new QnAMakerOptions();
+            noFiltersOptions.setTop(30);
+
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            Metadata strictFilterMovie = new Metadata();
+            strictFilterMovie.setName("movie");
+            strictFilterMovie.setValue("disney");
+
+            Metadata strictFilterHome = new Metadata();
+            strictFilterHome.setName("home");
+            strictFilterHome.setValue("floating");
+
+            Metadata strictFilterDog = new Metadata();
+            strictFilterDog.setName("dog");
+            strictFilterDog.setValue("samoyed");
+
             Metadata[] oneStrictFilters = new Metadata[] {strictFilterMovie};
             Metadata[] twoStrictFilters = new Metadata[] {strictFilterMovie, strictFilterHome};
             Metadata[] allChangedRequestOptionsFilters = new Metadata[] {strictFilterDog};
-            QnAMakerOptions oneFilteredOption = new QnAMakerOptions() {
-                {
-                    setTop(30);
-                    setStrictFilters(oneStrictFilters);
-                }
-            };
-            QnAMakerOptions twoStrictFiltersOptions = new QnAMakerOptions() {
-                {
-                    setTop(30);
-                    setStrictFilters(twoStrictFilters);
-                }
-            };
-            QnAMakerOptions allChangedRequestOptions = new QnAMakerOptions() {
-                {
-                    setTop(2000);
-                    setScoreThreshold(0.4f);
-                    setStrictFilters(allChangedRequestOptionsFilters);
-                }
-            };
+            QnAMakerOptions oneFilteredOption = new QnAMakerOptions();
+            oneFilteredOption.setTop(30);
+            oneFilteredOption.setStrictFilters(oneStrictFilters);
+
+            QnAMakerOptions twoStrictFiltersOptions = new QnAMakerOptions();
+            twoStrictFiltersOptions.setTop(30);
+            twoStrictFiltersOptions.setStrictFilters(twoStrictFilters);
+
+            QnAMakerOptions allChangedRequestOptions = new QnAMakerOptions();
+            allChangedRequestOptions.setTop(2000);
+            allChangedRequestOptions.setScoreThreshold(0.4f);
+            allChangedRequestOptions.setStrictFilters(allChangedRequestOptionsFilters);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, noFiltersOptions);
 
@@ -1318,33 +1194,24 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            Metadata strictFilterMovie = new Metadata() {
-                {
-                    setName("movie");
-                    setValue("disney");
-                }
-            };
-            Metadata strictFilterProduction = new Metadata() {
-                {
-                    setName("production");
-                    setValue("Walden");
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            Metadata strictFilterMovie = new Metadata();
+            strictFilterMovie.setName("movie");
+            strictFilterMovie.setValue("disney");
+
+            Metadata strictFilterProduction = new Metadata();
+            strictFilterProduction.setName("production");
+            strictFilterProduction.setValue("Walden");
+
             Metadata[] strictFilters = new Metadata[] {strictFilterMovie, strictFilterProduction};
-            QnAMakerOptions oneFilteredOption = new QnAMakerOptions() {
-                {
-                    setTop(30);
-                    setStrictFilters(strictFilters);
-                    setStrictFiltersJoinOperator(JoinOperator.OR);
-                }
-            };
+            QnAMakerOptions oneFilteredOption = new QnAMakerOptions();
+            oneFilteredOption.setTop(30);
+            oneFilteredOption.setStrictFilters(strictFilters);
+            oneFilteredOption.setStrictFiltersJoinOperator(JoinOperator.OR);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, oneFilteredOption);
 
@@ -1382,19 +1249,13 @@ public class QnAMakerTests {
             }
             String finalEndpoint = endpoint;
 
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
 
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             // Act (Null Telemetry client)
             // This will default to the NullTelemetryClient which no-ops all calls.
@@ -1429,18 +1290,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
@@ -1497,18 +1353,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
@@ -1565,18 +1416,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
@@ -1635,25 +1481,19 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
             // Act - Override the QnaMaker object to log custom stuff and honor parms passed in.
-            Map<String, String> telemetryProperties = new HashMap<String, String>() {{
-                put("Id", "MyID");
-            }};
+            Map<String, String> telemetryProperties = new HashMap<String, String>();
+            telemetryProperties.put("Id", "MyID");
 
             QnAMaker qna = new OverrideTelemetry(qnAMakerEndpoint, options, telemetryClient, false);
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), null, telemetryProperties, null).join();
@@ -1709,33 +1549,23 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
             // Act - Pass in properties during QnA invocation
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options, telemetryClient, false);
-            Map<String, String> telemetryProperties = new HashMap<String, String>() {
-                {
-                    put("MyImportantProperty", "myImportantValue");
-                }
-            };
-            Map<String, Double> telemetryMetrics = new HashMap<String, Double>() {
-                {
-                    put("MyImportantMetric", 3.14159);
-                }
-            };
+            Map<String, String> telemetryProperties = new HashMap<String, String>();
+            telemetryProperties.put("MyImportantProperty", "myImportantValue");
+
+            Map<String, Double> telemetryMetrics = new HashMap<String, Double>();
+            telemetryMetrics.put("MyImportantMetric", 3.14159);
 
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), null, telemetryProperties, telemetryMetrics).join();
             // Assert - added properties were added.
@@ -1796,35 +1626,25 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
             // Act - Pass in properties during QnA invocation that override default properties
             //  NOTE: We are invoking this with PII turned OFF, and passing a PII property (originalQuestion).
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, options, telemetryClient, false);
-            Map<String, String> telemetryProperties = new HashMap<String, String>() {
-                {
-                    put("knowledgeBaseId", "myImportantValue");
-                    put("originalQuestion", "myImportantValue2");
-                }
-            };
-            Map<String, Double> telemetryMetrics = new HashMap<String, Double>() {
-                {
-                    put("score", 3.14159);
-                }
-            };
+            Map<String, String> telemetryProperties = new HashMap<String, String>();
+            telemetryProperties.put("knowledgeBaseId", "myImportantValue");
+            telemetryProperties.put("originalQuestion", "myImportantValue2");
+
+            Map<String, Double> telemetryMetrics = new HashMap<String, Double>();
+            telemetryMetrics.put("score", 3.14159);
 
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), null, telemetryProperties, telemetryMetrics).join();
             // Assert - added properties were added.
@@ -1879,18 +1699,13 @@ public class QnAMakerTests {
                 endpoint = String.format("%s:%s", hostname, initializeMockServer(mockWebServer, response, url).port());
             }
             String finalEndpoint = endpoint;
-            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions options = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
+            qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnAMakerEndpoint.setEndpointKey(endpointKey);
+            qnAMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions options = new QnAMakerOptions();
+            options.setTop(1);
 
             BotTelemetryClient telemetryClient = Mockito.mock(BotTelemetryClient.class);
 
@@ -1903,17 +1718,12 @@ public class QnAMakerTests {
             //       Logically, the GetAnswersAync should win.  But ultimately OnQnaResultsAsync decides since it is the last
             //       code to touch the properties before logging (since it actually logs the event).
             QnAMaker qna = new OverrideFillTelemetry(qnAMakerEndpoint, options, telemetryClient, false);
-            Map<String, String> telemetryProperties = new HashMap<String, String>() {
-                {
-                    put("knowledgeBaseId", "myImportantValue");
-                    put("matchedQuestion", "myImportantValue2");
-                }
-            };
-            Map<String, Double> telemetryMetrics = new HashMap<String, Double>() {
-                {
-                    put("score", 3.14159);
-                }
-            };
+            Map<String, String> telemetryProperties = new HashMap<String, String>();
+            telemetryProperties.put("knowledgeBaseId", "myImportantValue");
+            telemetryProperties.put("matchedQuestion", "myImportantValue2");
+
+            Map<String, Double> telemetryMetrics = new HashMap<String, Double>();
+            telemetryMetrics.put("score", 3.14159);
 
             QueryResult[] results = qna.getAnswers(getContext("how do I clean the stove?"), null, telemetryProperties, telemetryMetrics).join();
             // Assert - added properties were added.
@@ -1957,15 +1767,11 @@ public class QnAMakerTests {
 
     private static TurnContext getContext(String utterance) {
         TestAdapter b = new TestAdapter();
-        Activity a = new Activity() {
-            {
-                setType(ActivityTypes.MESSAGE);
-                setText(utterance);
-                setConversation(new ConversationAccount());
-                setRecipient(new ChannelAccount());
-                setFrom(new ChannelAccount());
-            }
-        };
+        Activity a = new Activity(ActivityTypes.MESSAGE);
+        a.setText(utterance);
+        a.setConversation(new ConversationAccount());
+        a.setRecipient(new ChannelAccount());
+        a.setFrom(new ChannelAccount());
 
         return new TurnContextImpl(b, a);
     }
@@ -2034,18 +1840,14 @@ public class QnAMakerTests {
             }
             String finalEndpoint = endpoint;
             // Mock Qna
-            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint() {
-                {
-                    setKnowledgeBaseId(knowledgeBaseId);
-                    setEndpointKey(endpointKey);
-                    setHost(finalEndpoint);
-                }
-            };
-            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions() {
-                {
-                    setTop(1);
-                }
-            };
+            QnAMakerEndpoint qnaMakerEndpoint = new QnAMakerEndpoint();
+            qnaMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
+            qnaMakerEndpoint.setEndpointKey(endpointKey);
+            qnaMakerEndpoint.setHost(finalEndpoint);
+
+            QnAMakerOptions qnaMakerOptions = new QnAMakerOptions();
+            qnaMakerOptions.setTop(1);
+
             return new QnAMaker(qnaMakerEndpoint, qnaMakerOptions);
         } catch (Exception e) {
             return null;
@@ -2144,11 +1946,9 @@ public class QnAMakerTests {
                 telemetryClient.trackEvent(QnATelemetryConstants.QNA_MSG_EVENT, eventData.getLeft(), eventData.getRight());
 
                 // Create second event.
-                Map<String, String> secondEventProperties = new HashMap<String, String>(){
-                    {
-                        put("MyImportantProperty2", "myImportantValue2");
-                    }
-                };
+                Map<String, String> secondEventProperties = new HashMap<String, String>();
+                secondEventProperties.put("MyImportantProperty2", "myImportantValue2");
+
                 telemetryClient.trackEvent("MySecondEvent", secondEventProperties);
             });
         }

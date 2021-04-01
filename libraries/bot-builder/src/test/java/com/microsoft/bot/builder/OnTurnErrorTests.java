@@ -29,7 +29,7 @@ public class OnTurnErrorTests {
 
         new TestFlow(adapter, (turnContext -> {
             if (StringUtils.equals(turnContext.getActivity().getText(), "foo")) {
-                turnContext.sendActivity(turnContext.getActivity().getText());
+                turnContext.sendActivity(turnContext.getActivity().getText()).join();
             }
 
             if (

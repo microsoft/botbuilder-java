@@ -182,11 +182,9 @@ public class ThumbnailCard {
      * @return An Attachment object containing the card.
      */
     public Attachment toAttachment() {
-        return new Attachment() {
-            {
-                setContent(ThumbnailCard.this);
-                setContentType(CONTENTTYPE);
-            }
-        };
+        Attachment attachment = new Attachment();
+        attachment.setContent(this);
+        attachment.setContentType(CONTENTTYPE);
+        return attachment;
     }
 }

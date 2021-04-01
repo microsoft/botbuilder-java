@@ -312,11 +312,8 @@ public class TurnContextImpl implements TurnContext, AutoCloseable {
             return Async.completeExceptionally(new IllegalArgumentException("textReplyToSend"));
         }
 
-        Activity activityToSend = new Activity(ActivityTypes.MESSAGE) {
-            {
-                setText(textReplyToSend);
-            }
-        };
+        Activity activityToSend = new Activity(ActivityTypes.MESSAGE);
+        activityToSend.setText(textReplyToSend);
 
         if (StringUtils.isNotEmpty(speak)) {
             activityToSend.setSpeak(speak);

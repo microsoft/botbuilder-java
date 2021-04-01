@@ -14,6 +14,7 @@ import com.microsoft.bot.builder.TranscriptLoggerMiddleware;
 import com.microsoft.bot.builder.TranscriptStore;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -23,12 +24,11 @@ import com.microsoft.bot.schema.ResourceResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,25 +39,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * These tests require Azure Storage Emulator v5.7
- * The emulator must be installed at this path C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe
- * More info: https://docs.microsoft.com/azure/storage/common/storage-use-emulator
+ * These tests require Azure Storage Emulator v5.7 The emulator must be
+ * installed at this path C:\Program Files (x86)\Microsoft SDKs\Azure\Storage
+ * Emulator\AzureStorageEmulator.exe More info:
+ * https://docs.microsoft.com/azure/storage/common/storage-use-emulator
  */
 public class TranscriptStoreTests {
 
     @Rule
     public TestName TEST_NAME = new TestName();
 
-    protected String blobStorageEmulatorConnectionString =
-        "AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
+    protected String blobStorageEmulatorConnectionString = "AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
 
     private String channelId = "test";
 
-    private static final String[] CONVERSATION_IDS = {
-        "qaz", "wsx", "edc", "rfv", "tgb", "yhn", "ujm", "123", "456", "789",
-        "ZAQ", "XSW", "CDE", "VFR", "BGT", "NHY", "NHY", "098", "765", "432",
-        "zxc", "vbn", "mlk", "jhy", "yui", "kly", "asd", "asw", "aaa", "zzz",
-    };
+    private static final String[] CONVERSATION_IDS = { "qaz", "wsx", "edc", "rfv", "tgb", "yhn", "ujm", "123", "456",
+            "789", "ZAQ", "XSW", "CDE", "VFR", "BGT", "NHY", "NHY", "098", "765", "432", "zxc", "vbn", "mlk", "jhy",
+            "yui", "kly", "asd", "asw", "aaa", "zzz", };
 
     private static final String[] CONVERSATION_SPECIAL_IDS = { "asd !&/#.'+:?\"", "ASD@123<>|}{][", "$%^;\\*()_" };
 
@@ -69,22 +67,21 @@ public class TranscriptStoreTests {
         return new BlobsTranscriptStore(blobStorageEmulatorConnectionString, getContainerName());
     }
 
-    private static final String NO_EMULATOR_MESSAGE = "This test requires Azure STORAGE Emulator! Go to https://docs.microsoft.com/azure/storage/common/storage-use-emulator to download and install.";
-
-    @BeforeClass
-    public static void allTestsInit() throws IOException, InterruptedException {
-        assertEmulator();
+    @Before
+    public void beforeTest() {
+        org.junit.Assume.assumeTrue(AzureEmulatorUtils.isStorageEmulatorAvailable());
     }
 
     @After
     public void testCleanup() {
-        BlobContainerClient containerClient = new BlobContainerClientBuilder()
-            .connectionString(blobStorageEmulatorConnectionString)
-            .containerName(getContainerName())
-            .buildClient();
+        if (AzureEmulatorUtils.isStorageEmulatorAvailable()) {
+            BlobContainerClient containerClient = new BlobContainerClientBuilder()
+                    .connectionString(blobStorageEmulatorConnectionString).containerName(getContainerName())
+                    .buildClient();
 
-        if (containerClient.exists()) {
-            containerClient.delete();
+            if (containerClient.exists()) {
+                containerClient.delete();
+            }
         }
     }
 
@@ -92,9 +89,12 @@ public class TranscriptStoreTests {
     @Test
     public void blobTranscriptParamTest() {
         Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsTranscriptStore(null, getContainerName()));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsTranscriptStore(blobStorageEmulatorConnectionString, null));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsTranscriptStore(new String(), getContainerName()));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsTranscriptStore(blobStorageEmulatorConnectionString, new String()));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new BlobsTranscriptStore(blobStorageEmulatorConnectionString, null));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new BlobsTranscriptStore(new String(), getContainerName()));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new BlobsTranscriptStore(blobStorageEmulatorConnectionString, new String()));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class TranscriptStoreTests {
     @Test
     public void activityEmptyTest() {
         TranscriptStore transcriptStore = getTranscriptStore();
-        for(String convoId: CONVERSATION_SPECIAL_IDS) {
+        for (String convoId : CONVERSATION_SPECIAL_IDS) {
             PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(channelId, convoId).join();
             Assert.assertEquals(0, activities.getItems().size());
         }
@@ -123,8 +123,8 @@ public class TranscriptStoreTests {
             Activity a = TranscriptStoreTests.createActivity(i, i, CONVERSATION_IDS);
             transcriptStore.logActivity(a).join();
             activities.add(a);
-            loggedActivities[i] = transcriptStore.getTranscriptActivities(channelId, CONVERSATION_IDS[i])
-                .join().getItems().get(0);
+            loggedActivities[i] = transcriptStore.getTranscriptActivities(channelId, CONVERSATION_IDS[i]).join()
+                    .getItems().get(0);
         }
 
         Assert.assertEquals(5, loggedActivities.length);
@@ -139,7 +139,7 @@ public class TranscriptStoreTests {
             transcriptStore.deleteTranscript(a.getChannelId(), a.getConversation().getId()).join();
 
             PagedResult<Activity> loggedActivities = transcriptStore
-                .getTranscriptActivities(channelId, CONVERSATION_IDS[i]).join();
+                    .getTranscriptActivities(channelId, CONVERSATION_IDS[i]).join();
 
             Assert.assertEquals(0, loggedActivities.getItems().size());
         }
@@ -170,8 +170,8 @@ public class TranscriptStoreTests {
             Activity a = TranscriptStoreTests.createActivity(i, i, CONVERSATION_SPECIAL_IDS);
             transcriptStore.deleteTranscript(a.getChannelId(), a.getConversation().getId()).join();
 
-            PagedResult<Activity> loggedActivities = transcriptStore.
-                getTranscriptActivities(channelId, CONVERSATION_SPECIAL_IDS[i]).join();
+            PagedResult<Activity> loggedActivities = transcriptStore
+                    .getTranscriptActivities(channelId, CONVERSATION_SPECIAL_IDS[i]).join();
             Assert.assertEquals(0, loggedActivities.getItems().size());
         }
     }
@@ -191,7 +191,8 @@ public class TranscriptStoreTests {
             activities.add(a);
         }
 
-        PagedResult<Activity> loggedPagedResult = transcriptStore.getTranscriptActivities(cleanChannel, CONVERSATION_IDS[0]).join();
+        PagedResult<Activity> loggedPagedResult = transcriptStore
+                .getTranscriptActivities(cleanChannel, CONVERSATION_IDS[0]).join();
         String ct = loggedPagedResult.getContinuationToken();
         Assert.assertEquals(20, loggedPagedResult.getItems().size());
         Assert.assertNotNull(ct);
@@ -207,11 +208,12 @@ public class TranscriptStoreTests {
         TranscriptStore transcriptStore = getTranscriptStore();
         int i;
         for (i = 0; i < CONVERSATION_SPECIAL_IDS.length; i++) {
-            Activity a = TranscriptStoreTests.createActivity(i ,i , CONVERSATION_IDS);
+            Activity a = TranscriptStoreTests.createActivity(i, i, CONVERSATION_IDS);
             transcriptStore.deleteTranscript(a.getChannelId(), a.getConversation().getId()).join();
         }
 
-        PagedResult<Activity> loggedActivities = transcriptStore.getTranscriptActivities(channelId, CONVERSATION_IDS[i]).join();
+        PagedResult<Activity> loggedActivities = transcriptStore.getTranscriptActivities(channelId, CONVERSATION_IDS[i])
+                .join();
         Assert.assertEquals(0, loggedActivities.getItems().size());
     }
 
@@ -221,17 +223,16 @@ public class TranscriptStoreTests {
 
         Assert.assertThrows(IllegalArgumentException.class, () -> store.logActivity(null));
         Assert.assertThrows(IllegalArgumentException.class,
-            () -> store.getTranscriptActivities(null, CONVERSATION_IDS[0]));
+                () -> store.getTranscriptActivities(null, CONVERSATION_IDS[0]));
         Assert.assertThrows(IllegalArgumentException.class, () -> store.getTranscriptActivities(channelId, null));
     }
 
     @Test
     public void logActivities() {
         TranscriptStore transcriptStore = getTranscriptStore();
-        ConversationReference conversation = TestAdapter
-            .createConversationReference(UUID.randomUUID().toString(), "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(conversation)
-            .use(new TranscriptLoggerMiddleware(transcriptStore));
+        ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
+                "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
         new TestFlow(adapter, turnContext -> {
             delay(500);
             Activity typingActivity = new Activity(ActivityTypes.TYPING);
@@ -240,18 +241,10 @@ public class TranscriptStoreTests {
             delay(500);
             turnContext.sendActivity(String.format("echo:%s", turnContext.getActivity().getText())).join();
             return CompletableFuture.completedFuture(null);
-        })
-            .send("foo")
-                .assertReply(activity ->
-                    Assert.assertTrue(activity.isType(ActivityTypes.TYPING))
-                )
-                .assertReply("echo:foo")
-            .send("bar")
-                .assertReply(activity ->
-                    Assert.assertTrue(activity.isType(ActivityTypes.TYPING))
-                )
-                .assertReply("echo:bar")
-            .startTest().join();
+        }).send("foo").assertReply(activity -> Assert.assertTrue(activity.isType(ActivityTypes.TYPING)))
+                .assertReply("echo:foo").send("bar")
+                .assertReply(activity -> Assert.assertTrue(activity.isType(ActivityTypes.TYPING)))
+                .assertReply("echo:bar").startTest().join();
 
         PagedResult<Activity> pagedResult = null;
         try {
@@ -272,7 +265,7 @@ public class TranscriptStoreTests {
         Assert.assertTrue(pagedResult.getItems().get(4).isType(ActivityTypes.TYPING));
         Assert.assertTrue(pagedResult.getItems().get(5).isType(ActivityTypes.MESSAGE));
         Assert.assertEquals("echo:bar", pagedResult.getItems().get(5).getText());
-        for (Activity activity: pagedResult.getItems()) {
+        for (Activity activity : pagedResult.getItems()) {
             Assert.assertTrue(!StringUtils.isBlank(activity.getId()));
             Assert.assertTrue(activity.getTimestamp().isAfter(OffsetDateTime.MIN));
         }
@@ -281,14 +274,13 @@ public class TranscriptStoreTests {
     @Test
     public void logUpdateActivities() {
         TranscriptStore transcriptStore = getTranscriptStore();
-        ConversationReference conversation = TestAdapter
-            .createConversationReference(UUID.randomUUID().toString(), "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(conversation)
-            .use(new TranscriptLoggerMiddleware(transcriptStore));
-        final Activity[] activityToUpdate = {null};
+        ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
+                "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
+        final Activity[] activityToUpdate = { null };
         new TestFlow(adapter, turnContext -> {
             delay(500);
-            if(turnContext.getActivity().getText().equals("update")) {
+            if (turnContext.getActivity().getText().equals("update")) {
                 activityToUpdate[0].setText("new response");
                 turnContext.updateActivity(activityToUpdate[0]).join();
             } else {
@@ -296,20 +288,17 @@ public class TranscriptStoreTests {
                 ResourceResponse response = turnContext.sendActivity(activity).join();
                 activity.setId(response.getId());
 
-                ObjectMapper objectMapper = new ObjectMapper()
-                    .findAndRegisterModules();
+                ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
                 try {
                     // clone the activity, so we can use it to do an update
-                    activityToUpdate[0] = objectMapper.readValue(objectMapper.writeValueAsString(activity), Activity.class);
+                    activityToUpdate[0] = objectMapper.readValue(objectMapper.writeValueAsString(activity),
+                            Activity.class);
                 } catch (JsonProcessingException ex) {
                     ex.printStackTrace();
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).send("foo")
-          .send("update")
-            .assertReply("new response")
-          .startTest().join();
+        }).send("foo").send("update").assertReply("new response").startTest().join();
 
         PagedResult<Activity> pagedResult = null;
         try {
@@ -330,27 +319,25 @@ public class TranscriptStoreTests {
     @Test
     public void logMissingUpdateActivity() {
         TranscriptStore transcriptStore = getTranscriptStore();
-        ConversationReference conversation = TestAdapter
-            .createConversationReference(UUID.randomUUID().toString(), "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(conversation)
-            .use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] fooId = {new String()};
-        ObjectMapper objectMapper = new ObjectMapper()
-            .findAndRegisterModules();
+        ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
+                "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
+        final String[] fooId = { new String() };
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
         new TestFlow(adapter, turnContext -> {
             fooId[0] = turnContext.getActivity().getId();
             Activity updateActivity = null;
             try {
                 // clone the activity, so we can use it to do an update
-                updateActivity = objectMapper.readValue(objectMapper.writeValueAsString(turnContext.getActivity()), Activity.class);
+                updateActivity = objectMapper.readValue(objectMapper.writeValueAsString(turnContext.getActivity()),
+                        Activity.class);
             } catch (JsonProcessingException ex) {
                 ex.printStackTrace();
             }
             updateActivity.setText("updated response");
             ResourceResponse response = turnContext.updateActivity(updateActivity).join();
             return CompletableFuture.completedFuture(null);
-        }).send("foo")
-          .startTest().join();
+        }).send("foo").startTest().join();
 
         delay(3000);
 
@@ -374,11 +361,10 @@ public class TranscriptStoreTests {
     public void testDateLogUpdateActivities() {
         TranscriptStore transcriptStore = getTranscriptStore();
         OffsetDateTime dateTimeStartOffset1 = OffsetDateTime.now();
-        ConversationReference conversation = TestAdapter
-            .createConversationReference(UUID.randomUUID().toString(), "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(conversation)
-            .use(new TranscriptLoggerMiddleware(transcriptStore));
-        final Activity[] activityToUpdate = {null};
+        ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
+                "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
+        final Activity[] activityToUpdate = { null };
         new TestFlow(adapter, turnContext -> {
             if (turnContext.getActivity().getText().equals("update")) {
                 activityToUpdate[0].setText("new response");
@@ -392,16 +378,14 @@ public class TranscriptStoreTests {
                 ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
                 try {
                     // clone the activity, so we can use it to do an update
-                    activityToUpdate[0] = objectMapper.readValue(objectMapper.writeValueAsString(activity), Activity.class);
+                    activityToUpdate[0] = objectMapper.readValue(objectMapper.writeValueAsString(activity),
+                            Activity.class);
                 } catch (JsonProcessingException ex) {
                     ex.printStackTrace();
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).send("foo")
-          .send("update")
-                .assertReply("new response")
-          .startTest().join();
+        }).send("foo").send("update").assertReply("new response").startTest().join();
 
         try {
             TimeUnit.MILLISECONDS.sleep(5000);
@@ -410,11 +394,8 @@ public class TranscriptStoreTests {
         }
 
         // Perform some queries
-        PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities(
-            conversation.getChannelId(),
-            conversation.getConversation().getId(),
-            null,
-            dateTimeStartOffset1).join();
+        PagedResult<Activity> pagedResult = transcriptStore.getTranscriptActivities(conversation.getChannelId(),
+                conversation.getConversation().getId(), null, dateTimeStartOffset1).join();
         Assert.assertEquals(3, pagedResult.getItems().size());
         Assert.assertTrue(pagedResult.getItems().get(0).isType(ActivityTypes.MESSAGE));
         Assert.assertEquals("foo", pagedResult.getItems().get(0).getText());
@@ -424,11 +405,8 @@ public class TranscriptStoreTests {
         Assert.assertEquals("update", pagedResult.getItems().get(2).getText());
 
         // Perform some queries
-        pagedResult = transcriptStore.getTranscriptActivities(
-            conversation.getChannelId(),
-            conversation.getConversation().getId(),
-            null,
-            OffsetDateTime.MIN).join();
+        pagedResult = transcriptStore.getTranscriptActivities(conversation.getChannelId(),
+                conversation.getConversation().getId(), null, OffsetDateTime.MIN).join();
         Assert.assertEquals(3, pagedResult.getItems().size());
         Assert.assertTrue(pagedResult.getItems().get(0).isType(ActivityTypes.MESSAGE));
         Assert.assertEquals("foo", pagedResult.getItems().get(0).getText());
@@ -438,22 +416,19 @@ public class TranscriptStoreTests {
         Assert.assertEquals("update", pagedResult.getItems().get(2).getText());
 
         // Perform some queries
-        pagedResult = transcriptStore.getTranscriptActivities(
-            conversation.getChannelId(),
-            conversation.getConversation().getId(),
-            null,
-            OffsetDateTime.MAX).join();
+        pagedResult = transcriptStore.getTranscriptActivities(conversation.getChannelId(),
+                conversation.getConversation().getId(), null, OffsetDateTime.MAX).join();
         Assert.assertEquals(0, pagedResult.getItems().size());
     }
 
     @Test
     public void logDeleteActivities() {
         TranscriptStore transcriptStore = getTranscriptStore();
-        ConversationReference conversation = TestAdapter
-            .createConversationReference(UUID.randomUUID().toString(), "User1", "Bot");
-        TestAdapter adapter = new TestAdapter(conversation)
-            .use(new TranscriptLoggerMiddleware(transcriptStore));
-        final String[] activityId = {null};
+
+        ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
+                "User1", "Bot");
+        TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
+        final String[] activityId = { null };
         new TestFlow(adapter, turnContext -> {
             delay(500);
             if (turnContext.getActivity().getText().equals("deleteIt")) {
@@ -464,10 +439,7 @@ public class TranscriptStoreTests {
                 activityId[0] = response.getId();
             }
             return CompletableFuture.completedFuture(null);
-        }).send("foo")
-            .assertReply("response")
-          .send("deleteIt")
-          .startTest().join();
+        }).send("foo").assertReply("response").send("deleteIt").startTest().join();
 
         PagedResult<Activity> pagedResult = null;
         try {
@@ -504,19 +476,21 @@ public class TranscriptStoreTests {
     }
 
     /**
-     * There are some async oddities within TranscriptLoggerMiddleware that make it difficult to set a short delay when
-     * running this tests that ensures
-     * the TestFlow completes while also logging transcripts. Some tests will not pass without longer delays,
-     * but this method minimizes the delay required.
-     * @param conversation ConversationReference to pass to GetTranscriptActivitiesAsync()
-     *                     that contains ChannelId and Conversation.Id.
+     * There are some async oddities within TranscriptLoggerMiddleware that make it
+     * difficult to set a short delay when running this tests that ensures the
+     * TestFlow completes while also logging transcripts. Some tests will not pass
+     * without longer delays, but this method minimizes the delay required.
+     *
+     * @param conversation   ConversationReference to pass to
+     *                       GetTranscriptActivitiesAsync() that contains ChannelId
+     *                       and Conversation.Id.
      * @param expectedLength Expected length of pagedResult array.
-     * @param maxTimeout Maximum time to wait to retrieve pagedResult.
+     * @param maxTimeout     Maximum time to wait to retrieve pagedResult.
      * @return PagedResult.
      * @throws TimeoutException
      */
     private CompletableFuture<PagedResult<Activity>> getPagedResult(ConversationReference conversation,
-                                                                    Integer expectedLength, Integer maxTimeout) throws TimeoutException {
+            Integer expectedLength, Integer maxTimeout) throws TimeoutException {
         TranscriptStore transcriptStore = getTranscriptStore();
         if (maxTimeout == null) {
             maxTimeout = 5000;
@@ -527,39 +501,26 @@ public class TranscriptStoreTests {
             delay(500);
             try {
                 pagedResult = transcriptStore
-                    .getTranscriptActivities(conversation.getChannelId(), conversation.getConversation().getId()).join();
+                        .getTranscriptActivities(conversation.getChannelId(), conversation.getConversation().getId())
+                        .join();
                 if (pagedResult.getItems().size() >= expectedLength) {
                     break;
                 }
-            } catch (NoSuchElementException ex) { }
-            catch (NullPointerException e) { }
+            } catch (NoSuchElementException ex) {
+            } catch (NullPointerException e) {
+            }
         }
 
-        if(pagedResult == null) {
-            throw new TimeoutException("Unable to retrieve pagedResult in time");
+        if (pagedResult == null) {
+            return Async.completeExceptionally(new TimeoutException("Unable to retrieve pagedResult in time"));
         }
 
         return CompletableFuture.completedFuture(pagedResult);
     }
 
-    private static void assertEmulator() throws IOException, InterruptedException {
-        if (!checkEmulator()) {
-            Assert.fail(NO_EMULATOR_MESSAGE);
-        }
-    }
-
-    private  static Boolean checkEmulator() throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec
-            ("cmd /C \"" + System.getenv("ProgramFiles") + " (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\\AzureStorageEmulator.exe\" start");
-        int result = p.waitFor();
-        // status = 0: the service was started.
-        // status = -5: the service is already started. Only one instance of the application
-        // can be run at the same time.
-        return result == 0 || result == -5;
-    }
-
     /**
      * Time period delay.
+     *
      * @param delay Time to delay.
      */
     private void delay(Integer delay) {

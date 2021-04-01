@@ -137,13 +137,10 @@ public class MessageFactoryTests {
         String cardActionValue = UUID.randomUUID().toString();
         String cardActionTitle = UUID.randomUUID().toString();
 
-        CardAction ca = new CardAction() {
-            {
-                setType(ActionTypes.IM_BACK);
-                setValue(cardActionValue);
-                setTitle(cardActionTitle);
-            }
-        };
+        CardAction ca = new CardAction();
+        ca.setType(ActionTypes.IM_BACK);
+        ca.setValue(cardActionValue);
+        ca.setTitle(cardActionTitle);
 
         List<CardAction> cardActions = Collections.singletonList(ca);
 
@@ -178,24 +175,18 @@ public class MessageFactoryTests {
         String cardValue1 = UUID.randomUUID().toString();
         String cardTitle1 = UUID.randomUUID().toString();
 
-        CardAction cardAction1 = new CardAction() {
-            {
-                setType(ActionTypes.IM_BACK);
-                setValue(cardValue1);
-                setTitle(cardTitle1);
-            }
-        };
+        CardAction cardAction1 = new CardAction();
+        cardAction1.setType(ActionTypes.IM_BACK);
+        cardAction1.setValue(cardValue1);
+        cardAction1.setTitle(cardTitle1);
 
         String cardValue2 = UUID.randomUUID().toString();
         String cardTitle2 = UUID.randomUUID().toString();
 
-        CardAction cardAction2 = new CardAction() {
-            {
-                setType(ActionTypes.IM_BACK);
-                setValue(cardValue2);
-                setTitle(cardTitle2);
-            }
-        };
+        CardAction cardAction2 = new CardAction();
+        cardAction2.setType(ActionTypes.IM_BACK);
+        cardAction2.setValue(cardValue2);
+        cardAction2.setTitle(cardTitle2);
 
         List<CardAction> cardActions = Arrays.asList(cardAction1, cardAction2);
         Set<String> values = new HashSet<>(Arrays.asList(cardValue1, cardValue2));
@@ -238,11 +229,8 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment a = new Attachment() {
-            {
-                setName(attachmentName);
-            }
-        };
+        Attachment a = new Attachment();
+        a.setName(attachmentName);
 
         Activity message = MessageFactory.attachment(a, text, ssml, inputHint);
 
@@ -283,18 +271,12 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {
-            {
-                setName(attachmentName);
-            }
-        };
+        Attachment attachment1 = new Attachment();
+        attachment1.setName(attachmentName);
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {
-            {
-                setName(attachmentName2);
-            }
-        };
+        Attachment attachment2 = new Attachment();
+        attachment2.setName(attachmentName2);
 
         List<Attachment> multipleAttachments = Arrays.asList(attachment1, attachment2);
         Activity message = MessageFactory.carousel(multipleAttachments, text, ssml, inputHint);
@@ -324,18 +306,12 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName1 = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {
-            {
-                setName(attachmentName1);
-            }
-        };
+        Attachment attachment1 = new Attachment();
+        attachment1.setName(attachmentName1);
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {
-            {
-                setName(attachmentName2);
-            }
-        };
+        Attachment attachment2 = new Attachment();
+        attachment2.setName(attachmentName2);
 
         Set<Attachment> multipleAttachments = new HashSet<>(
             Arrays.asList(attachment1, attachment2)
@@ -368,18 +344,12 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName = UUID.randomUUID().toString();
-        Attachment a = new Attachment() {
-            {
-                setName(attachmentName);
-            }
-        };
+        Attachment a = new Attachment();
+        a.setName(attachmentName);
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment a2 = new Attachment() {
-            {
-                setName(attachmentName2);
-            }
-        };
+        Attachment a2 = new Attachment();
+        a2.setName(attachmentName2);
 
         List<Attachment> multipleAttachments = Arrays.asList(a, a2);
         Activity message = MessageFactory.attachment(multipleAttachments, text, ssml, inputHint);
@@ -409,18 +379,12 @@ public class MessageFactoryTests {
         InputHints inputHint = InputHints.EXPECTING_INPUT;
 
         String attachmentName1 = UUID.randomUUID().toString();
-        Attachment attachment1 = new Attachment() {
-            {
-                setName(attachmentName1);
-            }
-        };
+        Attachment attachment1 = new Attachment();
+        attachment1.setName(attachmentName1);
 
         String attachmentName2 = UUID.randomUUID().toString();
-        Attachment attachment2 = new Attachment() {
-            {
-                setName(attachmentName2);
-            }
-        };
+        Attachment attachment2 = new Attachment();
+        attachment2.setName(attachmentName2);
 
         Set<Attachment> multipleAttachments = new HashSet<>(
             Arrays.asList(attachment1, attachment2)
@@ -481,14 +445,12 @@ public class MessageFactoryTests {
 
         BotCallbackHandler replyWithimBackBack = turnContext -> {
             if (StringUtils.equals(turnContext.getActivity().getText(), "test")) {
+                CardAction card = new CardAction();
+                card.setType(ActionTypes.IM_BACK);
+                card.setText("red");
+                card.setTitle("redTitle");
                 Activity activity = MessageFactory.suggestedCardActions(
-                    Collections.singletonList(new CardAction() {
-                        {
-                            setType(ActionTypes.IM_BACK);
-                            setText("red");
-                            setTitle("redTitle");
-                        }
-                    }),
+                    Collections.singletonList(card),
                     "Select color"
                 );
 
@@ -534,18 +496,16 @@ public class MessageFactoryTests {
 
         BotCallbackHandler replyWithimBackBack = turnContext -> {
             if (StringUtils.equals(turnContext.getActivity().getText(), "test")) {
+                CardAction card = new CardAction();
+                card.setType(ActionTypes.IM_BACK);
+                card.setText("red");
+                card.setTitle("redTitle");
                 Activity activity = MessageFactory.suggestedCardActions(
-                    Collections.singletonList(new CardAction() {
-                        {
-                            setType(ActionTypes.IM_BACK);
-                            setText("red");
-                            setTitle("redTitle");
-                        }
-                    }),
+                    Collections.singletonList(card),
                     null
                 );
 
-                turnContext.sendActivity(activity);
+                turnContext.sendActivity(activity).join();
             }
             return CompletableFuture.completedFuture(null);
         };

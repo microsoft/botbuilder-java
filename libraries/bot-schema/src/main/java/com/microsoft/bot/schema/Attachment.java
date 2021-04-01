@@ -70,19 +70,17 @@ public class Attachment {
             return null;
         }
 
-        return new Attachment() {
-            {
-                setContentType(attachment.getContentType());
-                setContent(attachment.getContent());
-                setContentUrl(attachment.getContentUrl());
-                setName(attachment.getName());
-                setThumbnailUrl(attachment.getThumbnailUrl());
+        Attachment cloned = new Attachment();
+        cloned.setContentType(attachment.getContentType());
+        cloned.setContent(attachment.getContent());
+        cloned.setContentUrl(attachment.getContentUrl());
+        cloned.setName(attachment.getName());
+        cloned.setThumbnailUrl(attachment.getThumbnailUrl());
 
-                for (String key : attachment.getProperties().keySet()) {
-                    this.setProperties(key, attachment.getProperties().get(key));
-                }
-            }
-        };
+        for (String key : attachment.getProperties().keySet()) {
+            cloned.setProperties(key, attachment.getProperties().get(key));
+        }
+        return cloned;
     }
 
     /**

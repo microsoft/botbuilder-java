@@ -11,6 +11,7 @@ public final class TelemetryConstants {
 
     }
 
+    public static final String ATTACHMENTSPROPERTY = "attachments";
     public static final String CHANNELIDPROPERTY = "channelId";
     public static final String CONVERSATIONIDPROPERTY = "conversationId";
     public static final String CONVERSATIONNAMEPROPERTY = "conversationName";

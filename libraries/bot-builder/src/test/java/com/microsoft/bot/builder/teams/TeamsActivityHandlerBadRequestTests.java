@@ -21,23 +21,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TeamsActivityHandlerBadRequestTests {
     @Test
     public void TestFileConsentBadAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("fileConsent/invoke");
-                setValue(new FileConsentCardResponse() {
-                    {
-                        setAction("this.is.a.bad.action");
-                        setUploadInfo(new FileUploadInfo() {
-                            {
-                                setUniqueId("uniqueId");
-                                setFileType("fileType");
-                                setUploadUrl("uploadUrl");
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("fileConsent/invoke");
+        FileUploadInfo fileInfo = new FileUploadInfo();
+        fileInfo.setUniqueId("uniqueId");
+        fileInfo.setFileType("fileType");
+        fileInfo.setUploadUrl("uploadUrl");
+        FileConsentCardResponse fileConsentCard = new FileConsentCardResponse();
+        fileConsentCard.setAction("this.is.a.bad.action");
+        fileConsentCard.setUploadInfo(fileInfo);
+        activity.setValue(fileConsentCard);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 
@@ -60,16 +53,11 @@ public class TeamsActivityHandlerBadRequestTests {
 
     @Test
     public void TestMessagingExtensionSubmitActionPreviewBadAction() {
-        Activity activity = new Activity(ActivityTypes.INVOKE) {
-            {
-                setName("composeExtension/submitAction");
-                setValue(new MessagingExtensionAction() {
-                    {
-                        setBotMessagePreviewAction("this.is.a.bad.action");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.INVOKE);
+        activity.setName("composeExtension/submitAction");
+        MessagingExtensionAction action = new MessagingExtensionAction();
+        action.setBotMessagePreviewAction("this.is.a.bad.action");
+        activity.setValue(action);
 
         AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
 

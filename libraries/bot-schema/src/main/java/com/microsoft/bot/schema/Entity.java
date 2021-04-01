@@ -47,15 +47,13 @@ public class Entity implements EntitySerialization {
             return null;
         }
 
-        return new Entity() {
-            {
-                setType(entity.getType());
+        Entity cloned = new Entity();
+        cloned.setType(entity.getType());
+        for (String key : entity.getProperties().keySet()) {
+            cloned.setProperties(key, entity.getProperties().get(key));
+        }
 
-                for (String key : entity.getProperties().keySet()) {
-                    setProperties(key, entity.getProperties().get(key));
-                }
-            }
-        };
+        return cloned;
     }
 
     /**

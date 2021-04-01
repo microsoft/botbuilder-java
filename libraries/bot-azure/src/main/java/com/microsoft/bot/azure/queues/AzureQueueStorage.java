@@ -27,8 +27,10 @@ public class AzureQueueStorage extends QueueStorage {
 
     /**
      * Initializes a new instance of the {@link AzureQueueStorage} class.
+     * 
      * @param queuesStorageConnectionString Azure Storage connection string.
-     * @param queueName Name of the storage queue where entities will be queued.
+     * @param queueName                     Name of the storage queue where entities
+     *                                      will be queued.
      */
     public AzureQueueStorage(String queuesStorageConnectionString, String queueName) {
         if (StringUtils.isBlank(queuesStorageConnectionString)) {
@@ -39,27 +41,32 @@ public class AzureQueueStorage extends QueueStorage {
             throw new IllegalArgumentException("queueName is required.");
         }
 
-        queueClient = new QueueClientBuilder()
-            .connectionString(queuesStorageConnectionString)
-            .queueName(queueName)
-            .buildClient();
+        queueClient =
+            new QueueClientBuilder().connectionString(queuesStorageConnectionString).queueName(queueName).buildClient();
     }
 
     /**
-     * Queue an Activity to an Azure.Storage.Queues.QueueClient.
-     * The visibility timeout specifies how long the message should be invisible
-     * to Dequeue and Peek operations. The message content must be a UTF-8 encoded string that is up to 64KB in size.
-     * @param activity This is expected to be an {@link Activity} retrieved from a call to
-     *                 activity.GetConversationReference().GetContinuationActivity().
-     *                 This enables restarting the conversation using BotAdapter.ContinueConversationAsync.
+     * Queue an Activity to an Azure.Storage.Queues.QueueClient. The visibility
+     * timeout specifies how long the message should be invisible to Dequeue and
+     * Peek operations. The message content must be a UTF-8 encoded string that is
+     * up to 64KB in size.
+     * 
+     * @param activity          This is expected to be an {@link Activity} retrieved
+     *                          from a call to
+     *                          activity.GetConversationReference().GetContinuationActivity().
+     *                          This enables restarting the conversation using
+     *                          BotAdapter.ContinueConversationAsync.
      * @param visibilityTimeout Default value of 0. Cannot be larger than 7 days.
-     * @param timeToLive Specifies the time-to-live interval for the message.
-     * @return {@link SendMessageResult} as a Json string, from the QueueClient SendMessageAsync operation.
+     * @param timeToLive        Specifies the time-to-live interval for the message.
+     * @return {@link SendMessageResult} as a Json string, from the QueueClient
+     *         SendMessageAsync operation.
      */
     @Override
-    public CompletableFuture<String> queueActivity(Activity activity,
-                                                   @Nullable Duration visibilityTimeout,
-                                                   @Nullable Duration timeToLive) {
+    public CompletableFuture<String> queueActivity(
+        Activity activity,
+        @Nullable Duration visibilityTimeout,
+        @Nullable Duration timeToLive
+    ) {
         return CompletableFuture.supplyAsync(() -> {
             if (createQueueIfNotExists) {
                 try {
@@ -68,7 +75,8 @@ public class AzureQueueStorage extends QueueStorage {
                     throw new RuntimeException(e);
                 }
 
-                // This is an optimization flag to check if the container creation call has been made.
+                // This is an optimization flag to check if the container creation call has been
+                // made.
                 // It is okay if this is called more than once.
                 createQueueIfNotExists = false;
             }

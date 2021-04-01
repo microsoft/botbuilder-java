@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.builder.adapters.TestAdapter;
+import com.microsoft.bot.builder.adapters.TestFlow;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.Conversations;
@@ -19,6 +21,7 @@ import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.SimpleChannelProvider;
 import com.microsoft.bot.connector.authentication.SimpleCredentialProvider;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ActivityEventNames;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.CallerIdConstants;
 import com.microsoft.bot.schema.ConversationAccount;
@@ -32,6 +35,8 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +71,7 @@ public class BotFrameworkAdapterTests {
         final String ActivityIdValue = "SendActivityId";
         final String ConversationIdValue = "NewConversationId";
         final String TenantIdValue = "theTenantId";
-        final String EventActivityName = "CreateConversation";
+        final String EventActivityName = ActivityEventNames.CREATE_CONVERSATION;
 
         // so we can provide a mock ConnectorClient.
         class TestBotFrameworkAdapter extends BotFrameworkAdapter {
@@ -80,13 +85,11 @@ public class BotFrameworkAdapterTests {
                 AppCredentials usingAppCredentials
             ) {
                 Conversations conv = mock(Conversations.class);
+                ConversationResourceResponse response = new ConversationResourceResponse();
+                response.setActivityId(ActivityIdValue);
+                response.setId(ConversationIdValue);
                 when(conv.createConversation(any())).thenReturn(
-                    CompletableFuture.completedFuture(new ConversationResourceResponse() {
-                        {
-                            setActivityId(ActivityIdValue);
-                            setId(ConversationIdValue);
-                        }
-                    })
+                    CompletableFuture.completedFuture(response)
                 );
 
                 ConnectorClient client = mock(ConnectorClient.class);
@@ -106,28 +109,18 @@ public class BotFrameworkAdapterTests {
                 .set("id", JsonNodeFactory.instance.textNode(TenantIdValue))
         );
 
-        Activity activity = new Activity("Test") {
-            {
-                setChannelId(Channels.MSTEAMS);
-                setServiceUrl("https://fake.service.url");
-                setChannelData(channelData);
-                setConversation(new ConversationAccount() {
-                    {
-                        setTenantId(TenantIdValue);
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity("Test");
+        activity.setChannelId(Channels.MSTEAMS);
+        activity.setServiceUrl("https://fake.service.url");
+        activity.setChannelData(channelData);
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setTenantId(TenantIdValue);
+        activity.setConversation(conversation);
 
-        ConversationParameters parameters = new ConversationParameters() {
-            {
-                setActivity(new Activity() {
-                    {
-                        setChannelData(activity.getChannelData());
-                    }
-                });
-            }
-        };
+        Activity activityConversation = new Activity(ActivityTypes.MESSAGE);
+        activityConversation.setChannelData(activity.getChannelData());
+        ConversationParameters parameters = new ConversationParameters();
+        parameters.setActivity(activityConversation);
 
         ConversationReference reference = activity.getConversationReference();
         MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(null, null);
@@ -173,18 +166,14 @@ public class BotFrameworkAdapterTests {
         channelData.set("tenant", tenantId);
 
         Activity[] activity = new Activity[] {null};
-        sut.processActivity(mockClaims, new Activity("test") {
-            {
-                setChannelId(channelId);
-                setServiceUrl("https://smba.trafficmanager.net/amer/");
-                setChannelData(channelData);
-                setConversation(new ConversationAccount() {
-                    {
-                        setTenantId(conversationTenantId);
-                    }
-                });
-            }
-        }, (context) -> {
+        Activity activityTest = new Activity("test");
+        activityTest.setChannelId(channelId);
+        activityTest.setServiceUrl("https://smba.trafficmanager.net/amer/");
+        activityTest.setChannelData(channelData);
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setTenantId(conversationTenantId);
+        activityTest.setConversation(conversation);
+        sut.processActivity(mockClaims, activityTest, (context) -> {
             activity[0] = context.getActivity();
             return CompletableFuture.completedFuture(null);
         }).join();
@@ -197,14 +186,11 @@ public class BotFrameworkAdapterTests {
         CredentialProvider mockCredentials = mock(CredentialProvider.class);
         BotFrameworkAdapter adapter = new BotFrameworkAdapter(mockCredentials);
 
-        Activity incoming_activity = new Activity("test") {
-            {
-                setId("testid");
-                setChannelId(Channels.DIRECTLINE);
-                setServiceUrl("https://fake.service.url");
-                setConversation(new ConversationAccount("cid"));
-            }
-        };
+        Activity incoming_activity = new Activity("test");
+        incoming_activity.setId("testid");
+        incoming_activity.setChannelId(Channels.DIRECTLINE);
+        incoming_activity.setServiceUrl("https://fake.service.url");
+        incoming_activity.setConversation(new ConversationAccount("cid"));
 
         Activity reply = MessageFactory.text("test");
         reply.setId("TestReplyId");
@@ -267,20 +253,14 @@ public class BotFrameworkAdapterTests {
         int expectedAppCredentialsCount,
         int expectedClientCredentialsCount
     ) {
-        HashMap<String, String> claims = new HashMap<String, String>() {
-            {
-                put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
-                put(AuthenticationConstants.APPID_CLAIM, botAppId);
-                put(AuthenticationConstants.VERSION_CLAIM, "1.0");
-            }
-        };
+        HashMap<String, String> claims = new HashMap<String, String>();
+        claims.put(AuthenticationConstants.AUDIENCE_CLAIM, botAppId);
+        claims.put(AuthenticationConstants.APPID_CLAIM, botAppId);
+        claims.put(AuthenticationConstants.VERSION_CLAIM, "1.0");
         ClaimsIdentity identity = new ClaimsIdentity("anonymous", claims);
 
-        CredentialProvider credentialProvider = new SimpleCredentialProvider() {
-            {
-                setAppId(botAppId);
-            }
-        };
+        SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider();
+        credentialProvider.setAppId(botAppId);
         String serviceUrl = "https://smba.trafficmanager.net/amer/";
 
         BotFrameworkAdapter sut = new BotFrameworkAdapter(
@@ -311,12 +291,43 @@ public class BotFrameworkAdapterTests {
             return CompletableFuture.completedFuture(null);
         };
 
-        sut.processActivity(identity, new Activity("test") {
-            {
-                setChannelId(Channels.EMULATOR);
-                setServiceUrl(serviceUrl);
-            }
-        }, callback).join();
+        Activity activityTest = new Activity("test");
+        activityTest.setChannelId(Channels.EMULATOR);
+        activityTest.setServiceUrl(serviceUrl);
+        sut.processActivity(identity, activityTest, callback).join();
+    }
+
+    @Test
+    public void ShouldNotLogContinueConversation() {
+        TranscriptStore transcriptStore = new MemoryTranscriptStore();
+        TranscriptLoggerMiddleware sut = new TranscriptLoggerMiddleware(transcriptStore);
+
+        String conversationId = UUID.randomUUID().toString();
+        TestAdapter adapter = new TestAdapter(TestAdapter.createConversationReference(conversationId, "User1", "Bot"))
+            .use(sut);
+
+        Activity continueConversation = new Activity(ActivityTypes.EVENT);
+        continueConversation.setName(ActivityEventNames.CONTINUE_CONVERSATION);
+
+        new TestFlow(adapter, turnContext -> {
+            return turnContext.sendActivity("bar").thenApply(resourceResponse -> null);
+        })
+            .send("foo")
+            .assertReply(activity -> {
+                Assert.assertEquals("bar", activity.getText());
+                PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(activity.getChannelId(), conversationId).join();
+                Assert.assertEquals(2, activities.getItems().size());
+            })
+            .send(continueConversation)
+            .assertReply(activity -> {
+                // Ensure the event hasn't been added to the transcript.
+                PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(activity.getChannelId(), conversationId).join();
+
+                Assert.assertFalse(activities.getItems().stream().anyMatch(a -> a.isType(ActivityTypes.EVENT) && StringUtils
+                    .equals(a.getName(), ActivityEventNames.CONTINUE_CONVERSATION)));
+                Assert.assertEquals(3, activities.getItems().size());
+            })
+            .startTest().join();
     }
 
     private static void getAppCredentialsAndAssertValues(
@@ -385,13 +396,11 @@ public class BotFrameworkAdapterTests {
             return CompletableFuture.completedFuture(null);
         };
 
-        Activity inboundActivity = new Activity() {{
-            setType(ActivityTypes.MESSAGE);
-            setChannelId(Channels.EMULATOR);
-            setServiceUrl("http://tempuri.org/whatever");
-            setDeliveryMode(DeliveryModes.EXPECT_REPLIES.toString());
-            setText("hello world");
-        }};
+        Activity inboundActivity = new Activity(ActivityTypes.MESSAGE);
+        inboundActivity.setChannelId(Channels.EMULATOR);
+        inboundActivity.setServiceUrl("http://tempuri.org/whatever");
+        inboundActivity.setDeliveryMode(DeliveryModes.EXPECT_REPLIES.toString());
+        inboundActivity.setText("hello world");
 
         InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
 
@@ -418,14 +427,12 @@ public class BotFrameworkAdapterTests {
             return CompletableFuture.completedFuture(null);
         };
 
-        Activity inboundActivity = new Activity() {{
-            setType(ActivityTypes.MESSAGE);
-            setChannelId(Channels.EMULATOR);
-            setServiceUrl("http://tempuri.org/whatever");
-            setDeliveryMode(DeliveryModes.NORMAL.toString());
-            setText("hello world");
-            setConversation(new ConversationAccount("conversationId"));
-        }};
+        Activity inboundActivity = new Activity(ActivityTypes.MESSAGE);
+        inboundActivity.setChannelId(Channels.EMULATOR);
+        inboundActivity.setServiceUrl("http://tempuri.org/whatever");
+        inboundActivity.setDeliveryMode(DeliveryModes.NORMAL.toString());
+        inboundActivity.setText("hello world");
+        inboundActivity.setConversation(new ConversationAccount("conversationId"));
 
         InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
 
@@ -448,13 +455,11 @@ public class BotFrameworkAdapterTests {
             return CompletableFuture.completedFuture(null);
         };
 
-        Activity inboundActivity = new Activity() {{
-            setType(ActivityTypes.MESSAGE);
-            setChannelId(Channels.EMULATOR);
-            setServiceUrl("http://tempuri.org/whatever");
-            setText("hello world");
-            setConversation(new ConversationAccount("conversationId"));
-        }};
+        Activity inboundActivity = new Activity(ActivityTypes.MESSAGE);
+        inboundActivity.setChannelId(Channels.EMULATOR);
+        inboundActivity.setServiceUrl("http://tempuri.org/whatever");
+        inboundActivity.setText("hello world");
+        inboundActivity.setConversation(new ConversationAccount("conversationId"));
 
         InvokeResponse invokeResponse = adapter.processActivity((String) null, inboundActivity, callback).join();
 

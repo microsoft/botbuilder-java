@@ -8,6 +8,7 @@ import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnContextImpl;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.ChannelAccount;
@@ -41,17 +42,11 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberAdded1() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("b"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("b"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -64,18 +59,12 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberAdded2() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("a"));
-                        add(new ChannelAccount("b"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("a"));
+        members.add(new ChannelAccount("b"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -89,19 +78,13 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberAdded3() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("a"));
-                        add(new ChannelAccount("b"));
-                        add(new ChannelAccount("c"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("a"));
+        members.add(new ChannelAccount("b"));
+        members.add(new ChannelAccount("c"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -115,17 +98,11 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberRemoved1() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersRemoved(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("c"));
-                    }
-                });
-                setRecipient(new ChannelAccount("c"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("c"));
+        activity.setMembersRemoved(members);
+        activity.setRecipient(new ChannelAccount("c"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -138,18 +115,12 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberRemoved2() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersRemoved(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("a"));
-                        add(new ChannelAccount("c"));
-                    }
-                });
-                setRecipient(new ChannelAccount("c"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("a"));
+        members.add(new ChannelAccount("c"));
+        activity.setMembersRemoved(members);
+        activity.setRecipient(new ChannelAccount("c"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -163,19 +134,13 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberRemoved3() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersRemoved(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("a"));
-                        add(new ChannelAccount("b"));
-                        add(new ChannelAccount("c"));
-                    }
-                });
-                setRecipient(new ChannelAccount("c"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("a"));
+        members.add(new ChannelAccount("b"));
+        members.add(new ChannelAccount("c"));
+        activity.setMembersRemoved(members);
+        activity.setRecipient(new ChannelAccount("c"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -189,17 +154,11 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberAddedJustTheBot() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersAdded(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("b"));
-                    }
-                });
-                setRecipient(new ChannelAccount("b"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("b"));
+        activity.setMembersAdded(members);
+        activity.setRecipient(new ChannelAccount("b"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -212,17 +171,11 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestMemberRemovedJustTheBot() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.CONVERSATION_UPDATE);
-                setMembersRemoved(new ArrayList<ChannelAccount>() {
-                    {
-                        add(new ChannelAccount("c"));
-                    }
-                });
-                setRecipient(new ChannelAccount("c"));
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.CONVERSATION_UPDATE);
+        ArrayList<ChannelAccount> members = new ArrayList<ChannelAccount>();
+        members.add(new ChannelAccount("c"));
+        activity.setMembersRemoved(members);
+        activity.setRecipient(new ChannelAccount("c"));
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -240,21 +193,13 @@ public class TeamsActivityHandlerHidingTests {
         // sends separate activities each with a single add and a single remove.
 
         // Arrange
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.MESSAGE_REACTION);
-                setReactionsAdded(new ArrayList<MessageReaction>() {
-                    {
-                        add(new MessageReaction("sad"));
-                    }
-                });
-                setReactionsRemoved(new ArrayList<MessageReaction>() {
-                    {
-                        add(new MessageReaction("angry"));
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE_REACTION);
+        ArrayList<MessageReaction> reactionsAdded = new ArrayList<MessageReaction>();
+        reactionsAdded.add(new MessageReaction("sad"));
+        activity.setReactionsAdded(reactionsAdded);
+        ArrayList<MessageReaction> reactionsRemoved = new ArrayList<MessageReaction>();
+        reactionsRemoved.add(new MessageReaction("angry"));
+        activity.setReactionsRemoved(reactionsRemoved);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -269,12 +214,8 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestTokenResponseEventAsync() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.EVENT);
-                setName("tokens/response");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setName("tokens/response");
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -288,12 +229,8 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestEventAsync() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.EVENT);
-                setName("some.random.event");
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setName("some.random.event");
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -307,11 +244,7 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestEventNullNameAsync() {
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.EVENT);
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.EVENT);
 
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
@@ -325,12 +258,7 @@ public class TeamsActivityHandlerHidingTests {
 
     @Test
     public void TestUnrecognizedActivityType() {
-        Activity activity = new Activity() {
-            {
-                setType("shall.not.pass");
-            }
-        };
-
+        Activity activity = new Activity("shall.not.pass");
         TurnContext turnContext = new TurnContextImpl(new NotImplementedAdapter(), activity);
 
         TestActivityHandler bot = new TestActivityHandler();
@@ -346,7 +274,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             List<Activity> activities
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -354,7 +282,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             Activity activity
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
 
         @Override
@@ -362,7 +290,7 @@ public class TeamsActivityHandlerHidingTests {
             TurnContext context,
             ConversationReference reference
         ) {
-            throw new RuntimeException();
+            return Async.completeExceptionally(new RuntimeException());
         }
     }
 

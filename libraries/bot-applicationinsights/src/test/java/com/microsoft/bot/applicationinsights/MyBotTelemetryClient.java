@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
-public class MyBotTelemetryClient extends BotTelemetryClientImpl {
+public class MyBotTelemetryClient extends ApplicationInsightsBotTelemetryClient {
     public MyBotTelemetryClient(TelemetryClient telemetryClient) {
         super(telemetryClient);
     }

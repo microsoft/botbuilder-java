@@ -12,22 +12,14 @@ import com.microsoft.bot.schema.ConversationAccount;
 public final class TestUtilities {
     public static TurnContext createEmptyContext() {
         TestAdapter adapter = new TestAdapter();
-        Activity activity = new Activity() {
-            {
-                setType(ActivityTypes.MESSAGE);
-                setChannelId("EmptyContext");
-                setConversation(new ConversationAccount() {
-                    {
-                        setId("test");
-                    }
-                });
-                setFrom(new ChannelAccount() {
-                    {
-                        setId("empty@empty.context.org");
-                    }
-                });
-            }
-        };
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setChannelId("EmptyContext");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("test");
+        activity.setConversation(conversation);
+        ChannelAccount from = new ChannelAccount();
+        from.setId("empty@empty.context.org");
+        activity.setFrom(from);
 
         return new TurnContextImpl(adapter, activity);
     }

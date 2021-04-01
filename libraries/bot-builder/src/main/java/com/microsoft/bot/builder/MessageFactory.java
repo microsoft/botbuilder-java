@@ -135,14 +135,10 @@ public final class MessageFactory {
 
         List<CardAction> cardActions = new ArrayList<>();
         for (String action : actions) {
-            CardAction cardAction = new CardAction() {
-                {
-                    setType(ActionTypes.IM_BACK);
-                    setValue(action);
-                    setTitle(action);
-                }
-            };
-
+            CardAction cardAction = new CardAction();
+            cardAction.setType(ActionTypes.IM_BACK);
+            cardAction.setValue(action);
+            cardAction.setTitle(action);
             cardActions.add(cardAction);
         }
 
@@ -357,13 +353,10 @@ public final class MessageFactory {
             throw new IllegalArgumentException("contentType cannot be null or empty");
         }
 
-        Attachment attachment = new Attachment() {
-            {
-                setContentType(contentType);
-                setContentUrl(url);
-                setName(StringUtils.isEmpty(name) ? null : name);
-            }
-        };
+        Attachment attachment = new Attachment();
+        attachment.setContentType(contentType);
+        attachment.setContentUrl(url);
+        attachment.setName(StringUtils.isEmpty(name) ? null : name);
 
         return attachmentActivity(
             AttachmentLayoutTypes.LIST, Collections.singletonList(attachment), text, ssml, inputHint

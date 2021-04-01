@@ -14,22 +14,21 @@ import java.util.concurrent.CompletableFuture;
  * Enterprise channel auth validation.
  */
 public final class EnterpriseChannelValidation {
-    private static final TokenValidationParameters TOKENVALIDATIONPARAMETERS =
-        new TokenValidationParameters() {
-            {
-                this.validateIssuer = true;
-                this.validIssuers = new ArrayList<String>() {
-                    {
-                        add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
-                    }
-                };
-                this.validateAudience = false;
-                this.validateLifetime = true;
-                this.clockSkew =
-                    Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
-                this.requireSignedTokens = true;
-            }
-        };
+    private static TokenValidationParameters getTokenValidationParameters() {
+        TokenValidationParameters tokenValidationParamaters = new TokenValidationParameters();
+        tokenValidationParamaters.validateIssuer = true;
+
+        ArrayList<String> validIssuers = new ArrayList<String>();
+        validIssuers.add(AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER);
+        tokenValidationParamaters.validIssuers = validIssuers;
+
+        tokenValidationParamaters.validateAudience = false;
+        tokenValidationParamaters.validateLifetime = true;
+        tokenValidationParamaters.clockSkew = Duration.ofMinutes(AuthenticationConstants.DEFAULT_CLOCKSKEW_MINUTES);
+        tokenValidationParamaters.requireSignedTokens = true;
+
+        return tokenValidationParamaters;
+    }
 
     private EnterpriseChannelValidation() {
 
@@ -99,7 +98,7 @@ public final class EnterpriseChannelValidation {
 
             .thenCompose(channelService -> {
                 JwtTokenExtractor tokenExtractor = new JwtTokenExtractor(
-                    TOKENVALIDATIONPARAMETERS,
+                    getTokenValidationParameters(),
                     String.format(
                         AuthenticationConstants.TO_BOT_FROM_ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT,
                         channelService

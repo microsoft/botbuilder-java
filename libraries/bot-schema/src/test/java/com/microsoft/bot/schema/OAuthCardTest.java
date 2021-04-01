@@ -10,19 +10,19 @@ import org.junit.Test;
  * Tests to ensure the OAuthCard methods work as expected.
  */
 public class OAuthCardTest {
-    OAuthCard card = new OAuthCard(){
-        {
-            setText("Test OAuth Text");
-            setConnectionName("Test Connection Name");
-        }
-    };
+    OAuthCard getCard() {
+        OAuthCard card = new OAuthCard();
+        card.setText("Test OAuth Text");
+        card.setConnectionName("Test Connection Name");
+        return card;
+    }
 
     /**
      *Ensures that the OAuthCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.oauth", attachment.getContentType());
     }

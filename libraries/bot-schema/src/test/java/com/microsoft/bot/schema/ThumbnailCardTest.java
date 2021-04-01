@@ -10,22 +10,22 @@ import org.junit.Test;
  * Tests to ensure the ThumbnailCard methods work as expected.
  */
 public class ThumbnailCardTest {
-    ThumbnailCard card = new ThumbnailCard(){
-        {
-            setText("Test Thumbnail Text");
-            setTitle("Test Thumbnail Title");
-            setSubtitle("Test Thumbnail Subtitle");
-            setImage(new CardImage());
-            setTap(new CardAction());
-        }
-    };
+    ThumbnailCard getCard() {
+        ThumbnailCard card = new ThumbnailCard();
+        card.setText("Test Thumbnail Text");
+        card.setTitle("Test Thumbnail Title");
+        card.setSubtitle("Test Thumbnail Subtitle");
+        card.setImage(new CardImage());
+        card.setTap(new CardAction());
+        return card;
+    }
 
     /**
      *Ensures that the ThumbnailCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.thumbnail", attachment.getContentType());
     }

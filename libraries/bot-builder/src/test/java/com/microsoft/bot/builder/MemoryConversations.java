@@ -48,11 +48,9 @@ public class MemoryConversations implements Conversations {
         Activity activity
     ) {
         sentActivities.add(activity);
-        return CompletableFuture.completedFuture(new ResourceResponse() {
-            {
-                setId(activity.getId());
-            }
-        });
+        ResourceResponse response = new ResourceResponse();
+        response.setId(activity.getId());
+        return CompletableFuture.completedFuture(response);
     }
 
     @Override
@@ -69,11 +67,9 @@ public class MemoryConversations implements Conversations {
         Activity activity
     ) {
         sentActivities.add(activity);
-        return CompletableFuture.completedFuture(new ResourceResponse() {
-            {
-                setId(activity.getId());
-            }
-        });
+        ResourceResponse response = new ResourceResponse();
+        response.setId(activity.getId());
+        return CompletableFuture.completedFuture(response);
     }
 
     @Override

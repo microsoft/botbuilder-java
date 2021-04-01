@@ -34,11 +34,8 @@ public class ActivityTest {
     public void GetReplyConversationReference() {
         Activity activity = createActivity();
 
-        ResourceResponse reply = new ResourceResponse() {
-            {
-                setId("1234");
-            }
-        };
+        ResourceResponse reply = new ResourceResponse();
+        reply.setId("1234");
 
         ConversationReference conversationReference = activity.getReplyConversationReference(reply);
 
@@ -55,30 +52,22 @@ public class ActivityTest {
     public void ApplyConversationReference_isIncoming() {
         Activity activity = createActivity();
 
-        ConversationReference conversationReference = new ConversationReference() {
-            {
-                setChannelId("cr_123");
-                setServiceUrl("cr_serviceUrl");
-                setConversation(new ConversationAccount() {
-                    {
-                        setId("cr_456");
-                    }
-                });
-                setUser(new ChannelAccount() {
-                    {
-                        setId("cr_abc");
-                    }
-                });
-                setBot(new ChannelAccount() {
-                    {
-                        setId("cr_def");
-                    }
-                });
-                setActivityId("cr_12345");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
-                                    // tests stay in English
-            }
-        };
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setChannelId("cr_123");
+        conversationReference.setServiceUrl("cr_serviceUrl");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("cr_456");
+        conversationReference.setConversation(conversation);
+        ChannelAccount userAccount = new ChannelAccount();
+        userAccount.setId("cr_abc");
+        conversationReference.setUser(userAccount);
+        ChannelAccount botAccount = new ChannelAccount();
+        botAccount.setId("cr_def");
+        conversationReference.setBot(botAccount);
+        conversationReference.setActivityId("cr_12345");
+        // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+        // tests stay in English
+        conversationReference.setLocale("en-uS");
 
         activity.applyConversationReference(conversationReference, true);
 
@@ -96,30 +85,22 @@ public class ActivityTest {
     public void ApplyConversationReference() {
         Activity activity = createActivity();
 
-        ConversationReference conversationReference = new ConversationReference() {
-            {
-                setChannelId("123");
-                setServiceUrl("serviceUrl");
-                setConversation(new ConversationAccount() {
-                    {
-                        setId("456");
-                    }
-                });
-                setUser(new ChannelAccount() {
-                    {
-                        setId("abc");
-                    }
-                });
-                setBot(new ChannelAccount() {
-                    {
-                        setId("def");
-                    }
-                });
-                setActivityId("12345");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
-                                    // tests stay in English
-            }
-        };
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setChannelId("123");
+        conversationReference.setServiceUrl("serviceUrl");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("456");
+        conversationReference.setConversation(conversation);
+        ChannelAccount userAccount = new ChannelAccount();
+        userAccount.setId("abc");
+        conversationReference.setUser(userAccount);
+        ChannelAccount botAccount = new ChannelAccount();
+        botAccount.setId("def");
+        conversationReference.setBot(botAccount);
+        conversationReference.setActivityId("12345");
+        // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+        // tests stay in English
+        conversationReference.setLocale("en-uS");
 
         activity.applyConversationReference(conversationReference, false);
 
@@ -143,46 +124,35 @@ public class ActivityTest {
     }
 
     private Activity createActivity() {
-        ChannelAccount account1 = new ChannelAccount() {
-            {
-                setId("ChannelAccount_Id_1");
-                setName("ChannelAccount_Name_1");
-                setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
-                setRole(RoleTypes.USER);
-            }
-        };
+        ChannelAccount account1 = new ChannelAccount();
+        account1.setId("ChannelAccount_Id_1");
+        account1.setName("ChannelAccount_Name_1");
+        account1.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
+        account1.setRole(RoleTypes.USER);
 
-        ChannelAccount account2 = new ChannelAccount() {
-            {
-                setId("ChannelAccount_Id_2");
-                setName("ChannelAccount_Name_2");
-                setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
-                setRole(RoleTypes.USER);
-            }
-        };
+        ChannelAccount account2 = new ChannelAccount();
+        account2.setId("ChannelAccount_Id_2");
+        account2.setName("ChannelAccount_Name_2");
+        account2.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
+        account2.setRole(RoleTypes.USER);
 
-        ConversationAccount conversationAccount = new ConversationAccount() {
-            {
-                setConversationType("a");
-                setId("123");
-                setIsGroup(true);
-                setName("Name");
-                setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
-            }
-        };
+        ConversationAccount conversationAccount = new ConversationAccount();
+        conversationAccount.setConversationType("a");
+        conversationAccount.setId("123");
+        conversationAccount.setIsGroup(true);
+        conversationAccount.setName("Name");
+        conversationAccount.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
 
-        Activity activity = new Activity() {
-            {
-                setId("123");
-                setFrom(account1);
-                setRecipient(account2);
-                setConversation(conversationAccount);
-                setChannelId("ChannelId123");
-                setLocale("en-uS"); // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
-                                    // tests stay in English
-                setServiceUrl("ServiceUrl123");
-            }
-        };
+        Activity activity = new Activity();
+        activity.setId("123");
+        activity.setFrom(account1);
+        activity.setRecipient(account2);
+        activity.setConversation(conversationAccount);
+        activity.setChannelId("ChannelId123");
+        // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+        // tests stay in English
+        activity.setLocale("en-uS");
+        activity.setServiceUrl("ServiceUrl123");
 
         return activity;
     }
@@ -470,16 +440,12 @@ public class ActivityTest {
     public void GetMentions() {
         ArrayList<Entity> mentions = new ArrayList<Entity>();
 
-        mentions.add(new Entity() {
-            {
-                setType("mention");
-            }
-        });
-        mentions.add(new Entity() {
-            {
-                setType("reaction");
-            }
-        });
+        Entity mentionEntity = new Entity();
+        mentionEntity.setType("mention");
+        mentions.add(mentionEntity);
+        Entity reactionEntity = new Entity();
+        reactionEntity.setType("reaction");
+        mentions.add(reactionEntity);
 
         Activity activity = createActivity();
 

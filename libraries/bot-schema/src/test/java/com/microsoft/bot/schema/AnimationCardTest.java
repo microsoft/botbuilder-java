@@ -13,19 +13,20 @@ import org.junit.Test;
 public class AnimationCardTest {
     ArrayList<MediaUrl> media = new ArrayList<MediaUrl>();
 
-    AnimationCard card = new AnimationCard(){
-        {
-            setText("Test Animation Text");
-            setMedia(media);
-        }
-    };
+    AnimationCard getCard() {
+        AnimationCard card = new AnimationCard();
+        card.setText("Test Animation Text");
+        card.setMedia(media);
+        return card;
+    }
+
 
     /**
      *Ensures that the AnimationCard can be used as an attachment.
      */
     @Test
     public void testToAttachment() {
-        Attachment attachment = card.toAttachment();
+        Attachment attachment = getCard().toAttachment();
         Assert.assertNotNull(attachment);
         Assert.assertEquals("application/vnd.microsoft.card.animation", attachment.getContentType());
     }

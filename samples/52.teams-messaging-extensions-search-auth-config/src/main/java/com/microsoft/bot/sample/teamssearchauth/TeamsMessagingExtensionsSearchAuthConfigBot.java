@@ -81,16 +81,17 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
                 }
             }
 
-            return new MessagingExtensionResponse(new MessagingExtensionResult() {{
-                setType("config");
-                setSuggestedActions(new MessagingExtensionSuggestedAction() {{
-                    setAction(new CardAction() {{
-                        setType(ActionTypes.OPEN_URL);
-                        setValue(String.format("%s/searchSettings.html?settings=%s",
-                            siteUrl, escapedSettings.get()));
-                    }});
-                }});
-            }});
+            CardAction cardAction = new CardAction();
+            cardAction.setType(ActionTypes.OPEN_URL);
+            cardAction.setValue(String.format("%s/searchSettings.html?settings=%s", siteUrl, escapedSettings.get()));
+
+            MessagingExtensionSuggestedAction suggestedAction = new MessagingExtensionSuggestedAction();
+            suggestedAction.setAction(cardAction);
+
+            MessagingExtensionResult result = new MessagingExtensionResult();
+            result.setType("config");
+            result.setSuggestedActions(suggestedAction);
+            return new MessagingExtensionResponse(result);
         });
     }
 
@@ -137,37 +138,35 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
                 ObjectNode data = Serialization.createObjectNode();
                 data.set("data", Serialization.objectToTree(item));
 
-                ThumbnailCard previewCard = new ThumbnailCard() {{
-                    setTitle(item[0]);
-                    setTap(new CardAction() {{
-                        setType(ActionTypes.INVOKE);
-                        setValue(data);
-                    }});
-                }};
+                CardAction cardAction = new CardAction();
+                cardAction.setType(ActionTypes.INVOKE);
+                cardAction.setValue(data);
+                ThumbnailCard previewCard = new ThumbnailCard();
+                previewCard.setTitle(item[0]);
+                previewCard.setTap(cardAction);
 
                 if (!StringUtils.isEmpty(item[4])) {
-                    previewCard.setImage(new CardImage() {{
-                        setUrl(item[4]);
-                        setAlt("Icon");
-                    }});
+                    CardImage cardImage = new CardImage();
+                    cardImage.setUrl(item[4]);
+                    cardImage.setAlt("Icon");
+                    previewCard.setImage(cardImage);
                 }
 
-                MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
-                    setContentType(HeroCard.CONTENTTYPE);
-                    setContent(new HeroCard() {{
-                        setTitle(item[0]);
-                    }});
-                    setPreview(previewCard.toAttachment());
-                }};
+                HeroCard heroCard = new HeroCard();
+                heroCard.setTitle(item[0]);
+                MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+                attachment.setContentType(HeroCard.CONTENTTYPE);
+                attachment.setContent(heroCard);
+                attachment.setPreview(previewCard.toAttachment());
 
                 attachments.add(attachment);
             }
 
-            return new MessagingExtensionResponse(new MessagingExtensionResult() {{
-                setType("result");
-                setAttachmentLayout("list");
-                setAttachments(attachments);
-            }});
+            MessagingExtensionResult result = new MessagingExtensionResult();
+            result.setType("result");
+            result.setAttachmentLayout("list");
+            result.setAttachments(attachments);
+            return new MessagingExtensionResponse(result);
         });
     }
 
@@ -188,23 +187,26 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
             .thenCompose(response -> {
                 if (response == null || StringUtils.isEmpty(response.getToken())) {
                     // There is no token, so the user has not signed in yet.
+
                     return tokenProvider.getOAuthSignInLink(turnContext, connectionName)
-                        .thenApply(link -> new MessagingExtensionResponse() {{
-                            setComposeExtension(new MessagingExtensionResult() {{
-                                setType("auth");
-                                setSuggestedActions(
-                                    new MessagingExtensionSuggestedAction() {{
-                                        setAction(
-                                            new CardAction() {{
-                                                setType(ActionTypes.OPEN_URL);
-                                                setValue(link);
-                                                setTitle("Bot Service OAuth");
-                                            }}
-                                        );
-                                    }}
-                                );
-                            }});
-                        }});
+                        .thenApply(link -> {
+                            MessagingExtensionResponse extensionResponse = new MessagingExtensionResponse();
+                            CardAction cardAction = new CardAction();
+                            cardAction.setType(ActionTypes.OPEN_URL);
+                            cardAction.setValue(extensionResponse);
+                            cardAction.setTitle("Bot Service OAuth");
+
+                            MessagingExtensionSuggestedAction suggestedAction = new MessagingExtensionSuggestedAction();
+                            suggestedAction.setAction(cardAction);
+
+                            MessagingExtensionResult result = new MessagingExtensionResult();
+                            result.setType("auth");
+                            result.setSuggestedActions(suggestedAction);
+
+                            extensionResponse.setComposeExtension(result);
+
+                            return extensionResponse;
+                        });
                 }
 
                 String search = "";
@@ -223,33 +225,30 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
     ) {
         Map cardValue = (Map) query;
         List<String> data = (ArrayList) cardValue.get("data");
-        ThumbnailCard card = new ThumbnailCard() {{
-            setTitle(data.get(0));
-            setSubtitle(data.get(2));
-            setButtons(Arrays.asList(new CardAction() {{
-                setType(ActionTypes.OPEN_URL);
-                setTitle("Project");
-                setValue(data.get(3));
-            }}));
-        }};
-
+        CardAction cardAction = new CardAction();
+        cardAction.setType(ActionTypes.OPEN_URL);
+        cardAction.setTitle("Project");
+        cardAction.setValue(data.get(3));
+        ThumbnailCard card = new ThumbnailCard();
+        card.setTitle(data.get(0));
+        card.setSubtitle(data.get(2));
+        card.setButtons(Arrays.asList(cardAction));
+        
         if (!StringUtils.isEmpty(data.get(4))) {
-            card.setImage(new CardImage() {{
-                setUrl(data.get(4));
-                setAlt("Icon");
-            }});
+            CardImage cardImage = new CardImage();
+            cardImage.setUrl(data.get(4));
+            cardImage.setAlt("Icon");
+            card.setImage(cardImage);
         }
 
-        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment() {{
-            setContentType(ThumbnailCard.CONTENTTYPE);
-            setContent(card);
-        }};
+        MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+        attachment.setContentType(ThumbnailCard.CONTENTTYPE);
+        attachment.setContent(card);
 
-        MessagingExtensionResult composeExtension = new MessagingExtensionResult() {{
-            setType("result");
-            setAttachmentLayout("list");
-            setAttachments(Collections.singletonList(attachment));
-        }};
+        MessagingExtensionResult composeExtension = new MessagingExtensionResult();
+        composeExtension.setType("result");
+        composeExtension.setAttachmentLayout("list");
+        composeExtension.setAttachments(Collections.singletonList(attachment));
 
         return CompletableFuture.completedFuture(new MessagingExtensionResponse(composeExtension));
     }
@@ -269,20 +268,25 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
     ) {
         if (action.getCommandId().toUpperCase().equals("SIGNOUTCOMMAND")) {
             UserTokenProvider tokenProvider = (UserTokenProvider) turnContext.getAdapter();
+
             return tokenProvider.signOutUser(
                 turnContext,
                 connectionName,
                 turnContext.getActivity().getFrom().getId()
-            ).thenApply(response -> new MessagingExtensionActionResponse() {{
-                setTask(new TaskModuleContinueResponse() {{
-                    setValue(new TaskModuleTaskInfo() {{
-                        setCard(createAdaptiveCardAttachment());
-                        setHeight(200);
-                        setWidth(400);
-                        setTitle("Adaptive Card: Inputs");
-                    }});
-                }});
-            }});
+            ).thenApply(response -> {
+                TaskModuleTaskInfo taskInfo = new TaskModuleTaskInfo();
+                taskInfo.setCard(createAdaptiveCardAttachment());
+                taskInfo.setHeight(200);
+                taskInfo.setWidth(400);
+                taskInfo.setTitle("Adaptive Card: Inputs");
+
+                TaskModuleContinueResponse continueResponse = new TaskModuleContinueResponse();
+                continueResponse.setValue(taskInfo);
+
+                MessagingExtensionActionResponse actionResponse = new MessagingExtensionActionResponse();
+                actionResponse.setTask(continueResponse);
+                return actionResponse;
+            });
         }
 
         return notImplemented();
@@ -295,10 +299,10 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
         ) {
             String adaptiveCardJson = IOUtils.toString(input, StandardCharsets.UTF_8.toString());
 
-            return new Attachment() {{
-                setContentType("application/vnd.microsoft.card.adaptive");
-                setContent(Serialization.jsonToTree(adaptiveCardJson));
-            }};
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/vnd.microsoft.card.adaptive");
+            attachment.setContent(Serialization.jsonToTree(adaptiveCardJson));
+            return attachment;
         } catch (IOException e) {
             (LoggerFactory.getLogger(TeamsMessagingExtensionsSearchAuthConfigBot.class))
                 .error("Unable to createAdaptiveCardAttachment", e);
@@ -312,31 +316,35 @@ public class TeamsMessagingExtensionsSearchAuthConfigBot extends TeamsActivityHa
 
         List<MessagingExtensionAttachment> attachments = new ArrayList<>();
         for (Message msg : messages) {
-            attachments.add(new MessagingExtensionAttachment() {{
-                setContentType(HeroCard.CONTENTTYPE);
-                setContent(new HeroCard() {{
-                    setTitle(msg.from.emailAddress.address);
-                    setSubtitle(msg.subject);
-                    setText(msg.body.content);
-                }});
-                setPreview(new ThumbnailCard() {{
-                    setTitle(msg.from.emailAddress.address);
-                    setText(String.format("%s<br />%s", msg.subject, msg.bodyPreview));
-                    setImage(new CardImage() {{
-                        setUrl(
-                            "https://raw.githubusercontent.com/microsoft/botbuilder-samples/master/docs/media/OutlookLogo.jpg"
-                        );
-                        setAlt("Outlook logo");
-                    }});
-                }}.toAttachment());
-            }});
+
+            CardImage cardImage = new CardImage();
+            cardImage.setUrl("https://raw.githubusercontent.com/microsoft/botbuilder-samples/master/docs/media/OutlookLogo.jpg");
+            cardImage.setAlt("Outlook logo");
+
+            HeroCard heroCard = new HeroCard();
+            heroCard.setTitle(msg.from.emailAddress.address);
+            heroCard.setSubtitle(msg.subject);
+            heroCard.setText(msg.body.content);
+
+            ThumbnailCard thumbnailCard = new ThumbnailCard();
+            thumbnailCard.setTitle(msg.from.emailAddress.address);
+            thumbnailCard.setText(String.format("%s<br />%s", msg.subject, msg.bodyPreview));
+            thumbnailCard.setImage(cardImage);
+
+            MessagingExtensionAttachment attachment = new MessagingExtensionAttachment();
+            attachment.setContentType(HeroCard.CONTENTTYPE);
+            attachment.setContent(heroCard);
+            attachment.setPreview(thumbnailCard.toAttachment());
+
+            attachments.add(attachment);
         }
 
-        return new MessagingExtensionResult() {{
-            setType("result");
-            setAttachmentLayout("list");
-            setAttachments(attachments);
-        }};
+        MessagingExtensionResult result = new MessagingExtensionResult();
+        result.setType("result");
+        result.setAttachmentLayout("list");
+        result.setAttachments(attachments);
+
+        return result;
     }
 
     private CompletableFuture<List<String[]>> findPackages(String text) {

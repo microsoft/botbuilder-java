@@ -65,7 +65,8 @@ public class ActivityPromptTests {
         dialogs.add(eventPrompt);
 
         // Create mock Activity for testing.
-        Activity eventActivity = new Activity() { { setType(ActivityTypes.EVENT); setValue(2); }};
+        Activity eventActivity = new Activity(ActivityTypes.EVENT);
+        eventActivity.setValue(2);
 
         BotCallbackHandler botLogic = (turnContext -> {
             DialogContext dc =  dialogs.createContext(turnContext).join();

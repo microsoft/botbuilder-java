@@ -73,7 +73,7 @@ public class BotStateTests {
         Assert.assertEquals(1, readCount[0]);
         Assert.assertEquals(0, storeCount[0]);
 
-        propertyA.set(context, "there");
+        propertyA.set(context, "there").join();
         Assert.assertEquals(0, storeCount[0]); // Set on property should not bump
 
         userState.saveChanges(context).join();

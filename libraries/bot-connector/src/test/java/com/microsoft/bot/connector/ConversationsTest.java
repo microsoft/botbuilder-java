@@ -21,17 +21,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversation() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Create Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Create Conversation");
 
-        ConversationParameters params = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters params = new ConversationParameters();
+        params.setMembers(Collections.singletonList(user));
+        params.setBot(bot);
+        params.setActivity(activity);
 
         ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
 
@@ -41,18 +39,16 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithInvalidBot() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Create Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Create Conversation");
 
         bot.setId("invalid-id");
-        ConversationParameters params = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters params = new ConversationParameters();
+        params.setMembers(Collections.singletonList(user));
+        params.setBot(bot);
+        params.setActivity(activity);
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
@@ -70,17 +66,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithoutMembers() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Create Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Create Conversation");
 
-        ConversationParameters params = new ConversationParameters() {{
-            setMembers(Collections.<ChannelAccount>emptyList());
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters params = new ConversationParameters();
+        params.setMembers(Collections.<ChannelAccount>emptyList());
+        params.setBot(bot);
+        params.setActivity(activity);
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
@@ -98,17 +92,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void CreateConversationWithBotMember() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Create Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Create Conversation");
 
-        ConversationParameters params = new ConversationParameters() {{
-            setMembers(Collections.singletonList(bot));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters params = new ConversationParameters();
+        params.setMembers(Collections.singletonList(bot));
+        params.setBot(bot);
+        params.setActivity(activity);
 
         try {
             ConversationResourceResponse result = connector.getConversations().createConversation(params).join();
@@ -131,10 +123,9 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetConversationMembers() {
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -153,10 +144,9 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetConversationMembersWithInvalidConversationId() {
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -185,10 +175,9 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void GetConversationPagedMembers() {
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -210,17 +199,15 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void GetConversationPagedMembersWithInvalidConversationId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Get Activity Members");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Get Activity Members");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
+        createMessage.setActivity(activity);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -239,17 +226,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversation() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setName("activity");
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setName("activity");
+        activity.setText("TEST Send to Conversation");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -261,17 +246,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversationWithInvalidConversationId() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setName("activity");
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setName("activity");
+        activity.setText("TEST Send to Conversation");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -291,20 +274,18 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendToConversationWithInvalidBotId() {
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
         bot.setId("B21S8SG7K:T03CWQ0QB");
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setName("activity");
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setName("activity");
+        activity.setText("TEST Send to Conversation");
 
         try {
             ResourceResponse response = connector.getConversations().sendToConversation(conversation.getId(), activity).join();
@@ -321,11 +302,10 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void SendToConversationWithNullConversationId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Send to Conversation with null conversation id");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Send to Conversation with null conversation id");
 
         try {
             connector.getConversations().sendToConversation(null, activity).join();
@@ -349,39 +329,34 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void SendCardToConversation() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setName("activity");
-            setText("TEST Send Card to Conversation");
-            setAttachments(Arrays.asList(
-                new Attachment() {{
-                    setContentType("application/vnd.microsoft.card.hero");
-                    setContent(new HeroCard() {{
-                        setTitle("A static image");
-                        setSubtitle("JPEG image");
-                        setImages(Collections.singletonList(new CardImage() {{
-                            setUrl("https://docs.microsoft.com/en-us/bot-framework/media/designing-bots/core/dialogs-screens.png");
-                        }}));
-                    }});
-                }},
-                new Attachment() {{
-                    setContentType("application/vnd.microsoft.card.hero");
-                    setContent(new HeroCard() {{
-                        setTitle("An animation");
-                        setSubtitle("GIF image");
-                        setImages(Collections.singletonList(new CardImage() {{
-                            setUrl("http://i.giphy.com/Ki55RUbOV5njy.gif");
-                        }}));
-                    }});
-                }}
-            ));
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setName("activity");
+        activity.setText("TEST Send Card to Conversation");
+        CardImage imageJPEG = new CardImage();
+        imageJPEG.setUrl("https://docs.microsoft.com/en-us/bot-framework/media/designing-bots/core/dialogs-screens.png");
+        HeroCard heroCardJPEG = new HeroCard();
+        heroCardJPEG.setTitle("A static image");
+        heroCardJPEG.setSubtitle("JPEG image");
+        heroCardJPEG.setImages(Collections.singletonList(imageJPEG));
+        Attachment attachmentJPEG = new Attachment();
+        attachmentJPEG.setContentType("application/vnd.microsoft.card.hero");
+        attachmentJPEG.setContent(heroCardJPEG);
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        CardImage imageGIF = new CardImage();
+        imageGIF.setUrl("http://i.giphy.com/Ki55RUbOV5njy.gif");
+        HeroCard heroCardGIF = new HeroCard();
+        heroCardGIF.setTitle("An animation");
+        heroCardGIF.setSubtitle("GIF image");
+        heroCardGIF.setImages(Collections.singletonList(imageGIF));
+        Attachment attachmentGIF = new Attachment();
+        attachmentGIF.setContentType("application/vnd.microsoft.card.hero");
+        attachmentGIF.setContent(heroCardGIF);
+        activity.setAttachments(Arrays.asList(attachmentJPEG, attachmentGIF));
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -393,17 +368,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetActivityMembers() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Get Activity Members");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Get Activity Members");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
+        createMessage.setActivity(activity);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -422,17 +395,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void GetActivityMembersWithInvalidConversationId() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Get Activity Members");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Get Activity Members");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
+        createMessage.setActivity(activity);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -472,22 +443,19 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void ReplyToActivity() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Send to Conversation");
 
-        Activity reply = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Reply to Activity");
-        }};
+        Activity reply = new Activity(ActivityTypes.MESSAGE);
+        reply.setRecipient(user);
+        reply.setFrom(bot);
+        reply.setText("TEST Reply to Activity");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -501,22 +469,19 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void ReplyToActivityWithInvalidConversationId() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Send to Conversation");
 
-        Activity reply = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Reply to Activity");
-        }};
+        Activity reply = new Activity(ActivityTypes.MESSAGE);
+        reply.setRecipient(user);
+        reply.setFrom(bot);
+        reply.setText("TEST Reply to Activity");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -537,11 +502,10 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void ReplyToActivityWithNullConversationId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Reply activity with null conversation id");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Reply activity with null conversation id");
 
         try {
             connector.getConversations().replyToActivity(null, "id", activity).join();
@@ -553,11 +517,10 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void ReplyToActivityWithNullActivityId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Reply activity with null activity id");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Reply activity with null activity id");
 
         try {
             connector.getConversations().replyToActivity("id", null, activity).join();
@@ -579,16 +542,14 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void ReplyToActivityWithNullReply() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Reply activity with null reply");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Reply activity with null reply");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -605,17 +566,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivity() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Delete Activity");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Delete Activity");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
+        createMessage.setActivity(activity);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -627,17 +586,15 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void DeleteActivityWithInvalidConversationId() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Delete Activity");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Delete Activity");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-            setActivity(activity);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
+        createMessage.setActivity(activity);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -677,16 +634,14 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UpdateActivity() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Send to Conversation");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -703,16 +658,14 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UpdateActivityWithInvalidConversationId() {
 
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Send to Conversation");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Send to Conversation");
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
@@ -736,11 +689,10 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void UpdateActivityWithNullConversationId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Activity to be updated with null conversation Id");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Activity to be updated with null conversation Id");
 
         try {
             connector.getConversations().updateActivity(null, "id", activity).join();
@@ -752,11 +704,10 @@ public class ConversationsTest extends BotConnectorTestBase {
 
     @Test
     public void UpdateActivityWithNullActivityId() {
-        Activity activity = new Activity(ActivityTypes.MESSAGE) {{
-            setRecipient(user);
-            setFrom(bot);
-            setText("TEST Activity to be updated with null activity Id");
-        }};
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setRecipient(user);
+        activity.setFrom(bot);
+        activity.setText("TEST Activity to be updated with null activity Id");
 
         try {
             connector.getConversations().updateActivity("id", null, activity).join();
@@ -779,16 +730,14 @@ public class ConversationsTest extends BotConnectorTestBase {
     @Test
     public void UploadAttachment() {
 
-        AttachmentData attachment = new AttachmentData() {{
-            setName("bot-framework.png");
-            setType("image/png");
-            setOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
-        }};
+        AttachmentData attachment = new AttachmentData();
+        attachment.setName("bot-framework.png");
+        attachment.setType("image/png");
+        attachment.setOriginalBase64(encodeToBase64(new File(getClass().getClassLoader().getResource("bot-framework.png").getFile())));
 
-        ConversationParameters createMessage = new ConversationParameters() {{
-            setMembers(Collections.singletonList(user));
-            setBot(bot);
-        }};
+        ConversationParameters createMessage = new ConversationParameters();
+        createMessage.setMembers(Collections.singletonList(user));
+        createMessage.setBot(bot);
 
         ConversationResourceResponse conversation = connector.getConversations().createConversation(createMessage).join();
 
