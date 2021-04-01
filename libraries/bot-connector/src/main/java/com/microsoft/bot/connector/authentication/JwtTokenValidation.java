@@ -98,13 +98,7 @@ public final class JwtTokenValidation {
         return JwtTokenValidation.validateAuthHeader(
             authHeader, credentials, channelProvider, activity.getChannelId(),
             activity.getServiceUrl(), authConfig
-        )
-
-            .thenApply(identity -> {
-                // On the standard Auth path, we need to trust the URL that was incoming.
-                MicrosoftAppCredentials.trustServiceUrl(activity.getServiceUrl());
-                return identity;
-            });
+        );
     }
 
     /**

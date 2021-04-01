@@ -14,27 +14,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 
 public class MicrosoftAppCredentialsTests {
-    @Test
-    public void ValidUrlTrusted() {
-        MicrosoftAppCredentials.trustServiceUrl("https://goodurl.com");
-        Assert.assertTrue(MicrosoftAppCredentials.isTrustedServiceUrl("https://goodurl.com"));
-    }
-
-    @Test
-    public void InvalidUrlTrusted() {
-        MicrosoftAppCredentials.trustServiceUrl("badurl");
-        Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("badurl"));
-    }
-
-    @Test
-    public void TrustedUrlExpiration() throws InterruptedException {
-        // There is a +5 minute window for an expired url
-        MicrosoftAppCredentials.trustServiceUrl("https://goodurl.com", LocalDateTime.now().minusMinutes(6));
-        Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://goodurl.com"));
-
-        MicrosoftAppCredentials.trustServiceUrl("https://goodurl.com", LocalDateTime.now().minusMinutes(4));
-        Assert.assertTrue(MicrosoftAppCredentials.isTrustedServiceUrl("https://goodurl.com"));
-    }
 
     @Test
     public void ValidateAuthEndpoint() {

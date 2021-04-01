@@ -156,24 +156,6 @@ public class JwtTokenValidationTests {
     }
 
     /**
-     * Tests with a valid Token and service url; and ensures that Service url is added to Trusted service url list.
-     */
-    @Test
-    public void ChannelMsaHeaderValidServiceUrlShouldBeTrusted() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
-        Activity activity = new Activity(ActivityTypes.MESSAGE);
-        activity.setServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/");
-        JwtTokenValidation.authenticateRequest(
-            activity,
-            header,
-            credentials,
-            new SimpleChannelProvider()).join();
-
-        Assert.assertTrue(MicrosoftAppCredentials.isTrustedServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"));
-    }
-
-    /**
      * Tests with a valid Token and invalid service url; and ensures that Service url is NOT added to Trusted service url list.
      */
     @Test
@@ -192,7 +174,6 @@ public class JwtTokenValidationTests {
             Assert.fail("Should have thrown AuthenticationException");
         } catch (CompletionException e) {
             Assert.assertTrue(e.getCause() instanceof AuthenticationException);
-            Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://webchat.botframework.com/"));
         }
     }
 
@@ -255,26 +236,6 @@ public class JwtTokenValidationTests {
         } catch (CompletionException e) {
             Assert.assertTrue(e.getCause() instanceof AuthenticationException);
         }
-
-        Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://smba.trafficmanager.net/amer-client-ss.msg/"));
-    }
-
-    /**
-     * Tests with no authentication header and makes sure the service URL is not added to the trusted list.
-     */
-    @Test
-    public void ChannelAuthenticationDisabledServiceUrlShouldNotBeTrusted() throws ExecutionException, InterruptedException {
-        String header = "";
-        CredentialProvider credentials = new SimpleCredentialProvider("", "");
-
-        Activity activity = new Activity(ActivityTypes.MESSAGE);
-        activity.setServiceUrl("https://webchat.botframework.com/");
-        ClaimsIdentity identity = JwtTokenValidation.authenticateRequest(
-            activity,
-            header,
-            credentials,
-            new SimpleChannelProvider()).join();
-        Assert.assertFalse(MicrosoftAppCredentials.isTrustedServiceUrl("https://webchat.botframework.com/"));
     }
 
     @Test
