@@ -7,14 +7,10 @@ import com.microsoft.aad.msal4j.IAuthenticationResult;
 import com.microsoft.bot.restclient.credentials.ServiceClientCredentials;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Base abstraction for AAD credentials for auth and caching.
@@ -24,16 +20,6 @@ import java.util.concurrent.ConcurrentMap;
  * </p>
  */
 public abstract class AppCredentials implements ServiceClientCredentials {
-    private static final int EXPIRATION_SLACK = 5;
-    private static final int EXPIRATION_DAYS = 1;
-    private static ConcurrentMap<String, LocalDateTime> trustHostNames = new ConcurrentHashMap<>();
-
-    static {
-        trustHostNames.put("api.botframework.com", LocalDateTime.MAX);
-        trustHostNames.put("token.botframework.com", LocalDateTime.MAX);
-        trustHostNames.put("api.botframework.azure.us", LocalDateTime.MAX);
-        trustHostNames.put("token.botframework.azure.us", LocalDateTime.MAX);
-    }
 
     private String appId;
     private String authTenant;
@@ -60,73 +46,6 @@ public abstract class AppCredentials implements ServiceClientCredentials {
         authScope = StringUtils.isEmpty(withOAuthScope)
             ? AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
             : withOAuthScope;
-    }
-
-    /**
-     * Adds the host of service url to trusted hosts.
-     *
-     * @param serviceUrl The service URI.
-     */
-    public static void trustServiceUrl(String serviceUrl) {
-        trustServiceUrl(serviceUrl, LocalDateTime.now().plusDays(EXPIRATION_DAYS));
-    }
-
-    /**
-     * Adds the host of service url to trusted hosts with the specified expiration.
-     *
-     * <p>
-     * Note: The will fail to add if the url is not valid.
-     * </p>
-     *
-     * @param serviceUrl     The service URI.
-     * @param expirationTime The expiration time after which this service url is not
-     *                       trusted anymore.
-     */
-    public static void trustServiceUrl(String serviceUrl, LocalDateTime expirationTime) {
-        try {
-            URL url = new URL(serviceUrl);
-            trustServiceUrl(url, expirationTime);
-        } catch (MalformedURLException e) {
-            LoggerFactory.getLogger(MicrosoftAppCredentials.class).error("trustServiceUrl", e);
-        }
-    }
-
-    /**
-     * Adds the host of service url to trusted hosts with the specified expiration.
-     *
-     * @param serviceUrl     The service URI.
-     * @param expirationTime The expiration time after which this service url is not
-     *                       trusted anymore.
-     */
-    public static void trustServiceUrl(URL serviceUrl, LocalDateTime expirationTime) {
-        trustHostNames.put(serviceUrl.getHost(), expirationTime);
-    }
-
-    /**
-     * Checks if the service url is for a trusted host or not.
-     *
-     * @param serviceUrl The service URI.
-     * @return true if the service is trusted.
-     */
-    public static boolean isTrustedServiceUrl(String serviceUrl) {
-        try {
-            URL url = new URL(serviceUrl);
-            return isTrustedServiceUrl(url);
-        } catch (MalformedURLException e) {
-            LoggerFactory.getLogger(AppCredentials.class).error("trustServiceUrl", e);
-            return false;
-        }
-    }
-
-    /**
-     * Checks if the service url is for a trusted host or not.
-     *
-     * @param serviceUrl The service URI.
-     * @return true if the service is trusted.
-     */
-    public static boolean isTrustedServiceUrl(URL serviceUrl) {
-        return !trustHostNames.getOrDefault(serviceUrl.getHost(), LocalDateTime.MIN)
-            .isBefore(LocalDateTime.now().minusMinutes(EXPIRATION_SLACK));
     }
 
     /**
@@ -245,7 +164,7 @@ public abstract class AppCredentials implements ServiceClientCredentials {
         if (StringUtils.isBlank(getAppId()) || getAppId().equals(AuthenticationConstants.ANONYMOUS_SKILL_APPID)) {
             return false;
         }
-        return isTrustedServiceUrl(url);
+        return true;
     }
 
     // lazy Authenticator create.
