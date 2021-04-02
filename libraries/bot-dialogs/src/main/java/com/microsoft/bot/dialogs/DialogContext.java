@@ -167,14 +167,6 @@ public class DialogContext {
     }
 
     /**
-     * Gets the current DialogManager for this dialogContext.
-     * @return The root dialogManager that was used to create this dialog context chain.
-     */
-    public DialogManager getDialogManager() {
-        return getContext().getTurnState().get(DialogManager.class);
-    }
-
-    /**
      * Starts a new dialog and pushes it onto the dialog stack.
      * @param dialogId ID of the dialog to start.
      * @return If the task is successful, the result indicates whether the dialog is still
