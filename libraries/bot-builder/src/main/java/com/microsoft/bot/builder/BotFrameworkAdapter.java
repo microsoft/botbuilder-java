@@ -379,21 +379,11 @@ public class BotFrameworkAdapter extends BotAdapter
             context.getTurnState().add(BOT_IDENTITY_KEY, claimsIdentity);
             context.getTurnState().add(OAUTH_SCOPE_KEY, audience);
 
-            String appIdFromClaims = JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims());
-            return credentialProvider.isValidAppId(appIdFromClaims).thenCompose(isValidAppId -> {
-                // If we receive a valid app id in the incoming token claims, add the
-                // channel service URL to the trusted services list so we can send messages
-                // back.
-                if (!StringUtils.isEmpty(appIdFromClaims) && isValidAppId) {
-                    AppCredentials.trustServiceUrl(reference.getServiceUrl());
-                }
-
-                return createConnectorClient(reference.getServiceUrl(), claimsIdentity, audience)
-                    .thenCompose(connectorClient -> {
-                        context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
-                        return runPipeline(context, callback);
-                    });
-            });
+            return createConnectorClient(reference.getServiceUrl(), claimsIdentity, audience)
+                .thenCompose(connectorClient -> {
+                    context.getTurnState().add(CONNECTOR_CLIENT_KEY, connectorClient);
+                    return runPipeline(context, callback);
+                });
         } catch (Exception e) {
             pipelineResult.completeExceptionally(e);
         }
