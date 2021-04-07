@@ -25,13 +25,13 @@ import java.util.concurrent.CompletableFuture;
 public class BookingDialog extends CancelAndHelpDialog {
     private final String destinationStepMsgText = "Where would you like to travel to?";
     private final String originStepMsgText = "Where are you traveling from?";
-    
+
     /**
      * The constructor of the Booking Dialog class.
      */
     public BookingDialog() {
         super("BookingDialog");
-        
+
         addDialog(new TextPrompt("TextPrompt"));
         addDialog(new ConfirmPrompt("ConfirmPrompt"));
         addDialog(new DateResolverDialog(null));
@@ -42,13 +42,13 @@ public class BookingDialog extends CancelAndHelpDialog {
             this::confirmStep,
             this::finalStep
         };
-        
+
         addDialog(new WaterfallDialog("WaterfallDialog", Arrays.asList(waterfallSteps)));
-        
+
         // The initial child Dialog to run.
         setInitialDialogId("WaterfallDialog");
     }
-        
+
     private CompletableFuture<DialogTurnResult> destinationStep(WaterfallStepContext stepContext) {
         BookingDetails bookingDetails = (BookingDetails) stepContext.getOptions();
         if (bookingDetails.getDestination().isEmpty()) {
@@ -60,10 +60,10 @@ public class BookingDialog extends CancelAndHelpDialog {
             promptOptions.setPrompt(promptMessage);
             return stepContext.prompt("TextPrompt", promptOptions);
         }
-        
+
         return stepContext.next(bookingDetails.getDestination());
     }
-     
+
     private CompletableFuture<DialogTurnResult> originStep(WaterfallStepContext stepContext) {
         BookingDetails bookingDetails = (BookingDetails) stepContext.getOptions();
 

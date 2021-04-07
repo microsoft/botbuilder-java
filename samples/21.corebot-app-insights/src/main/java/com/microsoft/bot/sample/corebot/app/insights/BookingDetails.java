@@ -10,7 +10,7 @@ public class BookingDetails {
     private String destination;
     private String origin;
     private String travelDate;
-    
+
     /**
      * Gets the destination of the booking.
      *
@@ -19,7 +19,7 @@ public class BookingDetails {
     public String getDestination() {
         return destination;
     }
-    
+
         /**
      * Sets the destination of the booking.
      *
@@ -28,7 +28,7 @@ public class BookingDetails {
     public void setDestination(String withDestination) {
         destination = withDestination;
     }
-    
+
     /**
      * Gets the origin of the booking.
      *
@@ -37,7 +37,7 @@ public class BookingDetails {
     public String getOrigin() {
         return origin;
     }
-    
+
     /**
      * Sets the origin of the booking.
      *
@@ -46,7 +46,7 @@ public class BookingDetails {
     public void setOrigin(String withOrigin) {
         origin = withOrigin;
     }
-    
+
     /**
      * Gets the travel date of the booking.
      *
@@ -55,7 +55,7 @@ public class BookingDetails {
     public String getTravelDate() {
         return travelDate;
     }
-    
+
     /**
      * Sets the travel date of the booking.
      *
