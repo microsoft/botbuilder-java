@@ -116,6 +116,14 @@ public class SkillDialog extends Dialog {
      */
     @Override
     public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
+
+        Boolean interrupted = dc.getState().getValue(TurnPath.INTERRUPTED, false, Boolean.class);
+        if (interrupted) {
+            dc.getState().setValue(TurnPath.INTERRUPTED, false);
+            return resumeDialog(dc, DialogReason.END_CALLED);
+        }
+
+
         if (!onValidateActivity(dc.getContext().getActivity())) {
             return CompletableFuture.completedFuture(END_OF_TURN);
         }

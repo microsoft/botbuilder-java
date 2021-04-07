@@ -64,6 +64,34 @@ public class SkillConversationIdFactoryTests {
         Assert.assertNull(deletedConversationReference);
     }
 
+    @Test
+    public void IdIsUniqueEachTime() {
+        ConversationReference conversationReference = buildConversationReference();
+
+        // Create skill conversation
+        SkillConversationIdFactoryOptions options1 = new SkillConversationIdFactoryOptions();
+        options1.setActivity(buildMessageActivity(conversationReference));
+        options1.setBotFrameworkSkill(buildBotFrameworkSkill());
+        options1.setFromBotId(botId);
+        options1.setFromBotOAuthScope(botId);
+
+        String firstId = skillConversationIdFactory.createSkillConversationId(options1).join();
+
+
+        SkillConversationIdFactoryOptions options2 = new SkillConversationIdFactoryOptions();
+        options2.setActivity(buildMessageActivity(conversationReference));
+        options2.setBotFrameworkSkill(buildBotFrameworkSkill());
+        options2.setFromBotId(botId);
+        options2.setFromBotOAuthScope(botId);
+
+        String secondId = skillConversationIdFactory.createSkillConversationId(options2).join();
+
+        // Ensure that we get a different conversationId each time we call CreateSkillConversationIdAsync
+        Assert.assertNotEquals(firstId, secondId);
+    }
+
+
+
     private static ConversationReference buildConversationReference() {
         ConversationReference conversationReference = new ConversationReference();
         conversationReference.setConversation(new ConversationAccount(UUID.randomUUID().toString()));

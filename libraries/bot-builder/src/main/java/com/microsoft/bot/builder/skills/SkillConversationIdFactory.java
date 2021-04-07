@@ -5,6 +5,7 @@ package com.microsoft.bot.builder.skills;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.Storage;
@@ -51,9 +52,7 @@ public class SkillConversationIdFactory extends SkillConversationIdFactoryBase {
             Async.completeExceptionally(new IllegalArgumentException("options cannot be null."));
         }
         ConversationReference conversationReference = options.getActivity().getConversationReference();
-        String skillConversationId = String.format("%s-%s-%s-skillconvo",
-                conversationReference.getConversation().getId(), options.getBotFrameworkSkill().getId(),
-                conversationReference.getChannelId());
+        String skillConversationId = UUID.randomUUID().toString();
 
         SkillConversationReference skillConversationReference = new SkillConversationReference();
         skillConversationReference.setConversationReference(conversationReference);
