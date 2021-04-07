@@ -19,6 +19,7 @@ import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.connector.authentication.GovernmentAuthenticationConstants;
 import com.microsoft.bot.connector.authentication.SkillValidation;
 import com.microsoft.bot.dialogs.memory.DialogStateManager;
+import com.microsoft.bot.dialogs.memory.DialogStateManagerConfiguration;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.EndOfConversationCodes;
@@ -322,24 +323,25 @@ public abstract class Dialog {
         dialogSet.add(dialog);
 
         return dialogSet.createContext(turnContext)
-                .thenAccept(dialogContext -> innerRun(turnContext, dialog.getId(), dialogContext));
+                .thenAccept(dialogContext -> innerRun(turnContext, dialog.getId(), dialogContext, null));
     }
 
     /**
      * Shared implementation of run with Dialog and DialogManager.
      *
-     * @param turnContext   The turnContext.
-     * @param dialogId      The Id of the Dialog.
-     * @param dialogContext The DialogContext.
+     * @param turnContext        The turnContext.
+     * @param dialogId           The Id of the Dialog.
+     * @param dialogContext      The DialogContext.
+     * @param stateConfiguration The DialogStateManagerConfiguration.
      * @return A DialogTurnResult.
      */
     protected static CompletableFuture<DialogTurnResult> innerRun(TurnContext turnContext, String dialogId,
-            DialogContext dialogContext) {
+            DialogContext dialogContext, DialogStateManagerConfiguration stateConfiguration) {
         for (Entry<String, Object> entry : turnContext.getTurnState().getTurnStateServices().entrySet()) {
             dialogContext.getServices().replace(entry.getKey(), entry.getValue());
         }
 
-        DialogStateManager dialogStateManager = new DialogStateManager(dialogContext);
+        DialogStateManager dialogStateManager = new DialogStateManager(dialogContext, stateConfiguration);
         return dialogStateManager.loadAllScopes().thenCompose(result -> {
             dialogContext.getContext().getTurnState().add(dialogStateManager);
             DialogTurnResult dialogTurnResult = null;

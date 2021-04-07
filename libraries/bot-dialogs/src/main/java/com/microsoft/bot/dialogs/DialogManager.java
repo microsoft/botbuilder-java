@@ -254,7 +254,7 @@ public class DialogManager {
         // Create DialogContext
         DialogContext dc = new DialogContext(dialogs, context, dialogState);
 
-        return Dialog.innerRun(context, rootDialogId, dc).thenCompose(turnResult -> {
+        return Dialog.innerRun(context, rootDialogId, dc, getStateManagerConfiguration()).thenCompose(turnResult -> {
             return botStateSet.saveAllChanges(dc.getContext(), false).thenCompose(saveResult -> {
                 DialogManagerResult result = new DialogManagerResult();
                 result.setTurnResult(turnResult);
