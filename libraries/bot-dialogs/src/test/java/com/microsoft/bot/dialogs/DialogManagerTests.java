@@ -31,14 +31,20 @@ import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.builder.UserState;
 import com.microsoft.bot.builder.adapters.TestAdapter;
 import com.microsoft.bot.builder.adapters.TestFlow;
+import com.microsoft.bot.dialogs.memory.DialogStateManager;
+import com.microsoft.bot.dialogs.memory.DialogStateManagerConfiguration;
+import com.microsoft.bot.dialogs.memory.PathResolver;
+import com.microsoft.bot.dialogs.memory.scopes.MemoryScope;
 import com.microsoft.bot.dialogs.prompts.PromptOptions;
 import com.microsoft.bot.dialogs.prompts.TextPrompt;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
+import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.ResultPair;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -462,6 +468,44 @@ public class DialogManagerTests {
         Assert.assertEquals(DialogTurnStatus.EMPTY, _dmTurnResult.getTurnResult().getStatus());
     }
 
+    @Test
+    public void DialogManager_StateConfigurationTest() {
+                   // Arrange
+        WaterfallDialog dialog = new WaterfallDialog("test-dialog", null);
+
+        CustomMemoryScope memoryScope = new CustomMemoryScope();
+        CustomPathResolver pathResolver = new CustomPathResolver();
+
+        DialogManager dialogManager = new DialogManager(dialog, null);
+        dialogManager.setStateManagerConfiguration(new DialogStateManagerConfiguration());
+        dialogManager.getStateManagerConfiguration().getMemoryScopes().add(memoryScope);
+        dialogManager.getStateManagerConfiguration().getPathResolvers().add(pathResolver);
+
+        // The test dialog being used here happens to not send anything so we only need to mock the type.
+        TestAdapter adapter = new TestAdapter();
+
+        // ChannelId and Conversation.Id are required for ConversationState and
+        // ChannelId and From.Id are required for UserState.
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setChannelId("test-channel");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("test-conversation-id");
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId("test-id");
+        activity.setConversation(conversation);
+        activity.setFrom(channelAccount);
+
+        // Act
+        TurnContext turnContext = new TurnContextImpl(adapter, activity);
+        turnContext.getTurnState().add(new ConversationState(new MemoryStorage()));
+        dialogManager.onTurn(turnContext).join();
+        DialogStateManager actual = turnContext.getTurnState().get(DialogStateManager.class);
+
+        // Assert
+        Assert.assertTrue(actual.getConfiguration().getMemoryScopes().contains(memoryScope));
+        Assert.assertTrue(actual.getConfiguration().getPathResolvers().contains(pathResolver));
+    }
+
     private Dialog CreateTestDialog(String property) {
         return new AskForNameDialog(property.replace(".", ""), property);
     }
@@ -537,6 +581,33 @@ public class DialogManagerTests {
             }
             return next.get();
         }
+    }
+
+    private class CustomMemoryScope extends MemoryScope {
+        CustomMemoryScope() {
+            super("custom", false);
+        }
+
+        @Override
+        public Object getMemory(DialogContext dialogContext) {
+            throw new NotImplementedException("Not implemented");
+        }
+
+        @Override
+        public void setMemory(DialogContext dialogContext, Object memory) {
+            throw new NotImplementedException("Not implemented");
+        }
+    }
+
+    private class CustomPathResolver implements PathResolver {
+        CustomPathResolver() {
+        }
+
+        @Override
+        public String transformPath(String path) {
+            throw new NotImplementedException("Not implemented");
+        }
+
     }
 
     private class AskForNameDialog extends ComponentDialog implements DialogDependencies {
