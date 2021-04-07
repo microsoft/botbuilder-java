@@ -77,7 +77,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
     /**
      * Value indicating whether or not instance data should be included in response.
      */
-    private boolean includeInstanceData = false;
+    private boolean includeInstanceData = true;
 
     /**
      * Value indicating whether queries should be logged in LUIS. If queries should

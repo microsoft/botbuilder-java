@@ -195,14 +195,17 @@ public class TelemetryLoggerMiddleware implements Middleware {
     ) {
 
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put(TelemetryConstants.FROMIDPROPERTY, activity.getFrom().getId());
-        properties.put(
-            TelemetryConstants.CONVERSATIONNAMEPROPERTY,
-            activity.getConversation().getName()
-        );
-        properties.put(TelemetryConstants.LOCALEPROPERTY, activity.getLocale());
-        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, activity.getRecipient().getId());
-        properties.put(TelemetryConstants.RECIPIENTNAMEPROPERTY, activity.getRecipient().getName());
+        String fromId = activity.getFrom().getId() != null ? activity.getFrom().getId() : "";
+        properties.put(TelemetryConstants.FROMIDPROPERTY, fromId);
+        String conversationName =
+            activity.getConversation().getName() != null ? activity.getConversation().getName() : "";
+        properties.put(TelemetryConstants.CONVERSATIONNAMEPROPERTY, conversationName);
+        String activityLocale = activity.getLocale() != null ? activity.getLocale() : "";
+        properties.put(TelemetryConstants.LOCALEPROPERTY, activityLocale);
+        String recipientId = activity.getRecipient().getId() != null ? activity.getRecipient().getId() : "";
+        properties.put(TelemetryConstants.RECIPIENTIDPROPERTY, recipientId);
+        String recipientName = activity.getRecipient().getName() != null ? activity.getRecipient().getName() : "";
+        properties.put(TelemetryConstants.RECIPIENTNAMEPROPERTY, recipientName);
 
         // Use the LogPersonalInformation flag to toggle logging PII data, text and user
         // name are common examples
