@@ -16,7 +16,7 @@ public class TurnMemoryScope extends MemoryScope {
      * Initializes a new instance of the TurnMemoryScope class.
      */
     public TurnMemoryScope() {
-        super(ScopePath.TURN, true);
+        super(ScopePath.TURN, false);
     }
 
     /**
