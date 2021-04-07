@@ -3,8 +3,6 @@
 
 package com.microsoft.bot.applicationinsights;
 
-import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.telemetry.EventTelemetry;
 import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
@@ -26,19 +24,14 @@ import java.util.Map;
 
 public class BotTelemetryClientTests {
 
-    private BotTelemetryClient botTelemetryClient;
+    private ApplicationInsightsBotTelemetryClient botTelemetryClient;
     private TelemetryChannel mockTelemetryChannel;
 
     @Before
     public void initialize() {
+        botTelemetryClient = new ApplicationInsightsBotTelemetryClient("fakeKey");
         mockTelemetryChannel = Mockito.mock(TelemetryChannel.class);
-
-        TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
-        telemetryConfiguration.setInstrumentationKey("UNITTEST-INSTRUMENTATION-KEY");
-        telemetryConfiguration.setChannel(mockTelemetryChannel);
-        TelemetryClient telemetryClient = new TelemetryClient(telemetryConfiguration);
-
-        botTelemetryClient = new ApplicationInsightsBotTelemetryClient(telemetryClient);
+        botTelemetryClient.getTelemetryConfiguration().setChannel(mockTelemetryChannel);
     }
 
     @Test
@@ -49,16 +42,20 @@ public class BotTelemetryClientTests {
     }
 
     @Test
-    public void nonNullTelemetryClientSucceeds() {
-        TelemetryClient telemetryClient = new TelemetryClient();
+    public void emptyTelemetryClientThrows() {
+        Assert.assertThrows(IllegalArgumentException.class, () -> {
+            new ApplicationInsightsBotTelemetryClient("");
+        });
+    }
 
-        BotTelemetryClient botTelemetryClient = new ApplicationInsightsBotTelemetryClient(telemetryClient);
+    @Test
+    public void nonNullTelemetryClientSucceeds() {
+        BotTelemetryClient botTelemetryClient = new ApplicationInsightsBotTelemetryClient("fakeKey");
     }
 
     @Test
     public void overrideTest() {
-        TelemetryClient telemetryClient = new TelemetryClient();
-        MyBotTelemetryClient botTelemetryClient = new MyBotTelemetryClient(telemetryClient);
+        MyBotTelemetryClient botTelemetryClient = new MyBotTelemetryClient("fakeKey");
     }
 
     @Test
@@ -179,5 +176,14 @@ public class BotTelemetryClientTests {
             Assert.assertEquals("value", pageViewTelemetry.getProperties().get("hello"));
             Assert.assertEquals(0, Double.compare(0.6, pageViewTelemetry.getMetrics().get("metric")));
         }).send(Mockito.any(PageViewTelemetry.class));
+    }
+
+    @Test
+    public void flushTest() {
+        botTelemetryClient.flush();
+
+        Mockito.verify(mockTelemetryChannel, invocations -> {
+            Assert.assertEquals(1, invocations.getAllInvocations().size());
+        }).send(Mockito.any());
     }
 }
