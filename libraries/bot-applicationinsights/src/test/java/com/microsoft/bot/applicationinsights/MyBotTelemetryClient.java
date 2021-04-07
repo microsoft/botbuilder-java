@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.applicationinsights;
 
-import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.bot.builder.Severity;
 
 import java.time.Duration;
@@ -11,8 +10,8 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 public class MyBotTelemetryClient extends ApplicationInsightsBotTelemetryClient {
-    public MyBotTelemetryClient(TelemetryClient telemetryClient) {
-        super(telemetryClient);
+    public MyBotTelemetryClient(String instrumentationKey) {
+        super(instrumentationKey);
     }
 
     @Override

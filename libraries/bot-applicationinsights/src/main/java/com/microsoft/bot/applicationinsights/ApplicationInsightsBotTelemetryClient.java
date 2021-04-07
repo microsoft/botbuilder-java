@@ -4,6 +4,7 @@
 package com.microsoft.bot.applicationinsights;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.EventTelemetry;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.PageViewTelemetry;
@@ -12,6 +13,7 @@ import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
 import com.microsoft.bot.builder.BotTelemetryClient;
 import com.microsoft.bot.builder.Severity;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -26,17 +28,30 @@ import java.util.concurrent.ConcurrentMap;
 public class ApplicationInsightsBotTelemetryClient implements BotTelemetryClient {
 
     private final TelemetryClient telemetryClient;
+    private final TelemetryConfiguration telemetryConfiguration;
+
+    /**
+     * Provides access to the Application Insights configuration that is running here.
+     * Allows developers to adjust the options.
+     * @return Application insights configuration.
+     */
+    public TelemetryConfiguration getTelemetryConfiguration() {
+        return telemetryConfiguration;
+    }
 
     /**
      * Initializes a new instance of the {@link BotTelemetryClient}.
      *
-     * @param withTelemetryClient The telemetry client to forward bot events to.
+     * @param instrumentationKey The instrumentation key provided to create
+     *                           the {@link ApplicationInsightsBotTelemetryClient}.
      */
-    public ApplicationInsightsBotTelemetryClient(TelemetryClient withTelemetryClient) {
-        if (withTelemetryClient == null) {
-            throw new IllegalArgumentException("withTelemetry should be provided");
+    public ApplicationInsightsBotTelemetryClient(String instrumentationKey) {
+        if (StringUtils.isBlank(instrumentationKey)) {
+            throw new IllegalArgumentException("instrumentationKey should be provided");
         }
-        this.telemetryClient = withTelemetryClient;
+        this.telemetryConfiguration = TelemetryConfiguration.getActive();
+        telemetryConfiguration.setInstrumentationKey(instrumentationKey);
+        this.telemetryClient = new TelemetryClient(telemetryConfiguration);
     }
 
     /**
