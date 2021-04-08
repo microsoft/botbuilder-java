@@ -88,11 +88,6 @@
         <artifactId>json</artifactId>
         <version>20190722</version>
       </dependency>
-      <dependency>
-        <groupId>io.adaptivecards</groupId>
-        <artifactId>adaptivecards-android</artifactId>
-        <version>1.2.8</version>
-      </dependency>
     </dependencies>
 
   <profiles>
