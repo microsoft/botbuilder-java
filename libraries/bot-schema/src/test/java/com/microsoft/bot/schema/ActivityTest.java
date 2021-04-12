@@ -4,14 +4,20 @@
 package com.microsoft.bot.schema;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
+import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,6 +118,83 @@ public class ActivityTest {
         Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
         Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
         Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
+    }
+
+    @Test
+    public void ApplyConversationReferenceOverload() {
+        Activity activity = createActivity();
+
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setChannelId("123");
+        conversationReference.setServiceUrl("serviceUrl");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("456");
+        conversationReference.setConversation(conversation);
+        ChannelAccount userAccount = new ChannelAccount();
+        userAccount.setId("abc");
+        conversationReference.setUser(userAccount);
+        ChannelAccount botAccount = new ChannelAccount();
+        botAccount.setId("def");
+        conversationReference.setBot(botAccount);
+        conversationReference.setActivityId("12345");
+        // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
+        // tests stay in English
+        conversationReference.setLocale("en-uS");
+
+        activity.applyConversationReference(conversationReference);
+
+        Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
+        Assert.assertEquals(conversationReference.getLocale(), activity.getLocale());
+        Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
+        Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
+
+        Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
+        Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
+    }
+
+    @Test
+    public void ApplyConversationReferenceOverloadAlternatePaths() {
+        Activity activity = createActivity();
+
+        ConversationReference conversationReference = new ConversationReference();
+        conversationReference.setChannelId("123");
+        conversationReference.setServiceUrl("serviceUrl");
+        ConversationAccount conversation = new ConversationAccount();
+        conversation.setId("456");
+        conversationReference.setConversation(conversation);
+        ChannelAccount userAccount = new ChannelAccount();
+        userAccount.setId("abc");
+        conversationReference.setUser(userAccount);
+        ChannelAccount botAccount = new ChannelAccount();
+        botAccount.setId("def");
+        conversationReference.setBot(botAccount);
+        conversationReference.setActivityId(null);
+        conversationReference.setLocale(null);
+
+        activity.applyConversationReference(conversationReference, false);
+
+        Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
+        Assert.assertEquals("en-uS", activity.getLocale());
+        Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
+        Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
+
+        Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
+        Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
+
+        activity.applyConversationReference(conversationReference, true);
+
+        Assert.assertEquals(conversationReference.getChannelId(), activity.getChannelId());
+        Assert.assertEquals("en-uS", activity.getLocale());
+        Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
+        Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
+
+        Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
+        Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
+
+
     }
 
     @Test
@@ -240,6 +323,11 @@ public class ActivityTest {
             + "   \"eventType\":\"teamMemberAdded\", " + "   \"tenant\": {" + "     \"id\": \"tenant_id\"" + "   }"
             + " }" + "}";
 
+    private static final String serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId = "{ "
+            + " \"channelId\": \"msteams\", \"channelData\": { \"channel\": { \"id\": \"channel_id\", \"name\": "
+            + "\"channel_name\" }, \"team\": { \"id\": \"team_id\", \"name\": \"team_name\", \"aadGroupId\": "
+            + "\"aad_groupid\" }, \"eventType\": \"teamMemberAdded\", \"tenant\": { \"id\": \"tenant_id\" } } }";
+
     @Test
     public void GetInformationForMicrosoftTeams() throws JsonProcessingException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -264,6 +352,148 @@ public class ActivityTest {
         Assert.assertEquals(true, teamsChannelData.getNotification().getAlert());
         Assert.assertEquals("teamMemberAdded", teamsChannelData.getEventType());
         Assert.assertEquals("tenant_id", teamsChannelData.getTenant().getId());
+    }
+
+    @Test
+    public void GetTeamsChannelIdBadChannelData() {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+        String channelId = activity.teamsGetChannelId();
+        Assert.assertNull(channelId);
+    }
+
+    @Test
+    public void GetTeamsTeamIdBadChannelData() {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+        String channelId = activity.teamsGetTeamId();
+        Assert.assertNull(channelId);
+    }
+
+    @Test
+    public void GetTeamsTeamIdNullChannelData() {
+        Activity activity = new Activity();
+        String channelId = activity.teamsGetTeamId();
+        Assert.assertNull(channelId);
+    }
+
+    @Test
+    public void GetTeamsGetInfo() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+
+        Activity activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutTeamsChannelIdorTeamId, Activity.class);
+
+        TeamInfo teamsInfo = activity.teamsGetTeamInfo();
+        Assert.assertNotNull(teamsInfo);
+    }
+
+    @Test
+    public void GetTeamsGetInfoBadChannelData() {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+        TeamInfo teamInfo = activity.teamsGetTeamInfo();
+        Assert.assertNull(teamInfo);
+    }
+    @Test
+    public void TeamsNotifyUser() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId, Activity.class);
+
+        TeamsChannelData channelData = activity.teamsGetChannelData();
+        Assert.assertNull(channelData.getNotification());
+        activity.teamsNotifyUser();
+        Assert.assertNotNull(activity.teamsGetChannelData().getNotification());
+    }
+
+    @Test
+    public void TeamsNotifyUserBadChannelData() throws JsonProcessingException, IOException {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+
+        TeamsChannelData channelData = activity.teamsGetChannelData();
+        Assert.assertNull(channelData);
+        activity.teamsNotifyUser();
+        Assert.assertNotNull(activity.teamsGetChannelData().getNotification());
+    }
+
+    @Test
+    public void TeamsNotifyUserAlertInMeeting() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId, Activity.class);
+
+        TeamsChannelData channelData = activity.teamsGetChannelData();
+        Assert.assertNull(channelData.getNotification());
+        activity.teamsNotifyUser(true, "externalresourceURL");
+        Assert.assertNotNull(activity.teamsGetChannelData().getNotification());
+        Assert.assertEquals(activity.teamsGetChannelData().getNotification().getExternalResourceUrl(),
+                            "externalresourceURL");
+        Assert.assertTrue(activity.teamsGetChannelData().getNotification().getAlertInMeeting());
+    }
+
+    @Test
+    public void TeamsNotifyUserAlertInMeetingBadChannelData() throws JsonProcessingException, IOException {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+
+        Assert.assertNull(activity.teamsGetChannelData());
+        activity.teamsNotifyUser(true, "externalresourceURL");
+        Assert.assertNotNull(activity.teamsGetChannelData().getNotification());
+        Assert.assertEquals(activity.teamsGetChannelData().getNotification().getExternalResourceUrl(),
+                            "externalresourceURL");
+        Assert.assertTrue(activity.teamsGetChannelData().getNotification().getAlertInMeeting());
+    }
+
+
+    @Test
+    public void TeamsGetMeetingInfoNull() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId, Activity.class);
+
+        TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
+        Assert.assertNull(meetingInfo);
+    }
+
+    @Test
+    public void TeamsGetMeetingInfo() throws JsonProcessingException, IOException {
+        Activity activity = new Activity();
+        TeamsChannelData channelData = new TeamsChannelData();
+        TeamsMeetingInfo meeting = new TeamsMeetingInfo();
+        meeting.setId("meetingId");
+        channelData.setMeeting(meeting);
+        activity.setChannelData(channelData);
+
+        TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
+        Assert.assertNotNull(meetingInfo);
+        Assert.assertEquals(meetingInfo.getId(), "meetingId");
+    }
+
+    @Test
+    public void TeamsGetMeetingInfoBadChannelData() throws JsonProcessingException, IOException {
+        Activity activity = new Activity();
+        activity.setChannelData("badChannelData");
+
+        TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
+        Assert.assertNull(meetingInfo);
+    }
+
+
+    @Test
+    public void TeamsGetMeetingInfoNull() throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        Activity activity = objectMapper.readValue(
+            ActivityTest.serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId, Activity.class);
+
+        TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
+        Assert.assertNull(meetingInfo);
     }
 
     @Test
@@ -336,6 +566,16 @@ public class ActivityTest {
         Assert.assertEquals(activity.getValueType(), valueType);
         Assert.assertEquals(activity.getValue(), value);
         Assert.assertEquals(activity.getLabel(), label);
+
+        Activity secondActivity = Activity.createTraceActivity(name);
+        Assert.assertEquals(secondActivity.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(secondActivity.getName(), name);
+
+        Activity thirdActivity = Activity.createTraceActivity(name, null, value, label);
+        Assert.assertEquals(thirdActivity.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(thirdActivity.getName(), name);
+
+        Assert.assertTrue(thirdActivity.isType(ActivityTypes.TRACE));
     }
 
     @Test
@@ -363,6 +603,17 @@ public class ActivityTest {
         Assert.assertEquals(reply.getType(), ActivityTypes.MESSAGE);
         Assert.assertEquals(reply.getText(), text);
         Assert.assertEquals(reply.getLocale(), locale);
+
+        activity.setFrom(null);
+        activity.setRecipient(null);
+        activity.setConversation(null);
+        Activity reply2 = activity.createReply(text);
+        Assert.assertEquals(reply2.getType(), ActivityTypes.MESSAGE);
+        Assert.assertEquals(reply2.getText(), text);
+        Assert.assertEquals(reply2.getLocale(), "en-uS");
+        Assert.assertTrue(reply2.getFrom() != null);
+        Assert.assertTrue(reply2.getRecipient() != null);
+        Assert.assertTrue(reply2.getConversation() != null);
     }
 
     @Test
@@ -458,6 +709,13 @@ public class ActivityTest {
     }
 
     @Test
+    public void GetMentionsNull() {
+        Activity activity = createActivity();
+        activity.setEntities(null);
+        Assert.assertTrue(activity.getMentions() != null);
+    }
+
+    @Test
     public void CreateTrace() {
         Activity activity = createActivity();
 
@@ -473,6 +731,18 @@ public class ActivityTest {
         Assert.assertEquals(trace.getValue(), value);
         Assert.assertEquals(trace.getValueType(), valueType);
         Assert.assertEquals(trace.getLabel(), label);
+
+        Activity secondActivity = createActivity();
+        secondActivity.setRecipient(null);
+        secondActivity.setFrom(null);
+        Activity secondTrace = secondActivity.createTrace(name, value, null, label);
+        Assert.assertEquals(secondTrace.getType(), ActivityTypes.TRACE);
+        Assert.assertEquals(secondTrace.getName(), name);
+        Assert.assertEquals(secondTrace.getValue(), value);
+        Assert.assertEquals(secondTrace.getValueType(), value.getClass().getTypeName());
+        Assert.assertEquals(secondTrace.getLabel(), label);
+        Assert.assertTrue(secondTrace.getRecipient() != null);
+        Assert.assertTrue(secondTrace.getFrom() != null);
     }
 
     @Test
@@ -505,5 +775,459 @@ public class ActivityTest {
             activity.setServiceUrl(s);
             Assert.assertTrue(activity.isFromStreamingConnection());
         });
+    }
+
+    private JsonNode getTestNode() {
+        String json = "{ \"item1\" : \"value1\" } ";
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    @Test
+    public void ActivityCloneTest() throws JsonProcessingException {
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setAction("TestAction");
+
+        Attachment attachment = new Attachment();
+        attachment.setContentType("testContentType");
+        attachment.setContentUrl("testContentUrl");
+        attachment.setContent("testContent");
+        attachment.setName("testName");
+        attachment.setThumbnailUrl("testThumbnailUrl");
+        attachment.setProperties("testProperty", getTestNode());
+        activity.setAttachment(attachment);
+
+        activity.setCallerId("testCallerId");
+        activity.setChannelData("testChannelData");
+        activity.setCode(EndOfConversationCodes.BOT_TIMED_OUT);
+
+        ConversationAccount conversation = new ConversationAccount("testConversation");
+        activity.setConversation(conversation);
+
+        activity.setDeliveryMode("testDeliveryMode");
+
+        List<Entity> entityList = new ArrayList<Entity>();
+        Entity entity1 = new Entity();
+        entity1.setType("testEntity");
+        entityList.add(entity1);
+        activity.setEntities(entityList);
+
+        LocalDateTime expiration = LocalDateTime.now();
+        activity.setExpiration(expiration);
+
+        ChannelAccount fromChannel = new ChannelAccount("fromChannel");
+        activity.setFrom(fromChannel);
+
+        activity.setHistoryDisclosed(true);
+        activity.setId("testId");
+        activity.setImportance("testImportance");
+        activity.setInputHint(InputHints.ACCEPTING_INPUT);
+        activity.setLabel("testLabel");
+
+        List<String> listen = new ArrayList<String>();
+        listen.add("listen1");
+        listen.add("listen2");
+        activity.setListenFor(listen);
+
+        activity.setLocalTimeZone("testLocalTimeZone");
+        OffsetDateTime offsetDateTime = OffsetDateTime.now();
+        activity.setLocalTimestamp(offsetDateTime);
+        activity.setLocale("testLocale");
+
+        List<ChannelAccount> membersAdded = new ArrayList<ChannelAccount>();
+        ChannelAccount firstMember = new ChannelAccount("firstMember");
+        ChannelAccount secondMember = new ChannelAccount("secondMember");
+        membersAdded.add(firstMember);
+        membersAdded.add(secondMember);
+        activity.setMembersAdded(membersAdded);
+
+        List<ChannelAccount> membersRemoved = new ArrayList<ChannelAccount>();
+        ChannelAccount firstMemberRemoved = new ChannelAccount("firstMember");
+        ChannelAccount secondMemberRemoved = new ChannelAccount("secondMember");
+        membersRemoved.add(firstMemberRemoved);
+        membersRemoved.add(secondMemberRemoved);
+        activity.setMembersRemoved(membersRemoved);
+
+        List<Mention> mentions = new ArrayList<Mention>();
+        Mention firstMention = new Mention();
+        firstMention.setText("testTest");
+        firstMention.setMentioned(firstMember);
+        Mention secondMention = new Mention();
+        secondMention.setText("testTest");
+        secondMention.setMentioned(firstMember);
+        mentions.add(secondMention);
+        activity.setMentions(mentions);
+
+        activity.setName("testName");
+        activity.setProperties("testProperty", getTestNode());
+
+        List<MessageReaction> reactionsAdded = new ArrayList<MessageReaction>();
+        MessageReaction firstReaction = new MessageReaction();
+        firstReaction.setType("testType");
+        reactionsAdded.add(firstReaction);
+        MessageReaction secondReaction = new MessageReaction();
+        secondReaction.setType("testType");
+        reactionsAdded.add(secondReaction);
+        activity.setReactionsAdded(reactionsAdded);
+
+        List<MessageReaction> reactionsRemoved = new ArrayList<MessageReaction>();
+        MessageReaction firstReactionRemoved = new MessageReaction();
+        firstReactionRemoved.setType("testType");
+        reactionsRemoved.add(firstReactionRemoved);
+        MessageReaction secondReactionRemoved = new MessageReaction();
+        secondReactionRemoved.setType("testType");
+        reactionsRemoved.add(secondReactionRemoved);
+        activity.setReactionsRemoved(reactionsRemoved);
+
+        ChannelAccount recipientRemoved = new ChannelAccount();
+        recipientRemoved.setId("testRecipient");
+        activity.setRecipient(recipientRemoved);
+
+        ConversationReference relatesToReference = new ConversationReference();
+        relatesToReference.setActivityId("testActivityId");
+        activity.setRelatesTo(relatesToReference);
+
+        activity.setReplyToId("testReplyToId");
+        activity.setServiceUrl("testServiceUrl");
+        activity.setText("testText");
+        activity.setTextFormat(TextFormatTypes.MARKDOWN);
+
+        List<TextHighlight> textHighlights = new ArrayList<TextHighlight>();
+        TextHighlight firstTextHighlight = new TextHighlight();
+        firstTextHighlight.setText("testText");
+        textHighlights.add(firstTextHighlight);
+        TextHighlight secondTextHighlight = new TextHighlight();
+        secondTextHighlight.setText("testText");
+        textHighlights.add(secondTextHighlight);
+        activity.setTextHighlights(textHighlights);
+
+        OffsetDateTime timestamp = OffsetDateTime.now();
+        activity.setTimestamp(timestamp);
+
+        activity.setTopicName("testTopicName");
+        activity.setType("testType");
+        activity.setValue("testValue");
+        activity.setValueType("testValueType");
+
+        Activity clonedActivity = Activity.clone(activity);
+
+        Assert.assertEquals(activity.getAction(), clonedActivity.getAction());
+        Assert.assertEquals(activity.getCallerId(), clonedActivity.getCallerId());
+        Assert.assertEquals(activity.getChannelData(), clonedActivity.getChannelData());
+        Assert.assertEquals(activity.getDeliveryMode(), clonedActivity.getDeliveryMode());
+        Assert.assertEquals(activity.getId(), clonedActivity.getId());
+        Assert.assertEquals(activity.getImportance(), clonedActivity.getImportance());
+        Assert.assertEquals(activity.getLabel(), clonedActivity.getLabel());
+        Assert.assertEquals(activity.getLocalTimezone(), clonedActivity.getLocalTimezone());
+        Assert.assertEquals(activity.getLocale(), clonedActivity.getLocale());
+        Assert.assertEquals(activity.getName(), clonedActivity.getName());
+        Assert.assertEquals(activity.getReplyToId(), clonedActivity.getReplyToId());
+        Assert.assertEquals(activity.getServiceUrl(), clonedActivity.getServiceUrl());
+        Assert.assertEquals(activity.getSpeak(), clonedActivity.getSpeak());
+        Assert.assertEquals(activity.getSummary(), clonedActivity.getSummary());
+        Assert.assertEquals(activity.getText(), clonedActivity.getText());
+        Assert.assertEquals(activity.getTopicName(), clonedActivity.getTopicName());
+        Assert.assertEquals(activity.getType(), clonedActivity.getType());
+        Assert.assertEquals(activity.getValue(), clonedActivity.getValue());
+        Assert.assertEquals(activity.getValueType(), clonedActivity.getValueType());
+        Assert.assertEquals(activity.getAttachmentLayout(), clonedActivity.getAttachmentLayout());
+        Assert.assertEquals(activity.getAttachments().get(0).getName(),
+                            clonedActivity.getAttachments().get(0).getName());
+        Assert.assertEquals(activity.getChannelData(ChannelAccount.class).getId(),
+                            clonedActivity.getChannelData(ChannelAccount.class).getId());
+        Assert.assertEquals(activity.getCode(), clonedActivity.getCode());
+        Assert.assertEquals(activity.getConversation().getName(), clonedActivity.getConversation().getName());
+        Assert.assertEquals(activity.getConversationReference().getChannelId(),
+                            clonedActivity.getConversationReference().getChannelId());
+        Assert.assertEquals(activity.getEntities().get(0).getType(), clonedActivity.getEntities().get(0).getType());
+        Assert.assertEquals(activity.getExpiration(), clonedActivity.getExpiration());
+        Assert.assertEquals(activity.getFrom().getId(), clonedActivity.getFrom().getId());
+        Assert.assertEquals(activity.getInputHint(), clonedActivity.getInputHint());
+        Assert.assertEquals(activity.getListenFor(), clonedActivity.getListenFor());
+        Assert.assertEquals(activity.getLocalTimestamp(), clonedActivity.getLocalTimestamp());
+        Assert.assertEquals(activity.getMembersAdded().get(0).getId(), clonedActivity.getMembersAdded().get(0).getId());
+        Assert.assertEquals(activity.getMembersRemoved().get(0).getId(),
+                            clonedActivity.getMembersRemoved().get(0).getId());
+        Assert.assertEquals(activity.getMentions().get(0).getText(), clonedActivity.getMentions().get(0).getText());
+        Assert.assertEquals(activity.getProperties(), clonedActivity.getProperties());
+        Assert.assertEquals(activity.getReactionsAdded().get(0).getType(),
+                            clonedActivity.getReactionsAdded().get(0).getType());
+        Assert.assertEquals(activity.getReactionsRemoved().get(0).getType(),
+                            clonedActivity.getReactionsRemoved().get(0).getType());
+        Assert.assertEquals(activity.getRecipient().getId(), clonedActivity.getRecipient().getId());
+        Assert.assertEquals(activity.getRelatesTo().getActivityId(), clonedActivity.getRelatesTo().getActivityId());
+        // add activity.getReplyConversationReference(reply)
+        Assert.assertEquals(activity.getSuggestedActions(), clonedActivity.getSuggestedActions());
+        Assert.assertEquals(activity.getTextFormat(), clonedActivity.getTextFormat());
+        Assert.assertEquals(activity.getTextHighlights(), clonedActivity.getTextHighlights());
+        Assert.assertEquals(activity.getTimestamp(), clonedActivity.getTimestamp());
+    }
+
+    @Test
+    public void EnsureCloneAddsIdIfMissing() {
+        Activity testActivity = new Activity(ActivityTypes.COMMAND);
+        Assert.assertTrue(testActivity.getId() == null);
+        Activity clonedActivity = Activity.clone(testActivity);
+        Assert.assertTrue(clonedActivity.getId() != null);
+    }
+
+    @Test
+    public void TryGetChannelData() {
+        Activity activity = createActivity();
+        ResultPair<TeamsChannelData> channelData = activity.tryGetChannelData(
+            TeamsChannelData.class
+        );
+
+        activity.setChannelData(new TeamsChannelData());
+        channelData = activity.tryGetChannelData(
+            TeamsChannelData.class
+        );
+        Assert.assertTrue(channelData.getLeft());
+
+        activity.setChannelData(null);
+        Assert.assertNull(activity.teamsGetChannelData());
+    }
+
+    @Test
+    public void TryGetChannelDataBadChannelData() {
+        Activity activity = createActivity();
+        activity.setChannelData("badChannelData");
+        ResultPair<TeamsChannelData> channelData = activity.tryGetChannelData(
+            TeamsChannelData.class
+        );
+        Assert.assertFalse(channelData.getLeft());
+        Assert.assertNull(channelData.getRight());
+    }
+
+    @Test
+    public void RemoveRecipientMention() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "lastName";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+
+        String strippedActivityText = activity.removeRecipientMention();
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionImmutable() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "lastName";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+
+        String strippedActivityText = Activity.removeRecipientMentionImmutable(activity);
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionNoRecipient() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "<at>firstName</at> lastName\n";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+        activity.setRecipient(null);
+
+        String strippedActivityText = activity.removeRecipientMention();
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionImmutableNoRecipient() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "<at>firstName</at> lastName\n";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+        activity.setRecipient(null);
+
+        String strippedActivityText = Activity.removeRecipientMentionImmutable(activity);
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionText() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "<at>firstName</at>";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        mention.setText("lastName");
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+
+        String strippedActivityText = activity.removeRecipientMention();
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionTextNoId() {
+        Activity activity = createActivity();
+        activity.setText("<at>firstName</at> lastName\n");
+        String expectedStrippedName = "<at>firstName</at> lastName\n";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        mention.setText("lastName");
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+
+        String strippedActivityText = Activity.removeMentionTextImmutable(activity, null);
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+    @Test
+    public void RemoveRecipientMentionTextNoText() {
+        Activity activity = createActivity();
+        activity.setText("");
+        String expectedStrippedName = "";
+
+        List<Mention> mentionList = new ArrayList<Mention>();
+        Mention mention = new Mention();
+        mention.setText("lastName");
+        ChannelAccount channelAccount = new ChannelAccount();
+        channelAccount.setId(activity.getRecipient().getId());
+        channelAccount.setName("firstName");
+        mention.setMentioned(channelAccount);
+        mentionList.add(mention);
+        activity.setMentions(mentionList);
+
+        String strippedActivityText = Activity.removeMentionTextImmutable(activity, "lastName");
+        Assert.assertEquals(strippedActivityText, expectedStrippedName);
+    }
+
+
+    @Test
+    public void IsActivity() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+        activity.setType(ActivityTypes.COMMAND);
+
+        Assert.assertTrue(activity.isActivity(ActivityTypes.COMMAND));
+    }
+
+    @Test
+    public void IsActivityNoType() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+
+        Assert.assertFalse(activity.isActivity(ActivityTypes.COMMAND));
+    }
+
+    @Test
+    public void IsActivityExtendedType() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+        activity.setType("TestType/subtype");
+
+        Assert.assertTrue(activity.isActivity("TestType"));
+    }
+
+    @Test
+    public void IsActivityExtendedTypeNoMatch() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+        activity.setType("TestTypesubtype");
+
+        Assert.assertFalse(activity.isActivity("TestType"));
+    }
+
+    @Test
+    public void IsActivityNoMatch() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+        activity.setType("DifferentType");
+
+        Assert.assertFalse(activity.isActivity("TestType"));
+    }
+
+    @Test
+    public void IsActivityShorterTypeName() {
+        class MyActivity extends Activity {
+            @Override
+            public boolean isActivity(String activityType) {
+                return super.isActivity(activityType);
+            }
+        }
+
+        MyActivity activity = new MyActivity();
+        activity.setType("Test");
+
+        Assert.assertFalse(activity.isActivity("TestType"));
     }
 }
