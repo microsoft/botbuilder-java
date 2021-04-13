@@ -8,17 +8,27 @@ To get started building bots using the SDK, see the [Azure Bot Service Documenta
 
 For more information jump to a section below.
 
-* [Build status](#build-status)
-* [Getting started](#getting-started)
-* [Getting support and providing feedback](#getting-support-and-providing-feedback)
-* [Contributing and our code of conduct](#contributing-and-our-code-of-conduct)
-* [Reporting security sssues](#reporting-security-issues)
+- [!Bot Framework for Java](#)
+  - [Build Status](#build-status)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Clone](#clone)
+    - [Build and test locally](#build-and-test-locally)
+    - [Linting rules](#linting-rules)
+  - [Getting support and providing feedback](#getting-support-and-providing-feedback)
+    - [Github issues](#github-issues)
+    - [Stack overflow](#stack-overflow)
+    - [Azure Support](#azure-support)
+    - [Twitter](#twitter)
+    - [Gitter Chat Room](#gitter-chat-room)
+  - [Contributing and our code of conduct](#contributing-and-our-code-of-conduct)
+  - [Reporting Security Issues](#reporting-security-issues)
 
 ## Build Status
 
  | Branch | Description | Build Status | Coverage Status |
  |--------|-------------|--------------|-----------------|
- |Main | Preview 8 Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Java/BotBuilder-Java-4.0-daily?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=1202&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
+ |Main | 4.14.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Java/BotBuilder-Java-4.0-daily?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=1202&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
 
 ## Getting Started
 To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
