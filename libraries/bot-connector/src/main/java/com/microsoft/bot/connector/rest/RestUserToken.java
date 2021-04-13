@@ -71,7 +71,7 @@ public class RestUserToken implements UserToken {
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
         "x-ms-logging-context: com.microsoft.bot.schema.UserTokens exchangeToken" })
-        @GET("api/usertoken/GetToken")
+        @POST("api/usertoken/Exchange")
         CompletableFuture<Response<ResponseBody>> exchangeToken(
             @Query("userId") String userId,
             @Query("connectionName") String connectionName,
