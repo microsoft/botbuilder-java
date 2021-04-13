@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -20,8 +20,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <checkstyle.version>3.1.0</checkstyle.version>
     <pmd.version>3.14.0</pmd.version>
-    <repo.id>MyGet</repo.id>
-    <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url>
+    <!-- <repo.id>MyGet</repo.id> -->
+    <!-- <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url> -->
+    <!-- <repo.id>ossrh</repo.id> -->
+    <!-- <repo.url>https://oss.sonatype.org/content/repositories/snapshots/</repo.url> -->
   </properties>
 
   <licenses>
@@ -100,26 +102,26 @@
                   <goal>report</goal>
                 </goals>
               </execution>
-<!--              <execution>-->
-<!--                <id>default-check</id>-->
-<!--                <goals>-->
-<!--                  <goal>check</goal>-->
-<!--                </goals>-->
-<!--                <configuration>-->
-<!--                  <rules>-->
-<!--                    <rule>-->
-<!--                      <element>BUNDLE</element>-->
-<!--                      <limits>-->
-<!--                        <limit>-->
-<!--                          <counter>COMPLEXITY</counter>-->
-<!--                          <value>COVEREDRATIO</value>-->
-<!--                          <minimum>0.60</minimum>-->
-<!--                        </limit>-->
-<!--                      </limits>-->
-<!--                    </rule>-->
-<!--                  </rules>-->
-<!--                </configuration>-->
-<!--              </execution>-->
+              <!--              <execution>-->
+              <!--                <id>default-check</id>-->
+              <!--                <goals>-->
+              <!--                  <goal>check</goal>-->
+              <!--                </goals>-->
+              <!--                <configuration>-->
+              <!--                  <rules>-->
+              <!--                    <rule>-->
+              <!--                      <element>BUNDLE</element>-->
+              <!--                      <limits>-->
+              <!--                        <limit>-->
+              <!--                          <counter>COMPLEXITY</counter>-->
+              <!--                          <value>COVEREDRATIO</value>-->
+              <!--                          <minimum>0.60</minimum>-->
+              <!--                        </limit>-->
+              <!--                      </limits>-->
+              <!--                    </rule>-->
+              <!--                  </rules>-->
+              <!--                </configuration>-->
+              <!--              </execution>-->
             </executions>
           </plugin>
         </plugins>
@@ -420,27 +422,31 @@
     </dependencies>
   </dependencyManagement>
 
-  <repositories>
-    <repository>
-      <id>${repo.id}</id>
-      <url>${repo.url}</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+  <!--  <repositories>-->
+  <!--    <repository>-->
+  <!--      <id>${repo.id}</id>-->
+  <!--      <url>${repo.url}</url>-->
+  <!--      <releases>-->
+  <!--        <enabled>true</enabled>-->
+  <!--      </releases>-->
+  <!--      <snapshots>-->
+  <!--        <enabled>true</enabled>-->
+  <!--      </snapshots>-->
+  <!--    </repository>-->
+  <!--  </repositories>-->
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <name>Sonatype Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
     <repository>
-<!--      <id>ossrh</id>-->
-<!--      <url>https://oss.sonatype.org/</url>-->
-<!--      <id>MyGet</id>-->
-<!--      <url>${repo.url}</url>-->
-      <id>${repo.id}</id>
-      <url>${repo.url}</url>
+      <id>ossrh</id>
+      <name>Sonatype Releases</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+      <uniqueVersion>false</uniqueVersion>
     </repository>
   </distributionManagement>
 
