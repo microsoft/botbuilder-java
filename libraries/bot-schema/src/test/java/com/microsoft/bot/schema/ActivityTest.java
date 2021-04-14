@@ -190,11 +190,9 @@ public class ActivityTest {
         Assert.assertEquals(conversationReference.getServiceUrl(), activity.getServiceUrl());
         Assert.assertEquals(conversationReference.getConversation().getId(), activity.getConversation().getId());
 
-        Assert.assertEquals(conversationReference.getBot().getId(), activity.getFrom().getId());
-        Assert.assertEquals(conversationReference.getUser().getId(), activity.getRecipient().getId());
+        Assert.assertEquals(conversationReference.getUser().getId(), activity.getFrom().getId());
+        Assert.assertEquals(conversationReference.getBot().getId(), activity.getRecipient().getId());
         Assert.assertEquals(conversationReference.getActivityId(), activity.getReplyToId());
-
-
     }
 
     @Test
@@ -479,18 +477,6 @@ public class ActivityTest {
     public void TeamsGetMeetingInfoBadChannelData() throws JsonProcessingException, IOException {
         Activity activity = new Activity();
         activity.setChannelData("badChannelData");
-
-        TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
-        Assert.assertNull(meetingInfo);
-    }
-
-
-    @Test
-    public void TeamsGetMeetingInfoNull() throws JsonProcessingException, IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        Activity activity = objectMapper.readValue(
-            ActivityTest.serializedActivityFromTeamsWithoutNotificationTeamsChannelIdOrTeamId, Activity.class);
 
         TeamsMeetingInfo meetingInfo = activity.teamsGetMeetingInfo();
         Assert.assertNull(meetingInfo);
