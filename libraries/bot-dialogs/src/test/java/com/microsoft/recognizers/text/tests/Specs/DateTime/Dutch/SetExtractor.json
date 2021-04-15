@@ -1,0 +1,578 @@
+[
+  {
+    "Input": "Ik zal wekelijks vertrekken",
+    "Results": [
+      {
+        "Text": "wekelijks",
+        "Type": "set",
+        "Start": 7,
+        "Length": 9
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal dagelijks vertrekken",
+    "Results": [
+      {
+        "Text": "dagelijks",
+        "Type": "set",
+        "Start": 7,
+        "Length": 9
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke dag vertrekken",
+    "Results": [
+      {
+        "Text": "elke dag",
+        "Type": "set",
+        "Start": 7,
+        "Length": 8
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke maand vertrekken",
+    "Results": [
+      {
+        "Text": "elke maand",
+        "Type": "set",
+        "Start": 7,
+        "Length": 10
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal jaarlijks vertrekken",
+    "Results": [
+      {
+        "Text": "jaarlijks",
+        "Type": "set",
+        "Start": 7,
+        "Length": 9
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke twee dagen vertrekken",
+    "Results": [
+      {
+        "Text": "elke twee dagen",
+        "Type": "set",
+        "Start": 7,
+        "Length": 15
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke drie weken vertrekken",
+    "Results": [
+      {
+        "Text": "elke drie weken",
+        "Type": "set",
+        "Start": 7,
+        "Length": 15
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke dag om 15:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke dag om 15:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 17
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal iedere dag om 15:00 vertrekken",
+    "Results": [
+      {
+        "Text": "iedere dag om 15:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 19
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke 15/4 vertrekken",
+    "Results": [
+      {
+        "Text": "elke 15/4",
+        "Type": "set",
+        "Start": 7,
+        "Length": 9
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke maandag vertrekken",
+    "Results": [
+      {
+        "Text": "elke maandag",
+        "Type": "set",
+        "Start": 7,
+        "Length": 12
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke maandag om 16:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke maandag om 16:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 21
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke ochtend vertrekken",
+    "Results": [
+      {
+        "Text": "elke ochtend",
+        "Type": "set",
+        "Start": 7,
+        "Length": 12
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke ochtend om 09:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke ochtend om 09:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 21
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke middag om 16:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke middag om 16:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 20
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke dag om 21:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke dag om 21:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 17
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke avond om 9 uur vertrekken",
+    "Results": [
+      {
+        "Text": "elke avond om 9 uur",
+        "Type": "set",
+        "Start": 7,
+        "Length": 19
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik ga weg iedere ochtend om 9 uur",
+    "Results": [
+      {
+        "Text": "iedere ochtend om 9 uur",
+        "Type": "set",
+        "Start": 10,
+        "Length": 23
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik ga weg om 9 uur iedere ochtend",
+    "Results": [
+      {
+        "Text": "9 uur iedere ochtend",
+        "Type": "set",
+        "Start": 13,
+        "Length": 20
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik vertrek elke zondag ochtend om 9 uur",
+    "Results": [
+      {
+        "Text": "elke zondag ochtend om 9 uur",
+        "Type": "set",
+        "Start": 11,
+        "Length": 28
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke maandag om 09:00 vertrekken",
+    "Results": [
+      {
+        "Text": "elke maandag om 09:00",
+        "Type": "set",
+        "Start": 7,
+        "Length": 21
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal vertrekken om 9 uur 's ochtends elke maandag",
+    "Results": [
+      {
+        "Text": "9 uur 's ochtends elke maandag",
+        "Type": "set",
+        "Start": 21,
+        "Length": 30
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik zal elke zondag vertrekken",
+    "Results": [
+      {
+        "Text": "elke zondag",
+        "Type": "set",
+        "Start": 7,
+        "Length": 11
+      }
+    ],
+    "NotSupportedByDesign": "javascript,python,java"
+  },
+  {
+    "Input": "Ik vertrek wekelijks",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "wekelijks",
+        "Type": "set",
+        "Start": 11,
+        "Length": 9
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek dagelijks",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "dagelijks",
+        "Type": "set",
+        "Start": 11,
+        "Length": 9
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek elke dag",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke dag",
+        "Type": "set",
+        "Start": 11,
+        "Length": 8
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek elke maand",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke maand",
+        "Type": "set",
+        "Start": 11,
+        "Length": 10
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek jaarlijks",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "jaarlijks",
+        "Type": "set",
+        "Start": 11,
+        "Length": 9
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertek elke twee dagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke twee dagen",
+        "Type": "set",
+        "Start": 10,
+        "Length": 15
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere dag 15:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere dag 15:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 16
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek elke dag 15:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke dag 15:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 14
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek elke 15-4",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke 15-4",
+        "Type": "set",
+        "Start": 11,
+        "Length": 9
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere maandag",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere maandag",
+        "Type": "set",
+        "Start": 11,
+        "Length": 14
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek elke maandag 16:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "elke maandag 16:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 18
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere ochtend",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere ochtend",
+        "Type": "set",
+        "Start": 11,
+        "Length": 14
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere ochtend om 9:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere ochtend om 9:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 22
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere middag om 16:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere middag om 16:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 22
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere avond om 21:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere avond om 21:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 21
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek iedere avond om 9 uur",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "iedere avond om 9 uur",
+        "Type": "set",
+        "Start": 11,
+        "Length": 21
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek de ochtenden om 9:00",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "de ochtenden om 9:00",
+        "Type": "set",
+        "Start": 11,
+        "Length": 20
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek op ochtenden om 9 uur",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "op ochtenden om 9 uur",
+        "Type": "set",
+        "Start": 11,
+        "Length": 21
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek om 9 uur 's ochtends iedere zondag",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "9 uur 's ochtends iedere zondag",
+        "Type": "set",
+        "Start": 14,
+        "Length": 31
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek om 9 uur 's ochtends op maandagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "9 uur 's ochtends op maandagen",
+        "Type": "set",
+        "Start": 14,
+        "Length": 30
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek om 9:00 op maandagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "9:00 op maandagen",
+        "Type": "set",
+        "Start": 14,
+        "Length": 17
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek op maandagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "op maandagen",
+        "Type": "set",
+        "Start": 11,
+        "Length": 12
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek op zondagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "op zondagen",
+        "Type": "set",
+        "Start": 11,
+        "Length": 11
+      }
+    ]
+  },
+  {
+    "Input": "Ik vertrek zondagen",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "zondagen",
+        "Type": "set",
+        "Start": 11,
+        "Length": 8
+      }
+    ]
+  },
+  {
+    "Input": "Kan ik een boeking plaatsen voor de 9e van mei voor 2 nachten?",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "nachten",
+        "Type": "set",
+        "Start": 54,
+        "Length": 7
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "Input": "はmicrosoft.comです",
+    "Results": [
+      {
+        "Text": "microsoft.com",
+        "Start": 1,
+        "End": 13,
+        "TypeName": "url",
+        "Resolution": {
+          "value": "microsoft.com"
+        }
+      }
+    ]
+  }
+]

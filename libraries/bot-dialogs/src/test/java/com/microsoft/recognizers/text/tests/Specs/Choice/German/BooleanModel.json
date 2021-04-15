@@ -1,0 +1,185 @@
+[
+  {
+    "Input": "Ja klar!",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "Ja",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Ich denke nicht. Nein.",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "Nein",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.55
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Das sollte funktionieren, also mache ich es.",
+    "NotSupported": "dotnet",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "mache ich",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.571428571428571
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Nein. Ich sagte vierter Juli",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "Nein",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Ja... ich sagte keine Zwiebeln",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "Ja",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Ich sagte NEIN NICHT ja!",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "NEIN",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Ja. Ich sagte nein",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "Ja",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.55
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌 Alles klar",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌👌👌",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏾 Alles klar",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌🏾",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏿 Alles klar",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌🏿",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏻 Alles klar",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌🏻",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏼👌🏻👌🏽",
+    "NotSupportedByDesign": "python,java,javascript",
+    "Results": [
+      {
+        "Text": "👌🏼",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  }
+]
