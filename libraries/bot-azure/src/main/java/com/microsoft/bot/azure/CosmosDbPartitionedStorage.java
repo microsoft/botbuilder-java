@@ -22,7 +22,6 @@ import com.microsoft.azure.documentdb.PartitionKeyDefinition;
 import com.microsoft.azure.documentdb.RequestOptions;
 import com.microsoft.bot.builder.Storage;
 import com.microsoft.bot.builder.StoreItem;
-import com.microsoft.bot.connector.ExecutorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +134,7 @@ public class CosmosDbPartitionedStorage implements Storage {
             return CompletableFuture.completedFuture(new HashMap<>());
         }
 
-        return getCollection().thenApplyAsync(collection -> {
+        return getCollection().thenApply(collection -> {
             // Issue all of the reads at once
             List<CompletableFuture<Document>> documentFutures = new ArrayList<>();
             for (String key : keys) {
@@ -175,7 +174,7 @@ public class CosmosDbPartitionedStorage implements Storage {
             });
 
             return storeItems;
-        }, ExecutorFactory.getExecutor());
+        });
     }
 
     /**
@@ -196,7 +195,7 @@ public class CosmosDbPartitionedStorage implements Storage {
             return CompletableFuture.completedFuture(null);
         }
 
-        return getCollection().thenApplyAsync(collection -> {
+        return getCollection().thenApply(collection -> {
             for (Map.Entry<String, Object> change : changes.entrySet()) {
                 try {
                     ObjectNode node = objectMapper.valueToTree(change.getValue());
@@ -242,6 +241,9 @@ public class CosmosDbPartitionedStorage implements Storage {
 
                 } catch (JsonProcessingException | DocumentClientException e) {
                     logger.warn("Error upserting document: " + change.getKey(), e);
+                    if (e instanceof DocumentClientException) {
+                        throw new RuntimeException(e.getMessage());
+                    }
                 }
             }
 
@@ -265,7 +267,7 @@ public class CosmosDbPartitionedStorage implements Storage {
         return getCollection().thenCompose(collection -> Arrays.stream(keys).map(key -> {
             String escapedKey = CosmosDbKeyEscape
                 .escapeKey(key, cosmosDbStorageOptions.getKeySuffix(), cosmosDbStorageOptions.getCompatibilityMode());
-            return getDocumentById(escapedKey).thenApplyAsync(document -> {
+            return getDocumentById(escapedKey).thenApply(document -> {
                 if (document != null) {
                     try {
                         RequestOptions options = new RequestOptions();
@@ -279,7 +281,7 @@ public class CosmosDbPartitionedStorage implements Storage {
                 }
 
                 return null;
-            }, ExecutorFactory.getExecutor());
+            });
         }).collect(CompletableFutures.toFutureList()).thenApply(deleteResponses -> null));
     }
 
@@ -324,7 +326,6 @@ public class CosmosDbPartitionedStorage implements Storage {
                 return CompletableFuture.completedFuture(collectionCache);
             }
 
-            return CompletableFuture.supplyAsync(() -> {
                 // Get the collection if it exists.
                 List<DocumentCollection> collectionList = client.queryCollections(
                     getDatabase().getSelfLink(),
@@ -359,14 +360,12 @@ public class CosmosDbPartitionedStorage implements Storage {
                         throw new RuntimeException("getCollection", e);
                     }
                 }
-
-                return collectionCache;
-            }, ExecutorFactory.getExecutor());
+                return CompletableFuture.completedFuture(collectionCache);
         }
     }
 
     private CompletableFuture<Document> getDocumentById(String id) {
-        return getCollection().thenApplyAsync(collection -> {
+        return getCollection().thenApply(collection -> {
             // Retrieve the document using the DocumentClient.
             List<Document> documentList = client
                 .queryDocuments(collection.getSelfLink(), "SELECT * FROM root r WHERE r.id='" + id + "'", null)
@@ -378,7 +377,7 @@ public class CosmosDbPartitionedStorage implements Storage {
             } else {
                 return null;
             }
-        }, ExecutorFactory.getExecutor());
+        });
     }
 
     /**
