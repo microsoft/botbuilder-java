@@ -31,6 +31,7 @@ import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.ConversationAccount;
 import com.microsoft.bot.schema.InputHints;
 import com.microsoft.bot.schema.OAuthCard;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.SignInConstants;
 import com.microsoft.bot.schema.TokenExchangeInvokeRequest;
 import com.microsoft.bot.schema.TokenExchangeInvokeResponse;
@@ -292,7 +293,7 @@ public class OAuthPromptTests {
         value.setToken(exchangeToken);
         Activity activityToSend = new Activity(ActivityTypes.INVOKE);
         activityToSend.setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
-        activityToSend.setValue(value);
+        activityToSend.setValue(Serialization.objectToTree(value));
 
         new TestFlow(adapter, botCallbackHandler)
         .send("hello")
@@ -362,7 +363,7 @@ public class OAuthPromptTests {
         value.setToken(exchangeToken);
         Activity activityToSend = new Activity(ActivityTypes.INVOKE);
         activityToSend.setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
-        activityToSend.setValue(value);
+        activityToSend.setValue(Serialization.objectToTree(value));
 
         new TestFlow(adapter, botCallbackHandler)
         .send("hello")
