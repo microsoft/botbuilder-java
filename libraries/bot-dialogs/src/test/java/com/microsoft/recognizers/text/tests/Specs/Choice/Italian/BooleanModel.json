@@ -1,0 +1,282 @@
+[
+  {
+    "Input": "Certo!",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "Certo",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Sì",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "Sì",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Non credo. no.",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "no",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Penso dovrebbe funzionare. Si lo farò.",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "Si",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "Input": "no. Ho detto il quattro luglio",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "no",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "Input": "sì... ho detto niente cipolle",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "sì",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Ho detto NO non si!",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "NO",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "Si. Ho detto no",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "Si",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.55
+        }
+      }
+    ]
+  },
+  {
+    "Input": "non sono d'accordo, così non è ok",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "non è ok",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.625
+        }
+      }
+    ]
+  },
+  {
+    "Input": "d'accordo, è ok",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "d'accordo",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "sono d'accordo, non va bene",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "non va bene",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "falso",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "falso",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "non va bene",
+    "NotSupportedByDesign": "python,javascript",
+    "Results": [
+      {
+        "Text": "non va bene",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "niente affatto, staremo qui",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "niente affatto",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌 è ok",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌👌👌",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏾 è ok",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌🏾",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏿 è ok",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌🏿",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏻 è ok",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌🏻",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏼👌🏻👌🏽",
+    "NotSupportedByDesign": "python",
+    "Results": [
+      {
+        "Text": "👌🏼",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  }
+]

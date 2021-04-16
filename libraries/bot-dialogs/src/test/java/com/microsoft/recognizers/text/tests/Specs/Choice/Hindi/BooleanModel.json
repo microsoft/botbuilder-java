@@ -1,0 +1,254 @@
+[
+  {
+    "Input": "बिलकुल!",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "बिलकुल",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "मुझे ऐसा नहीं लगता. नहीं.",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "नहीं",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "मुझे लगता है यह काम कर जाएगा। तो हाँ मैं करुंगा।",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "हाँ",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.4545454545454546
+        }
+      }
+    ]
+  },
+  {
+    "Input": "ना. मैंने चार जुलाई कहा था",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "ना",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "Input": "हां... मैंने कहा था कोई प्याज़ नहीं",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "हां",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.4857142857142857
+        }
+      }
+    ]
+  },
+  {
+    "Input": "मैंने ना कहा था, हां नहीं!",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "ना",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "Input": "हां. मैंने ना कहा था",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "हां",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.52
+        }
+      }
+    ]
+  },
+  {
+    "Input": "असहमत, यह ठीक नहीं है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "ठीक नहीं",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.64
+        }
+      }
+    ]
+  },
+  {
+    "Input": "सहमत, यह ठीक है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "सहमत",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.55
+        }
+      }
+    ]
+  },
+  {
+    "Input": "सहमत, यह ठीक नहीं है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "ठीक नहीं",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.64
+        }
+      }
+    ]
+  },
+  {
+    "Input": "असहमत",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "असहमत",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "Input": "यह ठीक नहीं है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "ठीक नहीं",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": false,
+          "score": 0.7
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌 यह ठीक है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.55
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌👌👌",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏾 यह ठीक है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌🏾",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.64
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏿 यह ठीक है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌🏿",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.64
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏻 यह ठीक है",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌🏻",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.64
+        }
+      }
+    ]
+  },
+  {
+    "Input": "👌🏼👌🏻👌🏽",
+    "NotSupportedByDesign": "javascript,python,java",
+    "Results": [
+      {
+        "Text": "👌🏼",
+        "TypeName": "boolean",
+        "Resolution": {
+          "value": true,
+          "score": 0.6
+        }
+      }
+    ]
+  }
+]
