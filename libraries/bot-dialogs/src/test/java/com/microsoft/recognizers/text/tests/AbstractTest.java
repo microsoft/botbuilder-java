@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 @RunWith(Parameterized.class)
 public abstract class AbstractTest {
 
-    private static final String SpecsPath = "Specs/..";
+    private static final String SpecsPath = "./src/test/java/com/microsoft/recognizers/text/tests/Specs/..";
 
     private static final List<String> SupportedCultures = Arrays.asList("English", "Spanish", "Portuguese", "French", "German", "Chinese");
 
