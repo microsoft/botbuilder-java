@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
@@ -91,7 +92,7 @@ public class DialogStateManager implements Map<String, Object> {
         if (this.configuration == null) {
             this.configuration = new DialogStateManagerConfiguration();
 
-            Iterable<ComponentRegistration> components = ComponentRegistration.getComponents();
+            Iterable<Object> components = ComponentRegistration.getComponents();
 
             components.forEach((component) -> {
                 if (component instanceof ComponentMemoryScopes) {
@@ -166,7 +167,7 @@ public class DialogStateManager implements Map<String, Object> {
                     e.printStackTrace();
                 }
             } else {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(getBadScopeMessage(key));
             }
         }
     }
@@ -181,8 +182,10 @@ public class DialogStateManager implements Map<String, Object> {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null.");
         }
-        return configuration.getMemoryScopes().stream().filter((scope) -> scope.getName().equalsIgnoreCase(name))
-                .findFirst().get();
+        Optional<MemoryScope> result = configuration.getMemoryScopes().stream()
+                .filter((scope) -> scope.getName().equalsIgnoreCase(name))
+                .findFirst();
+        return result.isPresent() ? result.get() : null;
     }
 
     /**
@@ -807,12 +810,13 @@ public class DialogStateManager implements Map<String, Object> {
 
     @Override
     public final Object put(String key, Object value) {
-        return null;
+        setElement(key, value);
+        return value;
     }
 
     @Override
     public final Object remove(Object key) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
