@@ -473,6 +473,247 @@ public class DialogStateManagerTests {
             .startTest().join();
     }
 
+    @Test
+    public void TestNestedContainerDialogs() {
+         createFlow(new NestedContainerDialog(), null, null, false)
+            .sendConversationUpdate()
+            .assertReply("testDialog")
+            .assertReply("testDialog")
+            .assertReply("nested d1")
+            .assertReply("nested d1")
+            .assertReply("testDialog")
+            .assertReply("testDialog")
+            .assertReply("nested d2")
+            .startTest()
+            .join();
+    }
+
+    @Test
+    public void TestExpressionSet() {
+         createDialogContext(dc -> {
+            dc.getState().setValue("turn.x.y.z", null);
+            Assert.assertNull(dc.getState().getValue("turn.x.y.z", null, Object.class));
+            return CompletableFuture.completedFuture(null);
+        }).startTest();
+    }
+
+    @Test
+    public void TestConversationResetOnException() {
+        MemoryStorage storage = new MemoryStorage();
+        UserState userState = new UserState(storage);
+        ConversationState conversationState = new ConversationState(storage);
+
+        TestAdapter adapter = new TestAdapter()
+            .useStorage(storage)
+            .useBotState(userState, conversationState)
+            .use(new TranscriptLoggerMiddleware(new TraceTranscriptLogger()));
+
+        adapter.setOnTurnError((turnContext, exception) -> {
+             conversationState.delete(turnContext);
+             return turnContext.sendActivity(exception.getMessage()).thenApply(result -> null);
+        });
+
+        DialogManager dm = new DialogManager(new TestDialog(), null);
+
+         new TestFlow((TestAdapter) adapter, (turnContext) -> {
+            return dm.onTurn(turnContext).thenApply(result -> null);
+        })
+        .send("yo1")
+        .assertReply("unknown")
+        .send("yo2")
+        .assertReply("havedata")
+        .send("throw")
+        .assertReply("java.lang.RuntimeException: throwing")
+        .send("yo3")
+        .assertReply("unknown")
+        .send("yo4")
+        .assertReply("havedata")
+        .startTest()
+        .join();
+    }
+
+    @Test
+    public void TestConversationResetOnExpiration() {
+        MemoryStorage storage = new MemoryStorage();
+        UserState userState = new UserState(storage);
+        ConversationState conversationState = new ConversationState(storage);
+
+        TestAdapter adapter = new TestAdapter()
+            .useStorage(storage)
+            .useBotState(userState, conversationState);
+
+        adapter.setOnTurnError((turnContext, exception) -> {
+            conversationState.delete(turnContext);
+            return turnContext.sendActivity(exception.getMessage()).thenApply(result -> null);
+       });
+
+       DialogManager dm = new DialogManager(new TestDialog(), null);
+       dm.setExpireAfter(1000);
+
+         new TestFlow((TestAdapter)adapter, (turnContext) -> {
+            return dm.onTurn(turnContext).thenApply(result -> null);
+        })
+        .send("yo")
+        .assertReply("unknown")
+        .send("yo")
+        .assertReply("havedata")
+        .delay(1100)
+        .send("yo")
+        .assertReply("unknown", "Should have expired conversation and ended up with yo->unknown")
+        .send("yo")
+        .assertReply("havedata")
+        .send("yo")
+        .assertReply("havedata")
+        .startTest()
+        .join();
+    }
+
+    @Test
+    public void TestChangeTracking() {
+        createDialogContext(dc -> {
+
+            DialogStateManager state = dc.getState();
+            List<String> pathList = new ArrayList<String>();
+            pathList.add("dialog.user.first");
+            pathList.add("dialog.user.last");
+            List<String> dialogPaths = state.trackPaths(pathList);
+
+            state.setValue("dialog.eventCounter", 0);
+            Assert.assertFalse(state.anyPathChanged(0, dialogPaths));
+
+            state.setValue("dialog.eventCounter", 1);
+            state.setValue("dialog.foo", 3);
+            Assert.assertFalse(state.anyPathChanged(0, dialogPaths));
+
+            state.setValue("dialog.eventCounter", 2);
+            state.setValue("dialog.user.first", "bart");
+            Assert.assertTrue(state.anyPathChanged(1, dialogPaths));
+
+            state.setValue("dialog.eventCounter", 3);
+            Map<String, Object> testMap = new HashMap<String, Object>();
+            testMap.put("first", "tom");
+            testMap.put("last", "starr");
+            state.setValue("dialog.user", testMap);
+            Assert.assertTrue(state.anyPathChanged(2, dialogPaths));
+
+            state.setValue("dialog.eventCounter", 4);
+            Assert.assertFalse(state.anyPathChanged(3, dialogPaths));
+            return CompletableFuture.completedFuture(null);
+        }).startTest().join();
+    }
+
+    @Test
+    public void TestMemoryScope_PathResolver_Registration() {
+        final String key = "testKey";
+        String fullKey = String.format("test.%s", key);
+        String shortKey = String.format("^^%s", key);
+        final String testValue = "testValue";
+
+         createDialogContext(dc -> {
+            DialogStateManager state = dc.getState();
+            state.setValue(fullKey, testValue);
+            Assert.assertEquals(testValue, state.getValue(fullKey, "", String.class));
+            Assert.assertEquals(testValue, state.getStringValue(shortKey, ""));
+            return CompletableFuture.completedFuture(null);
+        }).startTest().join();
+    }
+
+    class TestDialog extends Dialog {
+
+        public TestDialog() {
+            super("TestDialog");
+        }
+
+        @Override
+        public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
+            String data = dc.getState().getValue("conversation.test", "unknown", String.class);
+            dc.getContext().sendActivity(data).join();
+            dc.getState().setValue("conversation.test", "havedata");
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
+        }
+
+        @Override
+        public CompletableFuture<DialogTurnResult> continueDialog(DialogContext dc) {
+            switch (dc.getContext().getActivity().getText()) {
+                case "throw":
+                    throw new RuntimeException("throwing");
+                case "end":
+                    return dc.endDialog();
+                default:
+            }
+
+            String data = dc.getState().getValue("conversation.test", "unknown", String.class);
+            dc.getContext().sendActivity(data).join();
+            return CompletableFuture.completedFuture(new DialogTurnResult(DialogTurnStatus.WAITING));
+        }
+    }
+
+    public class NestedContainerDialog extends ComponentDialog implements DialogDependencies {
+        public NestedContainerDialog() {
+        super("NestedContainerDialog");
+            addDialog(new NestedContainerDialog1());
+            addDialog(new NestedContainerDialog2());
+        }
+
+        @Override
+        public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
+            dc.getState().setValue("$name", "testDialog");
+            String nameResult = dc.getState().getValue("$name", "", String.class);
+            dc.getContext().sendActivity(nameResult).join();
+            nameResult = dc.getState().getValue("dialog.name", "", String.class);
+            dc.getContext().sendActivity(nameResult).join();
+            return dc.beginDialog("d1");
+        }
+
+        @Override
+        public CompletableFuture<DialogTurnResult> resumeDialog(DialogContext dc, DialogReason reason, Object result) {
+            if (((String) result).equals("d2")) {
+                return dc.endDialog();
+            }
+
+            String nameResult = dc.getState().getValue("$name", "", String.class);
+            dc.getContext().sendActivity(nameResult).join();
+            nameResult = dc.getState().getValue("dialog.name", "", String.class);
+            dc.getContext().sendActivity(nameResult).join();
+            return dc.beginDialog("d2");
+        }
+
+        @Override
+        public List<Dialog> getDependencies() {
+            return new ArrayList<Dialog>(getDialogs().getDialogs());
+        }
+    }
+
+    public class NestedContainerDialog2 extends ComponentDialog {
+        public NestedContainerDialog2() {
+            super("d2");
+        }
+
+    @Override
+        public CompletableFuture<DialogTurnResult> beginDialog(DialogContext outerDc, Object options) {
+            outerDc.getState().setValue("$name", "d2");
+            String nameResult = outerDc.getState().getValue("$name", "", String.class);
+            outerDc.getContext().sendActivity(String.format("nested %s", nameResult));
+            return outerDc.endDialog(getId());
+        }
+    }
+
+    public class NestedContainerDialog1 extends ComponentDialog {
+        public NestedContainerDialog1() {
+            super("d1");
+        }
+
+    @Override
+        public CompletableFuture<DialogTurnResult> beginDialog(DialogContext dc, Object options) {
+            dc.getState().setValue("$name", "d1");
+            String nameResult = dc.getState().getStringValue("$name", "");
+            dc.getContext().sendActivity(String.format("nested %s", nameResult)).join();
+            nameResult = dc.getState().getValue("dialog.name", "", String.class);
+            dc.getContext().sendActivity(String.format("nested %s", nameResult)).join();
+            return dc.endDialog(getId());
+        }
+    }
+
     public class D1Dialog extends ComponentDialog implements DialogDependencies {
         public D1Dialog() {
             super("d1");
