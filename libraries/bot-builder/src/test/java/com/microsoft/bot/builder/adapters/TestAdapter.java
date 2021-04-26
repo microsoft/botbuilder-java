@@ -139,6 +139,10 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
             setConversationReference(conversationReference);
         }
     }
+    public TestAdapter(ConversationReference reference, boolean sendTraceActivity) {
+        this(reference);
+        this.sendTraceActivity = sendTraceActivity;
+    }
 
     public Queue<Activity> activeQueue() {
         return botReplies;

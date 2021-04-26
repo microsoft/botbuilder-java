@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.BotState;
+import com.microsoft.bot.builder.ComponentRegistration;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.Storage;
@@ -29,6 +30,7 @@ import com.microsoft.bot.dialogs.memory.scopes.UserMemoryScope;
 import org.javatuples.Pair;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -37,7 +39,6 @@ public class MemoryScopeTests {
 
     @Rule
     public TestName testName = new TestName();
-
     public TestFlow CreateDialogContext(DialogTestFunction handler) {
         TestAdapter adapter = new TestAdapter(
                 TestAdapter.createConversationReference(testName.getMethodName(), "User1", "Bot"));
@@ -46,7 +47,7 @@ public class MemoryScopeTests {
         DialogManager dm = new DialogManager(new LamdbaDialog(testName.getMethodName(), handler), null);
         return new TestFlow(adapter, (turnContext) -> {
             return dm.onTurn(turnContext).thenApply(dialogManagerResult -> null);
-        }).sendConverationUpdate();
+        }).sendConversationUpdate();
     }
 
     @Test
