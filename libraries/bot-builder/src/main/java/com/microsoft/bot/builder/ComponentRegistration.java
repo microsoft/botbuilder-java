@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class ComponentRegistration {
 
-    private static final ConcurrentHashMap<Class<?>, ComponentRegistration> COMPONENTS =
-        new ConcurrentHashMap<Class<?>, ComponentRegistration>();
+    private static final ConcurrentHashMap<Class<?>, Object> COMPONENTS =
+        new ConcurrentHashMap<Class<?>, Object>();
 
     /**
      * Add a component which implements registration methods.
@@ -28,7 +28,7 @@ public class ComponentRegistration {
      *
      * @return A array of ComponentRegistration objects.
      */
-    public static Iterable<ComponentRegistration> getComponents() {
+    public static Iterable<Object> getComponents() {
         return COMPONENTS.values();
     }
 }

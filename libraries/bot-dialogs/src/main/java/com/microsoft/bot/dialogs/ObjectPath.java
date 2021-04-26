@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microsoft.bot.builder.TurnContextStateCollection;
 import com.microsoft.bot.schema.Serialization;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -599,6 +600,8 @@ public final class ObjectPath {
 
                 if (current instanceof List) {
                     current = ((List<Object>) current).get(index);
+                } else if (current instanceof ArrayNode) {
+                    current = ((ArrayNode) current).get(index);
                 } else {
                     current = Array.get(current, index);
                 }
@@ -633,6 +636,22 @@ public final class ObjectPath {
             return null;
         }
 
+        // Because TurnContextStateCollection is not implemented as a Map<String, Object> we need to
+        // set obj to the Map<String, Object> which holds the state values which is retrieved from calling
+        // getTurnStateServices()
+        if (obj instanceof TurnContextStateCollection) {
+            Map<String, Object> dict = ((TurnContextStateCollection) obj).getTurnStateServices();
+            List<Entry<String, Object>> matches = dict.entrySet().stream()
+                .filter(key -> key.getKey().equalsIgnoreCase(property))
+                .collect(Collectors.toList());
+
+            if (matches.size() > 0) {
+                return matches.get(0).getValue();
+            }
+
+            return null;
+        }
+
         if (obj instanceof Map) {
             Map<String, Object> dict = (Map<String, Object>) obj;
             List<Entry<String, Object>> matches = dict.entrySet().stream()
@@ -652,7 +671,7 @@ public final class ObjectPath {
             while (fields.hasNext()) {
                 String field = fields.next();
                 if (field.equalsIgnoreCase(property)) {
-                    return node.findValue(property);
+                    return node.findValue(field);
                 }
             }
             return null;

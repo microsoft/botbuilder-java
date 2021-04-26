@@ -3,10 +3,13 @@
 
 package com.microsoft.bot.dialogs.memory.scopes;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.microsoft.bot.dialogs.ObjectPath;
 
@@ -14,9 +17,9 @@ import com.microsoft.bot.dialogs.ObjectPath;
  * ReadOnlyObject is a wrapper around any Object to prevent setting of
  * properties on the Object.
  */
-public class ReadOnlyObject extends Dictionary<String, Object> {
+public final class ReadOnlyObject implements Map<String, Object> {
 
-    private final String notSupported = "This Object is final.";
+    private final String notSupported = "This Object is final and cannot be modified.";
 
     private Object obj;
 
@@ -38,13 +41,6 @@ public class ReadOnlyObject extends Dictionary<String, Object> {
     }
 
     /**
-     * @return The number of items.
-     */
-    public int count() {
-        return size();
-    }
-
-    /**
      *
      */
     @Override
@@ -52,34 +48,17 @@ public class ReadOnlyObject extends Dictionary<String, Object> {
         return false;
     }
 
-    /**
-     *
-     */
     @Override
-    public Enumeration<String> keys() {
-        return Collections.enumeration(ObjectPath.getProperties(obj));
+    public boolean containsKey(Object key) {
+        return ObjectPath.containsProperty(obj, (String) key);
     }
 
     /**
      *
      */
     @Override
-    public Enumeration<Object> elements() {
-        Enumeration<String> keys = this.keys();
-        ArrayList<Object> elements = new ArrayList<Object>();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            elements.add(getValue(key));
-        }
-        return Collections.enumeration(elements);
-    }
-
-    /**
-     *
-     * @return The values.
-     */
-    public Enumeration<Object> values() {
-        return elements();
+    public Set<String> keySet() {
+        return new HashSet<String>(ObjectPath.getProperties(obj));
     }
 
     /**
@@ -111,19 +90,45 @@ public class ReadOnlyObject extends Dictionary<String, Object> {
         throw new UnsupportedOperationException(notSupported);
     }
 
-    /**
-     * Get a value based on a key.
-     *
-     * @param name Key of the value.
-     * @return The value associated with the provided key.
-     */
-    public Object getValue(String name) {
-        Object value = ObjectPath.tryGetPathValue(obj, name, Object.class);
-        if (value != null) {
-            return new ReadOnlyObject(value);
-        } else {
-            return null;
+    @Override
+    public boolean containsValue(Object value) {
+        return false;
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends Object> m) {
+        throw new UnsupportedOperationException(notSupported);
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException(notSupported);
+    }
+
+    @Override
+    public Collection<Object> values() {
+        Set<String> keys = this.keySet();
+        List<Object> objectList = new ArrayList<Object>();
+        for (String key : keys) {
+            Object foundValue = ObjectPath.tryGetPathValue(obj, key, Object.class);
+            if (foundValue != null) {
+                objectList.add(foundValue);
+            }
         }
+        return objectList;
+    }
+
+    @Override
+    public Set<Entry<String, Object>> entrySet() {
+        Set<Entry<String, Object>> items = new HashSet<Entry<String, Object>>();
+        Set<String> keys = this.keySet();
+        for (String key : keys) {
+            Object foundValue = ObjectPath.tryGetPathValue(obj, key, Object.class);
+            if (foundValue != null) {
+                items.add(new SimpleEntry<String, Object>(key, foundValue));
+            }
+        }
+        return items;
     }
 
 }

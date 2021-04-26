@@ -5,6 +5,7 @@ package com.microsoft.bot.dialogs.memory;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
@@ -91,7 +93,17 @@ public class DialogStateManager implements Map<String, Object> {
         if (this.configuration == null) {
             this.configuration = new DialogStateManagerConfiguration();
 
-            Iterable<ComponentRegistration> components = ComponentRegistration.getComponents();
+            Map<String, Object> turnStateServices = dc.getContext().getTurnState().getTurnStateServices();
+            for (Map.Entry<String, Object> entry : turnStateServices.entrySet()) {
+                if (entry.getValue() instanceof MemoryScope[]) {
+                    this.configuration.getMemoryScopes().addAll(Arrays.asList((MemoryScope[]) entry.getValue()));
+                }
+                if (entry.getValue() instanceof PathResolver[]) {
+                    this.configuration.getPathResolvers().addAll(Arrays.asList((PathResolver[]) entry.getValue()));
+                }
+            }
+
+            Iterable<Object> components = ComponentRegistration.getComponents();
 
             components.forEach((component) -> {
                 if (component instanceof ComponentMemoryScopes) {
@@ -166,7 +178,7 @@ public class DialogStateManager implements Map<String, Object> {
                     e.printStackTrace();
                 }
             } else {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(getBadScopeMessage(key));
             }
         }
     }
@@ -181,8 +193,10 @@ public class DialogStateManager implements Map<String, Object> {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null.");
         }
-        return configuration.getMemoryScopes().stream().filter((scope) -> scope.getName().equalsIgnoreCase(name))
-                .findFirst().get();
+        Optional<MemoryScope> result = configuration.getMemoryScopes().stream()
+                .filter((scope) -> scope.getName().equalsIgnoreCase(name))
+                .findFirst();
+        return result.isPresent() ? result.get() : null;
     }
 
     /**
@@ -638,12 +652,13 @@ public class DialogStateManager implements Map<String, Object> {
      */
     public List<String> trackPaths(Iterable<String> paths) {
         List<String> allPaths = new ArrayList<String>();
-        for (String path : allPaths) {
+        for (String path : paths) {
             String tpath = transformPath(path);
             // Track any path that resolves to a constant path
-            Object resolved = ObjectPath.tryResolvePath(this, tpath);
+            ArrayList<Object> resolved = ObjectPath.tryResolvePath(this, tpath);
+            String[] segments = resolved.toArray(new String[resolved.size()]);
             if (resolved != null) {
-                String npath = String.join("_", resolved.toString());
+                String npath = String.join("_", segments);
                 setValue(pathTracker + "." + npath, 0);
                 allPaths.add(npath);
             }
@@ -721,7 +736,7 @@ public class DialogStateManager implements Map<String, Object> {
                 // Convert to a simple path with _ between segments
                 String pathName = String.join("_", stringSegments);
                 String trackedPath = String.format("%s.%s", pathTracker, pathName);
-                Integer counter = getValue(DialogPath.EVENTCOUNTER, 0, Integer.class);
+                Integer counter = null;
                 /**
                  *
                  */
@@ -777,7 +792,6 @@ public class DialogStateManager implements Map<String, Object> {
                 checkChildren(field, node.findValue(field), trackedPath, counter);
             }
         }
-
     }
 
     @Override
@@ -807,12 +821,13 @@ public class DialogStateManager implements Map<String, Object> {
 
     @Override
     public final Object put(String key, Object value) {
-        return null;
+        setElement(key, value);
+        return value;
     }
 
     @Override
     public final Object remove(Object key) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
