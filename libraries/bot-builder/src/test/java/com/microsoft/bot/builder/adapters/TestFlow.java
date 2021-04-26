@@ -76,7 +76,7 @@ public class TestFlow {
      *  Creates a conversation update activity and process it the activity.
      * @return A new TestFlow Object
      */
-    public TestFlow sendConverationUpdate() {
+    public TestFlow sendConversationUpdate() {
         return new TestFlow(testTask.thenCompose(result -> {
             Activity cu = Activity.createConversationUpdateActivity();
             cu.getMembersAdded().add(this.adapter.conversationReference().getUser());

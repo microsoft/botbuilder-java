@@ -399,24 +399,11 @@ public class Activity {
             cloned.setProperties(entry.getKey(), entry.getValue());
         }
 
-        cloned = ensureActivityHasId(cloned);
+        if (cloned.getId() == null) {
+            cloned.setId(String.format("g_%s", UUID.randomUUID().toString()));
+        }
 
         return cloned;
-    }
-
-    private static Activity ensureActivityHasId(Activity activity) {
-        Activity activityWithId = activity;
-
-        if (activity == null) {
-            throw new IllegalArgumentException("Cannot check or add Id on a null Activity.");
-        }
-
-        if (activity.getId() == null) {
-            String generatedId = String.format("g_%s", UUID.randomUUID().toString());
-            activity.setId(generatedId);
-        }
-
-        return activityWithId;
     }
 
     /**
@@ -1567,11 +1554,8 @@ public class Activity {
             result = thisType.length() == activityType.length();
 
             if (!result) {
-                // Finally, if the type is longer than the type they're looking for then we need
-                // to check if there's
-                // a / separator right after the type they're looking for
-                result = thisType.length() > activityType.length()
-                    && thisType.indexOf(activityType.length()) == '/';
+                // If there is a / separator right after the type they're looking for
+                result = thisType.charAt(activityType.length()) == '/';
             }
         }
 
@@ -1833,10 +1817,10 @@ public class Activity {
 
         if (teamsChannelData == null) {
             teamsChannelData = new TeamsChannelData();
-            setChannelData(teamsChannelData);
         }
 
         teamsChannelData.setNotification(new NotificationInfo(true));
+        setChannelData(teamsChannelData);
     }
 
     /**
@@ -1855,10 +1839,10 @@ public class Activity {
 
         if (teamsChannelData == null) {
             teamsChannelData = new TeamsChannelData();
-            setChannelData(teamsChannelData);
         }
 
         teamsChannelData.setNotification(new NotificationInfo(true, externalResourceUrl));
+        setChannelData(teamsChannelData);
     }
 
     /**

@@ -22,13 +22,25 @@ public class ChannelServiceHandlerTests {
     @Test
     public void AuthenticateSetsAnonymousSkillClaim() {
         TestChannelServiceHandler sut = new TestChannelServiceHandler();
-         sut.handleReplyToActivity(null, "123", "456", new Activity(ActivityTypes.MESSAGE));
+        sut.handleReplyToActivity(null, "123", "456", new Activity(ActivityTypes.MESSAGE));
 
         Assert.assertEquals(AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
                     sut.getClaimsIdentity().getType());
         Assert.assertEquals(AuthenticationConstants.ANONYMOUS_SKILL_APPID,
                     JwtTokenValidation.getAppIdFromClaims(sut.getClaimsIdentity().claims()));
     }
+
+    @Test
+    public void testHandleSendToConversation() {
+        TestChannelServiceHandler sut = new TestChannelServiceHandler();
+        sut.handleSendToConversation(null, "456", new Activity(ActivityTypes.MESSAGE));
+
+        Assert.assertEquals(AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
+                    sut.getClaimsIdentity().getType());
+        Assert.assertEquals(AuthenticationConstants.ANONYMOUS_SKILL_APPID,
+                    JwtTokenValidation.getAppIdFromClaims(sut.getClaimsIdentity().claims()));
+    }
+
 
     /**
      * A {@link ChannelServiceHandler} with overrides for testings.
@@ -50,6 +62,17 @@ public class ChannelServiceHandlerTests {
             this.claimsIdentity = claimsIdentity;
             return CompletableFuture.completedFuture(new ResourceResponse());
         }
+
+        @Override
+        protected CompletableFuture<ResourceResponse> onSendToConversation(
+            ClaimsIdentity claimsIdentity,
+            String activityId,
+            Activity activity
+        ) {
+            this.claimsIdentity = claimsIdentity;
+            return CompletableFuture.completedFuture(new ResourceResponse());
+        }
+
         /**
              * Gets the {@link ClaimsIdentity} sent to the different methods after
              * auth is done.
