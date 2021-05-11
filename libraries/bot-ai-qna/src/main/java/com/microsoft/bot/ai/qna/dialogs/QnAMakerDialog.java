@@ -854,13 +854,9 @@ public class QnAMakerDialog extends WaterfallDialog {
 
         // Calling QnAMaker to get response.
         return this.getQnAMakerClient(stepContext).thenApply(qnaMakerClient -> {
-            QueryResults response =
-                (QueryResults) stepContext.getState().get(String.format("turn.qnaresult%s", this.hashCode()));
-            if (response == null) {
-                response = qnaMakerClient
+            QueryResults response = qnaMakerClient
                     .getAnswersRaw(stepContext.getContext(), dialogOptions.getQnAMakerOptions(), null, null)
                     .join();
-            }
 
             // Resetting previous query.
             Integer previousQnAId = -1;
@@ -979,9 +975,7 @@ public class QnAMakerDialog extends WaterfallDialog {
             QueryResult answer = response.get(0);
 
             if (answer.getContext() != null && answer.getContext().getPrompts().length > 0) {
-                Map<String, Integer> previousContextData =
-                    ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, Map.class);
-
+                Map<String, Integer> previousContextData = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, Map.class, new HashMap<>());
                 for (QnAMakerPrompt prompt : answer.getContext().getPrompts()) {
                     previousContextData.put(prompt.getDisplayText(), prompt.getQnaId());
                 }
