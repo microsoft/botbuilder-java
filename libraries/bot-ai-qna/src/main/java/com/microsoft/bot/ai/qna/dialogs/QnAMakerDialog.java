@@ -975,7 +975,12 @@ public class QnAMakerDialog extends WaterfallDialog {
             QueryResult answer = response.get(0);
 
             if (answer.getContext() != null && answer.getContext().getPrompts().length > 0) {
-                Map<String, Integer> previousContextData = ObjectPath.getPathValue(stepContext.getActiveDialog().getState(), QNA_CONTEXT_DATA, Map.class, new HashMap<>());
+                Map<String, Integer> previousContextData =
+                    ObjectPath.getPathValue(
+                        stepContext.getActiveDialog().getState(),
+                        QNA_CONTEXT_DATA,
+                        Map.class,
+                        new HashMap<>());
                 for (QnAMakerPrompt prompt : answer.getContext().getPrompts()) {
                     previousContextData.put(prompt.getDisplayText(), prompt.getQnaId());
                 }
