@@ -1,6 +1,6 @@
 # ![Bot Framework for Java](./docs/media/BotFrameworkJava_header.png)
 
-This repository contains code for the Java version (currently in preview) of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
+This repository contains code for the Java version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
 This SDK enables developers to model conversation and build sophisticated bot applications using JavaScript. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
 
