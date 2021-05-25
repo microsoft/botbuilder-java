@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -91,15 +90,15 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
         }
         this.endpoint = withEndpoint;
 
-        if (Strings.isNullOrEmpty(this.endpoint.getKnowledgeBaseId())) {
+        if (StringUtils.isBlank(this.endpoint.getKnowledgeBaseId())) {
             throw new IllegalArgumentException("knowledgeBaseId");
         }
 
-        if (Strings.isNullOrEmpty(this.endpoint.getHost())) {
+        if (StringUtils.isBlank(this.endpoint.getHost())) {
             throw new IllegalArgumentException("host");
         }
 
-        if (Strings.isNullOrEmpty(this.endpoint.getEndpointKey())) {
+        if (StringUtils.isBlank(this.endpoint.getEndpointKey())) {
             throw new IllegalArgumentException("endpointKey");
         }
 
@@ -222,7 +221,7 @@ public class QnAMaker implements QnAMakerClient, TelemetryQnAMaker {
             return Async.completeExceptionally(new IllegalArgumentException("Activity type is not a message"));
         }
 
-        if (Strings.isNullOrEmpty(turnContext.getActivity().getText())) {
+        if (StringUtils.isBlank(turnContext.getActivity().getText())) {
             return Async.completeExceptionally(new IllegalArgumentException("Null or empty text"));
         }
 
