@@ -68,9 +68,9 @@ public class LuisRecognizerTests {
 
     @Test
     public void topIntentReturnsTopIntent() {
-        String defaultIntent = LuisRecognizer
+        String greetingIntent = LuisRecognizer
             .topIntent(getMockedResult());
-        assertEquals(defaultIntent, "Greeting");
+        assertEquals(greetingIntent, "Greeting");
     }
 
     @Test

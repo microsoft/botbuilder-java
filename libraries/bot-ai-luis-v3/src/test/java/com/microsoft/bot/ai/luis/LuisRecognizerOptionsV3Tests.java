@@ -74,6 +74,7 @@ public class LuisRecognizerOptionsV3Tests {
             "ExternalEntitiesAndSimpleOverride.json",
             "GeoPeopleOrdinal.json",
             "Minimal.json",
+// TODO: This is disabled until the bug requiring instance data for geo is fixed.
 //        "MinimalWithGeo.json",
             "NoEntitiesInstanceTrue.json",
             "Patterns.json",
