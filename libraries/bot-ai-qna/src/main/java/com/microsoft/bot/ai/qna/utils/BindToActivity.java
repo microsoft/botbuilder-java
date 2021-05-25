@@ -14,11 +14,11 @@ import javax.annotation.Nullable;
  * Class to bind activities.
  */
 public class BindToActivity {
-    private Activity activity;
+    private final Activity activity;
 
     /**
      * Construct to bind an Activity.
-     * 
+     *
      * @param withActivity activity to bind.
      */
     public BindToActivity(Activity withActivity) {
@@ -37,7 +37,7 @@ public class BindToActivity {
 
     /**
      * Get the activity text.
-     * 
+     *
      * @return The activity text.
      */
     public String toString() {
