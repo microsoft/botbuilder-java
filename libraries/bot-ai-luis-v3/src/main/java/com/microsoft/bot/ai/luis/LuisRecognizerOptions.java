@@ -20,7 +20,7 @@ public abstract class LuisRecognizerOptions {
 
     /**
      * Initializes an instance of the LuisRecognizerOptions implementation.
-     * 
+     *
      * @param application An instance of LuisApplication".
      */
     protected LuisRecognizerOptions(LuisApplication application) {
@@ -81,7 +81,7 @@ public abstract class LuisRecognizerOptions {
 
     /**
      * Indicates if personal information should be sent as telemetry.
-     * 
+     *
      * @return value boolean value to control personal information logging.
      */
     public boolean isLogPersonalInformation() {
@@ -90,7 +90,7 @@ public abstract class LuisRecognizerOptions {
 
     /**
      * Indicates if personal information should be sent as telemetry.
-     * 
+     *
      * @param logPersonalInformation to set personal information logging preference.
      */
     public void setLogPersonalInformation(boolean logPersonalInformation) {
@@ -100,7 +100,7 @@ public abstract class LuisRecognizerOptions {
     /**
      * Indicates if full results from the LUIS API should be returned with the
      * recognizer result.
-     * 
+     *
      * @return boolean value showing preference on LUIS API full response added to
      *         recognizer result.
      */
@@ -111,7 +111,7 @@ public abstract class LuisRecognizerOptions {
     /**
      * Indicates if full results from the LUIS API should be returned with the
      * recognizer result.
-     * 
+     *
      * @param includeAPIResults to set full Luis API response to be added to the
      *                          recognizer result.
      */
@@ -123,7 +123,7 @@ public abstract class LuisRecognizerOptions {
      * Implementation of the Luis API http call and result processing. This is
      * intended to follow a Strategy pattern and should only be consumed through the
      * LuisRecognizer class.
-     * 
+     *
      * @param turnContext used to extract the text utterance to be sent to Luis.
      * @return Recognizer Result populated by the Luis response.
      */
@@ -133,7 +133,7 @@ public abstract class LuisRecognizerOptions {
      * Implementation of the Luis API http call and result processing. This is
      * intended to follow a Strategy pattern and should only be consumed through the
      * LuisRecognizer class.
-     * 
+     *
      * @param context  Dialog Context to extract turn context.
      * @param activity to extract the text utterance to be sent to Luis.
      * @return Recognizer Result populated by the Luis response.

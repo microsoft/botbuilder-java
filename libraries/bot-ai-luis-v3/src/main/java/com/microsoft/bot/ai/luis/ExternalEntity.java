@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Request Body element to use when passing External Entities to the Luis
- * Service call.
+ * Service call. Defines a user predicted entity that extends an already
+ * existing one.
  *
  */
 public class ExternalEntity {
@@ -21,7 +22,7 @@ public class ExternalEntity {
 
     /**
      * Initializes a new instance of ExternalEntity.
-     * 
+     *
      * @param entity     name of the entity to extend.
      * @param start      start character index of the predicted entity.
      * @param length     length of the predicted entity.
@@ -49,8 +50,8 @@ public class ExternalEntity {
 
     /**
      * Gets the start character index of the predicted entity.
-     * 
-     * @return start character index of the predicted entity.
+     *
+     * @return The start character index of the predicted entity.
      */
     public int getStart() {
         return start;
@@ -58,8 +59,8 @@ public class ExternalEntity {
 
     /**
      * Sets the start character index of the predicted entity.
-     * 
-     * @param start character index of the predicted entity.
+     *
+     * @param start The start character index of the predicted entity.
      */
     public void setStart(int start) {
         this.start = start;
@@ -67,8 +68,8 @@ public class ExternalEntity {
 
     /**
      * Gets the name of the entity to extend.
-     * 
-     * @return name of the entity to extend.
+     *
+     * @return The name of the entity to extend.
      */
     public String getEntity() {
         return entity;
@@ -76,8 +77,8 @@ public class ExternalEntity {
 
     /**
      * Sets the name of the entity to extend.
-     * 
-     * @param entity name of the entity to extend.
+     *
+     * @param entity The name of the entity to extend.
      */
     public void setEntity(String entity) {
         this.entity = entity;
@@ -85,8 +86,8 @@ public class ExternalEntity {
 
     /**
      * Gets the length of the predicted entity.
-     * 
-     * @return length of the predicted entity.
+     *
+     * @return The length of the predicted entity.
      */
     public int getLength() {
         return length;
@@ -94,8 +95,8 @@ public class ExternalEntity {
 
     /**
      * Sets the length of the predicted entity.
-     * 
-     * @param length of the predicted entity.
+     *
+     * @param length The length of the predicted entity.
      */
     public void setLength(int length) {
         this.length = length;
@@ -103,17 +104,19 @@ public class ExternalEntity {
 
     /**
      * Gets a user supplied custom resolution to return as the entity's prediction.
-     * 
-     * @return custom resolution to return as the entity's prediction.
+     *
+     * @return A user supplied custom resolution to return as the entity's
+     *         prediction.
      */
     public JsonNode getResolution() {
         return resolution;
     }
 
     /**
-     * Sets External entities to be recognized in query.
-     * 
-     * @param resolution custom resolution to return as the entity's prediction.
+     * Sets a user supplied custom resolution to return as the entity's prediction.
+     *
+     * @param resolution A user supplied custom resolution to return as the entity's
+     *          prediction.
      */
     public void setResolution(JsonNode resolution) {
         this.resolution = resolution;
@@ -121,7 +124,7 @@ public class ExternalEntity {
 
     /**
      * Validate the object.
-     * 
+     *
      * @throws IllegalArgumentException on null or invalid values
      */
     public void validate() throws IllegalArgumentException {
