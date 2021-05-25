@@ -219,7 +219,7 @@ public class QnAMakerRecognizerTests {
 
     private String readFileContent (String fileName) throws IOException {
         String path = Paths.get("", "src", "test", "java", "com", "microsoft", "bot", "ai", "qna",
-            "testData", fileName).toAbsolutePath().toString();
+            "testdata", fileName).toAbsolutePath().toString();
         File file = new File(path);
         return FileUtils.readFileToString(file, "utf-8");
     }
