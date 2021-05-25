@@ -43,7 +43,7 @@ public class ExternalEntity {
     private int start;
 
     @JsonProperty(value = "entityLength")
-    private int length = -1;
+    private int length;
 
     @JsonProperty(value = "resolution")
     private JsonNode resolution;
@@ -128,7 +128,7 @@ public class ExternalEntity {
      * @throws IllegalArgumentException on null or invalid values
      */
     public void validate() throws IllegalArgumentException {
-        if (entity == null || length == -1) {
+        if (entity == null || length == 0) {
             throw new IllegalArgumentException("ExternalEntity requires an EntityName and EntityLength > 0");
         }
     }
