@@ -458,7 +458,7 @@ public class LuisRecognizerOptionsV3 extends LuisRecognizerOptions {
         ObjectNode queryOptions = JsonNodeFactory.instance.objectNode().put("preferExternalEntities",
                 preferExternalEntities);
 
-        if (dateTimeReference != null && !dateTimeReference.isEmpty()) {
+        if (StringUtils.isNotBlank(dateTimeReference)) {
             queryOptions.put("datetimeReference", dateTimeReference);
         }
 

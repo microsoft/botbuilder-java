@@ -129,7 +129,7 @@ public class LuisApplication {
             throw new IllegalArgumentException(String.format("%s is not a valid LUIS subscription key.", endpointKey));
         }
 
-        if (endpoint == null || endpoint.isEmpty()) {
+        if (StringUtils.isBlank(endpoint)) {
             endpoint = "https://westus.api.cognitive.microsoft.com";
         }
 
