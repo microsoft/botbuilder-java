@@ -1109,7 +1109,7 @@ public class QnAMakerTests {
 
             QnAMakerOptions allChangedRequestOptions = new QnAMakerOptions();
             allChangedRequestOptions.setTop(2000);
-            allChangedRequestOptions.setScoreThreshold(0.4f);
+            allChangedRequestOptions.setScoreThreshold(0.42f);
             allChangedRequestOptions.setStrictFilters(allChangedRequestOptionsFilters);
 
             QnAMaker qna = new QnAMaker(qnAMakerEndpoint, noFiltersOptions);
