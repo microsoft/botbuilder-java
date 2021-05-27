@@ -19,7 +19,7 @@ public class FeedbackRecord {
     private Integer qnaId;
 
     /**
-     * Gets the feedback recod's user ID.
+     * Gets the feedback record's user ID.
      *
      * @return The user ID.
      */
@@ -28,7 +28,7 @@ public class FeedbackRecord {
     }
 
     /**
-     * Sets the feedback recod's user ID.
+     * Sets the feedback record's user ID.
      *
      * @param withUserId The user ID.
      */

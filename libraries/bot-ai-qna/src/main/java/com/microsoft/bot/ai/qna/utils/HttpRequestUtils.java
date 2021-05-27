@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * Helper for HTTP requests.
  */
 public class HttpRequestUtils {
-    private OkHttpClient httpClient = new OkHttpClient();
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     /**
      * Execute Http request.
