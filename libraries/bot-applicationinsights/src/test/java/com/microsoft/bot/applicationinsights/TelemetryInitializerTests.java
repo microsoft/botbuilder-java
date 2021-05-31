@@ -133,9 +133,13 @@ public class TelemetryInitializerTests {
 	@Test
     public void telemetryInitializerMiddlewareWithUndefinedContext() {
         // Arrange
-	    BotTelemetryClient mockTelemetryClient = Mockito.mock(BotTelemetryClient.class);
+        BotTelemetryClient mockTelemetryClient = Mockito.mock(BotTelemetryClient.class);
         TelemetryLoggerMiddleware telemetryLoggerMiddleware = new TelemetryLoggerMiddleware(mockTelemetryClient, false);
         TelemetryInitializerMiddleware telemetryInitializerMiddleware = new TelemetryInitializerMiddleware(telemetryLoggerMiddleware, true);
-        Assert.assertThrows(IllegalArgumentException.class, () -> telemetryInitializerMiddleware.onTurn(null, () -> null));
+        // Assert
+        Assert.assertThrows(IllegalArgumentException.class, () -> {
+            // Act
+            telemetryInitializerMiddleware.onTurn(null, () -> null);
+        });
     }
 }
