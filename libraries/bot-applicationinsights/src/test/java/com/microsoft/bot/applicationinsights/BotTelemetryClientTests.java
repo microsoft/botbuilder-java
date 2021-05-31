@@ -100,7 +100,7 @@ public class BotTelemetryClientTests {
             Assert.assertEquals("test", eventTelemetry.getName());
             Assert.assertEquals("value", eventTelemetry.getProperties().get("hello"));
             Assert.assertEquals(0, Double.compare(0.6, eventTelemetry.getMetrics().get("metric")));
-        }).send(Mockito.any(AvailabilityTelemetry.class));
+        }).send(Mockito.any(EventTelemetry.class));
     }
 
     @Test
@@ -112,7 +112,8 @@ public class BotTelemetryClientTests {
             "data",
             OffsetDateTime.now(),
             Duration.ofNanos(1000),
-            "result", false);
+            "result",
+            false);
 
         Mockito.verify(mockTelemetryChannel, invocations -> {
             RemoteDependencyTelemetry remoteDependencyTelemetry = invocations.getAllInvocations().get(0).getArgument(0);
@@ -122,7 +123,7 @@ public class BotTelemetryClientTests {
             Assert.assertEquals("dependencyname", remoteDependencyTelemetry.getName());
             Assert.assertEquals("result", remoteDependencyTelemetry.getResultCode());
             Assert.assertFalse(remoteDependencyTelemetry.getSuccess());
-        }).send(Mockito.any(AvailabilityTelemetry.class));
+        }).send(Mockito.any(RemoteDependencyTelemetry.class));
     }
 
     @Test
