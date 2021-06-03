@@ -129,4 +129,17 @@ public class TelemetryInitializerTests {
         List<String> eventNames = eventNameCaptor.getAllValues();
         Assert.assertEquals(0, eventNames.size());
 	}
+
+	@Test
+    public void telemetryInitializerMiddlewareWithUndefinedContext() {
+        // Arrange
+        BotTelemetryClient mockTelemetryClient = Mockito.mock(BotTelemetryClient.class);
+        TelemetryLoggerMiddleware telemetryLoggerMiddleware = new TelemetryLoggerMiddleware(mockTelemetryClient, false);
+        TelemetryInitializerMiddleware telemetryInitializerMiddleware = new TelemetryInitializerMiddleware(telemetryLoggerMiddleware, true);
+        // Assert
+        Assert.assertThrows(IllegalArgumentException.class, () -> {
+            // Act
+            telemetryInitializerMiddleware.onTurn(null, () -> null);
+        });
+    }
 }

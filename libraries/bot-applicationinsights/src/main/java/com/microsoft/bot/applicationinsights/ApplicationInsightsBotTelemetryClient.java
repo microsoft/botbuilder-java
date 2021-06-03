@@ -93,6 +93,7 @@ public class ApplicationInsightsBotTelemetryClient implements BotTelemetryClient
             concurrentMetrics,
             concurrentProperties
         );
+        telemetry.setTimestamp(new Date(timeStamp.toInstant().toEpochMilli()));
         if (properties != null) {
             for (Map.Entry<String, String> pair : properties.entrySet()) {
                 telemetry.getProperties().put(pair.getKey(), pair.getValue());
