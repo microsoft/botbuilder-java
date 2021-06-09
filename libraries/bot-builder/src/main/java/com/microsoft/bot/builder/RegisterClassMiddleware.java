@@ -57,12 +57,12 @@ public class RegisterClassMiddleware<T> implements Middleware {
         this.service = withService;
     }
 
-    @Override
     /**
      * Adds the associated object or service to the current turn context.
      * @param turnContext The context object for this turn.
      * @param next The delegate to call to continue the bot middleware pipeline.
      */
+    @Override
     public CompletableFuture<Void> onTurn(TurnContext turnContext, NextDelegate next) {
         if (!StringUtils.isBlank(key)) {
             turnContext.getTurnState().add(key, service);
