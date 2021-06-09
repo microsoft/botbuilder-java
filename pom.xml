@@ -18,7 +18,7 @@
     <jdk.version>1.8</jdk.version>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <checkstyle.version>3.1.0</checkstyle.version>
+    <checkstyle.version>3.1.2</checkstyle.version>
     <pmd.version>3.14.0</pmd.version>
     <exclude.tests>%regex[.*recognizers.*]</exclude.tests>
     <!-- <repo.id>MyGet</repo.id> -->
