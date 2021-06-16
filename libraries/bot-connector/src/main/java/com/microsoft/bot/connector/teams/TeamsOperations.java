@@ -11,6 +11,7 @@
 package com.microsoft.bot.connector.teams;
 
 import com.microsoft.bot.schema.teams.ConversationList;
+import com.microsoft.bot.schema.teams.MeetingInfo;
 import com.microsoft.bot.schema.teams.TeamDetails;
 
 import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
@@ -48,4 +49,15 @@ public interface TeamsOperations {
         String participantId,
         String tenantId
     );
+
+    /**
+     * Fetches information related to a Teams meeting.
+     * @param meetingId Meeting Id.
+     * @return The details related to a team.
+     */
+    default CompletableFuture<MeetingInfo> fetchMeetingInfo(String meetingId) {
+        CompletableFuture<MeetingInfo> result = new CompletableFuture<>();
+        result.completeExceptionally(new Exception("fetchMeetingInfo not implemented"));
+        return result;
+    }
 }
