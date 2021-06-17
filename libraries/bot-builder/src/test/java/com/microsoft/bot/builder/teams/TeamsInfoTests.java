@@ -29,10 +29,13 @@ import com.microsoft.bot.schema.ConversationResourceResponse;
 import com.microsoft.bot.schema.Pair;
 import com.microsoft.bot.schema.teams.ChannelInfo;
 import com.microsoft.bot.schema.teams.ConversationList;
+import com.microsoft.bot.schema.teams.MeetingDetails;
+import com.microsoft.bot.schema.teams.MeetingInfo;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
+import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -176,6 +179,31 @@ public class TeamsInfoTests {
         handler.onTurn(turnContext).join();
     }
 
+    @Test
+    public void TestGetMeetingInfo() {
+        String baseUri = "https://test.coffee";
+        MicrosoftAppCredentials credentials = MicrosoftAppCredentials.empty();
+        ConnectorClient connectorClient = getConnectorClient(baseUri, credentials);
+
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-GetMeetingInfoAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+        TeamsChannelData data = new TeamsChannelData();
+        data.setMeeting(new TeamsMeetingInfo("meeting-id"));
+        activity.setChannelData(data);
+
+        TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
+        turnContext.getTurnState().add(BotFrameworkAdapter.CONNECTOR_CLIENT_KEY, connectorClient);
+        turnContext.getTurnState().add(
+            BotFrameworkAdapter.TEAMSCONNECTOR_CLIENT_KEY,
+            getTeamsConnectorClient(connectorClient.baseUrl(), credentials)
+        );
+        turnContext.getActivity().setServiceUrl("https://test.coffee");
+
+        ActivityHandler handler = new TestTeamsActivityHandler();
+        handler.onTurn(turnContext).join();
+    }
+
     private class TestBotFrameworkAdapter extends BotFrameworkAdapter {
 
         public TestBotFrameworkAdapter(CredentialProvider withCredentialProvider) {
@@ -212,6 +240,9 @@ public class TeamsInfoTests {
 
                     case "Test-SendMessageToTeamsChannelAsync":
                         return callSendMessageToTeamsChannel(turnContext);
+
+                    case "Test-GetMeetingInfoAsync":
+                        return callTeamsInfoGetMeetingInfo(turnContext);
 
                     default:
                         Assert.fail();
@@ -305,6 +336,16 @@ public class TeamsInfoTests {
 
             Assert.assertEquals("channel-id-3", channels.get(2).getId());
             Assert.assertEquals("channel-name-3", channels.get(2).getName());
+
+            return CompletableFuture.completedFuture(null);
+        }
+
+        private CompletableFuture<Void> callTeamsInfoGetMeetingInfo(TurnContext turnContext) {
+            MeetingInfo meeting = TeamsInfo.getMeetingInfo(turnContext, null).join();
+
+            Assert.assertEquals("meeting-id", meeting.getDetails().getId());
+            Assert.assertEquals("organizer-id", meeting.getOrganizer().getId());
+            Assert.assertEquals("meetingConversationId-1", meeting.getConversation().getId());
 
             return CompletableFuture.completedFuture(null);
         }
@@ -410,6 +451,24 @@ public class TeamsInfoTests {
         // fetchTeamDetails
         Mockito.when(mockOperations.fetchTeamDetails(Mockito.anyString())).thenReturn(
             CompletableFuture.completedFuture(details)
+        );
+
+        // fetchTeamDetails
+        MeetingInfo meetingInfo = new MeetingInfo();
+        MeetingDetails meetingDetails = new MeetingDetails();
+        meetingDetails.setId("meeting-id");
+        meetingInfo.setDetails(meetingDetails);
+
+        TeamsChannelAccount organizer = new TeamsChannelAccount();
+        organizer.setId("organizer-id");
+        meetingInfo.setOrganizer(organizer);
+
+        ConversationAccount conversationAccount = new ConversationAccount();
+        conversationAccount.setId("meetingConversationId-1");
+        meetingInfo.setConversation(conversationAccount);
+
+        Mockito.when(mockOperations.fetchMeetingInfo(Mockito.anyString())).thenReturn(
+            CompletableFuture.completedFuture(meetingInfo)
         );
 
         TeamsConnectorClient mockConnectorClient = Mockito.mock(TeamsConnectorClient.class);

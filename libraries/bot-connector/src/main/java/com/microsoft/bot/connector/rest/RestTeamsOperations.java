@@ -11,6 +11,7 @@ import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.teams.TeamsOperations;
 import com.microsoft.bot.restclient.ServiceResponse;
 import com.microsoft.bot.schema.teams.ConversationList;
+import com.microsoft.bot.schema.teams.MeetingInfo;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsMeetingParticipant;
 import okhttp3.ResponseBody;
@@ -163,6 +164,39 @@ public class RestTeamsOperations implements TeamsOperations {
     }
 
     /**
+     * Fetches Teams meeting participant details.
+     * @param meetingId Teams meeting id
+     * @return TeamsParticipantChannelAccount
+     */
+    @Override
+    public CompletableFuture<MeetingInfo> fetchMeetingInfo(String meetingId) {
+        return service.fetchMeetingInfo(
+            meetingId, client.getAcceptLanguage(), client.getUserAgent()
+        )
+            .thenApply(responseBodyResponse -> {
+                try {
+                    return fetchMeetingInfoDelegate(responseBodyResponse).body();
+                } catch (ErrorResponseException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new ErrorResponseException("fetchMeetingInfo", responseBodyResponse);
+                }
+            });
+    }
+
+    private ServiceResponse<MeetingInfo> fetchMeetingInfoDelegate(
+        Response<ResponseBody> response
+    ) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return client.restClient()
+            .responseBuilderFactory()
+            .<MeetingInfo, ErrorResponseException>newInstance(client.serializerAdapter())
+            .register(HttpURLConnection.HTTP_OK, new TypeToken<MeetingInfo>() {
+            }.getType())
+            .registerError(ErrorResponseException.class)
+            .build(response);
+    }
+
+    /**
      * The interface defining all the services for TeamsOperations to be used by
      * Retrofit to perform actually REST calls.
      */
@@ -193,6 +227,15 @@ public class RestTeamsOperations implements TeamsOperations {
             @Path("meetingId") String meetingId,
             @Path("participantId") String participantId,
             @Query("tenantId") String tenantId,
+            @Header("accept-language") String acceptLanguage,
+            @Header("User-Agent") String userAgent
+        );
+
+        @Headers({ "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Teams fetchMeetingInfo" })
+        @GET("v1/meetings/{meetingId}")
+        CompletableFuture<Response<ResponseBody>> fetchMeetingInfo(
+            @Path("meetingId") String meetingId,
             @Header("accept-language") String acceptLanguage,
             @Header("User-Agent") String userAgent
         );
