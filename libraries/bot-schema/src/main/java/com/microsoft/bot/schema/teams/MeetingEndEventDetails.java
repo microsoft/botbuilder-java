@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 /**
  * Specific details of a Teams meeting end event.
  */
-public class MeetingEndEventDetails extends MeetingDetails {
+public class MeetingEndEventDetails extends MeetingEventDetails {
     @JsonProperty(value = "EndTime")
     private OffsetDateTime endTime;
 
