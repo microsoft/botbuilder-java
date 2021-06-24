@@ -24,10 +24,13 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationResourceResponse;
 import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
 import com.microsoft.bot.schema.teams.ChannelInfo;
 import com.microsoft.bot.schema.teams.FileConsentCardResponse;
 import com.microsoft.bot.schema.teams.FileUploadInfo;
+import com.microsoft.bot.schema.teams.MeetingEndEventDetails;
+import com.microsoft.bot.schema.teams.MeetingStartEventDetails;
 import com.microsoft.bot.schema.teams.MessagingExtensionAction;
 import com.microsoft.bot.schema.teams.MessagingExtensionActionResponse;
 import com.microsoft.bot.schema.teams.MessagingExtensionQuery;
@@ -39,6 +42,7 @@ import com.microsoft.bot.schema.teams.TaskModuleResponse;
 import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
+import java.io.IOException;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -857,6 +861,80 @@ public class TeamsActivityHandlerTests {
         );
     }
 
+    @Test
+    public void TestOnEventActivity() {
+        // Arrange
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setChannelId(Channels.DIRECTLINE);
+
+        TurnContext turnContext = new TurnContextImpl(new SimpleAdapter(), activity);
+
+        // Act
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        // Assert
+        Assert.assertEquals(1, bot.record.size());
+        Assert.assertEquals("onEventActivity", bot.record.get(0));
+    }
+
+    @Test
+    public void TestMeetingStartEvent() throws IOException {
+        // Arrange
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setChannelId(Channels.MSTEAMS);
+        activity.setName("application/vnd.microsoft.meetingStart");
+        activity.setValue(Serialization.jsonToTree("{\"StartTime\": \"2021-06-05T00:01:02.0Z\"}"));
+
+        AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
+
+        TurnContext turnContext = new TurnContextImpl(
+            new SimpleAdapter(activitiesToSend::set),
+            activity
+        );
+
+        // Act
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        // Assert
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onEventActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsMeetingStart", bot.record.get(1));
+
+        Assert.assertNotNull(activitiesToSend.get());
+        Assert.assertEquals(1, activitiesToSend.get().size());
+        Assert.assertTrue(activitiesToSend.get().get(0).getText().contains("00:01:02"));
+    }
+
+    @Test
+    public void TestMeetingEndEvent() throws IOException {
+        // Arrange
+        Activity activity = new Activity(ActivityTypes.EVENT);
+        activity.setChannelId(Channels.MSTEAMS);
+        activity.setName("application/vnd.microsoft.meetingEnd");
+        activity.setValue(Serialization.jsonToTree("{\"EndTime\": \"2021-06-05T01:02:03.0Z\"}"));
+
+        AtomicReference<List<Activity>> activitiesToSend = new AtomicReference<>();
+
+        TurnContext turnContext = new TurnContextImpl(
+            new SimpleAdapter(activitiesToSend::set),
+            activity
+        );
+
+        // Act
+        TestActivityHandler bot = new TestActivityHandler();
+        bot.onTurn(turnContext).join();
+
+        // Assert
+        Assert.assertEquals(2, bot.record.size());
+        Assert.assertEquals("onEventActivity", bot.record.get(0));
+        Assert.assertEquals("onTeamsMeetingEnd", bot.record.get(1));
+        Assert.assertNotNull(activitiesToSend.get());
+        Assert.assertEquals(1, activitiesToSend.get().size());
+        Assert.assertTrue(activitiesToSend.get().get(0).getText().contains("1:02:03"));
+    }
+
     private static class NotImplementedAdapter extends BotAdapter {
 
         @Override
@@ -1208,6 +1286,34 @@ public class TeamsActivityHandlerTests {
         ) {
             record.add("onTeamsTeamUnarchived");
             return super.onTeamsTeamUnarchived(channelInfo, teamInfo, turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onEventActivity(
+            TurnContext turnContext
+        ) {
+            record.add("onEventActivity");
+            return super.onEventActivity(turnContext);
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsMeetingStart(
+            MeetingStartEventDetails meeting,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsMeetingStart");
+            return turnContext.sendActivity(meeting.getStartTime())
+                .thenCompose(resourceResponse -> super.onTeamsMeetingStart(meeting, turnContext));
+        }
+
+        @Override
+        protected CompletableFuture<Void> onTeamsMeetingEnd(
+            MeetingEndEventDetails meeting,
+            TurnContext turnContext
+        ) {
+            record.add("onTeamsMeetingEnd");
+            return turnContext.sendActivity(meeting.getEndTime())
+                .thenCompose(resourceResponse -> super.onTeamsMeetingEnd(meeting, turnContext));
         }
     }
 
