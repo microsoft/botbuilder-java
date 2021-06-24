@@ -4,19 +4,20 @@
 package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 
 /**
  * Specific details of a Teams meeting end event.
  */
 public class MeetingEndEventDetails extends MeetingDetails {
     @JsonProperty(value = "EndTime")
-    private String endTime;
+    private OffsetDateTime endTime;
 
     /**
      * Gets the meeting's end time, in UTC.
      * @return The meeting's end time, in UTC.
      */
-    public String getEndTime() {
+    public OffsetDateTime getEndTime() {
         return endTime;
     }
 
@@ -24,7 +25,7 @@ public class MeetingEndEventDetails extends MeetingDetails {
      * Sets the meeting's end time, in UTC.
      * @param withEndTime The meeting's end time, in UTC.
      */
-    public void setEndTime(String withEndTime) {
+    public void setEndTime(OffsetDateTime withEndTime) {
         endTime = withEndTime;
     }
 }

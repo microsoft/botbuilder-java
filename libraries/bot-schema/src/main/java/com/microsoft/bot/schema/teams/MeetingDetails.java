@@ -4,6 +4,7 @@
 package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 
 /**
  * Specific details of a Teams meeting.
@@ -13,10 +14,10 @@ public class MeetingDetails extends MeetingDetailsBase {
     private String msGraphResourceId;
 
     @JsonProperty(value = "scheduledStartTime")
-    private String scheduledStartTime;
+    private OffsetDateTime scheduledStartTime;
 
     @JsonProperty(value = "scheduledEndTime")
-    private String scheduledEndTime;
+    private OffsetDateTime scheduledEndTime;
 
     @JsonProperty(value = "type")
     private String type;
@@ -45,7 +46,7 @@ public class MeetingDetails extends MeetingDetailsBase {
      *
      * @return The meeting's scheduled start time, in UTC.
      */
-    public String getScheduledStartTime() {
+    public OffsetDateTime getScheduledStartTime() {
         return scheduledStartTime;
     }
 
@@ -54,7 +55,7 @@ public class MeetingDetails extends MeetingDetailsBase {
      *
      * @param withScheduledStartTime The meeting's scheduled start time, in UTC.
      */
-    public void setScheduledStartTime(String withScheduledStartTime) {
+    public void setScheduledStartTime(OffsetDateTime withScheduledStartTime) {
         scheduledStartTime = withScheduledStartTime;
     }
 
@@ -63,7 +64,7 @@ public class MeetingDetails extends MeetingDetailsBase {
      *
      * @return The meeting's scheduled end time, in UTC.
      */
-    public String getScheduledEndTime() {
+    public OffsetDateTime getScheduledEndTime() {
         return scheduledEndTime;
     }
 
@@ -72,7 +73,7 @@ public class MeetingDetails extends MeetingDetailsBase {
      *
      * @param withScheduledEndTime The meeting's scheduled end time, in UTC.
      */
-    public void setScheduledEndTime(String withScheduledEndTime) {
+    public void setScheduledEndTime(OffsetDateTime withScheduledEndTime) {
         scheduledEndTime = withScheduledEndTime;
     }
 

@@ -1302,7 +1302,7 @@ public class TeamsActivityHandlerTests {
             TurnContext turnContext
         ) {
             record.add("onTeamsMeetingStart");
-            return turnContext.sendActivity(meeting.getStartTime())
+            return turnContext.sendActivity(meeting.getStartTime().toString())
                 .thenCompose(resourceResponse -> super.onTeamsMeetingStart(meeting, turnContext));
         }
 
@@ -1312,7 +1312,7 @@ public class TeamsActivityHandlerTests {
             TurnContext turnContext
         ) {
             record.add("onTeamsMeetingEnd");
-            return turnContext.sendActivity(meeting.getEndTime())
+            return turnContext.sendActivity(meeting.getEndTime().toString())
                 .thenCompose(resourceResponse -> super.onTeamsMeetingEnd(meeting, turnContext));
         }
     }

@@ -4,19 +4,20 @@
 package com.microsoft.bot.schema.teams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 
 /**
  * Specific details of a Teams meeting start event.
  */
 public class MeetingStartEventDetails extends MeetingEventDetails {
     @JsonProperty(value = "StartTime")
-    private String startTime;
+    private OffsetDateTime startTime;
 
     /**
      * Gets the meeting's start time, in UTC.
      * @return The meeting's start time, in UTC.
      */
-    public String getStartTime() {
+    public OffsetDateTime getStartTime() {
         return startTime;
     }
 
@@ -24,7 +25,7 @@ public class MeetingStartEventDetails extends MeetingEventDetails {
      * Sets the meeting's start time, in UTC.
      * @param withStartTime The meeting's start time, in UTC.
      */
-    public void setStartTime(String withStartTime) {
+    public void setStartTime(OffsetDateTime withStartTime) {
         startTime = withStartTime;
     }
 }
