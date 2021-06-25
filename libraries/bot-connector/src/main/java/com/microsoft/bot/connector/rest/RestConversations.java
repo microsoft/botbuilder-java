@@ -7,6 +7,7 @@
 package com.microsoft.bot.connector.rest;
 
 import com.microsoft.bot.connector.Async;
+import com.microsoft.bot.connector.ConversationConstants;
 import com.microsoft.bot.restclient.ServiceResponseBuilder;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.AttachmentData;
@@ -111,15 +112,18 @@ public class RestConversations implements Conversations {
             @Header("User-Agent") String userAgent
         );
 
-        @Headers({ "Content-Type: application/json; charset=utf-8",
-            "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity" })
+        @Headers({
+            "Content-Type: application/json; charset=utf-8",
+            "x-ms-logging-context: com.microsoft.bot.schema.Conversations replyToActivity"
+        })
         @POST("v3/conversations/{conversationId}/activities/{activityId}")
         CompletableFuture<Response<ResponseBody>> replyToActivity(
             @Path("conversationId") String conversationId,
             @Path("activityId") String activityId,
             @Body Activity activity,
             @Header("accept-language") String acceptLanguage,
-            @Header("User-Agent") String userAgent
+            @Header("User-Agent") String userAgent,
+            @Header(ConversationConstants.CONVERSATION_ID_HTTP_HEADERNAME) String conversationIdHeader
         );
 
         @Headers({ "Content-Type: application/json; charset=utf-8",
@@ -454,7 +458,12 @@ public class RestConversations implements Conversations {
         Validator.validate(activity);
 
         return service.replyToActivity(
-            conversationId, activityId, activity, client.getAcceptLanguage(), client.getUserAgent()
+            conversationId,
+            activityId,
+            activity,
+            client.getAcceptLanguage(),
+            client.getUserAgent(),
+            conversationId
         )
 
             .thenApply(responseBodyResponse -> {
