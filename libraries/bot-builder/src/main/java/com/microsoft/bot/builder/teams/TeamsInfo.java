@@ -273,6 +273,15 @@ public final class TeamsInfo {
     /**
      * Gets the information for the given meeting id.
      * @param turnContext Turn context.
+     * @return Meeting Details.
+     */
+    public static CompletableFuture<MeetingInfo> getMeetingInfo(TurnContext turnContext) {
+        return getMeetingInfo(turnContext, null);
+    }
+
+    /**
+     * Gets the information for the given meeting id.
+     * @param turnContext Turn context.
      * @param meetingId The BASE64-encoded id of the Teams meeting.
      * @return Meeting Details.
      */
