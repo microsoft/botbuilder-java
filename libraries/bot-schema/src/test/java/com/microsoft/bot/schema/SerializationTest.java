@@ -177,13 +177,13 @@ public class SerializationTest {
         ChannelAccount account1 = new ChannelAccount();
         account1.setId("ChannelAccount_Id_1");
         account1.setName("ChannelAccount_Name_1");
-        account1.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
+        account1.setProperties("TestName", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
         account1.setRole(RoleTypes.USER);
 
         ChannelAccount account2 = new ChannelAccount();
         account2.setId("ChannelAccount_Id_2");
         account2.setName("ChannelAccount_Name_2");
-        account2.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
+        account2.setProperties("TestName", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
         account2.setRole(RoleTypes.USER);
 
         ConversationAccount conversationAccount = new ConversationAccount();
@@ -191,7 +191,7 @@ public class SerializationTest {
         conversationAccount.setId("123");
         conversationAccount.setIsGroup(true);
         conversationAccount.setName("Name");
-        conversationAccount.setProperties("Name", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
+        conversationAccount.setProperties("TestName", JsonNodeFactory.instance.objectNode().put("Name", "Value"));
 
         Activity activity = new Activity();
         activity.setId("123");
