@@ -1096,6 +1096,7 @@ public class BotFrameworkAdapter extends BotAdapter
      * @return A task that represents the work queued to execute.
      */
     @SuppressWarnings("checkstyle:InnerAssignment")
+    @Deprecated
     public CompletableFuture<Void> createConversation(
         String channelId,
         String serviceUrl,
@@ -1112,13 +1113,21 @@ public class BotFrameworkAdapter extends BotAdapter
         if (!StringUtils.isEmpty(tenantId)) {
             // Putting tenantId in channelData is a temporary solution while we wait for the
             // Teams API to be updated
-            ObjectNode channelData = JsonNodeFactory.instance.objectNode();
-            channelData.set(
-                "tenant",
-                JsonNodeFactory.instance.objectNode().set("tenantId", JsonNodeFactory.instance.textNode(tenantId))
-            );
+            if (conversationParameters.getChannelData() != null) {
+                ((ObjectNode) conversationParameters.getChannelData()).set(
+                    "tenantId",
+                    JsonNodeFactory.instance.textNode(tenantId)
+                );
+            } else {
+                ObjectNode channelData = JsonNodeFactory.instance.objectNode();
+                channelData.set(
+                    "tenant",
+                    JsonNodeFactory.instance.objectNode()
+                        .set("tenantId", JsonNodeFactory.instance.textNode(tenantId))
+                );
 
-            conversationParameters.setChannelData(channelData);
+                conversationParameters.setChannelData(channelData);
+            }
 
             conversationParameters.setTenantId(tenantId);
         }
