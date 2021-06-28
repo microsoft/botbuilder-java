@@ -2,7 +2,7 @@
 
 This repository contains code for the Java version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
-This SDK enables developers to model conversation and build sophisticated bot applications using JavaScript. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
+This SDK enables developers to model conversation and build sophisticated bot applications using Java. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
 
 To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).  If you are an existing user, then you can also [find out what's new with Bot Framework](https://docs.microsoft.com/en-us/azure/bot-service/what-is-new?view=azure-bot-service-4.0).
 
