@@ -21,6 +21,7 @@
     <checkstyle.version>3.1.2</checkstyle.version>
     <pmd.version>3.14.0</pmd.version>
     <exclude.tests>%regex[.*recognizers.*]</exclude.tests>
+    <argLine>-Dfile.encoding=UTF-8</argLine>
     <!-- <repo.id>MyGet</repo.id> -->
     <!-- <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url> -->
     <!-- <repo.id>ossrh</repo.id> -->
