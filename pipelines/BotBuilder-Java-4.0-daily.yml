@@ -8,9 +8,6 @@
 # Cron Schedules have been converted using UTC Time Zone and may need to be updated for your location
 schedules:
 - cron: 0 3 * * 1,2,3,4,5
-  branches:
-    include:
-    - bruce/javasigning12-2
 resources:
   repositories:
   - repository: self
@@ -34,56 +31,10 @@ jobs:
     inputs:
       targetType: inline
       script: >
+        Write-Host "Setting module versions"
         Write-Host "version = $(PackageVersion)"
 
-        Write-Host "Setting module versions"
-
-
         mvn versions:set -DnewVersion="$(PackageVersion)" --no-transfer-progress
-
-
-        Write-Host "Setting sample versions"
-
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\servlet-echo\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\02.echo-bot\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\03.welcome-user\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\08.suggested-actions\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\16.proactive-messages\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\45.state-management\pom.xml --no-transfer-progress
-
-        mvn versions:set -DnewVersion="$(PackageVersion)" -f samples\47.inspection\pom.xml --no-transfer-progress
-
-
-
-        Write-Host "Setting Sample dependency versions"
-
-
-        mvn versions:use-dep-version -f samples\servlet-echo\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\02.echo-bot\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\03.welcom-user\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\08.suggested-actions\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\16.proactive-messages\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\45.state-management\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
-
-        mvn versions:use-dep-version -f samples\47.inspection\pom.xml -Dincludes='com.microsoft.bot:bot-integration-core' -DdepVersion="$(PackageVersion)" -DforceVersion=true
-
 
         Write-Host "Completed"
   - task: PowerShell@2
