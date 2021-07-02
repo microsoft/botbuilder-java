@@ -117,118 +117,54 @@ jobs:
       targetType: inline
       script: >-
         $file = "$(Build.SourcesDirectory)\pom.xml";
-
         $xml = New-Object XML;
-
         $xml.Load($file);
-
         $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-
         $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-
         $element = $xml.SelectSingleNode('//ns:version', $nsm)
-
         #$element.InnerText = "$(PackageVersion)"
-
         #$xml.Save($file);
-
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-
         Write-Host $element.InnerText
-
         get-content $file;
 
-
         $file = "$(Build.SourcesDirectory)\libraries\bot-builder\pom.xml";
-
         $xml = New-Object XML;
-
         $xml.Load($file);
-
         $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-
         $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-
         $element = $xml.SelectSingleNode('//ns:version', $nsm)
-
         #$element.InnerText = "$(PackageVersion)"
-
         #$xml.Save($file);
-
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-
         Write-Host $element.InnerText
-
         get-content $file;
 
 
         $file = "$(Build.SourcesDirectory)\libraries\bot-schema\pom.xml";
-
         $xml = New-Object XML;
-
         $xml.Load($file);
-
         $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-
         $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-
         $element = $xml.SelectSingleNode('//ns:version', $nsm)
-
         #$element.InnerText = "$(PackageVersion)"
-
         #$xml.Save($file);
-
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-
         Write-Host $element.InnerText
-
         get-content $file;
-
 
         $file = "$(Build.SourcesDirectory)\libraries\bot-connector\pom.xml";
-
         $xml = New-Object XML;
-
         $xml.Load($file);
-
         $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-
         $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-
         $element = $xml.SelectSingleNode('//ns:version', $nsm)
-
         #$element.InnerText = "$(PackageVersion)"
-
         #$xml.Save($file);
-
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-
         Write-Host $element.InnerText
-
         get-content $file;
 
-
-        $file = "$(Build.SourcesDirectory)\samples\bot-connector-sample\pom.xml";
-
-        $xml = New-Object XML;
-
-        $xml.Load($file);
-
-        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-
-        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-
-        $element = $xml.SelectSingleNode('//ns:version', $nsm)
-
-        #$element.InnerText = "$(PackageVersion)"
-
-        #$xml.Save($file);
-
-        Write-Host $file '+++++++++++++++++++++++++++++++++++';
-
-        Write-Host $element.InnerText
-
-        get-content $file;
   - task: Maven@3
     displayName: Maven Install (this signs)
     inputs:
@@ -267,19 +203,9 @@ jobs:
       SourceFolder: $(system.defaultworkingdirectory)
       Contents: >-
         libraries/*/target/*.jar
-
         libraries/*/target/*.jar.asc
-
-        samples/*/target/*.jar
-
-        samples/*/target/*.jar.asc
-
         libraries/*/pom.xml
-
-        samples/*/pom.xml
-
         settings.xml
-
         pom.xml
       TargetFolder: $(Build.ArtifactStagingDirectory)/packages
   - task: PublishBuildArtifacts@1
