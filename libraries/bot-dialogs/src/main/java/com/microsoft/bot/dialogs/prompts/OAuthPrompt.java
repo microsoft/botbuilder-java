@@ -266,7 +266,7 @@ public class OAuthPrompt extends Dialog {
             Object tokenResponseObject = turnContext.getActivity().getValue();
             TokenResponse token = null;
             if (tokenResponseObject != null) {
-                token = (TokenResponse) tokenResponseObject;
+                token = Serialization.getAs(tokenResponseObject, TokenResponse.class);
             }
             result.setSucceeded(true);
             result.setValue(token);
