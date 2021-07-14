@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.authentication.MicrosoftGovernmentAppCredentials;
+import com.microsoft.bot.connector.skills.BotFrameworkClient;
 import com.microsoft.bot.restclient.serializer.JacksonAdapter;
 
 import okhttp3.HttpUrl;
@@ -22,8 +23,7 @@ import okhttp3.Response;
 import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.bot.builder.TypedInvokeResponse;
-import com.microsoft.bot.builder.skills.BotFrameworkClient;
+import com.microsoft.bot.schema.TypedInvokeResponse;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.AppCredentials;
 import com.microsoft.bot.schema.Activity;

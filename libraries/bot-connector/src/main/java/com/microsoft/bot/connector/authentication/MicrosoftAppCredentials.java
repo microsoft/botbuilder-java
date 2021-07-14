@@ -9,13 +9,14 @@ import java.net.MalformedURLException;
  * MicrosoftAppCredentials auth implementation and cache.
  */
 public class MicrosoftAppCredentials extends AppCredentials {
+
     /**
-     * The configuration property for the Microsoft app Password.
+     * The configuration property for the Microsoft app ID.
      */
     public static final String MICROSOFTAPPID = "MicrosoftAppId";
 
     /**
-     * The configuration property for the Microsoft app ID.
+     * The configuration property for the Microsoft app Password.
      */
     public static final String MICROSOFTAPPPASSWORD = "MicrosoftAppPassword";
 
@@ -104,7 +105,7 @@ public class MicrosoftAppCredentials extends AppCredentials {
         return new CredentialsAuthenticator(
             getAppId(),
             getAppPassword(),
-            new OAuthConfiguration(oAuthEndpoint(), oAuthScope())
+            new OAuthConfiguration(oAuthEndpoint(), oAuthScope(), validateAuthority())
         );
     }
 }

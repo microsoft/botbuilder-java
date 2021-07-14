@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
  * {@link Middleware}
  */
 public class TurnContextImpl implements TurnContext, AutoCloseable {
+    public static final String BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler";
+
     /**
      * The bot adapter that created this context object.
      */

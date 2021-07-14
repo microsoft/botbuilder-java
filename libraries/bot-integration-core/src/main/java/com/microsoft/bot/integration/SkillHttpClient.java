@@ -7,7 +7,7 @@ import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 
 import com.microsoft.bot.builder.skills.BotFrameworkSkill;
-import com.microsoft.bot.builder.TypedInvokeResponse;
+import com.microsoft.bot.schema.TypedInvokeResponse;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryOptions;
 import com.microsoft.bot.schema.Activity;
