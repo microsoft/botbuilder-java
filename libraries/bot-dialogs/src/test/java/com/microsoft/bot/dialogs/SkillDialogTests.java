@@ -3,28 +3,18 @@
 
 package com.microsoft.bot.dialogs;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-
 import com.microsoft.bot.builder.AutoSaveStateMiddleware;
 import com.microsoft.bot.builder.ConversationState;
 import com.microsoft.bot.builder.MemoryStorage;
 import com.microsoft.bot.builder.MessageFactory;
-import com.microsoft.bot.builder.TypedInvokeResponse;
+import com.microsoft.bot.schema.TypedInvokeResponse;
 import com.microsoft.bot.builder.adapters.TestAdapter;
-import com.microsoft.bot.builder.skills.BotFrameworkClient;
 import com.microsoft.bot.builder.skills.BotFrameworkSkill;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryOptions;
 import com.microsoft.bot.builder.skills.SkillConversationReference;
 import com.microsoft.bot.connector.Channels;
+import com.microsoft.bot.connector.skills.BotFrameworkClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.ActivityTypes;
 import com.microsoft.bot.schema.Attachment;
@@ -34,9 +24,18 @@ import com.microsoft.bot.schema.DeliveryModes;
 import com.microsoft.bot.schema.ExpectedReplies;
 import com.microsoft.bot.schema.OAuthCard;
 import com.microsoft.bot.schema.TokenExchangeResource;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * Tests for SkillsDialog.
@@ -96,7 +95,7 @@ public class SkillDialogTests {
     class MockFrameworkClient extends BotFrameworkClient {
 
         int returnStatus = 200;
-        ExpectedReplies expectedReplies = null;;
+        ExpectedReplies expectedReplies = null;
 
         MockFrameworkClient() {
 
