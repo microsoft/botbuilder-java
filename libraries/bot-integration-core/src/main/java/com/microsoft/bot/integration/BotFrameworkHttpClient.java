@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.integration;
 
+import com.microsoft.bot.connector.ConversationConstants;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -195,8 +196,12 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         });
     }
 
-    private <T extends Object> CompletableFuture<TypedInvokeResponse<T>> securePostActivity(URI toUrl,
-            Activity activity, String token, Class<T> type) {
+    private <T extends Object> CompletableFuture<TypedInvokeResponse<T>> securePostActivity(
+        URI toUrl,
+        Activity activity,
+        String token,
+        Class<T> type
+    ) {
         String jsonContent = "";
         try {
             ObjectMapper mapper = new JacksonAdapter().serializer();
@@ -208,7 +213,7 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
 
         try {
             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonContent);
-            Request request = buildRequest(toUrl, body, token);
+            Request request = buildRequest(activity, toUrl, body, token);
             Response response = httpClient.newCall(request).execute();
 
             T result = Serialization.getAs(response.body().string(), type);
@@ -219,14 +224,17 @@ public class BotFrameworkHttpClient extends BotFrameworkClient {
         }
     }
 
-    private Request buildRequest(URI url, RequestBody body, String token) {
-
+    private Request buildRequest(Activity activity, URI url, RequestBody body, String token) {
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url.toString()).newBuilder();
 
         Request.Builder requestBuilder = new Request.Builder().url(httpBuilder.build());
         if (token != null) {
             requestBuilder.addHeader("Authorization", String.format("Bearer %s", token));
         }
+        requestBuilder.addHeader(
+            ConversationConstants.CONVERSATION_ID_HTTP_HEADERNAME,
+            activity.getConversation().getId()
+        );
         requestBuilder.post(body);
         return requestBuilder.build();
     }

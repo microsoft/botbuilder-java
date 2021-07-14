@@ -5,7 +5,7 @@
 
   <groupId>com.microsoft.bot</groupId>
   <artifactId>bot-java</artifactId>
-  <version>4.14.0-SNAPSHOT</version>
+  <version>4.15.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Microsoft BotBuilder Java SDK Parent</name>
@@ -21,6 +21,7 @@
     <checkstyle.version>3.1.2</checkstyle.version>
     <pmd.version>3.14.0</pmd.version>
     <exclude.tests>%regex[.*recognizers.*]</exclude.tests>
+    <argLine>-Dfile.encoding=UTF-8</argLine>
     <!-- <repo.id>MyGet</repo.id> -->
     <!-- <repo.url>https://botbuilder.myget.org/F/botbuilder-v4-java-daily/maven/</repo.url> -->
     <!-- <repo.id>ossrh</repo.id> -->

@@ -17,6 +17,7 @@ import com.microsoft.bot.schema.Pair;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.teams.ChannelInfo;
 import com.microsoft.bot.schema.teams.ConversationList;
+import com.microsoft.bot.schema.teams.MeetingInfo;
 import com.microsoft.bot.schema.teams.TeamDetails;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
@@ -267,6 +268,33 @@ public final class TeamsInfo {
             participantId,
             tenantId
         );
+    }
+
+    /**
+     * Gets the information for the given meeting id.
+     * @param turnContext Turn context.
+     * @return Meeting Details.
+     */
+    public static CompletableFuture<MeetingInfo> getMeetingInfo(TurnContext turnContext) {
+        return getMeetingInfo(turnContext, null);
+    }
+
+    /**
+     * Gets the information for the given meeting id.
+     * @param turnContext Turn context.
+     * @param meetingId The BASE64-encoded id of the Teams meeting.
+     * @return Meeting Details.
+     */
+    public static CompletableFuture<MeetingInfo> getMeetingInfo(TurnContext turnContext, String meetingId) {
+        if (StringUtils.isEmpty(meetingId) && turnContext.getActivity().teamsGetMeetingInfo() != null) {
+            meetingId = turnContext.getActivity().teamsGetMeetingInfo().getId();
+        }
+
+        if (StringUtils.isEmpty(meetingId)) {
+            return illegalArgument("TeamsInfo.getMeetingInfo: method requires a meetingId");
+        }
+
+        return getTeamsConnectorClient(turnContext).getTeams().fetchMeetingInfo(meetingId);
     }
 
     private static CompletableFuture<List<TeamsChannelAccount>> getMembers(
