@@ -5,6 +5,7 @@ package com.microsoft.bot.dialogs.prompts;
 
 import com.microsoft.bot.builder.ConnectorClientBuilder;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.connector.authentication.ConnectorFactory;
@@ -33,6 +34,12 @@ public final class UserTokenAccess {
                 settings.getConnectionName(),
                 turnContext.getActivity().getChannelId(),
                 magicCode);
+        } else if (turnContext.getAdapter() instanceof UserTokenProvider) {
+            return ((UserTokenProvider) turnContext.getAdapter()).getUserToken(
+                turnContext,
+                settings.getOAuthAppCredentials(),
+                settings.getConnectionName(),
+                magicCode);
         } else {
             throw new UnsupportedOperationException("OAuth prompt is not supported by the current adapter");
         }
@@ -48,6 +55,13 @@ public final class UserTokenAccess {
             return userTokenClient.getSignInResource(
                 settings.getConnectionName(),
                 turnContext.getActivity(),
+                null);
+        } else if (turnContext.getAdapter() instanceof UserTokenProvider) {
+            return ((UserTokenProvider) turnContext.getAdapter()).getSignInResource(
+                turnContext,
+                settings.getOAuthAppCredentials(),
+                settings.getConnectionName(),
+                turnContext.getActivity().getFrom().getId(),
                 null);
         } else {
             throw new UnsupportedOperationException("OAuth prompt is not supported by the current adapter");
@@ -65,6 +79,12 @@ public final class UserTokenAccess {
                 turnContext.getActivity().getFrom().getId(),
                 settings.getConnectionName(),
                 turnContext.getActivity().getChannelId());
+        } else if (turnContext.getAdapter() instanceof UserTokenProvider) {
+            return ((UserTokenProvider) turnContext.getAdapter()).signOutUser(
+                turnContext,
+                settings.getOAuthAppCredentials(),
+                settings.getConnectionName(),
+                turnContext.getActivity().getFrom().getId());
         } else {
             throw new UnsupportedOperationException("OAuth prompt is not supported by the current adapter");
         }
@@ -81,6 +101,12 @@ public final class UserTokenAccess {
             String userId = turnContext.getActivity().getFrom().getId();
             String channelId = turnContext.getActivity().getChannelId();
             return userTokenClient.exchangeToken(userId, settings.getConnectionName(), channelId, tokenExchangeRequest);
+        } else if (turnContext.getAdapter() instanceof UserTokenProvider) {
+            return ((UserTokenProvider) turnContext.getAdapter()).exchangeToken(
+                turnContext,
+                settings.getConnectionName(),
+                turnContext.getActivity().getFrom().getId(),
+                tokenExchangeRequest);
         } else {
             throw new UnsupportedOperationException("OAuth prompt is not supported by the current adapter");
         }
