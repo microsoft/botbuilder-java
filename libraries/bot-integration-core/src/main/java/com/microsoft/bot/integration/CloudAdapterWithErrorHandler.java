@@ -38,7 +38,7 @@ public class CloudAdapterWithErrorHandler extends CloudAdapter {
         super(withConfiguration);
 
         setOnTurnError((turnContext, exception) -> {
-            LoggerFactory.getLogger(AdapterWithErrorHandler.class).error("onTurnError", exception);
+            LoggerFactory.getLogger(CloudAdapterWithErrorHandler.class).error("onTurnError", exception);
 
             return turnContext.sendActivities(
                 MessageFactory.text(ERROR_MSG_ONE), MessageFactory.text(ERROR_MSG_TWO)
@@ -65,7 +65,7 @@ public class CloudAdapterWithErrorHandler extends CloudAdapter {
         super(withConfiguration);
 
         setOnTurnError((turnContext, exception) -> {
-            LoggerFactory.getLogger(AdapterWithErrorHandler.class).error("onTurnError", exception);
+            LoggerFactory.getLogger(CloudAdapterWithErrorHandler.class).error("onTurnError", exception);
 
             return turnContext.sendActivities(
                 MessageFactory.text(ERROR_MSG_ONE), MessageFactory.text(ERROR_MSG_TWO)
