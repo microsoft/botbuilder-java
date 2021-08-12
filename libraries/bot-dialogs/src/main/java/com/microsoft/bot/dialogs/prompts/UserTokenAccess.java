@@ -80,11 +80,18 @@ public final class UserTokenAccess {
                 settings.getConnectionName(),
                 turnContext.getActivity().getChannelId());
         } else if (turnContext.getAdapter() instanceof UserTokenProvider) {
+            String id = "";
+            if (turnContext.getActivity() != null
+                && turnContext.getActivity() != null
+                && turnContext.getActivity().getFrom() != null) {
+                id = turnContext.getActivity().getFrom().getId();
+            }
+
             return ((UserTokenProvider) turnContext.getAdapter()).signOutUser(
                 turnContext,
                 settings.getOAuthAppCredentials(),
                 settings.getConnectionName(),
-                turnContext.getActivity().getFrom().getId());
+                id);
         } else {
             throw new UnsupportedOperationException("OAuth prompt is not supported by the current adapter");
         }

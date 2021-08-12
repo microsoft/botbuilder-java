@@ -336,7 +336,7 @@ public class OAuthPrompt extends Dialog {
                 try {
                     TokenExchangeRequest tokenExchangeReq = new TokenExchangeRequest();
                     tokenExchangeReq.setToken(tokenExchangeRequest.getToken());
-                    tokenExchangeResponse =  UserTokenAccess.exchangeToken(
+                    tokenExchangeResponse = UserTokenAccess.exchangeToken(
                         turnContext,
                         settings,
                         tokenExchangeReq).join();
@@ -570,14 +570,6 @@ public class OAuthPrompt extends Dialog {
      * @return   A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> signOutUser(TurnContext turnContext) {
-        String id = "";
-        if (turnContext.getActivity() != null
-            && turnContext.getActivity() != null
-            && turnContext.getActivity().getFrom() != null) {
-                id = turnContext.getActivity().getFrom().getId();
-            }
-
-        // Sign out user
         return UserTokenAccess.signOutUser(turnContext, settings);
     }
 
