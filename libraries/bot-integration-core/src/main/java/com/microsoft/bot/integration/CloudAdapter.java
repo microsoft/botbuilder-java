@@ -8,6 +8,8 @@ import com.microsoft.bot.builder.CloudAdapterBase;
 import com.microsoft.bot.connector.authentication.BotFrameworkAuthentication;
 import com.microsoft.bot.connector.authentication.BotFrameworkAuthenticationFactory;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.InvokeResponse;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -47,9 +49,9 @@ public class CloudAdapter extends CloudAdapterBase {
      * @param authHeader
      * @param activity
      * @param bot The Bot implementation to use for this request.
-     * @return void
+     * @return A CompletableFuture with the invoke response
      */
-    public CompletableFuture<Void> processIncomingActivity(String authHeader, Activity activity, Bot bot) {
-        return processActivity(authHeader, activity, bot::onTurn).thenApply(result -> null);
+    public CompletableFuture<InvokeResponse> processIncomingActivity(String authHeader, Activity activity, Bot bot) {
+        return processActivity(authHeader, activity, bot::onTurn);
     }
 }

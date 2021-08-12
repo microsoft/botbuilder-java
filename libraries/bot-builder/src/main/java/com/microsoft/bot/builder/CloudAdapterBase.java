@@ -456,10 +456,10 @@ public abstract class CloudAdapterBase extends BotAdapter {
                         authenticateRequestResult.getConnectorFactory());
 
                     // Run the pipeline
-                    return runPipeline(context, callbackHandler).thenApply(task -> {
+                    return (CompletableFuture<InvokeResponse>) runPipeline(context, callbackHandler).thenApply(task -> {
                         // If there are any results they will have been left on the TurnContext.
-                        return CompletableFuture.completedFuture(processTurnResults(context));
-                    }).thenApply(null);
+                        return processTurnResults(context);
+                    });
                 });
         });
     }
@@ -548,7 +548,10 @@ public abstract class CloudAdapterBase extends BotAdapter {
     private InvokeResponse processTurnResults(TurnContextImpl turnContext) {
         // Handle ExpectedReplies scenarios where the all the activities have been buffered
         // and sent back at once in an invoke response.
-        if (turnContext.getActivity().getDeliveryMode().equals(DeliveryModes.EXPECT_REPLIES)) {
+        if (
+            DeliveryModes
+                .fromString(turnContext.getActivity().getDeliveryMode()) == DeliveryModes.EXPECT_REPLIES
+        ) {
             return new InvokeResponse(
                 HttpURLConnection.HTTP_OK,
                 new ExpectedReplies(turnContext.getBufferedReplyActivities()));
