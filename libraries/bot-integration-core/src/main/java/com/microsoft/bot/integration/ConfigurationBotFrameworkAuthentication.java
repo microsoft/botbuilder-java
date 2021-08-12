@@ -88,7 +88,7 @@ public class ConfigurationBotFrameworkAuthentication extends BotFrameworkAuthent
      */
     @Override
     public CompletableFuture<AuthenticateRequestResult> authenticateRequest(Activity activity, String authHeader) {
-        return authenticateRequest(activity, authHeader);
+        return inner.authenticateRequest(activity, authHeader);
     }
 
     /**
