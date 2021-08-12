@@ -3,12 +3,14 @@
 
 package com.microsoft.bot.connector.authentication;
 
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.skills.BotFrameworkClient;
 import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.RoleTypes;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -123,31 +125,30 @@ public class ParameterizedBotFrameworkAuthentication extends BotFrameworkAuthent
     @Override
     public CompletableFuture<AuthenticateRequestResult> authenticateStreamingRequest(String authHeader,
                                                                                      String channelIdHeader) {
-        if (StringUtils.isNotBlank(channelIdHeader)) {
-            this.credentialsFactory.isAuthenticationDisabled().thenCompose(isAuthDisabled -> {
-                if (isAuthDisabled) {
-                    return jwtTokenValidationValidateAuthHeader(authHeader, channelIdHeader, null)
-                                                                .thenCompose(claimsIdentity -> {
-                            String outboundAudience = SkillValidation.isSkillClaim(claimsIdentity.claims())
-                                ? JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims())
-                                : this.toChannelFromBotOAuthScope;
 
-                            return generateCallerId(this.credentialsFactory, claimsIdentity, this.callerId)
-                                                    .thenCompose(resultCallerId -> {
-                                AuthenticateRequestResult authenticateRequestResult = new AuthenticateRequestResult();
-                                authenticateRequestResult.setClaimsIdentity(claimsIdentity);
-                                authenticateRequestResult.setAudience(outboundAudience);
-                                authenticateRequestResult.setCallerId(resultCallerId);
+        return this.credentialsFactory.isAuthenticationDisabled().thenCompose(isAuthDisabled -> {
 
-                                return CompletableFuture.completedFuture(authenticateRequestResult);
-                            });
-                        }
-                    );
-                }
-                return null;
-            });
-        }
-        throw new AuthenticationException("channelId header required");
+            if (StringUtils.isBlank(channelIdHeader) && !isAuthDisabled) {
+                throw new AuthenticationException("channelId header required when authentication is enabled");
+            }
+
+            return jwtTokenValidationValidateAuthHeader(authHeader, channelIdHeader, null)
+                .thenCompose(claimsIdentity -> {
+                    String outboundAudience = SkillValidation.isSkillClaim(claimsIdentity.claims())
+                        ? JwtTokenValidation.getAppIdFromClaims(claimsIdentity.claims())
+                        : this.toChannelFromBotOAuthScope;
+
+                    return generateCallerId(this.credentialsFactory, claimsIdentity, this.callerId)
+                        .thenCompose(callerId -> {
+                            AuthenticateRequestResult authenticateRequestResult = new AuthenticateRequestResult();
+                            authenticateRequestResult.setClaimsIdentity(claimsIdentity);
+                            authenticateRequestResult.setAudience(outboundAudience);
+                            authenticateRequestResult.setCallerId(callerId);
+
+                            return CompletableFuture.completedFuture(authenticateRequestResult);
+                        });
+                });
+        });
     }
 
     /**
@@ -229,7 +230,7 @@ public class ParameterizedBotFrameworkAuthentication extends BotFrameworkAuthent
         } else if (SkillValidation.isSkillClaim(claims)) {
             throw new AuthenticationException("ClaimsValidator is required for validation of Skill Host calls.");
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     private CompletableFuture<ClaimsIdentity> jwtTokenValidationAuthenticateToken(String authHeader,
@@ -316,7 +317,7 @@ public class ParameterizedBotFrameworkAuthentication extends BotFrameworkAuthent
                 // Invalid appId
                 throw new AuthenticationException("SkillValidation.validateIdentity(): Invalid appId.");
             }
-            return null;
+            return CompletableFuture.completedFuture(null);
         });
     }
 
@@ -422,8 +423,10 @@ public class ParameterizedBotFrameworkAuthentication extends BotFrameworkAuthent
             AuthenticationConstants.ALLOWED_SIGNING_ALGORITHMS);
 
         return tokenExtractor.getIdentity(authHeader, channelId, this.authConfiguration.requiredEndorsements())
-            .thenCompose(identity -> governmentChannelValidationValidateIdentity(identity, serviceUrl)
-                .thenApply(result -> identity));
+            .thenCompose(identity -> {
+                governmentChannelValidationValidateIdentity(identity, serviceUrl).join();
+                return CompletableFuture.completedFuture(identity);
+            });
     }
 
     private TokenValidationParameters channelValidationGetTokenValidationParameters() {
@@ -490,7 +493,7 @@ public class ParameterizedBotFrameworkAuthentication extends BotFrameworkAuthent
                     throw new AuthenticationException("Unauthorized. ServiceUrl claim do not match.");
                 }
             }
-            return null;
+            return CompletableFuture.completedFuture(null);
         });
     }
 
