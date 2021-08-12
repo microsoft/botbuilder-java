@@ -79,7 +79,7 @@ public class PasswordServiceClientCredentialFactory extends ServiceClientCredent
      */
     @Override
     public CompletableFuture<Boolean> isValidAppId(String appId) {
-        return CompletableFuture.completedFuture(appId == this.appId);
+        return CompletableFuture.completedFuture(appId.equals(this.appId));
     }
 
     /**
