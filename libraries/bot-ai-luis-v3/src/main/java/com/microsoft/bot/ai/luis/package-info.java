@@ -3,7 +3,7 @@
 // license information.
 
 /**
- * This package contains the classes for Bot-AI-LUIS.
+ * This package contains the classes for com.microsoft.bot.ai.luis.
  */
 
 package com.microsoft.bot.ai.luis;

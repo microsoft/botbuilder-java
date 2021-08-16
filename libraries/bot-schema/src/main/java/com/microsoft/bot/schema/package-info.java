@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the models classes for bot-schema.
+ * This package contains the models classes for com.microsoft.bot.schema.
  */
 package com.microsoft.bot.schema;

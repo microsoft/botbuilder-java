@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the classes for bot-azure.
+ * This package contains the classes for com.microsoft.bot.azure.blobs.
  */
 package com.microsoft.bot.azure.blobs;
