@@ -86,19 +86,19 @@ public class TeamsActivityHandler extends ActivityHandler {
                         result = onTeamsAppBasedLinkQuery(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), AppBasedLinkQuery.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/query":
                         result = onTeamsMessagingExtensionQuery(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), MessagingExtensionQuery.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/selectItem":
                         result = onTeamsMessagingExtensionSelectItem(turnContext, turnContext.getActivity().getValue())
-                            .thenApply(ActivityHandler::createInvokeResponse);
+                            .thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/submitAction":
@@ -107,7 +107,7 @@ public class TeamsActivityHandler extends ActivityHandler {
                                 turnContext,
                                 Serialization
                                     .safeGetAs(turnContext.getActivity().getValue(), MessagingExtensionAction.class)
-                            ).thenApply(ActivityHandler::createInvokeResponse);
+                            ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/fetchTask":
@@ -116,56 +116,56 @@ public class TeamsActivityHandler extends ActivityHandler {
                                 turnContext,
                                 Serialization
                                     .safeGetAs(turnContext.getActivity().getValue(), MessagingExtensionAction.class)
-                            ).thenApply(ActivityHandler::createInvokeResponse);
+                            ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/querySettingUrl":
                         result = onTeamsMessagingExtensionConfigurationQuerySettingUrl(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), MessagingExtensionQuery.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/setting":
                         result = onTeamsMessagingExtensionConfigurationSetting(
                             turnContext,
                             turnContext.getActivity().getValue()
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "composeExtension/onCardButtonClicked":
                         result = onTeamsMessagingExtensionCardButtonClicked(
                             turnContext,
                             turnContext.getActivity().getValue()
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "task/fetch":
                         result = onTeamsTaskModuleFetch(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), TaskModuleRequest.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "task/submit":
                         result = onTeamsTaskModuleSubmit(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), TaskModuleRequest.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "tab/fetch":
                         result = onTeamsTabFetch(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), TabRequest.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     case "tab/submit":
                         result = onTeamsTabSubmit(
                             turnContext,
                             Serialization.safeGetAs(turnContext.getActivity().getValue(), TabSubmit.class)
-                        ).thenApply(ActivityHandler::createInvokeResponse);
+                        ).thenApply(this::createInvokeResponse);
                         break;
 
                     default:
