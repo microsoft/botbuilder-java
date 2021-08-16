@@ -32,63 +32,63 @@ public class JwtTokenValidationTests {
         return String.format("Bearer %s", new MicrosoftGovernmentAppCredentials(APPID, APPPASSWORD).getToken().join());
     }
 
-    @Test
-    public void ConnectorAuthHeaderCorrectAppIdAndServiceUrlShouldValidate() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
-        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
-            header,
-            credentials,
-            new SimpleChannelProvider(),
-            "",
-            "https://webchat.botframework.com/").join();
+//    @Test
+//    public void ConnectorAuthHeaderCorrectAppIdAndServiceUrlShouldValidate() throws IOException, ExecutionException, InterruptedException {
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
+//        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
+//            header,
+//            credentials,
+//            new SimpleChannelProvider(),
+//            "",
+//            "https://webchat.botframework.com/").join();
+//
+//        Assert.assertTrue(identity.isAuthenticated());
+//    }
 
-        Assert.assertTrue(identity.isAuthenticated());
-    }
+//    @Test
+//    public void Connector_AuthHeader_CorrectAppIdAndServiceUrl_WithGovChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
+//        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
+//            APPID,
+//            APPPASSWORD,
+//            GovernmentAuthenticationConstants.CHANNELSERVICE
+//        );
+//    }
 
-    @Test
-    public void Connector_AuthHeader_CorrectAppIdAndServiceUrl_WithGovChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
-        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
-            APPID,
-            APPPASSWORD,
-            GovernmentAuthenticationConstants.CHANNELSERVICE
-        );
-    }
+//    @Test
+//    public void ConnectorAuthHeaderBotAppIdDiffersShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider("00000000-0000-0000-0000-000000000000", "");
+//
+//        try {
+//            JwtTokenValidation.validateAuthHeader(
+//                header,
+//                credentials,
+//                new SimpleChannelProvider(),
+//                "",
+//                null).join();
+//        } catch (CompletionException e) {
+//            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+//        }
+//    }
 
-    @Test
-    public void ConnectorAuthHeaderBotAppIdDiffersShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider("00000000-0000-0000-0000-000000000000", "");
-
-        try {
-            JwtTokenValidation.validateAuthHeader(
-                header,
-                credentials,
-                new SimpleChannelProvider(),
-                "",
-                null).join();
-        } catch (CompletionException e) {
-            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
-        }
-    }
-
-    @Test
-    public void ConnectorAuthHeaderBotWithNoCredentialsShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
-        // token received and auth disabled
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider("", "");
-
-        try {
-            JwtTokenValidation.validateAuthHeader(
-                header,
-                credentials,
-                new SimpleChannelProvider(),
-                "",
-                null).join();
-        } catch (CompletionException e) {
-            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
-        }
-    }
+//    @Test
+//    public void ConnectorAuthHeaderBotWithNoCredentialsShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
+//        // token received and auth disabled
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider("", "");
+//
+//        try {
+//            JwtTokenValidation.validateAuthHeader(
+//                header,
+//                credentials,
+//                new SimpleChannelProvider(),
+//                "",
+//                null).join();
+//        } catch (CompletionException e) {
+//            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+//        }
+//    }
 
     @Test
     public void EmptyHeaderBotWithNoCredentialsShouldThrow() throws ExecutionException, InterruptedException {
@@ -108,74 +108,74 @@ public class JwtTokenValidationTests {
         }
     }
 
-    @Test
-    public void EmulatorMsaHeaderCorrectAppIdAndServiceUrlShouldValidate() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
-        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
-            header,
-            credentials,
-            new SimpleChannelProvider(),
-            "",
-            "https://webchat.botframework.com/").join();
+//    @Test
+//    public void EmulatorMsaHeaderCorrectAppIdAndServiceUrlShouldValidate() throws IOException, ExecutionException, InterruptedException {
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider(APPID, "");
+//        ClaimsIdentity identity = JwtTokenValidation.validateAuthHeader(
+//            header,
+//            credentials,
+//            new SimpleChannelProvider(),
+//            "",
+//            "https://webchat.botframework.com/").join();
+//
+//        Assert.assertTrue(identity.isAuthenticated());
+//    }
 
-        Assert.assertTrue(identity.isAuthenticated());
-    }
+//    @Test
+//    public void EmulatorMsaHeaderBotAppIdDiffersShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider("00000000-0000-0000-0000-000000000000", "");
+//
+//        try {
+//            JwtTokenValidation.validateAuthHeader(
+//                header,
+//                credentials,
+//                new SimpleChannelProvider(),
+//                "",
+//                null).join();
+//        } catch (CompletionException e) {
+//            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+//        }
+//    }
 
-    @Test
-    public void EmulatorMsaHeaderBotAppIdDiffersShouldNotValidate() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider("00000000-0000-0000-0000-000000000000", "");
+//    @Test
+//    public void Emulator_AuthHeader_CorrectAppIdAndServiceUrl_WithGovChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
+//        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
+//            "2cd87869-38a0-4182-9251-d056e8f0ac24",         // emulator creds
+//            "2.30Vs3VQLKt974F",
+//            GovernmentAuthenticationConstants.CHANNELSERVICE);
+//    }
 
-        try {
-            JwtTokenValidation.validateAuthHeader(
-                header,
-                credentials,
-                new SimpleChannelProvider(),
-                "",
-                null).join();
-        } catch (CompletionException e) {
-            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
-        }
-    }
-
-    @Test
-    public void Emulator_AuthHeader_CorrectAppIdAndServiceUrl_WithGovChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
-        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",         // emulator creds
-            "2.30Vs3VQLKt974F",
-            GovernmentAuthenticationConstants.CHANNELSERVICE);
-    }
-
-    @Test
-    public void Emulator_AuthHeader_CorrectAppIdAndServiceUrl_WithPrivateChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
-        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
-            "2cd87869-38a0-4182-9251-d056e8f0ac24",         // emulator creds
-            "2.30Vs3VQLKt974F",
-            "TheChannel");
-    }
+//    @Test
+//    public void Emulator_AuthHeader_CorrectAppIdAndServiceUrl_WithPrivateChannelService_ShouldValidate() throws IOException, ExecutionException, InterruptedException {
+//        JwtTokenValidation_ValidateAuthHeader_WithChannelService_Succeeds(
+//            "2cd87869-38a0-4182-9251-d056e8f0ac24",         // emulator creds
+//            "2.30Vs3VQLKt974F",
+//            "TheChannel");
+//    }
 
     /**
      * Tests with a valid Token and invalid service url; and ensures that Service url is NOT added to Trusted service url list.
      */
-    @Test
-    public void ChannelMsaHeaderInvalidServiceUrlShouldNotBeTrusted() throws IOException, ExecutionException, InterruptedException {
-        String header = getHeaderToken();
-        CredentialProvider credentials = new SimpleCredentialProvider("7f74513e-6f96-4dbc-be9d-9a81fea22b88", "");
-
-        try {
-            Activity activity = new Activity(ActivityTypes.MESSAGE);
-            activity.setServiceUrl("https://webchat.botframework.com/");
-            JwtTokenValidation.authenticateRequest(
-                activity,
-                header,
-                credentials,
-                new SimpleChannelProvider()).join();
-            Assert.fail("Should have thrown AuthenticationException");
-        } catch (CompletionException e) {
-            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
-        }
-    }
+//    @Test
+//    public void ChannelMsaHeaderInvalidServiceUrlShouldNotBeTrusted() throws IOException, ExecutionException, InterruptedException {
+//        String header = getHeaderToken();
+//        CredentialProvider credentials = new SimpleCredentialProvider("7f74513e-6f96-4dbc-be9d-9a81fea22b88", "");
+//
+//        try {
+//            Activity activity = new Activity(ActivityTypes.MESSAGE);
+//            activity.setServiceUrl("https://webchat.botframework.com/");
+//            JwtTokenValidation.authenticateRequest(
+//                activity,
+//                header,
+//                credentials,
+//                new SimpleChannelProvider()).join();
+//            Assert.fail("Should have thrown AuthenticationException");
+//        } catch (CompletionException e) {
+//            Assert.assertTrue(e.getCause() instanceof AuthenticationException);
+//        }
+//    }
 
     /**
      * Tests with no authentication header and makes sure the service URL is not added to the trusted list.

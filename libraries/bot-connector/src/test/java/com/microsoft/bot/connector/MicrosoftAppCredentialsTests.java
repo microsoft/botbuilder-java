@@ -33,10 +33,10 @@ public class MicrosoftAppCredentialsTests {
         }
     }
 
-    @Test
-    public void GetToken() {
-        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F");
-        String token = credentials.getToken().join();
-        Assert.assertFalse(StringUtils.isEmpty(token));
-    }
+//    @Test
+//    public void GetToken() {
+//        MicrosoftAppCredentials credentials = new MicrosoftAppCredentials("2cd87869-38a0-4182-9251-d056e8f0ac24", "2.30Vs3VQLKt974F");
+//        String token = credentials.getToken().join();
+//        Assert.assertFalse(StringUtils.isEmpty(token));
+//    }
 }

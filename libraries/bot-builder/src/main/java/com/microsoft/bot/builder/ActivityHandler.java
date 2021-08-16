@@ -470,7 +470,7 @@ public class ActivityHandler implements Bot {
      * @param body The body to return in the invoke response.
      * @return The InvokeResponse object.
      */
-    protected static InvokeResponse createInvokeResponse(Object body) {
+    protected InvokeResponse createInvokeResponse(Object body) {
         return new InvokeResponse(HttpURLConnection.HTTP_OK, body);
     }
 
