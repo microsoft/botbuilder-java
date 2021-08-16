@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the classes for Bot-Builder.
+ * This package contains the classes for com.microsoft.bot.dialogs.memory.pathresolvers.
  */
 package com.microsoft.bot.dialogs.memory.pathresolvers;
