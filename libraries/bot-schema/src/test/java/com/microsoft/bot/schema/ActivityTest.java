@@ -34,6 +34,11 @@ public class ActivityTest {
         Assert.assertEquals(activity.getLocale(), conversationReference.getLocale());
         Assert.assertEquals(activity.getChannelId(), conversationReference.getChannelId());
         Assert.assertEquals(activity.getServiceUrl(), conversationReference.getServiceUrl());
+
+        activity.setType(ActivityTypes.CONVERSATION_UPDATE);
+        conversationReference = activity.getConversationReference();
+        Assert.assertNull(conversationReference.getActivityId());
+
     }
 
     @Test
@@ -229,7 +234,7 @@ public class ActivityTest {
         activity.setFrom(account1);
         activity.setRecipient(account2);
         activity.setConversation(conversationAccount);
-        activity.setChannelId("ChannelId123");
+        activity.setChannelId("directline");
         // Intentionally oddly-cased to check that it isn't defaulted somewhere, but
         // tests stay in English
         activity.setLocale("en-uS");
@@ -699,6 +704,22 @@ public class ActivityTest {
         Activity activity = createActivity();
         activity.setEntities(null);
         Assert.assertTrue(activity.getMentions() != null);
+    }
+
+    @Test
+    public void CreateTraceForConversationUpdateActivity() {
+        Activity activity = createActivity();
+        activity.setType(ActivityTypes.CONVERSATION_UPDATE);
+        Activity trace = activity.createTrace("test");
+        Assert.assertNull(trace.getReplyToId());
+    }
+
+    @Test
+    public void CreateReplyForConversationUpdateActivity() {
+        Activity activity = createActivity();
+        activity.setType(ActivityTypes.CONVERSATION_UPDATE);
+        Activity reply = activity.createReply("test");
+        Assert.assertNull(reply.getReplyToId());
     }
 
     @Test

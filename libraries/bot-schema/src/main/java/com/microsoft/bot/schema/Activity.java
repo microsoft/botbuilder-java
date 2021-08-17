@@ -1316,7 +1316,14 @@ public class Activity {
                 .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
-        reply.setReplyToId(this.getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+            && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+                reply.replyToId = this.getId();
+        } else {
+            reply.replyToId = null;
+        }
+
         reply.setServiceUrl(this.getServiceUrl());
         reply.setChannelId(this.getChannelId());
 
@@ -1382,7 +1389,14 @@ public class Activity {
                 .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
-        result.setReplyToId(this.getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+                && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+            result.replyToId = this.getId();
+        } else {
+            result.replyToId = null;
+        }
+
         result.setServiceUrl(this.getServiceUrl());
         result.setChannelId(this.getChannelId());
 
@@ -1503,7 +1517,14 @@ public class Activity {
     @JsonIgnore
     public ConversationReference getConversationReference() {
         ConversationReference conversationReference = new ConversationReference();
-        conversationReference.setActivityId(getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+                && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+                conversationReference.setActivityId(this.getId());
+        } else {
+            conversationReference.setActivityId(null);
+        }
+
         conversationReference.setUser(getFrom());
         conversationReference.setBot(getRecipient());
         conversationReference.setConversation(getConversation());
