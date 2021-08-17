@@ -3,11 +3,25 @@
 
 package com.microsoft.bot.dialogs.prompts;
 
+import java.net.HttpURLConnection;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.BotAssert;
+import com.microsoft.bot.builder.ConnectorClientBuilder;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnStateConstants;
+import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
@@ -32,19 +46,8 @@ import com.microsoft.bot.schema.TokenExchangeInvokeRequest;
 import com.microsoft.bot.schema.TokenExchangeInvokeResponse;
 import com.microsoft.bot.schema.TokenExchangeRequest;
 import com.microsoft.bot.schema.TokenResponse;
-import org.apache.commons.lang3.StringUtils;
 
-import java.net.HttpURLConnection;
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Creates a new prompt that asks the user to sign in using the Bot Frameworks
