@@ -193,7 +193,10 @@ public class TestAdapter extends BotAdapter implements UserTokenProvider {
                 // ready for next reply
                 if (activity.getType() == null)
                     activity.setType(ActivityTypes.MESSAGE);
-                activity.setChannelId(conversationReference().getChannelId());
+
+                if (activity.getChannelId() == null) {
+                    activity.setChannelId(conversationReference().getChannelId());
+                }
 
                 if (activity.getFrom() == null || StringUtils.equalsIgnoreCase(activity.getFrom().getId(), "unknown")
                         || activity.getFrom().getRole() == RoleTypes.BOT) {
