@@ -30,7 +30,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
         when(turnContext.getAdapter()).thenReturn(null);
@@ -46,7 +46,7 @@ public class UserTokenAccessTests {
         when(userTokenClient.getUserToken(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(CompletableFuture.completedFuture(new TokenResponse()));
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(userTokenClient);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(userTokenClient);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
@@ -71,7 +71,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
@@ -92,7 +92,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
         when(turnContext.getAdapter()).thenReturn(null);
@@ -105,7 +105,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
         when(turnContext.getAdapter()).thenReturn(null);
@@ -121,7 +121,7 @@ public class UserTokenAccessTests {
         when(userTokenClient.signOutUser(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(CompletableFuture.completedFuture(null));
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(userTokenClient);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(userTokenClient);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
@@ -145,7 +145,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
@@ -168,7 +168,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
         when(turnContext.getAdapter()).thenReturn(null);
@@ -182,7 +182,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(mock(ConnectorFactory.class));
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(mock(ConnectorFactory.class));
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
@@ -194,7 +194,7 @@ public class UserTokenAccessTests {
         TurnContext turnContext = mock(TurnContext.class);
 
         TurnContextStateCollection turnContextStateCollection = mock(TurnContextStateCollection.class);
-        when(turnContextStateCollection.get(Mockito.any(Class.class))).thenReturn(null);
+        when(turnContextStateCollection.get(Mockito.any(String.class))).thenReturn(null);
 
         when(turnContext.getTurnState()).thenReturn(turnContextStateCollection);
 
