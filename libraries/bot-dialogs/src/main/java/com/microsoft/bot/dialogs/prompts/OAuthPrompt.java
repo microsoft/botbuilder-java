@@ -17,11 +17,9 @@ import java.util.regex.Pattern;
 
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.BotAssert;
-import com.microsoft.bot.builder.ConnectorClientBuilder;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnStateConstants;
-import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
