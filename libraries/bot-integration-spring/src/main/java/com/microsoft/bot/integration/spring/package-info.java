@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the classes for bot-integration-spring.
+ * This package contains the classes for com.microsoft.bot.integration.spring.
  */
 package com.microsoft.bot.integration.spring;

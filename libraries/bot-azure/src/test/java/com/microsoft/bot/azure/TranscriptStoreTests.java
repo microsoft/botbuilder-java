@@ -493,7 +493,7 @@ public class TranscriptStoreTests {
             Integer expectedLength, Integer maxTimeout) throws TimeoutException {
         TranscriptStore transcriptStore = getTranscriptStore();
         if (maxTimeout == null) {
-            maxTimeout = 5000;
+            maxTimeout = 10000;
         }
 
         PagedResult<Activity> pagedResult = null;
