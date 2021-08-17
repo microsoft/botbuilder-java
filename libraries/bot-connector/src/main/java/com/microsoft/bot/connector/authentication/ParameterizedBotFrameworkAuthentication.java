@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.connector.authentication;
 
-import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.skills.BotFrameworkClient;
 import com.microsoft.bot.schema.Activity;
