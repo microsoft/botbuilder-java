@@ -3,6 +3,7 @@
 
 package com.microsoft.bot.dialogs.prompts;
 
+import com.microsoft.bot.builder.CloudAdapterBase;
 import com.microsoft.bot.builder.ConnectorClientBuilder;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.UserTokenProvider;
@@ -26,7 +27,7 @@ public final class UserTokenAccess {
         OAuthPromptSettings settings,
         String magicCode) {
 
-        UserTokenClient userTokenClient = turnContext.getTurnState().get(UserTokenClient.class);
+        UserTokenClient userTokenClient = turnContext.getTurnState().get(CloudAdapterBase.USER_TOKEN_CLIENT_KEY);
 
         if (userTokenClient != null) {
             return userTokenClient.getUserToken(
@@ -49,7 +50,7 @@ public final class UserTokenAccess {
         TurnContext turnContext,
         OAuthPromptSettings settings) {
 
-        UserTokenClient userTokenClient = turnContext.getTurnState().get(UserTokenClient.class);
+        UserTokenClient userTokenClient = turnContext.getTurnState().get(CloudAdapterBase.USER_TOKEN_CLIENT_KEY);
 
         if (userTokenClient != null) {
             return userTokenClient.getSignInResource(
@@ -72,7 +73,7 @@ public final class UserTokenAccess {
         TurnContext turnContext,
         OAuthPromptSettings settings) {
 
-        UserTokenClient userTokenClient = turnContext.getTurnState().get(UserTokenClient.class);
+        UserTokenClient userTokenClient = turnContext.getTurnState().get(CloudAdapterBase.USER_TOKEN_CLIENT_KEY);
 
         if (userTokenClient != null) {
             return userTokenClient.signOutUser(
@@ -102,7 +103,7 @@ public final class UserTokenAccess {
         OAuthPromptSettings settings,
         TokenExchangeRequest tokenExchangeRequest) {
 
-        UserTokenClient userTokenClient = turnContext.getTurnState().get(UserTokenClient.class);
+        UserTokenClient userTokenClient = turnContext.getTurnState().get(CloudAdapterBase.USER_TOKEN_CLIENT_KEY);
 
         if (userTokenClient != null) {
             String userId = turnContext.getActivity().getFrom().getId();
@@ -125,7 +126,7 @@ public final class UserTokenAccess {
         ClaimsIdentity claimsIdentity,
         String audience) {
 
-        ConnectorFactory connectorFactory = turnContext.getTurnState().get(ConnectorFactory.class);
+        ConnectorFactory connectorFactory = turnContext.getTurnState().get(CloudAdapterBase.CONNECTOR_FACTORY_KEY);
 
         if (connectorFactory != null) {
             return connectorFactory.create(serviceUrl, audience);
