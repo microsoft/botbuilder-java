@@ -6,6 +6,7 @@ package com.microsoft.bot.builder;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.authentication.ClaimsIdentity;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ResourceResponse;
 
@@ -373,5 +374,37 @@ public abstract class BotAdapter {
         BotCallbackHandler callback
     ) {
         return Async.completeExceptionally(new NotImplementedException("continueConversation"));
+    }
+
+    /**
+     * Creates a conversation on the specified channel.
+     *
+     * <p>
+     * To start a conversation, your bot must know its account information
+     * and the user's account information on that channel.
+     * Most _channels only support initiating a direct message (non-group) conversation.
+     * The adapter attempts to create a new conversation on the channel, and
+     * then sends a conversationUpdate activity through its middleware pipeline
+     * to the callback method.
+     * If the conversation is established with the
+     * specified users, the ID of the activity's {@link Activity#conversation}
+     * will contain the ID of the new conversation.
+     * </p>
+     * @param botAppId The application ID of the bot.
+     * @param channelId The ID for the channel.
+     * @param serviceUrl The channel's service URL endpoint.
+     * @param audience The audience for the connector.
+     * @param conversationParameters The conversation information to use to create the conversation.
+     * @param callback The method to call for the resulting bot turn.
+     * @return A task that represents the work queued to execute.
+     */
+    public CompletableFuture<Void> createConversation(
+        String botAppId,
+        String channelId,
+        String serviceUrl,
+        String audience,
+        ConversationParameters conversationParameters, BotCallbackHandler callback
+    ) {
+        return Async.completeExceptionally(new NotImplementedException("createConversation"));
     }
 }

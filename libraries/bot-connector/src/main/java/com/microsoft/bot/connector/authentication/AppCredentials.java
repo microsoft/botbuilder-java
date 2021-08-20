@@ -134,6 +134,14 @@ public abstract class AppCredentials implements ServiceClientCredentials {
     }
 
     /**
+     * Gets a value indicating whether to validate the Authority.
+     * @return The validateAuthority value to use.
+     */
+    public Boolean validateAuthority() {
+        return true;
+    }
+
+    /**
      * Gets an OAuth access token.
      *
      * @return If the task is successful, the result contains the access token

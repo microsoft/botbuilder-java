@@ -14,6 +14,7 @@ import com.microsoft.bot.connector.authentication.ChannelProvider;
 import com.microsoft.bot.connector.authentication.CredentialProvider;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.ClasspathPropertiesConfiguration;
+import com.microsoft.bot.integration.CloudAdapter;
 import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.ConfigurationChannelProvider;
 import com.microsoft.bot.integration.ConfigurationCredentialProvider;
@@ -125,6 +126,21 @@ public abstract class BotDependencyConfiguration {
     @Bean
     public BotFrameworkHttpAdapter getBotFrameworkHttpAdaptor(Configuration configuration) {
         return new BotFrameworkHttpAdapter(configuration);
+    }
+
+    /**
+     * Returns the CloudAdapter for the application.
+     *
+     * By default, it uses the {@link CloudAdapter} class.
+     *
+     * @param configuration The Configuration object to read from.
+     * @return A CloudAdapter object.
+     *
+     * @see #getConfiguration()
+     */
+    @Bean
+    public CloudAdapter getCloudAdapter(Configuration configuration) {
+        return new CloudAdapter(configuration);
     }
 
     /**

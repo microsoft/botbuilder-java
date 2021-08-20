@@ -101,4 +101,13 @@ public class ClaimsIdentity {
     public String getType() {
         return type;
     }
+
+    /**
+     * Returns a claim value (if its present).
+     * @param claimType The claim type to look for
+     * @return The claim value or null if not found
+     */
+    public String getClaimValue(String claimType) {
+        return claims().get(claimType);
+    }
 }

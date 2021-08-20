@@ -8,9 +8,9 @@ import java.net.URI;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.bot.builder.ConversationState;
-import com.microsoft.bot.builder.skills.BotFrameworkClient;
 import com.microsoft.bot.builder.skills.BotFrameworkSkill;
 import com.microsoft.bot.builder.skills.SkillConversationIdFactoryBase;
+import com.microsoft.bot.connector.skills.BotFrameworkClient;
 
 /**
  * Defines the options that will be used to execute a {@link SkillDialog} .

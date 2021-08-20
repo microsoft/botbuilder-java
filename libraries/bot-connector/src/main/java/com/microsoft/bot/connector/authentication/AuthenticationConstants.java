@@ -116,6 +116,16 @@ public final class AuthenticationConstants {
     public static final String AUDIENCE_CLAIM = "aud";
 
     /**
+     * Issuer Claim. From RFC 7519.
+     *     https://tools.ietf.org/html/rfc7519#section-4.1.1
+     * The "iss" (issuer) claim identifies the principal that issued the
+     * JWT.  The processing of this claim is generally application specific.
+     * The "iss" value is a case-sensitive string containing a StringOrURI
+     * value.  Use of this claim is OPTIONAL.
+     */
+    public static final String ISSUER_CLAIM = "iss";
+
+    /**
      * From RFC 7515 https://tools.ietf.org/html/rfc7515#section-4.1.4 The "kid"
      * (key ID) Header Parameter is a hint indicating which key was used to secure
      * the JWS. This parameter allows originators to explicitly signal a change of

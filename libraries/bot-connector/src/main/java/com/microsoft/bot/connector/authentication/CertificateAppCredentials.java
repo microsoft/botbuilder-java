@@ -41,7 +41,9 @@ public class CertificateAppCredentials extends AppCredentials {
         // going to create this now instead of lazy loading so we don't have some
         // awkward InputStream hanging around.
         authenticator =
-            new CertificateAuthenticator(withOptions, new OAuthConfiguration(oAuthEndpoint(), oAuthScope()));
+            new CertificateAuthenticator(withOptions, new OAuthConfiguration(oAuthEndpoint(),
+                                                                            oAuthScope(),
+                                                                            validateAuthority()));
     }
 
     /**

@@ -117,8 +117,8 @@ public final class ServiceResponseBuilder<T, E extends RestException> implements
                 throw exceptionType.getConstructor(String.class, Response.class, (Class<?>) responseTypes.get(0))
                         .newInstance("Status code " + statusCode + ", " + responseContent, response, buildBody(statusCode, responseBody));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new IOException("Status code " + statusCode + ", but an instance of " + exceptionType.getCanonicalName()
-                    + " cannot be created.", e);
+                throw new IOException("Status code " + statusCode + ", but an instance of "
+                                     + exceptionType.getCanonicalName() + " cannot be created.", e);
             }
         }
     }
@@ -136,8 +136,8 @@ public final class ServiceResponseBuilder<T, E extends RestException> implements
                 throw exceptionType.getConstructor(String.class, Response.class)
                         .newInstance("Status code " + statusCode, response);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new IOException("Status code " + statusCode + ", but an instance of " + exceptionType.getCanonicalName()
-                        + " cannot be created.", e);
+                throw new IOException("Status code " + statusCode + ", but an instance of "
+                                     + exceptionType.getCanonicalName() + " cannot be created.", e);
             }
         }
     }
