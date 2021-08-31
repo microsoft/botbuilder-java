@@ -191,10 +191,10 @@ jobs:
       options: --settings $(Build.SourcesDirectory)/settings.xml -Dinternal.repo.username=$(JavaMygetUserName) -Dinternal.repo.password=$(JavaMygetApiKey) -e --no-transfer-progress
       publishJUnitResults: false
   - task: CopyFiles@2
-    displayName: Copy deployment files to staging packages directory
+    displayName: 'Copy deployment files to staging packages directory'
     inputs:
-      SourceFolder: '$(system.defaultworkingdirectory)'
-      Contents: >-
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
         libraries/*/target/*.jar
         libraries/*/target/*.jar.asc
         libraries/*/pom.xml
