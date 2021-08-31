@@ -6,16 +6,21 @@
 # Variable Group 'JavaVariableGroup' was defined in the Variables tab
 # Variable Group 'JavaSigningVariableGroup' was defined in the Variables tab
 # Cron Schedules have been converted using UTC Time Zone and may need to be updated for your location
+
+# "name" here defines the build number format. Build number is accessed via $(Build.BuildNumber)
+name: $(Build.BuildId)
+
+pool:
+    vmImage: windows-2019
+
+trigger: none # ci trigger is set in ADO
+pr: none # pr trigger is set in ADO
+
 jobs:
 - job: Phase_1
   displayName: Phase 1
-  cancelTimeoutInMinutes: 1
-  pool:
-    vmImage: windows-2019
-  steps:
-  - checkout: self
-    persistCredentials: True
 
+  steps:
   - powershell: |
      # Replace {DateStamp} and {CommitHash} tokens with the actual values in var PackageVersion
      $dateStamp = (Get-Date -format "yyyyMMdd");
