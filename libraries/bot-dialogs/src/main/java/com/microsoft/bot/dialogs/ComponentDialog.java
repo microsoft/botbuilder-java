@@ -130,12 +130,12 @@ public class ComponentDialog extends DialogContainer {
      *         If the task is successful, the result indicates whether this dialog
      *         is still active after this dialog turn has been processed. Generally,
      *         the child dialog was started with a call to
-     *         {@link BeginDialog(DialogContext, Object)} in the parent's context.
+     *         BeginDialog(DialogContext, Object) in the parent's context.
      *         However, if the {@link DialogContext#replaceDialog(String, Object)}
      *         method is called, the logical child dialog may be different than the
      *         original. If this method is *not* overridden, the dialog
-     *         automatically calls its {@link RepromptDialog(TurnContext,
-     *         DialogInstance)} when the user replies.
+     *         automatically calls its RepromptDialog(TurnContext,
+     *         DialogInstance) when the user replies.
      */
     @Override
     public CompletableFuture<DialogTurnResult> resumeDialog(DialogContext outerDc, DialogReason reason, Object result) {
@@ -277,7 +277,7 @@ public class ComponentDialog extends DialogContainer {
      *         default, this calls the
      *         {@link Dialog#beginDialog(DialogContext, Object)} method of the
      *         component dialog's initial dialog, as defined by
-     *         {@link InitialDialogId} . Override this method in a derived class to
+     *         InitialDialogId . Override this method in a derived class to
      *         implement interrupt logic.
      */
     protected CompletableFuture<DialogTurnResult> onBeginDialog(DialogContext innerDc, Object options) {

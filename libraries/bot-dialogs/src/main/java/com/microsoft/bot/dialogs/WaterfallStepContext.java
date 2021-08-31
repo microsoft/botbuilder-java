@@ -9,9 +9,9 @@ import java.util.concurrent.CompletableFuture;
 import com.microsoft.bot.connector.Async;
 
 /**
- * Provides context for a step in a {@link waterfallDialog} .
+ * Provides context for a step in a {@link WaterfallDialog} .
  *
- * The {@link DialogContext#context} property contains the {@link TurnContext}
+ * The {@link DialogContext} property contains the {@link TurnContext}
  * for the current turn.
  */
 public class WaterfallStepContext extends DialogContext {
