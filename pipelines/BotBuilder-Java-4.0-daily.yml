@@ -25,43 +25,34 @@ jobs:
      $v = "$(PackageVersion)".Replace("{DateStamp}",$dateStamp).Replace("{CommitHash}",$commitHash);
      Write-Host "##vso[task.setvariable variable=PackageVersion;]$v";
      "Resolved PackageVersion = $v";
-    displayName: 'Resolve package version variable'
+    displayName: 'Resolve variable PackageVersion'
 
   - task: tagBuildOrRelease@0
     displayName: Tag Build with package version
     inputs:
       tags: PackageVersion=$(PackageVersion)
 
-  - task: PowerShell@2
-    displayName: Maven set versions in pom files
-    inputs:
-      targetType: inline
-      script: >
+  - powershell: |
         Write-Host "Setting module versions"
         Write-Host "version = $(PackageVersion)"
 
         mvn versions:set -DnewVersion="$(PackageVersion)" --no-transfer-progress
 
         Write-Host "Completed"
+    displayName: Maven set versions in pom files
 
-  - task: PowerShell@2
-    displayName: Import signing keys
-    continueOnError: True
-    timeoutInMinutes: 1
-    inputs:
-      targetType: inline
-      script: >+
+  - powershell: |
         gpg --version
 
-        Write-Host "Public key:"
+        Write-Host "Public key:";
         $file = "public.pgp";
         $key =  "$(PgpSigningPublicKey)";
 
         # Restore the missing newlines to the key
         $cut1 = $key.Substring(0, 80).LastIndexOf('-') + 2;
         $cut2 = $key.Substring($cut1).IndexOf('-') + $cut1;
-        $firstLine = $key.Substring(0, $cut1)
-        $lastLine = $key.Substring($cut2)
+        $firstLine = $key.Substring(0, $cut1);
+        $lastLine = $key.Substring($cut2);
         $middleLine = $key.Substring($cut1, $cut2 - $cut1);
         $middleLine = $middleLine.Replace(" ", "`r`n");
         $key2 = -Join ($firstLine, "`r`n", $middleLine, $lastLine);
@@ -69,8 +60,8 @@ jobs:
 
         #'-------------'; get-content "$file"; '==================='
 
-        gpg --import $file
-        Remove-Item $file
+        gpg --import $file;
+        Remove-Item $file;
 
         Write-Host "Private key:"
         $file = "private.pgp";
@@ -79,22 +70,17 @@ jobs:
 
         $cut1 = $key.Substring(0, 80).LastIndexOf('-') + 2;
         $cut2 = $key.Substring($cut1).IndexOf('-') + $cut1;
-        $firstLine = $key.Substring(0, $cut1)
-        $lastLine = $key.Substring($cut2)
+        $firstLine = $key.Substring(0, $cut1);
+        $lastLine = $key.Substring($cut2);
         $middleLine = $key.Substring($cut1, $cut2 - $cut1);
         $middleLine = $middleLine.Replace(" ", "`r`n");
         $key2 = -Join ($firstLine, "`r`n", $middleLine, $lastLine);
         New-Item -Path $file -ItemType "file" -Value $key2;
-        gpg --allow-secret-key-import --import $file
-        Remove-Item $file
+        gpg --allow-secret-key-import --import $file;
+        Remove-Item $file;
+    displayName: Import signing keys
 
-  - task: PowerShell@2
-    displayName: '[Diagnostics] Show pom files'
-    condition: succeededOrFailed()
-    enabled: False
-    inputs:
-      targetType: inline
-      script: >-
+  - powershell: |
         $file = "$(Build.SourcesDirectory)\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
@@ -142,6 +128,7 @@ jobs:
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
         Write-Host $element.InnerText
         get-content $file;
+    displayName: '[Diagnostics] Show pom files'
 
   - task: Maven@3
     displayName: Maven Install (this signs)
