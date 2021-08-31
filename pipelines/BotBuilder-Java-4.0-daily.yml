@@ -193,14 +193,14 @@ jobs:
   - task: CopyFiles@2
     displayName: Copy deployment files to staging packages directory
     inputs:
-      SourceFolder: $(system.defaultworkingdirectory)
+      SourceFolder: '$(system.defaultworkingdirectory)'
       Contents: >-
         libraries/*/target/*.jar
         libraries/*/target/*.jar.asc
         libraries/*/pom.xml
         settings.xml
         pom.xml
-      TargetFolder: $(Build.ArtifactStagingDirectory)/packages
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/packages'
   - task: PublishBuildArtifacts@1
     displayName: Publish deployment files to artifacts
     inputs:
