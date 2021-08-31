@@ -183,13 +183,8 @@ jobs:
     inputs:
       PathtoPublish: $(Build.ArtifactStagingDirectory)/packages
 
-  - task: PowerShell@2
+  - powershell: |
+        pushd ..;
+        Get-ChildItem -Recurse -Force;
     displayName: Dir workspace
-    condition: succeededOrFailed()
-    continueOnError: True
-    inputs:
-      targetType: inline
-      script: >-
-        pushd ..
-        Get-ChildItem -Recurse -Force
 ...
