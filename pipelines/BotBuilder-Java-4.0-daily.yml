@@ -33,12 +33,12 @@ jobs:
       tags: PackageVersion=$(PackageVersion)
 
   - powershell: |
-        Write-Host "Setting module versions"
-        Write-Host "version = $(PackageVersion)"
+        Write-Host "Setting module versions";
+        Write-Host "version = $(PackageVersion)";
 
-        mvn versions:set -DnewVersion="$(PackageVersion)" --no-transfer-progress
+        mvn versions:set -DnewVersion="$(PackageVersion)" --no-transfer-progress;
 
-        Write-Host "Completed"
+        Write-Host "Completed";
     displayName: Maven set versions in pom files
 
   - powershell: |
@@ -84,49 +84,49 @@ jobs:
         $file = "$(Build.SourcesDirectory)\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
-        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-        $element = $xml.SelectSingleNode('//ns:version', $nsm)
+        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable);
+        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI);
+        $element = $xml.SelectSingleNode('//ns:version', $nsm);
         #$element.InnerText = "$(PackageVersion)"
         #$xml.Save($file);
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-        Write-Host $element.InnerText
+        Write-Host $element.InnerText;
         get-content $file;
 
         $file = "$(Build.SourcesDirectory)\libraries\bot-builder\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
-        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-        $element = $xml.SelectSingleNode('//ns:version', $nsm)
+        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable);
+        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI);
+        $element = $xml.SelectSingleNode('//ns:version', $nsm);
         #$element.InnerText = "$(PackageVersion)"
         #$xml.Save($file);
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-        Write-Host $element.InnerText
+        Write-Host $element.InnerText;
         get-content $file;
 
         $file = "$(Build.SourcesDirectory)\libraries\bot-schema\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
-        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-        $element = $xml.SelectSingleNode('//ns:version', $nsm)
+        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable);
+        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI);
+        $element = $xml.SelectSingleNode('//ns:version', $nsm);
         #$element.InnerText = "$(PackageVersion)"
         #$xml.Save($file);
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-        Write-Host $element.InnerText
+        Write-Host $element.InnerText;
         get-content $file;
 
         $file = "$(Build.SourcesDirectory)\libraries\bot-connector\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
-        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
-        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI)
-        $element = $xml.SelectSingleNode('//ns:version', $nsm)
+        $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable);
+        $nsm.AddNamespace('ns', $xml.DocumentElement.NamespaceURI);
+        $element = $xml.SelectSingleNode('//ns:version', $nsm);
         #$element.InnerText = "$(PackageVersion)"
         #$xml.Save($file);
         Write-Host $file '+++++++++++++++++++++++++++++++++++';
-        Write-Host $element.InnerText
+        Write-Host $element.InnerText;
         get-content $file;
     displayName: '[Diagnostics] Show pom files'
 
