@@ -15,10 +15,23 @@ jobs:
   steps:
   - checkout: self
     persistCredentials: True
+
+  - powershell: |
+     # Replace {DateStamp} and {CommitHash} tokens with the actual values in var PackageVersion
+     $dateStamp = (Get-Date -format "yyyyMMdd");
+     $commitHash = "$(Build.SourceVersion)".SubString(0,7);
+
+     "Raw PackageVersion = $(PackageVersion)";
+     $v = "$(PackageVersion)".Replace("{DateStamp}",$dateStamp).Replace("{CommitHash}",$commitHash);
+     Write-Host "##vso[task.setvariable variable=PackageVersion;]$v";
+     "Resolved PackageVersion = $v";
+    displayName: 'Resolve package version variable'
+
   - task: tagBuildOrRelease@0
     displayName: Tag Build with package version
     inputs:
       tags: PackageVersion=$(PackageVersion)
+
   - task: PowerShell@2
     displayName: Maven set versions in pom files
     inputs:
@@ -30,6 +43,7 @@ jobs:
         mvn versions:set -DnewVersion="$(PackageVersion)" --no-transfer-progress
 
         Write-Host "Completed"
+
   - task: PowerShell@2
     displayName: Import signing keys
     continueOnError: True
@@ -39,68 +53,40 @@ jobs:
       script: >+
         gpg --version
 
-
         Write-Host "Public key:"
-
         $file = "public.pgp";
-
         $key =  "$(PgpSigningPublicKey)";
 
-
         # Restore the missing newlines to the key
-
         $cut1 = $key.Substring(0, 80).LastIndexOf('-') + 2;
-
         $cut2 = $key.Substring($cut1).IndexOf('-') + $cut1;
-
         $firstLine = $key.Substring(0, $cut1)
-
         $lastLine = $key.Substring($cut2)
-
         $middleLine = $key.Substring($cut1, $cut2 - $cut1);
-
         $middleLine = $middleLine.Replace(" ", "`r`n");
-
         $key2 = -Join ($firstLine, "`r`n", $middleLine, $lastLine);
-
         New-Item -Path $file -ItemType "file" -Value $key2;
 
         #'-------------'; get-content "$file"; '==================='
 
         gpg --import $file
-
         Remove-Item $file
-
 
         Write-Host "Private key:"
-
         $file = "private.pgp";
-
         $key =  "$(PgpSigningPrivateKey)";
-
         $passPhrase = "$(PassPhrase)";
 
-
         $cut1 = $key.Substring(0, 80).LastIndexOf('-') + 2;
-
         $cut2 = $key.Substring($cut1).IndexOf('-') + $cut1;
-
         $firstLine = $key.Substring(0, $cut1)
-
         $lastLine = $key.Substring($cut2)
-
         $middleLine = $key.Substring($cut1, $cut2 - $cut1);
-
         $middleLine = $middleLine.Replace(" ", "`r`n");
-
         $key2 = -Join ($firstLine, "`r`n", $middleLine, $lastLine);
-
         New-Item -Path $file -ItemType "file" -Value $key2;
-
         gpg --allow-secret-key-import --import $file
-
         Remove-Item $file
-
 
   - task: PowerShell@2
     displayName: '[Diagnostics] Show pom files'
@@ -133,7 +119,6 @@ jobs:
         Write-Host $element.InnerText
         get-content $file;
 
-
         $file = "$(Build.SourcesDirectory)\libraries\bot-schema\pom.xml";
         $xml = New-Object XML;
         $xml.Load($file);
@@ -165,6 +150,7 @@ jobs:
       options: -e --no-transfer-progress -Drepo.id=ConversationalAI -Drepo.url=https://pkgs.dev.azure.com/ConversationalAI/BotFramework/_packaging/SDK/maven/v1 -Dexclude.tests=
       codeCoverageTool: JaCoCo
       findbugsAnalysisEnabled: true
+
   - task: Maven@3
     displayName: 'Maven Package '
     enabled: False
@@ -172,6 +158,7 @@ jobs:
       goals: package -P devops
       options: -e --no-transfer-progress
       findbugsAnalysisEnabled: true
+
   - task: Maven@3
     displayName: Maven Deploy
     condition: "and(succeeded(), or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['publish'], 'true'))) "
@@ -183,6 +170,7 @@ jobs:
       checkstyleAnalysisEnabled: true
       pmdAnalysisEnabled: true
       findbugsAnalysisEnabled: true
+
   - task: Maven@3
     displayName: Maven deploy to scratch
     enabled: False
@@ -190,6 +178,7 @@ jobs:
       goals: deploy
       options: --settings $(Build.SourcesDirectory)/settings.xml -Dinternal.repo.username=$(JavaMygetUserName) -Dinternal.repo.password=$(JavaMygetApiKey) -e --no-transfer-progress
       publishJUnitResults: false
+
   - task: CopyFiles@2
     displayName: 'Copy deployment files to staging packages directory'
     inputs:
@@ -201,10 +190,12 @@ jobs:
         settings.xml
         pom.xml
       TargetFolder: '$(Build.ArtifactStagingDirectory)/packages'
+
   - task: PublishBuildArtifacts@1
     displayName: Publish deployment files to artifacts
     inputs:
       PathtoPublish: $(Build.ArtifactStagingDirectory)/packages
+
   - task: PowerShell@2
     displayName: Dir workspace
     condition: succeededOrFailed()
@@ -213,6 +204,5 @@ jobs:
       targetType: inline
       script: >-
         pushd ..
-
         Get-ChildItem -Recurse -Force
 ...
