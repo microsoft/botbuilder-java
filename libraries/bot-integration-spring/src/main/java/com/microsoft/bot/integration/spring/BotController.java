@@ -39,13 +39,13 @@ public class BotController {
     private Logger logger = LoggerFactory.getLogger(BotController.class);
 
     /**
-     * The BotFrameworkHttpAdapter to use. Note is is provided by dependency
+     * The BotFrameworkHttpAdapter to use. Note it is provided by dependency
      * injection via the constructor.
      */
     private final BotFrameworkHttpAdapter adapter;
 
     /**
-     * The BotFrameworkHttpAdapter to use. Note is is provided by dependency
+     * The BotFrameworkHttpAdapter to use. Note it is provided by dependency
      * injection via the constructor.
      */
     private final Bot bot;
