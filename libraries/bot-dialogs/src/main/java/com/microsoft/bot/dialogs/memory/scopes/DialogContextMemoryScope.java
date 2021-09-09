@@ -13,7 +13,7 @@ import com.microsoft.bot.dialogs.DialogInstance;
 import com.microsoft.bot.dialogs.ScopePath;
 
 /**
- * DialogContextMemoryScope maps "dialogcontext" -> properties.
+ * DialogContextMemoryScope maps "dialogcontext" to properties.
  */
 public class DialogContextMemoryScope extends MemoryScope {
 

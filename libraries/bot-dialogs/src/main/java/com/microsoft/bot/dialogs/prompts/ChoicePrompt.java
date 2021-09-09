@@ -157,8 +157,7 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
 
     /**
      * Gets or sets additional options passed to the underlying
-     * {@link ChoiceRecognizers#recognizeChoices(String, IList{Choice},
-     * FindChoicesOptions)} method.
+     * {@link ChoiceRecognizers#recognizeChoices(String, IList{Choice}, FindChoicesOptions)} method.
      *
      * @return Options to control the recognition strategy.
      */
@@ -168,8 +167,7 @@ public class ChoicePrompt extends Prompt<FoundChoice> {
 
     /**
      * Gets or sets additional options passed to the underlying
-     * {@link ChoiceRecognizers#recognizeChoices(String, IList{Choice},
-     * FindChoicesOptions)} method.
+     * {@link ChoiceRecognizers#recognizeChoices(String, IList{Choice}, FindChoicesOptions)} method.
      *
      * @param recognizerOptions Options to control the recognition strategy.
      */

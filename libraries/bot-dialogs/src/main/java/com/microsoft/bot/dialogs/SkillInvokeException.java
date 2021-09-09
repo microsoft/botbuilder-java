@@ -1,7 +1,7 @@
 package com.microsoft.bot.dialogs;
 
 /**
- * Exception used to report issues during the invoke method of the {@link SkillsDialog} class.
+ * Exception used to report issues during the invoke method of the {@link SkillDialog} class.
  */
 public class SkillInvokeException extends RuntimeException {
 

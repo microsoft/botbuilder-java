@@ -49,11 +49,11 @@ public class DialogTurnResult {
      * Gets or sets the result returned by a dialog that was just ended.
      *
      * <p>This will only be populated in certain cases:
-     * <br/>- The bot calls `DialogContext.BeginDialogAsync()` to start a new dialog and the dialog
-     * ends immediately.
-     * <br/>- The bot calls `DialogContext.ContinueDialogAsync()` and a dialog that was active ends.</p>
+     * <br>- The bot calls `DialogContext.BeginDialogAsync()` to start a new dialog and the dialog
+     * ends immediately.</br>
+     * <br>- The bot calls `DialogContext.ContinueDialogAsync()` and a dialog that was active ends.</br></p>
      *
-     * <p>In all cases where it's populated, <see cref="DialogContext.ActiveDialog"/> will be `null`.</p>
+     * <p>In all cases where it's populated, {@link "DialogContext.ActiveDialog"} will be `null`.</p>
      * @return The result returned by a dialog that was just ended.
      */
     public Object getResult() {

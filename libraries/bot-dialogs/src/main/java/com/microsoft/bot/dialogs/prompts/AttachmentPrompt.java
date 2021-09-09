@@ -23,7 +23,7 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
      *
      * @param dialogId   The ID to assign to this prompt.
      *
-     * The value of {@link dialogId} must be unique within the {@link DialogSet} or
+     * The value of dialogId must be unique within the {@link DialogSet} or
      * {@link ComponentDialog} to which the prompt is added.
      */
     public AttachmentPrompt(String dialogId) {
@@ -34,10 +34,10 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
      * Initializes a new instance of the {@link AttachmentPrompt} class.
      *
      * @param dialogId   The ID to assign to this prompt.
-     * @param validator  Optional, a {@link PromptValidator{T}} that contains additional,
+     * @param validator  Optional, a {@link PromptValidator} that contains additional,
      *                   custom validation for this prompt.
      *
-     * The value of {@link dialogId} must be unique within the {@link DialogSet} or
+     * The value of dialogId must be unique within the {@link DialogSet} or
      * {@link ComponentDialog} to which the prompt is added.
      */
     public AttachmentPrompt(String dialogId, PromptValidator<List<Attachment>> validator) {
@@ -51,7 +51,7 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
      * @param state        Contains state for the current instance of the prompt on the
      *                     dialog stack.
      * @param options      A prompt options Object constructed from the options initially
-     *                     provided in the call to {@link DialogContext#prompt(String, PromptOptions)} .
+     *                     provided in the call to {@link DialogContext(String, PromptOptions)} .
      * @param isRetry      true if this is the first time this prompt dialog instance on the
      *                     stack is prompting the user for input; otherwise, false.
      *
@@ -88,7 +88,7 @@ public class AttachmentPrompt extends Prompt<List<Attachment>> {
      * @param state        Contains state for the current instance of the prompt on the
      *                     dialog stack.
      * @param options      A prompt options Object constructed from the options initially
-     *                     provided in the call to {@link DialogContext#prompt(String, PromptOptions)} .
+     *                     provided in the call to {@link DialogContext(String, PromptOptions)} .
      *
      * @return   A {@link CompletableFuture} representing the asynchronous operation.
      *

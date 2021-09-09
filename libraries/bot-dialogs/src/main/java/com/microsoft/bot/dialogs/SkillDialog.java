@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * A specialized {@link Dialog} that can wrap remote calls to a skill.
  *
- * The options parameter in {@link BeginDialog} must be a
+ * The options parameter in BeginDialog must be a
  * {@link BeginSkillDialogOptions} instancewith the initial parameters for the
  * dialog.
  */
@@ -238,12 +238,12 @@ public class SkillDialog extends Dialog {
     }
 
     /**
-     * Validates the activity sent during {@link ContinueDialog} .
+     * Validates the activity sent during ContinueDialog .
      *
      * @param activity The {@link Activity} for the current turn of conversation.
      *
      *                 Override this method to implement a custom validator for the
-     *                 activity being sent during the {@link ContinueDialog} . This
+     *                 activity being sent during the ContinueDialog . This
      *                 method can be used to ignore activities of a certain type if
      *                 needed. If this method returns false, the dialog will end the
      *                 turn without processing the activity.

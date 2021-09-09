@@ -82,7 +82,7 @@ public abstract class MemoryScope {
          * @param dialogContext The dialog context object for this turn.
          * @param force True to overwrite any existing state cache or false to load state from storage only
          * if the cache doesn't already exist.
-         * @return CompletableFuture<Void>  A future that represents the work queued to execute.
+         * @return CompletableFuture  A future that represents the work queued to execute.
          */
         public CompletableFuture<Void> load(DialogContext dialogContext, Boolean force) {
             return CompletableFuture.completedFuture(null);
@@ -95,7 +95,7 @@ public abstract class MemoryScope {
          * @param dialogContext The dialog context Object for this turn.
          * @param force True to save the state cache to storage. or false to save state to storage only
          * if a property in the cache has changed.
-         * @return CompletableFuture<Void> A future that represents the work queued to execute.
+         * @return CompletableFuture A future that represents the work queued to execute.
          */
         public CompletableFuture<Void> saveChanges(DialogContext dialogContext, Boolean force) {
             return CompletableFuture.completedFuture(null);
@@ -105,7 +105,7 @@ public abstract class MemoryScope {
          * Deletes any state in storage and the cache for this.
          *
          * @param dialogContext The dialog context Object for this turn.
-         * @return CompletableFuture<Void> A future that represents the work queued to execute.
+         * @return CompletableFuture A future that represents the work queued to execute.
          */
         public CompletableFuture<Void> delete(DialogContext dialogContext) {
             return CompletableFuture.completedFuture(null);

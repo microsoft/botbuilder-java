@@ -39,10 +39,10 @@ public class ActivityPrompt extends Dialog {
      * class.
      *
      * @param dialogId  The ID to assign to this prompt.
-     * @param validator A {@link PromptValidator{Activity}} that contains validation
+     * @param validator A {@link PromptValidator} that contains validation
      *                  for this prompt.
      *
-     *                  The value of {@link dialogId} must be unique within the
+     *                  The value of dialogId must be unique within the
      *                  {@link DialogSet} or {@link ComponentDialog} to which the
      *                  prompt is added.
      */

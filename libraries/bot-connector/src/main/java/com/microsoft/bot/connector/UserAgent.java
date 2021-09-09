@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Conforms to spec:
  * https://github.com/Microsoft/botbuilder-dotnet/blob/d342cd66d159a023ac435aec0fdf791f93118f5f/doc/UserAgents.md
- * <p>
+ * 
  */
 public final class UserAgent {
     // os/java and botbuilder will never change - static initialize once

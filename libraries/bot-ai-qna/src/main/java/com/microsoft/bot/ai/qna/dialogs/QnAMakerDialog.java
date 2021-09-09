@@ -731,9 +731,9 @@ public class QnAMakerDialog extends WaterfallDialog {
      * Gets the options for the QnA Maker client that the dialog will use to query
      * the knowledge base.
      *
-     * @param dc The <see cref="DialogContext"/> for the current turn of
+     * @param dc The {@link "DialogContext"} for the current turn of
      *           conversation.
-     * @return A <see cref="Task"/> representing the asynchronous operation. If the
+     * @return A {@link "Task"} representing the asynchronous operation. If the
      *         task is successful, the result contains the QnA Maker options to use.
      */
     protected CompletableFuture<QnAMakerOptions> getQnAMakerOptions(DialogContext dc) {

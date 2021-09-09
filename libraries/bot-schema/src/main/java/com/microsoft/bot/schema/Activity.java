@@ -1266,7 +1266,7 @@ public class Activity {
      * {@link ActivityTypes#TRACE}.
      *
      * @param withName The name of the trace operation to create.
-     * @return >The new trace activity.
+     * @return The new trace activity.
      */
     public Activity createTrace(String withName) {
         return createTrace(withName, null, null, null);
@@ -1281,7 +1281,7 @@ public class Activity {
      * @param withValueType Optional, identifier for the format of withValue.
      *                      Default is the name of type of the withValue.
      * @param withLabel     Optional, a descriptive label for this trace operation.
-     * @return >The new trace activity.
+     * @return The new trace activity.
      */
     public Activity createTrace(
         String withName,
@@ -1447,7 +1447,7 @@ public class Activity {
     /**
      * Resolves the mentions from the entities of this activity.
      *
-     * This method is defined on the <see cref="Activity"/> class, but is only
+     * This method is defined on the {@link Activity} class, but is only
      * intended for use with a message activity, where the activity
      * {@link Activity#type} is set to {@link ActivityTypes#MESSAGE}.
      *

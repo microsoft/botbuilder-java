@@ -11,7 +11,7 @@ import com.microsoft.bot.dialogs.ScopePath;
  */
 public class ThisMemoryScope extends MemoryScope {
     /**
-     * DialogMemoryScope maps "this" -> dc.ActiveDialog.State.
+     * DialogMemoryScope maps "this" to dc.ActiveDialog.State.
      */
     public ThisMemoryScope() {
         super(ScopePath.THIS, true);
