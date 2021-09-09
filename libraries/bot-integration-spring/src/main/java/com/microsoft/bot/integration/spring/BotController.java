@@ -45,7 +45,7 @@ public class BotController {
     private final BotFrameworkHttpAdapter adapter;
 
     /**
-     * The BotFrameworkHttpAdapter to use. Note it is provided by dependency
+     * The Bot to use. Note it is provided by dependency
      * injection via the constructor.
      */
     private final Bot bot;
