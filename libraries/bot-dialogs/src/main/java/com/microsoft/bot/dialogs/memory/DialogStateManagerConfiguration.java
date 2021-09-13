@@ -19,7 +19,7 @@ public class DialogStateManagerConfiguration {
 
 
     /**
-     * @return List<PathResolver> Returns the list of PathResolvers.
+     * @return Returns the list of PathResolvers.
      */
     public List<PathResolver> getPathResolvers() {
         return this.pathResolvers;
@@ -35,7 +35,7 @@ public class DialogStateManagerConfiguration {
 
 
     /**
-     * @return List<MemoryScope> Returns the list of MemoryScopes.
+     * @return Returns the list of MemoryScopes.
      */
     public List<MemoryScope> getMemoryScopes() {
         return this.memoryScopes;

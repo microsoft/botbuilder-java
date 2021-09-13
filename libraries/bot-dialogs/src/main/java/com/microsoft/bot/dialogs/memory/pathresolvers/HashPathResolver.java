@@ -4,7 +4,7 @@
 package com.microsoft.bot.dialogs.memory.pathresolvers;
 
 /**
- * Maps #xxx => turn.recognized.intents.xxx.
+ * Maps #xxx to turn.recognized.intents.xxx.
  */
 public class HashPathResolver extends AliasPathResolver {
 

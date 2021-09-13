@@ -11,7 +11,7 @@ import com.microsoft.bot.dialogs.DialogContext;
 import com.microsoft.bot.dialogs.ScopePath;
 
 /**
- * DialogMemoryScope maps "dialog" -> dc.Parent?.ActiveDialog.State ?? ActiveDialog.State.
+ * DialogMemoryScope maps "dialog" to dc.Parent?.ActiveDialog.State ?? ActiveDialog.State.
  */
 public class DialogMemoryScope extends MemoryScope {
     /**

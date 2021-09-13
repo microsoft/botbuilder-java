@@ -20,7 +20,7 @@ public class AllowedCallersClaimsValidator extends ClaimsValidator {
 
     /**
      * Creates an instance of an {@link AllowedCallersClaimsValidator}.
-     * @param withAllowedCallers    A List<String> that contains the list of allowed callers.
+     * @param withAllowedCallers    A {@link List<String>} that contains the list of allowed callers.
      */
     public AllowedCallersClaimsValidator(List<String> withAllowedCallers) {
         this.allowedCallers = withAllowedCallers != null ? withAllowedCallers : new ArrayList<String>();

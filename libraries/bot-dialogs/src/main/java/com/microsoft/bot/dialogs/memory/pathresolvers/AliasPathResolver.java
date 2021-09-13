@@ -6,7 +6,7 @@ package com.microsoft.bot.dialogs.memory.pathresolvers;
 import com.microsoft.bot.dialogs.memory.PathResolver;
 
 /**
- * Maps aliasXXX -> path.xxx ($foo => dialog.foo).
+ * Maps aliasXXX to path.xxx ($foo to dialog.foo).
  */
 public class AliasPathResolver implements PathResolver {
 

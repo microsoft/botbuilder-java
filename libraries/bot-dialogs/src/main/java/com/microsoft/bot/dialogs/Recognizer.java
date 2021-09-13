@@ -135,7 +135,7 @@ public class Recognizer {
     /**
      * Returns ChooseIntent between multiple recognizer results.
      *
-     * @param recognizerResults >recognizer Id => recognizer results map.
+     * @param recognizerResults recognizer Id to recognizer results map.
      * @return recognizerResult which is ChooseIntent.
      */
     protected static RecognizerResult createChooseIntentResult(Map<String, RecognizerResult> recognizerResults) {
@@ -219,7 +219,7 @@ public class Recognizer {
      * @param recognizerResult Recognizer Result.
      * @param telemetryProperties A list of properties to append or override the properties
      *                            created using the RecognizerResult.
-     * @param dialogContext >Dialog Context.
+     * @param dialogContext Dialog Context.
      * @return A dictionary that can be included when calling the TrackEvent method on the
      * TelemetryClient.
      */

@@ -40,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
  * The DialogStateManager manages memory scopes and pathresolvers MemoryScopes
  * are named root level Objects, which can exist either in the dialogcontext or
  * off of turn state PathResolvers allow for shortcut behavior for mapping
- * things like $foo -> dialog.foo.
+ * things like $foo to dialog.foo.
  */
 public class DialogStateManager implements Map<String, Object> {
 
@@ -268,7 +268,7 @@ public class DialogStateManager implements Map<String, Object> {
      * clone of value).
      *
      * @param <TypeT> the value type to return.
-     * @param path    >path expression to use.
+     * @param path    path expression to use.
      * @param clsType the Type that is being requested as a result
      * @return ResultPair with boolean and requested type TypeT as a result
      */
@@ -503,7 +503,7 @@ public class DialogStateManager implements Map<String, Object> {
      * Delete the memory for a scope.
      *
      * @param name name of the scope
-     * @return Completed CompletableFuture<Void>
+     * @return Completed CompletableFuture
      */
     public CompletableFuture<Void> deleteScopesMemory(String name) {
         // Make a copy here that is final so it can be used in lamdba expression below
@@ -648,7 +648,7 @@ public class DialogStateManager implements Map<String, Object> {
      * Track when specific paths are changed.
      *
      * @param paths Paths to track.
-     * @return Normalized paths to pass to AnyPathChanged/>.
+     * @return Normalized paths to pass to AnyPathChanged.
      */
     public List<String> trackPaths(Iterable<String> paths) {
         List<String> allPaths = new ArrayList<String>();

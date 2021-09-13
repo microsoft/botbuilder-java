@@ -636,8 +636,8 @@ public class ActivityHandler implements Bot {
      *
      * @return   A task that represents the work queued to execute.
      *
-     * When the {@link OnInvokeActivity(TurnContext{InvokeActivity})} method
-     * receives an Invoke with a {@link InvokeActivity#name} of
+     * When the {@link OnInvokeActivity(TurnContext(InvokeActivity))} method
+     * receives an Invoke with a {@link InvokeActivity.name} of
      * `adaptiveCard/action`, it calls this method.
      */
     protected CompletableFuture<AdaptiveCardInvokeResponse> onAdaptiveCardInvoke(
