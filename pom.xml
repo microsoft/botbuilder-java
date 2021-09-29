@@ -334,6 +334,11 @@
         <artifactId>guava</artifactId>
         <version>30.1-jre</version>
       </dependency>
+      <dependency>
+        <groupId>net.minidev</groupId>
+        <artifactId>json-smart</artifactId>
+        <version>2.4.7</version>
+      </dependency>
 
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
