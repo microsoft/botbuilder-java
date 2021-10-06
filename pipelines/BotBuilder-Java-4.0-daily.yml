@@ -192,4 +192,6 @@ jobs:
         pushd ..;
         Get-ChildItem -Recurse -Force;
     displayName: Dir workspace
+    continueOnError: true
+    condition: succeededOrFailed()
 ...

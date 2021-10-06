@@ -68,3 +68,4 @@ libraries/swagger/generated
 /.vs/ProjectSettings.json
 /.vs/botbuilder-java/v16/TestStore/0/000.testlog
 /.vs/botbuilder-java/v16/TestStore/0/testlog.manifest
+/.vs/VSWorkspaceState.json
