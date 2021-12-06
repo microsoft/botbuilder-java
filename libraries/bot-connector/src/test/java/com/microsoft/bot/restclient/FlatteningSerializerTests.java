@@ -13,6 +13,8 @@ import com.microsoft.bot.restclient.serializer.JsonFlatten;
 import com.microsoft.bot.restclient.util.Foo;
 import org.junit.Assert;
 import org.junit.Test;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -23,6 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 public class FlatteningSerializerTests {
+    public void assertJsonEqualsNonStrict(String json1, String json2) {
+        try {
+            JSONAssert.assertEquals(json1, json2, false);
+        } catch (JSONException jse) {
+            throw new IllegalArgumentException(jse.getMessage());
+        }   
+    }
+
     @Test
     public void canFlatten() throws Exception {
         Foo foo = new Foo();
@@ -40,7 +50,8 @@ public class FlatteningSerializerTests {
 
         // serialization
         String serialized = adapter.serialize(foo);
-        Assert.assertEquals("{\"$type\":\"foo\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}}}", serialized);
+        String expected = "{\"$type\":\"foo\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}}}";
+        assertJsonEqualsNonStrict(expected, serialized);
 
         // deserialization
         Foo deserialized = adapter.deserialize(serialized, Foo.class);
@@ -56,7 +67,8 @@ public class FlatteningSerializerTests {
     @Test
     public void canSerializeMapKeysWithDotAndSlash() throws Exception {
         String serialized = new JacksonAdapter().serialize(prepareSchoolModel());
-        Assert.assertEquals("{\"teacher\":{\"students\":{\"af.B/D\":{},\"af.B/C\":{}}},\"tags\":{\"foo.aa\":\"bar\",\"x.y\":\"zz\"},\"properties\":{\"name\":\"school1\"}}", serialized);
+        String expected = "{\"teacher\":{\"students\":{\"af.B/D\":{},\"af.B/C\":{}}},\"tags\":{\"foo.aa\":\"bar\",\"x.y\":\"zz\"},\"properties\":{\"name\":\"school1\"}}";
+        assertJsonEqualsNonStrict(expected, serialized);
     }
 
     /**
