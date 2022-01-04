@@ -19,7 +19,7 @@ public class ConnectorConfiguration {
     /**
      * Load and pass properties to a function.
      *
-     * @param func T he function to process the loaded properties.
+     * @param func The function to process the loaded properties.
      */
     public void process(Consumer<Properties> func) {
         final Properties properties = new Properties();
