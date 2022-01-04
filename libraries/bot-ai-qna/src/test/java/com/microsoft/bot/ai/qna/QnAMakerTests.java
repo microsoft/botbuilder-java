@@ -803,7 +803,7 @@ public class QnAMakerTests {
                 results[0].getAnswer());
 
             // Verify that we added the bot.builder package details.
-            Assert.assertTrue(request.getHeader("User-Agent").contains("BotBuilder/4.0.0"));
+            Assert.assertTrue(request.getHeader("User-Agent").contains("BotBuilder/4."));
         } catch (Exception ex) {
             fail();
         } finally {
