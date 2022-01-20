@@ -323,7 +323,8 @@ public abstract class Dialog {
         dialogSet.add(dialog);
 
         return dialogSet.createContext(turnContext)
-                .thenAccept(dialogContext -> innerRun(turnContext, dialog.getId(), dialogContext, null));
+                .thenCompose(dialogContext -> innerRun(turnContext, dialog.getId(), dialogContext, null))
+                .thenAccept(dummy -> {});
     }
 
     /**
