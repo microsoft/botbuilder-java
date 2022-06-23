@@ -1641,6 +1641,7 @@ public class Activity {
      *
      * @return True if the Activity was originate from a streaming connection.
      */
+    @JsonIgnore
     public Boolean isFromStreamingConnection() {
         if (serviceUrl != null) {
             Boolean isHttp = this.getServiceUrl().toLowerCase().startsWith("http");
@@ -1739,6 +1740,7 @@ public class Activity {
      *
      * @return true if the activity is from microsoft teams.
      */
+    @JsonIgnore
     public boolean isTeamsActivity() {
         return "msteams".equals(channelId);
     }
