@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.connector.Async;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -702,17 +701,7 @@ public class ActivityHandler implements Bot {
             throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
         }
 
-        Object obj = activity.getValue();
-        JsonNode node = null;
-        if (obj instanceof JsonNode) {
-            node = (JsonNode) obj;
-        } else {
-            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
-                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
-            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
-        }
-
-        AdaptiveCardInvokeValue invokeValue = Serialization.treeToValue(node, AdaptiveCardInvokeValue.class);
+        AdaptiveCardInvokeValue invokeValue = Serialization.getAs(activity.getValue(), AdaptiveCardInvokeValue.class);
         if (invokeValue == null) {
             AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
                 HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
