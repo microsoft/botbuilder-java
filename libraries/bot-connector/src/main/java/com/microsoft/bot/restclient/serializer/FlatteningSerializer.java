@@ -183,6 +183,7 @@ public class FlatteningSerializer extends StdSerializer<Object> implements Resol
                             break;
                         }
                         String val = values[i];
+                        if (node.has(val) && node.get(val).isArray()) break;
                         if (node.has(val)) {
                             node = (ObjectNode) node.get(val);
                         } else {
