@@ -362,22 +362,22 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
-        <version>3.12.2</version>
+        <version>4.9.2</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>logging-interceptor</artifactId>
-        <version>3.12.2</version>
+        <version>4.9.2</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp-urlconnection</artifactId>
-        <version>3.12.2</version>
+        <version>4.9.2</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>mockwebserver</artifactId>
-        <version>3.12.2</version>
+        <version>4.9.2</version>
         <scope>test</scope>
       </dependency>
 
