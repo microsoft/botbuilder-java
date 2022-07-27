@@ -208,7 +208,7 @@ public final class ObjectPath {
                 }
             } else {
                 // lastSegment is an index
-                ((ArrayNode) current).set((int) lastSegment, null);
+                ((ArrayNode) current).set((int) lastSegment, (JsonNode) null);
             }
         }
     }
