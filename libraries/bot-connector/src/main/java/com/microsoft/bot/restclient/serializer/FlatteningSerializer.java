@@ -183,8 +183,10 @@ public class FlatteningSerializer extends StdSerializer<Object> implements Resol
                             break;
                         }
                         String val = values[i];
-                        if (node.has(val) && node.get(val).isArray()) break;
-                        if (node.has(val)) {
+                        if (node.has(val) && node.get(val) instanceof ArrayNode) {
+                            node = arrayToObjects((ArrayNode) node.get(val));
+                        }
+                        else if (node.has(val)) {
                             node = (ObjectNode) node.get(val);
                         } else {
                             ObjectNode child = new ObjectNode(JsonNodeFactory.instance);
@@ -228,5 +230,13 @@ public class FlatteningSerializer extends StdSerializer<Object> implements Resol
     @Override
     public void serializeWithType(Object value, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSerializer) throws IOException {
         serialize(value, gen, provider);
+    }
+
+    private static ObjectNode arrayToObjects(ArrayNode input) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        input.forEach(node -> node.fields().forEachRemaining(entry -> result.set(entry.getKey(), entry.getValue())));
+
+        return result;
     }
 }
