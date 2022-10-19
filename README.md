@@ -1,5 +1,7 @@
 # ![Bot Framework for Java](./docs/media/BotFrameworkJava_header.png)
 
+**The Bot Framework Java SDK is being retired with final long-term support ending in November 2023, after which this repository will be archived. There will be no further feature development, with only critical security and bug fixes within this repository being undertaken. Existing bots built with this SDK will continue to function. For all new bot development we recommend that you adopt [Power Virtual Agents](https://powervirtualagents.microsoft.com/en-us/blog/the-future-of-bot-building/).**
+
 This repository contains code for the Java version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
 This SDK enables developers to model conversation and build sophisticated bot applications using Java. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
@@ -8,7 +10,7 @@ To get started building bots using the SDK, see the [Azure Bot Service Documenta
 
 For more information jump to a section below.
 
-- [!Bot Framework for Java](#)
+- [Bot Framework for Java](#)
   - [Build Status](#build-status)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
