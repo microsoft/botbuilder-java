@@ -108,6 +108,7 @@ public class QnAMakerTests {
     @Test
     public void qnaMakerTraceActivity() {
         MockWebServer mockWebServer = new MockWebServer();
+        delay(1000);
         try {
             QnAMaker qna = this.qnaReturnsAnswer(mockWebServer);
 
