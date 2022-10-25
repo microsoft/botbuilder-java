@@ -37,6 +37,13 @@ jobs:
     inputs:
       tags: PackageVersion=$(PackageVersion)
 
+  - task: JavaToolInstaller@0
+    displayName: 'Use Java 11'
+    inputs:
+        versionSpec: 11
+        jdkArchitectureOption: x64
+        jdkSourceOption: PreInstalled
+
   - powershell: |
         Write-Host "Setting module versions";
         Write-Host "version = $(PackageVersion)";
