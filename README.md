@@ -108,7 +108,7 @@ We use the [@botframework](https://twitter.com/botframework) account on twitter 
 The [Gitter Channel](https://gitter.im/Microsoft/BotBuilder) provides a place where the Community can get together and collaborate.
 
 ## Contributing and our code of conduct
-We welcome contributions and suggestions. Please see our [contributing guidelines](./contributing.md) for more information.
+We welcome contributions and suggestions. Please see our [contributing guidelines](./Contributing.md) for more information.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
