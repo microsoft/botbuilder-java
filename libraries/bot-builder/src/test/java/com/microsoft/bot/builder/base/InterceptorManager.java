@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.io.BaseEncoding;
 import okhttp3.*;
-import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSource;
 
@@ -21,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class InterceptorManager {
 
@@ -288,7 +289,7 @@ public class InterceptorManager {
             String contentType = response.header("Content-Type");
             if (contentType != null) {
                 if (contentType.startsWith("application/json")) {
-                    content = buffer.readString(Util.UTF_8);
+                    content = buffer.readString(UTF_8);
                 } else {
                     content = BaseEncoding.base64().encode(buffer.readByteArray());
                 }
