@@ -5,4 +5,5 @@
 /**
  * This package contains the models classes for com.microsoft.bot.schema.
  */
+@Deprecated
 package com.microsoft.bot.schema;

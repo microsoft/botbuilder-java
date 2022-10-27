@@ -5,4 +5,5 @@
 /**
  * This package contains the classes for com.microsoft.bot.connector.
  */
+@Deprecated
 package com.microsoft.bot.connector;

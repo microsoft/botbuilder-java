@@ -5,5 +5,5 @@
 /**
  * This package contains the classes for com.microsoft.bot.ai.luis.
  */
-
+@Deprecated
 package com.microsoft.bot.ai.luis;
