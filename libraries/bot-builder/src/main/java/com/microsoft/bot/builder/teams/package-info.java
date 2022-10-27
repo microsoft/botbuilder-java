@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the classes for Bot-Builder-Inspection.
+ * This package contains the classes for com.microsoft.bot.builder.teams.
  */
 package com.microsoft.bot.builder.teams;

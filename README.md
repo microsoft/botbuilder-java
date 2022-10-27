@@ -1,5 +1,7 @@
 # ![Bot Framework for Java](./docs/media/BotFrameworkJava_header.png)
 
+**The Bot Framework Java SDK is being retired with final long-term support ending in November 2023, after which this repository will be archived. There will be no further feature development, with only critical security and bug fixes within this repository being undertaken. Existing bots built with this SDK will continue to function. For all new bot development we recommend that you adopt [Power Virtual Agents](https://powervirtualagents.microsoft.com/en-us/blog/the-future-of-bot-building/).**
+
 This repository contains code for the Java version of the [Microsoft Bot Framework SDK](https://github.com/Microsoft/botframework-sdk), which is part of the Microsoft Bot Framework - a comprehensive framework for building enterprise-grade conversational AI experiences.
 
 This SDK enables developers to model conversation and build sophisticated bot applications using Java. SDKs for [.NET](https://github.com/Microsoft/botbuilder-dotnet), [Python](https://github.com/Microsoft/botbuilder-python) and [JavaScript](https://github.com/Microsoft/botbuilder-js) are also available.
@@ -8,7 +10,7 @@ To get started building bots using the SDK, see the [Azure Bot Service Documenta
 
 For more information jump to a section below.
 
-- [!Bot Framework for Java](#)
+- [Bot Framework for Java](#)
   - [Build Status](#build-status)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -28,7 +30,7 @@ For more information jump to a section below.
 
  | Branch | Description | Build Status | Coverage Status |
  |--------|-------------|--------------|-----------------|
- |Main | 4.14.* Preview Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Java/BotBuilder-Java-4.0-daily?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=1202&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
+ |Main | 4.15.* Builds | [![Build Status](https://fuselabs.visualstudio.com/SDK_v4/_apis/build/status/Java/BotBuilder-Java-4.0-daily?branchName=main)](https://fuselabs.visualstudio.com/SDK_v4/_build/latest?definitionId=1202&branchName=main) | [![Coverage Status](https://coveralls.io/repos/github/microsoft/botbuilder-java/badge.svg?branch=823847c676b7dbb0fa348a308297ae375f5141ef)](https://coveralls.io/github/microsoft/botbuilder-java?branch=823847c676b7dbb0fa348a308297ae375f5141ef) |
 
 ## Getting Started
 To get started building bots using the SDK, see the [Azure Bot Service Documentation](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0).
@@ -106,7 +108,7 @@ We use the [@botframework](https://twitter.com/botframework) account on twitter 
 The [Gitter Channel](https://gitter.im/Microsoft/BotBuilder) provides a place where the Community can get together and collaborate.
 
 ## Contributing and our code of conduct
-We welcome contributions and suggestions. Please see our [contributing guidelines](./contributing.md) for more information.
+We welcome contributions and suggestions. Please see our [contributing guidelines](./Contributing.md) for more information.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact

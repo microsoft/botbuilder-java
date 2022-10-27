@@ -1266,7 +1266,7 @@ public class Activity {
      * {@link ActivityTypes#TRACE}.
      *
      * @param withName The name of the trace operation to create.
-     * @return >The new trace activity.
+     * @return The new trace activity.
      */
     public Activity createTrace(String withName) {
         return createTrace(withName, null, null, null);
@@ -1281,7 +1281,7 @@ public class Activity {
      * @param withValueType Optional, identifier for the format of withValue.
      *                      Default is the name of type of the withValue.
      * @param withLabel     Optional, a descriptive label for this trace operation.
-     * @return >The new trace activity.
+     * @return The new trace activity.
      */
     public Activity createTrace(
         String withName,
@@ -1316,7 +1316,14 @@ public class Activity {
                 .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
-        reply.setReplyToId(this.getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+            && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+                reply.replyToId = this.getId();
+        } else {
+            reply.replyToId = null;
+        }
+
         reply.setServiceUrl(this.getServiceUrl());
         reply.setChannelId(this.getChannelId());
 
@@ -1382,7 +1389,14 @@ public class Activity {
                 .setRecipient(new ChannelAccount(this.getFrom().getId(), this.getFrom().getName()));
         }
 
-        result.setReplyToId(this.getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+                && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+            result.replyToId = this.getId();
+        } else {
+            result.replyToId = null;
+        }
+
         result.setServiceUrl(this.getServiceUrl());
         result.setChannelId(this.getChannelId());
 
@@ -1433,7 +1447,7 @@ public class Activity {
     /**
      * Resolves the mentions from the entities of this activity.
      *
-     * This method is defined on the <see cref="Activity"/> class, but is only
+     * This method is defined on the {@link Activity} class, but is only
      * intended for use with a message activity, where the activity
      * {@link Activity#type} is set to {@link ActivityTypes#MESSAGE}.
      *
@@ -1503,7 +1517,14 @@ public class Activity {
     @JsonIgnore
     public ConversationReference getConversationReference() {
         ConversationReference conversationReference = new ConversationReference();
-        conversationReference.setActivityId(getId());
+        if (!StringUtils.equalsIgnoreCase(this.getType(), ActivityTypes.CONVERSATION_UPDATE)
+            || !StringUtils.equalsIgnoreCase(this.getChannelId(), "directline")
+                && !StringUtils.equalsIgnoreCase(this.getChannelId(), "webchat")) {
+                conversationReference.setActivityId(this.getId());
+        } else {
+            conversationReference.setActivityId(null);
+        }
+
         conversationReference.setUser(getFrom());
         conversationReference.setBot(getRecipient());
         conversationReference.setConversation(getConversation());

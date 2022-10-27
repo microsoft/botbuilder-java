@@ -3,6 +3,7 @@
 // license information.
 
 /**
- * This package contains the classes for bot-applicationinsights.
+ * This package contains the classes for com.microsoft.bot.applicationinsights.
  */
+@Deprecated
 package com.microsoft.bot.applicationinsights;

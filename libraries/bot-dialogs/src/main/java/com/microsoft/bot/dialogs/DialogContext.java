@@ -471,7 +471,7 @@ public class DialogContext {
 
     /**
      * @param name Name of the event to raise.
-     * @return CompletableFuture<Boolean>
+     * @return emitEvent
      */
     public CompletableFuture<Boolean> emitEvent(String name) {
         return emitEvent(name, null, true, false);
@@ -483,7 +483,7 @@ public class DialogContext {
      * @param bubble Flag to control whether the event should be bubbled to its parent if not handled locally.
      * Defaults to a value of `true`.
      * @param fromLeaf Whether the event is emitted from a leaf node.
-     * @return CompletableFuture<Boolean>
+     * @return completedFuture
      */
     public CompletableFuture<Boolean> emitEvent(String name, Object value, boolean bubble, boolean fromLeaf) {
         // Initialize event

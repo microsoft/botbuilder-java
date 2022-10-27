@@ -3,7 +3,6 @@
 
 package com.microsoft.bot.builder;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.bot.connector.Async;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -28,6 +27,7 @@ import com.microsoft.bot.schema.SignInConstants;
  * {@link Activity} types. Pre and post processing of Activities can be plugged
  * in by deriving and calling the base class implementation.
  */
+@Deprecated
 public class ActivityHandler implements Bot {
 
     /**
@@ -470,7 +470,7 @@ public class ActivityHandler implements Bot {
      * @param body The body to return in the invoke response.
      * @return The InvokeResponse object.
      */
-    protected static InvokeResponse createInvokeResponse(Object body) {
+    protected InvokeResponse createInvokeResponse(Object body) {
         return new InvokeResponse(HttpURLConnection.HTTP_OK, body);
     }
 
@@ -636,8 +636,8 @@ public class ActivityHandler implements Bot {
      *
      * @return   A task that represents the work queued to execute.
      *
-     * When the {@link OnInvokeActivity(TurnContext{InvokeActivity})} method
-     * receives an Invoke with a {@link InvokeActivity#name} of
+     * When the {@link OnInvokeActivity(TurnContext(InvokeActivity))} method
+     * receives an Invoke with a {@link InvokeActivity.name} of
      * `adaptiveCard/action`, it calls this method.
      */
     protected CompletableFuture<AdaptiveCardInvokeResponse> onAdaptiveCardInvoke(
@@ -702,17 +702,7 @@ public class ActivityHandler implements Bot {
             throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
         }
 
-        Object obj = activity.getValue();
-        JsonNode node = null;
-        if (obj instanceof JsonNode) {
-            node = (JsonNode) obj;
-        } else {
-            AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
-                HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
-            throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
-        }
-
-        AdaptiveCardInvokeValue invokeValue = Serialization.treeToValue(node, AdaptiveCardInvokeValue.class);
+        AdaptiveCardInvokeValue invokeValue = Serialization.getAs(activity.getValue(), AdaptiveCardInvokeValue.class);
         if (invokeValue == null) {
             AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
                 HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");

@@ -162,7 +162,6 @@ public final class Serialization {
      *
      * @param source The object to convert.
      * @return The JSON string value.
-     * @throws JsonProcessingException Error converting to JSON
      */
     public static String toStringSilent(Object source) {
         try {

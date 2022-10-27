@@ -11,7 +11,7 @@ import com.microsoft.bot.dialogs.ScopePath;
  */
 public class UserMemoryScope extends BotStateMemoryScope<UserState> {
     /**
-     * DialogMemoryScope maps "this" -> dc.ActiveDialog.State.
+     * DialogMemoryScope maps "this" to dc.ActiveDialog.State.
      */
     public UserMemoryScope() {
         super(UserState.class, ScopePath.USER);

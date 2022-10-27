@@ -73,7 +73,7 @@ public class WaterfallDialog extends Dialog {
      *
      * @param dc      The
      * @param options Optional, initial information to pass to the dialog.
-     * @return A CompletableFuture<Void> representing the asynchronous operation.
+     * @return A CompletableFuture representing the asynchronous operation.
      *
      *         If the task is successful, the result indicates whether the dialog is
      *         still active after the turn has been processed by the dialog.
@@ -110,7 +110,7 @@ public class WaterfallDialog extends Dialog {
      * dialog and the user replies with a new activity.
      *
      * @param dc The
-     * @return A CompletableFuture<Void> representing the asynchronous operation.
+     * @return A CompletableFuture representing the asynchronous operation.
      *
      *         If the task is successful, the result indicates whether the dialog is
      *         still active after the turn has been processed by the dialog. The

@@ -250,7 +250,7 @@ public final class JwtTokenValidation {
     /**
      * Internal helper to check if the token has the shape we expect "Bearer [big long string]".
      *
-     * @param authHeader >A string containing the token header.
+     * @param authHeader A string containing the token header.
      * @return True if the token is valid, false if not.
      */
     public static boolean isValidTokenFormat(String authHeader) {

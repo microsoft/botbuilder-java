@@ -3,6 +3,7 @@
 // license information.
 
 /**
- * This package contains the classes for bot-integration-core.
+ * This package contains the classes for com.microsoft.bot.integration.
  */
+@Deprecated
 package com.microsoft.bot.integration;

@@ -4,7 +4,7 @@
 package com.microsoft.bot.dialogs.memory.pathresolvers;
 
 /**
- * Maps @@ => turn.recognized.entitites.xxx array.
+ * Maps @@ to turn.recognized.entitites.xxx array.
  */
 public class AtPathResolver extends AliasPathResolver {
 

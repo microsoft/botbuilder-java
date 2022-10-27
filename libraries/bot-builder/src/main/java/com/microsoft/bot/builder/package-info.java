@@ -3,6 +3,7 @@
 // license information.
 
 /**
- * This package contains the classes for Bot-Builder.
+ * This package contains the classes for com.microsoft.bot.builder.
  */
+@Deprecated
 package com.microsoft.bot.builder;

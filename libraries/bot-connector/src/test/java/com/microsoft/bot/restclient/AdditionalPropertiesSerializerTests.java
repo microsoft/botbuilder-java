@@ -11,11 +11,21 @@ import com.microsoft.bot.restclient.util.Foo;
 import com.microsoft.bot.restclient.util.FooChild;
 import org.junit.Assert;
 import org.junit.Test;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AdditionalPropertiesSerializerTests {
+    public void assertJsonEqualsNonStrict(String json1, String json2) {
+        try {
+            JSONAssert.assertEquals(json1, json2, false);
+        } catch (JSONException jse) {
+            throw new IllegalArgumentException(jse.getMessage());
+        }
+    }
+
     @Test
     public void canSerializeAdditionalProperties() throws Exception {
         Foo foo = new Foo();
@@ -34,7 +44,8 @@ public class AdditionalPropertiesSerializerTests {
         foo.additionalProperties.put("properties.bar", "barbar");
 
         String serialized = new JacksonAdapter().serialize(foo);
-        Assert.assertEquals("{\"$type\":\"foo\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}},\"bar\":\"baz\",\"a.b\":\"c.d\",\"properties.bar\":\"barbar\"}", serialized);
+        String expected = "{\"$type\":\"foo\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}},\"bar\":\"baz\",\"a.b\":\"c.d\",\"properties.bar\":\"barbar\"}";
+        assertJsonEqualsNonStrict(expected, serialized);
     }
 
     @Test
@@ -65,7 +76,8 @@ public class AdditionalPropertiesSerializerTests {
         foo.additionalProperties.put("properties.bar", "barbar");
 
         String serialized = new JacksonAdapter().serialize(foo);
-        Assert.assertEquals("{\"$type\":\"foochild\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}},\"bar\":\"baz\",\"a.b\":\"c.d\",\"properties.bar\":\"barbar\"}", serialized);
+        String expected = "{\"$type\":\"foochild\",\"properties\":{\"bar\":\"hello.world\",\"props\":{\"baz\":[\"hello\",\"hello.world\"],\"q\":{\"qux\":{\"hello\":\"world\",\"a.b\":\"c.d\",\"bar.b\":\"uuzz\",\"bar.a\":\"ttyy\"}}}},\"bar\":\"baz\",\"a.b\":\"c.d\",\"properties.bar\":\"barbar\"}";
+        assertJsonEqualsNonStrict(expected, serialized);
     }
 
     @Test

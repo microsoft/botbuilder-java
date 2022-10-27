@@ -208,7 +208,7 @@ public final class ObjectPath {
                 }
             } else {
                 // lastSegment is an index
-                ((ArrayNode) current).set((int) lastSegment, null);
+                ((ArrayNode) current).set((int) lastSegment, (JsonNode) null);
             }
         }
     }
@@ -489,7 +489,7 @@ public final class ObjectPath {
 
     /**
      * Given an root Object and property path, resolve to a constant if eval = true or a constant path otherwise.
-     * conversation[user.name][user.age] => ['conversation', 'joe', 32].
+     * conversation[user.name][user.age] to ['conversation', 'joe', 32].
      * @param <T> Type of T
      * @param obj root Object.
      * @param propertyPath property path to resolve.
@@ -501,7 +501,7 @@ public final class ObjectPath {
 
     /**
      * Given an root Object and property path, resolve to a constant if eval = true or a constant path otherwise.
-     * conversation[user.name][user.age] => ['conversation', 'joe', 32].
+     * conversation[user.name][user.age] to ['conversation', 'joe', 32].
      * @param <T> Type of T
      * @param obj root Object.
      * @param propertyPath property path to resolve.

@@ -78,18 +78,18 @@ public final class SkillValidation {
     /**
      * Checks if the given list of claims represents a skill.
      *
-     * A skill claim should contain: An {@link AuthenticationConstants#versionClaim}
-     * claim. An {@link AuthenticationConstants#audienceClaim} claim. An
-     * {@link AuthenticationConstants#appIdClaim} claim (v1) or an a
-     * {@link AuthenticationConstants#authorizedParty} claim (v2). And the appId
+     * A skill claim should contain: An {@link AuthenticationConstants.VERSION_CLAIM}
+     * claim. An {@link AuthenticationConstants.AUTIENCE_CLAIM} claim. An
+     * {@link AuthenticationConstants.APPID_CLAIM} claim (v1) or an a
+     * {@link AuthenticationConstants.AUTHORIZED_PARTY} claim (v2). And the appId
      * claim should be different than the audience claim. When a channel (webchat,
-     * teams, etc.) invokes a bot, the {@link AuthenticationConstants#audienceClaim}
-     * is set to {@link AuthenticationConstants#toBotFromChannelTokenIssuer} but
+     * teams, etc.) invokes a bot, the {@link AuthenticationConstants.AUTIENCE_CLAIM}
+     * is set to {@link AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER} but
      * when a bot calls another bot, the audience claim is set to the appId of the
      * bot being invoked. The protocol supports v1 and v2 tokens: For v1 tokens, the
-     * {@link AuthenticationConstants#appIdClaim} is present and set to the app Id
+     * {@link AuthenticationConstants.APPID_CLAIM} is present and set to the app Id
      * of the calling bot. For v2 tokens, the
-     * {@link AuthenticationConstants#authorizedParty} is present and set to the app
+     * {@link AuthenticationConstants.AUTHORIZED_PARTY} is present and set to the app
      * Id of the calling bot.
      *
      * @param claims A list of claims.

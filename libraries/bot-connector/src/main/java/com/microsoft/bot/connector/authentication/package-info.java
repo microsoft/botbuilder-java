@@ -3,6 +3,6 @@
 // license information.
 
 /**
- * This package contains the implementation auth classes for ConnectorClient.
+ * This package contains the implementation auth classes for com.microsoft.bot.connector.authentication.
  */
 package com.microsoft.bot.connector.authentication;
