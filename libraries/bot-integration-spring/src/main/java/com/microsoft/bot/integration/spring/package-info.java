@@ -5,4 +5,5 @@
 /**
  * This package contains the classes for com.microsoft.bot.integration.spring.
  */
+@Deprecated
 package com.microsoft.bot.integration.spring;

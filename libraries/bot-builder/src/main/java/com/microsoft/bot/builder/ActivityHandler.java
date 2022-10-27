@@ -27,6 +27,7 @@ import com.microsoft.bot.schema.SignInConstants;
  * {@link Activity} types. Pre and post processing of Activities can be plugged
  * in by deriving and calling the base class implementation.
  */
+@Deprecated
 public class ActivityHandler implements Bot {
 
     /**
