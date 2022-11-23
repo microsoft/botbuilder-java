@@ -188,6 +188,12 @@ jobs:
     inputs:
       PathtoPublish: $(Build.ArtifactStagingDirectory)/packages
 
+  - task: PublishBuildArtifacts@1
+    displayName: Publish surefire-reports to artifacts
+    inputs:
+      PathtoPublish: $(Build.SourcesDirectory)/libraries/bot-builder/target/surefire-reports
+    condition: failed()
+
   - powershell: |
         pushd ..;
         Get-ChildItem -Recurse -Force;
