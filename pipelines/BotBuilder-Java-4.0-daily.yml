@@ -191,8 +191,9 @@ jobs:
   - task: PublishBuildArtifacts@1
     displayName: Publish surefire-reports to artifacts
     inputs:
-      PathtoPublish: $(Build.SourcesDirectory)/libraries/bot-builder/target/surefire-reports
-    condition: succeededOrFailed()
+      pathToPublish: $(Build.SourcesDirectory)/libraries/bot-builder/target/surefire-reports
+      artifactName: surefire-reports
+    condition: failed()
 
   - powershell: |
         pushd ..;
