@@ -155,6 +155,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <skip>true</skip>
               <source>8</source>
               <failOnError>false</failOnError>
               <bottom>
