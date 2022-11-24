@@ -633,7 +633,7 @@ public class OAuthPromptTests {
         settings.setText("Please sign in");
         settings.setConnectionName(connectionName);
         settings.setTitle("Sign in");
-        settings.setTimeout(1);
+        settings.setTimeout(10);
         dialogs.add(new OAuthPrompt("OAuthPrompt", settings));
 
         BotCallbackHandler botCallbackHandler = (turnContext) -> {
