@@ -139,7 +139,6 @@ public class QnAMakerTests {
                         Assert.assertTrue(activity.isType(ActivityTypes.TYPING));
                     })
                     .assertReply("echo:how do I clean the stove?")
-                .delay(500)
                 .send("bar")
                     .assertReply(activity -> Assert.assertTrue(activity.isType(ActivityTypes.TYPING)))
                     .assertReply("echo:bar")
