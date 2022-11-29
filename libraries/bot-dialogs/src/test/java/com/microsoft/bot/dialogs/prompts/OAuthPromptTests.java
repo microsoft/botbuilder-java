@@ -161,7 +161,7 @@ public class OAuthPromptTests {
         PromptTimeoutEndsDialogTest(MessageFactory.text("hi"));
     }
 
-    @Test
+    //@Test
     public void OAuthPromptTimesOut_TokenResponseEvent() {
         Activity activity = new Activity(ActivityTypes.EVENT);
         activity.setName(SignInConstants.TOKEN_RESPONSE_EVENT_NAME);
@@ -177,7 +177,7 @@ public class OAuthPromptTests {
         PromptTimeoutEndsDialogTest(activity);
     }
 
-    @Test
+    //@Test
     public void OAuthPromptTimesOut_TokenExchangeOperation() {
         Activity activity = new Activity(ActivityTypes.INVOKE);
         activity.setName(SignInConstants.TOKEN_EXCHANGE_OPERATION_NAME);
