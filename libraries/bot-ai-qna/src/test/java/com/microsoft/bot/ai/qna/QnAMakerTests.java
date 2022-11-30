@@ -107,7 +107,6 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivity() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
         PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
@@ -174,7 +173,6 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivityEmptyText() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
         PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
@@ -206,7 +204,6 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivityNullText() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
         PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
@@ -238,7 +235,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivityNullContext() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -259,7 +256,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivityBadMessage() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -290,7 +287,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTraceActivityNullActivity() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -315,7 +312,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswer() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -337,7 +334,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswerRaw() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -364,7 +361,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerLowScoreVariation() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -416,7 +413,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerCallTrain() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
@@ -465,7 +462,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswerConfiguration() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -488,10 +485,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswerWithFiltering() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_UsesStrictFilters_ToReturnAnswer.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -548,10 +545,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerSetScoreThresholdWhenThresholdIsZero() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -590,10 +587,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestThreshold() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_TestThreshold.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -630,7 +627,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestScoreThresholdTooLargeOutOfRange() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
@@ -646,7 +643,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestScoreThresholdTooSmallOutOfRange() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
@@ -662,10 +659,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswerWithContext() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_ReturnsAnswerWithContext.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -708,10 +705,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnAnswersWithoutContext() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_ReturnsAnswerWithoutContext.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -748,10 +745,10 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsHighScoreWhenIdPassed() {
+        PrintMethodName();
+
         MockWebServer mockWebServer = new MockWebServer();
         try {
-            System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
-
             String content = readFileContent("QnaMaker_ReturnsAnswerWithContext.json");
             ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
             JsonNode response = mapper.readTree(content);
@@ -789,7 +786,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestTopOutOfRange() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
@@ -805,7 +802,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestEndpointEmptyKbId() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(new String());
@@ -817,7 +814,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestEndpointEmptyEndpointKey() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
@@ -829,7 +826,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestEndpointEmptyHost() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         QnAMakerEndpoint qnAMakerEndpoint = new QnAMakerEndpoint();
         qnAMakerEndpoint.setKnowledgeBaseId(knowledgeBaseId);
@@ -841,7 +838,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerUserAgent() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -869,7 +866,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerV2LegacyEndpointShouldThrow() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -902,7 +899,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerV3LeagacyEndpointShouldThrow() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -935,7 +932,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerReturnsAnswerWithMetadataBoost() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -975,7 +972,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestThresholdInQueryOption() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1023,7 +1020,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestUnsuccessfulResponse() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         mockWebServer.enqueue(new MockResponse().setResponseCode(502));
@@ -1050,7 +1047,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerIsTestTrue() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1090,7 +1087,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerRankerTypeQuestionOnly() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1130,7 +1127,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerTestOptionsHydration() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1251,7 +1248,7 @@ public class QnAMakerTests {
 
     @Test
     public void qnaMakerStrictFiltersCompoundOperationType() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1306,7 +1303,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryNullTelemetryClient() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         // Arrange
         MockWebServer mockWebServer = new MockWebServer();
@@ -1350,7 +1347,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryReturnsAnswer() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         // Arrange
         MockWebServer mockWebServer = new MockWebServer();
@@ -1415,7 +1412,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryReturnsAnswerWhenNoAnswerFoundInKB() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         // Arrange
         MockWebServer mockWebServer = new MockWebServer();
@@ -1480,7 +1477,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryPii() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         // Arrange
         MockWebServer mockWebServer = new MockWebServer();
@@ -1548,7 +1545,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryOverride() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         MockWebServer mockWebServer = new MockWebServer();
         try {
@@ -1617,9 +1614,9 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryAdditionalPropsMetrics() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
-        //Arrange
+        // Arrange
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
@@ -1696,7 +1693,7 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryAdditionalPropsOverride() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
         // Arrange
         MockWebServer mockWebServer = new MockWebServer();
@@ -1771,9 +1768,9 @@ public class QnAMakerTests {
 
     @Test
     public void telemetryFillPropsOverride() {
-        System.out.println("Running " + (new Throwable().getStackTrace()[0].getMethodName()));
+        PrintMethodName();
 
-        //Arrange
+        // Arrange
         MockWebServer mockWebServer = new MockWebServer();
         try {
             String content = readFileContent("QnaMaker_ReturnsAnswer.json");
@@ -1853,7 +1850,7 @@ public class QnAMakerTests {
 
     private void PrintMethodName()
     {
-        String s = "Running " + (new Throwable().getStackTrace()[1].getMethodName());
+        String s = "Running " + (new Throwable().getStackTrace()[1].getMethodName()) + ".";
         System.console().writer().println(s);
     }
 
