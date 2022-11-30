@@ -545,7 +545,7 @@
           <version>2.22.2</version>
           <configuration>
             <includes>
-              <include>**/QnAMakerTests.java</include>
+              <include>**/*Test*.java</include>
             </includes>
             <excludes>
               <exclude>${exclude.tests}</exclude>
@@ -603,7 +603,8 @@
           <version>3.1.1</version>
           <configuration>
             <skip>false</skip>
-          </configuration>          <executions>
+          </configuration>
+          <executions>
             <execution>
               <id>attach-javadocs</id>
               <goals>
