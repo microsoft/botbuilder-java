@@ -139,7 +139,7 @@ jobs:
     displayName: Maven Install (this signs)
     inputs:
       goals: 'install -P devops '
-      options: -X --no-transfer-progress -Drepo.id=ConversationalAI -Drepo.url=https://pkgs.dev.azure.com/ConversationalAI/BotFramework/_packaging/SDK/maven/v1 -Dexclude.tests=
+      options: -e --no-transfer-progress -Drepo.id=ConversationalAI -Drepo.url=https://pkgs.dev.azure.com/ConversationalAI/BotFramework/_packaging/SDK/maven/v1 -Dexclude.tests=
       codeCoverageTool: JaCoCo
       findbugsAnalysisEnabled: true
 
