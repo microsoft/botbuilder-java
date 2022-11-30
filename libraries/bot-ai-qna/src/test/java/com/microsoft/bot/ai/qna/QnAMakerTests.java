@@ -1851,7 +1851,7 @@ public class QnAMakerTests {
     private void PrintMethodName()
     {
         String s = "Running " + (new Throwable().getStackTrace()[1].getMethodName()) + ".";
-        System.console().writer().println(s);
+        System.out.println(s);
     }
 
     private static TurnContext getContext(String utterance) {
