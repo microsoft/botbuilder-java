@@ -674,6 +674,7 @@ public class OAuthPromptTests {
                                          token);
         })
         .send(oauthPromptActivity)
+        .delay(200)
         .assertReply("ended")
         .startTest()
         .join();
