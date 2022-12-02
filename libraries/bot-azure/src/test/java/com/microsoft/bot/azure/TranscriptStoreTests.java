@@ -88,6 +88,7 @@ public class TranscriptStoreTests {
     // These tests require Azure Storage Emulator v5.7
     @Test
     public void blobTranscriptParamTest() {
+        PrintMethodName();
         Assert.assertThrows(IllegalArgumentException.class, () -> new BlobsTranscriptStore(null, getContainerName()));
         Assert.assertThrows(IllegalArgumentException.class,
                 () -> new BlobsTranscriptStore(blobStorageEmulatorConnectionString, null));
@@ -99,6 +100,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void transcriptsEmptyTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         String unusedChannelId = UUID.randomUUID().toString();
         PagedResult<TranscriptInfo> transcripts = transcriptStore.listTranscripts(unusedChannelId).join();
@@ -107,6 +109,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void activityEmptyTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         for (String convoId : CONVERSATION_SPECIAL_IDS) {
             PagedResult<Activity> activities = transcriptStore.getTranscriptActivities(channelId, convoId).join();
@@ -116,6 +119,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void activityAddTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         Activity[] loggedActivities = new Activity[5];
         List<Activity> activities = new ArrayList<Activity>();
@@ -132,6 +136,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void transcriptRemoveTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         for (int i = 0; i < 5; i++) {
             Activity a = TranscriptStoreTests.createActivity(i, i, CONVERSATION_IDS);
@@ -147,6 +152,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void activityAddSpecialCharsTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         Activity[] loggedActivities = new Activity[CONVERSATION_SPECIAL_IDS.length];
         List<Activity> activities = new ArrayList<Activity>();
@@ -165,6 +171,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void transcriptRemoveSpecialCharsTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         for (int i = 0; i < CONVERSATION_SPECIAL_IDS.length; i++) {
             Activity a = TranscriptStoreTests.createActivity(i, i, CONVERSATION_SPECIAL_IDS);
@@ -178,6 +185,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void activityAddPagedResultTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         String cleanChannel = UUID.randomUUID().toString();
 
@@ -205,6 +213,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void transcriptRemovePagedTest() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         int i;
         for (i = 0; i < CONVERSATION_SPECIAL_IDS.length; i++) {
@@ -219,6 +228,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void nullParameterTests() {
+        PrintMethodName();
         TranscriptStore store = getTranscriptStore();
 
         Assert.assertThrows(IllegalArgumentException.class, () -> store.logActivity(null));
@@ -229,6 +239,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void logActivities() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
                 "User1", "Bot");
@@ -273,6 +284,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void logUpdateActivities() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
                 "User1", "Bot");
@@ -318,6 +330,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void logMissingUpdateActivity() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
                 "User1", "Bot");
@@ -359,6 +372,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void testDateLogUpdateActivities() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         OffsetDateTime dateTimeStartOffset1 = OffsetDateTime.now();
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
@@ -423,6 +437,7 @@ public class TranscriptStoreTests {
 
     @Test
     public void logDeleteActivities() {
+        PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
 
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
@@ -516,6 +531,11 @@ public class TranscriptStoreTests {
         }
 
         return CompletableFuture.completedFuture(pagedResult);
+    }
+
+    private void PrintMethodName()
+    {
+        System.out.println("Running " + (new Throwable().getStackTrace()[1].getMethodName()) + "()");
     }
 
     /**
