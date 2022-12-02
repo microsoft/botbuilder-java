@@ -435,6 +435,12 @@ public class TranscriptStoreTests {
         pagedResult = transcriptStore.getTranscriptActivities(conversation.getChannelId(),
                 conversation.getConversation().getId(), null, OffsetDateTime.MAX).join();
         Assert.assertEquals(0, pagedResult.getItems().size());
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(5000);
+        } catch (InterruptedException e) {
+            // Empty error
+        }
     }
 
     @Test
