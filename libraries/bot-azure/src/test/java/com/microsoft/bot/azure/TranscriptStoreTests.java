@@ -399,7 +399,7 @@ public class TranscriptStoreTests {
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).send("foo").send("update").assertReply("new response").startTest().join();
+        }).send("foo").delay(500).send("update").assertReply("new response").startTest().join();
 
         try {
             TimeUnit.MILLISECONDS.sleep(5000);
