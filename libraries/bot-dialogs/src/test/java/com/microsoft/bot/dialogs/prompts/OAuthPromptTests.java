@@ -655,6 +655,7 @@ public class OAuthPromptTests {
 
         new TestFlow(adapter, botCallbackHandler)
         .send("hello")
+        .delay(200)
         .assertReply(activity -> {
             Assert.assertTrue(((Activity) activity).getAttachments().size() == 1);
             Assert.assertEquals(OAuthCard.CONTENTTYPE, ((Activity) activity).getAttachments().get(0).getContentType());
