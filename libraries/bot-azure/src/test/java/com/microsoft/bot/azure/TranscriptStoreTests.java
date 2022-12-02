@@ -389,6 +389,8 @@ public class TranscriptStoreTests {
                 ResourceResponse response = turnContext.sendActivity(activity).join();
                 activity.setId(response.getId());
 
+                delay(200);
+
                 ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
                 try {
                     // clone the activity, so we can use it to do an update
@@ -399,7 +401,7 @@ public class TranscriptStoreTests {
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).send("foo").delay(500).send("update").assertReply("new response").startTest().join();
+        }).send("foo").delay(500).send("update").delay(500).assertReply("new response").startTest().join();
 
         try {
             TimeUnit.MILLISECONDS.sleep(5000);
