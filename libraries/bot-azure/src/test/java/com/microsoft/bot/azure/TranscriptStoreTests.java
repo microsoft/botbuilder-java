@@ -375,7 +375,6 @@ public class TranscriptStoreTests {
         PrintMethodName();
         TranscriptStore transcriptStore = getTranscriptStore();
         OffsetDateTime dateTimeStartOffset1 = OffsetDateTime.now();
-        delay(200);
         ConversationReference conversation = TestAdapter.createConversationReference(UUID.randomUUID().toString(),
                 "User1", "Bot");
         TestAdapter adapter = new TestAdapter(conversation).use(new TranscriptLoggerMiddleware(transcriptStore));
@@ -390,6 +389,8 @@ public class TranscriptStoreTests {
                 ResourceResponse response = turnContext.sendActivity(activity).join();
                 activity.setId(response.getId());
 
+                delay(200);
+
                 ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
                 try {
                     // clone the activity, so we can use it to do an update
@@ -400,7 +401,7 @@ public class TranscriptStoreTests {
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).delay(200).send("foo").send("update").assertReply("new response").startTest().join();
+        }).delay(200).send("foo").delay(200).send("update").delay(200).assertReply("new response").delay(200).startTest().join();
 
         try {
             TimeUnit.MILLISECONDS.sleep(5000);
@@ -434,12 +435,6 @@ public class TranscriptStoreTests {
         pagedResult = transcriptStore.getTranscriptActivities(conversation.getChannelId(),
                 conversation.getConversation().getId(), null, OffsetDateTime.MAX).join();
         Assert.assertEquals(0, pagedResult.getItems().size());
-
-        try {
-            TimeUnit.MILLISECONDS.sleep(5000);
-        } catch (InterruptedException e) {
-            // Empty error
-        }
     }
 
     @Test
