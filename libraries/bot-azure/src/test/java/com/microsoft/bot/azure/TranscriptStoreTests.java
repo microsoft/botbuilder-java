@@ -401,7 +401,7 @@ public class TranscriptStoreTests {
                 }
             }
             return CompletableFuture.completedFuture(null);
-        }).delay(200).send("foo").delay(200).send("update").delay(200).assertReply("new response").delay(200).startTest().join();
+        }).send("foo").delay(500).send("update").delay(500).assertReply("new response").startTest().join();
 
         try {
             TimeUnit.MILLISECONDS.sleep(5000);
