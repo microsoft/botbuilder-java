@@ -5,6 +5,7 @@ package com.microsoft.bot.builder.teams;
 
 import com.microsoft.bot.builder.BotFrameworkAdapter;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
 import com.microsoft.bot.connector.authentication.MicrosoftAppCredentials;
 import com.microsoft.bot.connector.rest.RestTeamsConnectorClient;
@@ -420,6 +421,48 @@ public final class TeamsInfo {
             teamsChannelId,
             serviceUrl,
             credentials,
+            conversationParameters,
+            (TurnContext context) -> {
+                conversationReference.set(context.getActivity().getConversationReference());
+                newActivityId.set(context.getActivity().getId());
+                return CompletableFuture.completedFuture(null);
+            }
+        ).thenApply(aVoid -> new Pair<>(conversationReference.get(), newActivityId.get()));
+    }
+
+    public static CompletableFuture<Pair<ConversationReference, String>> sendMessageToTeamsChannel(
+        TurnContext turnContext,
+        Activity activity,
+        String teamsChannelId,
+        String botAppId
+    ) {
+        if (turnContext == null) {
+            return illegalArgument("turnContext is required");
+        }
+        if (turnContext.getActivity() == null) {
+            return illegalArgument("turnContext.Activity is required");
+        }
+        if (StringUtils.isEmpty(teamsChannelId)) {
+            return illegalArgument("teamsChannelId is required");
+        }
+
+        AtomicReference<ConversationReference> conversationReference = new AtomicReference<>();
+        AtomicReference<String> newActivityId = new AtomicReference<>();
+        String serviceUrl = turnContext.getActivity().getServiceUrl();
+
+        TeamsChannelData teamsChannelData = new TeamsChannelData();
+        teamsChannelData.setChannel(new ChannelInfo(teamsChannelId));
+
+        ConversationParameters conversationParameters = new ConversationParameters();
+        conversationParameters.setIsGroup(true);
+        conversationParameters.setChannelData(teamsChannelData);
+        conversationParameters.setActivity(activity);
+
+        return turnContext.getAdapter().createConversation(
+            botAppId,
+            Channels.MSTEAMS,
+            serviceUrl,
+            null,
             conversationParameters,
             (TurnContext context) -> {
                 conversationReference.set(context.getActivity().getConversationReference());

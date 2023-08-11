@@ -5,6 +5,8 @@ package com.microsoft.bot.builder.teams;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.microsoft.bot.builder.ActivityHandler;
+import com.microsoft.bot.builder.BotAdapter;
+import com.microsoft.bot.builder.BotCallbackHandler;
 import com.microsoft.bot.builder.BotFrameworkAdapter;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.SimpleAdapter;
@@ -27,6 +29,7 @@ import com.microsoft.bot.schema.ConversationParameters;
 import com.microsoft.bot.schema.ConversationReference;
 import com.microsoft.bot.schema.ConversationResourceResponse;
 import com.microsoft.bot.schema.Pair;
+import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.teams.ChannelInfo;
 import com.microsoft.bot.schema.teams.ConversationList;
 import com.microsoft.bot.schema.teams.MeetingDetails;
@@ -36,6 +39,7 @@ import com.microsoft.bot.schema.teams.TeamInfo;
 import com.microsoft.bot.schema.teams.TeamsChannelAccount;
 import com.microsoft.bot.schema.teams.TeamsChannelData;
 import com.microsoft.bot.schema.teams.TeamsMeetingInfo;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,6 +83,52 @@ public class TeamsInfoTests {
 
         ActivityHandler handler = new TestTeamsActivityHandler();
         handler.onTurn(turnContext).join();
+    }
+
+    @Test
+    public void TestSendMessageToTeamsChannelWithCloudAdapterSupport() {
+        String expectedTeamsChannelId = "teams-channel-id";
+        String expectedAppId = "app-id";
+        String expectedServiceUrl = "service-url";
+        String expectedActivityId = "activity-id";
+        String expectedConversationId = "conversation-id";
+
+        Activity requestActivity = new Activity(ActivityTypes.MESSAGE);
+        requestActivity.setServiceUrl(expectedServiceUrl);
+
+        TestCreateConversationAdapter adapter = new TestCreateConversationAdapter(expectedActivityId, expectedConversationId);
+
+        TurnContext turnContextMock = Mockito.mock(TurnContext.class);
+        Mockito.when(turnContextMock.getActivity()).thenReturn(requestActivity);
+        Mockito.when(turnContextMock.getAdapter()).thenReturn(adapter);
+
+        Activity activity = new Activity(ActivityTypes.MESSAGE);
+        activity.setText("Test-SendMessageToTeamsChannelAsync");
+        activity.setChannelId(Channels.MSTEAMS);
+
+        TeamsChannelData data = new TeamsChannelData();
+
+        TeamInfo teamInfo = new TeamInfo();
+        teamInfo.setId("team-id");
+
+        data.setTeam(teamInfo);
+
+        activity.setChannelData(data);
+
+        Pair<ConversationReference, String> r = TeamsInfo.sendMessageToTeamsChannel(turnContextMock, activity, expectedTeamsChannelId, expectedAppId).join();
+
+        Assert.assertEquals(expectedConversationId, r.getLeft().getConversation().getId());
+        Assert.assertEquals(expectedActivityId, r.getRight());
+        Assert.assertEquals(expectedAppId, adapter.getAppId());
+        Assert.assertEquals(Channels.MSTEAMS, adapter.getChannelId());
+        Assert.assertEquals(expectedServiceUrl, adapter.getServiceUrl());
+        Assert.assertNull(adapter.getAudience());
+
+        Object channelData = adapter.getConversationParameters().getChannelData();
+        String id = ((TeamsChannelData) channelData).getChannel().getId();
+
+        Assert.assertEquals(expectedTeamsChannelId, id);
+        Assert.assertEquals(adapter.getConversationParameters().getActivity(), activity);
     }
 
     @Test
@@ -477,5 +527,110 @@ public class TeamsInfoTests {
         Mockito.when(mockConnectorClient.credentials()).thenReturn(credentials);
 
         return mockConnectorClient;
+    }
+
+    private static class TestCreateConversationAdapter extends BotAdapter
+    {
+        private final String activityId;
+        private final String conversationId;
+
+        private String appId;
+        private String channelId;
+        private String serviceUrl;
+        private String audience;
+        private ConversationParameters conversationParameters;
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+
+        public String getChannelId() {
+            return channelId;
+        }
+
+        public void setChannelId(String channelId) {
+            this.channelId = channelId;
+        }
+
+        public String getServiceUrl() {
+            return serviceUrl;
+        }
+
+        public void setServiceUrl(String serviceUrl) {
+            this.serviceUrl = serviceUrl;
+        }
+
+        public String getAudience() {
+            return audience;
+        }
+
+        public void setAudience(String audience) {
+            this.audience = audience;
+        }
+
+        public ConversationParameters getConversationParameters() {
+            return conversationParameters;
+        }
+
+        public void setConversationParameters(ConversationParameters conversationParameters) {
+            this.conversationParameters = conversationParameters;
+        }
+
+        public TestCreateConversationAdapter(String withActivityId, String withConversationId)
+        {
+            activityId = withActivityId;
+            conversationId = withConversationId;
+        }
+
+        @Override
+        public CompletableFuture<Void> createConversation(
+            String withBotAppId,
+            String withChannelId,
+            String withServiceUrl,
+            String withAudience,
+            ConversationParameters withConversationParameters,
+            BotCallbackHandler callback
+        ) {
+            appId = withBotAppId;
+            channelId = withChannelId;
+            serviceUrl = withServiceUrl;
+            audience = withAudience;
+            conversationParameters = withConversationParameters;
+
+            Activity activity = new Activity(ActivityTypes.MESSAGE);
+            activity.setId(activityId);
+
+            ConversationAccount conversation = new ConversationAccount();
+            conversation.setId(conversationId);
+            activity.setConversation(conversation);
+
+            TurnContext mockTurnContext = Mockito.mock(TurnContext.class);
+            Mockito.when(mockTurnContext.getActivity()).thenReturn(activity);
+
+            callback.invoke(mockTurnContext);
+            return CompletableFuture.completedFuture(null);
+        }
+
+        @Override
+        public CompletableFuture<Void> deleteActivity(TurnContext turnContext, ConversationReference reference)
+        {
+            throw new NotImplementedException("deleteActivity");
+        }
+
+        @Override
+        public CompletableFuture<ResourceResponse[]> sendActivities(TurnContext turnContext, List<Activity> activities)
+        {
+            throw new NotImplementedException("sendActivities");
+        }
+
+        @Override
+        public CompletableFuture<ResourceResponse> updateActivity(TurnContext turnContext, Activity activity)
+        {
+            throw new NotImplementedException("updateActivity");
+        }
     }
 }

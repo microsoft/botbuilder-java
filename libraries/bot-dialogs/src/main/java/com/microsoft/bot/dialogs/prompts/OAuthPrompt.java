@@ -17,11 +17,9 @@ import java.util.regex.Pattern;
 
 import com.microsoft.bot.builder.BotAdapter;
 import com.microsoft.bot.builder.BotAssert;
-import com.microsoft.bot.builder.ConnectorClientBuilder;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.TurnStateConstants;
-import com.microsoft.bot.builder.UserTokenProvider;
 import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.connector.Channels;
 import com.microsoft.bot.connector.ConnectorClient;
@@ -140,15 +138,6 @@ public class OAuthPrompt extends Dialog {
             Activity prompt) {
         BotAssert.contextNotNull(turnContext);
 
-        BotAdapter adapter = turnContext.getAdapter();
-
-        if (!(adapter instanceof UserTokenProvider)) {
-            return Async.completeExceptionally(
-                    new UnsupportedOperationException("OAuthPrompt.Prompt(): not supported by the current adapter"));
-        }
-
-        UserTokenProvider tokenAdapter = (UserTokenProvider) adapter;
-
         // Ensure prompt initialized
         if (prompt == null) {
             prompt = Activity.createMessageActivity();
@@ -161,9 +150,8 @@ public class OAuthPrompt extends Dialog {
         // Append appropriate card if missing
         if (!channelSupportsOAuthCard(turnContext.getActivity().getChannelId())) {
             if (!prompt.getAttachments().stream().anyMatch(s -> s.getContent() instanceof SigninCard)) {
-                SignInResource signInResource = tokenAdapter
-                        .getSignInResource(turnContext, settings.getOAuthAppCredentials(), settings.getConnectionName(),
-                                turnContext.getActivity().getFrom().getId(), null)
+                SignInResource signInResource = UserTokenAccess
+                        .getSignInResource(turnContext, settings)
                         .join();
 
                 CardAction cardAction = new CardAction();
@@ -187,9 +175,8 @@ public class OAuthPrompt extends Dialog {
             }
         } else if (!prompt.getAttachments().stream().anyMatch(s -> s.getContent() instanceof OAuthCard)) {
             ActionTypes cardActionType = ActionTypes.SIGNIN;
-            SignInResource signInResource = tokenAdapter
-                    .getSignInResource(turnContext, settings.getOAuthAppCredentials(), settings.getConnectionName(),
-                            turnContext.getActivity().getFrom().getId(), null)
+            SignInResource signInResource = UserTokenAccess
+                    .getSignInResource(turnContext, settings)
                     .join();
             String value = signInResource.getSignInLink();
 
@@ -277,21 +264,14 @@ public class OAuthPrompt extends Dialog {
                 // set the ServiceUrl to the skill host's Url
                 dc.getContext().getActivity().setServiceUrl(callerInfo.getCallerServiceUrl());
 
-                Object adapter = turnContext.getAdapter();
-                // recreate a ConnectorClient and set it in TurnState so replies use the correct one
-                if (!(adapter instanceof ConnectorClientBuilder)) {
-                    return Async.completeExceptionally(
-                        new UnsupportedOperationException(
-                            "OAuthPrompt: ConnectorClientProvider interface not implemented by the current adapter"
-                    ));
-                }
-
-                ConnectorClientBuilder connectorClientProvider = (ConnectorClientBuilder) adapter;
+                String serviceUrl = dc.getContext().getActivity().getServiceUrl();
+                String audience = callerInfo.getScope();
                 ClaimsIdentity claimsIdentity = turnContext.getTurnState().get(BotAdapter.BOT_IDENTITY_KEY);
-                ConnectorClient connectorClient =  connectorClientProvider.createConnectorClient(
-                                                                dc.getContext().getActivity().getServiceUrl(),
+                ConnectorClient connectorClient =  UserTokenAccess.createConnectorClient(
+                                                                turnContext,
+                                                                serviceUrl,
                                                                 claimsIdentity,
-                                                                callerInfo.getScope()).join();
+                                                                audience).join();
 
                 if (turnContext.getTurnState().get(ConnectorClient.class) != null) {
                     turnContext.getTurnState().replace(connectorClient);
@@ -306,16 +286,6 @@ public class OAuthPrompt extends Dialog {
                 magicCode = (String) values.get("state");
             }
 
-            Object adapterObject = turnContext.getAdapter();
-            if (!(adapterObject instanceof UserTokenProvider)) {
-                return Async.completeExceptionally(
-                    new UnsupportedOperationException(
-                        "OAuthPrompt.Recognize(): not supported by the current adapter"
-                ));
-            }
-
-            UserTokenProvider adapter = (UserTokenProvider) adapterObject;
-
             // Getting the token follows a different flow in Teams. At the signin completion, Teams
             // will send the bot an "invoke" activity that contains a "magic" code. This code MUST
             // then be used to try fetching the token from Botframework service within some time
@@ -324,10 +294,9 @@ public class OAuthPrompt extends Dialog {
             // If it fails with a non-retriable error, we return 404. Teams will not (still work in
             // progress) retry in that case.
             try {
-                TokenResponse token =  adapter.getUserToken(
+                TokenResponse token =  UserTokenAccess.getUserToken(
                                                     turnContext,
-                                                    settings.getOAuthAppCredentials(),
-                                                    settings.getConnectionName(),
+                                                    settings,
                                                     magicCode).join();
 
                 if (token != null) {
@@ -363,28 +332,14 @@ public class OAuthPrompt extends Dialog {
                                 + "when sending the InvokeActivityInvalid ConnectionName in the "
                                 + "TokenExchangeInvokeRequest");
                 sendInvokeResponse(turnContext, HttpURLConnection.HTTP_BAD_REQUEST, response).join();
-            } else if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
-                TokenExchangeInvokeResponse response = new TokenExchangeInvokeResponse();
-                response.setId(tokenExchangeRequest.getId());
-                response.setConnectionName(settings.getConnectionName());
-                response.setFailureDetail("The bot's BotAdapter does not support token exchange "
-                                + "operations. Ensure the bot's Adapter supports the UserTokenProvider interface.");
-
-                sendInvokeResponse(turnContext, HttpURLConnection.HTTP_BAD_REQUEST, response).join();
-                    return Async.completeExceptionally(
-                        new UnsupportedOperationException(
-                            "OAuthPrompt.Recognize(): not supported by the current adapter"
-                    ));
             } else {
                 TokenResponse tokenExchangeResponse = null;
                 try {
-                    UserTokenProvider adapter = (UserTokenProvider) turnContext.getAdapter();
                     TokenExchangeRequest tokenExchangeReq = new TokenExchangeRequest();
                     tokenExchangeReq.setToken(tokenExchangeRequest.getToken());
-                    tokenExchangeResponse =  adapter.exchangeToken(
+                    tokenExchangeResponse = UserTokenAccess.exchangeToken(
                         turnContext,
-                        settings.getConnectionName(),
-                        turnContext.getActivity().getFrom().getId(),
+                        settings,
                         tokenExchangeReq).join();
                 } catch (Exception ex) {
                     // Ignore Exceptions
@@ -421,16 +376,8 @@ public class OAuthPrompt extends Dialog {
             Matcher m = r.matcher(turnContext.getActivity().getText());
 
             if (m.find()) {
-                if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
-                    return Async.completeExceptionally(
-                        new UnsupportedOperationException(
-                            "OAuthPrompt.Recognize(): not supported by the current adapter"
-                    ));
-                }
-                UserTokenProvider adapter = (UserTokenProvider) turnContext.getAdapter();
-                TokenResponse token =  adapter.getUserToken(turnContext,
-                                                            settings.getOAuthAppCredentials(),
-                                                            settings.getConnectionName(),
+                TokenResponse token =  UserTokenAccess.getUserToken(turnContext,
+                                                            settings,
                                                             m.group(0)).join();
                 if (token != null) {
                     result.setSucceeded(true);
@@ -507,17 +454,8 @@ public class OAuthPrompt extends Dialog {
         setCallerInfoInDialogState(state, dc.getContext());
 
         // Attempt to get the users token
-        if (!(dc.getContext().getAdapter() instanceof UserTokenProvider)) {
-            return Async.completeExceptionally(
-                new UnsupportedOperationException(
-                    "OAuthPrompt.Recognize(): not supported by the current adapter"
-            ));
-        }
-
-        UserTokenProvider adapter = (UserTokenProvider) dc.getContext().getAdapter();
-        TokenResponse output =  adapter.getUserToken(dc.getContext(),
-                                                     settings.getOAuthAppCredentials(),
-                                                     settings.getConnectionName(),
+        TokenResponse output =  UserTokenAccess.getUserToken(dc.getContext(),
+                                                     settings,
                                                      null).join();
         if (output != null) {
             // Return token
@@ -622,15 +560,7 @@ public class OAuthPrompt extends Dialog {
      *         successfully signs in, the result contains the user's token.
      */
     public CompletableFuture<TokenResponse> getUserToken(TurnContext turnContext) {
-        if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
-            return Async.completeExceptionally(
-                new UnsupportedOperationException(
-                    "OAuthPrompt.GetUserToken(): not supported by the current adapter"
-            ));
-        }
-        return ((UserTokenProvider) turnContext.getAdapter()).getUserToken(turnContext,
-                                                                           settings.getOAuthAppCredentials(),
-                                                                           settings.getConnectionName(), null);
+        return UserTokenAccess.getUserToken(turnContext, settings, null);
     }
 
     /**
@@ -641,24 +571,7 @@ public class OAuthPrompt extends Dialog {
      * @return   A task that represents the work queued to execute.
      */
     public CompletableFuture<Void> signOutUser(TurnContext turnContext) {
-        if (!(turnContext.getAdapter() instanceof UserTokenProvider)) {
-            return Async.completeExceptionally(
-                new UnsupportedOperationException(
-                    "OAuthPrompt.SignOutUser(): not supported by the current adapter"
-            ));
-        }
-        String id = "";
-        if (turnContext.getActivity() != null
-            && turnContext.getActivity() != null
-            && turnContext.getActivity().getFrom() != null) {
-                id = turnContext.getActivity().getFrom().getId();
-            }
-
-        // Sign out user
-        return ((UserTokenProvider) turnContext.getAdapter()).signOutUser(turnContext,
-                                                                          settings.getOAuthAppCredentials(),
-                                                                          settings.getConnectionName(),
-                                                                          id);
+        return UserTokenAccess.signOutUser(turnContext, settings);
     }
 
     private static CallerInfo createCallerInfo(TurnContext turnContext) {
