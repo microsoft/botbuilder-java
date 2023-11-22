@@ -468,6 +468,7 @@
     <module>libraries/bot-applicationinsights</module>
     <module>libraries/bot-azure</module>
     <module>libraries/bot-integration-spring</module>
+    <module>libraries/bot-integration-spring6</module>
   </modules>
 
   <build>
